@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "di_finance_extraction_fin_8k",
+    "version": "2.0.0",
+    "description": "Extraction hints for fin_8k.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_8k"
+  },
+  "hints": [
+    {
+      "id": "hint_1_period",
+      "entity": "kpi_guidance_change",
+      "anchors": [
+        "period",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_2_currency",
+      "entity": "kpi_material_event",
+      "anchors": [
+        "currency",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_3_unit",
+      "entity": "kpi_debt",
+      "anchors": [
+        "unit",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_4_total",
+      "entity": "kpi_liquidity",
+      "anchors": [
+        "total",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_5_variance",
+      "entity": "variance",
+      "anchors": [
+        "variance",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_6_guidance",
+      "entity": "guidance",
+      "anchors": [
+        "guidance",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_7_assumption",
+      "entity": "assumption",
+      "anchors": [
+        "assumption",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_8_notes",
+      "entity": "notes",
+      "anchors": [
+        "notes",
+        "8-k current report",
+        "relatorio 8-k de evento relevante"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    }
+  ]
+}

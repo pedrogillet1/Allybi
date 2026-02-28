@@ -5,16 +5,21 @@ import { describe, test, expect, jest, beforeEach } from "@jest/globals";
 // Jest hoists it before module evaluation.
 // ---------------------------------------------------------------------------
 jest.mock("../core/banks/bankLoader.service");
+jest.mock("../core/banks/documentIntelligenceBanks.service", () => ({
+  getDocumentIntelligenceBanksInstance: jest.fn(),
+}));
 
-import { getOptionalBank } from "../core/banks/bankLoader.service";
+import { getDocumentIntelligenceBanksInstance } from "../core/banks/documentIntelligenceBanks.service";
 import { TurnRoutePolicyService } from "./turnRoutePolicy.service";
 
 // ---------------------------------------------------------------------------
 // Typed mock helper
 // ---------------------------------------------------------------------------
-const mockGetOptionalBank = getOptionalBank as jest.MockedFunction<
-  typeof getOptionalBank
->;
+const mockGetDocumentIntelligenceBanksInstance =
+  getDocumentIntelligenceBanksInstance as jest.MockedFunction<
+    typeof getDocumentIntelligenceBanksInstance
+  >;
+const mockGetRoutingBank = jest.fn<(bankId: string) => any>();
 
 // ---------------------------------------------------------------------------
 // Realistic bank fixtures
@@ -71,7 +76,7 @@ const mockEmailBank = {
 // Helper: configure the mock to return the two canonical banks
 // ---------------------------------------------------------------------------
 function setupBothBanks() {
-  mockGetOptionalBank.mockImplementation((bankId: string) => {
+  mockGetRoutingBank.mockImplementation((bankId: string) => {
     if (bankId === "connectors_routing") return mockConnectorsBank as any;
     if (bankId === "email_routing") return mockEmailBank as any;
     return null;
@@ -84,6 +89,9 @@ function setupBothBanks() {
 describe("TurnRoutePolicyService", () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    mockGetDocumentIntelligenceBanksInstance.mockReturnValue({
+      getRoutingBank: mockGetRoutingBank,
+    } as any);
     // Default: both banks available
     setupBothBanks();
   });
@@ -121,7 +129,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockEmailBank,
         config: { ...mockEmailBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return disabledConnectors as any;
         if (bankId === "email_routing") return emailOnlyBank as any;
         return null;
@@ -143,7 +151,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return disabledConnectors as any;
         if (bankId === "email_routing") return disabledEmail as any;
         return null;
@@ -179,7 +187,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockEmailBank,
         config: { ...mockEmailBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return mockConnectorsBank as any;
         if (bankId === "email_routing") return disabledEmail as any;
         return null;
@@ -202,7 +210,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return disabledConnectors as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -217,7 +225,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return disabledConnectors as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -239,7 +247,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return disabledConnectors as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -254,7 +262,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return disabledConnectors as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -270,7 +278,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return disabledConnectors as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -286,7 +294,7 @@ describe("TurnRoutePolicyService", () => {
         ...mockEmailBank,
         config: { ...mockEmailBank.config, enabled: false },
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return mockConnectorsBank as any;
         if (bankId === "email_routing") return disabledEmail as any;
         return null;
@@ -319,7 +327,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing")
           return bankWithUpperCaseLocale as any;
         if (bankId === "email_routing") return null;
@@ -336,7 +344,7 @@ describe("TurnRoutePolicyService", () => {
   // -------------------------------------------------------------------------
   describe("strict mode", () => {
     test("throws when both banks are missing in strict mode", () => {
-      mockGetOptionalBank.mockReturnValue(null);
+      mockGetRoutingBank.mockReturnValue(null);
 
       expect(() => new TurnRoutePolicyService({ strict: true })).toThrow(
         /Missing required routing banks in strict mode/,
@@ -344,7 +352,7 @@ describe("TurnRoutePolicyService", () => {
     });
 
     test("throws mentioning connectors_routing when that bank is missing", () => {
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return null;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -356,7 +364,7 @@ describe("TurnRoutePolicyService", () => {
     });
 
     test("throws mentioning email_routing when that bank is missing", () => {
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return mockConnectorsBank as any;
         if (bankId === "email_routing") return null;
         return null;
@@ -368,7 +376,7 @@ describe("TurnRoutePolicyService", () => {
     });
 
     test("does NOT throw when banks are missing in non-strict mode", () => {
-      mockGetOptionalBank.mockReturnValue(null);
+      mockGetRoutingBank.mockReturnValue(null);
 
       expect(() => new TurnRoutePolicyService({ strict: false })).not.toThrow();
     });
@@ -398,7 +406,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return bankWithBadRegex as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -427,7 +435,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return mockConnectorsBank as any;
         if (bankId === "email_routing") return bankWithBadRegex as any;
         return null;
@@ -462,7 +470,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return bankWithBadRegex as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -496,7 +504,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return bankWithMixedRegex as any;
         if (bankId === "email_routing") return mockEmailBank as any;
         return null;
@@ -557,7 +565,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return bankNoStrip as any;
         if (bankId === "email_routing") return null;
         return null;
@@ -601,7 +609,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing")
           return bankWithNonRegexClause as any;
         if (bankId === "email_routing") return null;
@@ -623,7 +631,7 @@ describe("TurnRoutePolicyService", () => {
         config: { enabled: true, matching: {} },
         // rules intentionally omitted
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return bankNoRules as any;
         if (bankId === "email_routing") return bankNoRules as any;
         return null;
@@ -644,7 +652,7 @@ describe("TurnRoutePolicyService", () => {
           },
         ],
       };
-      mockGetOptionalBank.mockImplementation((bankId: string) => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
         if (bankId === "connectors_routing") return bankEmptyPatterns as any;
         if (bankId === "email_routing") return bankEmptyPatterns as any;
         return null;
@@ -657,7 +665,7 @@ describe("TurnRoutePolicyService", () => {
     test("getOptionalBank is called with the correct bank IDs at construction", () => {
       new TurnRoutePolicyService();
 
-      const calledIds = mockGetOptionalBank.mock.calls.map(
+      const calledIds = mockGetRoutingBank.mock.calls.map(
         (call) => call[0] as string,
       );
       expect(calledIds).toContain("connectors_routing");

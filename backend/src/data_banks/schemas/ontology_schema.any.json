@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "id": "ontology_schema",
+    "version": "1.0.0",
+    "description": "Schema for document intelligence ontology banks (domain, entity, doc_type, section, metric, unit). Requires at least one primary content array or object.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/ontology_schema.any.json",
+    "title": "Ontology Bank Schema",
+    "type": "object",
+    "required": ["_meta", "config"],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": ["id", "version", "description", "languages", "lastUpdated"],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": ["enabled"],
+        "additionalProperties": true
+      },
+      "domains": { "type": "array" },
+      "entities": { "type": "array" },
+      "docTypes": { "type": "array" },
+      "sections": { "type": "array" },
+      "metrics": { "type": "array" },
+      "units": { "type": "array" },
+      "categories": { "type": "array" },
+      "relationships": { "type": "array" }
+    },
+    "anyOf": [
+      { "required": ["domains"] },
+      { "required": ["entities"] },
+      { "required": ["docTypes"] },
+      { "required": ["sections"] },
+      { "required": ["metrics"] },
+      { "required": ["units"] },
+      { "required": ["categories"] },
+      { "required": ["relationships"] }
+    ]
+  }
+}

@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { describe, expect, test } from "@jest/globals";
 import {
   CentralizedChatRuntimeDelegate,
+  resolveSourceInvariantFailureCode,
   shouldApplyPreEnforcerTrim,
 } from "./CentralizedChatRuntimeDelegate";
 
@@ -63,5 +64,77 @@ describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
     expect(repaired).toBe(
       "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.",
     );
+  });
+});
+
+describe("CentralizedChatRuntimeDelegate answer mode routing", () => {
+  test("forces nav_pills for open operator", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    delegate.collectSemanticSignals = () => ({
+      userAskedForTable: false,
+      tableExpected: false,
+      userAskedForQuote: false,
+    });
+
+    const mode = delegate.resolveAnswerMode(
+      {
+        userId: "user-1",
+        message: "open the budget sheet",
+        meta: { operator: "open" },
+      },
+      { evidence: [] },
+    );
+
+    expect(mode).toBe("nav_pills");
+  });
+
+  test("forces nav_pills for navigate operator", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    delegate.collectSemanticSignals = () => ({
+      userAskedForTable: false,
+      tableExpected: false,
+      userAskedForQuote: false,
+    });
+
+    const mode = delegate.resolveAnswerMode(
+      {
+        userId: "user-1",
+        message: "navigate to indemnity clause",
+        meta: { operator: "navigate" },
+      },
+      { evidence: [{ docId: "doc-1" }] },
+    );
+
+    expect(mode).toBe("nav_pills");
+  });
+});
+
+describe("CentralizedChatRuntimeDelegate source invariants", () => {
+  test("returns missing_provenance when doc-grounded answer has zero filtered sources", () => {
+    const failure = resolveSourceInvariantFailureCode({
+      answerMode: "doc_grounded_single",
+      filteredSources: [],
+    });
+    expect(failure).toBe("missing_provenance");
+  });
+
+  test("returns null for non-doc-grounded answer even with zero sources", () => {
+    const failure = resolveSourceInvariantFailureCode({
+      answerMode: "general_answer",
+      filteredSources: [],
+    });
+    expect(failure).toBeNull();
+  });
+
+  test("returns null when doc-grounded answer still has scoped sources", () => {
+    const failure = resolveSourceInvariantFailureCode({
+      answerMode: "doc_grounded_table",
+      filteredSources: [{ documentId: "doc-1" }],
+    });
+    expect(failure).toBeNull();
   });
 });

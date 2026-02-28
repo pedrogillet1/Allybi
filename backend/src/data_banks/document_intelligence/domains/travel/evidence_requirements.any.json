@@ -1,0 +1,151 @@
+{
+  "_meta": {
+    "id": "di_travel_evidence_requirements",
+    "version": "1.0.0",
+    "description": "Evidence requirements and citation policy for travel documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "travel",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "issuer_document_header",
+      "label": {
+        "en": "Issuer document header",
+        "pt": "Cabecalho do emissor"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "summary_table",
+      "label": {
+        "en": "Summary table",
+        "pt": "Tabela de resumo"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "line_item_table",
+      "label": {
+        "en": "Line-item table",
+        "pt": "Tabela de itens"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 4,
+      "type": "status_or_confirmation",
+      "label": {
+        "en": "Status/confirmation section",
+        "pt": "Secao de status/confirmacao"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "totals_block",
+      "label": {
+        "en": "Totals block",
+        "pt": "Bloco de totais"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 6,
+      "type": "reference_payload",
+      "label": {
+        "en": "Reference payload",
+        "pt": "Carga de referencia"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 7,
+      "type": "footnote_or_notice",
+      "label": {
+        "en": "Notice/footnote text",
+        "pt": "Texto de aviso/rodape"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "travel_ev_001_key_answer_requires_source",
+      "description": "Key field answers (who/what/when/how much) must cite the source section/table in the same document.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "summary_table",
+        "issuer_document_header"
+      ]
+    },
+    {
+      "id": "travel_ev_002_numeric_claim_requires_line_or_total",
+      "description": "Numeric claims should cite line item detail or totals block.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "line_item_table",
+        "totals_block"
+      ]
+    },
+    {
+      "id": "travel_ev_003_status_claim_requires_confirmation",
+      "description": "Status claims should cite explicit status/confirmation fields.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "status_or_confirmation",
+        "reference_payload"
+      ]
+    },
+    {
+      "id": "travel_ev_004_terms_claim_requires_notice",
+      "description": "Advisory or terms claims must cite a terms/notice section.",
+      "applies": [
+        "advise",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "footnote_or_notice"
+      ]
+    },
+    {
+      "id": "travel_ev_005_scope_lock",
+      "description": "Evidence must remain inside the attached document scope; no external assumptions.",
+      "applies": [
+        "extract",
+        "validate",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "issuer_document_header"
+      ]
+    }
+  ]
+}

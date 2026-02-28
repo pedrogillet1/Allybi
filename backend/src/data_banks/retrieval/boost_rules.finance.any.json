@@ -1,0 +1,1979 @@
+{
+  "_meta": {
+    "id": "boost_rules_finance",
+    "version": "1.0.0",
+    "description": "Domain boost rules for finance retrieval ranking by intent, operator, doc type, and section anchors.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "maxMatchedRules": 6,
+    "maxDocumentIntelligenceBoost": 0.45,
+    "coefficientRange": "0..3"
+  },
+  "domain": "finance",
+  "rules": [
+    {
+      "id": "finance_advise_general_unlock",
+      "priority": 90,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "management_discussion",
+          "weight": 2.5
+        },
+        {
+          "section": "strategy",
+          "weight": 2.3
+        },
+        {
+          "section": "risk_mitigation",
+          "weight": 2.1
+        },
+        {
+          "section": "capital_plan",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_advise_doc_lock",
+      "priority": 89,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "management_discussion",
+          "weight": 1.9
+        },
+        {
+          "section": "strategy",
+          "weight": 1.75
+        },
+        {
+          "section": "risk_mitigation",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_advise_explicit_doc_type",
+      "priority": 88,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "strategy",
+          "weight": 2.2
+        },
+        {
+          "section": "risk_mitigation",
+          "weight": 2.02
+        },
+        {
+          "section": "capital_plan",
+          "weight": 1.84
+        },
+        {
+          "section": "action_items",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_calculate_general_unlock",
+      "priority": 87,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "kpi_table",
+          "weight": 2.5
+        },
+        {
+          "section": "income_statement_table",
+          "weight": 2.3
+        },
+        {
+          "section": "cash_flow_table",
+          "weight": 2.1
+        },
+        {
+          "section": "operating_metrics",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_calculate_doc_lock",
+      "priority": 86,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "kpi_table",
+          "weight": 1.9
+        },
+        {
+          "section": "income_statement_table",
+          "weight": 1.75
+        },
+        {
+          "section": "cash_flow_table",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_calculate_explicit_doc_type",
+      "priority": 85,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "income_statement_table",
+          "weight": 2.2
+        },
+        {
+          "section": "cash_flow_table",
+          "weight": 2.02
+        },
+        {
+          "section": "operating_metrics",
+          "weight": 1.84
+        },
+        {
+          "section": "assumptions",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_compare_general_unlock",
+      "priority": 84,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "executive_summary",
+          "weight": 2.5
+        },
+        {
+          "section": "variance_analysis",
+          "weight": 2.3
+        },
+        {
+          "section": "kpi_bridge",
+          "weight": 2.1
+        },
+        {
+          "section": "assumptions",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_compare_doc_lock",
+      "priority": 83,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "executive_summary",
+          "weight": 1.9
+        },
+        {
+          "section": "variance_analysis",
+          "weight": 1.75
+        },
+        {
+          "section": "kpi_bridge",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_compare_explicit_doc_type",
+      "priority": 82,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "variance_analysis",
+          "weight": 2.2
+        },
+        {
+          "section": "kpi_bridge",
+          "weight": 2.02
+        },
+        {
+          "section": "assumptions",
+          "weight": 1.84
+        },
+        {
+          "section": "footnotes",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_evaluate_general_unlock",
+      "priority": 81,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "risk_factors",
+          "weight": 2.5
+        },
+        {
+          "section": "covenants",
+          "weight": 2.3
+        },
+        {
+          "section": "liquidity",
+          "weight": 2.1
+        },
+        {
+          "section": "debt_schedule",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_evaluate_doc_lock",
+      "priority": 80,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "risk_factors",
+          "weight": 1.9
+        },
+        {
+          "section": "covenants",
+          "weight": 1.75
+        },
+        {
+          "section": "liquidity",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_evaluate_explicit_doc_type",
+      "priority": 79,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "covenants",
+          "weight": 2.2
+        },
+        {
+          "section": "liquidity",
+          "weight": 2.02
+        },
+        {
+          "section": "debt_schedule",
+          "weight": 1.84
+        },
+        {
+          "section": "management_discussion",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_extract_general_unlock",
+      "priority": 78,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "financial_highlights",
+          "weight": 2.5
+        },
+        {
+          "section": "kpi_table",
+          "weight": 2.3
+        },
+        {
+          "section": "income_statement_table",
+          "weight": 2.1
+        },
+        {
+          "section": "cash_flow_table",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_extract_doc_lock",
+      "priority": 77,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "financial_highlights",
+          "weight": 1.9
+        },
+        {
+          "section": "kpi_table",
+          "weight": 1.75
+        },
+        {
+          "section": "income_statement_table",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_extract_explicit_doc_type",
+      "priority": 76,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "kpi_table",
+          "weight": 2.2
+        },
+        {
+          "section": "income_statement_table",
+          "weight": 2.02
+        },
+        {
+          "section": "cash_flow_table",
+          "weight": 1.84
+        },
+        {
+          "section": "rent_roll_table",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_locate_general_unlock",
+      "priority": 75,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "section_index",
+          "weight": 2.3
+        },
+        {
+          "section": "sheet_index",
+          "weight": 2.1
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_locate_doc_lock",
+      "priority": 74,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "section_index",
+          "weight": 1.75
+        },
+        {
+          "section": "sheet_index",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_locate_explicit_doc_type",
+      "priority": 73,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "section_index",
+          "weight": 2.2
+        },
+        {
+          "section": "sheet_index",
+          "weight": 2.02
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.84
+        },
+        {
+          "section": "appendix_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_monitor_general_unlock",
+      "priority": 72,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "kpi_dashboard",
+          "weight": 2.5
+        },
+        {
+          "section": "trend_analysis",
+          "weight": 2.3
+        },
+        {
+          "section": "alerts",
+          "weight": 2.1
+        },
+        {
+          "section": "incident_log",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_monitor_doc_lock",
+      "priority": 71,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "kpi_dashboard",
+          "weight": 1.9
+        },
+        {
+          "section": "trend_analysis",
+          "weight": 1.75
+        },
+        {
+          "section": "alerts",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_monitor_explicit_doc_type",
+      "priority": 70,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "trend_analysis",
+          "weight": 2.2
+        },
+        {
+          "section": "alerts",
+          "weight": 2.02
+        },
+        {
+          "section": "incident_log",
+          "weight": 1.84
+        },
+        {
+          "section": "sla_report",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_navigate_general_unlock",
+      "priority": 69,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "sheet_index",
+          "weight": 2.3
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.1
+        },
+        {
+          "section": "tab_navigation",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_navigate_doc_lock",
+      "priority": 68,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "sheet_index",
+          "weight": 1.75
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_navigate_explicit_doc_type",
+      "priority": 67,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sheet_index",
+          "weight": 2.2
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.02
+        },
+        {
+          "section": "tab_navigation",
+          "weight": 1.84
+        },
+        {
+          "section": "section_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_open_general_unlock",
+      "priority": 66,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "sheet_index",
+          "weight": 2.3
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.1
+        },
+        {
+          "section": "tab_navigation",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_open_doc_lock",
+      "priority": 65,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "sheet_index",
+          "weight": 1.75
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_open_explicit_doc_type",
+      "priority": 64,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sheet_index",
+          "weight": 2.2
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.02
+        },
+        {
+          "section": "tab_navigation",
+          "weight": 1.84
+        },
+        {
+          "section": "section_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_summarize_general_unlock",
+      "priority": 63,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "executive_summary",
+          "weight": 2.5
+        },
+        {
+          "section": "management_discussion",
+          "weight": 2.3
+        },
+        {
+          "section": "financial_highlights",
+          "weight": 2.1
+        },
+        {
+          "section": "risk_factors",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_summarize_doc_lock",
+      "priority": 62,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "executive_summary",
+          "weight": 1.9
+        },
+        {
+          "section": "management_discussion",
+          "weight": 1.75
+        },
+        {
+          "section": "financial_highlights",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_summarize_explicit_doc_type",
+      "priority": 61,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "management_discussion",
+          "weight": 2.2
+        },
+        {
+          "section": "financial_highlights",
+          "weight": 2.02
+        },
+        {
+          "section": "risk_factors",
+          "weight": 1.84
+        },
+        {
+          "section": "outlook",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_validate_general_unlock",
+      "priority": 60,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.35
+        },
+        {
+          "docType": "balance_sheet",
+          "weight": 2.1
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "footnotes",
+          "weight": 2.5
+        },
+        {
+          "section": "reconciliation",
+          "weight": 2.3
+        },
+        {
+          "section": "notes_to_accounts",
+          "weight": 2.1
+        },
+        {
+          "section": "audit_findings",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_validate_doc_lock",
+      "priority": 59,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "income_statement",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "footnotes",
+          "weight": 1.9
+        },
+        {
+          "section": "reconciliation",
+          "weight": 1.75
+        },
+        {
+          "section": "notes_to_accounts",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_validate_explicit_doc_type",
+      "priority": 58,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "explicitDocTypes": [
+        "budget_report",
+        "income_statement"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "explicitDocTypes": [
+          "budget_report",
+          "income_statement"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "income_statement",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "reconciliation",
+          "weight": 2.2
+        },
+        {
+          "section": "notes_to_accounts",
+          "weight": 2.02
+        },
+        {
+          "section": "audit_findings",
+          "weight": 1.84
+        },
+        {
+          "section": "assumptions",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "finance_calculate_metric_bundle",
+      "priority": 68,
+      "weight": 1.9,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "income_statement",
+          "weight": 2.8
+        },
+        {
+          "docType": "hotel_operating_statement",
+          "weight": 2.7
+        },
+        {
+          "docType": "kpi_dashboard",
+          "weight": 2.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "kpi_table",
+          "weight": 2.9
+        },
+        {
+          "section": "operating_metrics",
+          "weight": 2.8
+        },
+        {
+          "section": "variance_analysis",
+          "weight": 2.7
+        }
+      ],
+      "guardrails": {
+        "includesMetrics": [
+          "margins",
+          "yoy",
+          "variance",
+          "ebitda",
+          "noi",
+          "revpar"
+        ]
+      }
+    },
+    {
+      "id": "finance_compare_budget_actual",
+      "priority": 67,
+      "weight": 1.7,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "docLock": false,
+        "minExplicitResolvedDocs": 2
+      },
+      "boostDocTypes": [
+        {
+          "docType": "budget_report",
+          "weight": 2.9
+        },
+        {
+          "docType": "forecast_model",
+          "weight": 2.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "variance_analysis",
+          "weight": 2.9
+        },
+        {
+          "section": "assumptions",
+          "weight": 2.4
+        },
+        {
+          "section": "kpi_bridge",
+          "weight": 2.4
+        }
+      ],
+      "guardrails": {
+        "compareNeedsResolvedDocs": true
+      }
+    },
+    {
+      "id": "finance_validate_reconciliation",
+      "priority": 66,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "balance_sheet",
+          "weight": 2.5
+        },
+        {
+          "docType": "cash_flow_statement",
+          "weight": 2.4
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "reconciliation",
+          "weight": 2.8
+        },
+        {
+          "section": "notes_to_accounts",
+          "weight": 2.6
+        }
+      ],
+      "guardrails": {
+        "numericIntegrityRequired": true
+      }
+    }
+  ]
+}

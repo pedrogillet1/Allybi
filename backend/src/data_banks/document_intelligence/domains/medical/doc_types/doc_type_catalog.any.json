@@ -1,0 +1,578 @@
+{
+  "_meta": {
+    "id": "medical_doc_type_catalog",
+    "version": "2.0.0",
+    "description": "Catalog of medical document types with EN/PT detection patterns.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "docTypes": [
+    {
+      "id": "med_soap_note",
+      "name": {
+        "en": "SOAP Note",
+        "pt": "Nota SOAP"
+      },
+      "description": "SOAP Note document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bsoap[ -]?note\\b",
+        "\\bsoap[ -]?note\\b",
+        "\\bnota[ -]?soap\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 100
+    },
+    {
+      "id": "med_history_and_physical",
+      "name": {
+        "en": "History and Physical",
+        "pt": "Historia e Exame Fisico"
+      },
+      "description": "History and Physical document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bhistory[ -]?and[ -]?physical\\b",
+        "\\bhistory[ -]?and[ -]?physical\\b",
+        "\\bhistoria[ -]?e[ -]?exame[ -]?fisico\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 99
+    },
+    {
+      "id": "med_progress_note",
+      "name": {
+        "en": "Progress Note",
+        "pt": "Nota de Evolucao"
+      },
+      "description": "Progress Note document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bprogress[ -]?note\\b",
+        "\\bprogress[ -]?note\\b",
+        "\\bnota[ -]?de[ -]?evolucao\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 98
+    },
+    {
+      "id": "med_consult_note",
+      "name": {
+        "en": "Consult Note",
+        "pt": "Nota de Consulta"
+      },
+      "description": "Consult Note document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bconsult[ -]?note\\b",
+        "\\bconsult[ -]?note\\b",
+        "\\bnota[ -]?de[ -]?consulta\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 97
+    },
+    {
+      "id": "med_emergency_note",
+      "name": {
+        "en": "Emergency Note",
+        "pt": "Nota de Emergencia"
+      },
+      "description": "Emergency Note document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bemergency[ -]?note\\b",
+        "\\bemergency[ -]?note\\b",
+        "\\bnota[ -]?de[ -]?emergencia\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 96
+    },
+    {
+      "id": "med_nursing_note",
+      "name": {
+        "en": "Nursing Note",
+        "pt": "Nota de Enfermagem"
+      },
+      "description": "Nursing Note document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bnursing[ -]?note\\b",
+        "\\bnursing[ -]?note\\b",
+        "\\bnota[ -]?de[ -]?enfermagem\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 95
+    },
+    {
+      "id": "med_care_plan",
+      "name": {
+        "en": "Care Plan",
+        "pt": "Plano de Cuidados"
+      },
+      "description": "Care Plan document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bcare[ -]?plan\\b",
+        "\\bcare[ -]?plan\\b",
+        "\\bplano[ -]?de[ -]?cuidados\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 94
+    },
+    {
+      "id": "med_discharge_summary",
+      "name": {
+        "en": "Discharge Summary",
+        "pt": "Resumo de Alta"
+      },
+      "description": "Discharge Summary document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bdischarge[ -]?summary\\b",
+        "\\bdischarge[ -]?summary\\b",
+        "\\bresumo[ -]?de[ -]?alta\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 93
+    },
+    {
+      "id": "med_followup_instructions",
+      "name": {
+        "en": "Follow-up Instructions",
+        "pt": "Instrucoes de Acompanhamento"
+      },
+      "description": "Follow-up Instructions document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bfollow[ -]?up[ -]?instructions\\b",
+        "\\bfollowup[ -]?instructions\\b",
+        "\\binstrucoes[ -]?de[ -]?acompanhamento\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 92
+    },
+    {
+      "id": "med_referral_letter",
+      "name": {
+        "en": "Referral Letter",
+        "pt": "Carta de Encaminhamento"
+      },
+      "description": "Referral Letter document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\breferral[ -]?letter\\b",
+        "\\breferral[ -]?letter\\b",
+        "\\bcarta[ -]?de[ -]?encaminhamento\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 91
+    },
+    {
+      "id": "med_lab_results_report",
+      "name": {
+        "en": "Lab Results Report",
+        "pt": "Laudo de Exames Laboratoriais"
+      },
+      "description": "Lab Results Report document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\blab[ -]?results[ -]?report\\b",
+        "\\blab[ -]?results[ -]?report\\b",
+        "\\blaudo[ -]?de[ -]?exames[ -]?laboratoriais\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 90
+    },
+    {
+      "id": "med_radiology_report",
+      "name": {
+        "en": "Radiology Report",
+        "pt": "Laudo de Radiologia"
+      },
+      "description": "Radiology Report document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bradiology[ -]?report\\b",
+        "\\bradiology[ -]?report\\b",
+        "\\blaudo[ -]?de[ -]?radiologia\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 89
+    },
+    {
+      "id": "med_pathology_report",
+      "name": {
+        "en": "Pathology Report",
+        "pt": "Laudo de Patologia"
+      },
+      "description": "Pathology Report document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bpathology[ -]?report\\b",
+        "\\bpathology[ -]?report\\b",
+        "\\blaudo[ -]?de[ -]?patologia\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 88
+    },
+    {
+      "id": "med_ecg_report",
+      "name": {
+        "en": "ECG Report",
+        "pt": "Laudo de ECG"
+      },
+      "description": "ECG Report document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\becg[ -]?report\\b",
+        "\\becg[ -]?report\\b",
+        "\\blaudo[ -]?de[ -]?ecg\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 87
+    },
+    {
+      "id": "med_vitals_chart",
+      "name": {
+        "en": "Vitals Chart",
+        "pt": "Grafico de Sinais Vitais"
+      },
+      "description": "Vitals Chart document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bvitals[ -]?chart\\b",
+        "\\bvitals[ -]?chart\\b",
+        "\\bgrafico[ -]?de[ -]?sinais[ -]?vitais\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 86
+    },
+    {
+      "id": "med_medication_list",
+      "name": {
+        "en": "Medication List",
+        "pt": "Lista de Medicamentos"
+      },
+      "description": "Medication List document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bmedication[ -]?list\\b",
+        "\\bmedication[ -]?list\\b",
+        "\\blista[ -]?de[ -]?medicamentos\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 85
+    },
+    {
+      "id": "med_prescription",
+      "name": {
+        "en": "Prescription",
+        "pt": "Prescricao"
+      },
+      "description": "Prescription document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bprescription\\b",
+        "\\bprescription\\b",
+        "\\bprescricao\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 84
+    },
+    {
+      "id": "med_allergy_list",
+      "name": {
+        "en": "Allergy List",
+        "pt": "Lista de Alergias"
+      },
+      "description": "Allergy List document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\ballergy[ -]?list\\b",
+        "\\ballergy[ -]?list\\b",
+        "\\blista[ -]?de[ -]?alergias\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 83
+    },
+    {
+      "id": "med_immunization_record",
+      "name": {
+        "en": "Immunization Record",
+        "pt": "Registro de Imunizacao"
+      },
+      "description": "Immunization Record document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bimmunization[ -]?record\\b",
+        "\\bimmunization[ -]?record\\b",
+        "\\bregistro[ -]?de[ -]?imunizacao\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 82
+    },
+    {
+      "id": "med_problem_list",
+      "name": {
+        "en": "Problem List",
+        "pt": "Lista de Problemas"
+      },
+      "description": "Problem List document profile for extraction and safety-bounded interpretation.",
+      "detectionPatterns": [
+        "\\bproblem[ -]?list\\b",
+        "\\bproblem[ -]?list\\b",
+        "\\blista[ -]?de[ -]?problemas\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "patient_identification",
+        "encounter_context",
+        "chief_complaint_reason",
+        "history_background",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "assessment_documented",
+        "plan_and_orders",
+        "medications_allergies",
+        "followup_and_disposition"
+      ],
+      "priority": 81
+    }
+  ]
+}

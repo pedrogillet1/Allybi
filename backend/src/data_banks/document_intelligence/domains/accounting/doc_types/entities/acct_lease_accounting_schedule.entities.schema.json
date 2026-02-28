@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_lease_accounting_schedule",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for lease accounting schedule documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_lease_accounting_schedule"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "standard",
+      "type": "string",
+      "required": false,
+      "description": "Lease accounting standard (ASC 842, IFRS 16, etc.)"
+    },
+    {
+      "id": "scheduleDate",
+      "type": "date",
+      "required": true,
+      "description": "Schedule date"
+    },
+    {
+      "id": "leaseLiabilityOpening",
+      "type": "currency",
+      "required": true,
+      "description": "Opening lease liability"
+    },
+    {
+      "id": "interestExpense",
+      "type": "currency",
+      "required": true,
+      "description": "Lease interest expense"
+    },
+    {
+      "id": "leaseLiabilityClosing",
+      "type": "currency",
+      "required": true,
+      "description": "Closing lease liability"
+    },
+    {
+      "id": "rouAssetClosing",
+      "type": "currency",
+      "required": false,
+      "description": "Closing ROU asset balance"
+    }
+  ]
+}

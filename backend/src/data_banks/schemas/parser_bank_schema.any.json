@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "id": "parser_bank_schema",
+    "version": "1.0.0",
+    "description": "Schema for parser helper banks (docx heading levels, excel number formats).",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/parser_bank_schema.any.json",
+    "title": "Parser Bank Schema",
+    "type": "object",
+    "required": [
+      "_meta",
+      "config",
+      "entries"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "description",
+          "languages",
+          "lastUpdated"
+        ],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "additionalProperties": true
+      },
+      "entries": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

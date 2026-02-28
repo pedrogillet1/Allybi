@@ -1,0 +1,5876 @@
+{
+  "_meta": {
+    "id": "ops_doc_logic",
+    "version": "1.0.0",
+    "description": "Operations document logic with document type semantics, structural expectations, and deterministic interpretation rules.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "definitions": [
+    {
+      "id": "doc_access_control_matrix",
+      "canonicalName": "Access Control Matrix",
+      "definition": {
+        "en": "Matrix mapping users, roles, and permissions to systems and resources.",
+        "pt": "Matriz que mapeia usuários, funções e permissões a sistemas e recursos."
+      },
+      "synonyms": {
+        "en": [
+          "access control matrix",
+          "ACM",
+          "permissions matrix",
+          "RBAC matrix"
+        ],
+        "pt": [
+          "matriz de controle de acesso",
+          "matriz de permissões",
+          "ACM"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 1
+    },
+    {
+      "id": "doc_api_documentation",
+      "canonicalName": "API Documentation",
+      "definition": {
+        "en": "Technical specification of application programming interfaces including endpoints, parameters, and response formats.",
+        "pt": "Especificação técnica de interfaces de programação de aplicações incluindo endpoints, parâmetros e formatos de resposta."
+      },
+      "synonyms": {
+        "en": [
+          "API docs",
+          "API documentation",
+          "API spec",
+          "API reference"
+        ],
+        "pt": [
+          "documentação de API",
+          "especificação de API",
+          "referência de API"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 2
+    },
+    {
+      "id": "doc_architecture_decision_record",
+      "canonicalName": "Architecture Decision Record",
+      "definition": {
+        "en": "Document capturing a significant architecture decision, its context, status, and consequences.",
+        "pt": "Documento que registra uma decisão arquitetural significativa, seu contexto, status e consequências."
+      },
+      "synonyms": {
+        "en": [
+          "ADR",
+          "architecture decision record",
+          "architecture decision",
+          "design decision record"
+        ],
+        "pt": [
+          "registro de decisão arquitetural",
+          "ADR",
+          "decisão de arquitetura"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 3
+    },
+    {
+      "id": "doc_asset_inventory",
+      "canonicalName": "Asset Inventory",
+      "definition": {
+        "en": "Comprehensive catalog of hardware, software, and infrastructure assets with lifecycle status.",
+        "pt": "Catálogo abrangente de ativos de hardware, software e infraestrutura com status do ciclo de vida."
+      },
+      "synonyms": {
+        "en": [
+          "asset inventory",
+          "asset register",
+          "CMDB extract",
+          "asset catalog"
+        ],
+        "pt": [
+          "inventário de ativos",
+          "registro de ativos",
+          "catálogo de ativos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 4
+    },
+    {
+      "id": "doc_audit_checklist",
+      "canonicalName": "Audit Checklist",
+      "definition": {
+        "en": "Structured checklist of controls, evidence items, and compliance checkpoints for operational audits.",
+        "pt": "Lista de verificação estruturada de controles, itens de evidência e pontos de conformidade para auditorias operacionais."
+      },
+      "synonyms": {
+        "en": [
+          "audit checklist",
+          "audit control list",
+          "compliance checklist",
+          "control checklist"
+        ],
+        "pt": [
+          "lista de verificação de auditoria",
+          "checklist de auditoria",
+          "checklist de conformidade"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 5
+    },
+    {
+      "id": "doc_backup_schedule",
+      "canonicalName": "Backup Schedule",
+      "definition": {
+        "en": "Defined schedule for data backup operations including frequency, retention, and storage targets.",
+        "pt": "Cronograma definido para operações de backup de dados incluindo frequência, retenção e destinos de armazenamento."
+      },
+      "synonyms": {
+        "en": [
+          "backup schedule",
+          "backup policy",
+          "backup plan",
+          "data protection schedule"
+        ],
+        "pt": [
+          "cronograma de backup",
+          "política de backup",
+          "plano de backup"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 6
+    },
+    {
+      "id": "doc_bcp",
+      "canonicalName": "Business Continuity Plan",
+      "definition": {
+        "en": "Plan ensuring critical business functions continue during and after a disaster or disruption.",
+        "pt": "Plano que garante a continuidade de funções críticas de negócio durante e após um desastre ou interrupção."
+      },
+      "synonyms": {
+        "en": [
+          "BCP",
+          "business continuity plan",
+          "continuity plan",
+          "business continuity"
+        ],
+        "pt": [
+          "plano de continuidade de negócios",
+          "BCP",
+          "plano de continuidade"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 7
+    },
+    {
+      "id": "doc_budget_request_it_ops",
+      "canonicalName": "Budget Request (IT Ops)",
+      "definition": {
+        "en": "Formal request for IT operations budget allocation covering infrastructure, licensing, and staffing.",
+        "pt": "Solicitação formal de alocação de orçamento para operações de TI cobrindo infraestrutura, licenciamento e pessoal."
+      },
+      "synonyms": {
+        "en": [
+          "IT budget request",
+          "ops budget request",
+          "IT ops budget",
+          "infrastructure budget request"
+        ],
+        "pt": [
+          "solicitação de orçamento de TI",
+          "pedido de orçamento de operações",
+          "orçamento de TI"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": false
+      },
+      "priority": 8
+    },
+    {
+      "id": "doc_capacity_forecast",
+      "canonicalName": "Capacity Forecast",
+      "definition": {
+        "en": "Projection of future resource capacity needs based on growth trends and planned changes.",
+        "pt": "Projeção de necessidades futuras de capacidade de recursos com base em tendências de crescimento e mudanças planejadas."
+      },
+      "synonyms": {
+        "en": [
+          "capacity forecast",
+          "capacity projection",
+          "resource forecast",
+          "growth forecast"
+        ],
+        "pt": [
+          "previsão de capacidade",
+          "projeção de capacidade",
+          "forecast de capacidade"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": false
+      },
+      "priority": 9
+    },
+    {
+      "id": "doc_capacity_plan",
+      "canonicalName": "Capacity Plan",
+      "definition": {
+        "en": "Document detailing current resource utilization and planned capacity to meet future demand.",
+        "pt": "Documento detalhando a utilização atual de recursos e capacidade planejada para atender demanda futura."
+      },
+      "synonyms": {
+        "en": [
+          "capacity plan",
+          "capacity planning document",
+          "resource capacity plan"
+        ],
+        "pt": [
+          "plano de capacidade",
+          "planejamento de capacidade",
+          "plano de recursos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": false
+      },
+      "priority": 10
+    },
+    {
+      "id": "doc_certificate_renewal_tracker",
+      "canonicalName": "Certificate Renewal Tracker",
+      "definition": {
+        "en": "Tracker for SSL/TLS and other digital certificate expiration dates and renewal status.",
+        "pt": "Rastreador de datas de expiração e status de renovação de certificados SSL/TLS e outros certificados digitais."
+      },
+      "synonyms": {
+        "en": [
+          "certificate tracker",
+          "cert renewal tracker",
+          "SSL tracker",
+          "certificate expiry tracker"
+        ],
+        "pt": [
+          "rastreador de certificados",
+          "controle de renovação de certificados",
+          "rastreador de SSL"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 11
+    },
+    {
+      "id": "doc_change_request",
+      "canonicalName": "Change Request",
+      "definition": {
+        "en": "Formal request to modify infrastructure, systems, or processes, including impact analysis and approval chain.",
+        "pt": "Solicitação formal para modificar infraestrutura, sistemas ou processos, incluindo análise de impacto e cadeia de aprovação."
+      },
+      "synonyms": {
+        "en": [
+          "change request",
+          "CR",
+          "RFC",
+          "request for change",
+          "change ticket"
+        ],
+        "pt": [
+          "solicitação de mudança",
+          "requisição de mudança",
+          "CR",
+          "RFC"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 12
+    },
+    {
+      "id": "doc_compliance_report",
+      "canonicalName": "Compliance Report",
+      "definition": {
+        "en": "Report documenting adherence to regulatory, policy, or contractual requirements within a defined audit period.",
+        "pt": "Relatório documentando a conformidade com requisitos regulatórios, de política ou contratuais dentro de um período de auditoria definido."
+      },
+      "synonyms": {
+        "en": [
+          "compliance report",
+          "regulatory compliance report",
+          "compliance assessment",
+          "compliance audit report"
+        ],
+        "pt": [
+          "relatório de conformidade",
+          "relatório de compliance",
+          "avaliação de conformidade"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 13
+    },
+    {
+      "id": "doc_configuration_management_db_export",
+      "canonicalName": "Configuration Management DB Export",
+      "definition": {
+        "en": "Export from a configuration management database listing configuration items and their relationships.",
+        "pt": "Exportação de um banco de dados de gerenciamento de configuração listando itens de configuração e suas relações."
+      },
+      "synonyms": {
+        "en": [
+          "CMDB export",
+          "configuration management export",
+          "CI export",
+          "CMDB dump"
+        ],
+        "pt": [
+          "exportação do CMDB",
+          "exportação de gerenciamento de configuração",
+          "dump do CMDB"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 14
+    },
+    {
+      "id": "doc_daily_standup_notes",
+      "canonicalName": "Daily Standup Notes",
+      "definition": {
+        "en": "Brief meeting notes from daily standup meetings capturing blockers, progress, and plans.",
+        "pt": "Notas breves de reuniões diárias capturando impedimentos, progresso e planos."
+      },
+      "synonyms": {
+        "en": [
+          "standup notes",
+          "daily standup notes",
+          "daily scrum notes",
+          "stand-up notes"
+        ],
+        "pt": [
+          "notas de daily",
+          "notas de reunião diária",
+          "notas de standup"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 15
+    },
+    {
+      "id": "doc_data_retention_schedule",
+      "canonicalName": "Data Retention Schedule",
+      "definition": {
+        "en": "Policy schedule defining retention periods, archival rules, and deletion timelines for data categories.",
+        "pt": "Cronograma de política definindo períodos de retenção, regras de arquivamento e prazos de exclusão para categorias de dados."
+      },
+      "synonyms": {
+        "en": [
+          "data retention schedule",
+          "retention policy",
+          "data lifecycle schedule",
+          "retention schedule"
+        ],
+        "pt": [
+          "cronograma de retenção de dados",
+          "política de retenção",
+          "ciclo de vida de dados"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 16
+    },
+    {
+      "id": "doc_decommission_plan",
+      "canonicalName": "Decommission Plan",
+      "definition": {
+        "en": "Plan for safely retiring systems, services, or infrastructure including data migration and dependency handling.",
+        "pt": "Plano para desativação segura de sistemas, serviços ou infraestrutura incluindo migração de dados e tratamento de dependências."
+      },
+      "synonyms": {
+        "en": [
+          "decommission plan",
+          "decom plan",
+          "retirement plan",
+          "sunset plan"
+        ],
+        "pt": [
+          "plano de descomissionamento",
+          "plano de desativação",
+          "plano de aposentadoria de sistema"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 17
+    },
+    {
+      "id": "doc_dependency_map",
+      "canonicalName": "Dependency Map",
+      "definition": {
+        "en": "Visual or structured representation of dependencies between services, systems, or components.",
+        "pt": "Representação visual ou estruturada de dependências entre serviços, sistemas ou componentes."
+      },
+      "synonyms": {
+        "en": [
+          "dependency map",
+          "dependency graph",
+          "service dependency map",
+          "dependency diagram"
+        ],
+        "pt": [
+          "mapa de dependências",
+          "grafo de dependências",
+          "diagrama de dependências"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 18
+    },
+    {
+      "id": "doc_deployment_guide",
+      "canonicalName": "Deployment Guide",
+      "definition": {
+        "en": "Step-by-step instructions for deploying applications or services to target environments.",
+        "pt": "Instruções passo a passo para implantação de aplicações ou serviços em ambientes-alvo."
+      },
+      "synonyms": {
+        "en": [
+          "deployment guide",
+          "deploy guide",
+          "deployment runbook",
+          "deployment instructions"
+        ],
+        "pt": [
+          "guia de implantação",
+          "guia de deploy",
+          "manual de implantação"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 19
+    },
+    {
+      "id": "doc_disaster_recovery_plan",
+      "canonicalName": "Disaster Recovery Plan",
+      "definition": {
+        "en": "Documented procedures for recovering IT systems and data after a catastrophic event.",
+        "pt": "Procedimentos documentados para recuperação de sistemas de TI e dados após um evento catastrófico."
+      },
+      "synonyms": {
+        "en": [
+          "DR plan",
+          "disaster recovery plan",
+          "DRP",
+          "disaster recovery"
+        ],
+        "pt": [
+          "plano de recuperação de desastres",
+          "plano de DR",
+          "DRP"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 20
+    },
+    {
+      "id": "doc_dns_configuration",
+      "canonicalName": "DNS Configuration",
+      "definition": {
+        "en": "Document listing DNS records, zones, and resolution rules for network name resolution.",
+        "pt": "Documento listando registros DNS, zonas e regras de resolução para resolução de nomes de rede."
+      },
+      "synonyms": {
+        "en": [
+          "DNS configuration",
+          "DNS config",
+          "DNS records",
+          "DNS zone file"
+        ],
+        "pt": [
+          "configuração de DNS",
+          "registros DNS",
+          "configuração de zona DNS"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 21
+    },
+    {
+      "id": "doc_dr_test_results",
+      "canonicalName": "DR Test Results",
+      "definition": {
+        "en": "Results and findings from disaster recovery testing exercises including RTO/RPO achievement.",
+        "pt": "Resultados e achados de exercícios de teste de recuperação de desastres incluindo atingimento de RTO/RPO."
+      },
+      "synonyms": {
+        "en": [
+          "DR test results",
+          "disaster recovery test results",
+          "DR drill results",
+          "DR exercise report"
+        ],
+        "pt": [
+          "resultados de teste de DR",
+          "resultados de exercício de DR",
+          "relatório de teste de recuperação"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 22
+    },
+    {
+      "id": "doc_environmental_compliance",
+      "canonicalName": "Environmental Compliance Report",
+      "definition": {
+        "en": "Report on adherence to environmental regulations, emissions standards, and sustainability targets.",
+        "pt": "Relatório sobre conformidade com regulamentações ambientais, padrões de emissões e metas de sustentabilidade."
+      },
+      "synonyms": {
+        "en": [
+          "environmental compliance",
+          "environmental report",
+          "sustainability compliance",
+          "EHS report"
+        ],
+        "pt": [
+          "conformidade ambiental",
+          "relatório ambiental",
+          "relatório de sustentabilidade"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 23
+    },
+    {
+      "id": "doc_error_budget_policy",
+      "canonicalName": "Error Budget Policy",
+      "definition": {
+        "en": "Policy defining acceptable error rates and the consequences of exceeding error budgets for services.",
+        "pt": "Política definindo taxas de erro aceitáveis e as consequências de exceder orçamentos de erro para serviços."
+      },
+      "synonyms": {
+        "en": [
+          "error budget policy",
+          "error budget",
+          "SLO error budget",
+          "reliability budget"
+        ],
+        "pt": [
+          "política de orçamento de erros",
+          "orçamento de erros",
+          "budget de erros"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 24
+    },
+    {
+      "id": "doc_escalation_matrix",
+      "canonicalName": "Escalation Matrix",
+      "definition": {
+        "en": "Matrix defining escalation paths, contact persons, and response time targets by severity level.",
+        "pt": "Matriz definindo caminhos de escalonamento, pessoas de contato e metas de tempo de resposta por nível de severidade."
+      },
+      "synonyms": {
+        "en": [
+          "escalation matrix",
+          "escalation path",
+          "escalation chart",
+          "escalation policy"
+        ],
+        "pt": [
+          "matriz de escalonamento",
+          "caminho de escalação",
+          "política de escalonamento"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 25
+    },
+    {
+      "id": "doc_executive_dashboard",
+      "canonicalName": "Executive Dashboard",
+      "definition": {
+        "en": "High-level visual summary of key operational metrics and status indicators for executive review.",
+        "pt": "Resumo visual de alto nível de métricas operacionais-chave e indicadores de status para revisão executiva."
+      },
+      "synonyms": {
+        "en": [
+          "executive dashboard",
+          "exec dashboard",
+          "leadership dashboard",
+          "CxO dashboard"
+        ],
+        "pt": [
+          "dashboard executivo",
+          "painel executivo",
+          "dashboard de liderança"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 26
+    },
+    {
+      "id": "doc_failover_procedure",
+      "canonicalName": "Failover Procedure",
+      "definition": {
+        "en": "Documented steps for switching operations from a primary system to a standby or backup system.",
+        "pt": "Passos documentados para transferir operações de um sistema primário para um sistema reserva ou backup."
+      },
+      "synonyms": {
+        "en": [
+          "failover procedure",
+          "failover plan",
+          "failover runbook",
+          "switchover procedure"
+        ],
+        "pt": [
+          "procedimento de failover",
+          "plano de failover",
+          "procedimento de comutação"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 27
+    },
+    {
+      "id": "doc_faq_document",
+      "canonicalName": "FAQ Document",
+      "definition": {
+        "en": "Frequently asked questions and answers document for common operational inquiries.",
+        "pt": "Documento de perguntas frequentes e respostas para consultas operacionais comuns."
+      },
+      "synonyms": {
+        "en": [
+          "FAQ",
+          "FAQ document",
+          "frequently asked questions",
+          "FAQ page"
+        ],
+        "pt": [
+          "FAQ",
+          "perguntas frequentes",
+          "documento de perguntas frequentes"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 28
+    },
+    {
+      "id": "doc_firewall_rules_export",
+      "canonicalName": "Firewall Rules Export",
+      "definition": {
+        "en": "Export of firewall rule configurations including allow/deny rules, ports, and source/destination mappings.",
+        "pt": "Exportação de configurações de regras de firewall incluindo regras de permissão/negação, portas e mapeamentos de origem/destino."
+      },
+      "synonyms": {
+        "en": [
+          "firewall rules",
+          "firewall export",
+          "firewall config",
+          "ACL export",
+          "firewall policy export"
+        ],
+        "pt": [
+          "regras de firewall",
+          "exportação de firewall",
+          "configuração de firewall"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 29
+    },
+    {
+      "id": "doc_firmware_update_log",
+      "canonicalName": "Firmware Update Log",
+      "definition": {
+        "en": "Log of firmware updates applied to hardware devices including versions, dates, and outcomes.",
+        "pt": "Registro de atualizações de firmware aplicadas a dispositivos de hardware incluindo versões, datas e resultados."
+      },
+      "synonyms": {
+        "en": [
+          "firmware update log",
+          "firmware log",
+          "firmware changelog",
+          "BIOS update log"
+        ],
+        "pt": [
+          "registro de atualização de firmware",
+          "log de firmware",
+          "histórico de firmware"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 30
+    },
+    {
+      "id": "doc_fmea",
+      "canonicalName": "Failure Mode and Effects Analysis",
+      "definition": {
+        "en": "Systematic analysis of potential failure modes, their causes, effects, and mitigation actions.",
+        "pt": "Análise sistemática de modos potenciais de falha, suas causas, efeitos e ações de mitigação."
+      },
+      "synonyms": {
+        "en": [
+          "FMEA",
+          "failure mode analysis",
+          "failure mode and effects analysis",
+          "FMECA"
+        ],
+        "pt": [
+          "FMEA",
+          "análise de modos de falha",
+          "análise de modos de falha e efeitos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 31
+    },
+    {
+      "id": "doc_health_check_report",
+      "canonicalName": "Health Check Report",
+      "definition": {
+        "en": "Report summarizing the health status of systems, services, or infrastructure components.",
+        "pt": "Relatório resumindo o estado de saúde de sistemas, serviços ou componentes de infraestrutura."
+      },
+      "synonyms": {
+        "en": [
+          "health check report",
+          "health check",
+          "system health report",
+          "infrastructure health report"
+        ],
+        "pt": [
+          "relatório de verificação de saúde",
+          "health check",
+          "relatório de saúde do sistema"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 32
+    },
+    {
+      "id": "doc_incident_report",
+      "canonicalName": "Incident Report",
+      "definition": {
+        "en": "Formal report of an operational incident including timeline, impact, response actions, and resolution.",
+        "pt": "Relatório formal de um incidente operacional incluindo cronologia, impacto, ações de resposta e resolução."
+      },
+      "synonyms": {
+        "en": [
+          "incident report",
+          "incident ticket",
+          "incident record",
+          "INC report",
+          "outage report"
+        ],
+        "pt": [
+          "relatório de incidente",
+          "registro de incidente",
+          "ticket de incidente"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 33
+    },
+    {
+      "id": "doc_integration_spec",
+      "canonicalName": "Integration Specification",
+      "definition": {
+        "en": "Technical specification for system-to-system integrations including protocols, data formats, and error handling.",
+        "pt": "Especificação técnica para integrações entre sistemas incluindo protocolos, formatos de dados e tratamento de erros."
+      },
+      "synonyms": {
+        "en": [
+          "integration spec",
+          "integration specification",
+          "integration design",
+          "integration document"
+        ],
+        "pt": [
+          "especificação de integração",
+          "documento de integração",
+          "design de integração"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 34
+    },
+    {
+      "id": "doc_inventory_report",
+      "canonicalName": "Inventory Report",
+      "definition": {
+        "en": "Report on physical or digital inventory levels, movements, and discrepancies.",
+        "pt": "Relatório sobre níveis de inventário físico ou digital, movimentações e discrepâncias."
+      },
+      "synonyms": {
+        "en": [
+          "inventory report",
+          "stock report",
+          "inventory status",
+          "inventory count report"
+        ],
+        "pt": [
+          "relatório de inventário",
+          "relatório de estoque",
+          "contagem de inventário"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 35
+    },
+    {
+      "id": "doc_kanban_board_export",
+      "canonicalName": "Kanban Board Export",
+      "definition": {
+        "en": "Export of Kanban board data including cards, columns, WIP limits, and cycle time metrics.",
+        "pt": "Exportação de dados do quadro Kanban incluindo cartões, colunas, limites WIP e métricas de tempo de ciclo."
+      },
+      "synonyms": {
+        "en": [
+          "Kanban export",
+          "Kanban board export",
+          "board export",
+          "Kanban data"
+        ],
+        "pt": [
+          "exportação do Kanban",
+          "exportação do quadro Kanban",
+          "dados do Kanban"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 36
+    },
+    {
+      "id": "doc_knowledge_base_article",
+      "canonicalName": "Knowledge Base Article",
+      "definition": {
+        "en": "Documented solution or reference article in a knowledge management system.",
+        "pt": "Solução documentada ou artigo de referência em um sistema de gestão do conhecimento."
+      },
+      "synonyms": {
+        "en": [
+          "KB article",
+          "knowledge base article",
+          "knowledge article",
+          "KB entry"
+        ],
+        "pt": [
+          "artigo da base de conhecimento",
+          "artigo KB",
+          "artigo de conhecimento"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 37
+    },
+    {
+      "id": "doc_known_error_database",
+      "canonicalName": "Known Error Database",
+      "definition": {
+        "en": "Database of known errors with documented workarounds and permanent fix status.",
+        "pt": "Banco de dados de erros conhecidos com soluções alternativas documentadas e status de correção permanente."
+      },
+      "synonyms": {
+        "en": [
+          "KEDB",
+          "known error database",
+          "known errors",
+          "known error record"
+        ],
+        "pt": [
+          "banco de erros conhecidos",
+          "KEDB",
+          "registro de erros conhecidos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 38
+    },
+    {
+      "id": "doc_kpi_dashboard",
+      "canonicalName": "KPI Dashboard",
+      "definition": {
+        "en": "Dashboard displaying key performance indicators with targets, actuals, and trend analysis.",
+        "pt": "Painel exibindo indicadores-chave de desempenho com metas, valores realizados e análise de tendências."
+      },
+      "synonyms": {
+        "en": [
+          "KPI dashboard",
+          "metrics dashboard",
+          "performance dashboard",
+          "KPI report"
+        ],
+        "pt": [
+          "dashboard de KPI",
+          "painel de indicadores",
+          "dashboard de desempenho"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 55
+    },
+    {
+      "id": "doc_kpi_report",
+      "canonicalName": "KPI Report",
+      "definition": {
+        "en": "Report presenting key performance indicator values, trends, and variance analysis.",
+        "pt": "Relatório apresentando valores de indicadores-chave de desempenho, tendências e análise de variação."
+      },
+      "synonyms": {
+        "en": [
+          "KPI report",
+          "metrics report",
+          "performance report",
+          "indicators report"
+        ],
+        "pt": [
+          "relatório de KPI",
+          "relatório de indicadores",
+          "relatório de desempenho"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 83
+    },
+    {
+      "id": "doc_license_compliance",
+      "canonicalName": "License Compliance Report",
+      "definition": {
+        "en": "Report tracking software license usage, entitlements, and compliance status.",
+        "pt": "Relatório rastreando uso de licenças de software, direitos e status de conformidade."
+      },
+      "synonyms": {
+        "en": [
+          "license compliance",
+          "license audit",
+          "software license report",
+          "license tracking"
+        ],
+        "pt": [
+          "conformidade de licenças",
+          "auditoria de licenças",
+          "relatório de licenciamento"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 39
+    },
+    {
+      "id": "doc_load_test_report",
+      "canonicalName": "Load Test Report",
+      "definition": {
+        "en": "Report presenting results of performance and load testing including throughput, latency, and error rates.",
+        "pt": "Relatório apresentando resultados de testes de desempenho e carga incluindo throughput, latência e taxas de erro."
+      },
+      "synonyms": {
+        "en": [
+          "load test report",
+          "performance test report",
+          "stress test report",
+          "load testing results"
+        ],
+        "pt": [
+          "relatório de teste de carga",
+          "relatório de teste de desempenho",
+          "resultados de teste de carga"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 40
+    },
+    {
+      "id": "doc_maintenance_log",
+      "canonicalName": "Maintenance Log",
+      "definition": {
+        "en": "Chronological log of maintenance activities performed on systems or infrastructure.",
+        "pt": "Registro cronológico de atividades de manutenção realizadas em sistemas ou infraestrutura."
+      },
+      "synonyms": {
+        "en": [
+          "maintenance log",
+          "maintenance record",
+          "maintenance history",
+          "maintenance journal"
+        ],
+        "pt": [
+          "registro de manutenção",
+          "log de manutenção",
+          "histórico de manutenção"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 41
+    },
+    {
+      "id": "doc_migration_plan",
+      "canonicalName": "Migration Plan",
+      "definition": {
+        "en": "Plan for migrating systems, data, or services from one platform or environment to another.",
+        "pt": "Plano para migração de sistemas, dados ou serviços de uma plataforma ou ambiente para outro."
+      },
+      "synonyms": {
+        "en": [
+          "migration plan",
+          "migration strategy",
+          "data migration plan",
+          "cloud migration plan"
+        ],
+        "pt": [
+          "plano de migração",
+          "estratégia de migração",
+          "plano de migração de dados"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 42
+    },
+    {
+      "id": "doc_monitoring_alert_rules",
+      "canonicalName": "Monitoring Alert Rules",
+      "definition": {
+        "en": "Configuration of monitoring alert conditions, thresholds, notification channels, and severity mappings.",
+        "pt": "Configuração de condições de alerta de monitoramento, limiares, canais de notificação e mapeamentos de severidade."
+      },
+      "synonyms": {
+        "en": [
+          "alert rules",
+          "monitoring rules",
+          "alerting configuration",
+          "monitoring alert rules"
+        ],
+        "pt": [
+          "regras de alerta",
+          "regras de monitoramento",
+          "configuração de alertas"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 43
+    },
+    {
+      "id": "doc_network_diagram",
+      "canonicalName": "Network Diagram",
+      "definition": {
+        "en": "Visual representation of network topology including nodes, connections, subnets, and security zones.",
+        "pt": "Representação visual da topologia de rede incluindo nós, conexões, sub-redes e zonas de segurança."
+      },
+      "synonyms": {
+        "en": [
+          "network diagram",
+          "network topology",
+          "network map",
+          "infrastructure diagram"
+        ],
+        "pt": [
+          "diagrama de rede",
+          "topologia de rede",
+          "mapa de rede"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 44
+    },
+    {
+      "id": "doc_ola",
+      "canonicalName": "Operational Level Agreement",
+      "definition": {
+        "en": "Internal agreement between teams defining service delivery responsibilities and performance targets.",
+        "pt": "Acordo interno entre equipes definindo responsabilidades de entrega de serviço e metas de desempenho."
+      },
+      "synonyms": {
+        "en": [
+          "OLA",
+          "operational level agreement",
+          "internal SLA",
+          "team agreement"
+        ],
+        "pt": [
+          "OLA",
+          "acordo de nível operacional",
+          "acordo interno de serviço"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 45
+    },
+    {
+      "id": "doc_on_call_schedule",
+      "canonicalName": "On-Call Schedule",
+      "definition": {
+        "en": "Schedule defining on-call rotations, escalation contacts, and coverage periods.",
+        "pt": "Cronograma definindo rotações de plantão, contatos de escalonamento e períodos de cobertura."
+      },
+      "synonyms": {
+        "en": [
+          "on-call schedule",
+          "on-call rotation",
+          "pager schedule",
+          "on-call roster"
+        ],
+        "pt": [
+          "escala de plantão",
+          "cronograma de plantão",
+          "rotação de plantão"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 46
+    },
+    {
+      "id": "doc_onboarding_guide",
+      "canonicalName": "Onboarding Guide",
+      "definition": {
+        "en": "Guide for onboarding new team members including access provisioning, tools setup, and orientation.",
+        "pt": "Guia para integração de novos membros da equipe incluindo provisionamento de acesso, configuração de ferramentas e orientação."
+      },
+      "synonyms": {
+        "en": [
+          "onboarding guide",
+          "onboarding document",
+          "new hire guide",
+          "onboarding checklist"
+        ],
+        "pt": [
+          "guia de integração",
+          "guia de onboarding",
+          "manual de integração"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 47
+    },
+    {
+      "id": "doc_patch_management_log",
+      "canonicalName": "Patch Management Log",
+      "definition": {
+        "en": "Log tracking security and software patches applied across systems with dates and outcomes.",
+        "pt": "Registro rastreando patches de segurança e software aplicados em sistemas com datas e resultados."
+      },
+      "synonyms": {
+        "en": [
+          "patch log",
+          "patch management log",
+          "patching record",
+          "update log"
+        ],
+        "pt": [
+          "registro de patches",
+          "log de gerenciamento de patches",
+          "histórico de atualizações"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 48
+    },
+    {
+      "id": "doc_penetration_test_report",
+      "canonicalName": "Penetration Test Report",
+      "definition": {
+        "en": "Report from security penetration testing detailing vulnerabilities found, risk ratings, and remediation recommendations.",
+        "pt": "Relatório de teste de penetração de segurança detalhando vulnerabilidades encontradas, classificações de risco e recomendações de remediação."
+      },
+      "synonyms": {
+        "en": [
+          "pen test report",
+          "penetration test report",
+          "pentest report",
+          "security assessment report"
+        ],
+        "pt": [
+          "relatório de teste de penetração",
+          "relatório de pentest",
+          "relatório de avaliação de segurança"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 49
+    },
+    {
+      "id": "doc_playbook",
+      "canonicalName": "Playbook",
+      "definition": {
+        "en": "Tactical guide with predefined response procedures for specific operational scenarios.",
+        "pt": "Guia tático com procedimentos de resposta predefinidos para cenários operacionais específicos."
+      },
+      "synonyms": {
+        "en": [
+          "playbook",
+          "response playbook",
+          "ops playbook",
+          "operational playbook"
+        ],
+        "pt": [
+          "playbook",
+          "manual de respostas",
+          "playbook operacional"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 50
+    },
+    {
+      "id": "doc_postmortem",
+      "canonicalName": "Postmortem",
+      "definition": {
+        "en": "Analysis document written after an incident identifying root cause, contributing factors, timeline, and action items.",
+        "pt": "Documento de análise escrito após um incidente identificando causa raiz, fatores contribuintes, cronologia e itens de ação."
+      },
+      "synonyms": {
+        "en": [
+          "postmortem",
+          "post-mortem",
+          "post-incident review",
+          "PIR",
+          "blameless postmortem"
+        ],
+        "pt": [
+          "postmortem",
+          "pós-mortem",
+          "revisão pós-incidente",
+          "análise pós-incidente"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 51
+    },
+    {
+      "id": "doc_problem_record",
+      "canonicalName": "Problem Record",
+      "definition": {
+        "en": "ITIL problem record tracking the underlying cause of one or more incidents.",
+        "pt": "Registro de problema ITIL rastreando a causa subjacente de um ou mais incidentes."
+      },
+      "synonyms": {
+        "en": [
+          "problem record",
+          "problem ticket",
+          "problem report",
+          "PRB record"
+        ],
+        "pt": [
+          "registro de problema",
+          "ticket de problema",
+          "relatório de problema"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 52
+    },
+    {
+      "id": "doc_process_map",
+      "canonicalName": "Process Map",
+      "definition": {
+        "en": "Visual diagram of a business or operational process showing steps, decisions, and flow.",
+        "pt": "Diagrama visual de um processo de negócio ou operacional mostrando etapas, decisões e fluxo."
+      },
+      "synonyms": {
+        "en": [
+          "process map",
+          "process flow",
+          "process diagram",
+          "workflow diagram",
+          "flowchart"
+        ],
+        "pt": [
+          "mapa de processos",
+          "fluxo de processos",
+          "diagrama de processos",
+          "fluxograma"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 53
+    },
+    {
+      "id": "doc_procurement_request",
+      "canonicalName": "Procurement Request",
+      "definition": {
+        "en": "Formal request to purchase goods, services, or licenses through the procurement process.",
+        "pt": "Solicitação formal para compra de bens, serviços ou licenças através do processo de aquisição."
+      },
+      "synonyms": {
+        "en": [
+          "procurement request",
+          "purchase request",
+          "PR",
+          "requisition",
+          "procurement order"
+        ],
+        "pt": [
+          "solicitação de compra",
+          "requisição de compra",
+          "pedido de aquisição"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": false
+      },
+      "priority": 54
+    },
+    {
+      "id": "doc_release_checklist",
+      "canonicalName": "Release Checklist",
+      "definition": {
+        "en": "Checklist of pre-release and post-release verification steps for software deployments.",
+        "pt": "Lista de verificação de etapas de verificação pré e pós-lançamento para implantações de software."
+      },
+      "synonyms": {
+        "en": [
+          "release checklist",
+          "deployment checklist",
+          "go-live checklist",
+          "release readiness checklist"
+        ],
+        "pt": [
+          "checklist de release",
+          "checklist de implantação",
+          "checklist de go-live"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 56
+    },
+    {
+      "id": "doc_release_notes",
+      "canonicalName": "Release Notes",
+      "definition": {
+        "en": "Document describing changes, fixes, and new features included in a software release.",
+        "pt": "Documento descrevendo mudanças, correções e novas funcionalidades incluídas em uma versão de software."
+      },
+      "synonyms": {
+        "en": [
+          "release notes",
+          "changelog",
+          "release log",
+          "version notes",
+          "what's new"
+        ],
+        "pt": [
+          "notas de versão",
+          "notas de release",
+          "changelog",
+          "registro de mudanças"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 57
+    },
+    {
+      "id": "doc_restore_test_log",
+      "canonicalName": "Restore Test Log",
+      "definition": {
+        "en": "Log documenting backup restoration tests including success/failure status and recovery time.",
+        "pt": "Registro documentando testes de restauração de backup incluindo status de sucesso/falha e tempo de recuperação."
+      },
+      "synonyms": {
+        "en": [
+          "restore test log",
+          "backup restore test",
+          "recovery test log",
+          "restore drill log"
+        ],
+        "pt": [
+          "registro de teste de restauração",
+          "teste de restore",
+          "log de teste de recuperação"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 58
+    },
+    {
+      "id": "doc_risk_register",
+      "canonicalName": "Risk Register",
+      "definition": {
+        "en": "Register of identified operational risks with likelihood, impact, mitigation strategies, and review dates.",
+        "pt": "Registro de riscos operacionais identificados com probabilidade, impacto, estratégias de mitigação e datas de revisão."
+      },
+      "synonyms": {
+        "en": [
+          "risk register",
+          "risk log",
+          "risk matrix",
+          "risk tracker",
+          "risk assessment"
+        ],
+        "pt": [
+          "registro de riscos",
+          "matriz de riscos",
+          "log de riscos",
+          "avaliação de riscos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 59
+    },
+    {
+      "id": "doc_rollback_plan",
+      "canonicalName": "Rollback Plan",
+      "definition": {
+        "en": "Documented steps for reverting a deployment or change to its previous state in case of failure.",
+        "pt": "Passos documentados para reverter uma implantação ou mudança ao estado anterior em caso de falha."
+      },
+      "synonyms": {
+        "en": [
+          "rollback plan",
+          "rollback procedure",
+          "backout plan",
+          "revert plan"
+        ],
+        "pt": [
+          "plano de rollback",
+          "procedimento de rollback",
+          "plano de reversão"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 60
+    },
+    {
+      "id": "doc_root_cause_analysis",
+      "canonicalName": "Root Cause Analysis",
+      "definition": {
+        "en": "Structured investigation to identify the fundamental cause of an incident or defect.",
+        "pt": "Investigação estruturada para identificar a causa fundamental de um incidente ou defeito."
+      },
+      "synonyms": {
+        "en": [
+          "RCA",
+          "root cause analysis",
+          "5 whys analysis",
+          "causal analysis",
+          "fishbone analysis"
+        ],
+        "pt": [
+          "análise de causa raiz",
+          "RCA",
+          "análise dos 5 porquês",
+          "análise causal"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 61
+    },
+    {
+      "id": "doc_runbook",
+      "canonicalName": "Runbook",
+      "definition": {
+        "en": "Step-by-step operational procedures for routine or emergency tasks, designed for operator execution.",
+        "pt": "Procedimentos operacionais passo a passo para tarefas rotineiras ou emergenciais, projetados para execução por operadores."
+      },
+      "synonyms": {
+        "en": [
+          "runbook",
+          "operations runbook",
+          "ops runbook",
+          "run book",
+          "operator guide"
+        ],
+        "pt": [
+          "runbook",
+          "manual de operações",
+          "guia do operador",
+          "livro de procedimentos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 62
+    },
+    {
+      "id": "doc_safety_inspection_report",
+      "canonicalName": "Safety Inspection Report",
+      "definition": {
+        "en": "Report from workplace or facility safety inspections documenting findings and corrective actions.",
+        "pt": "Relatório de inspeções de segurança do local de trabalho ou instalação documentando achados e ações corretivas."
+      },
+      "synonyms": {
+        "en": [
+          "safety inspection report",
+          "safety audit report",
+          "safety inspection",
+          "HSE inspection report"
+        ],
+        "pt": [
+          "relatório de inspeção de segurança",
+          "relatório de auditoria de segurança",
+          "inspeção de segurança"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 63
+    },
+    {
+      "id": "doc_sbom",
+      "canonicalName": "Software Bill of Materials",
+      "definition": {
+        "en": "Inventory of all software components, libraries, and dependencies in an application.",
+        "pt": "Inventário de todos os componentes de software, bibliotecas e dependências em uma aplicação."
+      },
+      "synonyms": {
+        "en": [
+          "SBOM",
+          "software bill of materials",
+          "dependency list",
+          "component inventory"
+        ],
+        "pt": [
+          "SBOM",
+          "lista de materiais de software",
+          "inventário de componentes",
+          "lista de dependências"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 64
+    },
+    {
+      "id": "doc_security_incident_report",
+      "canonicalName": "Security Incident Report",
+      "definition": {
+        "en": "Report documenting a security breach or event including scope, impact, containment, and remediation.",
+        "pt": "Relatório documentando uma violação ou evento de segurança incluindo escopo, impacto, contenção e remediação."
+      },
+      "synonyms": {
+        "en": [
+          "security incident report",
+          "security breach report",
+          "security event report",
+          "SIRT report"
+        ],
+        "pt": [
+          "relatório de incidente de segurança",
+          "relatório de violação de segurança",
+          "relatório de evento de segurança"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 65
+    },
+    {
+      "id": "doc_service_catalog",
+      "canonicalName": "Service Catalog",
+      "definition": {
+        "en": "Catalog of available IT and operational services with descriptions, SLAs, and request procedures.",
+        "pt": "Catálogo de serviços de TI e operacionais disponíveis com descrições, SLAs e procedimentos de solicitação."
+      },
+      "synonyms": {
+        "en": [
+          "service catalog",
+          "service catalogue",
+          "IT service catalog",
+          "service portfolio"
+        ],
+        "pt": [
+          "catálogo de serviços",
+          "portfólio de serviços",
+          "catálogo de serviços de TI"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 66
+    },
+    {
+      "id": "doc_service_request_form",
+      "canonicalName": "Service Request Form",
+      "definition": {
+        "en": "Standardized form for requesting IT or operational services.",
+        "pt": "Formulário padronizado para solicitar serviços de TI ou operacionais."
+      },
+      "synonyms": {
+        "en": [
+          "service request",
+          "service request form",
+          "SR form",
+          "service ticket template"
+        ],
+        "pt": [
+          "formulário de solicitação de serviço",
+          "solicitação de serviço",
+          "formulário SR"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 67
+    },
+    {
+      "id": "doc_shift_handover",
+      "canonicalName": "Shift Handover",
+      "definition": {
+        "en": "Document transferring operational context, open issues, and pending actions between shifts.",
+        "pt": "Documento transferindo contexto operacional, questões abertas e ações pendentes entre turnos."
+      },
+      "synonyms": {
+        "en": [
+          "shift handover",
+          "shift handoff",
+          "handover notes",
+          "shift turnover",
+          "shift log"
+        ],
+        "pt": [
+          "passagem de turno",
+          "handover de turno",
+          "notas de passagem de turno"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 68
+    },
+    {
+      "id": "doc_sla_document",
+      "canonicalName": "SLA Document",
+      "definition": {
+        "en": "Service Level Agreement defining performance targets, measurement methods, and penalties.",
+        "pt": "Acordo de Nível de Serviço definindo metas de desempenho, métodos de medição e penalidades."
+      },
+      "synonyms": {
+        "en": [
+          "SLA",
+          "SLA document",
+          "service level agreement",
+          "service contract"
+        ],
+        "pt": [
+          "SLA",
+          "acordo de nível de serviço",
+          "contrato de nível de serviço"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 69
+    },
+    {
+      "id": "doc_sop",
+      "canonicalName": "Standard Operating Procedure",
+      "definition": {
+        "en": "Versioned document prescribing standardized steps for performing a specific operational task.",
+        "pt": "Documento versionado prescrevendo etapas padronizadas para realizar uma tarefa operacional específica."
+      },
+      "synonyms": {
+        "en": [
+          "SOP",
+          "standard operating procedure",
+          "operating procedure",
+          "standard procedure"
+        ],
+        "pt": [
+          "POP",
+          "procedimento operacional padrão",
+          "SOP",
+          "procedimento padrão"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 70
+    },
+    {
+      "id": "doc_sprint_retrospective",
+      "canonicalName": "Sprint Retrospective",
+      "definition": {
+        "en": "Meeting notes from sprint retrospective capturing what went well, improvements, and action items.",
+        "pt": "Notas de reunião de retrospectiva do sprint capturando o que funcionou bem, melhorias e itens de ação."
+      },
+      "synonyms": {
+        "en": [
+          "sprint retrospective",
+          "retro notes",
+          "sprint retro",
+          "retrospective"
+        ],
+        "pt": [
+          "retrospectiva do sprint",
+          "retro do sprint",
+          "notas de retrospectiva"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 71
+    },
+    {
+      "id": "doc_sre_toil_tracking",
+      "canonicalName": "SRE Toil Tracking",
+      "definition": {
+        "en": "Document tracking manual, repetitive operational work (toil) and automation opportunities.",
+        "pt": "Documento rastreando trabalho operacional manual e repetitivo (toil) e oportunidades de automação."
+      },
+      "synonyms": {
+        "en": [
+          "toil tracking",
+          "SRE toil tracking",
+          "toil report",
+          "toil budget",
+          "toil log"
+        ],
+        "pt": [
+          "rastreamento de toil",
+          "tracking de toil",
+          "relatório de toil SRE"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 72
+    },
+    {
+      "id": "doc_status_report",
+      "canonicalName": "Status Report",
+      "definition": {
+        "en": "Periodic report on project, service, or operational status including milestones and blockers.",
+        "pt": "Relatório periódico sobre status de projeto, serviço ou operação incluindo marcos e impedimentos."
+      },
+      "synonyms": {
+        "en": [
+          "status report",
+          "status update",
+          "weekly status",
+          "project status report",
+          "SITREP"
+        ],
+        "pt": [
+          "relatório de status",
+          "atualização de status",
+          "relatório semanal de status"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 73
+    },
+    {
+      "id": "doc_threshold_configuration",
+      "canonicalName": "Threshold Configuration",
+      "definition": {
+        "en": "Configuration document defining operational thresholds for alerts, autoscaling, and circuit breakers.",
+        "pt": "Documento de configuração definindo limiares operacionais para alertas, autoescalonamento e circuit breakers."
+      },
+      "synonyms": {
+        "en": [
+          "threshold config",
+          "threshold configuration",
+          "alerting thresholds",
+          "threshold settings"
+        ],
+        "pt": [
+          "configuração de limiares",
+          "thresholds operacionais",
+          "configuração de thresholds"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 74
+    },
+    {
+      "id": "doc_training_manual",
+      "canonicalName": "Training Manual",
+      "definition": {
+        "en": "Comprehensive training document covering operational procedures, tools, and best practices.",
+        "pt": "Manual de treinamento abrangente cobrindo procedimentos operacionais, ferramentas e melhores práticas."
+      },
+      "synonyms": {
+        "en": [
+          "training manual",
+          "training guide",
+          "training document",
+          "operator training manual"
+        ],
+        "pt": [
+          "manual de treinamento",
+          "guia de treinamento",
+          "documento de treinamento"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 75
+    },
+    {
+      "id": "doc_troubleshooting_guide",
+      "canonicalName": "Troubleshooting Guide",
+      "definition": {
+        "en": "Guide providing diagnostic steps and solutions for common operational problems.",
+        "pt": "Guia fornecendo etapas de diagnóstico e soluções para problemas operacionais comuns."
+      },
+      "synonyms": {
+        "en": [
+          "troubleshooting guide",
+          "TSG",
+          "diagnostic guide",
+          "troubleshooting document"
+        ],
+        "pt": [
+          "guia de solução de problemas",
+          "guia de troubleshooting",
+          "manual de diagnóstico"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 76
+    },
+    {
+      "id": "doc_value_stream_map",
+      "canonicalName": "Value Stream Map",
+      "definition": {
+        "en": "Lean methodology visualization of end-to-end process flow showing value-add and waste.",
+        "pt": "Visualização de metodologia lean do fluxo de processo ponta a ponta mostrando valor agregado e desperdício."
+      },
+      "synonyms": {
+        "en": [
+          "value stream map",
+          "VSM",
+          "value stream mapping",
+          "lean process map"
+        ],
+        "pt": [
+          "mapa de fluxo de valor",
+          "VSM",
+          "mapeamento de fluxo de valor"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 77
+    },
+    {
+      "id": "doc_vendor_scorecard",
+      "canonicalName": "Vendor Scorecard",
+      "definition": {
+        "en": "Evaluation framework scoring vendor performance across quality, delivery, cost, and compliance.",
+        "pt": "Framework de avaliação pontuando o desempenho de fornecedores em qualidade, entrega, custo e conformidade."
+      },
+      "synonyms": {
+        "en": [
+          "vendor scorecard",
+          "supplier scorecard",
+          "vendor evaluation",
+          "vendor performance report"
+        ],
+        "pt": [
+          "scorecard de fornecedores",
+          "avaliação de fornecedores",
+          "relatório de desempenho de fornecedores"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": false
+      },
+      "priority": 78
+    },
+    {
+      "id": "doc_vpn_configuration",
+      "canonicalName": "VPN Configuration",
+      "definition": {
+        "en": "Document specifying VPN tunnel configurations, encryption settings, and access policies.",
+        "pt": "Documento especificando configurações de túneis VPN, configurações de criptografia e políticas de acesso."
+      },
+      "synonyms": {
+        "en": [
+          "VPN config",
+          "VPN configuration",
+          "VPN setup",
+          "VPN tunnel config"
+        ],
+        "pt": [
+          "configuração de VPN",
+          "configuração de túnel VPN",
+          "setup de VPN"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 79
+    },
+    {
+      "id": "doc_war_room_log",
+      "canonicalName": "War Room Log",
+      "definition": {
+        "en": "Log of activities and decisions during a war room session for major incident resolution.",
+        "pt": "Registro de atividades e decisões durante uma sessão de war room para resolução de incidentes graves."
+      },
+      "synonyms": {
+        "en": [
+          "war room log",
+          "war room notes",
+          "crisis room log",
+          "bridge call notes"
+        ],
+        "pt": [
+          "registro de war room",
+          "notas de war room",
+          "log de sala de crise"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 80
+    },
+    {
+      "id": "doc_webhook_configuration",
+      "canonicalName": "Webhook Configuration",
+      "definition": {
+        "en": "Configuration of webhook endpoints, payload formats, retry policies, and authentication.",
+        "pt": "Configuração de endpoints de webhook, formatos de payload, políticas de retry e autenticação."
+      },
+      "synonyms": {
+        "en": [
+          "webhook config",
+          "webhook configuration",
+          "webhook setup",
+          "webhook integration"
+        ],
+        "pt": [
+          "configuração de webhook",
+          "setup de webhook",
+          "integração de webhook"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 81
+    },
+    {
+      "id": "doc_work_order",
+      "canonicalName": "Work Order",
+      "definition": {
+        "en": "Formal order authorizing specific maintenance, repair, or operational work to be performed.",
+        "pt": "Ordem formal autorizando trabalho específico de manutenção, reparo ou operação a ser realizado."
+      },
+      "synonyms": {
+        "en": [
+          "work order",
+          "WO",
+          "job order",
+          "maintenance order",
+          "task order"
+        ],
+        "pt": [
+          "ordem de serviço",
+          "ordem de trabalho",
+          "OS",
+          "ordem de manutenção"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": false,
+        "requiresDisclosureOfAssumptions": false,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 82
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule_ops_doc_access_matrix_completeness",
+      "appliesTo": [
+        "doc_access_control_matrix"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "access",
+            "permission",
+            "role",
+            "privilege",
+            "least privilege"
+          ],
+          "pt": [
+            "acesso",
+            "permissão",
+            "papel",
+            "privilégio",
+            "menor privilégio"
+          ]
+        }
+      },
+      "check": {
+        "type": "access_matrix_completeness_check",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_ACCESS_MATRIX_INCOMPLETE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify the access control matrix covers all critical systems and follows the principle of least privilege.",
+          "pt": "Verifique se a matriz de controle de acesso cobre todos os sistemas críticos e segue o princípio do menor privilégio."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_adr_status_required",
+      "appliesTo": [
+        "doc_architecture_decision_record"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "summarize",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "ADR",
+            "architecture decision",
+            "status",
+            "accepted",
+            "deprecated"
+          ],
+          "pt": [
+            "ADR",
+            "decisão arquitetural",
+            "status",
+            "aceito",
+            "depreciado"
+          ]
+        }
+      },
+      "check": {
+        "type": "adr_status_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_ADR_STATUS_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the current status of this ADR (proposed, accepted, deprecated, or superseded)?",
+          "pt": "Qual é o status atual deste ADR (proposto, aceito, depreciado ou substituído)?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_api_deprecation_notice",
+      "appliesTo": [
+        "doc_api_documentation"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "deprecated",
+            "sunset",
+            "end of life",
+            "breaking change",
+            "API version"
+          ],
+          "pt": [
+            "depreciado",
+            "descontinuado",
+            "fim de vida",
+            "mudança incompatível",
+            "versão de API"
+          ]
+        }
+      },
+      "check": {
+        "type": "deprecation_notice_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_API_DEPRECATION",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Check whether any endpoints referenced in this API documentation have been deprecated or sunset.",
+          "pt": "Verifique se algum endpoint referenciado nesta documentação de API foi depreciado ou descontinuado."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_asset_lifecycle_status",
+      "appliesTo": [
+        "doc_asset_inventory"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "summarize",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "asset",
+            "lifecycle",
+            "EOL",
+            "end of life",
+            "end of support"
+          ],
+          "pt": [
+            "ativo",
+            "ciclo de vida",
+            "fim de vida",
+            "fim de suporte"
+          ]
+        }
+      },
+      "check": {
+        "type": "lifecycle_status_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_ASSET_LIFECYCLE_UNCLEAR",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the lifecycle status of these assets (active, approaching EOL, or end of support)?",
+          "pt": "Qual é o status do ciclo de vida destes ativos (ativo, próximo do fim de vida, ou fim de suporte)?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_backup_schedule_env_context",
+      "appliesTo": [
+        "doc_backup_schedule"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "backup",
+            "schedule",
+            "retention",
+            "frequency"
+          ],
+          "pt": [
+            "backup",
+            "cronograma",
+            "retenção",
+            "frequência"
+          ]
+        }
+      },
+      "check": {
+        "type": "environment_context_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_BACKUP_ENV_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which environment does this backup schedule apply to (production, staging, or development)?",
+          "pt": "A qual ambiente este cronograma de backup se aplica (produção, staging ou desenvolvimento)?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_bcp_test_date_required",
+      "appliesTo": [
+        "doc_bcp"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "BCP",
+            "continuity",
+            "current",
+            "valid",
+            "tested"
+          ],
+          "pt": [
+            "BCP",
+            "continuidade",
+            "atual",
+            "válido",
+            "testado"
+          ]
+        }
+      },
+      "check": {
+        "type": "last_tested_date_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_BCP_TEST_DATE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "When was this Business Continuity Plan last tested? I need the test date to validate its currency.",
+          "pt": "Quando este Plano de Continuidade de Negócios foi testado pela última vez? Preciso da data do teste para validar sua atualidade."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_capacity_baseline_date",
+      "appliesTo": [
+        "doc_capacity_plan",
+        "doc_capacity_forecast"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "compare",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "capacity",
+            "baseline",
+            "projection",
+            "forecast",
+            "utilization"
+          ],
+          "pt": [
+            "capacidade",
+            "linha de base",
+            "projeção",
+            "previsão",
+            "utilização"
+          ]
+        }
+      },
+      "check": {
+        "type": "baseline_date_for_projection_validity",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_CAPACITY_BASELINE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the baseline date for these capacity projections? Projections are only valid relative to their baseline.",
+          "pt": "Qual é a data base para essas projeções de capacidade? Projeções são válidas apenas em relação à sua data base."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_cert_expiry_check",
+      "appliesTo": [
+        "doc_certificate_renewal_tracker"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "monitor",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "certificate",
+            "expiry",
+            "renewal",
+            "SSL",
+            "TLS"
+          ],
+          "pt": [
+            "certificado",
+            "expiração",
+            "renovação",
+            "SSL",
+            "TLS"
+          ]
+        }
+      },
+      "check": {
+        "type": "expiry_date_currency_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_CERT_EXPIRY_STALE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Certificate expiry data may be outdated. Verify tracker was updated recently before relying on these dates.",
+          "pt": "Dados de expiração de certificados podem estar desatualizados. Verifique se o rastreador foi atualizado recentemente antes de confiar nessas datas."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_change_approval_chain",
+      "appliesTo": [
+        "doc_change_request"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "change request",
+            "approval",
+            "approved",
+            "CAB",
+            "authorization"
+          ],
+          "pt": [
+            "solicitação de mudança",
+            "aprovação",
+            "aprovado",
+            "CAB",
+            "autorização"
+          ]
+        }
+      },
+      "check": {
+        "type": "approval_chain_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_CHANGE_APPROVAL_MISSING",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I cannot confirm this change request's validity without verifying the approval chain. Please provide the approval status.",
+          "pt": "Não posso confirmar a validade desta solicitação de mudança sem verificar a cadeia de aprovação. Forneça o status de aprovação."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_change_impact_scope",
+      "appliesTo": [
+        "doc_change_request"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "impact",
+            "scope",
+            "affected systems",
+            "risk"
+          ],
+          "pt": [
+            "impacto",
+            "escopo",
+            "sistemas afetados",
+            "risco"
+          ]
+        }
+      },
+      "check": {
+        "type": "impact_scope_completeness",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_CHANGE_IMPACT_INCOMPLETE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "The change impact assessment may be incomplete. Confirm all affected systems have been identified.",
+          "pt": "A avaliação de impacto da mudança pode estar incompleta. Confirme que todos os sistemas afetados foram identificados."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_cmdb_snapshot_date",
+      "appliesTo": [
+        "doc_configuration_management_db_export"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "CMDB",
+            "configuration item",
+            "CI",
+            "relationship"
+          ],
+          "pt": [
+            "CMDB",
+            "item de configuração",
+            "CI",
+            "relacionamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "snapshot_date_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_CMDB_SNAPSHOT_STALE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "CMDB exports are point-in-time snapshots. Confirm the export date before relying on relationship data.",
+          "pt": "Exportações do CMDB são instantâneos pontuais. Confirme a data de exportação antes de confiar nos dados de relacionamento."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_compliance_audit_period",
+      "appliesTo": [
+        "doc_compliance_report"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "compliance",
+            "audit period",
+            "regulatory",
+            "compliant",
+            "non-compliant"
+          ],
+          "pt": [
+            "conformidade",
+            "período de auditoria",
+            "regulatório",
+            "conforme",
+            "não conforme"
+          ]
+        }
+      },
+      "check": {
+        "type": "audit_period_specification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_COMPLIANCE_PERIOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which audit period does this compliance report cover? Findings are only valid within their audit period.",
+          "pt": "Qual período de auditoria este relatório de conformidade cobre? Os achados são válidos apenas dentro do período de auditoria."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_cross_version_merge_block",
+      "appliesTo": [
+        "all_ops_doc_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "compare",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "version",
+            "previous version",
+            "older version",
+            "v1",
+            "v2"
+          ],
+          "pt": [
+            "versão",
+            "versão anterior",
+            "versão antiga",
+            "v1",
+            "v2"
+          ]
+        }
+      },
+      "check": {
+        "type": "cross_version_merge_prevention",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_CROSS_VERSION_MERGE",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I cannot merge information from different document versions. Please specify which version to use.",
+          "pt": "Não posso mesclar informações de versões diferentes do documento. Especifique qual versão utilizar."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_daily_standup_no_decisions",
+      "appliesTo": [
+        "doc_daily_standup_notes"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "standup",
+            "daily",
+            "blocker",
+            "decision",
+            "agreed"
+          ],
+          "pt": [
+            "daily",
+            "diária",
+            "impedimento",
+            "decisão",
+            "acordado"
+          ]
+        }
+      },
+      "check": {
+        "type": "decision_authority_limitation",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_STANDUP_NO_DECISIONS",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Daily standup notes capture blockers and updates, not formal decisions. Do not treat standup notes as decision records.",
+          "pt": "Notas de daily capturam impedimentos e atualizações, não decisões formais. Não trate notas de daily como registros de decisão."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_data_retention_legal_hold",
+      "appliesTo": [
+        "doc_data_retention_schedule"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "retention",
+            "deletion",
+            "legal hold",
+            "archive",
+            "expiry"
+          ],
+          "pt": [
+            "retenção",
+            "exclusão",
+            "retenção legal",
+            "arquivo",
+            "expiração"
+          ]
+        }
+      },
+      "check": {
+        "type": "legal_hold_awareness",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RETENTION_LEGAL_HOLD",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Are any of these data categories subject to a legal hold that overrides the standard retention schedule?",
+          "pt": "Alguma dessas categorias de dados está sujeita a retenção legal que substitui o cronograma de retenção padrão?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_decommission_dependency_check",
+      "appliesTo": [
+        "doc_decommission_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "decommission",
+            "retire",
+            "sunset",
+            "dependencies",
+            "downstream"
+          ],
+          "pt": [
+            "descomissionamento",
+            "desativar",
+            "aposentar",
+            "dependências",
+            "downstream"
+          ]
+        }
+      },
+      "check": {
+        "type": "dependency_impact_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_DECOM_DEPS_UNCHECKED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Have all downstream dependencies been identified and migrated before decommissioning?",
+          "pt": "Todas as dependências downstream foram identificadas e migradas antes do descomissionamento?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_deployment_env_target",
+      "appliesTo": [
+        "doc_deployment_guide"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "deploy",
+            "target",
+            "environment",
+            "production",
+            "staging"
+          ],
+          "pt": [
+            "implantar",
+            "alvo",
+            "ambiente",
+            "produção",
+            "staging"
+          ]
+        }
+      },
+      "check": {
+        "type": "deployment_target_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_DEPLOY_TARGET_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which target environment does this deployment guide apply to (production, staging, or development)?",
+          "pt": "A qual ambiente-alvo este guia de implantação se aplica (produção, staging ou desenvolvimento)?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_dns_propagation_warning",
+      "appliesTo": [
+        "doc_dns_configuration"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "DNS",
+            "record",
+            "TTL",
+            "propagation",
+            "resolution"
+          ],
+          "pt": [
+            "DNS",
+            "registro",
+            "TTL",
+            "propagação",
+            "resolução"
+          ]
+        }
+      },
+      "check": {
+        "type": "dns_propagation_awareness",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_DNS_PROPAGATION",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "DNS configuration changes may take time to propagate. Verify current resolution state before assuming changes are live.",
+          "pt": "Mudanças na configuração de DNS podem levar tempo para propagar. Verifique o estado atual de resolução antes de assumir que as alterações estão ativas."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_dr_last_tested_date",
+      "appliesTo": [
+        "doc_disaster_recovery_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "DR plan",
+            "disaster recovery",
+            "current",
+            "valid",
+            "tested",
+            "RTO",
+            "RPO"
+          ],
+          "pt": [
+            "plano de DR",
+            "recuperação de desastres",
+            "atual",
+            "válido",
+            "testado",
+            "RTO",
+            "RPO"
+          ]
+        }
+      },
+      "check": {
+        "type": "last_tested_date_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_DR_TEST_DATE_MISSING",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I cannot validate a DR plan without knowing when it was last tested. Please provide the last test date.",
+          "pt": "Não posso validar um plano de DR sem saber quando foi testado pela última vez. Forneça a data do último teste."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_dr_rto_rpo_match",
+      "appliesTo": [
+        "doc_disaster_recovery_plan",
+        "doc_dr_test_results"
+      ],
+      "trigger": {
+        "operators": [
+          "compare",
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "RTO",
+            "RPO",
+            "recovery time",
+            "recovery point",
+            "target"
+          ],
+          "pt": [
+            "RTO",
+            "RPO",
+            "tempo de recuperação",
+            "ponto de recuperação",
+            "meta"
+          ]
+        }
+      },
+      "check": {
+        "type": "rto_rpo_target_vs_actual",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_DR_RTO_RPO_MISMATCH",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "When comparing RTO/RPO, always distinguish between target values and actual test results.",
+          "pt": "Ao comparar RTO/RPO, sempre distinga entre valores-alvo e resultados reais de teste."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_env_context_for_thresholds",
+      "appliesTo": [
+        "doc_threshold_configuration",
+        "doc_monitoring_alert_rules"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract",
+          "compare",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "threshold",
+            "alert",
+            "monitor",
+            "prod",
+            "staging",
+            "dev",
+            "environment"
+          ],
+          "pt": [
+            "limiar",
+            "alerta",
+            "monitoramento",
+            "produção",
+            "staging",
+            "desenvolvimento",
+            "ambiente"
+          ]
+        }
+      },
+      "check": {
+        "type": "environment_context_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_THRESHOLD_ENV_MISSING",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I cannot summarize monitoring thresholds without knowing the environment (production, staging, or development). Which environment applies?",
+          "pt": "Não posso resumir limiares de monitoramento sem saber o ambiente (produção, staging ou desenvolvimento). Qual ambiente se aplica?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_error_budget_slo_link",
+      "appliesTo": [
+        "doc_error_budget_policy"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "error budget",
+            "SLO",
+            "reliability",
+            "budget remaining"
+          ],
+          "pt": [
+            "orçamento de erros",
+            "SLO",
+            "confiabilidade",
+            "budget restante"
+          ]
+        }
+      },
+      "check": {
+        "type": "slo_linkage_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_ERROR_BUDGET_SLO_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which SLO does this error budget policy relate to? Error budgets must reference a specific service level objective.",
+          "pt": "A qual SLO esta política de orçamento de erros se refere? Orçamentos de erro devem referenciar um objetivo de nível de serviço específico."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_escalation_severity_match",
+      "appliesTo": [
+        "doc_escalation_matrix"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "escalation",
+            "severity",
+            "P1",
+            "P2",
+            "critical",
+            "contact"
+          ],
+          "pt": [
+            "escalonamento",
+            "severidade",
+            "P1",
+            "P2",
+            "crítico",
+            "contato"
+          ]
+        }
+      },
+      "check": {
+        "type": "severity_level_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_ESCALATION_SEVERITY_AMBIGUOUS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What severity level applies to determine the correct escalation path?",
+          "pt": "Qual nível de severidade se aplica para determinar o caminho correto de escalonamento?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_exec_dashboard_data_source",
+      "appliesTo": [
+        "doc_executive_dashboard",
+        "doc_kpi_dashboard",
+        "doc_kpi_report"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "dashboard",
+            "data source",
+            "metric",
+            "KPI",
+            "indicator"
+          ],
+          "pt": [
+            "dashboard",
+            "fonte de dados",
+            "métrica",
+            "KPI",
+            "indicador"
+          ]
+        }
+      },
+      "check": {
+        "type": "data_source_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_DASHBOARD_SOURCE_UNKNOWN",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the data source and refresh frequency for these dashboard metrics?",
+          "pt": "Qual é a fonte de dados e frequência de atualização para essas métricas do dashboard?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_failover_last_validated",
+      "appliesTo": [
+        "doc_failover_procedure"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "failover",
+            "switchover",
+            "validated",
+            "tested",
+            "current"
+          ],
+          "pt": [
+            "failover",
+            "comutação",
+            "validado",
+            "testado",
+            "atual"
+          ]
+        }
+      },
+      "check": {
+        "type": "last_validation_date_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_FAILOVER_NOT_VALIDATED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Failover procedures should be validated regularly. Check when this procedure was last tested.",
+          "pt": "Procedimentos de failover devem ser validados regularmente. Verifique quando este procedimento foi testado pela última vez."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_faq_review_currency",
+      "appliesTo": [
+        "doc_faq_document",
+        "doc_knowledge_base_article"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "FAQ",
+            "knowledge base",
+            "answer",
+            "solution",
+            "article"
+          ],
+          "pt": [
+            "FAQ",
+            "base de conhecimento",
+            "resposta",
+            "solução",
+            "artigo"
+          ]
+        }
+      },
+      "check": {
+        "type": "content_review_date_check",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_FAQ_STALE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "FAQ and knowledge base articles may be outdated. Check the last review date before relying on their content.",
+          "pt": "Artigos de FAQ e base de conhecimento podem estar desatualizados. Verifique a data da última revisão antes de confiar em seu conteúdo."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_firewall_classification",
+      "appliesTo": [
+        "doc_firewall_rules_export"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "firewall",
+            "rules",
+            "ACL",
+            "allow",
+            "deny",
+            "port"
+          ],
+          "pt": [
+            "firewall",
+            "regras",
+            "ACL",
+            "permitir",
+            "negar",
+            "porta"
+          ]
+        }
+      },
+      "check": {
+        "type": "security_classification_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_FIREWALL_CLASSIFICATION",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "Firewall rule exports may contain sensitive security information. Verify the classification level before sharing content.",
+          "pt": "Exportações de regras de firewall podem conter informações de segurança sensíveis. Verifique o nível de classificação antes de compartilhar conteúdo."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_fmea_rpn_recalc",
+      "appliesTo": [
+        "doc_fmea"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "compare",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "FMEA",
+            "RPN",
+            "severity",
+            "occurrence",
+            "detection",
+            "risk priority"
+          ],
+          "pt": [
+            "FMEA",
+            "RPN",
+            "severidade",
+            "ocorrência",
+            "detecção",
+            "prioridade de risco"
+          ]
+        }
+      },
+      "check": {
+        "type": "rpn_calculation_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_FMEA_RPN_UNVERIFIED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "When evaluating FMEA, verify that RPN values match the product of severity, occurrence, and detection ratings.",
+          "pt": "Ao avaliar FMEA, verifique se os valores de RPN correspondem ao produto das classificações de severidade, ocorrência e detecção."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_health_check_scope",
+      "appliesTo": [
+        "doc_health_check_report"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "evaluate",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "health",
+            "status",
+            "green",
+            "red",
+            "degraded",
+            "healthy"
+          ],
+          "pt": [
+            "saúde",
+            "status",
+            "verde",
+            "vermelho",
+            "degradado",
+            "saudável"
+          ]
+        }
+      },
+      "check": {
+        "type": "health_check_scope_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_HEALTH_SCOPE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which service or infrastructure component does this health check cover?",
+          "pt": "Qual serviço ou componente de infraestrutura esta verificação de saúde cobre?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_incident_severity_classification",
+      "appliesTo": [
+        "doc_incident_report",
+        "doc_security_incident_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "severity",
+            "priority",
+            "P1",
+            "P2",
+            "P3",
+            "critical",
+            "major",
+            "minor"
+          ],
+          "pt": [
+            "severidade",
+            "prioridade",
+            "P1",
+            "P2",
+            "P3",
+            "crítico",
+            "maior",
+            "menor"
+          ]
+        }
+      },
+      "check": {
+        "type": "severity_classification_consistency",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_INCIDENT_SEVERITY_INCONSISTENT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "The incident severity classification may vary across documents. Which severity classification standard should I use?",
+          "pt": "A classificação de severidade do incidente pode variar entre documentos. Qual padrão de classificação de severidade devo utilizar?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_incident_timeline_before_rca",
+      "appliesTo": [
+        "doc_incident_report"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "summarize",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "root cause",
+            "timeline",
+            "incident",
+            "cause",
+            "triggered by"
+          ],
+          "pt": [
+            "causa raiz",
+            "cronologia",
+            "incidente",
+            "causa",
+            "provocado por"
+          ]
+        }
+      },
+      "check": {
+        "type": "timeline_verification_before_root_cause",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_INCIDENT_TIMELINE_UNVERIFIED",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I must verify the incident timeline before making root cause claims. Has the timeline been confirmed?",
+          "pt": "Devo verificar a cronologia do incidente antes de fazer afirmações sobre a causa raiz. A cronologia foi confirmada?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_integration_auth_check",
+      "appliesTo": [
+        "doc_integration_spec",
+        "doc_webhook_configuration"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "authentication",
+            "auth",
+            "token",
+            "API key",
+            "OAuth",
+            "credentials"
+          ],
+          "pt": [
+            "autenticação",
+            "token",
+            "chave de API",
+            "OAuth",
+            "credenciais"
+          ]
+        }
+      },
+      "check": {
+        "type": "credential_exposure_prevention",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_INTEGRATION_CRED_EXPOSURE",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "Integration specifications may contain authentication credentials. I will not extract or display credential values.",
+          "pt": "Especificações de integração podem conter credenciais de autenticação. Não vou extrair ou exibir valores de credenciais."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_integration_version_compat",
+      "appliesTo": [
+        "doc_integration_spec",
+        "doc_api_documentation"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "API version",
+            "integration",
+            "compatibility",
+            "breaking change",
+            "deprecated endpoint"
+          ],
+          "pt": [
+            "versão de API",
+            "integração",
+            "compatibilidade",
+            "mudança incompatível",
+            "endpoint depreciado"
+          ]
+        }
+      },
+      "check": {
+        "type": "version_compatibility_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_INTEGRATION_VERSION_CONFLICT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which API version should I reference for this integration validation?",
+          "pt": "Qual versão da API devo referenciar para esta validação de integração?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_inventory_reconciliation",
+      "appliesTo": [
+        "doc_inventory_report",
+        "doc_asset_inventory"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "compare",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "inventory",
+            "count",
+            "reconciliation",
+            "discrepancy",
+            "variance"
+          ],
+          "pt": [
+            "inventário",
+            "contagem",
+            "reconciliação",
+            "discrepância",
+            "variação"
+          ]
+        }
+      },
+      "check": {
+        "type": "reconciliation_date_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_INVENTORY_UNRECONCILED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "When was the last physical-to-system inventory reconciliation completed?",
+          "pt": "Quando foi concluída a última reconciliação de inventário físico versus sistema?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_kanban_wip_context",
+      "appliesTo": [
+        "doc_kanban_board_export"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "evaluate",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "WIP",
+            "cycle time",
+            "lead time",
+            "throughput",
+            "bottleneck"
+          ],
+          "pt": [
+            "WIP",
+            "tempo de ciclo",
+            "lead time",
+            "throughput",
+            "gargalo"
+          ]
+        }
+      },
+      "check": {
+        "type": "wip_limit_context_required",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_KANBAN_WIP_CONTEXT",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Kanban metrics require context about WIP limits and team capacity. Confirm these are current before drawing conclusions.",
+          "pt": "Métricas de Kanban requerem contexto sobre limites de WIP e capacidade da equipe. Confirme que estão atuais antes de tirar conclusões."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_kedb_workaround_currency",
+      "appliesTo": [
+        "doc_known_error_database"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "known error",
+            "workaround",
+            "fix",
+            "permanent fix",
+            "KEDB"
+          ],
+          "pt": [
+            "erro conhecido",
+            "solução alternativa",
+            "correção",
+            "correção permanente",
+            "KEDB"
+          ]
+        }
+      },
+      "check": {
+        "type": "workaround_currency_check",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_KEDB_WORKAROUND_STALE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Known error workarounds may be outdated. Verify the last review date before applying.",
+          "pt": "Soluções alternativas de erros conhecidos podem estar desatualizadas. Verifique a data da última revisão antes de aplicar."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_license_entitlement_check",
+      "appliesTo": [
+        "doc_license_compliance"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "license",
+            "entitlement",
+            "compliance",
+            "usage",
+            "over-deployed"
+          ],
+          "pt": [
+            "licença",
+            "direito",
+            "conformidade",
+            "uso",
+            "sobre-implantado"
+          ]
+        }
+      },
+      "check": {
+        "type": "entitlement_vs_usage_comparison",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_LICENSE_ENTITLEMENT_MISMATCH",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I compare license entitlements against current deployment counts or historical peak usage?",
+          "pt": "Devo comparar direitos de licença com contagens de implantação atuais ou pico de uso histórico?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_load_test_env_match",
+      "appliesTo": [
+        "doc_load_test_report"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "compare",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "load test",
+            "performance",
+            "throughput",
+            "latency",
+            "baseline"
+          ],
+          "pt": [
+            "teste de carga",
+            "desempenho",
+            "throughput",
+            "latência",
+            "linha de base"
+          ]
+        }
+      },
+      "check": {
+        "type": "test_environment_match",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_LOAD_TEST_ENV_MISMATCH",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Was this load test executed against production-equivalent infrastructure? Test environment differences affect result validity.",
+          "pt": "Este teste de carga foi executado em infraestrutura equivalente à produção? Diferenças no ambiente de teste afetam a validade dos resultados."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_maintenance_window_check",
+      "appliesTo": [
+        "doc_maintenance_log",
+        "doc_work_order"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "maintenance window",
+            "scheduled",
+            "downtime",
+            "planned"
+          ],
+          "pt": [
+            "janela de manutenção",
+            "programado",
+            "tempo de inatividade",
+            "planejado"
+          ]
+        }
+      },
+      "check": {
+        "type": "maintenance_window_compliance",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_MAINTENANCE_WINDOW_VIOLATION",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify that maintenance activities were performed within approved maintenance windows.",
+          "pt": "Verifique se as atividades de manutenção foram realizadas dentro das janelas de manutenção aprovadas."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_migration_data_validation",
+      "appliesTo": [
+        "doc_migration_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "data migration",
+            "data validation",
+            "data integrity",
+            "record count",
+            "checksum"
+          ],
+          "pt": [
+            "migração de dados",
+            "validação de dados",
+            "integridade de dados",
+            "contagem de registros",
+            "checksum"
+          ]
+        }
+      },
+      "check": {
+        "type": "data_validation_step_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_MIGRATION_NO_VALIDATION",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify that the migration plan includes data validation steps to confirm integrity after migration.",
+          "pt": "Verifique se o plano de migração inclui etapas de validação de dados para confirmar a integridade após a migração."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_migration_rollback_exists",
+      "appliesTo": [
+        "doc_migration_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "migration",
+            "rollback",
+            "fallback",
+            "go/no-go",
+            "cutover"
+          ],
+          "pt": [
+            "migração",
+            "rollback",
+            "fallback",
+            "go/no-go",
+            "cutover"
+          ]
+        }
+      },
+      "check": {
+        "type": "rollback_plan_existence",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_MIGRATION_NO_ROLLBACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Does this migration plan include a validated rollback procedure?",
+          "pt": "Este plano de migração inclui um procedimento de rollback validado?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_monitoring_env_context",
+      "appliesTo": [
+        "doc_monitoring_alert_rules"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "alert",
+            "monitoring",
+            "rule",
+            "notification",
+            "channel"
+          ],
+          "pt": [
+            "alerta",
+            "monitoramento",
+            "regra",
+            "notificação",
+            "canal"
+          ]
+        }
+      },
+      "check": {
+        "type": "environment_context_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_MONITORING_ENV_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which environment do these monitoring rules apply to? Alert configurations differ between production, staging, and development.",
+          "pt": "A qual ambiente estas regras de monitoramento se aplicam? Configurações de alerta diferem entre produção, staging e desenvolvimento."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_network_diagram_date",
+      "appliesTo": [
+        "doc_network_diagram",
+        "doc_dependency_map"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "topology",
+            "diagram",
+            "architecture",
+            "network",
+            "dependency"
+          ],
+          "pt": [
+            "topologia",
+            "diagrama",
+            "arquitetura",
+            "rede",
+            "dependência"
+          ]
+        }
+      },
+      "check": {
+        "type": "diagram_date_verification",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_DIAGRAM_STALE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Network and dependency diagrams may not reflect current state. Verify the diagram's last-updated date.",
+          "pt": "Diagramas de rede e dependências podem não refletir o estado atual. Verifique a data da última atualização do diagrama."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_network_security_zones",
+      "appliesTo": [
+        "doc_network_diagram"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "summarize",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "DMZ",
+            "security zone",
+            "segment",
+            "VLAN",
+            "subnet",
+            "trust boundary"
+          ],
+          "pt": [
+            "DMZ",
+            "zona de segurança",
+            "segmento",
+            "VLAN",
+            "sub-rede",
+            "limite de confiança"
+          ]
+        }
+      },
+      "check": {
+        "type": "security_zone_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_NETWORK_ZONES_UNCLEAR",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which security zone or network segment is relevant to this query?",
+          "pt": "Qual zona de segurança ou segmento de rede é relevante para esta consulta?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_no_cross_runbook_merge",
+      "appliesTo": [
+        "doc_runbook"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "compare",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "runbook",
+            "version",
+            "procedure",
+            "steps",
+            "different runbook"
+          ],
+          "pt": [
+            "runbook",
+            "versão",
+            "procedimento",
+            "passos",
+            "runbook diferente"
+          ]
+        }
+      },
+      "check": {
+        "type": "cross_document_merge_prevention",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_CROSS_RUNBOOK_MERGE",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I cannot merge information across different runbook versions. Mixing steps from different versions could cause operational errors. Please specify one version.",
+          "pt": "Não posso mesclar informações de versões diferentes de runbooks. Misturar passos de versões diferentes pode causar erros operacionais. Especifique uma versão."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_ola_parties_identification",
+      "appliesTo": [
+        "doc_ola"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "summarize",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "OLA",
+            "operational agreement",
+            "internal",
+            "team",
+            "responsibility"
+          ],
+          "pt": [
+            "OLA",
+            "acordo operacional",
+            "interno",
+            "equipe",
+            "responsabilidade"
+          ]
+        }
+      },
+      "check": {
+        "type": "party_identification_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_OLA_PARTIES_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which internal teams are party to this OLA? I need to identify the service provider and consumer teams.",
+          "pt": "Quais equipes internas são parte deste OLA? Preciso identificar as equipes provedora e consumidora do serviço."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_oncall_schedule_currency",
+      "appliesTo": [
+        "doc_on_call_schedule"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "on-call",
+            "rotation",
+            "contact",
+            "coverage",
+            "current"
+          ],
+          "pt": [
+            "plantão",
+            "rotação",
+            "contato",
+            "cobertura",
+            "atual"
+          ]
+        }
+      },
+      "check": {
+        "type": "schedule_currency_check",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_ONCALL_STALE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "On-call schedules change frequently. Verify this schedule is current before relying on contact information.",
+          "pt": "Escalas de plantão mudam com frequência. Verifique se esta escala está atual antes de confiar nas informações de contato."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_patch_impact_assessment",
+      "appliesTo": [
+        "doc_patch_management_log",
+        "doc_firmware_update_log"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "patch",
+            "update",
+            "firmware",
+            "impact",
+            "reboot required"
+          ],
+          "pt": [
+            "patch",
+            "atualização",
+            "firmware",
+            "impacto",
+            "reinicialização necessária"
+          ]
+        }
+      },
+      "check": {
+        "type": "patch_impact_assessment",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_PATCH_IMPACT_UNKNOWN",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify whether these patches require system restarts or have known side effects before reporting them as non-disruptive.",
+          "pt": "Verifique se esses patches requerem reinicialização do sistema ou têm efeitos colaterais conhecidos antes de reportá-los como não disruptivos."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_pentest_classification",
+      "appliesTo": [
+        "doc_penetration_test_report"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "penetration test",
+            "vulnerability",
+            "finding",
+            "critical",
+            "remediation"
+          ],
+          "pt": [
+            "teste de penetração",
+            "vulnerabilidade",
+            "achado",
+            "crítico",
+            "remediação"
+          ]
+        }
+      },
+      "check": {
+        "type": "security_classification_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_PENTEST_CLASSIFICATION",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "Penetration test reports contain sensitive security findings. Verify the classification level and distribution restrictions before sharing content.",
+          "pt": "Relatórios de teste de penetração contêm achados de segurança sensíveis. Verifique o nível de classificação e restrições de distribuição antes de compartilhar conteúdo."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_playbook_scenario_match",
+      "appliesTo": [
+        "doc_playbook"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "playbook",
+            "scenario",
+            "response",
+            "procedure",
+            "when"
+          ],
+          "pt": [
+            "playbook",
+            "cenário",
+            "resposta",
+            "procedimento",
+            "quando"
+          ]
+        }
+      },
+      "check": {
+        "type": "scenario_match_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_PLAYBOOK_SCENARIO_MISMATCH",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which specific scenario in the playbook applies to the current situation?",
+          "pt": "Qual cenário específico do playbook se aplica à situação atual?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_postmortem_action_items_status",
+      "appliesTo": [
+        "doc_postmortem"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "monitor",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "action item",
+            "follow-up",
+            "remediation",
+            "completed",
+            "pending"
+          ],
+          "pt": [
+            "item de ação",
+            "acompanhamento",
+            "remediação",
+            "concluído",
+            "pendente"
+          ]
+        }
+      },
+      "check": {
+        "type": "action_item_status_tracking",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_POSTMORTEM_ACTIONS_UNTRACKED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Postmortem action items should include current completion status. Verify action item statuses are up to date.",
+          "pt": "Itens de ação do postmortem devem incluir status atual de conclusão. Verifique se os status dos itens de ação estão atualizados."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_postmortem_contributing_vs_root",
+      "appliesTo": [
+        "doc_postmortem"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "summarize",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "root cause",
+            "contributing factor",
+            "cause",
+            "postmortem",
+            "why"
+          ],
+          "pt": [
+            "causa raiz",
+            "fator contribuinte",
+            "causa",
+            "postmortem",
+            "por que"
+          ]
+        }
+      },
+      "check": {
+        "type": "root_cause_vs_contributing_factor_distinction",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_POSTMORTEM_CAUSE_CONFLATION",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I must distinguish between root cause and contributing factors. The postmortem lists multiple causes; which is identified as the root cause?",
+          "pt": "Devo distinguir entre causa raiz e fatores contribuintes. O postmortem lista múltiplas causas; qual está identificada como a causa raiz?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_problem_vs_incident_distinction",
+      "appliesTo": [
+        "doc_problem_record",
+        "doc_incident_report"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "compare",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "problem",
+            "incident",
+            "underlying cause",
+            "recurring"
+          ],
+          "pt": [
+            "problema",
+            "incidente",
+            "causa subjacente",
+            "recorrente"
+          ]
+        }
+      },
+      "check": {
+        "type": "problem_incident_distinction",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_PROBLEM_INCIDENT_CONFLATION",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Distinguish between incident records (service disruption events) and problem records (underlying causes). Do not conflate them.",
+          "pt": "Distinga entre registros de incidente (eventos de interrupção de serviço) e registros de problema (causas subjacentes). Não os confunda."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_process_map_owner",
+      "appliesTo": [
+        "doc_process_map",
+        "doc_value_stream_map"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "process owner",
+            "RACI",
+            "accountable",
+            "responsible"
+          ],
+          "pt": [
+            "dono do processo",
+            "RACI",
+            "responsável",
+            "accountable"
+          ]
+        }
+      },
+      "check": {
+        "type": "process_ownership_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_PROCESS_OWNER_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Who is the designated process owner for this operational process?",
+          "pt": "Quem é o dono designado deste processo operacional?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_procurement_budget_approval",
+      "appliesTo": [
+        "doc_procurement_request",
+        "doc_budget_request_it_ops"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "procurement",
+            "budget",
+            "approved",
+            "authorization",
+            "spending"
+          ],
+          "pt": [
+            "aquisição",
+            "orçamento",
+            "aprovado",
+            "autorização",
+            "gasto"
+          ]
+        }
+      },
+      "check": {
+        "type": "budget_approval_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_PROCUREMENT_UNAPPROVED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Has budget approval been obtained for this procurement request?",
+          "pt": "A aprovação orçamentária foi obtida para esta solicitação de aquisição?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_rca_5_whys_depth",
+      "appliesTo": [
+        "doc_root_cause_analysis"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "root cause",
+            "5 whys",
+            "fishbone",
+            "causal",
+            "analysis"
+          ],
+          "pt": [
+            "causa raiz",
+            "5 porquês",
+            "espinha de peixe",
+            "causal",
+            "análise"
+          ]
+        }
+      },
+      "check": {
+        "type": "analysis_depth_verification",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RCA_SHALLOW",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Ensure the root cause analysis has sufficient depth. Stopping at symptoms rather than root causes undermines corrective actions.",
+          "pt": "Garanta que a análise de causa raiz tenha profundidade suficiente. Parar nos sintomas ao invés das causas raiz compromete as ações corretivas."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_release_notes_version_order",
+      "appliesTo": [
+        "doc_release_notes",
+        "doc_release_checklist"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "compare",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "release",
+            "version",
+            "changelog",
+            "release notes",
+            "what's new"
+          ],
+          "pt": [
+            "versão",
+            "release",
+            "changelog",
+            "notas de versão",
+            "novidades"
+          ]
+        }
+      },
+      "check": {
+        "type": "version_ordering_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RELEASE_VERSION_ORDER",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Release notes span multiple versions. Should I present changes from newest to oldest, or for a specific version only?",
+          "pt": "As notas de versão abrangem múltiplas versões. Devo apresentar mudanças da mais recente para a mais antiga, ou apenas para uma versão específica?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_release_pre_post_checks",
+      "appliesTo": [
+        "doc_release_checklist",
+        "doc_release_notes"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "pre-release",
+            "post-release",
+            "smoke test",
+            "sanity check",
+            "verification"
+          ],
+          "pt": [
+            "pré-release",
+            "pós-release",
+            "smoke test",
+            "verificação",
+            "sanidade"
+          ]
+        }
+      },
+      "check": {
+        "type": "pre_post_check_completeness",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RELEASE_CHECKS_INCOMPLETE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify that both pre-release and post-release verification steps have been completed and documented.",
+          "pt": "Verifique se as etapas de verificação pré-release e pós-release foram concluídas e documentadas."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_restore_test_recency",
+      "appliesTo": [
+        "doc_restore_test_log",
+        "doc_backup_schedule"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "restore",
+            "backup test",
+            "recovery test",
+            "restore test",
+            "last tested"
+          ],
+          "pt": [
+            "restauração",
+            "teste de backup",
+            "teste de recuperação",
+            "teste de restore",
+            "último teste"
+          ]
+        }
+      },
+      "check": {
+        "type": "test_recency_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RESTORE_TEST_STALE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Restore test results should be recent to be reliable. Check the date of the last successful restore test.",
+          "pt": "Resultados de testes de restauração devem ser recentes para serem confiáveis. Verifique a data do último teste de restauração bem-sucedido."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_risk_register_review_date",
+      "appliesTo": [
+        "doc_risk_register"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "risk",
+            "register",
+            "current",
+            "likelihood",
+            "impact",
+            "mitigation"
+          ],
+          "pt": [
+            "risco",
+            "registro",
+            "atual",
+            "probabilidade",
+            "impacto",
+            "mitigação"
+          ]
+        }
+      },
+      "check": {
+        "type": "last_review_date_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RISK_REGISTER_STALE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "When was this risk register last reviewed? Risk assessments require a recent review date for current-state claims.",
+          "pt": "Quando este registro de riscos foi revisado pela última vez? Avaliações de risco requerem uma data de revisão recente para afirmações sobre o estado atual."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_rollback_tested",
+      "appliesTo": [
+        "doc_rollback_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "rollback",
+            "revert",
+            "backout",
+            "tested",
+            "validated"
+          ],
+          "pt": [
+            "rollback",
+            "reverter",
+            "backout",
+            "testado",
+            "validado"
+          ]
+        }
+      },
+      "check": {
+        "type": "rollback_validation_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_ROLLBACK_UNTESTED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Has this rollback plan been tested in a non-production environment? Untested rollback plans carry high risk.",
+          "pt": "Este plano de rollback foi testado em ambiente não produtivo? Planos de rollback não testados apresentam alto risco."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_runbook_step_verification",
+      "appliesTo": [
+        "doc_runbook"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "runbook",
+            "steps",
+            "procedure",
+            "execute",
+            "follow"
+          ],
+          "pt": [
+            "runbook",
+            "passos",
+            "procedimento",
+            "executar",
+            "seguir"
+          ]
+        }
+      },
+      "check": {
+        "type": "step_by_step_verification_before_summary",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RUNBOOK_STEPS_UNVERIFIED",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I cannot summarize runbook steps without verifying each step is complete and in correct order. The full step sequence must be preserved.",
+          "pt": "Não posso resumir passos do runbook sem verificar que cada passo está completo e na ordem correta. A sequência completa de passos deve ser preservada."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_safety_regulatory_framework",
+      "appliesTo": [
+        "doc_safety_inspection_report",
+        "doc_environmental_compliance"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "safety",
+            "inspection",
+            "regulation",
+            "compliance",
+            "OSHA",
+            "environmental"
+          ],
+          "pt": [
+            "segurança",
+            "inspeção",
+            "regulamentação",
+            "conformidade",
+            "NR",
+            "ambiental"
+          ]
+        }
+      },
+      "check": {
+        "type": "regulatory_framework_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SAFETY_FRAMEWORK_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which regulatory framework applies to this safety inspection (e.g., OSHA, ISO 45001, local regulations)?",
+          "pt": "Qual framework regulatório se aplica a esta inspeção de segurança (ex.: NR, ISO 45001, regulamentações locais)?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_sbom_version_pinning",
+      "appliesTo": [
+        "doc_sbom"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "SBOM",
+            "dependency",
+            "version",
+            "vulnerability",
+            "CVE"
+          ],
+          "pt": [
+            "SBOM",
+            "dependência",
+            "versão",
+            "vulnerabilidade",
+            "CVE"
+          ]
+        }
+      },
+      "check": {
+        "type": "version_pinning_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SBOM_VERSION_UNPINNED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "SBOM entries should have pinned versions for accurate vulnerability assessment. Flag any entries with version ranges.",
+          "pt": "Entradas do SBOM devem ter versões fixadas para avaliação precisa de vulnerabilidades. Sinalize entradas com faixas de versão."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_security_classification_check",
+      "appliesTo": [
+        "doc_security_incident_report",
+        "doc_penetration_test_report",
+        "doc_firewall_rules_export",
+        "doc_vpn_configuration"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract",
+          "evaluate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "security",
+            "classified",
+            "confidential",
+            "restricted",
+            "internal only"
+          ],
+          "pt": [
+            "segurança",
+            "classificado",
+            "confidencial",
+            "restrito",
+            "uso interno"
+          ]
+        }
+      },
+      "check": {
+        "type": "classification_level_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SECURITY_CLASSIFICATION",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I must verify the security classification level of this document before sharing its content. What is the classification?",
+          "pt": "Devo verificar o nível de classificação de segurança deste documento antes de compartilhar seu conteúdo. Qual é a classificação?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_service_catalog_tier",
+      "appliesTo": [
+        "doc_service_catalog"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "compare",
+          "locate"
+        ],
+        "keywords": {
+          "en": [
+            "service",
+            "tier",
+            "catalog",
+            "offering",
+            "SLA"
+          ],
+          "pt": [
+            "serviço",
+            "nível",
+            "catálogo",
+            "oferta",
+            "SLA"
+          ]
+        }
+      },
+      "check": {
+        "type": "service_tier_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SERVICE_TIER_AMBIGUOUS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which service tier are you asking about? Support levels and SLAs differ by tier.",
+          "pt": "Sobre qual nível de serviço você está perguntando? Níveis de suporte e SLAs diferem por nível."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_service_request_sla_match",
+      "appliesTo": [
+        "doc_service_request_form"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "service request",
+            "priority",
+            "response time",
+            "resolution time"
+          ],
+          "pt": [
+            "solicitação de serviço",
+            "prioridade",
+            "tempo de resposta",
+            "tempo de resolução"
+          ]
+        }
+      },
+      "check": {
+        "type": "sla_priority_alignment",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SR_SLA_MISMATCH",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the priority level of this service request to determine the applicable SLA targets?",
+          "pt": "Qual é o nível de prioridade desta solicitação de serviço para determinar as metas de SLA aplicáveis?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_shift_handover_completeness",
+      "appliesTo": [
+        "doc_shift_handover"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "handover",
+            "handoff",
+            "open issues",
+            "pending",
+            "shift"
+          ],
+          "pt": [
+            "passagem de turno",
+            "handover",
+            "questões abertas",
+            "pendente",
+            "turno"
+          ]
+        }
+      },
+      "check": {
+        "type": "handover_completeness_check",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_HANDOVER_INCOMPLETE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify the shift handover includes all open issues, pending actions, and escalated items.",
+          "pt": "Verifique se a passagem de turno inclui todas as questões abertas, ações pendentes e itens escalonados."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_sla_tier_identification",
+      "appliesTo": [
+        "doc_sla_document"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "SLA",
+            "service level",
+            "target",
+            "metric",
+            "uptime",
+            "availability"
+          ],
+          "pt": [
+            "SLA",
+            "nível de serviço",
+            "meta",
+            "métrica",
+            "uptime",
+            "disponibilidade"
+          ]
+        }
+      },
+      "check": {
+        "type": "tier_identification_before_metric_comparison",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SLA_TIER_MISSING",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "I cannot compare SLA metrics without identifying the service tier first. Which tier applies to this evaluation?",
+          "pt": "Não posso comparar métricas de SLA sem identificar o nível de serviço primeiro. Qual nível se aplica a esta avaliação?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_sop_effective_date",
+      "appliesTo": [
+        "doc_sop"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "effective date",
+            "supersedes",
+            "replaces",
+            "current version"
+          ],
+          "pt": [
+            "data de vigência",
+            "substitui",
+            "substitui",
+            "versão atual"
+          ]
+        }
+      },
+      "check": {
+        "type": "effective_date_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SOP_EFFECTIVE_DATE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the effective date of this SOP version? I need to confirm it is the currently active version.",
+          "pt": "Qual é a data de vigência desta versão do POP? Preciso confirmar que é a versão atualmente ativa."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_sop_version_citation",
+      "appliesTo": [
+        "doc_sop"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "SOP",
+            "procedure",
+            "standard",
+            "version",
+            "revision"
+          ],
+          "pt": [
+            "POP",
+            "procedimento",
+            "padrão",
+            "versão",
+            "revisão"
+          ]
+        }
+      },
+      "check": {
+        "type": "version_number_citation_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_SOP_VERSION_MISSING",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "SOPs must include version numbers in any summary or citation. Which version of this SOP should I reference?",
+          "pt": "POPs devem incluir números de versão em qualquer resumo ou citação. Qual versão deste POP devo referenciar?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_sprint_retro_action_tracking",
+      "appliesTo": [
+        "doc_sprint_retrospective"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "evaluate",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "improvement",
+            "action item",
+            "retrospective",
+            "follow-up"
+          ],
+          "pt": [
+            "melhoria",
+            "item de ação",
+            "retrospectiva",
+            "acompanhamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "action_item_tracking",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_RETRO_ACTIONS_UNTRACKED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Sprint retrospective action items should be tracked to completion. Verify which items from previous retros remain open.",
+          "pt": "Itens de ação de retrospectiva do sprint devem ser rastreados até a conclusão. Verifique quais itens de retros anteriores permanecem abertos."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_sre_toil_automation_roi",
+      "appliesTo": [
+        "doc_sre_toil_tracking"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "automation",
+            "ROI",
+            "time saved",
+            "investment",
+            "payoff"
+          ],
+          "pt": [
+            "automação",
+            "ROI",
+            "tempo economizado",
+            "investimento",
+            "retorno"
+          ]
+        }
+      },
+      "check": {
+        "type": "roi_calculation_verification",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_TOIL_ROI_UNVERIFIED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify that toil automation ROI calculations account for both implementation cost and ongoing maintenance effort.",
+          "pt": "Verifique se os cálculos de ROI de automação de toil consideram tanto o custo de implementação quanto o esforço de manutenção contínua."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_status_report_period",
+      "appliesTo": [
+        "doc_status_report",
+        "doc_executive_dashboard",
+        "doc_kpi_dashboard",
+        "doc_kpi_report"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "compare",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "status",
+            "period",
+            "weekly",
+            "monthly",
+            "quarterly",
+            "report date"
+          ],
+          "pt": [
+            "status",
+            "período",
+            "semanal",
+            "mensal",
+            "trimestral",
+            "data do relatório"
+          ]
+        }
+      },
+      "check": {
+        "type": "reporting_period_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_STATUS_PERIOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which reporting period does this status report cover?",
+          "pt": "Qual período de reporte este relatório de status cobre?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_toil_measurement_consistency",
+      "appliesTo": [
+        "doc_sre_toil_tracking"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "compare",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "toil",
+            "automation",
+            "manual work",
+            "toil budget",
+            "toil percentage"
+          ],
+          "pt": [
+            "toil",
+            "automação",
+            "trabalho manual",
+            "orçamento de toil",
+            "percentual de toil"
+          ]
+        }
+      },
+      "check": {
+        "type": "measurement_methodology_consistency",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_TOIL_MEASUREMENT_INCONSISTENT",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Toil measurements must use consistent methodology across periods. Verify the measurement criteria have not changed.",
+          "pt": "Medições de toil devem usar metodologia consistente entre períodos. Verifique se os critérios de medição não mudaram."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_training_version_alignment",
+      "appliesTo": [
+        "doc_training_manual",
+        "doc_onboarding_guide"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "training",
+            "onboarding",
+            "procedure",
+            "current",
+            "outdated"
+          ],
+          "pt": [
+            "treinamento",
+            "integração",
+            "procedimento",
+            "atual",
+            "desatualizado"
+          ]
+        }
+      },
+      "check": {
+        "type": "content_version_alignment",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_TRAINING_OUTDATED",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Training materials may not reflect current procedures. Verify alignment with the latest SOPs and runbooks.",
+          "pt": "Materiais de treinamento podem não refletir procedimentos atuais. Verifique o alinhamento com os POPs e runbooks mais recentes."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_troubleshooting_decision_tree",
+      "appliesTo": [
+        "doc_troubleshooting_guide"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "locate"
+        ],
+        "keywords": {
+          "en": [
+            "troubleshoot",
+            "diagnose",
+            "decision tree",
+            "symptom",
+            "resolution"
+          ],
+          "pt": [
+            "solucionar",
+            "diagnosticar",
+            "árvore de decisão",
+            "sintoma",
+            "resolução"
+          ]
+        }
+      },
+      "check": {
+        "type": "decision_tree_completeness",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_TSG_INCOMPLETE_TREE",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Follow the troubleshooting guide's decision tree in order. Do not skip diagnostic steps.",
+          "pt": "Siga a árvore de decisão do guia de solução de problemas em ordem. Não pule etapas de diagnóstico."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_value_stream_baseline",
+      "appliesTo": [
+        "doc_value_stream_map",
+        "doc_process_map"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "compare",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "value stream",
+            "process",
+            "lead time",
+            "waste",
+            "improvement"
+          ],
+          "pt": [
+            "fluxo de valor",
+            "processo",
+            "lead time",
+            "desperdício",
+            "melhoria"
+          ]
+        }
+      },
+      "check": {
+        "type": "baseline_measurement_date",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_VSM_BASELINE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "When was the baseline measurement for this value stream map taken? Improvement comparisons need a dated baseline.",
+          "pt": "Quando a medição de linha de base deste mapa de fluxo de valor foi realizada? Comparações de melhoria precisam de uma linha de base datada."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_vendor_eval_criteria",
+      "appliesTo": [
+        "doc_vendor_scorecard"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "compare",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "vendor",
+            "supplier",
+            "scorecard",
+            "evaluation",
+            "performance"
+          ],
+          "pt": [
+            "fornecedor",
+            "scorecard",
+            "avaliação",
+            "desempenho"
+          ]
+        }
+      },
+      "check": {
+        "type": "evaluation_criteria_specification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_VENDOR_CRITERIA_UNCLEAR",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which evaluation criteria and weighting scheme should I use for this vendor comparison?",
+          "pt": "Quais critérios de avaliação e esquema de ponderação devo utilizar para esta comparação de fornecedores?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_vpn_security_check",
+      "appliesTo": [
+        "doc_vpn_configuration"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "VPN",
+            "tunnel",
+            "encryption",
+            "access",
+            "configuration"
+          ],
+          "pt": [
+            "VPN",
+            "túnel",
+            "criptografia",
+            "acesso",
+            "configuração"
+          ]
+        }
+      },
+      "check": {
+        "type": "security_classification_check",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_VPN_CLASSIFICATION",
+        "severity": "block",
+        "action": "refuse",
+        "questionTemplate": {
+          "en": "VPN configurations contain sensitive network access information. Verify the classification level before sharing details.",
+          "pt": "Configurações de VPN contêm informações sensíveis de acesso à rede. Verifique o nível de classificação antes de compartilhar detalhes."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_war_room_decision_authority",
+      "appliesTo": [
+        "doc_war_room_log"
+      ],
+      "trigger": {
+        "operators": [
+          "summarize",
+          "extract",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "war room",
+            "decision",
+            "authority",
+            "commander",
+            "incident commander"
+          ],
+          "pt": [
+            "war room",
+            "decisão",
+            "autoridade",
+            "comandante",
+            "comandante de incidente"
+          ]
+        }
+      },
+      "check": {
+        "type": "decision_authority_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "OPS_DOC_WAR_ROOM_AUTHORITY_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Who held incident command authority during this war room session?",
+          "pt": "Quem detinha a autoridade de comando de incidente durante esta sessão de war room?"
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_webhook_idempotency",
+      "appliesTo": [
+        "doc_webhook_configuration"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "webhook",
+            "retry",
+            "idempotent",
+            "duplicate",
+            "delivery"
+          ],
+          "pt": [
+            "webhook",
+            "retry",
+            "idempotente",
+            "duplicado",
+            "entrega"
+          ]
+        }
+      },
+      "check": {
+        "type": "idempotency_verification",
+        "deterministic": false,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_WEBHOOK_NOT_IDEMPOTENT",
+        "severity": "warn",
+        "action": "warn_then_continue",
+        "questionTemplate": {
+          "en": "Verify whether webhook consumers handle duplicate deliveries idempotently before assuming at-most-once processing.",
+          "pt": "Verifique se os consumidores de webhook tratam entregas duplicadas de forma idempotente antes de assumir processamento no máximo uma vez."
+        }
+      }
+    },
+    {
+      "id": "rule_ops_doc_work_order_authorization",
+      "appliesTo": [
+        "doc_work_order"
+      ],
+      "trigger": {
+        "operators": [
+          "validate",
+          "evaluate"
+        ],
+        "keywords": {
+          "en": [
+            "work order",
+            "authorized",
+            "approved",
+            "requester",
+            "assigned"
+          ],
+          "pt": [
+            "ordem de serviço",
+            "autorizado",
+            "aprovado",
+            "solicitante",
+            "atribuído"
+          ]
+        }
+      },
+      "check": {
+        "type": "authorization_verification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": false
+      },
+      "failureAction": {
+        "code": "OPS_DOC_WORK_ORDER_UNAUTHORIZED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Has this work order been properly authorized by the designated approver?",
+          "pt": "Esta ordem de serviço foi devidamente autorizada pelo aprovador designado?"
+        }
+      }
+    }
+  ]
+}

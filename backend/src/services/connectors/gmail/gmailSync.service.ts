@@ -35,6 +35,11 @@ export interface GmailSyncInput {
 export interface GmailSyncResult {
   provider: "gmail";
   syncedCount: number;
+  fetchedCount: number;
+  ingestedCount: number;
+  createdCount: number;
+  existingCount: number;
+  skippedCount: number;
   historyId?: string;
   mode: "initial" | "incremental";
   lastSyncAt: string;
@@ -211,7 +216,7 @@ export class GmailSyncService {
       }
     }
 
-    await this.ingestion.ingestDocuments(
+    const ingested = await this.ingestion.ingestDocuments(
       {
         userId: input.userId,
         correlationId: input.correlationId,
@@ -220,6 +225,15 @@ export class GmailSyncService {
       },
       docs,
     );
+    const createdCount = ingested.filter(
+      (item) => item.status === "created",
+    ).length;
+    const existingCount = ingested.filter(
+      (item) => item.status === "existing",
+    ).length;
+    const fetchedCount = docs.length;
+    const ingestedCount = ingested.length;
+    const skippedCount = Math.max(0, fetchedCount - ingestedCount);
 
     cursorFile.providers.gmail = {
       historyId: (profile.historyId as string | undefined) || prior.historyId,
@@ -230,7 +244,12 @@ export class GmailSyncService {
 
     return {
       provider: "gmail",
-      syncedCount: docs.length,
+      syncedCount: ingestedCount,
+      fetchedCount,
+      ingestedCount,
+      createdCount,
+      existingCount,
+      skippedCount,
       historyId: cursorFile.providers.gmail.historyId,
       mode,
       lastSyncAt:

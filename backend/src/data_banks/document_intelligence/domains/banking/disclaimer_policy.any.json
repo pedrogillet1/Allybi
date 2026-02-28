@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "di_banking_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer policy for banking responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "disclaimers": [
+    {
+      "id": "banking_disc_001_not_financial_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This analysis is informational and does not constitute banking, legal, or financial advice.",
+        "pt": "Esta analise e informativa e nao constitui orientacao bancaria, juridica ou financeira."
+      }
+    },
+    {
+      "id": "banking_disc_002_document_timebound",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Balances and status reflect the uploaded statement period and may have changed.",
+        "pt": "Saldos e status refletem o periodo do documento enviado e podem ter mudado."
+      }
+    },
+    {
+      "id": "banking_disc_003_dispute_channel",
+      "trigger": "analysis_involves_dispute",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "For formal disputes, contact your bank using official support channels and keep reference numbers.",
+        "pt": "Para contestacoes formais, contate seu banco pelos canais oficiais e guarde os codigos de referencia."
+      }
+    }
+  ]
+}

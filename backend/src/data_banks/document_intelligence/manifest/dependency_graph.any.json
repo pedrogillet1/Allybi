@@ -1,0 +1,1363 @@
+{
+  "_meta": {
+    "id": "document_intelligence_dependency_graph",
+    "version": "1.1.0",
+    "description": "Document intelligence dependency graph overlay used to enforce runtime wiring and prevent manifest drift.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "enforceAtBoot": true,
+    "failOnCycleInStrict": true,
+    "failOnMissingNodeInStrict": true
+  },
+  "banks": [
+    {
+      "id": "accounting_rules",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "ambiguity_questions",
+      "dependsOn": [
+        "quality_gates"
+      ]
+    },
+    {
+      "id": "assumption_policy",
+      "dependsOn": [
+        "clarification_policy"
+      ]
+    },
+    {
+      "id": "boost_rules_finance",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "boost_rules_legal",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "boost_rules_medical",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "boost_rules_ops",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "date_patterns",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "decision_support_finance",
+      "dependsOn": [
+        "assumption_policy",
+        "explain_style_finance"
+      ]
+    },
+    {
+      "id": "decision_support_legal",
+      "dependsOn": [
+        "assumption_policy",
+        "explain_style_legal"
+      ]
+    },
+    {
+      "id": "decision_support_medical",
+      "dependsOn": [
+        "assumption_policy",
+        "explain_style_medical"
+      ]
+    },
+    {
+      "id": "decision_support_ops",
+      "dependsOn": [
+        "assumption_policy",
+        "explain_style_ops"
+      ]
+    },
+    {
+      "id": "doc_aliases_accounting",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_aliases_finance",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_aliases_legal",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_aliases_medical",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_aliases_ops",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_accounting",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_finance",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_legal",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_medical",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_ops",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_taxonomy",
+      "dependsOn": []
+    },
+    {
+      "id": "document_intelligence_bank_map",
+      "dependsOn": [
+        "bank_registry"
+      ]
+    },
+    {
+      "id": "document_intelligence_dependency_graph",
+      "dependsOn": [
+        "document_intelligence_schema_registry"
+      ]
+    },
+    {
+      "id": "document_intelligence_orphan_allowlist",
+      "dependsOn": [
+        "document_intelligence_bank_map",
+        "document_intelligence_usage_manifest"
+      ]
+    },
+    {
+      "id": "document_intelligence_runtime_wiring_gates",
+      "dependsOn": [
+        "document_intelligence_bank_map",
+        "document_intelligence_usage_manifest"
+      ]
+    },
+    {
+      "id": "document_intelligence_schema_registry",
+      "dependsOn": [
+        "bank_registry",
+        "document_intelligence_manifest_schema"
+      ]
+    },
+    {
+      "id": "document_intelligence_usage_manifest",
+      "dependsOn": [
+        "document_intelligence_bank_map",
+        "document_intelligence_dependency_graph"
+      ]
+    },
+    {
+      "id": "explain_style_finance",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "explain_style_legal",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "explain_style_medical",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "explain_style_ops",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "finance_doc_logic",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "finance_kpi_ontology",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "headings_map",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "identifier_patterns",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "keyword_taxonomy_finance",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "keyword_taxonomy_legal",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "keyword_taxonomy_medical",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "keyword_taxonomy_ops",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "layout_cues",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "legal_abbreviations_en",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_abbreviations_pt",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_answer_style_bank",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_board_resolution_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_board_resolution_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_board_resolution_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_clause_ontology",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "legal_disclaimer_policy",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_doc_type_catalog",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_domain_detection_rules",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_domain_profile",
+      "dependsOn": []
+    },
+    {
+      "id": "legal_dpa_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_dpa_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_dpa_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_employment_agreement_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_employment_agreement_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_employment_agreement_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_evidence_requirements",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_lease_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_lease_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_lease_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_lexicon_en",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_lexicon_pt",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_litigation_memo_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_litigation_memo_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_litigation_memo_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_msa_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_msa_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_msa_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_nda_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_nda_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_nda_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_privacy_policy_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_privacy_policy_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_privacy_policy_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_reasoning_scaffolds",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_redaction_and_safety_rules",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_reference_rules",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "legal_retrieval_strategies",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_risk_heuristics",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "legal_sow_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_sow_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_sow_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_terms_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_terms_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_terms_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "legal_validation_policies",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_abbreviations_en",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_abbreviations_pt",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_answer_style_bank",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_care_plan_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_care_plan_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_care_plan_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_discharge_summary_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_discharge_summary_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_discharge_summary_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_disclaimer_policy",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_doc_type_catalog",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_domain_detection_rules",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_domain_profile",
+      "dependsOn": []
+    },
+    {
+      "id": "medical_evidence_requirements",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_explanation_templates",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "medical_lab_report_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_lab_report_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_lab_report_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_lexicon_en",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_lexicon_pt",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_med_list_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_med_list_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_med_list_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_progress_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_progress_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_progress_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_radiology_report_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_radiology_report_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_radiology_report_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_reasoning_scaffolds",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_redaction_and_safety_rules",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_referral_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_referral_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_referral_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_report_ontology",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "medical_retrieval_strategies",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_safety_boundaries",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "medical_soap_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_soap_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_soap_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ]
+    },
+    {
+      "id": "medical_validation_policies",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "money_patterns",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "numeric_integrity",
+      "dependsOn": [
+        "quality_gates"
+      ]
+    },
+    {
+      "id": "operator_playbook_advise_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_advise_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_advise_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_advise_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_calculate_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_calculate_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_calculate_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_calculate_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_compare_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_compare_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_compare_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_compare_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_evaluate_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_evaluate_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_evaluate_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_evaluate_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_extract_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_extract_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_extract_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_extract_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_locate_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_locate_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_locate_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_locate_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_monitor_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_monitor_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_monitor_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_monitor_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_navigate_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_navigate_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_navigate_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_navigate_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_open_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_open_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_open_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_open_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_summarize_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_summarize_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_summarize_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_summarize_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_validate_finance",
+      "dependsOn": [
+        "doc_aliases_finance",
+        "doc_archetypes_finance",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_validate_legal",
+      "dependsOn": [
+        "doc_aliases_legal",
+        "doc_archetypes_legal",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_validate_medical",
+      "dependsOn": [
+        "doc_aliases_medical",
+        "doc_archetypes_medical",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_validate_ops",
+      "dependsOn": [
+        "doc_aliases_ops",
+        "doc_archetypes_ops",
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "ops_doc_logic",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "ops_kpi_ontology",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "pain_points_finance",
+      "dependsOn": [
+        "keyword_taxonomy_finance"
+      ]
+    },
+    {
+      "id": "pain_points_legal",
+      "dependsOn": [
+        "keyword_taxonomy_legal"
+      ]
+    },
+    {
+      "id": "pain_points_medical",
+      "dependsOn": [
+        "keyword_taxonomy_medical"
+      ]
+    },
+    {
+      "id": "pain_points_ops",
+      "dependsOn": [
+        "keyword_taxonomy_ops"
+      ]
+    },
+    {
+      "id": "party_patterns",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "pattern_library",
+      "dependsOn": [
+        "document_intelligence_bank_map"
+      ]
+    },
+    {
+      "id": "query_rewrites_finance",
+      "dependsOn": [
+        "doc_aliases_finance"
+      ]
+    },
+    {
+      "id": "query_rewrites_legal",
+      "dependsOn": [
+        "doc_aliases_legal"
+      ]
+    },
+    {
+      "id": "query_rewrites_medical",
+      "dependsOn": [
+        "doc_aliases_medical"
+      ]
+    },
+    {
+      "id": "query_rewrites_ops",
+      "dependsOn": [
+        "doc_aliases_ops"
+      ]
+    },
+    {
+      "id": "section_priority_finance",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "section_priority_legal",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "section_priority_medical",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "section_priority_ops",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "sheetname_patterns",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "source_policy",
+      "dependsOn": [
+        "quality_gates"
+      ]
+    },
+    {
+      "id": "table_header_ontology_finance",
+      "dependsOn": [
+        "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "table_header_ontology_legal",
+      "dependsOn": [
+        "doc_archetypes_legal"
+      ]
+    },
+    {
+      "id": "table_header_ontology_medical",
+      "dependsOn": [
+        "doc_archetypes_medical"
+      ]
+    },
+    {
+      "id": "table_header_ontology_ops",
+      "dependsOn": [
+        "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "wrong_doc_lock",
+      "dependsOn": [
+        "quality_gates"
+      ]
+    }
+  ],
+  "familyDependencies": [
+    {
+      "idPrefix": "boost_rules_",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "idPrefix": "doc_aliases_",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "idPrefix": "doc_archetypes_",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "idPrefix": "keyword_taxonomy_",
+      "dependsOnIdPrefix": "doc_archetypes_"
+    },
+    {
+      "idPrefix": "legal_",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "idPrefix": "medical_",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "idPrefix": "operator_playbook_",
+      "dependsOnIdPrefix": "doc_archetypes_"
+    },
+    {
+      "idPrefix": "pain_points_",
+      "dependsOnIdPrefix": "keyword_taxonomy_"
+    },
+    {
+      "idPrefix": "query_rewrites_",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "idPrefix": "section_priority_",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "idPrefix": "table_header_ontology_",
+      "dependsOnIdPrefix": "doc_archetypes_"
+    }
+  ]
+}

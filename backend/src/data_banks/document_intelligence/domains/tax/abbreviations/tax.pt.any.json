@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "id": "di_tax_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "Portuguese abbreviations for tax domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "language": "pt"
+  },
+  "domain": "tax",
+  "abbreviations": [
+    {
+      "abbr": "CARNE",
+      "expansion": "Documento de Cobranca de Imposto"
+    },
+    {
+      "abbr": "CCIR",
+      "expansion": "Certificado de Cadastro de Imovel Rural"
+    },
+    {
+      "abbr": "CND",
+      "expansion": "Certidao Negativa de Debitos"
+    },
+    {
+      "abbr": "CNPJ",
+      "expansion": "Cadastro Nacional da Pessoa Juridica"
+    },
+    {
+      "abbr": "COFINS",
+      "expansion": "Contribuicao para o Financiamento da Seguridade Social"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoas Fisicas"
+    },
+    {
+      "abbr": "CSLL",
+      "expansion": "Contribuicao Social sobre o Lucro Liquido"
+    },
+    {
+      "abbr": "DARF",
+      "expansion": "Documento de Arrecadacao de Receitas Federais"
+    },
+    {
+      "abbr": "DAS",
+      "expansion": "Documento de Arrecadacao do Simples Nacional"
+    },
+    {
+      "abbr": "DCTF",
+      "expansion": "Declaracao de Debitos e Creditos Tributarios Federais"
+    },
+    {
+      "abbr": "DECRED",
+      "expansion": "Declaracao de Operacoes com Cartoes"
+    },
+    {
+      "abbr": "DIRF",
+      "expansion": "Declaracao do Imposto de Renda Retido na Fonte"
+    },
+    {
+      "abbr": "ECF",
+      "expansion": "Escrituracao Contabil Fiscal"
+    },
+    {
+      "abbr": "EFD",
+      "expansion": "Escrituracao Fiscal Digital"
+    },
+    {
+      "abbr": "EIN",
+      "expansion": "Numero de Identificacao do Empregador"
+    },
+    {
+      "abbr": "GCAP",
+      "expansion": "Programa de Ganho de Capital"
+    },
+    {
+      "abbr": "GPS",
+      "expansion": "Guia da Previdencia Social"
+    },
+    {
+      "abbr": "ICMS",
+      "expansion": "Imposto sobre Circulacao de Mercadorias e Servicos"
+    },
+    {
+      "abbr": "IE",
+      "expansion": "Inscricao Estadual"
+    },
+    {
+      "abbr": "II",
+      "expansion": "Imposto de Importacao"
+    },
+    {
+      "abbr": "INSS",
+      "expansion": "Instituto Nacional do Seguro Social"
+    },
+    {
+      "abbr": "IOF",
+      "expansion": "Imposto sobre Operacoes Financeiras"
+    },
+    {
+      "abbr": "IPI",
+      "expansion": "Imposto sobre Produtos Industrializados"
+    },
+    {
+      "abbr": "IPTU",
+      "expansion": "Imposto Predial e Territorial Urbano"
+    },
+    {
+      "abbr": "IRPF",
+      "expansion": "Imposto de Renda Pessoa Fisica"
+    },
+    {
+      "abbr": "IRPJ",
+      "expansion": "Imposto de Renda Pessoa Juridica"
+    },
+    {
+      "abbr": "ISS",
+      "expansion": "Imposto Sobre Servicos"
+    },
+    {
+      "abbr": "ITBI",
+      "expansion": "Imposto sobre Transmissao de Bens Imoveis"
+    },
+    {
+      "abbr": "ITCMD",
+      "expansion": "Imposto sobre Transmissao Causa Mortis e Doacao"
+    },
+    {
+      "abbr": "ITR",
+      "expansion": "Imposto Territorial Rural"
+    },
+    {
+      "abbr": "NF",
+      "expansion": "Nota Fiscal"
+    },
+    {
+      "abbr": "NFS-e",
+      "expansion": "Nota Fiscal de Servico Eletronica"
+    },
+    {
+      "abbr": "PERDCOMP",
+      "expansion": "Pedido Eletronico de Restituicao e Compensacao"
+    },
+    {
+      "abbr": "PIS",
+      "expansion": "Programa de Integracao Social"
+    },
+    {
+      "abbr": "RFB",
+      "expansion": "Receita Federal do Brasil"
+    },
+    {
+      "abbr": "SEFIP",
+      "expansion": "Sistema Empresa de Recolhimento do FGTS e Informacoes a Previdencia"
+    },
+    {
+      "abbr": "SELIC",
+      "expansion": "Sistema Especial de Liquidacao e de Custodia"
+    },
+    {
+      "abbr": "SPED",
+      "expansion": "Sistema Publico de Escrituracao Digital"
+    },
+    {
+      "abbr": "TIT",
+      "expansion": "Tribunal de Impostos e Taxas"
+    },
+    {
+      "abbr": "YTD",
+      "expansion": "Acumulado no Ano"
+    }
+  ]
+}

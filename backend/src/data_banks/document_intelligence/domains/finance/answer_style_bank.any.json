@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "id": "di_finance_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer styling rules for finance domain — tone, depth, audience adaptation.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "audienceProfiles": [
+    { "id": "executive", "tone": "concise", "defaultDepth": "executive_brief", "numberFormatting": "rounded_with_units", "jargonLevel": "high" },
+    { "id": "analyst", "tone": "precise", "defaultDepth": "detailed", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
+    { "id": "auditor", "tone": "skeptical", "defaultDepth": "audit_trail", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
+    { "id": "board_member", "tone": "strategic", "defaultDepth": "summary", "numberFormatting": "rounded_with_units", "jargonLevel": "medium" },
+    { "id": "general", "tone": "explanatory", "defaultDepth": "paragraph", "numberFormatting": "rounded_with_units", "jargonLevel": "low" }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "fin_style_001_currency",
+      "rule": "Always include currency symbol and units (e.g., $1.2M, R$500K). Never present bare numbers for monetary values.",
+      "applies": ["extract", "calculate", "compare", "summarize"]
+    },
+    {
+      "id": "fin_style_002_period_label",
+      "rule": "Always label the fiscal period (e.g., FY2025, Q3 2025, YTD). Never present financial data without period context.",
+      "applies": ["extract", "calculate", "compare", "monitor"]
+    },
+    {
+      "id": "fin_style_003_direction",
+      "rule": "For changes, always indicate direction and magnitude (e.g., 'increased 12% YoY', 'declined $3.2M QoQ').",
+      "applies": ["compare", "monitor", "summarize"]
+    },
+    {
+      "id": "fin_style_004_rounding",
+      "rule": "Round to appropriate precision: millions for revenue/assets >$10M, thousands for smaller items. Preserve cents only for per-share figures.",
+      "applies": ["extract", "calculate", "summarize"]
+    },
+    {
+      "id": "fin_style_005_negative_numbers",
+      "rule": "Use parentheses for losses/deficits per accounting convention: ($2.3M) not -$2.3M.",
+      "applies": ["extract", "calculate"]
+    },
+    {
+      "id": "fin_style_006_uncertainty",
+      "rule": "For estimates, forecasts, or unaudited figures, prefix with qualifier: 'estimated', 'projected', 'unaudited'.",
+      "applies": ["advise", "evaluate", "summarize"]
+    },
+    {
+      "id": "fin_style_007_gaap_label",
+      "rule": "When presenting non-GAAP metrics (adjusted EBITDA, etc.), explicitly label as 'non-GAAP' and note the adjustment.",
+      "applies": ["extract", "calculate", "compare"]
+    }
+  ]
+}

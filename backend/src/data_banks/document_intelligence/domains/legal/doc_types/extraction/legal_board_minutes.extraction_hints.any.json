@@ -1,0 +1,668 @@
+{
+  "_meta": {
+    "id": "legal_board_minutes_extraction_hints",
+    "version": "2.0.0",
+    "description": "Extraction hints and pitfalls for Board Meeting Minutes.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_board_minutes"
+  },
+  "hints": [
+    {
+      "id": "legal_board_minutes_hint_001",
+      "entity": "document_title",
+      "anchors": [
+        "document title",
+        "board meeting minutes document title",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document title in legal_board_minutes",
+        "document_header document title"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_002",
+      "entity": "document_version",
+      "anchors": [
+        "document version",
+        "board meeting minutes document version",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document version in legal_board_minutes",
+        "parties document version"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_003",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "board meeting minutes effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "effective date in legal_board_minutes",
+        "recitals_background effective date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_004",
+      "entity": "execution_date",
+      "anchors": [
+        "execution date",
+        "board meeting minutes execution date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "execution date in legal_board_minutes",
+        "definitions execution date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_005",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "board meeting minutes expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "expiration date in legal_board_minutes",
+        "scope_of_services expiration date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_006",
+      "entity": "renewal_term_days",
+      "anchors": [
+        "renewal term days",
+        "board meeting minutes renewal term days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "renewal term days in legal_board_minutes",
+        "fees_and_payment renewal term days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_007",
+      "entity": "notice_period_days",
+      "anchors": [
+        "notice period days",
+        "board meeting minutes notice period days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "notice period days in legal_board_minutes",
+        "term_and_renewal notice period days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_008",
+      "entity": "governing_law",
+      "anchors": [
+        "governing law",
+        "board meeting minutes governing law",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "governing law in legal_board_minutes",
+        "termination governing law"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_009",
+      "entity": "jurisdiction_venue",
+      "anchors": [
+        "jurisdiction venue",
+        "board meeting minutes jurisdiction venue",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "jurisdiction venue in legal_board_minutes",
+        "confidentiality_privacy jurisdiction venue"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_010",
+      "entity": "arbitration_forum",
+      "anchors": [
+        "arbitration forum",
+        "board meeting minutes arbitration forum",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "arbitration forum in legal_board_minutes",
+        "security_compliance arbitration forum"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_011",
+      "entity": "party_one_name",
+      "anchors": [
+        "party one name",
+        "board meeting minutes party one name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "ip_and_license",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one name in legal_board_minutes",
+        "ip_and_license party one name"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_012",
+      "entity": "party_one_role",
+      "anchors": [
+        "party one role",
+        "board meeting minutes party one role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "liability_and_indemnity",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one role in legal_board_minutes",
+        "liability_and_indemnity party one role"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_board_minutes_hint_013",
+      "entity": "party_one_address",
+      "anchors": [
+        "party one address",
+        "board meeting minutes party one address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "dispute_resolution",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one address in legal_board_minutes",
+        "dispute_resolution party one address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_014",
+      "entity": "party_two_name",
+      "anchors": [
+        "party two name",
+        "board meeting minutes party two name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "notices_misc",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two name in legal_board_minutes",
+        "notices_misc party two name"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_015",
+      "entity": "party_two_role",
+      "anchors": [
+        "party two role",
+        "board meeting minutes party two role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "signatures",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two role in legal_board_minutes",
+        "signatures party two role"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_016",
+      "entity": "party_two_address",
+      "anchors": [
+        "party two address",
+        "board meeting minutes party two address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "annexes_schedules",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two address in legal_board_minutes",
+        "annexes_schedules party two address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_017",
+      "entity": "affiliate_definition",
+      "anchors": [
+        "affiliate definition",
+        "board meeting minutes affiliate definition",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "affiliate definition in legal_board_minutes",
+        "document_header affiliate definition"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_018",
+      "entity": "services_description",
+      "anchors": [
+        "services description",
+        "board meeting minutes services description",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "services description in legal_board_minutes",
+        "parties services description"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_019",
+      "entity": "deliverables_summary",
+      "anchors": [
+        "deliverables summary",
+        "board meeting minutes deliverables summary",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "deliverables summary in legal_board_minutes",
+        "recitals_background deliverables summary"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_020",
+      "entity": "service_level_target",
+      "anchors": [
+        "service level target",
+        "board meeting minutes service level target",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "service level target in legal_board_minutes",
+        "definitions service level target"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_board_minutes_hint_021",
+      "entity": "fee_amount",
+      "anchors": [
+        "fee amount",
+        "board meeting minutes fee amount",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee amount in legal_board_minutes",
+        "scope_of_services fee amount"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_board_minutes_hint_022",
+      "entity": "fee_currency",
+      "anchors": [
+        "fee currency",
+        "board meeting minutes fee currency",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee currency in legal_board_minutes",
+        "fees_and_payment fee currency"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_board_minutes_hint_023",
+      "entity": "payment_terms_days",
+      "anchors": [
+        "payment terms days",
+        "board meeting minutes payment terms days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "payment terms days in legal_board_minutes",
+        "term_and_renewal payment terms days"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_board_minutes_hint_024",
+      "entity": "late_fee_rate",
+      "anchors": [
+        "late fee rate",
+        "board meeting minutes late fee rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "late fee rate in legal_board_minutes",
+        "termination late fee rate"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_board_minutes_hint_025",
+      "entity": "liability_cap_text",
+      "anchors": [
+        "liability cap text",
+        "board meeting minutes liability cap text",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "liability cap text in legal_board_minutes",
+        "confidentiality_privacy liability cap text"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_board_minutes_hint_026",
+      "entity": "indemnity_scope",
+      "anchors": [
+        "indemnity scope",
+        "board meeting minutes indemnity scope",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "indemnity scope in legal_board_minutes",
+        "security_compliance indemnity scope"
+      ],
+      "confidenceBias": "low"
+    }
+  ]
+}

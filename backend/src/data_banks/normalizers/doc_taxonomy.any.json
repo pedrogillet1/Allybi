@@ -1,0 +1,5972 @@
+{
+  "_meta": {
+    "id": "doc_taxonomy",
+    "version": "2.0.0",
+    "description": "SSOT document identity taxonomy mapping canonical doc types to domains, archetypes, and pack references.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "enforceDeterministicSort": true,
+    "dedupeCaseInsensitive": true,
+    "docTypeCountByDomain": {
+      "accounting": 22,
+      "banking": 8,
+      "billing": 18,
+      "education": 6,
+      "finance": 23,
+      "housing": 6,
+      "hr_payroll": 5,
+      "identity": 9,
+      "insurance": 8,
+      "legal": 30,
+      "medical": 20,
+      "tax": 9,
+      "travel": 6
+    }
+  },
+  "domains": [
+    "accounting",
+    "banking",
+    "billing",
+    "education",
+    "finance",
+    "housing",
+    "hr_payroll",
+    "identity",
+    "insurance",
+    "legal",
+    "medical",
+    "tax",
+    "travel"
+  ],
+  "docTypes": [
+    {
+      "id": "acct_accrual_schedule",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Accrual Schedule",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_ap_aging",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reconciliation_aging",
+      "displayName": "Acct Ap Aging",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_ap_aging"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_ap_aging"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_ap_aging"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_ap_aging"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_ar_aging",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reconciliation_aging",
+      "displayName": "Acct Ar Aging",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_ar_aging"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_ar_aging"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_ar_aging"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_ar_aging"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_audit_workpaper",
+      "domainId": "accounting",
+      "archetypeId": "accounting_close_control",
+      "displayName": "Acct Audit Workpaper",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_audit_workpaper"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_audit_workpaper"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_audit_workpaper"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_audit_workpaper"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_bank_rec",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reconciliation_aging",
+      "displayName": "Acct Bank Rec",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_bank_rec"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_bank_rec"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_bank_rec"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_bank_rec"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_cash_reconciliation",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reconciliation_aging",
+      "displayName": "Acct Cash Reconciliation",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_close_checklist",
+      "domainId": "accounting",
+      "archetypeId": "accounting_close_control",
+      "displayName": "Acct Close Checklist",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_controls_narrative",
+      "domainId": "accounting",
+      "archetypeId": "accounting_close_control",
+      "displayName": "Acct Controls Narrative",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_controls_narrative"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_controls_narrative"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_controls_narrative"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_controls_narrative"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_cost_center_report",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Cost Center Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_depreciation_schedule",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Depreciation Schedule",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_fixed_asset_register",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Fixed Asset Register",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_gl_export",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Gl Export",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_intercompany_reconciliation",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reconciliation_aging",
+      "displayName": "Acct Intercompany Reconciliation",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_inventory_valuation",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Inventory Valuation",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_invoice_register",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Invoice Register",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_je_support",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Je Support",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_je_support"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_je_support"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_je_support"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_je_support"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_payment_run",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Payment Run",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_prepaid_schedule",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Prepaid Schedule",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_revenue_recognition_schedule",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reporting_tax",
+      "displayName": "Acct Revenue Recognition Schedule",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_subledger_reconciliation",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reconciliation_aging",
+      "displayName": "Acct Subledger Reconciliation",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_tax_reconciliation",
+      "domainId": "accounting",
+      "archetypeId": "accounting_reporting_tax",
+      "displayName": "Acct Tax Reconciliation",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_gl_export"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_gl_export"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_gl_export"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_gl_export"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "acct_trial_balance",
+      "domainId": "accounting",
+      "archetypeId": "accounting_ledger_journal",
+      "displayName": "Acct Trial Balance",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_accounting_domain_detection_rules",
+        "doc_aliases_accounting"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_accounting_sections_acct_trial_balance"
+        ],
+        "entities": [
+          "di_accounting_entities_acct_trial_balance"
+        ],
+        "tables": [
+          "di_accounting_tables_acct_trial_balance"
+        ],
+        "extraction": [
+          "di_accounting_extraction_acct_trial_balance"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_account_opening_confirmation",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Account Opening Confirmation",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_bank_statement",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Bank Statement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_credit_card_statement",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Credit Card Statement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_loan_statement",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Loan Statement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_mortgage_statement",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Mortgage Statement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_payment_receipt",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Payment Receipt",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_transaction_export_csv",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Transaction Export CSV",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "csv",
+        "xlsx",
+        "pdf"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "banking_wire_transfer_confirmation",
+      "domainId": "banking",
+      "archetypeId": "everyday_document",
+      "displayName": "Banking Wire Transfer Confirmation",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_cable_streaming_invoice",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Cable Streaming Invoice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_ecommerce_receipt",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Ecommerce Receipt",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_electricity_bill",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Electricity Bill",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_gas_bill",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Gas Bill",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_hoa_condo_fee_statement",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing HOA Condo Fee Statement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_internet_bill",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Internet Bill",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_invoice_business",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Invoice Business",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_medical_invoice",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Medical Invoice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_membership_subscription_invoice",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Membership Subscription Invoice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_pharmacy_receipt",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Pharmacy Receipt",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_phone_bill_fixed",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Phone Bill Fixed",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_phone_bill_mobile",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Phone Bill Mobile",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_rent_receipt",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Rent Receipt",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_retail_receipt",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Retail Receipt",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_shipping_invoice",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Shipping Invoice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_trash_waste_bill",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Trash Waste Bill",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_tuition_invoice",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Tuition Invoice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "billing_water_sewer_bill",
+      "domainId": "billing",
+      "archetypeId": "everyday_document",
+      "displayName": "Billing Water Sewer Bill",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "edu_course_syllabus",
+      "domainId": "education",
+      "archetypeId": "everyday_document",
+      "displayName": "Edu Course Syllabus",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "edu_diploma_certificate",
+      "domainId": "education",
+      "archetypeId": "everyday_document",
+      "displayName": "Edu Diploma Certificate",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "edu_enrollment_letter",
+      "domainId": "education",
+      "archetypeId": "everyday_document",
+      "displayName": "Edu Enrollment Letter",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "edu_student_financial_aid_award",
+      "domainId": "education",
+      "archetypeId": "everyday_document",
+      "displayName": "Edu Student Financial Aid Award",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "edu_student_schedule",
+      "domainId": "education",
+      "archetypeId": "everyday_document",
+      "displayName": "Edu Student Schedule",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "edu_transcript",
+      "domainId": "education",
+      "archetypeId": "everyday_document",
+      "displayName": "Edu Transcript",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_10k",
+      "domainId": "finance",
+      "archetypeId": "finance_filings_disclosure",
+      "displayName": "Fin 10k",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_10k"
+        ],
+        "entities": [
+          "di_finance_entities_fin_10k"
+        ],
+        "tables": [
+          "di_finance_tables_fin_10k"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_10k"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_10q",
+      "domainId": "finance",
+      "archetypeId": "finance_filings_disclosure",
+      "displayName": "Fin 10q",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_10q"
+        ],
+        "entities": [
+          "di_finance_entities_fin_10q"
+        ],
+        "tables": [
+          "di_finance_tables_fin_10q"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_10q"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_8k",
+      "domainId": "finance",
+      "archetypeId": "finance_filings_disclosure",
+      "displayName": "Fin 8k",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_8k"
+        ],
+        "entities": [
+          "di_finance_entities_fin_8k"
+        ],
+        "tables": [
+          "di_finance_tables_fin_8k"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_8k"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_annual_report",
+      "domainId": "finance",
+      "archetypeId": "finance_filings_disclosure",
+      "displayName": "Fin Annual Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_balance_sheet",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Balance Sheet",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": "fin_statements_pack"
+      }
+    },
+    {
+      "id": "fin_board_pack",
+      "domainId": "finance",
+      "archetypeId": "finance_planning_forecast",
+      "displayName": "Fin Board Pack",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_budget",
+      "domainId": "finance",
+      "archetypeId": "finance_planning_forecast",
+      "displayName": "Fin Budget",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_budget"
+        ],
+        "entities": [
+          "di_finance_entities_fin_budget"
+        ],
+        "tables": [
+          "di_finance_tables_fin_budget"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_budget"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_cap_table",
+      "domainId": "finance",
+      "archetypeId": "finance_capital_compliance",
+      "displayName": "Fin Cap Table",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_cap_table"
+        ],
+        "entities": [
+          "di_finance_entities_fin_cap_table"
+        ],
+        "tables": [
+          "di_finance_tables_fin_cap_table"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_cap_table"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_cash_flow_statement",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Cash Flow Statement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": "fin_statements_pack"
+      }
+    },
+    {
+      "id": "fin_covenant",
+      "domainId": "finance",
+      "archetypeId": "finance_capital_compliance",
+      "displayName": "Fin Covenant",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_covenant"
+        ],
+        "entities": [
+          "di_finance_entities_fin_covenant"
+        ],
+        "tables": [
+          "di_finance_tables_fin_covenant"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_covenant"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_earnings_release",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Earnings Release",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_earnings_release"
+        ],
+        "entities": [
+          "di_finance_entities_fin_earnings_release"
+        ],
+        "tables": [
+          "di_finance_tables_fin_earnings_release"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_earnings_release"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_expense_report",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Expense Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_forecast",
+      "domainId": "finance",
+      "archetypeId": "finance_planning_forecast",
+      "displayName": "Fin Forecast",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_forecast"
+        ],
+        "entities": [
+          "di_finance_entities_fin_forecast"
+        ],
+        "tables": [
+          "di_finance_tables_fin_forecast"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_forecast"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_income_statement",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Income Statement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": "fin_statements_pack"
+      }
+    },
+    {
+      "id": "fin_investor_presentation",
+      "domainId": "finance",
+      "archetypeId": "finance_filings_disclosure",
+      "displayName": "Fin Investor Presentation",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_kpi_dashboard",
+      "domainId": "finance",
+      "archetypeId": "finance_planning_forecast",
+      "displayName": "Fin Kpi Dashboard",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_management_report",
+      "domainId": "finance",
+      "archetypeId": "finance_planning_forecast",
+      "displayName": "Fin Management Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_quarterly_report",
+      "domainId": "finance",
+      "archetypeId": "finance_filings_disclosure",
+      "displayName": "Fin Quarterly Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_revenue_report",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Revenue Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_statements_pack",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Statements Pack",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_treasury_report",
+      "domainId": "finance",
+      "archetypeId": "finance_capital_compliance",
+      "displayName": "Fin Treasury Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_variance",
+      "domainId": "finance",
+      "archetypeId": "finance_planning_forecast",
+      "displayName": "Fin Variance",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_variance"
+        ],
+        "entities": [
+          "di_finance_entities_fin_variance"
+        ],
+        "tables": [
+          "di_finance_tables_fin_variance"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_variance"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "fin_working_capital_report",
+      "domainId": "finance",
+      "archetypeId": "finance_statements_performance",
+      "displayName": "Fin Working Capital Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "housing_hoa_statement",
+      "domainId": "housing",
+      "archetypeId": "everyday_document",
+      "displayName": "Housing HOA Statement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "housing_home_inspection_report",
+      "domainId": "housing",
+      "archetypeId": "everyday_document",
+      "displayName": "Housing Home Inspection Report",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "housing_lease_summary",
+      "domainId": "housing",
+      "archetypeId": "everyday_document",
+      "displayName": "Housing Lease Summary",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "housing_mortgage_statement",
+      "domainId": "housing",
+      "archetypeId": "everyday_document",
+      "displayName": "Housing Mortgage Statement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "housing_property_tax_bill",
+      "domainId": "housing",
+      "archetypeId": "everyday_document",
+      "displayName": "Housing Property Tax Bill",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "housing_rent_receipt",
+      "domainId": "housing",
+      "archetypeId": "everyday_document",
+      "displayName": "Housing Rent Receipt",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "hr_benefits_enrollment_summary",
+      "domainId": "hr_payroll",
+      "archetypeId": "everyday_document",
+      "displayName": "HR Benefits Enrollment Summary",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "hr_employment_verification_letter",
+      "domainId": "hr_payroll",
+      "archetypeId": "everyday_document",
+      "displayName": "HR Employment Verification Letter",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "hr_expense_report",
+      "domainId": "hr_payroll",
+      "archetypeId": "everyday_document",
+      "displayName": "HR Expense Report",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "hr_pay_stub",
+      "domainId": "hr_payroll",
+      "archetypeId": "everyday_document",
+      "displayName": "HR Pay Stub",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "hr_timesheet",
+      "domainId": "hr_payroll",
+      "archetypeId": "everyday_document",
+      "displayName": "HR Timesheet",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_birth_certificate",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Birth Certificate",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_business_registration_certificate",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Business Registration Certificate",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_driver_license",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Driver License",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_marriage_certificate",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Marriage Certificate",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_national_id_card",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID National ID Card",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_passport",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Passport",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_proof_of_address",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Proof Of Address",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_tax_id_card",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Tax ID Card",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "id_vehicle_registration",
+      "domainId": "identity",
+      "archetypeId": "everyday_document",
+      "displayName": "ID Vehicle Registration",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_certificate_of_insurance",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Certificate Of Insurance",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_claim_status_letter",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Claim Status Letter",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_claim_submission",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Claim Submission",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_coverage_summary",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Coverage Summary",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_denial_letter",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Denial Letter",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_explanation_of_benefits",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Explanation Of Benefits",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_policy_document",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Policy Document",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "ins_premium_invoice",
+      "domainId": "insurance",
+      "archetypeId": "everyday_document",
+      "displayName": "Ins Premium Invoice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_addendum",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Addendum",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_amendment",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Amendment",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_asset_purchase_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Asset Purchase Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_board_minutes",
+      "domainId": "legal",
+      "archetypeId": "legal_policy_governance",
+      "displayName": "Legal Board Minutes",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_board_resolution",
+      "domainId": "legal",
+      "archetypeId": "legal_policy_governance",
+      "displayName": "Legal Board Resolution",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_board_resolution_sections"
+        ],
+        "entities": [
+          "legal_board_resolution_entities"
+        ],
+        "tables": [
+          "legal_board_resolution_tables"
+        ],
+        "extraction": [
+          "legal_board_resolution_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_compliance_certificate",
+      "domainId": "legal",
+      "archetypeId": "legal_policy_governance",
+      "displayName": "Legal Compliance Certificate",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_data_transfer_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Data Transfer Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_dpa",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Dpa",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_dpa_sections"
+        ],
+        "entities": [
+          "legal_dpa_entities"
+        ],
+        "tables": [
+          "legal_dpa_tables"
+        ],
+        "extraction": [
+          "legal_dpa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_employment_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Employment Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_employment_agreement_sections"
+        ],
+        "entities": [
+          "legal_employment_agreement_entities"
+        ],
+        "tables": [
+          "legal_employment_agreement_tables"
+        ],
+        "extraction": [
+          "legal_employment_agreement_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_ip_assignment",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Ip Assignment",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_lease_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Lease Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_lease_sections"
+        ],
+        "entities": [
+          "legal_lease_entities"
+        ],
+        "tables": [
+          "legal_lease_tables"
+        ],
+        "extraction": [
+          "legal_lease_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_legal_opinion",
+      "domainId": "legal",
+      "archetypeId": "legal_dispute_regulatory",
+      "displayName": "Legal Legal Opinion",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_litigation_memo",
+      "domainId": "legal",
+      "archetypeId": "legal_dispute_regulatory",
+      "displayName": "Legal Litigation Memo",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_litigation_memo_sections"
+        ],
+        "entities": [
+          "legal_litigation_memo_entities"
+        ],
+        "tables": [
+          "legal_litigation_memo_tables"
+        ],
+        "extraction": [
+          "legal_litigation_memo_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_msa",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Msa",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_nda",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Nda",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_nda_sections"
+        ],
+        "entities": [
+          "legal_nda_entities"
+        ],
+        "tables": [
+          "legal_nda_tables"
+        ],
+        "extraction": [
+          "legal_nda_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_non_compete_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Non Compete Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_partner_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Partner Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_policy_notice",
+      "domainId": "legal",
+      "archetypeId": "legal_policy_governance",
+      "displayName": "Legal Policy Notice",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_privacy_policy",
+      "domainId": "legal",
+      "archetypeId": "legal_policy_governance",
+      "displayName": "Legal Privacy Policy",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_privacy_policy_sections"
+        ],
+        "entities": [
+          "legal_privacy_policy_entities"
+        ],
+        "tables": [
+          "legal_privacy_policy_tables"
+        ],
+        "extraction": [
+          "legal_privacy_policy_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_purchase_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Purchase Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_regulatory_filing",
+      "domainId": "legal",
+      "archetypeId": "legal_dispute_regulatory",
+      "displayName": "Legal Regulatory Filing",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_response_letter",
+      "domainId": "legal",
+      "archetypeId": "legal_dispute_regulatory",
+      "displayName": "Legal Response Letter",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_service_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Service Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_settlement_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_dispute_regulatory",
+      "displayName": "Legal Settlement Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_share_purchase_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Share Purchase Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_sow",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Sow",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_sow_sections"
+        ],
+        "entities": [
+          "legal_sow_entities"
+        ],
+        "tables": [
+          "legal_sow_tables"
+        ],
+        "extraction": [
+          "legal_sow_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_statement_of_claim",
+      "domainId": "legal",
+      "archetypeId": "legal_dispute_regulatory",
+      "displayName": "Legal Statement Of Claim",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_subscription_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Subscription Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_terms_of_service",
+      "domainId": "legal",
+      "archetypeId": "legal_policy_governance",
+      "displayName": "Legal Terms Of Service",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_terms_sections"
+        ],
+        "entities": [
+          "legal_terms_entities"
+        ],
+        "tables": [
+          "legal_terms_tables"
+        ],
+        "extraction": [
+          "legal_terms_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "legal_vendor_agreement",
+      "domainId": "legal",
+      "archetypeId": "legal_contract_agreement",
+      "displayName": "Legal Vendor Agreement",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_legal",
+        "legal_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "legal_msa_sections"
+        ],
+        "entities": [
+          "legal_msa_entities"
+        ],
+        "tables": [
+          "legal_msa_tables"
+        ],
+        "extraction": [
+          "legal_msa_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_allergy_list",
+      "domainId": "medical",
+      "archetypeId": "medical_medication_care",
+      "displayName": "Med Allergy List",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_care_plan",
+      "domainId": "medical",
+      "archetypeId": "medical_medication_care",
+      "displayName": "Med Care Plan",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_care_plan_sections"
+        ],
+        "entities": [
+          "medical_care_plan_entities"
+        ],
+        "tables": [
+          "medical_care_plan_tables"
+        ],
+        "extraction": [
+          "medical_care_plan_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_consult_note",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Consult Note",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_discharge_instructions",
+      "domainId": "medical",
+      "archetypeId": "medical_medication_care",
+      "displayName": "Med Discharge Instructions",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_discharge_summary",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Discharge Summary",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_discharge_summary_sections"
+        ],
+        "entities": [
+          "medical_discharge_summary_entities"
+        ],
+        "tables": [
+          "medical_discharge_summary_tables"
+        ],
+        "extraction": [
+          "medical_discharge_summary_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_history_and_physical",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med History And Physical",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_immunization_summary",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Immunization Summary",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_insurance_claim",
+      "domainId": "medical",
+      "archetypeId": "medical_admin_claims",
+      "displayName": "Med Insurance Claim",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_lab_report",
+      "domainId": "medical",
+      "archetypeId": "medical_diagnostics_results",
+      "displayName": "Med Lab Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_lab_report_sections"
+        ],
+        "entities": [
+          "medical_lab_report_entities"
+        ],
+        "tables": [
+          "medical_lab_report_tables"
+        ],
+        "extraction": [
+          "medical_lab_report_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_medication_list",
+      "domainId": "medical",
+      "archetypeId": "medical_medication_care",
+      "displayName": "Med Medication List",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_med_list_sections"
+        ],
+        "entities": [
+          "medical_med_list_entities"
+        ],
+        "tables": [
+          "medical_med_list_tables"
+        ],
+        "extraction": [
+          "medical_med_list_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_operative_report",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Operative Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_pathology_report",
+      "domainId": "medical",
+      "archetypeId": "medical_diagnostics_results",
+      "displayName": "Med Pathology Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_prescription",
+      "domainId": "medical",
+      "archetypeId": "medical_medication_care",
+      "displayName": "Med Prescription",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_problem_list",
+      "domainId": "medical",
+      "archetypeId": "medical_medication_care",
+      "displayName": "Med Problem List",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_progress_note",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Progress Note",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_radiology_report",
+      "domainId": "medical",
+      "archetypeId": "medical_diagnostics_results",
+      "displayName": "Med Radiology Report",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_radiology_report_sections"
+        ],
+        "entities": [
+          "medical_radiology_report_entities"
+        ],
+        "tables": [
+          "medical_radiology_report_tables"
+        ],
+        "extraction": [
+          "medical_radiology_report_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_referral_note",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Referral Note",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_referral_sections"
+        ],
+        "entities": [
+          "medical_referral_entities"
+        ],
+        "tables": [
+          "medical_referral_tables"
+        ],
+        "extraction": [
+          "medical_referral_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_soap_note",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Soap Note",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_soap_note_sections"
+        ],
+        "entities": [
+          "medical_soap_note_entities"
+        ],
+        "tables": [
+          "medical_soap_note_tables"
+        ],
+        "extraction": [
+          "medical_soap_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_vaccination_record",
+      "domainId": "medical",
+      "archetypeId": "medical_clinical_notes",
+      "displayName": "Med Vaccination Record",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "med_vital_signs_flowsheet",
+      "domainId": "medical",
+      "archetypeId": "medical_diagnostics_results",
+      "displayName": "Med Vital Signs Flowsheet",
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "hl7",
+        "csv"
+      ],
+      "detectionHintsRefs": [
+        "doc_aliases_medical",
+        "medical_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "medical_progress_note_sections"
+        ],
+        "entities": [
+          "medical_progress_note_entities"
+        ],
+        "tables": [
+          "medical_progress_note_tables"
+        ],
+        "extraction": [
+          "medical_progress_note_extraction_hints"
+        ]
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_assessment_notice",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Assessment Notice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_business_income_return",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Business Income Return",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_individual_income_return",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Individual Income Return",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_payment_slip",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Payment Slip",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_payroll_withholding_filing",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Payroll Withholding Filing",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_property_tax_bill",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Property Tax Bill",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_refund_notice",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Refund Notice",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_tax_id_registration",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax Tax ID Registration",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "tax_vat_gst_return",
+      "domainId": "tax",
+      "archetypeId": "everyday_document",
+      "displayName": "Tax VAT GST Return",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "travel_boarding_pass",
+      "domainId": "travel",
+      "archetypeId": "everyday_document",
+      "displayName": "Travel Boarding Pass",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "png",
+        "jpg"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "travel_car_rental_agreement",
+      "domainId": "travel",
+      "archetypeId": "everyday_document",
+      "displayName": "Travel Car Rental Agreement",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "travel_hotel_booking_confirmation",
+      "domainId": "travel",
+      "archetypeId": "everyday_document",
+      "displayName": "Travel Hotel Booking Confirmation",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "travel_itinerary",
+      "domainId": "travel",
+      "archetypeId": "everyday_document",
+      "displayName": "Travel Itinerary",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "travel_travel_insurance_policy",
+      "domainId": "travel",
+      "archetypeId": "everyday_document",
+      "displayName": "Travel Travel Insurance Policy",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    },
+    {
+      "id": "travel_visa_application_receipt",
+      "domainId": "travel",
+      "archetypeId": "everyday_document",
+      "displayName": "Travel Visa Application Receipt",
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "primaryLanguages": [
+        "en",
+        "pt"
+      ],
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "detectionHintsRefs": [],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "relationships": {
+        "amendmentOf": null,
+        "partOfPack": null
+      }
+    }
+  ]
+}

@@ -25,6 +25,10 @@
  */
 
 import crypto from "crypto";
+import {
+  getDocumentIntelligenceBanksInstance,
+  type DocumentIntelligenceBanksService,
+} from "../banks/documentIntelligenceBanks.service";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 
@@ -268,6 +272,10 @@ export class ScopeGateService {
   constructor(
     private readonly bankLoader: BankLoader,
     private readonly docStore: DocStore,
+    private readonly documentIntelligenceBanks: Pick<
+      DocumentIntelligenceBanksService,
+      "getMergedDocAliasesBank" | "getDocAliasPhrases" | "getDocTaxonomy"
+    > = getDocumentIntelligenceBanksInstance(),
   ) {}
 
   async evaluate(
@@ -303,7 +311,15 @@ export class ScopeGateService {
     const scopeHintsBank = this.safeGetBank<any>("scope_hints");
     const followupBank = this.safeGetBank<any>("followup_indicators");
     const discourseBank = this.safeGetBank<any>("discourse_markers");
-    const docAliasesBank = this.safeGetBank<any>("doc_aliases");
+    const docAliasesBank =
+      this.documentIntelligenceBanks.getMergedDocAliasesBank();
+    const docAliasPhrases = this.documentIntelligenceBanks.getDocAliasPhrases();
+    let docTaxonomyBank: any | null = null;
+    try {
+      docTaxonomyBank = this.documentIntelligenceBanks.getDocTaxonomy();
+    } catch {
+      docTaxonomyBank = null;
+    }
     const stopwordsDocnames = this.safeGetBank<any>("stopwords_docnames");
     const ambiguityPolicies = this.safeGetBank<any>("disambiguation_policies");
     const rankFeatures = this.safeGetBank<any>("ambiguity_rank_features");
@@ -372,7 +388,8 @@ export class ScopeGateService {
     const explicitDocRef =
       explicitDocRefFromUpstream ||
       Boolean(resolvedDocIdFromUpstream) ||
-      Boolean(filenameToken);
+      Boolean(filenameToken) ||
+      this.matchesAnyDocAliasPhrase(qLower, docAliasPhrases, docTaxonomyBank);
 
     // 7) Resolve explicit doc reference to a docId if needed
     const explicitResolved = await this.resolveExplicitDocRef({
@@ -721,6 +738,37 @@ export class ScopeGateService {
 
     const filtered = toks.filter((t) => !generic.has(t) && !status.has(t));
     return filtered;
+  }
+
+  private matchesAnyDocAliasPhrase(
+    query: string,
+    phrases: string[],
+    taxonomyBank: any | null,
+  ): boolean {
+    const normalizedQuery = lower(query);
+    if (!normalizedQuery) return false;
+
+    const taxonomyTokens = Array.isArray(taxonomyBank?.typeDefinitions)
+      ? taxonomyBank.typeDefinitions
+          .flatMap((entry: any) => [
+            lower(entry?.id),
+            ...(Array.isArray(entry?.aliases)
+              ? entry.aliases.map((alias: unknown) =>
+                  lower(String(alias ?? "")),
+                )
+              : []),
+          ])
+          .filter(Boolean)
+      : [];
+
+    const allPhrases = Array.from(
+      new Set([...phrases, ...taxonomyTokens]),
+    ).filter((token) => token.length >= 3);
+
+    return allPhrases.some((phrase) => {
+      const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`(^|\\b)${escaped}(\\b|$)`, "i").test(normalizedQuery);
+    });
   }
 
   // -----------------------------

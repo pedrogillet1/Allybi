@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Document type catalog for hr_payroll domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll"
+  },
+  "domain": "hr_payroll",
+  "docTypes": [
+    {
+      "id": "hr_benefits_enrollment_summary",
+      "name": {
+        "en": "Benefits Enrollment Summary",
+        "pt": "Resumo de Adesao a Beneficios"
+      },
+      "description": "Benefits Enrollment Summary detection profile for hr_payroll extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bbenefits\\s+enrollment\\s+summary\\b",
+        "\\bhr\\s+benefits\\s+enrollment\\s+summary\\b",
+        "\\bresumo\\s+de\\s+adesao\\s+a\\s+beneficios\\b"
+      ],
+      "priority": 116
+    },
+    {
+      "id": "hr_employment_verification_letter",
+      "name": {
+        "en": "Employment Verification Letter",
+        "pt": "Carta de Comprovacao de Emprego"
+      },
+      "description": "Employment Verification Letter detection profile for hr_payroll extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bemployment\\s+verification\\s+letter\\b",
+        "\\bhr\\s+employment\\s+verification\\s+letter\\b",
+        "\\bcarta\\s+de\\s+comprovacao\\s+de\\s+emprego\\b"
+      ],
+      "priority": 117
+    },
+    {
+      "id": "hr_expense_report",
+      "name": {
+        "en": "Expense Report",
+        "pt": "Relatorio de Despesas"
+      },
+      "description": "Expense Report detection profile for hr_payroll extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bexpense\\s+report\\b",
+        "\\bhr\\s+expense\\s+report\\b",
+        "\\brelatorio\\s+de\\s+despesas\\b"
+      ],
+      "priority": 118
+    },
+    {
+      "id": "hr_pay_stub",
+      "name": {
+        "en": "Pay Stub",
+        "pt": "Holerite"
+      },
+      "description": "Pay Stub detection profile for hr_payroll extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bpay\\s+stub\\b",
+        "\\bhr\\s+pay\\s+stub\\b",
+        "\\bholerite\\b"
+      ],
+      "priority": 120
+    },
+    {
+      "id": "hr_timesheet",
+      "name": {
+        "en": "Timesheet",
+        "pt": "Folha de Ponto"
+      },
+      "description": "Timesheet detection profile for hr_payroll extraction and interpretation.",
+      "detectionPatterns": [
+        "\\btimesheet\\b",
+        "\\bhr\\s+timesheet\\b",
+        "\\bfolha\\s+de\\s+ponto\\b"
+      ],
+      "priority": 119
+    }
+  ]
+}

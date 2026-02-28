@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "id": "di_accounting_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for accounting domain — section prioritization, boost rules, and query expansion.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "maxBoostRules": 10,
+    "maxQueryExpansionTerms": 8
+  },
+  "domain": "accounting",
+  "sectionPriority": [
+    { "section": "trial_balance_summary", "weight": 3.0, "operators": ["extract", "validate", "calculate"] },
+    { "section": "general_ledger_detail", "weight": 2.8, "operators": ["extract", "locate", "calculate"] },
+    { "section": "journal_entries", "weight": 2.5, "operators": ["extract", "validate", "locate"] },
+    { "section": "reconciliation_summary", "weight": 2.5, "operators": ["validate", "compare"] },
+    { "section": "aging_buckets", "weight": 2.2, "operators": ["extract", "monitor", "evaluate"] },
+    { "section": "reconciling_items", "weight": 2.0, "operators": ["extract", "validate"] },
+    { "section": "controls_matrix", "weight": 2.0, "operators": ["evaluate", "validate"] },
+    { "section": "audit_findings", "weight": 2.2, "operators": ["summarize", "evaluate", "advise"] },
+    { "section": "account_detail", "weight": 2.0, "operators": ["extract", "locate"] },
+    { "section": "supporting_schedules", "weight": 1.8, "operators": ["extract", "validate"] }
+  ],
+  "boostRules": [
+    {
+      "id": "acct_boost_001_account_lookup",
+      "priority": 95,
+      "weight": 2.5,
+      "operators": ["extract", "locate"],
+      "condition": "query references a specific GL account number or name",
+      "boostSections": ["general_ledger_detail", "trial_balance_summary", "journal_entries"]
+    },
+    {
+      "id": "acct_boost_002_reconciliation",
+      "priority": 90,
+      "weight": 2.2,
+      "operators": ["validate", "compare"],
+      "condition": "query asks about reconciling items or differences",
+      "boostSections": ["reconciliation_summary", "reconciling_items"]
+    },
+    {
+      "id": "acct_boost_003_aging_analysis",
+      "priority": 88,
+      "weight": 2.0,
+      "operators": ["monitor", "evaluate"],
+      "condition": "query involves overdue or aging analysis",
+      "boostSections": ["aging_buckets", "account_detail"]
+    },
+    {
+      "id": "acct_boost_004_journal_trace",
+      "priority": 92,
+      "weight": 2.5,
+      "operators": ["locate", "validate"],
+      "condition": "query traces a posting or journal entry",
+      "boostSections": ["journal_entries", "general_ledger_detail"]
+    }
+  ],
+  "queryExpansion": [
+    { "trigger": "\\bGL\\b", "expansions": ["general ledger", "ledger detail", "razão geral"] },
+    { "trigger": "\\bTB\\b", "expansions": ["trial balance", "balancete"] },
+    { "trigger": "\\bJE\\b", "expansions": ["journal entry", "journal entries", "lançamento contábil"] },
+    { "trigger": "\\brec\\b", "expansions": ["reconciliation", "bank reconciliation", "reconciliação"] },
+    { "trigger": "\\baging\\b", "expansions": ["aging report", "aging schedule", "aging analysis", "relatório de vencimento"] },
+    { "trigger": "\\bworkpaper\\b", "expansions": ["working paper", "audit workpaper", "PBC", "papel de trabalho"] }
+  ]
+}

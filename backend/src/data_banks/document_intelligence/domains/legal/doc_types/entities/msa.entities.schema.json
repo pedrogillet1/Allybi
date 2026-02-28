@@ -1,0 +1,242 @@
+{
+  "_meta": {
+    "id": "legal_msa_entities",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for Master Service Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "msa"
+  },
+  "entities": [
+    {
+      "id": "address",
+      "type": "string",
+      "required": true,
+      "description": "Extract Address for Master Service Agreement.",
+      "section": "abstract"
+    },
+    {
+      "id": "article_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Article Number for Master Service Agreement.",
+      "section": "action_items"
+    },
+    {
+      "id": "case_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Case Number for Master Service Agreement.",
+      "section": "appendix"
+    },
+    {
+      "id": "city",
+      "type": "string",
+      "required": true,
+      "description": "Extract City for Master Service Agreement.",
+      "section": "approvals"
+    },
+    {
+      "id": "clause_reference",
+      "type": "string",
+      "required": true,
+      "description": "Extract Clause Reference for Master Service Agreement.",
+      "section": "assumptions"
+    },
+    {
+      "id": "company_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract Company Name for Master Service Agreement.",
+      "section": "attachments"
+    },
+    {
+      "id": "counterparty",
+      "type": "string",
+      "required": true,
+      "description": "Extract Counterparty for Master Service Agreement.",
+      "section": "audit_trail"
+    },
+    {
+      "id": "country",
+      "type": "string",
+      "required": true,
+      "description": "Extract Country for Master Service Agreement.",
+      "section": "authorization"
+    },
+    {
+      "id": "court_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract Court Name for Master Service Agreement.",
+      "section": "certifications"
+    },
+    {
+      "id": "currency_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Extract Currency Amount for Master Service Agreement.",
+      "section": "compliance_section"
+    },
+    {
+      "id": "currency_code",
+      "type": "string",
+      "required": true,
+      "description": "Extract Currency Code for Master Service Agreement.",
+      "section": "confidentiality_clause"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Document Number for Master Service Agreement.",
+      "section": "criteria"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Effective Date for Master Service Agreement.",
+      "section": "data_tables"
+    },
+    {
+      "id": "execution_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Execution Date for Master Service Agreement.",
+      "section": "definitions"
+    },
+    {
+      "id": "expiration_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Expiration Date for Master Service Agreement.",
+      "section": "detailed_analysis"
+    },
+    {
+      "id": "filing_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Filing Date for Master Service Agreement.",
+      "section": "disclaimers"
+    },
+    {
+      "id": "interest_rate",
+      "type": "number",
+      "required": true,
+      "description": "Extract Interest Rate for Master Service Agreement.",
+      "section": "discussion"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Extract Jurisdiction for Master Service Agreement.",
+      "section": "dispute_resolution"
+    },
+    {
+      "id": "period_reference",
+      "type": "string",
+      "required": true,
+      "description": "Extract Period Reference for Master Service Agreement.",
+      "section": "distribution_list"
+    },
+    {
+      "id": "person_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract Person Name for Master Service Agreement.",
+      "section": "document_metadata"
+    },
+    {
+      "id": "person_role",
+      "type": "string",
+      "required": false,
+      "description": "Extract Person Role for Master Service Agreement.",
+      "section": "executive_summary"
+    },
+    {
+      "id": "person_title",
+      "type": "string",
+      "required": false,
+      "description": "Extract Person Title for Master Service Agreement.",
+      "section": "exhibits"
+    },
+    {
+      "id": "reference_code",
+      "type": "string",
+      "required": false,
+      "description": "Extract Reference Code for Master Service Agreement.",
+      "section": "findings"
+    },
+    {
+      "id": "registration_number",
+      "type": "string",
+      "required": false,
+      "description": "Extract Registration Number for Master Service Agreement.",
+      "section": "glossary"
+    },
+    {
+      "id": "regulatory_body",
+      "type": "string",
+      "required": false,
+      "description": "Extract Regulatory Body for Master Service Agreement.",
+      "section": "governing_law"
+    },
+    {
+      "id": "signatory",
+      "type": "string",
+      "required": false,
+      "description": "Extract Signatory for Master Service Agreement.",
+      "section": "header"
+    },
+    {
+      "id": "state_province",
+      "type": "string",
+      "required": false,
+      "description": "Extract State/Province for Master Service Agreement.",
+      "section": "indemnification"
+    },
+    {
+      "id": "statute_citation",
+      "type": "string",
+      "required": false,
+      "description": "Extract Statute Citation for Master Service Agreement.",
+      "section": "introduction"
+    },
+    {
+      "id": "subsidiary",
+      "type": "string",
+      "required": false,
+      "description": "Extract Subsidiary for Master Service Agreement.",
+      "section": "limitations"
+    },
+    {
+      "id": "tax_id",
+      "type": "string",
+      "required": false,
+      "description": "Extract Tax ID for Master Service Agreement.",
+      "section": "methodology"
+    },
+    {
+      "id": "tax_rate",
+      "type": "number",
+      "required": false,
+      "description": "Extract Tax Rate for Master Service Agreement.",
+      "section": "procedures"
+    },
+    {
+      "id": "witness",
+      "type": "string",
+      "required": false,
+      "description": "Extract Witness for Master Service Agreement.",
+      "section": "recitals"
+    }
+  ]
+}

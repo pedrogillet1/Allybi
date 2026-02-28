@@ -1,0 +1,306 @@
+{
+  "_meta": {
+    "id": "legal_baa_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for Business Associate Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_baa"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "title",
+        "agreement date",
+        "version",
+        "Business Associate Agreement Document Header",
+        "Acordo de Associado Comercial Cabecalho do Documento"
+      ]
+    },
+    {
+      "id": "parties",
+      "name": {
+        "en": "Parties",
+        "pt": "Partes"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Parties",
+        "Partes",
+        "between",
+        "party",
+        "counterparty",
+        "Business Associate Agreement Parties",
+        "Acordo de Associado Comercial Partes"
+      ]
+    },
+    {
+      "id": "recitals_background",
+      "name": {
+        "en": "Recitals and Background",
+        "pt": "Considerandos e Contexto"
+      },
+      "required": false,
+      "order": 3,
+      "headingAnchors": [
+        "Recitals and Background",
+        "Considerandos e Contexto",
+        "whereas",
+        "background",
+        "purpose",
+        "Business Associate Agreement Recitals and Background",
+        "Acordo de Associado Comercial Considerandos e Contexto"
+      ]
+    },
+    {
+      "id": "definitions",
+      "name": {
+        "en": "Definitions",
+        "pt": "Definicoes"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Definitions",
+        "Definicoes",
+        "means",
+        "defined terms",
+        "definition",
+        "Business Associate Agreement Definitions",
+        "Acordo de Associado Comercial Definicoes"
+      ]
+    },
+    {
+      "id": "scope_of_services",
+      "name": {
+        "en": "Scope of Services / Subject Matter",
+        "pt": "Escopo de Servicos / Objeto"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "Scope of Services / Subject Matter",
+        "Escopo de Servicos / Objeto",
+        "scope",
+        "services",
+        "statement of work",
+        "Business Associate Agreement Scope of Services / Subject Matter",
+        "Acordo de Associado Comercial Escopo de Servicos / Objeto"
+      ]
+    },
+    {
+      "id": "fees_and_payment",
+      "name": {
+        "en": "Fees and Payment Terms",
+        "pt": "Remuneracao e Pagamento"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Fees and Payment Terms",
+        "Remuneracao e Pagamento",
+        "fees",
+        "payment",
+        "invoice",
+        "Business Associate Agreement Fees and Payment Terms",
+        "Acordo de Associado Comercial Remuneracao e Pagamento"
+      ]
+    },
+    {
+      "id": "term_and_renewal",
+      "name": {
+        "en": "Term and Renewal",
+        "pt": "Prazo e Renovacao"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Term and Renewal",
+        "Prazo e Renovacao",
+        "term",
+        "renewal",
+        "commencement",
+        "Business Associate Agreement Term and Renewal",
+        "Acordo de Associado Comercial Prazo e Renovacao"
+      ]
+    },
+    {
+      "id": "termination",
+      "name": {
+        "en": "Termination",
+        "pt": "Rescisao"
+      },
+      "required": true,
+      "order": 8,
+      "headingAnchors": [
+        "Termination",
+        "Rescisao",
+        "terminate",
+        "termination for cause",
+        "survival",
+        "Business Associate Agreement Termination",
+        "Acordo de Associado Comercial Rescisao"
+      ]
+    },
+    {
+      "id": "confidentiality_privacy",
+      "name": {
+        "en": "Confidentiality and Privacy",
+        "pt": "Confidencialidade e Privacidade"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Confidentiality and Privacy",
+        "Confidencialidade e Privacidade",
+        "confidential information",
+        "privacy",
+        "personal data",
+        "Business Associate Agreement Confidentiality and Privacy",
+        "Acordo de Associado Comercial Confidencialidade e Privacidade"
+      ]
+    },
+    {
+      "id": "security_compliance",
+      "name": {
+        "en": "Security and Compliance",
+        "pt": "Seguranca e Conformidade"
+      },
+      "required": false,
+      "order": 10,
+      "headingAnchors": [
+        "Security and Compliance",
+        "Seguranca e Conformidade",
+        "security measures",
+        "compliance",
+        "controls",
+        "Business Associate Agreement Security and Compliance",
+        "Acordo de Associado Comercial Seguranca e Conformidade"
+      ]
+    },
+    {
+      "id": "ip_and_license",
+      "name": {
+        "en": "IP and License",
+        "pt": "Propriedade Intelectual e Licenca"
+      },
+      "required": false,
+      "order": 11,
+      "headingAnchors": [
+        "IP and License",
+        "Propriedade Intelectual e Licenca",
+        "intellectual property",
+        "license grant",
+        "ownership",
+        "Business Associate Agreement IP and License",
+        "Acordo de Associado Comercial Propriedade Intelectual e Licenca"
+      ]
+    },
+    {
+      "id": "liability_and_indemnity",
+      "name": {
+        "en": "Liability and Indemnity",
+        "pt": "Responsabilidade e Indenizacao"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Liability and Indemnity",
+        "Responsabilidade e Indenizacao",
+        "liability",
+        "indemnify",
+        "damages",
+        "Business Associate Agreement Liability and Indemnity",
+        "Acordo de Associado Comercial Responsabilidade e Indenizacao"
+      ]
+    },
+    {
+      "id": "dispute_resolution",
+      "name": {
+        "en": "Dispute Resolution",
+        "pt": "Resolucao de Disputas"
+      },
+      "required": true,
+      "order": 13,
+      "headingAnchors": [
+        "Dispute Resolution",
+        "Resolucao de Disputas",
+        "governing law",
+        "jurisdiction",
+        "arbitration",
+        "Business Associate Agreement Dispute Resolution",
+        "Acordo de Associado Comercial Resolucao de Disputas"
+      ]
+    },
+    {
+      "id": "notices_misc",
+      "name": {
+        "en": "Notices and Miscellaneous",
+        "pt": "Notificacoes e Disposicoes Gerais"
+      },
+      "required": false,
+      "order": 14,
+      "headingAnchors": [
+        "Notices and Miscellaneous",
+        "Notificacoes e Disposicoes Gerais",
+        "notice",
+        "assignment",
+        "entire agreement",
+        "Business Associate Agreement Notices and Miscellaneous",
+        "Acordo de Associado Comercial Notificacoes e Disposicoes Gerais"
+      ]
+    },
+    {
+      "id": "signatures",
+      "name": {
+        "en": "Signatures",
+        "pt": "Assinaturas"
+      },
+      "required": true,
+      "order": 15,
+      "headingAnchors": [
+        "Signatures",
+        "Assinaturas",
+        "signature",
+        "executed",
+        "authorized signatory",
+        "Business Associate Agreement Signatures",
+        "Acordo de Associado Comercial Assinaturas"
+      ]
+    },
+    {
+      "id": "annexes_schedules",
+      "name": {
+        "en": "Annexes and Schedules",
+        "pt": "Anexos e Apensos"
+      },
+      "required": false,
+      "order": 16,
+      "headingAnchors": [
+        "Annexes and Schedules",
+        "Anexos e Apensos",
+        "schedule",
+        "annex",
+        "appendix",
+        "Business Associate Agreement Annexes and Schedules",
+        "Acordo de Associado Comercial Anexos e Apensos"
+      ]
+    }
+  ]
+}

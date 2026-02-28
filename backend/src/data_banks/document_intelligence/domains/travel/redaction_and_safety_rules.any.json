@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "di_travel_redaction_and_safety_rules",
+    "version": "1.0.0",
+    "description": "Redaction and safety rules for travel domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel"
+  },
+  "domain": "travel",
+  "redactionRules": [
+    {
+      "id": "travel_redact_001_personal_id",
+      "dataType": "government_or_personal_id",
+      "pattern": "\\b(?:\\d{3}-\\d{2}-\\d{4}|\\d{11}|[A-Z]{1,2}\\d{6,9})\\b",
+      "action": "REDACT",
+      "replacement": "[ID REDACTED]"
+    },
+    {
+      "id": "travel_redact_002_account_ref",
+      "dataType": "account_or_reference",
+      "pattern": "\\b(?:account|acct|ref|reference|policy|pnr|loan|student id|employee id)\\s*[:#-]?\\s*[A-Za-z0-9-]{6,24}\\b",
+      "action": "MASK_KEEP_LAST4",
+      "replacement": "[REFERENCE MASKED]"
+    },
+    {
+      "id": "travel_redact_003_address",
+      "dataType": "address",
+      "pattern": "\\b(?:street|st\\.|avenue|ave\\.|road|rd\\.|apt|suite|unit|endereco|bairro)\\b.{0,100}",
+      "action": "PARTIAL_REDACT",
+      "replacement": "[ADDRESS PARTIALLY REDACTED]"
+    },
+    {
+      "id": "travel_redact_004_card_pan",
+      "dataType": "card_or_pan",
+      "pattern": "\\b(?:\\d[ -]*?){13,19}\\b",
+      "action": "MASK_KEEP_LAST4",
+      "replacement": "[CARD MASKED]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "travel_safety_001_pii_safe_default",
+      "severity": "error",
+      "description": "Default to masked output for PII unless user explicitly requests redacted-safe display fields only.",
+      "trigger": "output contains personal identifiers, addresses, or account references",
+      "action": "ENFORCE_PII_SAFE_OUTPUT"
+    },
+    {
+      "id": "travel_safety_002_no_identity_assertion",
+      "severity": "error",
+      "description": "Do not assert legal identity ownership based on a single document.",
+      "trigger": "user asks for definitive identity proof",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "travel_safety_003_no_fabrication",
+      "severity": "error",
+      "description": "Do not fabricate policies, rates, legal conclusions, or missing fields.",
+      "trigger": "missing explicit evidence for user request",
+      "action": "STATE_UNCERTAINTY"
+    },
+    {
+      "id": "travel_safety_004_scope_lock",
+      "severity": "warning",
+      "description": "Keep responses within attached-document scope unless user provides additional files.",
+      "trigger": "query requests cross-file assumptions",
+      "action": "SCOPE_LOCK_NOTICE"
+    }
+  ]
+}

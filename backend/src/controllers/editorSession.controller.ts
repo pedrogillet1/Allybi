@@ -291,6 +291,9 @@ type StoredSession = {
   lastPreview?: any;
   receipt?: any;
 
+  latestRevisionId?: string;
+  locale?: string;
+
   createdAt: number;
   expiresAt: number;
 };
@@ -494,6 +497,13 @@ export class EditorSessionController {
 
     const sessionId = randomUUID();
 
+    const locale =
+      String(req.body?.locale || "").trim() ||
+      String(req.headers?.["accept-language"] || "")
+        .split(",")[0]
+        ?.trim() ||
+      undefined;
+
     const stored = this.store.create({
       id: sessionId,
       userId: ctx.userId,
@@ -518,6 +528,7 @@ export class EditorSessionController {
         (planRequest.target as ResolvedTarget | undefined) ?? undefined,
       lastPreview: previewResult.result,
       receipt: previewResult.receipt,
+      locale,
     });
 
     const data: EditorSessionStartResponse = {
@@ -686,6 +697,9 @@ export class EditorSessionController {
 
     session.status = "applied";
     session.receipt = applied.receipt;
+    const appliedResult = applied.result as any;
+    session.latestRevisionId =
+      appliedResult?.revisionId || appliedResult?.newRevisionId || undefined;
     this.store.update(session);
 
     const data: EditorSessionApplyResponse = {

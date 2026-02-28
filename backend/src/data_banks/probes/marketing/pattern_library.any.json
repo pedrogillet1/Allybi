@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,16 +14,5824 @@
   },
   "patterns": [
     {
-      "id": "where_is_x",
-      "template": "where does it say {x}"
+      "id": "pattern_cross_001",
+      "template": "what changed across departments this month",
+      "templatePt": "pt: what changed across departments this month",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "what changed across departments this month for last 30 days",
+        "what changed across departments this month para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
     },
     {
-      "id": "what_changed",
-      "template": "what changed between {a} and {b}"
+      "id": "pattern_cross_002",
+      "template": "where are shared risks increasing fastest",
+      "templatePt": "pt: where are shared risks increasing fastest",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "where are shared risks increasing fastest for last 30 days",
+        "where are shared risks increasing fastest para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
     },
     {
-      "id": "extract_deadlines",
-      "template": "extract all obligations and deadlines"
+      "id": "pattern_cross_003",
+      "template": "which deadlines are likely to slip",
+      "templatePt": "pt: which deadlines are likely to slip",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "which deadlines are likely to slip for last 30 days",
+        "which deadlines are likely to slip para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_004",
+      "template": "show top unresolved escalations",
+      "templatePt": "pt: show top unresolved escalations",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "show top unresolved escalations for last 30 days",
+        "show top unresolved escalations para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_005",
+      "template": "compare evidence quality across domains",
+      "templatePt": "pt: compare evidence quality across domains",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "compare evidence quality across domains for last 30 days",
+        "compare evidence quality across domains para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_006",
+      "template": "what trends need executive attention",
+      "templatePt": "pt: what trends need executive attention",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "what trends need executive attention for last 30 days",
+        "what trends need executive attention para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_007",
+      "template": "which workflows have highest re-ask rate",
+      "templatePt": "pt: which workflows have highest re-ask rate",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "which workflows have highest re-ask rate for last 30 days",
+        "which workflows have highest re-ask rate para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_008",
+      "template": "where is confidence dropping in answers",
+      "templatePt": "pt: where is confidence dropping in answers",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "where is confidence dropping in answers for last 30 days",
+        "where is confidence dropping in answers para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_009",
+      "template": "which doc types drive most follow-ups",
+      "templatePt": "pt: which doc types drive most follow-ups",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "which doc types drive most follow-ups for last 30 days",
+        "which doc types drive most follow-ups para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_010",
+      "template": "what actions can reduce fallback rate",
+      "templatePt": "pt: what actions can reduce fallback rate",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "what actions can reduce fallback rate for last 30 days",
+        "what actions can reduce fallback rate para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_011",
+      "template": "what changed in obligations and risks",
+      "templatePt": "pt: what changed in obligations and risks",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "what changed in obligations and risks for last 30 days",
+        "what changed in obligations and risks para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_012",
+      "template": "which KPIs are most volatile now",
+      "templatePt": "pt: which KPIs are most volatile now",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "which KPIs are most volatile now for last 30 days",
+        "which KPIs are most volatile now para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_013",
+      "template": "where are compliance exceptions concentrated",
+      "templatePt": "pt: where are compliance exceptions concentrated",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "where are compliance exceptions concentrated for last 30 days",
+        "where are compliance exceptions concentrated para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_014",
+      "template": "which entities have repeated anomalies",
+      "templatePt": "pt: which entities have repeated anomalies",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "which entities have repeated anomalies for last 30 days",
+        "which entities have repeated anomalies para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_015",
+      "template": "how did user intent shift this quarter",
+      "templatePt": "pt: how did user intent shift this quarter",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "how did user intent shift this quarter for last 30 days",
+        "how did user intent shift this quarter para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_016",
+      "template": "what root causes appear across incidents",
+      "templatePt": "pt: what root causes appear across incidents",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "what root causes appear across incidents for last 30 days",
+        "what root causes appear across incidents para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_017",
+      "template": "which approvals are missing most often",
+      "templatePt": "pt: which approvals are missing most often",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "which approvals are missing most often for last 30 days",
+        "which approvals are missing most often para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_018",
+      "template": "what evidence is repeatedly cited as weak",
+      "templatePt": "pt: what evidence is repeatedly cited as weak",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "what evidence is repeatedly cited as weak for last 30 days",
+        "what evidence is repeatedly cited as weak para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_019",
+      "template": "where are escalation triggers increasing",
+      "templatePt": "pt: where are escalation triggers increasing",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "where are escalation triggers increasing for last 30 days",
+        "where are escalation triggers increasing para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_cross_020",
+      "template": "which reports need immediate review",
+      "templatePt": "pt: which reports need immediate review",
+      "domain": "cross",
+      "intent": "analysis",
+      "tags": [
+        "cross_domain",
+        "executive",
+        "monitoring",
+        "marketing_probe"
+      ],
+      "operatorHints": [
+        "summarize",
+        "compare",
+        "extract",
+        "calculate"
+      ],
+      "slots": [
+        "time_window",
+        "entity",
+        "domain"
+      ],
+      "exampleQueries": [
+        "which reports need immediate review for last 30 days",
+        "which reports need immediate review para os últimos 30 dias"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_01_compare",
+      "template": "compare budget variance between {document_a} and {document_b}",
+      "templatePt": "compare budget variance entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare budget variance between finance_doc_q1 and finance_doc_q2",
+        "compare budget variance entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_01_extract",
+      "template": "extract all budget variance with owner and deadline from {document}",
+      "templatePt": "extraia todos os budget variance com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all budget variance with owner and deadline from finance_doc",
+        "extraia todos os budget variance com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_01_locate",
+      "template": "where does it mention budget variance in {document}",
+      "templatePt": "onde menciona budget variance em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention budget variance in finance_doc",
+        "onde menciona budget variance em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_01_summarize",
+      "template": "summarize the key risks and actions for budget variance",
+      "templatePt": "resuma os principais riscos e ações para budget variance",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for budget variance",
+        "resuma os principais riscos e ações para budget variance"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_02_compare",
+      "template": "compare cash conversion cycle between {document_a} and {document_b}",
+      "templatePt": "compare cash conversion cycle entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare cash conversion cycle between finance_doc_q1 and finance_doc_q2",
+        "compare cash conversion cycle entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_02_extract",
+      "template": "extract all cash conversion cycle with owner and deadline from {document}",
+      "templatePt": "extraia todos os cash conversion cycle com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all cash conversion cycle with owner and deadline from finance_doc",
+        "extraia todos os cash conversion cycle com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_02_locate",
+      "template": "where does it mention cash conversion cycle in {document}",
+      "templatePt": "onde menciona cash conversion cycle em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention cash conversion cycle in finance_doc",
+        "onde menciona cash conversion cycle em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_02_summarize",
+      "template": "summarize the key risks and actions for cash conversion cycle",
+      "templatePt": "resuma os principais riscos e ações para cash conversion cycle",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for cash conversion cycle",
+        "resuma os principais riscos e ações para cash conversion cycle"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_03_compare",
+      "template": "compare accounts receivable aging between {document_a} and {document_b}",
+      "templatePt": "compare accounts receivable aging entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare accounts receivable aging between finance_doc_q1 and finance_doc_q2",
+        "compare accounts receivable aging entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_03_extract",
+      "template": "extract all accounts receivable aging with owner and deadline from {document}",
+      "templatePt": "extraia todos os accounts receivable aging com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all accounts receivable aging with owner and deadline from finance_doc",
+        "extraia todos os accounts receivable aging com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_03_locate",
+      "template": "where does it mention accounts receivable aging in {document}",
+      "templatePt": "onde menciona accounts receivable aging em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention accounts receivable aging in finance_doc",
+        "onde menciona accounts receivable aging em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_03_summarize",
+      "template": "summarize the key risks and actions for accounts receivable aging",
+      "templatePt": "resuma os principais riscos e ações para accounts receivable aging",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for accounts receivable aging",
+        "resuma os principais riscos e ações para accounts receivable aging"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_04_compare",
+      "template": "compare treasury position between {document_a} and {document_b}",
+      "templatePt": "compare treasury position entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare treasury position between finance_doc_q1 and finance_doc_q2",
+        "compare treasury position entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_04_extract",
+      "template": "extract all treasury position with owner and deadline from {document}",
+      "templatePt": "extraia todos os treasury position com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all treasury position with owner and deadline from finance_doc",
+        "extraia todos os treasury position com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_04_locate",
+      "template": "where does it mention treasury position in {document}",
+      "templatePt": "onde menciona treasury position em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention treasury position in finance_doc",
+        "onde menciona treasury position em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_04_summarize",
+      "template": "summarize the key risks and actions for treasury position",
+      "templatePt": "resuma os principais riscos e ações para treasury position",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for treasury position",
+        "resuma os principais riscos e ações para treasury position"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_05_compare",
+      "template": "compare expense overrun between {document_a} and {document_b}",
+      "templatePt": "compare expense overrun entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare expense overrun between finance_doc_q1 and finance_doc_q2",
+        "compare expense overrun entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_05_extract",
+      "template": "extract all expense overrun with owner and deadline from {document}",
+      "templatePt": "extraia todos os expense overrun com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all expense overrun with owner and deadline from finance_doc",
+        "extraia todos os expense overrun com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_05_locate",
+      "template": "where does it mention expense overrun in {document}",
+      "templatePt": "onde menciona expense overrun em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention expense overrun in finance_doc",
+        "onde menciona expense overrun em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_05_summarize",
+      "template": "summarize the key risks and actions for expense overrun",
+      "templatePt": "resuma os principais riscos e ações para expense overrun",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for expense overrun",
+        "resuma os principais riscos e ações para expense overrun"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_06_compare",
+      "template": "compare forecast accuracy between {document_a} and {document_b}",
+      "templatePt": "compare forecast accuracy entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare forecast accuracy between finance_doc_q1 and finance_doc_q2",
+        "compare forecast accuracy entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_06_extract",
+      "template": "extract all forecast accuracy with owner and deadline from {document}",
+      "templatePt": "extraia todos os forecast accuracy com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all forecast accuracy with owner and deadline from finance_doc",
+        "extraia todos os forecast accuracy com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_06_locate",
+      "template": "where does it mention forecast accuracy in {document}",
+      "templatePt": "onde menciona forecast accuracy em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention forecast accuracy in finance_doc",
+        "onde menciona forecast accuracy em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_06_summarize",
+      "template": "summarize the key risks and actions for forecast accuracy",
+      "templatePt": "resuma os principais riscos e ações para forecast accuracy",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for forecast accuracy",
+        "resuma os principais riscos e ações para forecast accuracy"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_07_compare",
+      "template": "compare debt covenant between {document_a} and {document_b}",
+      "templatePt": "compare debt covenant entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare debt covenant between finance_doc_q1 and finance_doc_q2",
+        "compare debt covenant entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_07_extract",
+      "template": "extract all debt covenant with owner and deadline from {document}",
+      "templatePt": "extraia todos os debt covenant com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all debt covenant with owner and deadline from finance_doc",
+        "extraia todos os debt covenant com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_07_locate",
+      "template": "where does it mention debt covenant in {document}",
+      "templatePt": "onde menciona debt covenant em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention debt covenant in finance_doc",
+        "onde menciona debt covenant em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_07_summarize",
+      "template": "summarize the key risks and actions for debt covenant",
+      "templatePt": "resuma os principais riscos e ações para debt covenant",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for debt covenant",
+        "resuma os principais riscos e ações para debt covenant"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_08_compare",
+      "template": "compare tax exposure between {document_a} and {document_b}",
+      "templatePt": "compare tax exposure entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare tax exposure between finance_doc_q1 and finance_doc_q2",
+        "compare tax exposure entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_08_extract",
+      "template": "extract all tax exposure with owner and deadline from {document}",
+      "templatePt": "extraia todos os tax exposure com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all tax exposure with owner and deadline from finance_doc",
+        "extraia todos os tax exposure com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_08_locate",
+      "template": "where does it mention tax exposure in {document}",
+      "templatePt": "onde menciona tax exposure em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention tax exposure in finance_doc",
+        "onde menciona tax exposure em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_08_summarize",
+      "template": "summarize the key risks and actions for tax exposure",
+      "templatePt": "resuma os principais riscos e ações para tax exposure",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for tax exposure",
+        "resuma os principais riscos e ações para tax exposure"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_09_compare",
+      "template": "compare operating margin between {document_a} and {document_b}",
+      "templatePt": "compare operating margin entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare operating margin between finance_doc_q1 and finance_doc_q2",
+        "compare operating margin entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_09_extract",
+      "template": "extract all operating margin with owner and deadline from {document}",
+      "templatePt": "extraia todos os operating margin com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all operating margin with owner and deadline from finance_doc",
+        "extraia todos os operating margin com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_09_locate",
+      "template": "where does it mention operating margin in {document}",
+      "templatePt": "onde menciona operating margin em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention operating margin in finance_doc",
+        "onde menciona operating margin em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_09_summarize",
+      "template": "summarize the key risks and actions for operating margin",
+      "templatePt": "resuma os principais riscos e ações para operating margin",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for operating margin",
+        "resuma os principais riscos e ações para operating margin"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_10_compare",
+      "template": "compare board narrative between {document_a} and {document_b}",
+      "templatePt": "compare board narrative entre {document_a} e {document_b}",
+      "domain": "finance",
+      "intent": "compare",
+      "tags": [
+        "finance",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare board narrative between finance_doc_q1 and finance_doc_q2",
+        "compare board narrative entre finance_doc_q1 e finance_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_10_extract",
+      "template": "extract all board narrative with owner and deadline from {document}",
+      "templatePt": "extraia todos os board narrative com responsável e prazo de {document}",
+      "domain": "finance",
+      "intent": "extract",
+      "tags": [
+        "finance",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all board narrative with owner and deadline from finance_doc",
+        "extraia todos os board narrative com responsável e prazo de finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_10_locate",
+      "template": "where does it mention board narrative in {document}",
+      "templatePt": "onde menciona board narrative em {document}",
+      "domain": "finance",
+      "intent": "locate",
+      "tags": [
+        "finance",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention board narrative in finance_doc",
+        "onde menciona board narrative em finance_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_finance_10_summarize",
+      "template": "summarize the key risks and actions for board narrative",
+      "templatePt": "resuma os principais riscos e ações para board narrative",
+      "domain": "finance",
+      "intent": "summarize",
+      "tags": [
+        "finance",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for board narrative",
+        "resuma os principais riscos e ações para board narrative"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_01_compare",
+      "template": "compare termination for convenience between {document_a} and {document_b}",
+      "templatePt": "compare termination for convenience entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare termination for convenience between legal_doc_q1 and legal_doc_q2",
+        "compare termination for convenience entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_01_extract",
+      "template": "extract all termination for convenience with owner and deadline from {document}",
+      "templatePt": "extraia todos os termination for convenience com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all termination for convenience with owner and deadline from legal_doc",
+        "extraia todos os termination for convenience com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_01_locate",
+      "template": "where does it mention termination for convenience in {document}",
+      "templatePt": "onde menciona termination for convenience em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention termination for convenience in legal_doc",
+        "onde menciona termination for convenience em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_01_summarize",
+      "template": "summarize the key risks and actions for termination for convenience",
+      "templatePt": "resuma os principais riscos e ações para termination for convenience",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for termination for convenience",
+        "resuma os principais riscos e ações para termination for convenience"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_02_compare",
+      "template": "compare indemnity cap between {document_a} and {document_b}",
+      "templatePt": "compare indemnity cap entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare indemnity cap between legal_doc_q1 and legal_doc_q2",
+        "compare indemnity cap entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_02_extract",
+      "template": "extract all indemnity cap with owner and deadline from {document}",
+      "templatePt": "extraia todos os indemnity cap com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all indemnity cap with owner and deadline from legal_doc",
+        "extraia todos os indemnity cap com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_02_locate",
+      "template": "where does it mention indemnity cap in {document}",
+      "templatePt": "onde menciona indemnity cap em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention indemnity cap in legal_doc",
+        "onde menciona indemnity cap em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_02_summarize",
+      "template": "summarize the key risks and actions for indemnity cap",
+      "templatePt": "resuma os principais riscos e ações para indemnity cap",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for indemnity cap",
+        "resuma os principais riscos e ações para indemnity cap"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_03_compare",
+      "template": "compare data processing obligations between {document_a} and {document_b}",
+      "templatePt": "compare data processing obligations entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare data processing obligations between legal_doc_q1 and legal_doc_q2",
+        "compare data processing obligations entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_03_extract",
+      "template": "extract all data processing obligations with owner and deadline from {document}",
+      "templatePt": "extraia todos os data processing obligations com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all data processing obligations with owner and deadline from legal_doc",
+        "extraia todos os data processing obligations com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_03_locate",
+      "template": "where does it mention data processing obligations in {document}",
+      "templatePt": "onde menciona data processing obligations em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention data processing obligations in legal_doc",
+        "onde menciona data processing obligations em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_03_summarize",
+      "template": "summarize the key risks and actions for data processing obligations",
+      "templatePt": "resuma os principais riscos e ações para data processing obligations",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for data processing obligations",
+        "resuma os principais riscos e ações para data processing obligations"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_04_compare",
+      "template": "compare notice period between {document_a} and {document_b}",
+      "templatePt": "compare notice period entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare notice period between legal_doc_q1 and legal_doc_q2",
+        "compare notice period entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_04_extract",
+      "template": "extract all notice period with owner and deadline from {document}",
+      "templatePt": "extraia todos os notice period com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all notice period with owner and deadline from legal_doc",
+        "extraia todos os notice period com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_04_locate",
+      "template": "where does it mention notice period in {document}",
+      "templatePt": "onde menciona notice period em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention notice period in legal_doc",
+        "onde menciona notice period em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_04_summarize",
+      "template": "summarize the key risks and actions for notice period",
+      "templatePt": "resuma os principais riscos e ações para notice period",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for notice period",
+        "resuma os principais riscos e ações para notice period"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_05_compare",
+      "template": "compare governing law between {document_a} and {document_b}",
+      "templatePt": "compare governing law entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare governing law between legal_doc_q1 and legal_doc_q2",
+        "compare governing law entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_05_extract",
+      "template": "extract all governing law with owner and deadline from {document}",
+      "templatePt": "extraia todos os governing law com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all governing law with owner and deadline from legal_doc",
+        "extraia todos os governing law com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_05_locate",
+      "template": "where does it mention governing law in {document}",
+      "templatePt": "onde menciona governing law em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention governing law in legal_doc",
+        "onde menciona governing law em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_05_summarize",
+      "template": "summarize the key risks and actions for governing law",
+      "templatePt": "resuma os principais riscos e ações para governing law",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for governing law",
+        "resuma os principais riscos e ações para governing law"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_06_compare",
+      "template": "compare liability carve-outs between {document_a} and {document_b}",
+      "templatePt": "compare liability carve-outs entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare liability carve-outs between legal_doc_q1 and legal_doc_q2",
+        "compare liability carve-outs entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_06_extract",
+      "template": "extract all liability carve-outs with owner and deadline from {document}",
+      "templatePt": "extraia todos os liability carve-outs com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all liability carve-outs with owner and deadline from legal_doc",
+        "extraia todos os liability carve-outs com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_06_locate",
+      "template": "where does it mention liability carve-outs in {document}",
+      "templatePt": "onde menciona liability carve-outs em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention liability carve-outs in legal_doc",
+        "onde menciona liability carve-outs em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_06_summarize",
+      "template": "summarize the key risks and actions for liability carve-outs",
+      "templatePt": "resuma os principais riscos e ações para liability carve-outs",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for liability carve-outs",
+        "resuma os principais riscos e ações para liability carve-outs"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_07_compare",
+      "template": "compare change of control between {document_a} and {document_b}",
+      "templatePt": "compare change of control entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare change of control between legal_doc_q1 and legal_doc_q2",
+        "compare change of control entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_07_extract",
+      "template": "extract all change of control with owner and deadline from {document}",
+      "templatePt": "extraia todos os change of control com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all change of control with owner and deadline from legal_doc",
+        "extraia todos os change of control com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_07_locate",
+      "template": "where does it mention change of control in {document}",
+      "templatePt": "onde menciona change of control em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention change of control in legal_doc",
+        "onde menciona change of control em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_07_summarize",
+      "template": "summarize the key risks and actions for change of control",
+      "templatePt": "resuma os principais riscos e ações para change of control",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for change of control",
+        "resuma os principais riscos e ações para change of control"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_08_compare",
+      "template": "compare non-compete scope between {document_a} and {document_b}",
+      "templatePt": "compare non-compete scope entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare non-compete scope between legal_doc_q1 and legal_doc_q2",
+        "compare non-compete scope entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_08_extract",
+      "template": "extract all non-compete scope with owner and deadline from {document}",
+      "templatePt": "extraia todos os non-compete scope com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all non-compete scope with owner and deadline from legal_doc",
+        "extraia todos os non-compete scope com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_08_locate",
+      "template": "where does it mention non-compete scope in {document}",
+      "templatePt": "onde menciona non-compete scope em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention non-compete scope in legal_doc",
+        "onde menciona non-compete scope em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_08_summarize",
+      "template": "summarize the key risks and actions for non-compete scope",
+      "templatePt": "resuma os principais riscos e ações para non-compete scope",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for non-compete scope",
+        "resuma os principais riscos e ações para non-compete scope"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_09_compare",
+      "template": "compare ip ownership between {document_a} and {document_b}",
+      "templatePt": "compare ip ownership entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare ip ownership between legal_doc_q1 and legal_doc_q2",
+        "compare ip ownership entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_09_extract",
+      "template": "extract all ip ownership with owner and deadline from {document}",
+      "templatePt": "extraia todos os ip ownership com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all ip ownership with owner and deadline from legal_doc",
+        "extraia todos os ip ownership com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_09_locate",
+      "template": "where does it mention ip ownership in {document}",
+      "templatePt": "onde menciona ip ownership em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention ip ownership in legal_doc",
+        "onde menciona ip ownership em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_09_summarize",
+      "template": "summarize the key risks and actions for ip ownership",
+      "templatePt": "resuma os principais riscos e ações para ip ownership",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for ip ownership",
+        "resuma os principais riscos e ações para ip ownership"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_10_compare",
+      "template": "compare audit rights between {document_a} and {document_b}",
+      "templatePt": "compare audit rights entre {document_a} e {document_b}",
+      "domain": "legal",
+      "intent": "compare",
+      "tags": [
+        "legal",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare audit rights between legal_doc_q1 and legal_doc_q2",
+        "compare audit rights entre legal_doc_q1 e legal_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_10_extract",
+      "template": "extract all audit rights with owner and deadline from {document}",
+      "templatePt": "extraia todos os audit rights com responsável e prazo de {document}",
+      "domain": "legal",
+      "intent": "extract",
+      "tags": [
+        "legal",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all audit rights with owner and deadline from legal_doc",
+        "extraia todos os audit rights com responsável e prazo de legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_10_locate",
+      "template": "where does it mention audit rights in {document}",
+      "templatePt": "onde menciona audit rights em {document}",
+      "domain": "legal",
+      "intent": "locate",
+      "tags": [
+        "legal",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention audit rights in legal_doc",
+        "onde menciona audit rights em legal_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_legal_10_summarize",
+      "template": "summarize the key risks and actions for audit rights",
+      "templatePt": "resuma os principais riscos e ações para audit rights",
+      "domain": "legal",
+      "intent": "summarize",
+      "tags": [
+        "legal",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for audit rights",
+        "resuma os principais riscos e ações para audit rights"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_01_compare",
+      "template": "compare critical lab value between {document_a} and {document_b}",
+      "templatePt": "compare critical lab value entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare critical lab value between medical_doc_q1 and medical_doc_q2",
+        "compare critical lab value entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_01_extract",
+      "template": "extract all critical lab value with owner and deadline from {document}",
+      "templatePt": "extraia todos os critical lab value com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all critical lab value with owner and deadline from medical_doc",
+        "extraia todos os critical lab value com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_01_locate",
+      "template": "where does it mention critical lab value in {document}",
+      "templatePt": "onde menciona critical lab value em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention critical lab value in medical_doc",
+        "onde menciona critical lab value em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_01_summarize",
+      "template": "summarize the key risks and actions for critical lab value",
+      "templatePt": "resuma os principais riscos e ações para critical lab value",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for critical lab value",
+        "resuma os principais riscos e ações para critical lab value"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_02_compare",
+      "template": "compare reference range explanation between {document_a} and {document_b}",
+      "templatePt": "compare reference range explanation entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare reference range explanation between medical_doc_q1 and medical_doc_q2",
+        "compare reference range explanation entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_02_extract",
+      "template": "extract all reference range explanation with owner and deadline from {document}",
+      "templatePt": "extraia todos os reference range explanation com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all reference range explanation with owner and deadline from medical_doc",
+        "extraia todos os reference range explanation com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_02_locate",
+      "template": "where does it mention reference range explanation in {document}",
+      "templatePt": "onde menciona reference range explanation em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention reference range explanation in medical_doc",
+        "onde menciona reference range explanation em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_02_summarize",
+      "template": "summarize the key risks and actions for reference range explanation",
+      "templatePt": "resuma os principais riscos e ações para reference range explanation",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for reference range explanation",
+        "resuma os principais riscos e ações para reference range explanation"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_03_compare",
+      "template": "compare medication interaction risk between {document_a} and {document_b}",
+      "templatePt": "compare medication interaction risk entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare medication interaction risk between medical_doc_q1 and medical_doc_q2",
+        "compare medication interaction risk entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_03_extract",
+      "template": "extract all medication interaction risk with owner and deadline from {document}",
+      "templatePt": "extraia todos os medication interaction risk com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all medication interaction risk with owner and deadline from medical_doc",
+        "extraia todos os medication interaction risk com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_03_locate",
+      "template": "where does it mention medication interaction risk in {document}",
+      "templatePt": "onde menciona medication interaction risk em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention medication interaction risk in medical_doc",
+        "onde menciona medication interaction risk em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_03_summarize",
+      "template": "summarize the key risks and actions for medication interaction risk",
+      "templatePt": "resuma os principais riscos e ações para medication interaction risk",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for medication interaction risk",
+        "resuma os principais riscos e ações para medication interaction risk"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_04_compare",
+      "template": "compare imaging impression between {document_a} and {document_b}",
+      "templatePt": "compare imaging impression entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare imaging impression between medical_doc_q1 and medical_doc_q2",
+        "compare imaging impression entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_04_extract",
+      "template": "extract all imaging impression with owner and deadline from {document}",
+      "templatePt": "extraia todos os imaging impression com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all imaging impression with owner and deadline from medical_doc",
+        "extraia todos os imaging impression com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_04_locate",
+      "template": "where does it mention imaging impression in {document}",
+      "templatePt": "onde menciona imaging impression em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention imaging impression in medical_doc",
+        "onde menciona imaging impression em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_04_summarize",
+      "template": "summarize the key risks and actions for imaging impression",
+      "templatePt": "resuma os principais riscos e ações para imaging impression",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for imaging impression",
+        "resuma os principais riscos e ações para imaging impression"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_05_compare",
+      "template": "compare triage urgency between {document_a} and {document_b}",
+      "templatePt": "compare triage urgency entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare triage urgency between medical_doc_q1 and medical_doc_q2",
+        "compare triage urgency entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_05_extract",
+      "template": "extract all triage urgency with owner and deadline from {document}",
+      "templatePt": "extraia todos os triage urgency com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all triage urgency with owner and deadline from medical_doc",
+        "extraia todos os triage urgency com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_05_locate",
+      "template": "where does it mention triage urgency in {document}",
+      "templatePt": "onde menciona triage urgency em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention triage urgency in medical_doc",
+        "onde menciona triage urgency em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_05_summarize",
+      "template": "summarize the key risks and actions for triage urgency",
+      "templatePt": "resuma os principais riscos e ações para triage urgency",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for triage urgency",
+        "resuma os principais riscos e ações para triage urgency"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_06_compare",
+      "template": "compare follow-up recommendation between {document_a} and {document_b}",
+      "templatePt": "compare follow-up recommendation entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare follow-up recommendation between medical_doc_q1 and medical_doc_q2",
+        "compare follow-up recommendation entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_06_extract",
+      "template": "extract all follow-up recommendation with owner and deadline from {document}",
+      "templatePt": "extraia todos os follow-up recommendation com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all follow-up recommendation with owner and deadline from medical_doc",
+        "extraia todos os follow-up recommendation com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_06_locate",
+      "template": "where does it mention follow-up recommendation in {document}",
+      "templatePt": "onde menciona follow-up recommendation em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention follow-up recommendation in medical_doc",
+        "onde menciona follow-up recommendation em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_06_summarize",
+      "template": "summarize the key risks and actions for follow-up recommendation",
+      "templatePt": "resuma os principais riscos e ações para follow-up recommendation",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for follow-up recommendation",
+        "resuma os principais riscos e ações para follow-up recommendation"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_07_compare",
+      "template": "compare allergy alert between {document_a} and {document_b}",
+      "templatePt": "compare allergy alert entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare allergy alert between medical_doc_q1 and medical_doc_q2",
+        "compare allergy alert entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_07_extract",
+      "template": "extract all allergy alert with owner and deadline from {document}",
+      "templatePt": "extraia todos os allergy alert com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all allergy alert with owner and deadline from medical_doc",
+        "extraia todos os allergy alert com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_07_locate",
+      "template": "where does it mention allergy alert in {document}",
+      "templatePt": "onde menciona allergy alert em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention allergy alert in medical_doc",
+        "onde menciona allergy alert em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_07_summarize",
+      "template": "summarize the key risks and actions for allergy alert",
+      "templatePt": "resuma os principais riscos e ações para allergy alert",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for allergy alert",
+        "resuma os principais riscos e ações para allergy alert"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_08_compare",
+      "template": "compare vital sign trend between {document_a} and {document_b}",
+      "templatePt": "compare vital sign trend entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare vital sign trend between medical_doc_q1 and medical_doc_q2",
+        "compare vital sign trend entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_08_extract",
+      "template": "extract all vital sign trend with owner and deadline from {document}",
+      "templatePt": "extraia todos os vital sign trend com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all vital sign trend with owner and deadline from medical_doc",
+        "extraia todos os vital sign trend com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_08_locate",
+      "template": "where does it mention vital sign trend in {document}",
+      "templatePt": "onde menciona vital sign trend em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention vital sign trend in medical_doc",
+        "onde menciona vital sign trend em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_08_summarize",
+      "template": "summarize the key risks and actions for vital sign trend",
+      "templatePt": "resuma os principais riscos e ações para vital sign trend",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for vital sign trend",
+        "resuma os principais riscos e ações para vital sign trend"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_09_compare",
+      "template": "compare discharge instruction between {document_a} and {document_b}",
+      "templatePt": "compare discharge instruction entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare discharge instruction between medical_doc_q1 and medical_doc_q2",
+        "compare discharge instruction entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_09_extract",
+      "template": "extract all discharge instruction with owner and deadline from {document}",
+      "templatePt": "extraia todos os discharge instruction com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all discharge instruction with owner and deadline from medical_doc",
+        "extraia todos os discharge instruction com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_09_locate",
+      "template": "where does it mention discharge instruction in {document}",
+      "templatePt": "onde menciona discharge instruction em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention discharge instruction in medical_doc",
+        "onde menciona discharge instruction em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_09_summarize",
+      "template": "summarize the key risks and actions for discharge instruction",
+      "templatePt": "resuma os principais riscos e ações para discharge instruction",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for discharge instruction",
+        "resuma os principais riscos e ações para discharge instruction"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_10_compare",
+      "template": "compare referral trigger between {document_a} and {document_b}",
+      "templatePt": "compare referral trigger entre {document_a} e {document_b}",
+      "domain": "medical",
+      "intent": "compare",
+      "tags": [
+        "medical",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare referral trigger between medical_doc_q1 and medical_doc_q2",
+        "compare referral trigger entre medical_doc_q1 e medical_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_10_extract",
+      "template": "extract all referral trigger with owner and deadline from {document}",
+      "templatePt": "extraia todos os referral trigger com responsável e prazo de {document}",
+      "domain": "medical",
+      "intent": "extract",
+      "tags": [
+        "medical",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all referral trigger with owner and deadline from medical_doc",
+        "extraia todos os referral trigger com responsável e prazo de medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_10_locate",
+      "template": "where does it mention referral trigger in {document}",
+      "templatePt": "onde menciona referral trigger em {document}",
+      "domain": "medical",
+      "intent": "locate",
+      "tags": [
+        "medical",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention referral trigger in medical_doc",
+        "onde menciona referral trigger em medical_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_medical_10_summarize",
+      "template": "summarize the key risks and actions for referral trigger",
+      "templatePt": "resuma os principais riscos e ações para referral trigger",
+      "domain": "medical",
+      "intent": "summarize",
+      "tags": [
+        "medical",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for referral trigger",
+        "resuma os principais riscos e ações para referral trigger"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_01_compare",
+      "template": "compare incident timeline between {document_a} and {document_b}",
+      "templatePt": "compare incident timeline entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare incident timeline between ops_doc_q1 and ops_doc_q2",
+        "compare incident timeline entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_01_extract",
+      "template": "extract all incident timeline with owner and deadline from {document}",
+      "templatePt": "extraia todos os incident timeline com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all incident timeline with owner and deadline from ops_doc",
+        "extraia todos os incident timeline com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_01_locate",
+      "template": "where does it mention incident timeline in {document}",
+      "templatePt": "onde menciona incident timeline em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention incident timeline in ops_doc",
+        "onde menciona incident timeline em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_01_summarize",
+      "template": "summarize the key risks and actions for incident timeline",
+      "templatePt": "resuma os principais riscos e ações para incident timeline",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for incident timeline",
+        "resuma os principais riscos e ações para incident timeline"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_02_compare",
+      "template": "compare SLA breach root cause between {document_a} and {document_b}",
+      "templatePt": "compare SLA breach root cause entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare SLA breach root cause between ops_doc_q1 and ops_doc_q2",
+        "compare SLA breach root cause entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_02_extract",
+      "template": "extract all SLA breach root cause with owner and deadline from {document}",
+      "templatePt": "extraia todos os SLA breach root cause com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all SLA breach root cause with owner and deadline from ops_doc",
+        "extraia todos os SLA breach root cause com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_02_locate",
+      "template": "where does it mention SLA breach root cause in {document}",
+      "templatePt": "onde menciona SLA breach root cause em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention SLA breach root cause in ops_doc",
+        "onde menciona SLA breach root cause em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_02_summarize",
+      "template": "summarize the key risks and actions for SLA breach root cause",
+      "templatePt": "resuma os principais riscos e ações para SLA breach root cause",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for SLA breach root cause",
+        "resuma os principais riscos e ações para SLA breach root cause"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_03_compare",
+      "template": "compare change request risk between {document_a} and {document_b}",
+      "templatePt": "compare change request risk entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare change request risk between ops_doc_q1 and ops_doc_q2",
+        "compare change request risk entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_03_extract",
+      "template": "extract all change request risk with owner and deadline from {document}",
+      "templatePt": "extraia todos os change request risk com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all change request risk with owner and deadline from ops_doc",
+        "extraia todos os change request risk com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_03_locate",
+      "template": "where does it mention change request risk in {document}",
+      "templatePt": "onde menciona change request risk em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention change request risk in ops_doc",
+        "onde menciona change request risk em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_03_summarize",
+      "template": "summarize the key risks and actions for change request risk",
+      "templatePt": "resuma os principais riscos e ações para change request risk",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for change request risk",
+        "resuma os principais riscos e ações para change request risk"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_04_compare",
+      "template": "compare runbook gap between {document_a} and {document_b}",
+      "templatePt": "compare runbook gap entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare runbook gap between ops_doc_q1 and ops_doc_q2",
+        "compare runbook gap entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_04_extract",
+      "template": "extract all runbook gap with owner and deadline from {document}",
+      "templatePt": "extraia todos os runbook gap com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all runbook gap with owner and deadline from ops_doc",
+        "extraia todos os runbook gap com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_04_locate",
+      "template": "where does it mention runbook gap in {document}",
+      "templatePt": "onde menciona runbook gap em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention runbook gap in ops_doc",
+        "onde menciona runbook gap em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_04_summarize",
+      "template": "summarize the key risks and actions for runbook gap",
+      "templatePt": "resuma os principais riscos e ações para runbook gap",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for runbook gap",
+        "resuma os principais riscos e ações para runbook gap"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_05_compare",
+      "template": "compare vendor performance issue between {document_a} and {document_b}",
+      "templatePt": "compare vendor performance issue entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare vendor performance issue between ops_doc_q1 and ops_doc_q2",
+        "compare vendor performance issue entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_05_extract",
+      "template": "extract all vendor performance issue with owner and deadline from {document}",
+      "templatePt": "extraia todos os vendor performance issue com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all vendor performance issue with owner and deadline from ops_doc",
+        "extraia todos os vendor performance issue com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_05_locate",
+      "template": "where does it mention vendor performance issue in {document}",
+      "templatePt": "onde menciona vendor performance issue em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention vendor performance issue in ops_doc",
+        "onde menciona vendor performance issue em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_05_summarize",
+      "template": "summarize the key risks and actions for vendor performance issue",
+      "templatePt": "resuma os principais riscos e ações para vendor performance issue",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for vendor performance issue",
+        "resuma os principais riscos e ações para vendor performance issue"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_06_compare",
+      "template": "compare capacity bottleneck between {document_a} and {document_b}",
+      "templatePt": "compare capacity bottleneck entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare capacity bottleneck between ops_doc_q1 and ops_doc_q2",
+        "compare capacity bottleneck entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_06_extract",
+      "template": "extract all capacity bottleneck with owner and deadline from {document}",
+      "templatePt": "extraia todos os capacity bottleneck com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all capacity bottleneck with owner and deadline from ops_doc",
+        "extraia todos os capacity bottleneck com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_06_locate",
+      "template": "where does it mention capacity bottleneck in {document}",
+      "templatePt": "onde menciona capacity bottleneck em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention capacity bottleneck in ops_doc",
+        "onde menciona capacity bottleneck em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_06_summarize",
+      "template": "summarize the key risks and actions for capacity bottleneck",
+      "templatePt": "resuma os principais riscos e ações para capacity bottleneck",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for capacity bottleneck",
+        "resuma os principais riscos e ações para capacity bottleneck"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_07_compare",
+      "template": "compare risk register update between {document_a} and {document_b}",
+      "templatePt": "compare risk register update entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare risk register update between ops_doc_q1 and ops_doc_q2",
+        "compare risk register update entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_07_extract",
+      "template": "extract all risk register update with owner and deadline from {document}",
+      "templatePt": "extraia todos os risk register update com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all risk register update with owner and deadline from ops_doc",
+        "extraia todos os risk register update com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_07_locate",
+      "template": "where does it mention risk register update in {document}",
+      "templatePt": "onde menciona risk register update em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention risk register update in ops_doc",
+        "onde menciona risk register update em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_07_summarize",
+      "template": "summarize the key risks and actions for risk register update",
+      "templatePt": "resuma os principais riscos e ações para risk register update",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for risk register update",
+        "resuma os principais riscos e ações para risk register update"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_08_compare",
+      "template": "compare onboarding delay between {document_a} and {document_b}",
+      "templatePt": "compare onboarding delay entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare onboarding delay between ops_doc_q1 and ops_doc_q2",
+        "compare onboarding delay entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_08_extract",
+      "template": "extract all onboarding delay with owner and deadline from {document}",
+      "templatePt": "extraia todos os onboarding delay com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all onboarding delay with owner and deadline from ops_doc",
+        "extraia todos os onboarding delay com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_08_locate",
+      "template": "where does it mention onboarding delay in {document}",
+      "templatePt": "onde menciona onboarding delay em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention onboarding delay in ops_doc",
+        "onde menciona onboarding delay em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_08_summarize",
+      "template": "summarize the key risks and actions for onboarding delay",
+      "templatePt": "resuma os principais riscos e ações para onboarding delay",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for onboarding delay",
+        "resuma os principais riscos e ações para onboarding delay"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_09_compare",
+      "template": "compare control evidence between {document_a} and {document_b}",
+      "templatePt": "compare control evidence entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare control evidence between ops_doc_q1 and ops_doc_q2",
+        "compare control evidence entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_09_extract",
+      "template": "extract all control evidence with owner and deadline from {document}",
+      "templatePt": "extraia todos os control evidence com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all control evidence with owner and deadline from ops_doc",
+        "extraia todos os control evidence com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_09_locate",
+      "template": "where does it mention control evidence in {document}",
+      "templatePt": "onde menciona control evidence em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention control evidence in ops_doc",
+        "onde menciona control evidence em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_09_summarize",
+      "template": "summarize the key risks and actions for control evidence",
+      "templatePt": "resuma os principais riscos e ações para control evidence",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for control evidence",
+        "resuma os principais riscos e ações para control evidence"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_10_compare",
+      "template": "compare procurement cycle time between {document_a} and {document_b}",
+      "templatePt": "compare procurement cycle time entre {document_a} e {document_b}",
+      "domain": "ops",
+      "intent": "compare",
+      "tags": [
+        "ops",
+        "delta",
+        "comparison",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "compare"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "compare procurement cycle time between ops_doc_q1 and ops_doc_q2",
+        "compare procurement cycle time entre ops_doc_q1 e ops_doc_q2"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_10_extract",
+      "template": "extract all procurement cycle time with owner and deadline from {document}",
+      "templatePt": "extraia todos os procurement cycle time com responsável e prazo de {document}",
+      "domain": "ops",
+      "intent": "extract",
+      "tags": [
+        "ops",
+        "extract_structured",
+        "fields",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "extract"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "extract all procurement cycle time with owner and deadline from ops_doc",
+        "extraia todos os procurement cycle time com responsável e prazo de ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_10_locate",
+      "template": "where does it mention procurement cycle time in {document}",
+      "templatePt": "onde menciona procurement cycle time em {document}",
+      "domain": "ops",
+      "intent": "locate",
+      "tags": [
+        "ops",
+        "find_text",
+        "evidence",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "locate",
+        "quote"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "where does it mention procurement cycle time in ops_doc",
+        "onde menciona procurement cycle time em ops_doc"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
+    },
+    {
+      "id": "pattern_ops_10_summarize",
+      "template": "summarize the key risks and actions for procurement cycle time",
+      "templatePt": "resuma os principais riscos e ações para procurement cycle time",
+      "domain": "ops",
+      "intent": "summarize",
+      "tags": [
+        "ops",
+        "summary",
+        "executive",
+        "marketing_probe",
+        "query_pattern"
+      ],
+      "operatorHints": [
+        "summarize"
+      ],
+      "slots": [
+        "subject",
+        "document",
+        "document_a",
+        "document_b"
+      ],
+      "exampleQueries": [
+        "summarize the key risks and actions for procurement cycle time",
+        "resuma os principais riscos e ações para procurement cycle time"
+      ],
+      "languageHints": [
+        "en",
+        "pt",
+        "any"
+      ]
     }
   ]
 }

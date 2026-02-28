@@ -83,6 +83,19 @@ export interface BankAliasesFile {
   tests?: any;
 }
 
+export interface BankDependencyNode {
+  id: string;
+  dependsOn?: string[];
+  optional?: boolean;
+}
+
+export interface BankDependenciesFile {
+  _meta: BankMeta;
+  config: any;
+  banks: BankDependencyNode[];
+  tests?: any;
+}
+
 export class DataBankError extends Error {
   constructor(
     message: string,
@@ -180,6 +193,25 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+function normalizeAliasKey(value: string, options: any): string {
+  let out = String(value || "").trim();
+  if (options?.collapseWhitespace !== false) {
+    out = out.replace(/\s+/g, " ");
+  }
+  if (options?.stripDiacritics) {
+    out = out.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  if (!options?.caseSensitive) {
+    out = out.toLowerCase();
+  }
+  return out;
+}
+
+function toStringList(values: unknown): string[] {
+  if (!Array.isArray(values)) return [];
+  return values.map((value) => String(value || "").trim()).filter(Boolean);
+}
+
 /**
  * Minimal bank-level contract checks (schema-lite).
  * Real schema validation can be enabled via AJV if present.
@@ -215,14 +247,20 @@ function tryCreateAjv(): any | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const Ajv = require("ajv");
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const addFormats = require("ajv-formats");
     const ajv = new Ajv({
       allErrors: true,
       strict: false,
       allowUnionTypes: true,
     });
-    addFormats(ajv);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const addFormats = require("ajv-formats");
+      if (typeof addFormats === "function") {
+        addFormats(ajv);
+      }
+    } catch {
+      // Optional: schema validation remains available without extra formats.
+    }
     return ajv;
   } catch {
     return null;
@@ -235,6 +273,9 @@ export class DataBankLoaderService {
 
   private registry: BankRegistryFile | null = null;
   private aliases: BankAliasesFile | null = null;
+  private aliasEntries: Array<{ alias: string; canonicalId: string }> = [];
+  private aliasNormalizedMap = new Map<string, string>();
+  private dependencies: BankDependenciesFile | null = null;
 
   // Loaded banks (canonical id -> bank object)
   private bankCache = new Map<string, BankFile>();
@@ -278,13 +319,19 @@ export class DataBankLoaderService {
     this.bankCache.clear();
     this.schemaCache.clear();
     this.loadLog = [];
+    this.aliasEntries = [];
+    this.aliasNormalizedMap.clear();
+    this.dependencies = null;
 
     // Bootstrap: load registry + aliases with minimal checks (no schema validation)
     await this.loadRegistryBootstrap();
     await this.loadAliasesBootstrap();
+    await this.loadDependenciesBootstrap();
 
     // Validate registry integrity (duplicates, paths, env keys)
     this.validateRegistryIntegrity();
+    this.validateAliasIntegrity();
+    this.validateDependencyGraphIntegrity();
 
     // Bootstrap schemas next (so we can validate everything else)
     await this.loadSchemasBootstrap();
@@ -333,6 +380,7 @@ export class DataBankLoaderService {
     if (this.opts.strict) {
       this.assertRequiredBanksLoaded();
     }
+    this.validateDocumentIntelligenceContracts();
 
     this.logger.info("Data banks loaded successfully", {
       env: this.opts.env,
@@ -424,25 +472,79 @@ export class DataBankLoaderService {
       // Convert array format to Record<string, string> for resolveAlias()
       // Array format: [{ alias: "foo", canonicalId: "bar" }, ...]
       // Object format: { "foo": "bar", ... }
-      let aliasMap: Record<string, string> = {};
+      const aliasMap: Record<string, string> = {};
+      const aliasEntries: Array<{ alias: string; canonicalId: string }> = [];
       if (Array.isArray(parsed.aliases)) {
         for (const entry of parsed.aliases) {
-          if (entry.alias && entry.canonicalId) {
-            aliasMap[entry.alias] = entry.canonicalId;
-          }
+          const alias = String(entry?.alias || "").trim();
+          const canonicalId = String(entry?.canonicalId || "").trim();
+          if (!alias || !canonicalId) continue;
+          aliasMap[alias] = canonicalId;
+          aliasEntries.push({ alias, canonicalId });
         }
       } else if (typeof parsed.aliases === "object") {
-        aliasMap = parsed.aliases;
+        for (const [alias, canonicalId] of Object.entries(parsed.aliases)) {
+          const normalizedAlias = String(alias || "").trim();
+          const normalizedCanonicalId = String(canonicalId || "").trim();
+          if (!normalizedAlias || !normalizedCanonicalId) continue;
+          aliasMap[normalizedAlias] = normalizedCanonicalId;
+          aliasEntries.push({
+            alias: normalizedAlias,
+            canonicalId: normalizedCanonicalId,
+          });
+        }
       }
 
       this.aliases = { ...parsed, aliases: aliasMap };
+      this.aliasEntries = aliasEntries;
+      this.aliasNormalizedMap.clear();
+      for (const entry of aliasEntries) {
+        const normalized = normalizeAliasKey(entry.alias, parsed.config ?? {});
+        if (!normalized) continue;
+        if (!this.aliasNormalizedMap.has(normalized)) {
+          this.aliasNormalizedMap.set(normalized, entry.canonicalId);
+        }
+      }
       this.logger.info("Loaded bank aliases", {
         aliases: Object.keys(aliasMap).length,
       });
     } catch {
       this.aliases = null;
+      this.aliasEntries = [];
+      this.aliasNormalizedMap.clear();
       this.logger.warn(
         "bank_aliases.any.json not found; alias resolution disabled",
+      );
+    }
+  }
+
+  private async loadDependenciesBootstrap(): Promise<void> {
+    const depsPath = path.join(
+      this.opts.rootDir,
+      "manifest/bank_dependencies.any.json",
+    );
+    try {
+      const raw = await fs.readFile(depsPath, "utf8");
+      const parsed = safeParseJson<BankDependenciesFile>(
+        raw,
+        "manifest/bank_dependencies.any.json",
+      );
+      validateMinimalBankContract(
+        parsed,
+        "manifest/bank_dependencies.any.json",
+      );
+      requireFields(parsed, ["banks"], "manifest/bank_dependencies.any.json");
+      if (!Array.isArray(parsed.banks)) {
+        throw new DataBankError("bank_dependencies.banks must be an array");
+      }
+      this.dependencies = parsed;
+      this.logger.info("Loaded bank dependencies", {
+        nodes: parsed.banks.length,
+      });
+    } catch (err: any) {
+      this.dependencies = null;
+      this.logger.warn(
+        `bank_dependencies.any.json not loaded; dependency overlay disabled (${err?.message || "missing"})`,
       );
     }
   }
@@ -500,6 +602,12 @@ export class DataBankLoaderService {
       }
 
       const p = normalizeRegistryPath(b.path);
+      if (p.startsWith("_deprecated/")) {
+        throw new DataBankError(
+          `Registry entry points to deprecated bank path: ${p}`,
+          { entry: b },
+        );
+      }
 
       if (ids.has(b.id))
         throw new DataBankError(`Duplicate bank id in registry: ${b.id}`);
@@ -542,6 +650,461 @@ export class DataBankLoaderService {
     this.logger.info("Registry integrity checks passed");
   }
 
+  private validateAliasIntegrity(): void {
+    if (!this.aliases || !this.registry) return;
+
+    const aliasConfig = this.aliases.config ?? {};
+    const failOnCollision = Boolean(aliasConfig.failOnCollision);
+    const failOnDanglingByEnv = ensureEnvMap(
+      aliasConfig.failOnDanglingAliasByEnv,
+      "bank_aliases.config.failOnDanglingAliasByEnv",
+    );
+    const shouldFailOnDangling = Boolean(failOnDanglingByEnv[this.opts.env]);
+    const registryIds = new Set(this.registry.banks.map((b) => b.id));
+    const normalizedAliasToCanonical = new Map<string, string>();
+    const collisions: Array<{ alias: string; canonicalIds: string[] }> = [];
+    const danglingAliases: Array<{ alias: string; canonicalId: string }> = [];
+    const aliasMap = this.aliases.aliases ?? {};
+    const entries = this.aliasEntries.length
+      ? this.aliasEntries
+      : Object.entries(aliasMap).map(([alias, canonicalId]) => ({
+          alias,
+          canonicalId,
+        }));
+
+    for (const entry of entries) {
+      const normalizedAlias = normalizeAliasKey(entry.alias, aliasConfig);
+      if (!normalizedAlias) continue;
+      const canonicalId = String(entry.canonicalId || "").trim();
+      if (!canonicalId) continue;
+
+      const existingCanonical = normalizedAliasToCanonical.get(normalizedAlias);
+      if (existingCanonical && existingCanonical !== canonicalId) {
+        collisions.push({
+          alias: entry.alias,
+          canonicalIds: [existingCanonical, canonicalId],
+        });
+      } else {
+        normalizedAliasToCanonical.set(normalizedAlias, canonicalId);
+      }
+    }
+
+    const resolveChain = (inputAlias: string): string | null => {
+      let current = String(inputAlias || "").trim();
+      const seen = new Set<string>();
+      for (let i = 0; i < 16; i++) {
+        if (!current) return null;
+        const normalized = normalizeAliasKey(current, aliasConfig);
+        if (seen.has(normalized)) return null;
+        seen.add(normalized);
+
+        const mapped =
+          aliasMap[current] ?? this.aliasNormalizedMap.get(normalized);
+        if (!mapped) {
+          return registryIds.has(current) ? current : null;
+        }
+        current = String(mapped || "").trim();
+      }
+      return null;
+    };
+
+    for (const entry of entries) {
+      const alias = String(entry.alias || "").trim();
+      const canonicalId = String(entry.canonicalId || "").trim();
+      if (!alias || !canonicalId) continue;
+      const resolved = resolveChain(alias);
+      if (!resolved || !registryIds.has(resolved)) {
+        danglingAliases.push({ alias, canonicalId });
+      }
+    }
+
+    if (collisions.length > 0) {
+      const details = {
+        collisions: collisions.slice(0, 20),
+        total: collisions.length,
+      };
+      if (failOnCollision || this.opts.strict) {
+        throw new DataBankError("Alias collision detected", details);
+      }
+      this.logger.warn("Alias collisions detected (non-fatal)", details);
+    }
+
+    if (danglingAliases.length > 0) {
+      const details = {
+        dangling: danglingAliases.slice(0, 30),
+        total: danglingAliases.length,
+        env: this.opts.env,
+      };
+      if (shouldFailOnDangling || this.opts.strict) {
+        throw new DataBankError("Dangling aliases detected", details);
+      }
+      this.logger.warn("Dangling aliases detected (non-fatal)", details);
+    }
+  }
+
+  private validateDependencyGraphIntegrity(): void {
+    if (!this.dependencies) return;
+
+    const nodes = Array.isArray(this.dependencies.banks)
+      ? this.dependencies.banks
+      : [];
+    const ids = new Set<string>();
+    const duplicates = new Set<string>();
+    for (const node of nodes) {
+      const id = String(node?.id || "").trim();
+      if (!id) continue;
+      if (ids.has(id)) duplicates.add(id);
+      ids.add(id);
+    }
+
+    if (duplicates.size > 0) {
+      throw new DataBankError("Duplicate dependency graph node ids", {
+        duplicates: [...duplicates].sort((a, b) => a.localeCompare(b)),
+      });
+    }
+
+    // Validate cycle safety only across declared nodes.
+    const byId = new Map<string, BankDependencyNode>(
+      nodes
+        .map((node) => ({
+          ...node,
+          id: String(node?.id || "").trim(),
+          dependsOn: toStringList(node?.dependsOn),
+        }))
+        .filter((node) => node.id)
+        .map((node) => [node.id, node]),
+    );
+
+    const visiting = new Set<string>();
+    const visited = new Set<string>();
+    const cycles: string[] = [];
+    const visit = (id: string, stack: string[]) => {
+      if (visited.has(id) || cycles.length > 0) return;
+      if (visiting.has(id)) {
+        cycles.push([...stack, id].join(" -> "));
+        return;
+      }
+      visiting.add(id);
+      const node = byId.get(id);
+      for (const dep of toStringList(node?.dependsOn)) {
+        if (!byId.has(dep)) continue;
+        visit(dep, [...stack, id]);
+      }
+      visiting.delete(id);
+      visited.add(id);
+    };
+
+    for (const id of byId.keys()) {
+      visit(id, []);
+    }
+
+    const failOnCycle = Boolean(this.dependencies?.config?.failOnCycle);
+    if (cycles.length > 0) {
+      const details = { cycles };
+      if (failOnCycle || this.opts.strict) {
+        throw new DataBankError("Dependency graph cycle detected", details);
+      }
+      this.logger.warn("Dependency graph cycle detected (non-fatal)", details);
+    }
+  }
+
+  private validateDocumentIntelligenceContracts(): void {
+    const mapBank = this.safeGetBank<any>("document_intelligence_bank_map");
+    if (!mapBank || typeof mapBank !== "object") return;
+
+    const mapRequired = toStringList(mapBank.requiredCoreBankIds);
+    const mapOptional = toStringList(mapBank.optionalBankIds);
+    const mapIds = Array.from(new Set([...mapRequired, ...mapOptional]));
+    const infraIds = [
+      "document_intelligence_manifest_schema",
+      "document_intelligence_schema_registry",
+      "document_intelligence_dependency_graph",
+      "document_intelligence_usage_manifest",
+      "document_intelligence_orphan_allowlist",
+      "document_intelligence_runtime_wiring_gates",
+    ];
+
+    this.validateDocumentIntelligenceDependencyCoverage(mapIds, infraIds);
+    this.validateDocumentIntelligenceSchemaRegistry(mapIds, infraIds);
+    this.validateDocumentIntelligenceRuntimeWiringGates();
+    this.validateDocumentIntelligenceOrphanPolicy(mapIds);
+  }
+
+  private validateDocumentIntelligenceDependencyCoverage(
+    mapIds: string[],
+    infraIds: string[],
+  ): void {
+    if (!this.dependencies || !this.registry) return;
+
+    const failOnMissingNode = Boolean(
+      this.dependencies.config?.failOnMissingNode,
+    );
+    const dependencyIds = new Set(
+      (this.dependencies.banks || [])
+        .map((node) => String(node?.id || "").trim())
+        .filter(Boolean),
+    );
+    const expectedIds = Array.from(new Set([...mapIds, ...infraIds]));
+    const missingNodes = expectedIds.filter((id) => !dependencyIds.has(id));
+    if (missingNodes.length > 0) {
+      const details = {
+        missingNodes: missingNodes.sort((a, b) => a.localeCompare(b)),
+      };
+      if (failOnMissingNode || this.opts.strict) {
+        throw new DataBankError(
+          "Document intelligence dependency coverage missing nodes",
+          details,
+        );
+      }
+      this.logger.warn(
+        "Document intelligence dependency coverage missing nodes (non-fatal)",
+        details,
+      );
+    }
+  }
+
+  private validateDocumentIntelligenceSchemaRegistry(
+    mapIds: string[],
+    infraIds: string[],
+  ): void {
+    if (!this.registry) return;
+
+    const schemaRegistry = this.safeGetBank<any>(
+      "document_intelligence_schema_registry",
+    );
+    if (!schemaRegistry || typeof schemaRegistry !== "object") return;
+
+    const familyMappings = Array.isArray(schemaRegistry.schemaFamilies)
+      ? schemaRegistry.schemaFamilies
+      : [];
+    const explicitAssignments = new Map<string, string>();
+    const schemaIdsDeclared = new Set<string>();
+    for (const assignment of Array.isArray(schemaRegistry.schemaAssignments)
+      ? schemaRegistry.schemaAssignments
+      : []) {
+      const bankId = String(assignment?.bankId || "").trim();
+      const schemaId = String(assignment?.schemaId || "").trim();
+      if (!bankId || !schemaId) continue;
+      explicitAssignments.set(bankId, schemaId);
+      schemaIdsDeclared.add(schemaId);
+    }
+    for (const family of familyMappings) {
+      const schemaId = String(family?.schemaId || "").trim();
+      if (schemaId) schemaIdsDeclared.add(schemaId);
+    }
+
+    const knownSchemaIds = new Set(
+      this.registry.banks
+        .filter((entry) => entry.category === "schemas")
+        .map((entry) => entry.id),
+    );
+    const unknownSchemas = [...schemaIdsDeclared].filter(
+      (schemaId) => !knownSchemaIds.has(schemaId),
+    );
+    if (unknownSchemas.length > 0) {
+      throw new DataBankError(
+        "Document intelligence schema registry references unknown schemas",
+        { unknownSchemas: unknownSchemas.sort((a, b) => a.localeCompare(b)) },
+      );
+    }
+
+    const idsToCheck = Array.from(new Set([...mapIds, ...infraIds]));
+    const mismatches: Array<{
+      id: string;
+      expectedSchemaId: string;
+      actualSchemaId: string;
+      path: string;
+    }> = [];
+    const missingAssignments: string[] = [];
+
+    for (const id of idsToCheck) {
+      const entry = this.registry.banks.find((bank) => bank.id === id);
+      if (!entry) continue;
+
+      const explicit = explicitAssignments.get(id) ?? "";
+      let expected = explicit;
+      if (!expected) {
+        const match = familyMappings.find((family: any) => {
+          const prefix = String(family?.pathPrefix || "").trim();
+          if (!prefix) return false;
+          return normalizeRegistryPath(entry.path).startsWith(prefix);
+        });
+        expected = String(match?.schemaId || "").trim();
+      }
+
+      if (!expected) {
+        missingAssignments.push(id);
+        continue;
+      }
+
+      const actual = String(entry.schemaId || "").trim();
+      if (actual !== expected) {
+        mismatches.push({
+          id,
+          expectedSchemaId: expected,
+          actualSchemaId: actual,
+          path: entry.path,
+        });
+      }
+    }
+
+    const failOnMissing = Boolean(
+      schemaRegistry?.config?.failOnMissingAssignmentsInStrict,
+    );
+    const failOnMismatch = Boolean(
+      schemaRegistry?.config?.failOnSchemaMismatchInStrict,
+    );
+
+    if (missingAssignments.length > 0) {
+      const details = {
+        missingAssignments: missingAssignments.sort((a, b) =>
+          a.localeCompare(b),
+        ),
+      };
+      if ((failOnMissing && this.opts.strict) || this.opts.strict) {
+        throw new DataBankError(
+          "Document intelligence schema registry missing assignments",
+          details,
+        );
+      }
+      this.logger.warn(
+        "Document intelligence schema registry missing assignments (non-fatal)",
+        details,
+      );
+    }
+
+    if (mismatches.length > 0) {
+      const details = { mismatches: mismatches.slice(0, 30) };
+      if ((failOnMismatch && this.opts.strict) || this.opts.strict) {
+        throw new DataBankError(
+          "Document intelligence schema mismatch detected",
+          details,
+        );
+      }
+      this.logger.warn(
+        "Document intelligence schema mismatch detected (non-fatal)",
+        details,
+      );
+    }
+  }
+
+  private validateDocumentIntelligenceRuntimeWiringGates(): void {
+    const gatesBank = this.safeGetBank<any>(
+      "document_intelligence_runtime_wiring_gates",
+    );
+    if (!gatesBank || typeof gatesBank !== "object") return;
+
+    const gates = Array.isArray(gatesBank.gates) ? gatesBank.gates : [];
+    if (gates.length === 0) {
+      throw new DataBankError("Runtime wiring gates bank has no gates", {
+        bankId: "document_intelligence_runtime_wiring_gates",
+      });
+    }
+
+    const missingRequiredBanks = new Set<string>();
+    for (const gate of gates) {
+      const requiredBanks = toStringList(gate?.requiredBanks);
+      for (const id of requiredBanks) {
+        if (!this.bankCache.has(id)) {
+          missingRequiredBanks.add(id);
+        }
+      }
+    }
+
+    if (missingRequiredBanks.size > 0) {
+      const details = {
+        missingRequiredBanks: [...missingRequiredBanks].sort((a, b) =>
+          a.localeCompare(b),
+        ),
+      };
+      if (this.opts.strict) {
+        throw new DataBankError(
+          "Runtime wiring gates reference missing loaded banks",
+          details,
+        );
+      }
+      this.logger.warn(
+        "Runtime wiring gates reference missing loaded banks (non-fatal)",
+        details,
+      );
+    }
+  }
+
+  private validateDocumentIntelligenceOrphanPolicy(mapIds: string[]): void {
+    const usageBank = this.safeGetBank<any>(
+      "document_intelligence_usage_manifest",
+    );
+    const orphanAllowlist = this.safeGetBank<any>(
+      "document_intelligence_orphan_allowlist",
+    );
+    if (!usageBank || !orphanAllowlist) return;
+
+    const consumedIds = new Set(toStringList(usageBank.consumedBankIds));
+    const consumedPrefixes = toStringList(usageBank.consumedIdPrefixes);
+    const consumedPatterns = toStringList(usageBank.consumedIdPatterns)
+      .map((pattern) => {
+        try {
+          return new RegExp(pattern);
+        } catch {
+          return null;
+        }
+      })
+      .filter((pattern): pattern is RegExp => pattern != null);
+
+    const allowlistedIds = new Set(
+      toStringList(orphanAllowlist.allowlistedBankIds),
+    );
+    const allowlistedPrefixes = toStringList(
+      orphanAllowlist.allowlistedIdPrefixes,
+    );
+    const allowlistedPatterns = toStringList(
+      orphanAllowlist.allowlistedIdPatterns,
+    )
+      .map((pattern) => {
+        try {
+          return new RegExp(pattern);
+        } catch {
+          return null;
+        }
+      })
+      .filter((pattern): pattern is RegExp => pattern != null);
+
+    const isConsumed = (id: string): boolean => {
+      if (consumedIds.has(id)) return true;
+      if (consumedPrefixes.some((prefix) => id.startsWith(prefix))) return true;
+      if (consumedPatterns.some((pattern) => pattern.test(id))) return true;
+      return false;
+    };
+
+    const isAllowlisted = (id: string): boolean => {
+      if (allowlistedIds.has(id)) return true;
+      if (allowlistedPrefixes.some((prefix) => id.startsWith(prefix)))
+        return true;
+      if (allowlistedPatterns.some((pattern) => pattern.test(id))) return true;
+      return false;
+    };
+
+    const orphans = mapIds.filter(
+      (id) => !isConsumed(id) && !isAllowlisted(id),
+    );
+    if (orphans.length === 0) return;
+
+    const failOnOrphan = Boolean(usageBank?.config?.failOnOrphanInStrict);
+    const details = {
+      orphanBankIds: orphans.sort((a, b) => a.localeCompare(b)),
+    };
+    if ((failOnOrphan && this.opts.strict) || this.opts.strict) {
+      throw new DataBankError(
+        "Document intelligence orphan banks detected",
+        details,
+      );
+    }
+    this.logger.warn(
+      "Document intelligence orphan banks detected (non-fatal)",
+      details,
+    );
+  }
+
   // -------------------------
   // Load ordering and dependencies
   // -------------------------
@@ -550,7 +1113,18 @@ export class DataBankLoaderService {
     if (!this.registry) throw new DataBankError("Registry not loaded");
 
     // Filter only enabled banks in env (still keep dependencies for ordering)
-    const enabled = this.registry.banks.filter((b) => this.isEnabledInEnv(b));
+    const enabled = this.registry.banks.filter((b) => {
+      if (!this.isEnabledInEnv(b)) return false;
+      const relPath = normalizeRegistryPath(String(b.path || ""));
+      if (relPath.startsWith("_deprecated/")) {
+        this.logger.warn("Skipping deprecated bank path", {
+          id: b.id,
+          path: relPath,
+        });
+        return false;
+      }
+      return true;
+    });
 
     // Group by category in loadOrder (if provided)
     const loadOrder =
@@ -660,7 +1234,8 @@ export class DataBankLoaderService {
     bank: any,
   ): Promise<void> {
     // If no schemaId defined, fallback to minimal checks only
-    const schemaId = entry.schemaId ?? null;
+    const schemaId =
+      entry.schemaId ?? this.registry?.schemaMap?.[entry.category] ?? null;
     if (!schemaId) return;
 
     const schemaBank = this.schemaCache.get(schemaId) ?? null;
@@ -683,14 +1258,46 @@ export class DataBankLoaderService {
     // We support two common patterns:
     //  1) schemaBank.schema is a JSON Schema object
     //  2) schemaBank.action.schema is a JSON Schema object
-    const schemaObj =
+    let schemaObj =
       schemaBank.schema ??
       schemaBank?.action?.schema ??
       schemaBank?.config?.schema ??
       null;
+    if (
+      !schemaObj &&
+      schemaBank &&
+      typeof schemaBank === "object" &&
+      (schemaBank.$schema || schemaBank.type || schemaBank.properties)
+    ) {
+      const { _meta, config, tests, ...schemaCandidate } = schemaBank;
+      void _meta;
+      void config;
+      void tests;
+      if (
+        schemaCandidate &&
+        typeof schemaCandidate === "object" &&
+        (schemaCandidate.$schema ||
+          schemaCandidate.type ||
+          schemaCandidate.properties)
+      ) {
+        schemaObj = schemaCandidate;
+      }
+    }
 
     if (this.ajv && schemaObj && typeof schemaObj === "object") {
-      const validate = this.ajv.compile(schemaObj);
+      const schemaForAjv =
+        schemaObj && typeof schemaObj === "object"
+          ? { ...schemaObj }
+          : schemaObj;
+      if (
+        schemaForAjv &&
+        typeof schemaForAjv === "object" &&
+        typeof schemaForAjv.$schema === "string" &&
+        schemaForAjv.$schema.includes("json-schema.org/draft/2020-12")
+      ) {
+        delete schemaForAjv.$schema;
+      }
+      const validate = this.ajv.compile(schemaForAjv);
       const ok = validate(bank);
       if (!ok) {
         throw new DataBankError(
@@ -800,11 +1407,15 @@ export class DataBankLoaderService {
     if (!trimmed) return trimmed;
     const aliases = this.aliases?.aliases ?? null;
     if (!aliases) return trimmed;
+    const aliasConfig = this.aliases?.config ?? {};
 
     // Resolve chains safely with max depth
     let cur = trimmed;
     for (let i = 0; i < 8; i++) {
-      const next = aliases[cur];
+      const direct = aliases[cur];
+      const normalized = normalizeAliasKey(cur, aliasConfig);
+      const normalizedNext = this.aliasNormalizedMap.get(normalized) ?? null;
+      const next = direct ?? normalizedNext;
       if (!next) return cur;
       if (next === cur) return cur;
       cur = next;

@@ -1,27 +1,3279 @@
 {
   "_meta": {
     "id": "doc_aliases_medical",
-    "version": "1.0.0",
-    "description": "User alias mapping for medical documents.",
+    "version": "3.0.0",
+    "description": "Alias mapping for medical document detection (EN/PT + colloquial terms).",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28",
+    "updatedAt": "2026-02-28T22:00:00Z"
   },
   "config": {
     "enabled": true,
     "domain": "medical",
-    "caseInsensitive": true
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.74
   },
   "domain": "medical",
   "aliases": [
     {
-      "alias": "medical document",
-      "docTypes": [],
+      "phrase": "active problems",
+      "normalized": "active problems",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
       "hints": {
-        "period": "unknown",
-        "owner": "unknown"
-      }
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest active problems",
+        "extract findings from active problems"
+      ]
+    },
+    {
+      "phrase": "after visit summary",
+      "normalized": "after visit summary",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest after visit summary",
+        "extract findings from after visit summary"
+      ]
+    },
+    {
+      "phrase": "aftercare instructions",
+      "normalized": "aftercare instructions",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find aftercare instructions for latest visit",
+        "show aftercare instructions"
+      ]
+    },
+    {
+      "phrase": "alergias",
+      "normalized": "alergias",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find alergias for latest visit",
+        "show alergias"
+      ]
+    },
+    {
+      "phrase": "alergias do paciente",
+      "normalized": "alergias do paciente",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest alergias do paciente",
+        "extract findings from alergias do paciente"
+      ]
+    },
+    {
+      "phrase": "allergies",
+      "normalized": "allergies",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest allergies",
+        "extract findings from allergies"
+      ]
+    },
+    {
+      "phrase": "allergy list",
+      "normalized": "allergy list",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest allergy list",
+        "extract findings from allergy list"
+      ]
+    },
+    {
+      "phrase": "allergy profile",
+      "normalized": "allergy profile",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find allergy profile for latest visit",
+        "show allergy profile"
+      ]
+    },
+    {
+      "phrase": "alta",
+      "normalized": "alta",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find alta for latest visit",
+        "show alta"
+      ]
+    },
+    {
+      "phrase": "alta hospitalar",
+      "normalized": "alta hospitalar",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest alta hospitalar",
+        "extract findings from alta hospitalar"
+      ]
+    },
+    {
+      "phrase": "alta medica",
+      "normalized": "alta medica",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find alta medica for latest visit",
+        "show alta medica"
+      ]
+    },
+    {
+      "phrase": "anamnese e exame fisico",
+      "normalized": "anamnese e exame fisico",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest anamnese e exame fisico",
+        "extract findings from anamnese e exame fisico"
+      ]
+    },
+    {
+      "phrase": "anatomopatologico",
+      "normalized": "anatomopatologico",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find anatomopatologico for latest visit",
+        "show anatomopatologico"
+      ]
+    },
+    {
+      "phrase": "anotacao de enfermagem",
+      "normalized": "anotacao de enfermagem",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest anotacao de enfermagem",
+        "extract findings from anotacao de enfermagem"
+      ]
+    },
+    {
+      "phrase": "biopsy report",
+      "normalized": "biopsy report",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest biopsy report",
+        "extract findings from biopsy report"
+      ]
+    },
+    {
+      "phrase": "blood test report",
+      "normalized": "blood test report",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest blood test report",
+        "extract findings from blood test report"
+      ]
+    },
+    {
+      "phrase": "bloodwork",
+      "normalized": "bloodwork",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find bloodwork for latest visit",
+        "show bloodwork"
+      ]
+    },
+    {
+      "phrase": "care pathway",
+      "normalized": "care pathway",
+      "docTypeIds": [
+        "med_care_plan"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest care pathway",
+        "extract findings from care pathway"
+      ]
+    },
+    {
+      "phrase": "care plan",
+      "normalized": "care plan",
+      "docTypeIds": [
+        "med_care_plan"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest care plan",
+        "extract findings from care plan"
+      ]
+    },
+    {
+      "phrase": "carta de encaminhamento",
+      "normalized": "carta de encaminhamento",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest carta de encaminhamento",
+        "extract findings from carta de encaminhamento"
+      ]
+    },
+    {
+      "phrase": "carta de referencia",
+      "normalized": "carta de referencia",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest carta de referencia",
+        "extract findings from carta de referencia"
+      ]
+    },
+    {
+      "phrase": "carta de referencia medica",
+      "normalized": "carta de referencia medica",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find carta de referencia medica for latest visit",
+        "show carta de referencia medica"
+      ]
+    },
+    {
+      "phrase": "carteira de vacina",
+      "normalized": "carteira de vacina",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find carteira de vacina for latest visit",
+        "show carteira de vacina"
+      ]
+    },
+    {
+      "phrase": "carteira de vacinacao",
+      "normalized": "carteira de vacinacao",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest carteira de vacinacao",
+        "extract findings from carteira de vacinacao"
+      ]
+    },
+    {
+      "phrase": "chart de sinais vitais",
+      "normalized": "chart de sinais vitais",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find chart de sinais vitais for latest visit",
+        "show chart de sinais vitais"
+      ]
+    },
+    {
+      "phrase": "consult letter",
+      "normalized": "consult letter",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find consult letter for latest visit",
+        "show consult letter"
+      ]
+    },
+    {
+      "phrase": "consult note",
+      "normalized": "consult note",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest consult note",
+        "extract findings from consult note"
+      ]
+    },
+    {
+      "phrase": "consulta especializada",
+      "normalized": "consulta especializada",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest consulta especializada",
+        "extract findings from consulta especializada"
+      ]
+    },
+    {
+      "phrase": "controle de sinais vitais",
+      "normalized": "controle de sinais vitais",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest controle de sinais vitais",
+        "extract findings from controle de sinais vitais"
+      ]
+    },
+    {
+      "phrase": "ct report",
+      "normalized": "ct report",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest ct report",
+        "extract findings from ct report"
+      ]
+    },
+    {
+      "phrase": "current medications",
+      "normalized": "current medications",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest current medications",
+        "extract findings from current medications"
+      ]
+    },
+    {
+      "phrase": "daily progress note",
+      "normalized": "daily progress note",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest daily progress note",
+        "extract findings from daily progress note"
+      ]
+    },
+    {
+      "phrase": "diagnoses list documented",
+      "normalized": "diagnoses list documented",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest diagnoses list documented",
+        "extract findings from diagnoses list documented"
+      ]
+    },
+    {
+      "phrase": "discharge note",
+      "normalized": "discharge note",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest discharge note",
+        "extract findings from discharge note"
+      ]
+    },
+    {
+      "phrase": "discharge summary",
+      "normalized": "discharge summary",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest discharge summary",
+        "extract findings from discharge summary"
+      ]
+    },
+    {
+      "phrase": "documento de alta",
+      "normalized": "documento de alta",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest documento de alta",
+        "extract findings from documento de alta"
+      ]
+    },
+    {
+      "phrase": "ecg",
+      "normalized": "ecg",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find ecg for latest visit",
+        "show ecg"
+      ]
+    },
+    {
+      "phrase": "ecg report",
+      "normalized": "ecg report",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest ecg report",
+        "extract findings from ecg report"
+      ]
+    },
+    {
+      "phrase": "ed note",
+      "normalized": "ed note",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest ed note",
+        "extract findings from ed note"
+      ]
+    },
+    {
+      "phrase": "ekg report",
+      "normalized": "ekg report",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest ekg report",
+        "extract findings from ekg report"
+      ]
+    },
+    {
+      "phrase": "electrocardiogram report",
+      "normalized": "electrocardiogram report",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest electrocardiogram report",
+        "extract findings from electrocardiogram report"
+      ]
+    },
+    {
+      "phrase": "eletro",
+      "normalized": "eletro",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find eletro for latest visit",
+        "show eletro"
+      ]
+    },
+    {
+      "phrase": "emergency note",
+      "normalized": "emergency note",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest emergency note",
+        "extract findings from emergency note"
+      ]
+    },
+    {
+      "phrase": "encaminhamento",
+      "normalized": "encaminhamento",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find encaminhamento for latest visit",
+        "show encaminhamento"
+      ]
+    },
+    {
+      "phrase": "encaminhamento medico",
+      "normalized": "encaminhamento medico",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest encaminhamento medico",
+        "extract findings from encaminhamento medico"
+      ]
+    },
+    {
+      "phrase": "er chart",
+      "normalized": "er chart",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find er chart for latest visit",
+        "show er chart"
+      ]
+    },
+    {
+      "phrase": "er note",
+      "normalized": "er note",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest er note",
+        "extract findings from er note"
+      ]
+    },
+    {
+      "phrase": "evolucao clinica",
+      "normalized": "evolucao clinica",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest evolucao clinica",
+        "extract findings from evolucao clinica"
+      ]
+    },
+    {
+      "phrase": "evolucao de enfermagem",
+      "normalized": "evolucao de enfermagem",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest evolucao de enfermagem",
+        "extract findings from evolucao de enfermagem"
+      ]
+    },
+    {
+      "phrase": "evolucao diaria",
+      "normalized": "evolucao diaria",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest evolucao diaria",
+        "extract findings from evolucao diaria"
+      ]
+    },
+    {
+      "phrase": "evolucao medica",
+      "normalized": "evolucao medica",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find evolucao medica for latest visit",
+        "show evolucao medica"
+      ]
+    },
+    {
+      "phrase": "evolucao soap",
+      "normalized": "evolucao soap",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest evolucao soap",
+        "extract findings from evolucao soap"
+      ]
+    },
+    {
+      "phrase": "exam results",
+      "normalized": "exam results",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find exam results for latest visit",
+        "show exam results"
+      ]
+    },
+    {
+      "phrase": "exame de laboratorio",
+      "normalized": "exame de laboratorio",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest exame de laboratorio",
+        "extract findings from exame de laboratorio"
+      ]
+    },
+    {
+      "phrase": "ficha de emergencia",
+      "normalized": "ficha de emergencia",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find ficha de emergencia for latest visit",
+        "show ficha de emergencia"
+      ]
+    },
+    {
+      "phrase": "follow-up instructions",
+      "normalized": "follow up instructions",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest follow-up instructions",
+        "extract findings from follow-up instructions"
+      ]
+    },
+    {
+      "phrase": "grafico de sinais vitais",
+      "normalized": "grafico de sinais vitais",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest grafico de sinais vitais",
+        "extract findings from grafico de sinais vitais"
+      ]
+    },
+    {
+      "phrase": "h and p",
+      "normalized": "h and p",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest h and p",
+        "extract findings from h and p"
+      ]
+    },
+    {
+      "phrase": "h p inicial",
+      "normalized": "h p inicial",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find h p inicial for latest visit",
+        "show h p inicial"
+      ]
+    },
+    {
+      "phrase": "h&p",
+      "normalized": "h p",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest h&p",
+        "extract findings from h&p"
+      ]
+    },
+    {
+      "phrase": "histopathology report",
+      "normalized": "histopathology report",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest histopathology report",
+        "extract findings from histopathology report"
+      ]
+    },
+    {
+      "phrase": "historia clinica e exame",
+      "normalized": "historia clinica e exame",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find historia clinica e exame for latest visit",
+        "show historia clinica e exame"
+      ]
+    },
+    {
+      "phrase": "historia clinica inicial",
+      "normalized": "historia clinica inicial",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest historia clinica inicial",
+        "extract findings from historia clinica inicial"
+      ]
+    },
+    {
+      "phrase": "historia e exame fisico",
+      "normalized": "historia e exame fisico",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest historia e exame fisico",
+        "extract findings from historia e exame fisico"
+      ]
+    },
+    {
+      "phrase": "historico de alergias",
+      "normalized": "historico de alergias",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest historico de alergias",
+        "extract findings from historico de alergias"
+      ]
+    },
+    {
+      "phrase": "historico e exame fisico",
+      "normalized": "historico e exame fisico",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest historico e exame fisico",
+        "extract findings from historico e exame fisico"
+      ]
+    },
+    {
+      "phrase": "historico vacinal",
+      "normalized": "historico vacinal",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest historico vacinal",
+        "extract findings from historico vacinal"
+      ]
+    },
+    {
+      "phrase": "history and physical",
+      "normalized": "history and physical",
+      "docTypeIds": [
+        "med_history_and_physical"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest history and physical",
+        "extract findings from history and physical"
+      ]
+    },
+    {
+      "phrase": "image laudo",
+      "normalized": "image laudo",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find image laudo for latest visit",
+        "show image laudo"
+      ]
+    },
+    {
+      "phrase": "imaging report",
+      "normalized": "imaging report",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest imaging report",
+        "extract findings from imaging report"
+      ]
+    },
+    {
+      "phrase": "immunization record",
+      "normalized": "immunization record",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest immunization record",
+        "extract findings from immunization record"
+      ]
+    },
+    {
+      "phrase": "instrucoes de acompanhamento",
+      "normalized": "instrucoes de acompanhamento",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest instrucoes de acompanhamento",
+        "extract findings from instrucoes de acompanhamento"
+      ]
+    },
+    {
+      "phrase": "instrucoes de retorno",
+      "normalized": "instrucoes de retorno",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find instrucoes de retorno for latest visit",
+        "show instrucoes de retorno"
+      ]
+    },
+    {
+      "phrase": "instrucoes pos consulta",
+      "normalized": "instrucoes pos consulta",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest instrucoes pos consulta",
+        "extract findings from instrucoes pos consulta"
+      ]
+    },
+    {
+      "phrase": "lab panel",
+      "normalized": "lab panel",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find lab panel for latest visit",
+        "show lab panel"
+      ]
+    },
+    {
+      "phrase": "lab report",
+      "normalized": "lab report",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest lab report",
+        "extract findings from lab report"
+      ]
+    },
+    {
+      "phrase": "lab results report",
+      "normalized": "lab results report",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest lab results report",
+        "extract findings from lab results report"
+      ]
+    },
+    {
+      "phrase": "laudo",
+      "normalized": "laudo",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find laudo for latest visit",
+        "show laudo"
+      ]
+    },
+    {
+      "phrase": "laudo anatomopatologico",
+      "normalized": "laudo anatomopatologico",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo anatomopatologico",
+        "extract findings from laudo anatomopatologico"
+      ]
+    },
+    {
+      "phrase": "laudo de biopsia",
+      "normalized": "laudo de biopsia",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de biopsia",
+        "extract findings from laudo de biopsia"
+      ]
+    },
+    {
+      "phrase": "laudo de ecg",
+      "normalized": "laudo de ecg",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de ecg",
+        "extract findings from laudo de ecg"
+      ]
+    },
+    {
+      "phrase": "laudo de eletrocardiograma",
+      "normalized": "laudo de eletrocardiograma",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de eletrocardiograma",
+        "extract findings from laudo de eletrocardiograma"
+      ]
+    },
+    {
+      "phrase": "laudo de exame",
+      "normalized": "laudo de exame",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de exame",
+        "extract findings from laudo de exame"
+      ]
+    },
+    {
+      "phrase": "laudo de imagem",
+      "normalized": "laudo de imagem",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de imagem",
+        "extract findings from laudo de imagem"
+      ]
+    },
+    {
+      "phrase": "laudo de patologia",
+      "normalized": "laudo de patologia",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de patologia",
+        "extract findings from laudo de patologia"
+      ]
+    },
+    {
+      "phrase": "laudo de radiologia",
+      "normalized": "laudo de radiologia",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de radiologia",
+        "extract findings from laudo de radiologia"
+      ]
+    },
+    {
+      "phrase": "laudo de raio x",
+      "normalized": "laudo de raio x",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de raio x",
+        "extract findings from laudo de raio x"
+      ]
+    },
+    {
+      "phrase": "laudo de ressonancia",
+      "normalized": "laudo de ressonancia",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de ressonancia",
+        "extract findings from laudo de ressonancia"
+      ]
+    },
+    {
+      "phrase": "laudo de tomografia",
+      "normalized": "laudo de tomografia",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo de tomografia",
+        "extract findings from laudo de tomografia"
+      ]
+    },
+    {
+      "phrase": "laudo laboratorial",
+      "normalized": "laudo laboratorial",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest laudo laboratorial",
+        "extract findings from laudo laboratorial"
+      ]
+    },
+    {
+      "phrase": "lista de alergias",
+      "normalized": "lista de alergias",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest lista de alergias",
+        "extract findings from lista de alergias"
+      ]
+    },
+    {
+      "phrase": "lista de alergias do paciente",
+      "normalized": "lista de alergias do paciente",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find lista de alergias do paciente for latest visit",
+        "show lista de alergias do paciente"
+      ]
+    },
+    {
+      "phrase": "lista de condicoes",
+      "normalized": "lista de condicoes",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest lista de condicoes",
+        "extract findings from lista de condicoes"
+      ]
+    },
+    {
+      "phrase": "lista de diagnosticos documentados",
+      "normalized": "lista de diagnosticos documentados",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest lista de diagnosticos documentados",
+        "extract findings from lista de diagnosticos documentados"
+      ]
+    },
+    {
+      "phrase": "lista de medicamentos",
+      "normalized": "lista de medicamentos",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest lista de medicamentos",
+        "extract findings from lista de medicamentos"
+      ]
+    },
+    {
+      "phrase": "lista de problemas",
+      "normalized": "lista de problemas",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest lista de problemas",
+        "extract findings from lista de problemas"
+      ]
+    },
+    {
+      "phrase": "lista de problemas do paciente",
+      "normalized": "lista de problemas do paciente",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find lista de problemas do paciente for latest visit",
+        "show lista de problemas do paciente"
+      ]
+    },
+    {
+      "phrase": "lista de remedios",
+      "normalized": "lista de remedios",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest lista de remedios",
+        "extract findings from lista de remedios"
+      ]
+    },
+    {
+      "phrase": "med list",
+      "normalized": "med list",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest med list",
+        "extract findings from med list"
+      ]
+    },
+    {
+      "phrase": "medicacoes em uso",
+      "normalized": "medicacoes em uso",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest medicacoes em uso",
+        "extract findings from medicacoes em uso"
+      ]
+    },
+    {
+      "phrase": "medication list",
+      "normalized": "medication list",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest medication list",
+        "extract findings from medication list"
+      ]
+    },
+    {
+      "phrase": "mri report",
+      "normalized": "mri report",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest mri report",
+        "extract findings from mri report"
+      ]
+    },
+    {
+      "phrase": "nota clinica soap",
+      "normalized": "nota clinica soap",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find nota clinica soap for latest visit",
+        "show nota clinica soap"
+      ]
+    },
+    {
+      "phrase": "nota da enfermagem",
+      "normalized": "nota da enfermagem",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find nota da enfermagem for latest visit",
+        "show nota da enfermagem"
+      ]
+    },
+    {
+      "phrase": "nota de alta",
+      "normalized": "nota de alta",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de alta",
+        "extract findings from nota de alta"
+      ]
+    },
+    {
+      "phrase": "nota de atendimento urgente",
+      "normalized": "nota de atendimento urgente",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de atendimento urgente",
+        "extract findings from nota de atendimento urgente"
+      ]
+    },
+    {
+      "phrase": "nota de consulta",
+      "normalized": "nota de consulta",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de consulta",
+        "extract findings from nota de consulta"
+      ]
+    },
+    {
+      "phrase": "nota de emergencia",
+      "normalized": "nota de emergencia",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de emergencia",
+        "extract findings from nota de emergencia"
+      ]
+    },
+    {
+      "phrase": "nota de enfermagem",
+      "normalized": "nota de enfermagem",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de enfermagem",
+        "extract findings from nota de enfermagem"
+      ]
+    },
+    {
+      "phrase": "nota de evolucao",
+      "normalized": "nota de evolucao",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de evolucao",
+        "extract findings from nota de evolucao"
+      ]
+    },
+    {
+      "phrase": "nota de interconsulta",
+      "normalized": "nota de interconsulta",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de interconsulta",
+        "extract findings from nota de interconsulta"
+      ]
+    },
+    {
+      "phrase": "nota de plantao",
+      "normalized": "nota de plantao",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find nota de plantao for latest visit",
+        "show nota de plantao"
+      ]
+    },
+    {
+      "phrase": "nota de progresso",
+      "normalized": "nota de progresso",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota de progresso",
+        "extract findings from nota de progresso"
+      ]
+    },
+    {
+      "phrase": "nota do pronto socorro",
+      "normalized": "nota do pronto socorro",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota do pronto socorro",
+        "extract findings from nota do pronto socorro"
+      ]
+    },
+    {
+      "phrase": "nota soap",
+      "normalized": "nota soap",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota soap",
+        "extract findings from nota soap"
+      ]
+    },
+    {
+      "phrase": "nota subjetivo objetivo avaliacao plano",
+      "normalized": "nota subjetivo objetivo avaliacao plano",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest nota subjetivo objetivo avaliacao plano",
+        "extract findings from nota subjetivo objetivo avaliacao plano"
+      ]
+    },
+    {
+      "phrase": "nurse note",
+      "normalized": "nurse note",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest nurse note",
+        "extract findings from nurse note"
+      ]
+    },
+    {
+      "phrase": "nursing chart",
+      "normalized": "nursing chart",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find nursing chart for latest visit",
+        "show nursing chart"
+      ]
+    },
+    {
+      "phrase": "nursing note",
+      "normalized": "nursing note",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest nursing note",
+        "extract findings from nursing note"
+      ]
+    },
+    {
+      "phrase": "ordem de medicacao",
+      "normalized": "ordem de medicacao",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest ordem de medicacao",
+        "extract findings from ordem de medicacao"
+      ]
+    },
+    {
+      "phrase": "orientacoes de alta",
+      "normalized": "orientacoes de alta",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest orientacoes de alta",
+        "extract findings from orientacoes de alta"
+      ]
+    },
+    {
+      "phrase": "orientacoes de retorno",
+      "normalized": "orientacoes de retorno",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest orientacoes de retorno",
+        "extract findings from orientacoes de retorno"
+      ]
+    },
+    {
+      "phrase": "painel laboratorial",
+      "normalized": "painel laboratorial",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest painel laboratorial",
+        "extract findings from painel laboratorial"
+      ]
+    },
+    {
+      "phrase": "parecer",
+      "normalized": "parecer",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find parecer for latest visit",
+        "show parecer"
+      ]
+    },
+    {
+      "phrase": "parecer medico",
+      "normalized": "parecer medico",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest parecer medico",
+        "extract findings from parecer medico"
+      ]
+    },
+    {
+      "phrase": "pathology report",
+      "normalized": "pathology report",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest pathology report",
+        "extract findings from pathology report"
+      ]
+    },
+    {
+      "phrase": "pedido de avaliacao especializada",
+      "normalized": "pedido de avaliacao especializada",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest pedido de avaliacao especializada",
+        "extract findings from pedido de avaliacao especializada"
+      ]
+    },
+    {
+      "phrase": "plan of care",
+      "normalized": "plan of care",
+      "docTypeIds": [
+        "med_care_plan"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest plan of care",
+        "extract findings from plan of care"
+      ]
+    },
+    {
+      "phrase": "plano assistencial",
+      "normalized": "plano assistencial",
+      "docTypeIds": [
+        "med_care_plan"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest plano assistencial",
+        "extract findings from plano assistencial"
+      ]
+    },
+    {
+      "phrase": "plano de cuidados",
+      "normalized": "plano de cuidados",
+      "docTypeIds": [
+        "med_care_plan"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest plano de cuidados",
+        "extract findings from plano de cuidados"
+      ]
+    },
+    {
+      "phrase": "plano terapeutico",
+      "normalized": "plano terapeutico",
+      "docTypeIds": [
+        "med_care_plan"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest plano terapeutico",
+        "extract findings from plano terapeutico"
+      ]
+    },
+    {
+      "phrase": "plano terapeutico singular",
+      "normalized": "plano terapeutico singular",
+      "docTypeIds": [
+        "med_care_plan"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find plano terapeutico singular for latest visit",
+        "show plano terapeutico singular"
+      ]
+    },
+    {
+      "phrase": "pos consulta",
+      "normalized": "pos consulta",
+      "docTypeIds": [
+        "med_followup_instructions"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find pos consulta for latest visit",
+        "show pos consulta"
+      ]
+    },
+    {
+      "phrase": "prescricao",
+      "normalized": "prescricao",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest prescricao",
+        "extract findings from prescricao"
+      ]
+    },
+    {
+      "phrase": "prescrição",
+      "normalized": "prescricao",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest prescrição",
+        "extract findings from prescrição"
+      ]
+    },
+    {
+      "phrase": "prescricao medica",
+      "normalized": "prescricao medica",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find prescricao medica for latest visit",
+        "show prescricao medica"
+      ]
+    },
+    {
+      "phrase": "prescrição medica",
+      "normalized": "prescricao medica",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find prescrição medica for latest visit",
+        "show prescrição medica"
+      ]
+    },
+    {
+      "phrase": "prescription",
+      "normalized": "prescription",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest prescription",
+        "extract findings from prescription"
+      ]
+    },
+    {
+      "phrase": "problem list",
+      "normalized": "problem list",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest problem list",
+        "extract findings from problem list"
+      ]
+    },
+    {
+      "phrase": "problem profile",
+      "normalized": "problem profile",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find problem profile for latest visit",
+        "show problem profile"
+      ]
+    },
+    {
+      "phrase": "problemas ativos",
+      "normalized": "problemas ativos",
+      "docTypeIds": [
+        "med_problem_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest problemas ativos",
+        "extract findings from problemas ativos"
+      ]
+    },
+    {
+      "phrase": "progress note",
+      "normalized": "progress note",
+      "docTypeIds": [
+        "med_progress_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest progress note",
+        "extract findings from progress note"
+      ]
+    },
+    {
+      "phrase": "radiology report",
+      "normalized": "radiology report",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest radiology report",
+        "extract findings from radiology report"
+      ]
+    },
+    {
+      "phrase": "reacoes alergicas",
+      "normalized": "reacoes alergicas",
+      "docTypeIds": [
+        "med_allergy_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest reacoes alergicas",
+        "extract findings from reacoes alergicas"
+      ]
+    },
+    {
+      "phrase": "receita",
+      "normalized": "receita",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find receita for latest visit",
+        "show receita"
+      ]
+    },
+    {
+      "phrase": "receita medica",
+      "normalized": "receita medica",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest receita medica",
+        "extract findings from receita medica"
+      ]
+    },
+    {
+      "phrase": "receituario",
+      "normalized": "receituario",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest receituario",
+        "extract findings from receituario"
+      ]
+    },
+    {
+      "phrase": "referral",
+      "normalized": "referral",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find referral for latest visit",
+        "show referral"
+      ]
+    },
+    {
+      "phrase": "referral letter",
+      "normalized": "referral letter",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest referral letter",
+        "extract findings from referral letter"
+      ]
+    },
+    {
+      "phrase": "referral note",
+      "normalized": "referral note",
+      "docTypeIds": [
+        "med_referral_letter"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest referral note",
+        "extract findings from referral note"
+      ]
+    },
+    {
+      "phrase": "registro de enfermagem",
+      "normalized": "registro de enfermagem",
+      "docTypeIds": [
+        "med_nursing_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest registro de enfermagem",
+        "extract findings from registro de enfermagem"
+      ]
+    },
+    {
+      "phrase": "registro de imunizacao",
+      "normalized": "registro de imunizacao",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest registro de imunizacao",
+        "extract findings from registro de imunizacao"
+      ]
+    },
+    {
+      "phrase": "registro de triagem medica",
+      "normalized": "registro de triagem medica",
+      "docTypeIds": [
+        "med_emergency_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest registro de triagem medica",
+        "extract findings from registro de triagem medica"
+      ]
+    },
+    {
+      "phrase": "registro de vacinas",
+      "normalized": "registro de vacinas",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest registro de vacinas",
+        "extract findings from registro de vacinas"
+      ]
+    },
+    {
+      "phrase": "relacao de medicamentos",
+      "normalized": "relacao de medicamentos",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest relacao de medicamentos",
+        "extract findings from relacao de medicamentos"
+      ]
+    },
+    {
+      "phrase": "remedios em uso",
+      "normalized": "remedios em uso",
+      "docTypeIds": [
+        "med_medication_list"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "list",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find remedios em uso for latest visit",
+        "show remedios em uso"
+      ]
+    },
+    {
+      "phrase": "resultado de biopsia",
+      "normalized": "resultado de biopsia",
+      "docTypeIds": [
+        "med_pathology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest resultado de biopsia",
+        "extract findings from resultado de biopsia"
+      ]
+    },
+    {
+      "phrase": "resultado de exame",
+      "normalized": "resultado de exame",
+      "docTypeIds": [
+        "med_lab_results_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest resultado de exame",
+        "extract findings from resultado de exame"
+      ]
+    },
+    {
+      "phrase": "resumo alta",
+      "normalized": "resumo alta",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find resumo alta for latest visit",
+        "show resumo alta"
+      ]
+    },
+    {
+      "phrase": "resumo de alta",
+      "normalized": "resumo de alta",
+      "docTypeIds": [
+        "med_discharge_summary"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest resumo de alta",
+        "extract findings from resumo de alta"
+      ]
+    },
+    {
+      "phrase": "resumo soap",
+      "normalized": "resumo soap",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest resumo soap",
+        "extract findings from resumo soap"
+      ]
+    },
+    {
+      "phrase": "rx",
+      "normalized": "rx",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest rx",
+        "extract findings from rx"
+      ]
+    },
+    {
+      "phrase": "s o a p",
+      "normalized": "s o a p",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest s o a p",
+        "extract findings from s o a p"
+      ]
+    },
+    {
+      "phrase": "scan report",
+      "normalized": "scan report",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find scan report for latest visit",
+        "show scan report"
+      ]
+    },
+    {
+      "phrase": "script",
+      "normalized": "script",
+      "docTypeIds": [
+        "med_prescription"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find script for latest visit",
+        "show script"
+      ]
+    },
+    {
+      "phrase": "sinais",
+      "normalized": "sinais",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find sinais for latest visit",
+        "show sinais"
+      ]
+    },
+    {
+      "phrase": "sinais vitais",
+      "normalized": "sinais vitais",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest sinais vitais",
+        "extract findings from sinais vitais"
+      ]
+    },
+    {
+      "phrase": "soap",
+      "normalized": "soap",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest soap",
+        "extract findings from soap"
+      ]
+    },
+    {
+      "phrase": "soap note",
+      "normalized": "soap note",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest soap note",
+        "extract findings from soap note"
+      ]
+    },
+    {
+      "phrase": "specialist consult note",
+      "normalized": "specialist consult note",
+      "docTypeIds": [
+        "med_consult_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest specialist consult note",
+        "extract findings from specialist consult note"
+      ]
+    },
+    {
+      "phrase": "subjective objective assessment plan note",
+      "normalized": "subjective objective assessment plan note",
+      "docTypeIds": [
+        "med_soap_note"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "note",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find subjective objective assessment plan note for latest visit",
+        "show subjective objective assessment plan note"
+      ]
+    },
+    {
+      "phrase": "tabela de sinais vitais",
+      "normalized": "tabela de sinais vitais",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest tabela de sinais vitais",
+        "extract findings from tabela de sinais vitais"
+      ]
+    },
+    {
+      "phrase": "traçado de ecg",
+      "normalized": "tracado de ecg",
+      "docTypeIds": [
+        "med_ecg_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "open latest traçado de ecg",
+        "extract findings from traçado de ecg"
+      ]
+    },
+    {
+      "phrase": "vaccination record",
+      "normalized": "vaccination record",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest vaccination record",
+        "extract findings from vaccination record"
+      ]
+    },
+    {
+      "phrase": "vaccine card",
+      "normalized": "vaccine card",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest vaccine card",
+        "extract findings from vaccine card"
+      ]
+    },
+    {
+      "phrase": "vacinas",
+      "normalized": "vacinas",
+      "docTypeIds": [
+        "med_immunization_record"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "find vacinas for latest visit",
+        "show vacinas"
+      ]
+    },
+    {
+      "phrase": "vital signs chart",
+      "normalized": "vital signs chart",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest vital signs chart",
+        "extract findings from vital signs chart"
+      ]
+    },
+    {
+      "phrase": "vitals",
+      "normalized": "vitals",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find vitals for latest visit",
+        "show vitals"
+      ]
+    },
+    {
+      "phrase": "vitals chart",
+      "normalized": "vitals chart",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest vitals chart",
+        "extract findings from vitals chart"
+      ]
+    },
+    {
+      "phrase": "vitals trend",
+      "normalized": "vitals trend",
+      "docTypeIds": [
+        "med_vitals_chart"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest vitals trend",
+        "extract findings from vitals trend"
+      ]
+    },
+    {
+      "phrase": "xray report",
+      "normalized": "xray report",
+      "docTypeIds": [
+        "med_radiology_report"
+      ],
+      "hints": {
+        "periodHint": "encounter_or_collection_time",
+        "entityHint": "patient_measurements_medications",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open latest xray report",
+        "extract findings from xray report"
+      ]
     }
   ]
 }

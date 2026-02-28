@@ -1,0 +1,850 @@
+{
+  "_meta": {
+    "id": "legal_retrieval_strategies",
+    "version": "2.0.0",
+    "description": "Legal retrieval ordering, boosts, and query expansion controls.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "maxBoostRules": 40,
+    "maxQueryExpansionTerms": 80
+  },
+  "domain": "legal",
+  "sectionPriority": [
+    {
+      "id": "legal_section_priority_001",
+      "section": "document_header",
+      "weight": 3.1,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_002",
+      "section": "parties",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_section_priority_003",
+      "section": "recitals_background",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_004",
+      "section": "definitions",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_section_priority_005",
+      "section": "scope_of_services",
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_006",
+      "section": "fees_and_payment",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_section_priority_007",
+      "section": "term_and_renewal",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_008",
+      "section": "termination",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_section_priority_009",
+      "section": "confidentiality_privacy",
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_010",
+      "section": "security_compliance",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_section_priority_011",
+      "section": "ip_and_license",
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_012",
+      "section": "liability_and_indemnity",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_section_priority_013",
+      "section": "dispute_resolution",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_014",
+      "section": "notices_misc",
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_section_priority_015",
+      "section": "signatures",
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_section_priority_016",
+      "section": "annexes_schedules",
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "legal_boost_001",
+      "priority": 110,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references nda",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_nda"
+    },
+    {
+      "id": "legal_boost_002",
+      "priority": 109,
+      "weight": 2.77,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references msa",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_msa"
+    },
+    {
+      "id": "legal_boost_003",
+      "priority": 108,
+      "weight": 2.74,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references sow",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_sow"
+    },
+    {
+      "id": "legal_boost_004",
+      "priority": 107,
+      "weight": 2.71,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references dpa",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_dpa"
+    },
+    {
+      "id": "legal_boost_005",
+      "priority": 106,
+      "weight": 2.68,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references sla",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_sla"
+    },
+    {
+      "id": "legal_boost_006",
+      "priority": 105,
+      "weight": 2.65,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references baa",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_baa"
+    },
+    {
+      "id": "legal_boost_007",
+      "priority": 104,
+      "weight": 2.62,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references employment agreement",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_employment_agreement"
+    },
+    {
+      "id": "legal_boost_008",
+      "priority": 103,
+      "weight": 2.59,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references offer letter",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_offer_letter"
+    },
+    {
+      "id": "legal_boost_009",
+      "priority": 102,
+      "weight": 2.56,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references contractor agreement",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_contractor_agreement"
+    },
+    {
+      "id": "legal_boost_010",
+      "priority": 101,
+      "weight": 2.53,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references consulting agreement",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_consulting_agreement"
+    },
+    {
+      "id": "legal_boost_011",
+      "priority": 100,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references ip assignment",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_ip_assignment"
+    },
+    {
+      "id": "legal_boost_012",
+      "priority": 99,
+      "weight": 2.47,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references license agreement",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_license_agreement"
+    },
+    {
+      "id": "legal_boost_013",
+      "priority": 98,
+      "weight": 2.44,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references eula",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_eula"
+    },
+    {
+      "id": "legal_boost_014",
+      "priority": 97,
+      "weight": 2.41,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references reseller distribution",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_reseller_distribution"
+    },
+    {
+      "id": "legal_boost_015",
+      "priority": 96,
+      "weight": 2.38,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references partnership jv",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_partnership_jv"
+    },
+    {
+      "id": "legal_boost_016",
+      "priority": 95,
+      "weight": 2.35,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references board minutes",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_board_minutes"
+    },
+    {
+      "id": "legal_boost_017",
+      "priority": 94,
+      "weight": 2.32,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references board resolution",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_board_resolution"
+    },
+    {
+      "id": "legal_boost_018",
+      "priority": 93,
+      "weight": 2.29,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references written consent",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_written_consent"
+    },
+    {
+      "id": "legal_boost_019",
+      "priority": 92,
+      "weight": 2.26,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references bylaws charter",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_bylaws_charter"
+    },
+    {
+      "id": "legal_boost_020",
+      "priority": 91,
+      "weight": 2.23,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references privacy policy",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_privacy_policy"
+    },
+    {
+      "id": "legal_boost_021",
+      "priority": 90,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references terms of service",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_terms_of_service"
+    },
+    {
+      "id": "legal_boost_022",
+      "priority": 89,
+      "weight": 2.17,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references cookie policy",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_cookie_policy"
+    },
+    {
+      "id": "legal_boost_023",
+      "priority": 88,
+      "weight": 2.14,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references acceptable use policy",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_acceptable_use_policy"
+    },
+    {
+      "id": "legal_boost_024",
+      "priority": 87,
+      "weight": 2.11,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references data retention policy",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_data_retention_policy"
+    },
+    {
+      "id": "legal_boost_025",
+      "priority": 86,
+      "weight": 2.08,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references code of conduct",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_code_of_conduct"
+    },
+    {
+      "id": "legal_boost_026",
+      "priority": 85,
+      "weight": 2.05,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references security policy",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_security_policy"
+    },
+    {
+      "id": "legal_boost_027",
+      "priority": 84,
+      "weight": 2.02,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references complaint",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_complaint"
+    },
+    {
+      "id": "legal_boost_028",
+      "priority": 83,
+      "weight": 1.99,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references motion brief",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_motion_brief"
+    },
+    {
+      "id": "legal_boost_029",
+      "priority": 82,
+      "weight": 1.96,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references court order",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_court_order"
+    },
+    {
+      "id": "legal_boost_030",
+      "priority": 81,
+      "weight": 1.93,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references settlement agreement",
+      "boostSections": [
+        "definitions",
+        "scope_of_services",
+        "liability_and_indemnity",
+        "dispute_resolution"
+      ],
+      "docTypeId": "legal_settlement_agreement"
+    }
+  ],
+  "queryExpansion": [
+    "governing law",
+    "jurisdiction",
+    "venue",
+    "indemnity",
+    "liability cap",
+    "confidential information",
+    "trade secret",
+    "term",
+    "renewal",
+    "termination",
+    "survival",
+    "assignment",
+    "subprocessor",
+    "security incident",
+    "service credits",
+    "sla breach",
+    "payment terms",
+    "late fee",
+    "board approval",
+    "written consent",
+    "release of claims",
+    "injunctive relief",
+    "arbitration",
+    "notice period",
+    "data retention",
+    "cookie categories",
+    "acceptable use",
+    "code of conduct",
+    "court order",
+    "settlement amount"
+  ],
+  "strategies": [
+    {
+      "id": "legal_strategy_clause_first",
+      "operators": [
+        "extract",
+        "compare",
+        "validate"
+      ],
+      "description": "Prioritize clause text and definitions before summaries.",
+      "steps": [
+        "detect target clause family",
+        "retrieve exact clause span",
+        "resolve cross-references",
+        "extract structured entities",
+        "emit citation-backed output"
+      ]
+    },
+    {
+      "id": "legal_strategy_policy_matrix",
+      "operators": [
+        "summarize",
+        "evaluate",
+        "advise"
+      ],
+      "description": "For policy docs, build requirement matrix by section and control owner.",
+      "steps": [
+        "identify policy controls",
+        "map obligations to owner",
+        "check review cadence",
+        "flag missing control evidence",
+        "summarize policy gaps"
+      ]
+    },
+    {
+      "id": "legal_strategy_dispute_path",
+      "operators": [
+        "locate",
+        "evaluate",
+        "advise"
+      ],
+      "description": "For litigation docs, prioritize timeline, relief sought, and procedural posture.",
+      "steps": [
+        "extract procedural posture",
+        "index requested relief",
+        "collect deadline/order dates",
+        "identify risks",
+        "produce action checklist"
+      ]
+    }
+  ]
+}

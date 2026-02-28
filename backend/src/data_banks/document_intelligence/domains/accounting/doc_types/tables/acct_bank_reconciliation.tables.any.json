@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "id": "di_accounting_tables_acct_bank_reconciliation",
+    "version": "1.1.0",
+    "description": "Expected table patterns for bank reconciliation documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_bank_reconciliation"
+  },
+  "tableHeaderSynonyms": {
+    "debit": [
+      "debit",
+      "debits",
+      "dr",
+      "dr.",
+      "debit amount",
+      "debit amt",
+      "debit value",
+      "debit posting",
+      "debit column",
+      "debit entry",
+      "debit movement",
+      "debito",
+      "débito",
+      "valor debito",
+      "lancamento a debito",
+      "entrada debito"
+    ],
+    "credit": [
+      "credit",
+      "credits",
+      "cr",
+      "cr.",
+      "credit amount",
+      "credit amt",
+      "credit value",
+      "credit posting",
+      "credit column",
+      "credit entry",
+      "credit movement",
+      "credito",
+      "crédito",
+      "valor credito",
+      "lancamento a credito",
+      "saida credito"
+    ],
+    "balance": [
+      "balance",
+      "ending balance",
+      "closing balance",
+      "opening balance",
+      "running balance",
+      "net balance",
+      "book balance",
+      "statement balance",
+      "saldo",
+      "saldo final",
+      "saldo inicial",
+      "saldo liquido",
+      "saldo contabil",
+      "saldo bancario",
+      "valor liquido",
+      "balanco"
+    ],
+    "account": [
+      "account",
+      "account no",
+      "account number",
+      "account code",
+      "acct",
+      "acct no",
+      "gl account",
+      "ledger account",
+      "nominal account",
+      "conta",
+      "numero da conta",
+      "codigo da conta",
+      "conta contabil",
+      "conta razao",
+      "plano de contas item",
+      "classificacao contabil"
+    ],
+    "vendor": [
+      "vendor",
+      "supplier",
+      "payee",
+      "provider",
+      "seller",
+      "beneficiary",
+      "counterparty",
+      "fornecedor",
+      "prestador",
+      "favorecido",
+      "credor",
+      "terceiro",
+      "parceiro",
+      "nome do fornecedor",
+      "codigo do fornecedor",
+      "id fornecedor"
+    ],
+    "invoice": [
+      "invoice",
+      "invoice no",
+      "invoice number",
+      "invoice id",
+      "bill",
+      "bill number",
+      "voucher",
+      "nota fiscal",
+      "nf",
+      "nf-e",
+      "fatura",
+      "numero da fatura",
+      "documento fiscal",
+      "doc number",
+      "id invoice",
+      "chave da nota"
+    ]
+  },
+  "tables": [
+    {
+      "id": "acct_bank_reconciliation_main_table",
+      "name": {
+        "en": "Bank Reconciliation Main",
+        "pt": "Conciliacao Bancaria Principal"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "item",
+        "description",
+        "book_amount",
+        "bank_amount",
+        "difference"
+      ],
+      "keyRows": [
+        "grand_total"
+      ]
+    },
+    {
+      "id": "acct_bank_reconciliation_summary_table",
+      "name": {
+        "en": "Bank Reconciliation Summary",
+        "pt": "Conciliacao Bancaria Resumo"
+      },
+      "section": "summary",
+      "expectedColumns": [
+        "metric",
+        "value"
+      ],
+      "keyRows": [
+        "total",
+        "subtotal",
+        "difference"
+      ]
+    }
+  ]
+}

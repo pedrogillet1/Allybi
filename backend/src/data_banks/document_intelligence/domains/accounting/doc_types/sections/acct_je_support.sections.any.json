@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "id": "di_accounting_sections_acct_je_support",
+    "description": "Section map for journal entry support documents.",
+    "version": "1.0.0",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_je_support"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "ontologySectionId": "accounting.je.header",
+      "name": {
+        "en": "JE Header",
+        "pt": "Cabecalho do Lancamento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Journal Entry",
+        "JE Support",
+        "Lancamento Contabil"
+      ]
+    },
+    {
+      "id": "entry_lines",
+      "ontologySectionId": "accounting.je.lines",
+      "name": {
+        "en": "Entry Lines",
+        "pt": "Linhas do Lancamento"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Debit",
+        "Credit",
+        "Account Lines",
+        "Partidas"
+      ]
+    },
+    {
+      "id": "supporting_calculation",
+      "ontologySectionId": "accounting.je.supporting_calc",
+      "name": {
+        "en": "Supporting Calculation",
+        "pt": "Calculo de Suporte"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Calculation",
+        "Supporting Schedule",
+        "Calculo"
+      ]
+    },
+    {
+      "id": "supporting_evidence",
+      "ontologySectionId": "accounting.je.supporting_evidence",
+      "name": {
+        "en": "Supporting Evidence",
+        "pt": "Evidencias de Suporte"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Attachment",
+        "Evidence",
+        "Support Documents"
+      ]
+    },
+    {
+      "id": "approval_workflow",
+      "ontologySectionId": "accounting.je.approval",
+      "name": {
+        "en": "Approval Workflow",
+        "pt": "Fluxo de Aprovacao"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "Prepared By",
+        "Reviewed By",
+        "Approved By"
+      ]
+    },
+    {
+      "id": "posting_confirmation",
+      "ontologySectionId": "accounting.je.posting_confirmation",
+      "name": {
+        "en": "Posting Confirmation",
+        "pt": "Confirmacao de Postagem"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "Posted",
+        "Posting Date",
+        "Batch ID"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "id": "di_tax_entities_tax_property_tax_bill",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for tax_property_tax_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "docType": "tax_property_tax_bill"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Document issuer or authority"
+    },
+    {
+      "id": "subject_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary subject referenced by the document"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": false,
+      "description": "Official document number"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": false,
+      "description": "Document effective date"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Jurisdiction or governing authority"
+    },
+    {
+      "id": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current processing or legal status"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code when monetary values are present"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total document amount when applicable"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date for payment or action"
+    },
+    {
+      "id": "reference_id",
+      "type": "string",
+      "required": false,
+      "description": "External reference id"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "property_id",
+      "type": "string",
+      "required": true,
+      "description": "Property identifier/registration"
+    },
+    {
+      "id": "property_address",
+      "type": "string",
+      "required": true,
+      "description": "Property address"
+    },
+    {
+      "id": "valuation_date",
+      "type": "date",
+      "required": false,
+      "description": "Property valuation date"
+    },
+    {
+      "id": "assessed_value",
+      "type": "currency",
+      "required": true,
+      "description": "Assessed property value"
+    },
+    {
+      "id": "tax_rate",
+      "type": "number",
+      "required": true,
+      "description": "Applied property tax rate"
+    },
+    {
+      "id": "annual_tax_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Annual tax amount"
+    },
+    {
+      "id": "installment_count",
+      "type": "number",
+      "required": false,
+      "description": "Number of installments"
+    },
+    {
+      "id": "installment_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Installment amount"
+    },
+    {
+      "id": "single_payment_discount",
+      "type": "currency",
+      "required": false,
+      "description": "Discount for single payment"
+    },
+    {
+      "id": "municipal_reference",
+      "type": "string",
+      "required": false,
+      "description": "Municipal bill reference"
+    },
+    {
+      "id": "tax_doc_type",
+      "type": "string",
+      "required": true,
+      "description": "Resolved doc type: tax_property_tax_bill"
+    }
+  ]
+}

@@ -114,6 +114,35 @@ export type PatchOp =
       sheet: string;
       cols: number[];
       width: number | "auto";
+    }
+  | {
+      op: "REMOVE_DUPLICATES";
+      sheet?: string;
+      range: A1Range;
+      keyColumns?: number[];
+      hasHeader?: boolean;
+    }
+  | { op: "TRIM_WHITESPACE"; sheet?: string; range: A1Range }
+  | {
+      op: "NORMALIZE_VALUES";
+      sheet?: string;
+      range: A1Range;
+      normalization: "dates" | "numbers" | "text_case";
+      textCase?: "upper" | "lower" | "title";
+      dateFormat?: string;
+    }
+  | {
+      op: "SET_SHEET_PROTECTION";
+      sheet: string;
+      password?: string;
+      options?: Record<string, boolean>;
+    }
+  | {
+      op: "SET_CELL_PROTECTION";
+      sheet?: string;
+      range: A1Range;
+      locked: boolean;
+      hidden?: boolean;
     };
 
 export type PatchPlanTranslationResult = {

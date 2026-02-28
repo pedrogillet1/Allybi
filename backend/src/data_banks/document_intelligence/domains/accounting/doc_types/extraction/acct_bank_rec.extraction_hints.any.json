@@ -1,0 +1,11 @@
+{
+  "_meta": { "id": "di_accounting_extraction_acct_bank_rec", "version": "1.0.0", "description": "Extraction hints for bank reconciliation.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "accounting", "docType": "acct_bank_rec" },
+  "hints": [
+    { "id": "hint_book_balance", "entity": "book_balance", "anchors": ["balance per books", "book balance", "GL balance", "saldo contábil"], "location": "reconciliation_summary", "extractionMethod": "table_row_match" },
+    { "id": "hint_bank_balance", "entity": "bank_balance", "anchors": ["balance per bank", "bank balance", "statement balance", "saldo bancário"], "location": "reconciliation_summary", "extractionMethod": "table_row_match" },
+    { "id": "hint_outstanding_checks", "entity": "outstanding_checks_total", "anchors": ["outstanding checks total", "total outstanding"], "location": "outstanding_checks_list", "extractionMethod": "table_row_match" },
+    { "id": "hint_deposits_in_transit", "entity": "deposits_in_transit_total", "anchors": ["deposits in transit total", "total deposits in transit"], "location": "deposits_in_transit_list", "extractionMethod": "table_row_match" },
+    { "id": "hint_rec_date", "entity": "reconciliation_date", "anchors": ["As of", "Date", "Period ending"], "location": "header", "extractionMethod": "heading_proximity" }
+  ]
+}

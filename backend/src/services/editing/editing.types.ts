@@ -87,6 +87,7 @@ export interface EditPlanDiagnostics {
 }
 
 export interface EditPlan {
+  [key: string]: unknown;
   operator: EditOperator;
   canonicalOperator?: string;
   intentSource?: EditIntentSource;
@@ -200,6 +201,12 @@ export interface EditPreviewRequest {
   preserveTokens?: string[];
 }
 
+export interface EditValidationEntry {
+  id: string;
+  pass: boolean;
+  detail?: string;
+}
+
 export interface EditPreviewResult {
   ok: boolean;
   target?: ResolvedTarget;
@@ -208,6 +215,9 @@ export interface EditPreviewResult {
   receipt?: EditReceipt;
   requiresConfirmation?: boolean;
   similarityScore?: number;
+  requestId?: string;
+  validations?: EditValidationEntry[];
+  followups?: string[];
   error?: string;
 }
 
@@ -304,6 +314,9 @@ export interface EditApplyResult {
   };
   preview?: EditPreviewResult;
   receipt?: EditReceipt;
+  requestId?: string;
+  validations?: EditValidationEntry[];
+  followups?: string[];
   error?: string;
 }
 

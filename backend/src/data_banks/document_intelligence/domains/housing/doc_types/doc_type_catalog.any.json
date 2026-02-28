@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "id": "di_housing_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Document type catalog for housing domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing"
+  },
+  "domain": "housing",
+  "docTypes": [
+    {
+      "id": "housing_hoa_statement",
+      "name": {
+        "en": "HOA Statement",
+        "pt": "Extrato de Condominio"
+      },
+      "description": "HOA Statement detection profile for housing extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bhoa\\s+statement\\b",
+        "\\bhousing\\s+hoa\\s+statement\\b",
+        "\\bextrato\\s+de\\s+condominio\\b"
+      ],
+      "priority": 115
+    },
+    {
+      "id": "housing_home_inspection_report",
+      "name": {
+        "en": "Home Inspection Report",
+        "pt": "Relatorio de Inspecao Residencial"
+      },
+      "description": "Home Inspection Report detection profile for housing extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bhome\\s+inspection\\s+report\\b",
+        "\\bhousing\\s+home\\s+inspection\\s+report\\b",
+        "\\brelatorio\\s+de\\s+inspecao\\s+residencial\\b"
+      ],
+      "priority": 116
+    },
+    {
+      "id": "housing_lease_summary",
+      "name": {
+        "en": "Lease Summary",
+        "pt": "Resumo de Locacao"
+      },
+      "description": "Lease Summary detection profile for housing extraction and interpretation.",
+      "detectionPatterns": [
+        "\\blease\\s+summary\\b",
+        "\\bhousing\\s+lease\\s+summary\\b",
+        "\\bresumo\\s+de\\s+locacao\\b"
+      ],
+      "priority": 120
+    },
+    {
+      "id": "housing_mortgage_statement",
+      "name": {
+        "en": "Mortgage Statement",
+        "pt": "Extrato de Hipoteca"
+      },
+      "description": "Mortgage Statement detection profile for housing extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bmortgage\\s+statement\\b",
+        "\\bhousing\\s+mortgage\\s+statement\\b",
+        "\\bextrato\\s+de\\s+hipoteca\\b"
+      ],
+      "priority": 118
+    },
+    {
+      "id": "housing_property_tax_bill",
+      "name": {
+        "en": "Property Tax Bill",
+        "pt": "Conta de IPTU"
+      },
+      "description": "Property Tax Bill detection profile for housing extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bproperty\\s+tax\\s+bill\\b",
+        "\\bhousing\\s+property\\s+tax\\s+bill\\b",
+        "\\bconta\\s+de\\s+iptu\\b"
+      ],
+      "priority": 117
+    },
+    {
+      "id": "housing_rent_receipt",
+      "name": {
+        "en": "Rent Receipt",
+        "pt": "Recibo de Aluguel"
+      },
+      "description": "Rent Receipt detection profile for housing extraction and interpretation.",
+      "detectionPatterns": [
+        "\\brent\\s+receipt\\b",
+        "\\bhousing\\s+rent\\s+receipt\\b",
+        "\\brecibo\\s+de\\s+aluguel\\b"
+      ],
+      "priority": 119
+    }
+  ]
+}

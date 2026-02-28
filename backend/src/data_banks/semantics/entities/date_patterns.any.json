@@ -1,21 +1,1494 @@
 {
   "_meta": {
     "id": "date_patterns",
-    "version": "1.0.0",
-    "description": "Date extraction patterns with multilingual normalization and fiscal period hints.",
+    "version": "1.1.0",
+    "description": "Cross-domain date extraction patterns with normalization hints for everyday document families.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true
   },
   "rules": [
     {
-      "id": "date_patterns_rule_001",
-      "pattern": "",
-      "notes": "Populate domain-specific extraction patterns."
+      "id": "date_001",
+      "name": "abbreviated_day_en",
+      "pattern": "(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\\.?",
+      "examples": [
+        "Fri",
+        "Mon",
+        "Sun",
+        "Tue."
+      ],
+      "normalization": "day_of_week_en",
+      "locale": "en",
+      "notes": "Abbreviated English day of week"
+    },
+    {
+      "id": "date_002",
+      "name": "abbreviated_day_pt",
+      "pattern": "(?:seg|ter|qua|qui|sex|sab|dom)\\.?",
+      "examples": [
+        "dom",
+        "seg",
+        "sex",
+        "ter."
+      ],
+      "normalization": "day_of_week_pt",
+      "locale": "pt",
+      "notes": "Abbreviated Portuguese day of week"
+    },
+    {
+      "name": "academic_term_en",
+      "pattern": "(?:Spring|Summer|Fall|Winter)\\s\\d{4}",
+      "examples": [
+        "Fall 2026",
+        "Spring 2027"
+      ],
+      "normalization": "academic_term",
+      "locale": "en",
+      "notes": "Academic term label in English",
+      "id": "date_003"
+    },
+    {
+      "name": "academic_term_pt",
+      "pattern": "(?:1o\\ssemestre|2o\\ssemestre|semestre)\\s(?:de\\s)?\\d{4}",
+      "examples": [
+        "1o semestre 2026",
+        "2o semestre de 2027"
+      ],
+      "normalization": "academic_term",
+      "locale": "pt",
+      "notes": "Academic term label in Portuguese",
+      "id": "date_004"
+    },
+    {
+      "name": "academic_year_range",
+      "pattern": "(?:academic\\syear|ano\\sletivo)\\s\\d{4}\\/?\\d{4}",
+      "examples": [
+        "Academic Year 2026/2027",
+        "Ano letivo 2026/2027"
+      ],
+      "normalization": "academic_year",
+      "locale": "any",
+      "notes": "Academic year range",
+      "id": "date_005"
+    },
+    {
+      "name": "ano_calendario_pt",
+      "pattern": "(?:Ano\\sCalendario)\\s\\d{4}",
+      "examples": [
+        "Ano Calendario 2025"
+      ],
+      "normalization": "tax_year",
+      "locale": "pt",
+      "notes": "Brazilian tax-calendar year marker",
+      "id": "date_006"
+    },
+    {
+      "name": "ate_data_pt",
+      "pattern": "ate\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "ate 31/12/2026"
+      ],
+      "normalization": "end_date",
+      "locale": "pt",
+      "notes": "Until date phrase in Portuguese",
+      "id": "date_007"
+    },
+    {
+      "name": "billing_cycle_mm_yyyy",
+      "pattern": "(?:cycle|ciclo)\\s\\d{2}/\\d{4}",
+      "examples": [
+        "ciclo 11/2025",
+        "cycle 05/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "locale": "any",
+      "notes": "Billing cycle month/year",
+      "id": "date_008"
+    },
+    {
+      "name": "billing_cycle_week_number",
+      "pattern": "(?:cycle\\sweek|semana\\sdo\\sciclo)\\s\\d{1,2}",
+      "examples": [
+        "cycle week 3"
+      ],
+      "normalization": "cycle_week",
+      "locale": "any",
+      "notes": "Billing cycle week index",
+      "id": "date_009"
+    },
+    {
+      "name": "bimestre_label_pt",
+      "pattern": "\\b[1-6]o\\sbimestre\\sde\\s\\d{4}",
+      "examples": [
+        "3o bimestre de 2026"
+      ],
+      "normalization": "bimester",
+      "locale": "pt",
+      "notes": "Bimester expression in Portuguese",
+      "id": "date_010"
+    },
+    {
+      "name": "checkin_checkout_en",
+      "pattern": "(?:check[- ]?in|check[- ]?out)\\s*:?\\s*\\d{1,2}\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{4}",
+      "examples": [
+        "Check-in: 12 Aug 2026",
+        "Check-out: 15 Aug 2026"
+      ],
+      "normalization": "travel_date",
+      "locale": "en",
+      "notes": "Travel check-in/check-out date",
+      "id": "date_011"
+    },
+    {
+      "name": "competencia_pt",
+      "pattern": "(?:competencia)\\s*:?\\s*\\d{2}/\\d{4}",
+      "examples": [
+        "Competencia: 05/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "locale": "pt",
+      "notes": "Payroll/tax competence month",
+      "id": "date_012"
+    },
+    {
+      "name": "cycle_cutoff_date",
+      "pattern": "(?:cutoff|fechamento\\sdo\\sciclo)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Cutoff: 05/28/2026",
+        "Fechamento do ciclo: 28/05/2026"
+      ],
+      "normalization": "cycle_cutoff",
+      "locale": "any",
+      "notes": "Billing/card cycle cutoff date",
+      "id": "date_013"
+    },
+    {
+      "name": "date_compact_ddmmyyyy",
+      "pattern": "\\b\\d{2}\\d{2}\\d{4}\\b",
+      "examples": [
+        "15012024",
+        "31052026"
+      ],
+      "normalization": "DDMMYYYY_or_MMDDYYYY_context",
+      "locale": "universal",
+      "notes": "Compact day-month-year candidate",
+      "id": "date_014"
+    },
+    {
+      "name": "date_compact_yyyymmdd",
+      "pattern": "\\b\\d{8}\\b",
+      "examples": [
+        "20240115",
+        "20260531"
+      ],
+      "normalization": "YYYYMMDD",
+      "locale": "universal",
+      "notes": "Compact numeric date",
+      "id": "date_015"
+    },
+    {
+      "id": "date_016",
+      "name": "deadline_ate_pt",
+      "pattern": "(?:ate|prazo|vencimento)\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "ate 15/01/2024",
+        "prazo 31/12/2023",
+        "vencimento 28/02/2024"
+      ],
+      "normalization": "deadline_date",
+      "locale": "pt",
+      "notes": "Portuguese deadline phrasing"
+    },
+    {
+      "id": "date_017",
+      "name": "deadline_due_by_en",
+      "pattern": "(?:due by|due on|no later than|by)\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "due by 01/15/2024",
+        "no later than 12/31/2023"
+      ],
+      "normalization": "deadline_date",
+      "locale": "en",
+      "notes": "English deadline phrasing"
+    },
+    {
+      "name": "document_expiry_en",
+      "pattern": "(?:expires|expiry\\sdate)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Expires: 12/01/2030"
+      ],
+      "normalization": "expiry_date",
+      "locale": "en",
+      "notes": "Document expiry date",
+      "id": "date_018"
+    },
+    {
+      "name": "document_validade_pt",
+      "pattern": "(?:validade|expira\\sem)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Validade: 01/12/2030"
+      ],
+      "normalization": "expiry_date",
+      "locale": "pt",
+      "notes": "Document validity/expiry date",
+      "id": "date_019"
+    },
+    {
+      "name": "due_date_label_en",
+      "pattern": "(?:due\\sdate|pay\\sby)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Due Date: 06/15/2026"
+      ],
+      "normalization": "deadline_date",
+      "locale": "en",
+      "notes": "Due date with English label",
+      "id": "date_020"
+    },
+    {
+      "id": "date_021",
+      "name": "duration_anos_pt",
+      "pattern": "\\d+\\sanos?",
+      "examples": [
+        "1 ano",
+        "2 anos",
+        "5 anos"
+      ],
+      "normalization": "duration_years",
+      "locale": "pt",
+      "notes": "Duration in years (Portuguese)"
+    },
+    {
+      "id": "date_022",
+      "name": "duration_days_en",
+      "pattern": "\\d+\\sdays?",
+      "examples": [
+        "1 day",
+        "30 days",
+        "90 days"
+      ],
+      "normalization": "duration_days",
+      "locale": "en",
+      "notes": "Duration in days (English)"
+    },
+    {
+      "id": "date_023",
+      "name": "duration_dias_pt",
+      "pattern": "\\d+\\sdias?",
+      "examples": [
+        "1 dia",
+        "30 dias",
+        "90 dias"
+      ],
+      "normalization": "duration_days",
+      "locale": "pt",
+      "notes": "Duration in days (Portuguese)"
+    },
+    {
+      "id": "date_024",
+      "name": "duration_meses_pt",
+      "pattern": "\\d+\\s(?:meses|mes)",
+      "examples": [
+        "1 mes",
+        "12 meses",
+        "6 meses"
+      ],
+      "normalization": "duration_months",
+      "locale": "pt",
+      "notes": "Duration in months (Portuguese)"
+    },
+    {
+      "id": "date_025",
+      "name": "duration_months_en",
+      "pattern": "\\d+\\smonths?",
+      "examples": [
+        "1 month",
+        "12 months",
+        "6 months"
+      ],
+      "normalization": "duration_months",
+      "locale": "en",
+      "notes": "Duration in months (English)"
+    },
+    {
+      "id": "date_026",
+      "name": "duration_years_en",
+      "pattern": "\\d+\\syears?",
+      "examples": [
+        "1 year",
+        "2 years",
+        "5 years"
+      ],
+      "normalization": "duration_years",
+      "locale": "en",
+      "notes": "Duration in years (English)"
+    },
+    {
+      "name": "effective_from_en",
+      "pattern": "effective\\sfrom\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "effective from 01/01/2026"
+      ],
+      "normalization": "start_date",
+      "locale": "en",
+      "notes": "Effective-from phrase",
+      "id": "date_027"
+    },
+    {
+      "name": "embarque_desembarque_pt",
+      "pattern": "(?:embarque|desembarque)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Embarque: 12/08/2026"
+      ],
+      "normalization": "travel_date",
+      "locale": "pt",
+      "notes": "Travel embark/disembark date",
+      "id": "date_028"
+    },
+    {
+      "id": "date_029",
+      "name": "eu_dash_4digit",
+      "pattern": "\\d{1,2}-\\d{1,2}-\\d{4}",
+      "examples": [
+        "15-01-2024",
+        "31-12-2023"
+      ],
+      "normalization": "DD-MM-YYYY",
+      "locale": "eu",
+      "notes": "European dash-separated date"
+    },
+    {
+      "id": "date_030",
+      "name": "eu_dot",
+      "pattern": "\\d{1,2}\\.\\d{1,2}\\.\\d{4}",
+      "examples": [
+        "15.01.2024",
+        "31.12.2023",
+        "5.1.2024"
+      ],
+      "normalization": "DD.MM.YYYY",
+      "locale": "de",
+      "notes": "European dot-separated date (German, Swiss)"
+    },
+    {
+      "id": "date_031",
+      "name": "eu_slash_4digit",
+      "pattern": "\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "15/01/2024",
+        "31/12/2023",
+        "5/1/2024"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "locale": "pt-BR",
+      "notes": "European/Brazilian format DD/MM/YYYY (ambiguous with US, context-dependent)"
+    },
+    {
+      "id": "date_032",
+      "name": "fiscal_half_h",
+      "pattern": "H[12]\\s?\\d{2,4}",
+      "examples": [
+        "H1 2024",
+        "H12024",
+        "H2 2023"
+      ],
+      "normalization": "fiscal_half",
+      "locale": "universal",
+      "notes": "Fiscal half-year H1/H2"
+    },
+    {
+      "id": "date_033",
+      "name": "fiscal_quarter_num_q",
+      "pattern": "[1-4]Q\\s?\\d{2,4}",
+      "examples": [
+        "1Q24",
+        "2Q 24",
+        "4Q2023"
+      ],
+      "normalization": "fiscal_quarter",
+      "locale": "universal",
+      "notes": "Quarter number prefix format"
+    },
+    {
+      "id": "date_034",
+      "name": "fiscal_quarter_q_year",
+      "pattern": "Q[1-4]\\s?\\d{4}",
+      "examples": [
+        "Q1 2024",
+        "Q22024",
+        "Q4 2023"
+      ],
+      "normalization": "fiscal_quarter",
+      "locale": "universal",
+      "notes": "Fiscal quarter Q1-Q4 with 4-digit year"
+    },
+    {
+      "name": "fiscal_quarter_written_en",
+      "pattern": "(?:first|second|third|fourth)\\squarter\\sof\\s\\d{4}",
+      "examples": [
+        "first quarter of 2026"
+      ],
+      "normalization": "fiscal_quarter",
+      "locale": "en",
+      "notes": "Written quarter expression",
+      "id": "date_035"
+    },
+    {
+      "id": "date_036",
+      "name": "fiscal_semestre_pt",
+      "pattern": "[12]S\\s?\\d{2,4}",
+      "examples": [
+        "1S2024",
+        "1S24",
+        "2S 2023"
+      ],
+      "normalization": "fiscal_half",
+      "locale": "pt",
+      "notes": "Portuguese semester format"
+    },
+    {
+      "id": "date_037",
+      "name": "fiscal_trimester_pt",
+      "pattern": "[1-4]T\\s?\\d{2,4}",
+      "examples": [
+        "1T2024",
+        "2T 2024",
+        "4T23"
+      ],
+      "normalization": "fiscal_quarter",
+      "locale": "pt",
+      "notes": "Portuguese trimester format"
+    },
+    {
+      "name": "fiscal_week_fw",
+      "pattern": "FW\\s?\\d{1,2}\\s?\\d{4}",
+      "examples": [
+        "FW 22 2026"
+      ],
+      "normalization": "fiscal_week",
+      "locale": "universal",
+      "notes": "Fiscal week label",
+      "id": "date_038"
+    },
+    {
+      "id": "date_039",
+      "name": "fiscal_year_cy",
+      "pattern": "CY\\s?\\d{2,4}",
+      "examples": [
+        "CY 2024",
+        "CY2024",
+        "CY24"
+      ],
+      "normalization": "calendar_year",
+      "locale": "universal",
+      "notes": "Calendar year with CY prefix"
+    },
+    {
+      "id": "date_040",
+      "name": "fiscal_year_fy",
+      "pattern": "FY\\s?\\d{2,4}",
+      "examples": [
+        "FY 2024",
+        "FY2024",
+        "FY24"
+      ],
+      "normalization": "fiscal_year",
+      "locale": "universal",
+      "notes": "Fiscal year with FY prefix"
+    },
+    {
+      "name": "flight_datetime_local",
+      "pattern": "\\d{1,2}\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{4}\\s\\d{2}:\\d{2}\\s(?:LT|local)",
+      "examples": [
+        "12 Aug 2026 21:35 LT"
+      ],
+      "normalization": "travel_local_datetime",
+      "locale": "en",
+      "notes": "Flight local datetime notation",
+      "id": "date_041"
+    },
+    {
+      "id": "date_042",
+      "name": "iso_8601_date",
+      "pattern": "\\d{4}-\\d{2}-\\d{2}",
+      "examples": [
+        "2023-12-31",
+        "2024-01-15"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "locale": "universal",
+      "notes": "ISO 8601 standard date format"
+    },
+    {
+      "id": "date_043",
+      "name": "iso_8601_datetime",
+      "pattern": "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}",
+      "examples": [
+        "2023-12-31T23:59:59",
+        "2024-01-15T14:30:00"
+      ],
+      "normalization": "YYYY-MM-DDTHH:mm:ss",
+      "locale": "universal",
+      "notes": "ISO 8601 with time component"
+    },
+    {
+      "id": "date_044",
+      "name": "iso_8601_with_tz",
+      "pattern": "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}",
+      "examples": [
+        "2024-01-15T14:30:00-05:00",
+        "2024-01-15T14:30:00+03:00"
+      ],
+      "normalization": "YYYY-MM-DDTHH:mm:ssTZ",
+      "locale": "universal",
+      "notes": "ISO 8601 with timezone offset"
+    },
+    {
+      "id": "date_045",
+      "name": "iso_8601_with_z",
+      "pattern": "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z",
+      "examples": [
+        "2024-01-15T14:30:00Z"
+      ],
+      "normalization": "YYYY-MM-DDTHH:mm:ssZ",
+      "locale": "universal",
+      "notes": "ISO 8601 with UTC Z suffix"
+    },
+    {
+      "name": "iso_week_date",
+      "pattern": "\\d{4}-W\\d{2}-\\d",
+      "examples": [
+        "2026-W23-4"
+      ],
+      "normalization": "iso_week_date",
+      "locale": "universal",
+      "notes": "ISO week-date format",
+      "id": "date_046"
+    },
+    {
+      "name": "lancado_em_pt",
+      "pattern": "lancado\\sem\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "lancado em 01/06/2026"
+      ],
+      "normalization": "posting_date",
+      "locale": "pt",
+      "notes": "Posting date phrase in Portuguese",
+      "id": "date_047"
+    },
+    {
+      "name": "loan_maturity_label",
+      "pattern": "(?:maturity|vencimento\\sfinal)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Maturity: 12/31/2030"
+      ],
+      "normalization": "loan_maturity_date",
+      "locale": "any",
+      "notes": "Loan maturity date",
+      "id": "date_048"
+    },
+    {
+      "name": "month_name_en_abbrev_alt",
+      "pattern": "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\/\\d{4}",
+      "examples": [
+        "May/2026"
+      ],
+      "normalization": "Mon/YYYY",
+      "locale": "en",
+      "notes": "English abbreviated month with slash",
+      "id": "date_049"
+    },
+    {
+      "name": "month_name_pt_abbrev_alt",
+      "pattern": "(?:jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\\.\\/\\d{4}",
+      "examples": [
+        "mai./2026",
+        "out./2025"
+      ],
+      "normalization": "Mon/YYYY",
+      "locale": "pt",
+      "notes": "Portuguese abbreviated month with dot",
+      "id": "date_050"
+    },
+    {
+      "id": "date_051",
+      "name": "month_year_en_abbr",
+      "pattern": "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?\\s\\d{4}",
+      "examples": [
+        "Dec. 2023",
+        "Jan 2024",
+        "Mar 2024"
+      ],
+      "normalization": "Mon YYYY",
+      "locale": "en",
+      "notes": "Abbreviated English month + year"
+    },
+    {
+      "id": "date_052",
+      "name": "month_year_en_full",
+      "pattern": "(?:January|February|March|April|May|June|July|August|September|October|November|December)\\s\\d{4}",
+      "examples": [
+        "December 2023",
+        "January 2024"
+      ],
+      "normalization": "Month YYYY",
+      "locale": "en",
+      "notes": "English full month + year"
+    },
+    {
+      "id": "date_053",
+      "name": "month_year_numeric",
+      "pattern": "\\d{1,2}/\\d{4}",
+      "examples": [
+        "01/2024",
+        "12/2023",
+        "3/2024"
+      ],
+      "normalization": "MM/YYYY",
+      "locale": "universal",
+      "notes": "Numeric month/year"
+    },
+    {
+      "id": "date_054",
+      "name": "mtd_indicator",
+      "pattern": "\\b(?:MTD|mtd|month-to-date|acumulado\\sno\\smes)\\b",
+      "examples": [
+        "acumulado no mes",
+        "month-to-date",
+        "MTD"
+      ],
+      "normalization": "period_mtd",
+      "locale": "universal",
+      "notes": "Month-to-date indicator"
+    },
+    {
+      "name": "night_of_en",
+      "pattern": "night\\sof\\s\\d{1,2}\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{4}",
+      "examples": [
+        "night of 03 Jun 2026"
+      ],
+      "normalization": "specific_night",
+      "locale": "en",
+      "notes": "Night-of phrasing",
+      "id": "date_055"
+    },
+    {
+      "name": "noite_de_pt",
+      "pattern": "noite\\sde\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "noite de 03/06/2026"
+      ],
+      "normalization": "specific_night",
+      "locale": "pt",
+      "notes": "Night-of phrasing in Portuguese",
+      "id": "date_056"
+    },
+    {
+      "name": "payroll_period_en",
+      "pattern": "(?:payroll\\speriod)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}\\s*[-\\u2013]\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Payroll Period: 05/01/2026 - 05/15/2026"
+      ],
+      "normalization": "date_range",
+      "locale": "en",
+      "notes": "Payroll period range",
+      "id": "date_057"
+    },
+    {
+      "name": "period_label_p1",
+      "pattern": "P\\d{1,2}\\s\\d{4}",
+      "examples": [
+        "P05 2026",
+        "P12 2025"
+      ],
+      "normalization": "accounting_period",
+      "locale": "universal",
+      "notes": "Accounting period label P## YYYY",
+      "id": "date_058"
+    },
+    {
+      "name": "policy_effective_expiry_range",
+      "pattern": "(?:effective|vigencia)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}\\s*[-\\u2013]\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Effective: 01/01/2026 - 12/31/2026"
+      ],
+      "normalization": "coverage_range",
+      "locale": "any",
+      "notes": "Policy effective-to-expiry range",
+      "id": "date_059"
+    },
+    {
+      "name": "posted_on_en",
+      "pattern": "posted\\son\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "posted on 06/01/2026"
+      ],
+      "normalization": "posting_date",
+      "locale": "en",
+      "notes": "Transaction posting date phrase",
+      "id": "date_060"
+    },
+    {
+      "name": "prazo_entrega_pt",
+      "pattern": "(?:prazo\\sde\\sentrega)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Prazo de Entrega: 31/05/2026"
+      ],
+      "normalization": "deadline_date",
+      "locale": "pt",
+      "notes": "Tax filing deadline in Portuguese",
+      "id": "date_061"
+    },
+    {
+      "name": "processing_window_range",
+      "pattern": "(?:processing\\swindow|janela\\sde\\sprocessamento)\\s*:?\\s*\\d{2}:\\d{2}\\s*[-\\u2013]\\s*\\d{2}:\\d{2}",
+      "examples": [
+        "processing window: 08:00-18:00"
+      ],
+      "normalization": "time_range",
+      "locale": "any",
+      "notes": "Processing time window",
+      "id": "date_062"
+    },
+    {
+      "id": "date_063",
+      "name": "qtd_indicator",
+      "pattern": "\\b(?:QTD|qtd|quarter-to-date|acumulado\\sno\\strimestre)\\b",
+      "examples": [
+        "acumulado no trimestre",
+        "QTD",
+        "quarter-to-date"
+      ],
+      "normalization": "period_qtd",
+      "locale": "universal",
+      "notes": "Quarter-to-date indicator"
+    },
+    {
+      "name": "quarter_label_en_ext",
+      "pattern": "\\bQ[1-4]\\/\\d{4}",
+      "examples": [
+        "Q2/2026"
+      ],
+      "normalization": "fiscal_quarter",
+      "locale": "en",
+      "notes": "Quarter label with slash",
+      "id": "date_064"
+    },
+    {
+      "name": "quarter_label_pt_ext",
+      "pattern": "\\b[1-4]o\\strimestre\\/\\d{4}",
+      "examples": [
+        "2o trimestre/2026"
+      ],
+      "normalization": "fiscal_quarter",
+      "locale": "pt",
+      "notes": "Quarter label with slash",
+      "id": "date_065"
+    },
+    {
+      "id": "date_066",
+      "name": "range_de_a_pt",
+      "pattern": "de\\s(?:janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\\sa\\s(?:janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)",
+      "examples": [
+        "de janeiro a marco",
+        "de outubro a dezembro"
+      ],
+      "normalization": "date_range_pt_de_a",
+      "locale": "pt",
+      "notes": "Portuguese de/a month range"
+    },
+    {
+      "id": "date_067",
+      "name": "range_en_month_dash",
+      "pattern": "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?\\s?[-\\u2013]\\s?(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?\\s\\d{4}",
+      "examples": [
+        "Apr–Jun 2024",
+        "Jan-Mar 2024",
+        "Oct - Dec 2023"
+      ],
+      "normalization": "date_range_month",
+      "locale": "en",
+      "notes": "English month range with year"
+    },
+    {
+      "id": "date_068",
+      "name": "range_from_to_en",
+      "pattern": "from\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?\\sto\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?",
+      "examples": [
+        "from Jan to Mar",
+        "from Oct to Dec"
+      ],
+      "normalization": "date_range_en_from_to",
+      "locale": "en",
+      "notes": "English from/to month range"
+    },
+    {
+      "id": "date_069",
+      "name": "range_full_date_dash",
+      "pattern": "\\d{1,2}/\\d{1,2}/\\d{4}\\s?[-\\u2013]\\s?\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "01/01/2024 - 03/31/2024",
+        "15/01/2024–28/02/2024"
+      ],
+      "normalization": "date_range_full",
+      "locale": "auto_detect",
+      "notes": "Full date range with dash"
+    },
+    {
+      "id": "date_070",
+      "name": "range_numeric_dash",
+      "pattern": "\\d{1,2}/\\d{4}\\s?[-\\u2013]\\s?\\d{1,2}/\\d{4}",
+      "examples": [
+        "01/2024 - 03/2024",
+        "10/2023–12/2023"
+      ],
+      "normalization": "date_range_numeric",
+      "locale": "universal",
+      "notes": "Numeric month/year range"
+    },
+    {
+      "id": "date_071",
+      "name": "relative_amanha_pt",
+      "pattern": "\\bamanha\\b",
+      "examples": [
+        "amanha"
+      ],
+      "normalization": "relative_plus_1_day",
+      "locale": "pt",
+      "notes": "Portuguese: tomorrow"
+    },
+    {
+      "name": "relative_em_30_dias_pt",
+      "pattern": "em\\s30\\sdias",
+      "examples": [
+        "em 30 dias"
+      ],
+      "normalization": "relative_plus_30_days",
+      "locale": "pt",
+      "notes": "Relative date phrase in Portuguese",
+      "id": "date_072"
+    },
+    {
+      "id": "date_073",
+      "name": "relative_hoje_pt",
+      "pattern": "\\bhoje\\b",
+      "examples": [
+        "hoje"
+      ],
+      "normalization": "relative_current_date",
+      "locale": "pt",
+      "notes": "Portuguese: today"
+    },
+    {
+      "name": "relative_in_30_days_en",
+      "pattern": "in\\s30\\sdays",
+      "examples": [
+        "in 30 days"
+      ],
+      "normalization": "relative_plus_30_days",
+      "locale": "en",
+      "notes": "Relative date phrase",
+      "id": "date_074"
+    },
+    {
+      "id": "date_075",
+      "name": "relative_last_month_en",
+      "pattern": "\\blast\\smonth\\b",
+      "examples": [
+        "last month"
+      ],
+      "normalization": "relative_minus_1_month",
+      "locale": "en",
+      "notes": "Relative: last month"
+    },
+    {
+      "id": "date_076",
+      "name": "relative_last_week_en",
+      "pattern": "\\blast\\s(?:week|wk)\\b",
+      "examples": [
+        "last week",
+        "last wk"
+      ],
+      "normalization": "relative_minus_1_week",
+      "locale": "en",
+      "notes": "Relative: last week"
+    },
+    {
+      "id": "date_077",
+      "name": "relative_last_year_en",
+      "pattern": "\\blast\\syear\\b",
+      "examples": [
+        "last year"
+      ],
+      "normalization": "relative_minus_1_year",
+      "locale": "en",
+      "notes": "Relative: last year"
+    },
+    {
+      "id": "date_078",
+      "name": "relative_mes_passado_pt",
+      "pattern": "\\bmes\\spassado\\b",
+      "examples": [
+        "mes passado"
+      ],
+      "normalization": "relative_minus_1_month",
+      "locale": "pt",
+      "notes": "Portuguese: last month"
+    },
+    {
+      "id": "date_079",
+      "name": "relative_next_month_en",
+      "pattern": "\\bnext\\smonth\\b",
+      "examples": [
+        "next month"
+      ],
+      "normalization": "relative_plus_1_month",
+      "locale": "en",
+      "notes": "Relative: next month"
+    },
+    {
+      "id": "date_080",
+      "name": "relative_next_week_en",
+      "pattern": "\\bnext\\s(?:week|wk)\\b",
+      "examples": [
+        "next week",
+        "next wk"
+      ],
+      "normalization": "relative_plus_1_week",
+      "locale": "en",
+      "notes": "Relative: next week"
+    },
+    {
+      "id": "date_081",
+      "name": "relative_next_year_en",
+      "pattern": "\\bnext\\syear\\b",
+      "examples": [
+        "next year"
+      ],
+      "normalization": "relative_plus_1_year",
+      "locale": "en",
+      "notes": "Relative: next year"
+    },
+    {
+      "id": "date_082",
+      "name": "relative_ontem_pt",
+      "pattern": "\\bontem\\b",
+      "examples": [
+        "ontem"
+      ],
+      "normalization": "relative_minus_1_day",
+      "locale": "pt",
+      "notes": "Portuguese: yesterday"
+    },
+    {
+      "id": "date_083",
+      "name": "relative_proxima_semana_pt",
+      "pattern": "\\bproxima\\ssemana\\b",
+      "examples": [
+        "proxima semana"
+      ],
+      "normalization": "relative_plus_1_week",
+      "locale": "pt",
+      "notes": "Portuguese: next week"
+    },
+    {
+      "id": "date_084",
+      "name": "relative_proximo_mes_pt",
+      "pattern": "\\bproximo\\smes\\b",
+      "examples": [
+        "proximo mes"
+      ],
+      "normalization": "relative_plus_1_month",
+      "locale": "pt",
+      "notes": "Portuguese: next month"
+    },
+    {
+      "id": "date_085",
+      "name": "relative_semana_passada_pt",
+      "pattern": "\\bsemana\\spassada\\b",
+      "examples": [
+        "semana passada"
+      ],
+      "normalization": "relative_minus_1_week",
+      "locale": "pt",
+      "notes": "Portuguese: last week"
+    },
+    {
+      "id": "date_086",
+      "name": "relative_today_en",
+      "pattern": "\\btoday\\b",
+      "examples": [
+        "today"
+      ],
+      "normalization": "relative_current_date",
+      "locale": "en",
+      "notes": "Relative date: today"
+    },
+    {
+      "id": "date_087",
+      "name": "relative_tomorrow_en",
+      "pattern": "\\btomorrow\\b",
+      "examples": [
+        "tomorrow"
+      ],
+      "normalization": "relative_plus_1_day",
+      "locale": "en",
+      "notes": "Relative date: tomorrow"
+    },
+    {
+      "id": "date_088",
+      "name": "relative_yesterday_en",
+      "pattern": "\\byesterday\\b",
+      "examples": [
+        "yesterday"
+      ],
+      "normalization": "relative_minus_1_day",
+      "locale": "en",
+      "notes": "Relative date: yesterday"
+    },
+    {
+      "name": "report_generated_on",
+      "pattern": "(?:generated\\son|emitido\\sem)\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Emitido em 01/06/2026",
+        "Generated on 06/01/2026"
+      ],
+      "normalization": "issue_date",
+      "locale": "any",
+      "notes": "Report generation date",
+      "id": "date_089"
+    },
+    {
+      "name": "rfc_2822_datetime",
+      "pattern": "(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),\\s\\d{1,2}\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{4}\\s\\d{2}:\\d{2}:\\d{2}\\s[+-]\\d{4}",
+      "examples": [
+        "Tue, 05 May 2026 13:45:00 -0300"
+      ],
+      "normalization": "RFC2822",
+      "locale": "universal",
+      "notes": "RFC 2822 email date time",
+      "id": "date_090"
+    },
+    {
+      "name": "rolling_12_months",
+      "pattern": "(?:rolling\\s12\\smonths|ultimos\\s12\\smeses)",
+      "examples": [
+        "rolling 12 months",
+        "ultimos 12 meses"
+      ],
+      "normalization": "relative_12_month_window",
+      "locale": "any",
+      "notes": "Rolling 12-month window phrase",
+      "id": "date_091"
+    },
+    {
+      "name": "semana_inicio_pt",
+      "pattern": "semana\\scomecando\\sem\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "semana comecando em 12/05/2026"
+      ],
+      "normalization": "week_start_date",
+      "locale": "pt",
+      "notes": "Week start phrase in Portuguese",
+      "id": "date_092"
+    },
+    {
+      "name": "semester_label_en",
+      "pattern": "S(?:emester)?\\s?[12]\\s?\\d{4}",
+      "examples": [
+        "S2 2025",
+        "Semester 1 2026"
+      ],
+      "normalization": "semester",
+      "locale": "en",
+      "notes": "Semester label",
+      "id": "date_093"
+    },
+    {
+      "name": "statement_month_label",
+      "pattern": "(?:statement\\smonth|mes\\sdo\\sextrato)\\s*:?\\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\\s\\d{4}",
+      "examples": [
+        "statement month: May 2026"
+      ],
+      "normalization": "statement_month",
+      "locale": "any",
+      "notes": "Statement month textual label",
+      "id": "date_094"
+    },
+    {
+      "name": "statement_period_range_text",
+      "pattern": "(?:statement\\speriod|periodo\\sdo\\sextrato)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}\\s*(?:to|ate|a)\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "statement period: 01/05/2026 to 31/05/2026"
+      ],
+      "normalization": "date_range",
+      "locale": "any",
+      "notes": "Statement period date range",
+      "id": "date_095"
+    },
+    {
+      "name": "tax_filing_deadline_en",
+      "pattern": "(?:filing\\sdeadline)\\s*:?\\s*\\d{1,2}\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{4}",
+      "examples": [
+        "Filing Deadline: 15 Apr 2026"
+      ],
+      "normalization": "deadline_date",
+      "locale": "en",
+      "notes": "Tax filing deadline",
+      "id": "date_096"
+    },
+    {
+      "name": "tax_year_en",
+      "pattern": "(?:Tax\\sYear)\\s\\d{4}",
+      "examples": [
+        "Tax Year 2025"
+      ],
+      "normalization": "tax_year",
+      "locale": "en",
+      "notes": "Tax year marker",
+      "id": "date_097"
+    },
+    {
+      "id": "date_098",
+      "name": "time_12h",
+      "pattern": "\\d{1,2}:\\d{2}\\s?(?:AM|PM|am|pm|a\\.m\\.|p\\.m\\.)",
+      "examples": [
+        "10:30 AM",
+        "12:00 a.m.",
+        "2:30pm"
+      ],
+      "normalization": "HH:mm_12h",
+      "locale": "en",
+      "notes": "12-hour time with AM/PM"
+    },
+    {
+      "id": "date_099",
+      "name": "time_24h",
+      "pattern": "\\d{2}:\\d{2}(?::\\d{2})?",
+      "examples": [
+        "08:00",
+        "14:30",
+        "23:59:59"
+      ],
+      "normalization": "HH:mm:ss_24h",
+      "locale": "universal",
+      "notes": "24-hour time format"
+    },
+    {
+      "name": "time_hhmmss_comma",
+      "pattern": "\\d{2}:\\d{2}:\\d{2},\\d{3}",
+      "examples": [
+        "14:22:30,125"
+      ],
+      "normalization": "HH:mm:ss,SSS",
+      "locale": "universal",
+      "notes": "Time with millisecond comma separator",
+      "id": "date_100"
+    },
+    {
+      "name": "time_with_timezone_abbrev",
+      "pattern": "\\d{2}:\\d{2}\\s(?:UTC|GMT|BRT|EST|CST|PST)",
+      "examples": [
+        "09:00 BRT",
+        "14:10 UTC"
+      ],
+      "normalization": "HH:mm_TZ",
+      "locale": "any",
+      "notes": "Time with timezone abbreviation",
+      "id": "date_101"
+    },
+    {
+      "name": "trimestre_escrito_pt",
+      "pattern": "(?:primeiro|segundo|terceiro|quarto)\\strimestre\\sde\\s\\d{4}",
+      "examples": [
+        "terceiro trimestre de 2026"
+      ],
+      "normalization": "fiscal_quarter",
+      "locale": "pt",
+      "notes": "Written Portuguese quarter expression",
+      "id": "date_102"
+    },
+    {
+      "name": "unix_timestamp_millis",
+      "pattern": "\\b1[6-9]\\d{11,12}\\b",
+      "examples": [
+        "1717351200123"
+      ],
+      "normalization": "unix_milliseconds",
+      "locale": "universal",
+      "notes": "Unix timestamp in milliseconds",
+      "id": "date_103"
+    },
+    {
+      "name": "unix_timestamp_seconds",
+      "pattern": "\\b1[6-9]\\d{8,9}\\b",
+      "examples": [
+        "1717351200"
+      ],
+      "normalization": "unix_seconds",
+      "locale": "universal",
+      "notes": "Unix timestamp in seconds",
+      "id": "date_104"
+    },
+    {
+      "name": "until_date_en",
+      "pattern": "until\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "until 12/31/2026"
+      ],
+      "normalization": "end_date",
+      "locale": "en",
+      "notes": "Until date phrase",
+      "id": "date_105"
+    },
+    {
+      "id": "date_106",
+      "name": "us_dash",
+      "pattern": "\\d{1,2}-\\d{1,2}-\\d{4}",
+      "examples": [
+        "01-15-2024",
+        "1-5-2024"
+      ],
+      "normalization": "MM-DD-YYYY",
+      "locale": "en-US",
+      "notes": "US date with dashes"
+    },
+    {
+      "id": "date_107",
+      "name": "us_slash_2digit",
+      "pattern": "\\d{1,2}/\\d{1,2}/\\d{2}",
+      "examples": [
+        "01/15/24",
+        "1/5/24",
+        "12/31/23"
+      ],
+      "normalization": "MM/DD/YY",
+      "locale": "en-US",
+      "notes": "US date format with 2-digit year"
+    },
+    {
+      "id": "date_108",
+      "name": "us_slash_4digit",
+      "pattern": "\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "01/15/2024",
+        "1/5/2024",
+        "12/31/2023"
+      ],
+      "normalization": "MM/DD/YYYY",
+      "locale": "en-US",
+      "notes": "US date format with 4-digit year"
+    },
+    {
+      "name": "value_date_label",
+      "pattern": "(?:value\\sdate|data\\svalor)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Value Date: 06/01/2026"
+      ],
+      "normalization": "value_date",
+      "locale": "any",
+      "notes": "Banking value date",
+      "id": "date_109"
+    },
+    {
+      "name": "vencimento_label_pt",
+      "pattern": "(?:vencimento|data\\sde\\svencimento)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Vencimento: 15/06/2026"
+      ],
+      "normalization": "deadline_date",
+      "locale": "pt",
+      "notes": "Due date with Portuguese label",
+      "id": "date_110"
+    },
+    {
+      "name": "vigente_desde_pt",
+      "pattern": "vigente\\sdesde\\s\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "vigente desde 01/01/2026"
+      ],
+      "normalization": "start_date",
+      "locale": "pt",
+      "notes": "Effective-from phrase in Portuguese",
+      "id": "date_111"
+    },
+    {
+      "name": "week_commencing_en",
+      "pattern": "week\\scommencing\\s\\d{1,2}\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{4}",
+      "examples": [
+        "week commencing 12 May 2026"
+      ],
+      "normalization": "week_start_date",
+      "locale": "en",
+      "notes": "Week commencing phrase",
+      "id": "date_112"
+    },
+    {
+      "id": "date_113",
+      "name": "week_en",
+      "pattern": "week\\s\\d{1,2}",
+      "examples": [
+        "week 1",
+        "week 52"
+      ],
+      "normalization": "week_number_en",
+      "locale": "en",
+      "notes": "English week number"
+    },
+    {
+      "id": "date_114",
+      "name": "week_number_cw",
+      "pattern": "CW\\s?\\d{1,2}\\s?\\d{0,4}",
+      "examples": [
+        "CW 52 2024",
+        "CW01",
+        "CW12"
+      ],
+      "normalization": "calendar_week",
+      "locale": "universal",
+      "notes": "Calendar week CW format"
+    },
+    {
+      "id": "date_115",
+      "name": "week_number_semana",
+      "pattern": "semana\\s\\d{1,2}",
+      "examples": [
+        "semana 1",
+        "semana 52"
+      ],
+      "normalization": "week_number_pt",
+      "locale": "pt",
+      "notes": "Portuguese week number"
+    },
+    {
+      "id": "date_116",
+      "name": "week_number_w",
+      "pattern": "W\\d{1,2}\\s?\\d{4}",
+      "examples": [
+        "W01 2024",
+        "W12024",
+        "W52 2023"
+      ],
+      "normalization": "week_number",
+      "locale": "universal",
+      "notes": "ISO week number W## format"
+    },
+    {
+      "id": "date_117",
+      "name": "written_en_abbr_month_day",
+      "pattern": "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?\\s\\d{1,2},?\\s\\d{4}",
+      "examples": [
+        "Dec. 31, 2023",
+        "Jan 15, 2024",
+        "Mar 1 2024"
+      ],
+      "normalization": "Mon DD, YYYY",
+      "locale": "en",
+      "notes": "Abbreviated English month + day + year"
+    },
+    {
+      "id": "date_118",
+      "name": "written_en_day_abbr_month",
+      "pattern": "\\d{1,2}\\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?\\s\\d{4}",
+      "examples": [
+        "1 Mar 2024",
+        "15 Jan 2024",
+        "31 Dec. 2023"
+      ],
+      "normalization": "DD Mon YYYY",
+      "locale": "en",
+      "notes": "Day + abbreviated English month + year"
+    },
+    {
+      "id": "date_119",
+      "name": "written_en_day_month_year",
+      "pattern": "\\d{1,2}(?:st|nd|rd|th)?\\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\\s\\d{4}",
+      "examples": [
+        "15th January 2024",
+        "1st December 2023",
+        "23rd March 2024"
+      ],
+      "normalization": "DD Month YYYY",
+      "locale": "en",
+      "notes": "English ordinal day + full month + year"
+    },
+    {
+      "id": "date_120",
+      "name": "written_en_month_day_year",
+      "pattern": "(?:January|February|March|April|May|June|July|August|September|October|November|December)\\s\\d{1,2},?\\s\\d{4}",
+      "examples": [
+        "December 31 2023",
+        "January 15, 2024"
+      ],
+      "normalization": "Month DD, YYYY",
+      "locale": "en",
+      "notes": "Full English month name with day and year"
+    },
+    {
+      "id": "date_121",
+      "name": "written_pt_abbr_slash",
+      "pattern": "\\d{1,2}/(?:jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/\\d{4}",
+      "examples": [
+        "15/jan/2024",
+        "31/dez/2023"
+      ],
+      "normalization": "DD/Mon/YYYY",
+      "locale": "pt",
+      "notes": "Portuguese abbreviated month with slashes"
+    },
+    {
+      "id": "date_122",
+      "name": "written_pt_full",
+      "pattern": "\\d{1,2}\\sde\\s(?:janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\\sde\\s\\d{4}",
+      "examples": [
+        "15 de janeiro de 2024",
+        "31 de dezembro de 2023"
+      ],
+      "normalization": "DD de Month de YYYY",
+      "locale": "pt",
+      "notes": "Full Portuguese date format"
+    },
+    {
+      "id": "date_123",
+      "name": "written_pt_month_year",
+      "pattern": "(?:janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\\sde\\s\\d{4}",
+      "examples": [
+        "dezembro de 2023",
+        "janeiro de 2024"
+      ],
+      "normalization": "Month de YYYY",
+      "locale": "pt",
+      "notes": "Portuguese month-year only"
+    },
+    {
+      "id": "date_124",
+      "name": "year_only_4digit",
+      "pattern": "\\b(?:19|20)\\d{2}\\b",
+      "examples": [
+        "1999",
+        "2023",
+        "2024"
+      ],
+      "normalization": "YYYY",
+      "locale": "universal",
+      "notes": "4-digit year only"
+    },
+    {
+      "id": "date_125",
+      "name": "ytd_indicator",
+      "pattern": "\\b(?:YTD|ytd|year-to-date|acumulado\\sno\\sano)\\b",
+      "examples": [
+        "acumulado no ano",
+        "year-to-date",
+        "YTD"
+      ],
+      "normalization": "period_ytd",
+      "locale": "universal",
+      "notes": "Year-to-date indicator"
     }
   ]
 }

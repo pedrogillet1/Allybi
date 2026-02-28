@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "editing_microcopy",
-    "version": "1.0.0",
-    "description": "Microcopy for edit flows (preview/confirm/apply/undo/error), localized for EN/PT.",
+    "version": "2.0.0",
+    "description": "Microcopy for edit flows (preview/confirm/apply/undo/error), localized for EN/PT. Includes canonical-operator overrides with {{placeholder}} interpolation.",
     "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-02-07"
+    "lastUpdated": "2026-02-27"
   },
   "config": {
     "enabled": true,
@@ -276,6 +276,337 @@
         "*": {
           "en": { "body": "This action is recognized, but the current editing engine does not support applying it yet." },
           "pt": { "body": "Esta acao foi reconhecida, mas o mecanismo de edicao atual ainda nao suporta aplica-la." }
+        }
+      },
+      "undo": {
+        "*": {
+          "en": { "body": "Revision restored to the previous version." },
+          "pt": { "body": "Revisao restaurada para a versao anterior." }
+        }
+      }
+    },
+    "actionLabels": {
+      "en": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "pick_target": "Pick different target",
+        "undo": "Undo",
+        "open_doc": "Open doc",
+        "go_to_location": "Go to location",
+        "export": "Export"
+      },
+      "pt": {
+        "confirm": "Confirmar",
+        "cancel": "Cancelar",
+        "pick_target": "Escolher outro alvo",
+        "undo": "Desfazer",
+        "open_doc": "Abrir documento",
+        "go_to_location": "Ir para local",
+        "export": "Exportar"
+      },
+      "es": {
+        "confirm": "Confirmar",
+        "cancel": "Cancelar",
+        "pick_target": "Elegir otro objetivo",
+        "undo": "Deshacer",
+        "open_doc": "Abrir documento",
+        "go_to_location": "Ir a ubicación",
+        "export": "Exportar"
+      }
+    },
+    "byCanonicalOperator": {
+      "preview": {
+        "DOCX_CREATE_TABLE": {
+          "en": { "body": "Draft ready for table creation ({{rowCount}} rows, {{colCount}} columns). Review layout before applying." },
+          "pt": { "body": "Previa pronta para criacao de tabela ({{rowCount}} linhas, {{colCount}} colunas). Revise o layout antes de aplicar." }
+        },
+        "DOCX_ADD_TABLE_ROW": {
+          "en": { "body": "Draft ready to add a row to the table. Review position and content before applying." },
+          "pt": { "body": "Previa pronta para adicionar linha a tabela. Revise posicao e conteudo antes de aplicar." }
+        },
+        "DOCX_DELETE_TABLE_ROW": {
+          "en": { "body": "Draft ready to remove a table row. Review which row will be deleted before applying." },
+          "pt": { "body": "Previa pronta para remover linha da tabela. Revise qual linha sera excluida antes de aplicar." }
+        },
+        "DOCX_SET_TABLE_CELL": {
+          "en": { "body": "Draft ready to update table cell content. Review cell location and value before applying." },
+          "pt": { "body": "Previa pronta para atualizar conteudo da celula da tabela. Revise localizacao e valor antes de aplicar." }
+        },
+        "DOCX_SET_HEADER": {
+          "en": { "body": "Draft ready for document header change. Review the new header text before applying." },
+          "pt": { "body": "Previa pronta para alteracao do cabecalho. Revise o novo texto do cabecalho antes de aplicar." }
+        },
+        "DOCX_SET_FOOTER": {
+          "en": { "body": "Draft ready for document footer change. Review the new footer text before applying." },
+          "pt": { "body": "Previa pronta para alteracao do rodape. Revise o novo texto do rodape antes de aplicar." }
+        },
+        "DOCX_INSERT_PAGE_NUMBERS": {
+          "en": { "body": "Draft ready to insert page numbers. Review format and position before applying." },
+          "pt": { "body": "Previa pronta para inserir numeros de pagina. Revise formato e posicao antes de aplicar." }
+        },
+        "DOCX_SET_HEADING_LEVEL": {
+          "en": { "body": "Draft ready to change heading level to {{headingLevel}}. Review the target heading before applying." },
+          "pt": { "body": "Previa pronta para alterar nivel do titulo para {{headingLevel}}. Revise o titulo alvo antes de aplicar." }
+        },
+        "DOCX_FIND_REPLACE": {
+          "en": { "body": "Draft ready to find and replace text. Review matches before applying." },
+          "pt": { "body": "Previa pronta para localizar e substituir texto. Revise as correspondencias antes de aplicar." }
+        },
+        "DOCX_TRANSLATE_SCOPE": {
+          "en": { "body": "Draft ready to translate {{scopeLabel}} to {{targetLanguage}}. Review the translation before applying." },
+          "pt": { "body": "Previa pronta para traduzir {{scopeLabel}} para {{targetLanguage}}. Revise a traducao antes de aplicar." }
+        },
+        "DOCX_MERGE_PARAGRAPHS": {
+          "en": { "body": "Draft ready to merge paragraphs into one. Review the combined text before applying." },
+          "pt": { "body": "Previa pronta para unir paragrafos. Revise o texto combinado antes de aplicar." }
+        },
+        "DOCX_SPLIT_PARAGRAPH": {
+          "en": { "body": "Draft ready to split paragraph at the indicated point. Review both halves before applying." },
+          "pt": { "body": "Previa pronta para dividir paragrafo no ponto indicado. Revise ambas as partes antes de aplicar." }
+        },
+        "DOCX_DELETE_PARAGRAPH": {
+          "en": { "body": "Draft ready to delete a paragraph. Review the target paragraph before confirming removal." },
+          "pt": { "body": "Previa pronta para excluir paragrafo. Revise o paragrafo alvo antes de confirmar a remocao." }
+        },
+        "DOCX_SET_RUN_STYLE": {
+          "en": { "body": "Draft ready to change text styling ({{styleDetail}}). Review the affected runs before applying." },
+          "pt": { "body": "Previa pronta para alterar estilo do texto ({{styleDetail}}). Revise os trechos afetados antes de aplicar." }
+        },
+        "DOCX_LIST_APPLY_BULLETS": {
+          "en": { "body": "Draft ready to apply bullet list formatting. Review the target paragraphs before applying." },
+          "pt": { "body": "Previa pronta para aplicar formatacao de lista com marcadores. Revise os paragrafos alvo antes de aplicar." }
+        },
+        "DOCX_LIST_APPLY_NUMBERING": {
+          "en": { "body": "Draft ready to apply numbered list formatting. Review the target paragraphs before applying." },
+          "pt": { "body": "Previa pronta para aplicar formatacao de lista numerada. Revise os paragrafos alvo antes de aplicar." }
+        },
+        "XLSX_ADD_SHEET": {
+          "en": { "body": "Draft ready to add a new sheet ({{sheetName}}). Review the name before applying." },
+          "pt": { "body": "Previa pronta para adicionar nova planilha ({{sheetName}}). Revise o nome antes de aplicar." }
+        },
+        "XLSX_RENAME_SHEET": {
+          "en": { "body": "Draft ready to rename sheet to {{newSheetName}}. Review before applying." },
+          "pt": { "body": "Previa pronta para renomear planilha para {{newSheetName}}. Revise antes de aplicar." }
+        },
+        "XLSX_DELETE_SHEET": {
+          "en": { "body": "Draft ready to delete sheet {{sheetName}}. This cannot be undone." },
+          "pt": { "body": "Previa pronta para excluir planilha {{sheetName}}. Esta acao nao pode ser desfeita." }
+        },
+        "XLSX_CHART_CREATE": {
+          "en": { "body": "Draft ready to create a {{chartType}} chart from {{sourceRange}}. Review settings before applying." },
+          "pt": { "body": "Previa pronta para criar grafico {{chartType}} a partir de {{sourceRange}}. Revise as configuracoes antes de aplicar." }
+        },
+        "XLSX_SORT_RANGE": {
+          "en": { "body": "Draft ready to sort {{sortRange}}. Review sort column and direction before applying." },
+          "pt": { "body": "Previa pronta para ordenar {{sortRange}}. Revise coluna e direcao de ordenacao antes de aplicar." }
+        },
+        "XLSX_FILTER_APPLY": {
+          "en": { "body": "Draft ready to apply filter on {{filterRange}}. Review filter criteria before applying." },
+          "pt": { "body": "Previa pronta para aplicar filtro em {{filterRange}}. Revise os criterios do filtro antes de aplicar." }
+        },
+        "XLSX_INSERT_ROWS": {
+          "en": { "body": "Draft ready to insert {{rowCount}} row(s). Review insertion point before applying." },
+          "pt": { "body": "Previa pronta para inserir {{rowCount}} linha(s). Revise o ponto de insercao antes de aplicar." }
+        },
+        "XLSX_DELETE_ROWS": {
+          "en": { "body": "Draft ready to delete {{rowCount}} row(s). Review which rows will be removed." },
+          "pt": { "body": "Previa pronta para excluir {{rowCount}} linha(s). Revise quais linhas serao removidas." }
+        }
+      },
+      "applied": {
+        "DOCX_CREATE_TABLE": {
+          "en": { "body": "Table created and saved to the document." },
+          "pt": { "body": "Tabela criada e salva no documento." }
+        },
+        "DOCX_ADD_TABLE_ROW": {
+          "en": { "body": "Table row added and saved." },
+          "pt": { "body": "Linha da tabela adicionada e salva." }
+        },
+        "DOCX_DELETE_TABLE_ROW": {
+          "en": { "body": "Table row removed and saved." },
+          "pt": { "body": "Linha da tabela removida e salva." }
+        },
+        "DOCX_SET_TABLE_CELL": {
+          "en": { "body": "Table cell updated and saved." },
+          "pt": { "body": "Celula da tabela atualizada e salva." }
+        },
+        "DOCX_SET_HEADER": {
+          "en": { "body": "Document header updated and saved." },
+          "pt": { "body": "Cabecalho do documento atualizado e salvo." }
+        },
+        "DOCX_SET_FOOTER": {
+          "en": { "body": "Document footer updated and saved." },
+          "pt": { "body": "Rodape do documento atualizado e salvo." }
+        },
+        "DOCX_INSERT_PAGE_NUMBERS": {
+          "en": { "body": "Page numbers inserted and saved." },
+          "pt": { "body": "Numeros de pagina inseridos e salvos." }
+        },
+        "DOCX_SET_HEADING_LEVEL": {
+          "en": { "body": "Heading level updated and saved." },
+          "pt": { "body": "Nivel do titulo atualizado e salvo." }
+        },
+        "DOCX_FIND_REPLACE": {
+          "en": { "body": "Find and replace completed and saved." },
+          "pt": { "body": "Localizar e substituir concluido e salvo." }
+        },
+        "DOCX_TRANSLATE_SCOPE": {
+          "en": { "body": "Translation applied and saved." },
+          "pt": { "body": "Traducao aplicada e salva." }
+        },
+        "DOCX_MERGE_PARAGRAPHS": {
+          "en": { "body": "Paragraphs merged and saved." },
+          "pt": { "body": "Paragrafos mesclados e salvos." }
+        },
+        "DOCX_SPLIT_PARAGRAPH": {
+          "en": { "body": "Paragraph split and saved." },
+          "pt": { "body": "Paragrafo dividido e salvo." }
+        },
+        "DOCX_DELETE_PARAGRAPH": {
+          "en": { "body": "Paragraph deleted and saved." },
+          "pt": { "body": "Paragrafo excluido e salvo." }
+        },
+        "DOCX_SET_RUN_STYLE": {
+          "en": { "body": "Text styling updated and saved." },
+          "pt": { "body": "Estilo do texto atualizado e salvo." }
+        },
+        "DOCX_LIST_APPLY_BULLETS": {
+          "en": { "body": "Bullet list formatting applied and saved." },
+          "pt": { "body": "Formatacao de lista com marcadores aplicada e salva." }
+        },
+        "DOCX_LIST_APPLY_NUMBERING": {
+          "en": { "body": "Numbered list formatting applied and saved." },
+          "pt": { "body": "Formatacao de lista numerada aplicada e salva." }
+        },
+        "XLSX_ADD_SHEET": {
+          "en": { "body": "New sheet added and saved." },
+          "pt": { "body": "Nova planilha adicionada e salva." }
+        },
+        "XLSX_RENAME_SHEET": {
+          "en": { "body": "Sheet renamed and saved." },
+          "pt": { "body": "Planilha renomeada e salva." }
+        },
+        "XLSX_DELETE_SHEET": {
+          "en": { "body": "Sheet deleted and saved." },
+          "pt": { "body": "Planilha excluida e salva." }
+        },
+        "XLSX_CHART_CREATE": {
+          "en": { "body": "Chart created and saved to the workbook." },
+          "pt": { "body": "Grafico criado e salvo na planilha." }
+        },
+        "XLSX_SORT_RANGE": {
+          "en": { "body": "Range sorted and saved." },
+          "pt": { "body": "Intervalo ordenado e salvo." }
+        },
+        "XLSX_FILTER_APPLY": {
+          "en": { "body": "Filter applied and saved." },
+          "pt": { "body": "Filtro aplicado e salvo." }
+        },
+        "XLSX_INSERT_ROWS": {
+          "en": { "body": "Rows inserted and saved." },
+          "pt": { "body": "Linhas inseridas e salvas." }
+        },
+        "XLSX_DELETE_ROWS": {
+          "en": { "body": "Rows deleted and saved." },
+          "pt": { "body": "Linhas excluidas e salvas." }
+        }
+      },
+      "noop": {
+        "DOCX_CREATE_TABLE": {
+          "en": { "body": "No table was created. The requested table structure may already exist." },
+          "pt": { "body": "Nenhuma tabela foi criada. A estrutura solicitada pode ja existir." }
+        },
+        "DOCX_ADD_TABLE_ROW": {
+          "en": { "body": "No row was added. The table already has the expected rows." },
+          "pt": { "body": "Nenhuma linha foi adicionada. A tabela ja possui as linhas esperadas." }
+        },
+        "DOCX_DELETE_TABLE_ROW": {
+          "en": { "body": "No row was removed. The target row was not found." },
+          "pt": { "body": "Nenhuma linha foi removida. A linha alvo nao foi encontrada." }
+        },
+        "DOCX_SET_TABLE_CELL": {
+          "en": { "body": "No cell was updated. The cell already contains the expected value." },
+          "pt": { "body": "Nenhuma celula foi atualizada. A celula ja contem o valor esperado." }
+        },
+        "DOCX_SET_HEADER": {
+          "en": { "body": "No header change was needed. The header already matches your request." },
+          "pt": { "body": "Nenhuma alteracao de cabecalho foi necessaria. O cabecalho ja corresponde ao seu pedido." }
+        },
+        "DOCX_SET_FOOTER": {
+          "en": { "body": "No footer change was needed. The footer already matches your request." },
+          "pt": { "body": "Nenhuma alteracao de rodape foi necessaria. O rodape ja corresponde ao seu pedido." }
+        },
+        "DOCX_INSERT_PAGE_NUMBERS": {
+          "en": { "body": "No page numbers were inserted. Page numbering is already present." },
+          "pt": { "body": "Nenhum numero de pagina foi inserido. A numeracao de paginas ja esta presente." }
+        },
+        "DOCX_SET_HEADING_LEVEL": {
+          "en": { "body": "No heading level change was needed. The heading is already at the requested level." },
+          "pt": { "body": "Nenhuma alteracao de nivel do titulo foi necessaria. O titulo ja esta no nivel solicitado." }
+        },
+        "DOCX_FIND_REPLACE": {
+          "en": { "body": "No replacements were made. The search term was not found in the document." },
+          "pt": { "body": "Nenhuma substituicao foi feita. O termo de busca nao foi encontrado no documento." }
+        },
+        "DOCX_TRANSLATE_SCOPE": {
+          "en": { "body": "No translation was needed. The content is already in the target language." },
+          "pt": { "body": "Nenhuma traducao foi necessaria. O conteudo ja esta no idioma alvo." }
+        },
+        "DOCX_MERGE_PARAGRAPHS": {
+          "en": { "body": "No merge was performed. Only one paragraph was found in the target range." },
+          "pt": { "body": "Nenhuma mesclagem foi realizada. Apenas um paragrafo foi encontrado no intervalo alvo." }
+        },
+        "DOCX_SPLIT_PARAGRAPH": {
+          "en": { "body": "No split was performed. The split point could not be determined." },
+          "pt": { "body": "Nenhuma divisao foi realizada. O ponto de divisao nao pôde ser determinado." }
+        },
+        "DOCX_DELETE_PARAGRAPH": {
+          "en": { "body": "No paragraph was deleted. The target paragraph was not found." },
+          "pt": { "body": "Nenhum paragrafo foi excluido. O paragrafo alvo nao foi encontrado." }
+        },
+        "DOCX_SET_RUN_STYLE": {
+          "en": { "body": "No style change was needed. The text already has the requested formatting." },
+          "pt": { "body": "Nenhuma alteracao de estilo foi necessaria. O texto ja possui a formatacao solicitada." }
+        },
+        "DOCX_LIST_APPLY_BULLETS": {
+          "en": { "body": "No bullet formatting was applied. The paragraphs are already bulleted." },
+          "pt": { "body": "Nenhuma formatacao de marcadores foi aplicada. Os paragrafos ja possuem marcadores." }
+        },
+        "DOCX_LIST_APPLY_NUMBERING": {
+          "en": { "body": "No numbering was applied. The paragraphs are already numbered." },
+          "pt": { "body": "Nenhuma numeracao foi aplicada. Os paragrafos ja estao numerados." }
+        },
+        "XLSX_ADD_SHEET": {
+          "en": { "body": "No sheet was added. A sheet with that name already exists." },
+          "pt": { "body": "Nenhuma planilha foi adicionada. Ja existe uma planilha com esse nome." }
+        },
+        "XLSX_RENAME_SHEET": {
+          "en": { "body": "No rename was performed. The sheet already has the requested name." },
+          "pt": { "body": "Nenhuma renomeacao foi realizada. A planilha ja possui o nome solicitado." }
+        },
+        "XLSX_DELETE_SHEET": {
+          "en": { "body": "No sheet was deleted. The target sheet was not found." },
+          "pt": { "body": "Nenhuma planilha foi excluida. A planilha alvo nao foi encontrada." }
+        },
+        "XLSX_CHART_CREATE": {
+          "en": { "body": "No chart was created. The chart configuration may already exist." },
+          "pt": { "body": "Nenhum grafico foi criado. A configuracao do grafico pode ja existir." }
+        },
+        "XLSX_SORT_RANGE": {
+          "en": { "body": "No sort was performed. The range is already sorted as requested." },
+          "pt": { "body": "Nenhuma ordenacao foi realizada. O intervalo ja esta ordenado conforme solicitado." }
+        },
+        "XLSX_FILTER_APPLY": {
+          "en": { "body": "No filter was applied. The filter criteria match the current state." },
+          "pt": { "body": "Nenhum filtro foi aplicado. Os criterios do filtro correspondem ao estado atual." }
+        },
+        "XLSX_INSERT_ROWS": {
+          "en": { "body": "No rows were inserted. The target location could not be resolved." },
+          "pt": { "body": "Nenhuma linha foi inserida. O local alvo nao pôde ser resolvido." }
+        },
+        "XLSX_DELETE_ROWS": {
+          "en": { "body": "No rows were deleted. The target rows were not found." },
+          "pt": { "body": "Nenhuma linha foi excluida. As linhas alvo nao foram encontradas." }
         }
       }
     },

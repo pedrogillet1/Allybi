@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "id": "medical_referral_entities",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for Referral Note.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "referral"
+  },
+  "entities": [
+    {
+      "id": "address",
+      "type": "string",
+      "required": true,
+      "description": "Extract Address for Referral Note.",
+      "section": "abstract"
+    },
+    {
+      "id": "case_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Case Number for Referral Note.",
+      "section": "appendix"
+    },
+    {
+      "id": "city",
+      "type": "string",
+      "required": true,
+      "description": "Extract City for Referral Note.",
+      "section": "approvals"
+    },
+    {
+      "id": "country",
+      "type": "string",
+      "required": true,
+      "description": "Extract Country for Referral Note.",
+      "section": "assessment_plan"
+    },
+    {
+      "id": "diagnosis_code",
+      "type": "string",
+      "required": true,
+      "description": "Extract Diagnosis Code for Referral Note.",
+      "section": "attachments"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Document Number for Referral Note.",
+      "section": "authorization"
+    },
+    {
+      "id": "dosage",
+      "type": "string",
+      "required": true,
+      "description": "Extract Dosage for Referral Note.",
+      "section": "certifications"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Effective Date for Referral Note.",
+      "section": "compliance_section"
+    },
+    {
+      "id": "expiration_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Expiration Date for Referral Note.",
+      "section": "criteria"
+    },
+    {
+      "id": "lab_value",
+      "type": "number",
+      "required": true,
+      "description": "Extract Lab Value for Referral Note.",
+      "section": "data_tables"
+    },
+    {
+      "id": "medication_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract Medication Name for Referral Note.",
+      "section": "detailed_analysis"
+    },
+    {
+      "id": "period_reference",
+      "type": "string",
+      "required": true,
+      "description": "Extract Period Reference for Referral Note.",
+      "section": "disclaimers"
+    },
+    {
+      "id": "person_name",
+      "type": "string",
+      "required": false,
+      "description": "Extract Person Name for Referral Note.",
+      "section": "discussion"
+    },
+    {
+      "id": "person_role",
+      "type": "string",
+      "required": false,
+      "description": "Extract Person Role for Referral Note.",
+      "section": "document_metadata"
+    },
+    {
+      "id": "person_title",
+      "type": "string",
+      "required": false,
+      "description": "Extract Person Title for Referral Note.",
+      "section": "executive_summary"
+    },
+    {
+      "id": "procedure_code",
+      "type": "string",
+      "required": false,
+      "description": "Extract Procedure Code for Referral Note.",
+      "section": "findings"
+    },
+    {
+      "id": "registration_number",
+      "type": "string",
+      "required": false,
+      "description": "Extract Registration Number for Referral Note.",
+      "section": "glossary"
+    },
+    {
+      "id": "regulatory_body",
+      "type": "string",
+      "required": false,
+      "description": "Extract Regulatory Body for Referral Note.",
+      "section": "header"
+    },
+    {
+      "id": "report_date",
+      "type": "date",
+      "required": false,
+      "description": "Extract Report Date for Referral Note.",
+      "section": "history_present_illness"
+    },
+    {
+      "id": "state_province",
+      "type": "string",
+      "required": false,
+      "description": "Extract State/Province for Referral Note.",
+      "section": "introduction"
+    }
+  ]
+}

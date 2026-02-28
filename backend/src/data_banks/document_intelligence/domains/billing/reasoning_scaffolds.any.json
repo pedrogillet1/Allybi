@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "id": "di_billing_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for billing analysis tasks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing"
+  },
+  "domain": "billing",
+  "scaffolds": [
+    {
+      "id": "billing_scaffold_001_due_validation",
+      "name": "Due Amount and Date Validation",
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "steps": [
+        "Locate amount due and due date in summary and balance sections",
+        "Confirm currency and billing period context",
+        "Check if minimum payment differs from full amount due",
+        "Capture penalties or late fee triggers",
+        "Return concise payment guidance with citations"
+      ]
+    },
+    {
+      "id": "billing_scaffold_002_charge_explainer",
+      "name": "Charge Breakdown Explainer",
+      "operators": [
+        "extract",
+        "summarize",
+        "compare"
+      ],
+      "steps": [
+        "Identify base plan/service charge",
+        "Enumerate variable charges from usage/activity",
+        "Separate taxes, fees, and one-off adjustments",
+        "Compute subtotal and tie out to final amount due",
+        "Highlight unusual deltas from previous balance when present"
+      ]
+    },
+    {
+      "id": "billing_scaffold_003_dispute_triage",
+      "name": "Dispute and Exception Triage",
+      "operators": [
+        "evaluate",
+        "advise"
+      ],
+      "steps": [
+        "Locate contested line item or fee",
+        "Check terms/notices for policy basis",
+        "Find reversal/credit activity and status",
+        "Assess whether evidence is sufficient for challenge",
+        "Provide neutral next steps and missing evidence checklist"
+      ]
+    },
+    {
+      "id": "billing_scaffold_004_usage_anomaly",
+      "name": "Usage Anomaly Review",
+      "operators": [
+        "monitor",
+        "calculate",
+        "evaluate"
+      ],
+      "steps": [
+        "Extract usage quantity, unit, and billed amount",
+        "Compare usage to prior period indicators if available",
+        "Compute implied unit rate and detect outliers",
+        "Check plan/tier change or overage indicators",
+        "Summarize likely drivers with confidence level"
+      ]
+    }
+  ]
+}

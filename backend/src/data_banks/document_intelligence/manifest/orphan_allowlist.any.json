@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "id": "document_intelligence_orphan_allowlist",
+    "version": "1.0.0",
+    "description": "Explicit allowlist for document intelligence banks that are intentionally not runtime-consumed yet.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "enforceAtBoot": true,
+    "strictEnvs": [
+      "production",
+      "staging"
+    ]
+  },
+  "allowlistedBankIds": [
+    "docint_eval_suite_registry",
+    "document_intelligence_implementation_report",
+    "pattern_library"
+  ],
+  "allowlistedIdPrefixes": [],
+  "allowlistedIdPatterns": [
+    "^docint_eval_suite_registry$",
+    "^document_intelligence_implementation_report$",
+    "^legal_legal_.*_(sections|tables|extraction_hints)$",
+    "^medical_med_.*_(sections|tables|extraction_hints)$"
+  ],
+  "notes": [
+    "Allowlist must contain only non-runtime banks (reports, telemetry-only probes, generation artifacts).",
+    "Runtime banks must be accounted for via usage_manifest consumedBankIds/Prefixes/Patterns and proof tests.",
+    "pattern_library remains allowlisted while telemetry-only and not used by runtime answer paths.",
+    "document_intelligence_implementation_report is generated output from docint:verify, not a runtime bank.",
+    "legal_legal_* and medical_med_* doc-type bank IDs are legacy superseded artifacts kept on disk for migration safety; they are not runtime-wired.",
+    "docint_eval_suite_registry is test/evaluation-only and intentionally excluded from runtime loading."
+  ]
+}

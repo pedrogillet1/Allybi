@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_housing_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for housing domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "language": "pt"
+  },
+  "domain": "housing",
+  "terms": [
+    {
+      "id": "housing_lex_aluguel",
+      "canonical": "aluguel",
+      "synonyms": [
+        "renda locaticia",
+        "mensalidade de aluguel"
+      ],
+      "display": "Aluguel"
+    },
+    {
+      "id": "housing_lex_avaliacao",
+      "canonical": "avaliacao",
+      "synonyms": [
+        "valor venal",
+        "avaliacao do imovel"
+      ],
+      "display": "Avaliacao"
+    },
+    {
+      "id": "housing_lex_bairro",
+      "canonical": "bairro",
+      "synonyms": [
+        "localidade",
+        "regiao"
+      ],
+      "display": "Bairro"
+    },
+    {
+      "id": "housing_lex_boleto",
+      "canonical": "boleto",
+      "synonyms": [
+        "fatura",
+        "titulo de cobranca"
+      ],
+      "display": "Boleto"
+    },
+    {
+      "id": "housing_lex_condominio",
+      "canonical": "condominio",
+      "synonyms": [
+        "taxa condominial",
+        "hoa"
+      ],
+      "display": "Condominio"
+    },
+    {
+      "id": "housing_lex_deposito_caucao",
+      "canonical": "deposito caucao",
+      "synonyms": [
+        "garantia",
+        "deposito"
+      ],
+      "display": "Deposito Caucao"
+    },
+    {
+      "id": "housing_lex_endereco_do_imovel",
+      "canonical": "endereco do imovel",
+      "synonyms": [
+        "logradouro",
+        "endereco"
+      ],
+      "display": "Endereco Do Imovel"
+    },
+    {
+      "id": "housing_lex_escrow",
+      "canonical": "escrow",
+      "synonyms": [
+        "conta garantia",
+        "conta vinculada"
+      ],
+      "display": "Escrow"
+    },
+    {
+      "id": "housing_lex_extrato_de_hipoteca",
+      "canonical": "extrato de hipoteca",
+      "synonyms": [
+        "extrato de financiamento",
+        "mortgage statement"
+      ],
+      "display": "Extrato De Hipoteca"
+    },
+    {
+      "id": "housing_lex_imposto_predial",
+      "canonical": "imposto predial",
+      "synonyms": [
+        "iptu",
+        "tributo imobiliario"
+      ],
+      "display": "Imposto Predial"
+    },
+    {
+      "id": "housing_lex_inspecao",
+      "canonical": "inspecao",
+      "synonyms": [
+        "vistoria",
+        "laudo de inspecao"
+      ],
+      "display": "Inspecao"
+    },
+    {
+      "id": "housing_lex_juros",
+      "canonical": "juros",
+      "synonyms": [
+        "encargos financeiros",
+        "taxa de juros"
+      ],
+      "display": "Juros"
+    },
+    {
+      "id": "housing_lex_locador",
+      "canonical": "locador",
+      "synonyms": [
+        "proprietario",
+        "senhorio"
+      ],
+      "display": "Locador"
+    },
+    {
+      "id": "housing_lex_locatario",
+      "canonical": "locatario",
+      "synonyms": [
+        "inquilino",
+        "arrendatario"
+      ],
+      "display": "Locatario"
+    },
+    {
+      "id": "housing_lex_prazo_de_locacao",
+      "canonical": "prazo de locacao",
+      "synonyms": [
+        "vigencia",
+        "periodo contratual"
+      ],
+      "display": "Prazo De Locacao"
+    },
+    {
+      "id": "housing_lex_principal",
+      "canonical": "principal",
+      "synonyms": [
+        "saldo devedor",
+        "amortizacao"
+      ],
+      "display": "Principal"
+    },
+    {
+      "id": "housing_lex_recibo_de_aluguel",
+      "canonical": "recibo de aluguel",
+      "synonyms": [
+        "comprovante de aluguel",
+        "recibo"
+      ],
+      "display": "Recibo De Aluguel"
+    },
+    {
+      "id": "housing_lex_taxa_de_manutencao",
+      "canonical": "taxa de manutencao",
+      "synonyms": [
+        "taxa de servico",
+        "manutencao"
+      ],
+      "display": "Taxa De Manutencao"
+    },
+    {
+      "id": "housing_lex_unidade",
+      "canonical": "unidade",
+      "synonyms": [
+        "apartamento",
+        "numero da unidade"
+      ],
+      "display": "Unidade"
+    },
+    {
+      "id": "housing_lex_vencimento",
+      "canonical": "vencimento",
+      "synonyms": [
+        "data limite",
+        "prazo de pagamento"
+      ],
+      "display": "Vencimento"
+    }
+  ]
+}

@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,5206 @@
     "telemetryOnly": true
   },
   "domain": "medical",
-  "clusters": []
+  "clusters": [
+    {
+      "id": "medical_cluster_automate_care_plan",
+      "label": "care plan consistency - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "automation intent",
+        "intenção de automação",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "automation intent care plan consistency",
+        "intenção de automação consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_chronic_monitoring",
+      "label": "chronic condition monitoring - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "automation intent",
+        "intenção de automação",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "automation intent chronic condition monitoring",
+        "intenção de automação monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_discharge",
+      "label": "discharge readiness - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "automation intent",
+        "intenção de automação",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "automation intent discharge readiness",
+        "intenção de automação prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_documentation",
+      "label": "clinical documentation completeness - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "automation intent",
+        "intenção de automação",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "automation intent clinical documentation completeness",
+        "intenção de automação completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_imaging_flags",
+      "label": "imaging red-flag detection - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "automation intent",
+        "intenção de automação",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "automation intent imaging red-flag detection",
+        "intenção de automação detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_lab_trends",
+      "label": "lab trend interpretation - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "automation intent",
+        "intenção de automação",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "automation intent lab trend interpretation",
+        "intenção de automação interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_medication_safety",
+      "label": "medication safety review - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "automation intent",
+        "intenção de automação",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "automation intent medication safety review",
+        "intenção de automação revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_patient_communication",
+      "label": "patient-friendly explanation quality - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "automation intent",
+        "intenção de automação",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "automation intent patient-friendly explanation quality",
+        "intenção de automação qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_referral_quality",
+      "label": "referral quality checks - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "automation intent",
+        "intenção de automação",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "automation intent referral quality checks",
+        "intenção de automação checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_automate_triage",
+      "label": "triage urgency classification - automation intent",
+      "intent": "automate",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "automation intent",
+        "intenção de automação",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "automation intent triage urgency classification",
+        "intenção de automação classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_care_plan",
+      "label": "care plan consistency - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "benchmark intent",
+        "intenção de benchmark",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "benchmark intent care plan consistency",
+        "intenção de benchmark consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_chronic_monitoring",
+      "label": "chronic condition monitoring - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "benchmark intent",
+        "intenção de benchmark",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "benchmark intent chronic condition monitoring",
+        "intenção de benchmark monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_discharge",
+      "label": "discharge readiness - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "benchmark intent",
+        "intenção de benchmark",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "benchmark intent discharge readiness",
+        "intenção de benchmark prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_documentation",
+      "label": "clinical documentation completeness - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "benchmark intent",
+        "intenção de benchmark",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "benchmark intent clinical documentation completeness",
+        "intenção de benchmark completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_imaging_flags",
+      "label": "imaging red-flag detection - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "benchmark intent",
+        "intenção de benchmark",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "benchmark intent imaging red-flag detection",
+        "intenção de benchmark detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_lab_trends",
+      "label": "lab trend interpretation - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "benchmark intent",
+        "intenção de benchmark",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "benchmark intent lab trend interpretation",
+        "intenção de benchmark interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_medication_safety",
+      "label": "medication safety review - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "benchmark intent",
+        "intenção de benchmark",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "benchmark intent medication safety review",
+        "intenção de benchmark revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_patient_communication",
+      "label": "patient-friendly explanation quality - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "benchmark intent",
+        "intenção de benchmark",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "benchmark intent patient-friendly explanation quality",
+        "intenção de benchmark qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_referral_quality",
+      "label": "referral quality checks - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "benchmark intent",
+        "intenção de benchmark",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "benchmark intent referral quality checks",
+        "intenção de benchmark checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_benchmark_triage",
+      "label": "triage urgency classification - benchmark intent",
+      "intent": "benchmark",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "benchmark intent",
+        "intenção de benchmark",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "benchmark intent triage urgency classification",
+        "intenção de benchmark classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_care_plan",
+      "label": "care plan consistency - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "comparison intent",
+        "intenção de comparação",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "comparison intent care plan consistency",
+        "intenção de comparação consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_chronic_monitoring",
+      "label": "chronic condition monitoring - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "comparison intent",
+        "intenção de comparação",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "comparison intent chronic condition monitoring",
+        "intenção de comparação monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_discharge",
+      "label": "discharge readiness - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "comparison intent",
+        "intenção de comparação",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "comparison intent discharge readiness",
+        "intenção de comparação prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_documentation",
+      "label": "clinical documentation completeness - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "comparison intent",
+        "intenção de comparação",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "comparison intent clinical documentation completeness",
+        "intenção de comparação completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_imaging_flags",
+      "label": "imaging red-flag detection - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "comparison intent",
+        "intenção de comparação",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "comparison intent imaging red-flag detection",
+        "intenção de comparação detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_lab_trends",
+      "label": "lab trend interpretation - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "comparison intent",
+        "intenção de comparação",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "comparison intent lab trend interpretation",
+        "intenção de comparação interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_medication_safety",
+      "label": "medication safety review - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "comparison intent",
+        "intenção de comparação",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "comparison intent medication safety review",
+        "intenção de comparação revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_patient_communication",
+      "label": "patient-friendly explanation quality - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "comparison intent",
+        "intenção de comparação",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "comparison intent patient-friendly explanation quality",
+        "intenção de comparação qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_referral_quality",
+      "label": "referral quality checks - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "comparison intent",
+        "intenção de comparação",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "comparison intent referral quality checks",
+        "intenção de comparação checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_compare_triage",
+      "label": "triage urgency classification - comparison intent",
+      "intent": "compare",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "comparison intent",
+        "intenção de comparação",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "comparison intent triage urgency classification",
+        "intenção de comparação classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_care_plan",
+      "label": "care plan consistency - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "diagnostic intent care plan consistency",
+        "intenção de diagnóstico consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_chronic_monitoring",
+      "label": "chronic condition monitoring - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "diagnostic intent chronic condition monitoring",
+        "intenção de diagnóstico monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_discharge",
+      "label": "discharge readiness - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "diagnostic intent discharge readiness",
+        "intenção de diagnóstico prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_documentation",
+      "label": "clinical documentation completeness - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "diagnostic intent clinical documentation completeness",
+        "intenção de diagnóstico completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_imaging_flags",
+      "label": "imaging red-flag detection - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "diagnostic intent imaging red-flag detection",
+        "intenção de diagnóstico detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_lab_trends",
+      "label": "lab trend interpretation - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "diagnostic intent lab trend interpretation",
+        "intenção de diagnóstico interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_medication_safety",
+      "label": "medication safety review - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "diagnostic intent medication safety review",
+        "intenção de diagnóstico revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_patient_communication",
+      "label": "patient-friendly explanation quality - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "diagnostic intent patient-friendly explanation quality",
+        "intenção de diagnóstico qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_referral_quality",
+      "label": "referral quality checks - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "diagnostic intent referral quality checks",
+        "intenção de diagnóstico checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_diagnose_triage",
+      "label": "triage urgency classification - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "diagnostic intent triage urgency classification",
+        "intenção de diagnóstico classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_care_plan",
+      "label": "care plan consistency - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "discovery intent",
+        "intenção de descoberta",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "discovery intent care plan consistency",
+        "intenção de descoberta consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_chronic_monitoring",
+      "label": "chronic condition monitoring - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "discovery intent",
+        "intenção de descoberta",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "discovery intent chronic condition monitoring",
+        "intenção de descoberta monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_discharge",
+      "label": "discharge readiness - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "discovery intent",
+        "intenção de descoberta",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "discovery intent discharge readiness",
+        "intenção de descoberta prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_documentation",
+      "label": "clinical documentation completeness - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "discovery intent",
+        "intenção de descoberta",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "discovery intent clinical documentation completeness",
+        "intenção de descoberta completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_imaging_flags",
+      "label": "imaging red-flag detection - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "discovery intent",
+        "intenção de descoberta",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "discovery intent imaging red-flag detection",
+        "intenção de descoberta detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_lab_trends",
+      "label": "lab trend interpretation - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "discovery intent",
+        "intenção de descoberta",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "discovery intent lab trend interpretation",
+        "intenção de descoberta interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_medication_safety",
+      "label": "medication safety review - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "discovery intent",
+        "intenção de descoberta",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "discovery intent medication safety review",
+        "intenção de descoberta revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_patient_communication",
+      "label": "patient-friendly explanation quality - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "discovery intent",
+        "intenção de descoberta",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "discovery intent patient-friendly explanation quality",
+        "intenção de descoberta qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_referral_quality",
+      "label": "referral quality checks - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "discovery intent",
+        "intenção de descoberta",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "discovery intent referral quality checks",
+        "intenção de descoberta checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_discover_triage",
+      "label": "triage urgency classification - discovery intent",
+      "intent": "discover",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "discovery intent",
+        "intenção de descoberta",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "discovery intent triage urgency classification",
+        "intenção de descoberta classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_care_plan",
+      "label": "care plan consistency - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "forecast intent",
+        "intenção de previsão",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "forecast intent care plan consistency",
+        "intenção de previsão consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_chronic_monitoring",
+      "label": "chronic condition monitoring - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "forecast intent",
+        "intenção de previsão",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "forecast intent chronic condition monitoring",
+        "intenção de previsão monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_discharge",
+      "label": "discharge readiness - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "forecast intent",
+        "intenção de previsão",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "forecast intent discharge readiness",
+        "intenção de previsão prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_documentation",
+      "label": "clinical documentation completeness - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "forecast intent",
+        "intenção de previsão",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "forecast intent clinical documentation completeness",
+        "intenção de previsão completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_imaging_flags",
+      "label": "imaging red-flag detection - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "forecast intent",
+        "intenção de previsão",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "forecast intent imaging red-flag detection",
+        "intenção de previsão detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_lab_trends",
+      "label": "lab trend interpretation - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "forecast intent",
+        "intenção de previsão",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "forecast intent lab trend interpretation",
+        "intenção de previsão interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_medication_safety",
+      "label": "medication safety review - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "forecast intent",
+        "intenção de previsão",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "forecast intent medication safety review",
+        "intenção de previsão revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_patient_communication",
+      "label": "patient-friendly explanation quality - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "forecast intent",
+        "intenção de previsão",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "forecast intent patient-friendly explanation quality",
+        "intenção de previsão qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_referral_quality",
+      "label": "referral quality checks - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "forecast intent",
+        "intenção de previsão",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "forecast intent referral quality checks",
+        "intenção de previsão checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_forecast_triage",
+      "label": "triage urgency classification - forecast intent",
+      "intent": "forecast",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "forecast intent",
+        "intenção de previsão",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "forecast intent triage urgency classification",
+        "intenção de previsão classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_care_plan",
+      "label": "care plan consistency - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "optimization intent",
+        "intenção de otimização",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "optimization intent care plan consistency",
+        "intenção de otimização consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_chronic_monitoring",
+      "label": "chronic condition monitoring - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "optimization intent",
+        "intenção de otimização",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "optimization intent chronic condition monitoring",
+        "intenção de otimização monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_discharge",
+      "label": "discharge readiness - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "optimization intent",
+        "intenção de otimização",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "optimization intent discharge readiness",
+        "intenção de otimização prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_documentation",
+      "label": "clinical documentation completeness - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "optimization intent",
+        "intenção de otimização",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "optimization intent clinical documentation completeness",
+        "intenção de otimização completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_imaging_flags",
+      "label": "imaging red-flag detection - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "optimization intent",
+        "intenção de otimização",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "optimization intent imaging red-flag detection",
+        "intenção de otimização detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_lab_trends",
+      "label": "lab trend interpretation - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "optimization intent",
+        "intenção de otimização",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "optimization intent lab trend interpretation",
+        "intenção de otimização interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_medication_safety",
+      "label": "medication safety review - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "optimization intent",
+        "intenção de otimização",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "optimization intent medication safety review",
+        "intenção de otimização revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_patient_communication",
+      "label": "patient-friendly explanation quality - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "optimization intent",
+        "intenção de otimização",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "optimization intent patient-friendly explanation quality",
+        "intenção de otimização qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_referral_quality",
+      "label": "referral quality checks - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "optimization intent",
+        "intenção de otimização",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "optimization intent referral quality checks",
+        "intenção de otimização checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_optimize_triage",
+      "label": "triage urgency classification - optimization intent",
+      "intent": "optimize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "optimization intent",
+        "intenção de otimização",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "optimization intent triage urgency classification",
+        "intenção de otimização classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_care_plan",
+      "label": "care plan consistency - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "prioritization intent",
+        "intenção de priorização",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "prioritization intent care plan consistency",
+        "intenção de priorização consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_chronic_monitoring",
+      "label": "chronic condition monitoring - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "prioritization intent",
+        "intenção de priorização",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "prioritization intent chronic condition monitoring",
+        "intenção de priorização monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_discharge",
+      "label": "discharge readiness - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "prioritization intent",
+        "intenção de priorização",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "prioritization intent discharge readiness",
+        "intenção de priorização prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_documentation",
+      "label": "clinical documentation completeness - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "prioritization intent",
+        "intenção de priorização",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "prioritization intent clinical documentation completeness",
+        "intenção de priorização completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_imaging_flags",
+      "label": "imaging red-flag detection - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "prioritization intent",
+        "intenção de priorização",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "prioritization intent imaging red-flag detection",
+        "intenção de priorização detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_lab_trends",
+      "label": "lab trend interpretation - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "prioritization intent",
+        "intenção de priorização",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "prioritization intent lab trend interpretation",
+        "intenção de priorização interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_medication_safety",
+      "label": "medication safety review - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "prioritization intent",
+        "intenção de priorização",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "prioritization intent medication safety review",
+        "intenção de priorização revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_patient_communication",
+      "label": "patient-friendly explanation quality - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "prioritization intent",
+        "intenção de priorização",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "prioritization intent patient-friendly explanation quality",
+        "intenção de priorização qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_referral_quality",
+      "label": "referral quality checks - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "prioritization intent",
+        "intenção de priorização",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "prioritization intent referral quality checks",
+        "intenção de priorização checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_prioritize_triage",
+      "label": "triage urgency classification - prioritization intent",
+      "intent": "prioritize",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "prioritization intent",
+        "intenção de priorização",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "prioritization intent triage urgency classification",
+        "intenção de priorização classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_care_plan",
+      "label": "care plan consistency - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "reporting intent",
+        "intenção de reporte",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "reporting intent care plan consistency",
+        "intenção de reporte consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_chronic_monitoring",
+      "label": "chronic condition monitoring - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "reporting intent",
+        "intenção de reporte",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "reporting intent chronic condition monitoring",
+        "intenção de reporte monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_discharge",
+      "label": "discharge readiness - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "reporting intent",
+        "intenção de reporte",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "reporting intent discharge readiness",
+        "intenção de reporte prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_documentation",
+      "label": "clinical documentation completeness - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "reporting intent",
+        "intenção de reporte",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "reporting intent clinical documentation completeness",
+        "intenção de reporte completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_imaging_flags",
+      "label": "imaging red-flag detection - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "reporting intent",
+        "intenção de reporte",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "reporting intent imaging red-flag detection",
+        "intenção de reporte detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_lab_trends",
+      "label": "lab trend interpretation - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "reporting intent",
+        "intenção de reporte",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "reporting intent lab trend interpretation",
+        "intenção de reporte interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_medication_safety",
+      "label": "medication safety review - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "reporting intent",
+        "intenção de reporte",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "reporting intent medication safety review",
+        "intenção de reporte revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_patient_communication",
+      "label": "patient-friendly explanation quality - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "reporting intent",
+        "intenção de reporte",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "reporting intent patient-friendly explanation quality",
+        "intenção de reporte qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_referral_quality",
+      "label": "referral quality checks - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "reporting intent",
+        "intenção de reporte",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "reporting intent referral quality checks",
+        "intenção de reporte checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_report_triage",
+      "label": "triage urgency classification - reporting intent",
+      "intent": "report",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "reporting intent",
+        "intenção de reporte",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "reporting intent triage urgency classification",
+        "intenção de reporte classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_care_plan",
+      "label": "care plan consistency - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "care_plan",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "care_plan",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "care plan consistency",
+        "consistência do plano de cuidado",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "care plan consistency analytics",
+        "consistência do plano de cuidado analytics",
+        "care plan consistency dashboard",
+        "consistência do plano de cuidado dashboard",
+        "risk monitoring intent care plan consistency",
+        "intenção de monitoramento de risco consistência do plano de cuidado",
+        "medical care_plan"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated care_plan"
+      ],
+      "examples": [
+        "How can we improve care plan consistency?",
+        "Como melhorar consistência do plano de cuidado?",
+        "Show care plan consistency insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_chronic_monitoring",
+      "label": "chronic condition monitoring - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "chronic_monitoring",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "vital_signs_chart",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "chronic condition monitoring",
+        "monitoramento de condição crônica",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "chronic condition monitoring analytics",
+        "monitoramento de condição crônica analytics",
+        "chronic condition monitoring dashboard",
+        "monitoramento de condição crônica dashboard",
+        "risk monitoring intent chronic condition monitoring",
+        "intenção de monitoramento de risco monitoramento de condição crônica",
+        "medical chronic_monitoring"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated chronic_monitoring"
+      ],
+      "examples": [
+        "How can we improve chronic condition monitoring?",
+        "Como melhorar monitoramento de condição crônica?",
+        "Show chronic condition monitoring insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_discharge",
+      "label": "discharge readiness - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "discharge",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "discharge_summary",
+        "progress_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "discharge readiness",
+        "prontidão para alta",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "discharge readiness analytics",
+        "prontidão para alta analytics",
+        "discharge readiness dashboard",
+        "prontidão para alta dashboard",
+        "risk monitoring intent discharge readiness",
+        "intenção de monitoramento de risco prontidão para alta",
+        "medical discharge"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated discharge"
+      ],
+      "examples": [
+        "How can we improve discharge readiness?",
+        "Como melhorar prontidão para alta?",
+        "Show discharge readiness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_documentation",
+      "label": "clinical documentation completeness - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "documentation",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "electronic_health_record_extract",
+        "nursing_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "clinical documentation completeness",
+        "completude de documentação clínica",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "clinical documentation completeness analytics",
+        "completude de documentação clínica analytics",
+        "clinical documentation completeness dashboard",
+        "completude de documentação clínica dashboard",
+        "risk monitoring intent clinical documentation completeness",
+        "intenção de monitoramento de risco completude de documentação clínica",
+        "medical documentation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated documentation"
+      ],
+      "examples": [
+        "How can we improve clinical documentation completeness?",
+        "Como melhorar completude de documentação clínica?",
+        "Show clinical documentation completeness insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_imaging_flags",
+      "label": "imaging red-flag detection - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "imaging_flags",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "imaging_report",
+        "radiology_request"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "imaging red-flag detection",
+        "detecção de alertas em imagem",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "imaging red-flag detection analytics",
+        "detecção de alertas em imagem analytics",
+        "imaging red-flag detection dashboard",
+        "detecção de alertas em imagem dashboard",
+        "risk monitoring intent imaging red-flag detection",
+        "intenção de monitoramento de risco detecção de alertas em imagem",
+        "medical imaging_flags"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated imaging_flags"
+      ],
+      "examples": [
+        "How can we improve imaging red-flag detection?",
+        "Como melhorar detecção de alertas em imagem?",
+        "Show imaging red-flag detection insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_lab_trends",
+      "label": "lab trend interpretation - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "lab_trends",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "lab trend interpretation",
+        "interpretação de tendências laboratoriais",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "lab trend interpretation analytics",
+        "interpretação de tendências laboratoriais analytics",
+        "lab trend interpretation dashboard",
+        "interpretação de tendências laboratoriais dashboard",
+        "risk monitoring intent lab trend interpretation",
+        "intenção de monitoramento de risco interpretação de tendências laboratoriais",
+        "medical lab_trends"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated lab_trends"
+      ],
+      "examples": [
+        "How can we improve lab trend interpretation?",
+        "Como melhorar interpretação de tendências laboratoriais?",
+        "Show lab trend interpretation insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_medication_safety",
+      "label": "medication safety review - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "medication_safety",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "medication_list",
+        "prescription"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "medication safety review",
+        "revisão de segurança medicamentosa",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "medication safety review analytics",
+        "revisão de segurança medicamentosa analytics",
+        "medication safety review dashboard",
+        "revisão de segurança medicamentosa dashboard",
+        "risk monitoring intent medication safety review",
+        "intenção de monitoramento de risco revisão de segurança medicamentosa",
+        "medical medication_safety"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated medication_safety"
+      ],
+      "examples": [
+        "How can we improve medication safety review?",
+        "Como melhorar revisão de segurança medicamentosa?",
+        "Show medication safety review insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_patient_communication",
+      "label": "patient-friendly explanation quality - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "patient_communication",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "diagnosis_summary",
+        "treatment_plan"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "patient-friendly explanation quality",
+        "qualidade de explicação para pacientes",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "patient-friendly explanation quality analytics",
+        "qualidade de explicação para pacientes analytics",
+        "patient-friendly explanation quality dashboard",
+        "qualidade de explicação para pacientes dashboard",
+        "risk monitoring intent patient-friendly explanation quality",
+        "intenção de monitoramento de risco qualidade de explicação para pacientes",
+        "medical patient_communication"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated patient_communication"
+      ],
+      "examples": [
+        "How can we improve patient-friendly explanation quality?",
+        "Como melhorar qualidade de explicação para pacientes?",
+        "Show patient-friendly explanation quality insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_referral_quality",
+      "label": "referral quality checks - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "referral_quality",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "referral_letter",
+        "consult_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "referral quality checks",
+        "checagens de qualidade de encaminhamento",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "referral quality checks analytics",
+        "checagens de qualidade de encaminhamento analytics",
+        "referral quality checks dashboard",
+        "checagens de qualidade de encaminhamento dashboard",
+        "risk monitoring intent referral quality checks",
+        "intenção de monitoramento de risco checagens de qualidade de encaminhamento",
+        "medical referral_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated referral_quality"
+      ],
+      "examples": [
+        "How can we improve referral quality checks?",
+        "Como melhorar checagens de qualidade de encaminhamento?",
+        "Show referral quality checks insights by period."
+      ]
+    },
+    {
+      "id": "medical_cluster_risk_triage",
+      "label": "triage urgency classification - risk monitoring intent",
+      "intent": "risk",
+      "domain": "medical",
+      "tags": [
+        "medical",
+        "triage",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "relatedDocTypes": [
+        "triage_note",
+        "emergency_department_note"
+      ],
+      "keywords": [
+        "medical analytics",
+        "clinical intelligence",
+        "saúde analytics",
+        "patient safety insights",
+        "triage urgency classification",
+        "classificação de urgência em triagem",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "triage urgency classification analytics",
+        "classificação de urgência em triagem analytics",
+        "triage urgency classification dashboard",
+        "classificação de urgência em triagem dashboard",
+        "risk monitoring intent triage urgency classification",
+        "intenção de monitoramento de risco classificação de urgência em triagem",
+        "medical triage"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated triage"
+      ],
+      "examples": [
+        "How can we improve triage urgency classification?",
+        "Como melhorar classificação de urgência em triagem?",
+        "Show triage urgency classification insights by period."
+      ]
+    }
+  ]
 }

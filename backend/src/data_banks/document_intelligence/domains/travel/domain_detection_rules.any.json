@@ -1,0 +1,119 @@
+{
+  "_meta": {
+    "id": "di_travel_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting travel documents from headings, content, and table structure.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 32
+  },
+  "domain": "travel",
+  "rules": [
+    {
+      "id": "travel_detect_001_itinerary",
+      "priority": 100,
+      "weight": 3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\btravel itinerary\\b",
+        "\\btrip itinerary\\b",
+        "\\bitinerario\\b"
+      ],
+      "description": "Itinerary markers"
+    },
+    {
+      "id": "travel_detect_002_boarding_pass",
+      "priority": 99,
+      "weight": 2.9,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bboarding pass\\b",
+        "\\bgate\\b",
+        "\\bflight\\s*no\\b",
+        "\\bcartao de embarque\\b"
+      ],
+      "description": "Boarding pass markers"
+    },
+    {
+      "id": "travel_detect_003_hotel_confirmation",
+      "priority": 97,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bhotel booking confirmation\\b",
+        "\\bcheck-in\\b",
+        "\\bcheck-out\\b",
+        "\\bconfirmacao de reserva\\b"
+      ],
+      "description": "Hotel booking markers"
+    },
+    {
+      "id": "travel_detect_004_car_rental",
+      "priority": 96,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bcar rental agreement\\b",
+        "\\bpick-up\\b",
+        "\\bdrop-off\\b",
+        "\\blocacao de veiculo\\b"
+      ],
+      "description": "Car rental markers"
+    },
+    {
+      "id": "travel_detect_005_insurance_policy",
+      "priority": 95,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\btravel insurance policy\\b",
+        "\\bpolicy number\\b",
+        "\\bseguro viagem\\b"
+      ],
+      "description": "Travel insurance markers"
+    },
+    {
+      "id": "travel_detect_006_visa_receipt",
+      "priority": 94,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bvisa application receipt\\b",
+        "\\bconsular fee\\b",
+        "\\bsolicitacao de visto\\b"
+      ],
+      "description": "Visa receipt markers"
+    },
+    {
+      "id": "travel_detect_007_negative_medical",
+      "priority": 120,
+      "weight": -3.5,
+      "signal": "negative_heading_or_content",
+      "patterns": [
+        "\\blab report\\b",
+        "\\bhematology\\b",
+        "\\bpatient id\\b"
+      ],
+      "description": "Negative: medical/lab markers suppress travel routing"
+    },
+    {
+      "id": "travel_detect_999_scope_lock",
+      "priority": 70,
+      "weight": 1.4,
+      "signal": "content",
+      "patterns": [
+        "\\bdocument\\s+number\\b",
+        "\\breference\\b",
+        "\\bpage\\s+\\d+\\b"
+      ],
+      "description": "Generic structural markers for scoped document extraction"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "_meta": { "id": "di_finance_entities_fin_variance", "version": "1.0.0", "description": "Entity extraction schema for variance analysis reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "finance", "docType": "fin_variance" },
+  "entities": [
+    { "id": "actual_net_income", "type": "currency", "required": false, "description": "Actual net income" },
+    { "id": "actual_revenue", "type": "currency", "required": true, "description": "Actual revenue" },
+    { "id": "budget_net_income", "type": "currency", "required": false, "description": "Budgeted net income" },
+    { "id": "budget_revenue", "type": "currency", "required": true, "description": "Budgeted revenue" },
+    { "id": "entity_name", "type": "string", "required": true, "description": "Company or business unit" },
+    { "id": "period", "type": "string", "required": true, "description": "Reporting period" },
+    { "id": "revenue_variance_amount", "type": "currency", "required": true, "description": "Revenue variance (actual - budget)" },
+    { "id": "revenue_variance_pct", "type": "number", "required": false, "description": "Revenue variance percentage" },
+    { "id": "total_favorable_variance", "type": "currency", "required": false, "description": "Total favorable variance" },
+    { "id": "total_unfavorable_variance", "type": "currency", "required": false, "description": "Total unfavorable variance" }
+  ]
+}

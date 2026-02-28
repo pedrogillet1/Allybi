@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "id": "di_accounting_domain_profile",
+    "version": "1.0.0",
+    "description": "Accounting domain profile — defines scope, detection signals, and capabilities for bookkeeping, general ledger, reconciliation, and audit documents.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting"
+  },
+  "domain": "accounting",
+  "displayName": { "en": "Accounting", "pt": "Contabilidade" },
+  "scope": "General ledger, trial balance, journal entries, reconciliation, accounts receivable/payable aging, audit workpapers, internal controls, and compliance documentation.",
+  "coreConcepts": [
+    "chart_of_accounts", "double_entry", "debit_credit", "general_ledger",
+    "trial_balance", "journal_entry", "accrual_basis", "cash_basis",
+    "bank_reconciliation", "aging_schedule", "audit_evidence",
+    "internal_controls", "materiality", "segregation_of_duties",
+    "closing_entries", "adjusting_entries", "reversing_entries",
+    "subsidiary_ledger"
+  ],
+  "supportedOperators": [
+    "advise", "calculate", "compare", "evaluate", "extract",
+    "locate", "monitor", "navigate", "open", "summarize", "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "trial balance", "general ledger", "journal entry", "chart of accounts",
+      "bank reconciliation", "aging report", "audit workpaper",
+      "debit", "credit", "GL account"
+    ],
+    "mediumConfidence": [
+      "ledger", "posting", "accrual", "adjusting entry", "closing entry",
+      "subsidiary ledger", "reconciling items", "internal controls"
+    ]
+  },
+  "relatedDomains": ["finance"],
+  "ontologyPrefix": "acct"
+}

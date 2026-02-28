@@ -1,0 +1,203 @@
+{
+  "_meta": {
+    "id": "di_insurance_abbreviations_en",
+    "version": "1.0.0",
+    "description": "English abbreviations for insurance domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "language": "en"
+  },
+  "domain": "insurance",
+  "abbreviations": [
+    {
+      "abbr": "AOB",
+      "expansion": "Assignment of Benefits"
+    },
+    {
+      "abbr": "BIN",
+      "expansion": "Bank Identification Number"
+    },
+    {
+      "abbr": "BOP",
+      "expansion": "Businessowners Policy"
+    },
+    {
+      "abbr": "CGL",
+      "expansion": "Commercial General Liability"
+    },
+    {
+      "abbr": "CLAIM",
+      "expansion": "Claim Submission Record"
+    },
+    {
+      "abbr": "COB",
+      "expansion": "Coordination of Benefits"
+    },
+    {
+      "abbr": "COPAY",
+      "expansion": "Copayment"
+    },
+    {
+      "abbr": "CSR",
+      "expansion": "Customer Service Representative"
+    },
+    {
+      "abbr": "DD",
+      "expansion": "Direct Debit"
+    },
+    {
+      "abbr": "DME",
+      "expansion": "Durable Medical Equipment"
+    },
+    {
+      "abbr": "DOS",
+      "expansion": "Date of Service"
+    },
+    {
+      "abbr": "DP",
+      "expansion": "Deductible Paid"
+    },
+    {
+      "abbr": "EOB",
+      "expansion": "Explanation of Benefits"
+    },
+    {
+      "abbr": "EOP",
+      "expansion": "Explanation of Payment"
+    },
+    {
+      "abbr": "ERA",
+      "expansion": "Electronic Remittance Advice"
+    },
+    {
+      "abbr": "ERISA",
+      "expansion": "Employee Retirement Income Security Act"
+    },
+    {
+      "abbr": "FWA",
+      "expansion": "Fraud Waste and Abuse"
+    },
+    {
+      "abbr": "GL",
+      "expansion": "General Liability"
+    },
+    {
+      "abbr": "HCPCS",
+      "expansion": "Healthcare Common Procedure Coding System"
+    },
+    {
+      "abbr": "HMO",
+      "expansion": "Health Maintenance Organization"
+    },
+    {
+      "abbr": "ICD",
+      "expansion": "International Classification of Diseases"
+    },
+    {
+      "abbr": "ID",
+      "expansion": "Identifier"
+    },
+    {
+      "abbr": "IPA",
+      "expansion": "Independent Practice Association"
+    },
+    {
+      "abbr": "LOB",
+      "expansion": "Line of Business"
+    },
+    {
+      "abbr": "LTD",
+      "expansion": "Long Term Disability"
+    },
+    {
+      "abbr": "MBR",
+      "expansion": "Member"
+    },
+    {
+      "abbr": "NPI",
+      "expansion": "National Provider Identifier"
+    },
+    {
+      "abbr": "OON",
+      "expansion": "Out of Network"
+    },
+    {
+      "abbr": "OOP",
+      "expansion": "Out of Pocket"
+    },
+    {
+      "abbr": "PA",
+      "expansion": "Prior Authorization"
+    },
+    {
+      "abbr": "PAYER",
+      "expansion": "Insurance Payer"
+    },
+    {
+      "abbr": "PBM",
+      "expansion": "Pharmacy Benefit Manager"
+    },
+    {
+      "abbr": "PCP",
+      "expansion": "Primary Care Provider"
+    },
+    {
+      "abbr": "PDP",
+      "expansion": "Premium Due Period"
+    },
+    {
+      "abbr": "PIP",
+      "expansion": "Personal Injury Protection"
+    },
+    {
+      "abbr": "PPO",
+      "expansion": "Preferred Provider Organization"
+    },
+    {
+      "abbr": "PREM",
+      "expansion": "Premium"
+    },
+    {
+      "abbr": "RX",
+      "expansion": "Prescription"
+    },
+    {
+      "abbr": "SIU",
+      "expansion": "Special Investigation Unit"
+    },
+    {
+      "abbr": "SNF",
+      "expansion": "Skilled Nursing Facility"
+    },
+    {
+      "abbr": "SOB",
+      "expansion": "Schedule of Benefits"
+    },
+    {
+      "abbr": "STD",
+      "expansion": "Short Term Disability"
+    },
+    {
+      "abbr": "SUBRO",
+      "expansion": "Subrogation"
+    },
+    {
+      "abbr": "TPA",
+      "expansion": "Third Party Administrator"
+    },
+    {
+      "abbr": "UCR",
+      "expansion": "Usual Customary and Reasonable"
+    },
+    {
+      "abbr": "UM",
+      "expansion": "Utilization Management"
+    }
+  ]
+}

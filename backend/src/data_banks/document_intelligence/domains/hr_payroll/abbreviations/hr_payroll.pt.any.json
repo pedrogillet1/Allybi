@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for hr_payroll domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll",
+    "language": "pt"
+  },
+  "domain": "hr_payroll",
+  "abbreviations": [
+    {
+      "abbr": "CLT",
+      "expansion": "Consolidacao das Leis do Trabalho"
+    },
+    {
+      "abbr": "CNPJ",
+      "expansion": "Cadastro Nacional da Pessoa Juridica"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoa Fisica"
+    },
+    {
+      "abbr": "CTPS",
+      "expansion": "Carteira de Trabalho e Previdencia Social"
+    },
+    {
+      "abbr": "DCTF",
+      "expansion": "Declaracao de Debitos e Creditos Tributarios Federais"
+    },
+    {
+      "abbr": "DP",
+      "expansion": "Departamento Pessoal"
+    },
+    {
+      "abbr": "DSR",
+      "expansion": "Descanso Semanal Remunerado"
+    },
+    {
+      "abbr": "eSocial",
+      "expansion": "Sistema de Escrituracao Digital das Obrigacoes Fiscais"
+    },
+    {
+      "abbr": "FGTS",
+      "expansion": "Fundo de Garantia do Tempo de Servico"
+    },
+    {
+      "abbr": "HE",
+      "expansion": "Horas Extras"
+    },
+    {
+      "abbr": "INSS",
+      "expansion": "Instituto Nacional do Seguro Social"
+    },
+    {
+      "abbr": "IRRF",
+      "expansion": "Imposto de Renda Retido na Fonte"
+    },
+    {
+      "abbr": "N/A",
+      "expansion": "Nao Aplicavel"
+    },
+    {
+      "abbr": "PIS",
+      "expansion": "Programa de Integracao Social"
+    },
+    {
+      "abbr": "RAIS",
+      "expansion": "Relacao Anual de Informacoes Sociais"
+    },
+    {
+      "abbr": "RH",
+      "expansion": "Recursos Humanos"
+    },
+    {
+      "abbr": "SEFIP",
+      "expansion": "Sistema Empresa de Recolhimento do FGTS"
+    },
+    {
+      "abbr": "VA",
+      "expansion": "Vale Alimentacao"
+    },
+    {
+      "abbr": "VR",
+      "expansion": "Vale Refeicao"
+    },
+    {
+      "abbr": "VT",
+      "expansion": "Vale Transporte"
+    }
+  ]
+}

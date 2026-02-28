@@ -1,0 +1,1887 @@
+{
+  "_meta": {
+    "id": "section_priority_finance",
+    "version": "1.0.0",
+    "description": "Section-priority rules for finance retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "mode": "deterministic_scan_order"
+  },
+  "domain": "finance",
+  "rules": [
+    {
+      "id": "finance_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "management_discussion",
+        "strategy",
+        "risk_mitigation",
+        "capital_plan",
+        "action_items"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_mitigation",
+        "capital_plan",
+        "action_items",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "management_discussion",
+        "strategy",
+        "risk_mitigation",
+        "capital_plan"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table",
+        "operating_metrics",
+        "assumptions"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "cash_flow_table",
+        "operating_metrics",
+        "assumptions",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table",
+        "operating_metrics"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "variance_analysis",
+        "kpi_bridge",
+        "assumptions",
+        "footnotes"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_bridge",
+        "assumptions",
+        "footnotes",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "variance_analysis",
+        "kpi_bridge",
+        "assumptions"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule",
+        "management_discussion"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liquidity",
+        "debt_schedule",
+        "management_discussion",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "financial_highlights",
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table",
+        "rent_roll_table"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "income_statement_table",
+        "cash_flow_table",
+        "rent_roll_table",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "financial_highlights",
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks",
+        "appendix_index"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sheet_index",
+        "bookmarks",
+        "appendix_index",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log",
+        "sla_report"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "alerts",
+        "incident_log",
+        "sla_report",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "management_discussion",
+        "financial_highlights",
+        "risk_factors",
+        "outlook"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "financial_highlights",
+        "risk_factors",
+        "outlook",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "management_discussion",
+        "financial_highlights",
+        "risk_factors"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "footnotes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings",
+        "assumptions"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "notes_to_accounts",
+        "audit_findings",
+        "assumptions",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "footnotes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_calculate_metrics_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "income_statement",
+        "hotel_operating_statement",
+        "kpi_dashboard"
+      ],
+      "sections": [
+        "kpi_table",
+        "operating_metrics",
+        "variance_analysis",
+        "assumptions",
+        "footnotes"
+      ]
+    },
+    {
+      "id": "finance_compare_budget_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "budget_report",
+        "forecast_model"
+      ],
+      "sections": [
+        "executive_summary",
+        "variance_analysis",
+        "kpi_bridge",
+        "assumptions",
+        "footnotes"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "id": "finance_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "management_discussion",
+        "strategy",
+        "risk_mitigation",
+        "capital_plan",
+        "action_items"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_mitigation",
+        "capital_plan",
+        "action_items",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "management_discussion",
+        "strategy",
+        "risk_mitigation",
+        "capital_plan"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table",
+        "operating_metrics",
+        "assumptions"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "cash_flow_table",
+        "operating_metrics",
+        "assumptions",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table",
+        "operating_metrics"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "variance_analysis",
+        "kpi_bridge",
+        "assumptions",
+        "footnotes"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_bridge",
+        "assumptions",
+        "footnotes",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "variance_analysis",
+        "kpi_bridge",
+        "assumptions"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule",
+        "management_discussion"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liquidity",
+        "debt_schedule",
+        "management_discussion",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "financial_highlights",
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table",
+        "rent_roll_table"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "income_statement_table",
+        "cash_flow_table",
+        "rent_roll_table",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "financial_highlights",
+        "kpi_table",
+        "income_statement_table",
+        "cash_flow_table"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks",
+        "appendix_index"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sheet_index",
+        "bookmarks",
+        "appendix_index",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log",
+        "sla_report"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "alerts",
+        "incident_log",
+        "sla_report",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "management_discussion",
+        "financial_highlights",
+        "risk_factors",
+        "outlook"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "financial_highlights",
+        "risk_factors",
+        "outlook",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "executive_summary",
+        "management_discussion",
+        "financial_highlights",
+        "risk_factors"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "footnotes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings",
+        "assumptions"
+      ],
+      "docTypes": [
+        "budget_report",
+        "income_statement",
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "finance_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "notes_to_accounts",
+        "audit_findings",
+        "assumptions",
+        "executive_summary",
+        "financial_highlights"
+      ],
+      "docTypes": [
+        "cash_flow_statement",
+        "pnl_statement",
+        "forecast_model"
+      ]
+    },
+    {
+      "id": "finance_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "footnotes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings"
+      ],
+      "docTypes": [
+        "kpi_dashboard",
+        "rent_roll",
+        "hotel_operating_statement"
+      ]
+    },
+    {
+      "id": "finance_calculate_metrics_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "income_statement",
+        "hotel_operating_statement",
+        "kpi_dashboard"
+      ],
+      "sections": [
+        "kpi_table",
+        "operating_metrics",
+        "variance_analysis",
+        "assumptions",
+        "footnotes"
+      ]
+    },
+    {
+      "id": "finance_compare_budget_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "budget_report",
+        "forecast_model"
+      ],
+      "sections": [
+        "executive_summary",
+        "variance_analysis",
+        "kpi_bridge",
+        "assumptions",
+        "footnotes"
+      ]
+    }
+  ]
+}

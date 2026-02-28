@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "id": "di_billing_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Document type catalog for billing domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing"
+  },
+  "domain": "billing",
+  "docTypes": [
+    {
+      "id": "billing_electricity_bill",
+      "name": {
+        "en": "Electricity Bill",
+        "pt": "Conta de Energia"
+      },
+      "description": "Utility invoice for electricity service including meter consumption and tariff charges.",
+      "detectionPatterns": [
+        "\\belectricity bill\\b",
+        "\\bpower bill\\b",
+        "\\bkwh\\b",
+        "\\bconta de energia\\b",
+        "\\bconsumo de energia\\b"
+      ],
+      "priority": 100
+    },
+    {
+      "id": "billing_internet_bill",
+      "name": {
+        "en": "Internet Bill",
+        "pt": "Conta de Internet"
+      },
+      "description": "Recurring broadband or fiber bill with plan fees, usage, and taxes.",
+      "detectionPatterns": [
+        "\\binternet bill\\b",
+        "\\bbroadband\\b",
+        "\\bfiber plan\\b",
+        "\\bconta de internet\\b",
+        "\\bprovedor\\b"
+      ],
+      "priority": 99
+    },
+    {
+      "id": "billing_invoice_business",
+      "name": {
+        "en": "Business Invoice",
+        "pt": "Fatura Empresarial"
+      },
+      "description": "B2B invoice with PO references, tax lines, and payment terms.",
+      "detectionPatterns": [
+        "\\bbusiness invoice\\b",
+        "\\binvoice\\s*#",
+        "\\bpurchase order\\b",
+        "\\bfatura empresarial\\b",
+        "\\bnota fiscal\\b"
+      ],
+      "priority": 98
+    },
+    {
+      "id": "billing_phone_bill_mobile",
+      "name": {
+        "en": "Mobile Phone Bill",
+        "pt": "Conta de Celular"
+      },
+      "description": "Wireless carrier bill with line-level voice, sms, and data charges.",
+      "detectionPatterns": [
+        "\\bmobile bill\\b",
+        "\\bwireless bill\\b",
+        "\\bmsisdn\\b",
+        "\\bimei\\b",
+        "\\bconta de celular\\b"
+      ],
+      "priority": 97
+    },
+    {
+      "id": "billing_retail_receipt",
+      "name": {
+        "en": "Retail Receipt",
+        "pt": "Recibo de Varejo"
+      },
+      "description": "Point-of-sale receipt showing purchased items, taxes, and payment confirmation.",
+      "detectionPatterns": [
+        "\\bretail receipt\\b",
+        "\\bpos receipt\\b",
+        "\\bstore receipt\\b",
+        "\\brecibo\\b",
+        "\\bcupom fiscal\\b"
+      ],
+      "priority": 96
+    },
+    {
+      "id": "billing_water_sewer_bill",
+      "name": {
+        "en": "Water and Sewer Bill",
+        "pt": "Conta de Agua e Esgoto"
+      },
+      "description": "Municipal water/sewer utility bill with meter readings and service charges.",
+      "detectionPatterns": [
+        "\\bwater bill\\b",
+        "\\bsewer charge\\b",
+        "\\bm3\\b",
+        "\\bconta de agua\\b",
+        "\\besgoto\\b"
+      ],
+      "priority": 95
+    }
+  ]
+}

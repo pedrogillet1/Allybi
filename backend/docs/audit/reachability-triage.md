@@ -1,12 +1,12 @@
 # Reachability Triage
 
-Generated: 2026-02-27T19:19:56.736Z
+Generated: 2026-02-28T02:58:32.256Z
 
 ## Summary
 
-- Unreachable files: 82
+- Unreachable files: 109
 - `WIRE`: 0
-- `MOVE`: 73
+- `MOVE`: 100
 - `DELETE`: 9
 
 ## By Bucket
@@ -18,9 +18,9 @@ Generated: 2026-02-27T19:19:56.736Z
 | controllers | 1 | 0 | 1 | 0 |
 | data_banks | 7 | 0 | 7 | 0 |
 | entrypoints | 1 | 0 | 1 | 0 |
-| modules | 4 | 0 | 4 | 0 |
-| services | 22 | 0 | 14 | 8 |
-| tests | 21 | 0 | 21 | 0 |
+| modules | 8 | 0 | 8 | 0 |
+| services | 33 | 0 | 25 | 8 |
+| tests | 33 | 0 | 33 | 0 |
 | types | 1 | 0 | 0 | 1 |
 
 ## Detailed Triage
@@ -61,31 +61,46 @@ Generated: 2026-02-27T19:19:56.736Z
 | src/data_banks/generators/generateCapabilitiesCatalog.ts | MOVE | platform-runtime | R2-MOVE | Non-runtime workload should live under scripts/tools or data. |
 | src/data_banks/generators/parallel_bank_generator.ts | MOVE | platform-runtime | R2-MOVE | Non-runtime workload should live under scripts/tools or data. |
 | src/entrypoints/http/routes/editor-session.routes.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/modules/chat/runtime/CentralizedChatRuntimeDelegate.provenance.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/modules/chat/runtime/CentralizedChatRuntimeDelegate.scope.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/modules/chat/runtime/CentralizedChatRuntimeDelegate.truncation.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/modules/chat/runtime/ChatRuntimeOrchestrator.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/modules/chat/runtime/ContractNormalizer.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/modules/chat/runtime/EvidenceValidator.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/modules/chat/runtime/provenance/ProvenanceBuilder.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/modules/chat/runtime/truncationClassifier.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/chat/chatKernel.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/chat/guardrails/editorMode.guard.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/chat/guardrails/editorMode.guard.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 | src/services/chat/handlers/editorTurn.handler.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 | src/services/chat/turnRoutePolicy.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/chat/turnRouter.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/core/banks/dataBankLoader.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/core/banks/documentIntelligenceIntegrity.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/core/banks/runtimeWiringIntegrity.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/core/banks/runtimeWiringProof.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/core/certification/orchestratorCertification.service.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 | src/services/core/certification/orchestratorCertification.types.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 | src/services/core/certification/orchestratorCertificationPolicy.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
+| src/services/core/enforcement/responseContractEnforcer.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/core/handlers/editHandler.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/core/retrieval/retrievalDocLock.benchmark.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/core/retrieval/retrievalEngine.scope-lock.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/core/retrieval/retrievalEngine.telemetry.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/core/scope/documentReferenceResolver.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/creative/assetSpec.types.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 | src/services/creative/deck/deckPlan.types.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 | src/services/editing/documentRevisionStore.findReplace.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/editing/entrypoints/editingAgentRouter.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/editing/intentRuntime/matcher.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/editing/intentRuntime/segmenter.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/editing/safety/editingSafetyGate.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/editing/textGeneration.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/editing/xlsx/xlsxFileEditor.service.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 | src/services/llm/core/llmRequestBuilder.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/retrieval/document_intelligence/ruleInterpreter.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/spreadsheetEngine/spreadsheetEngine.client.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/services/telemetry/adminTelemetryAdapter.retrievalRules.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/services/telemetry/traceWriter.service.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/tests/benchmarks/runBenchmarks.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/tests/certification/editing-capability-matrix.cert.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
@@ -105,8 +120,20 @@ Generated: 2026-02-27T19:19:56.736Z
 | src/tests/certification/turn-debug-packet.cert.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/tests/certification/types.ts | MOVE | platform-runtime | R2-MOVE | Non-runtime workload should live under scripts/tools or data. |
 | src/tests/certification/wrong-doc.cert.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/document-intelligence/docint-bank-integrity.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/document-intelligence/docint-orphan-detection.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/document-intelligence/docint-wiring-proof.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/e2e/editing/docx-structural.e2e.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/e2e/editing/xlsx-format-and-value.e2e.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/tests/editing/capabilityMatrix.consistency.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/editing/docx-page-section-break.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/tests/editing/docx_xlsx_bitwise.contract.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/editing/editingRouting.bankWiring.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/editing/slotFill.locale.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/editing/xlsx-agent-golden.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/editing/xlsx-data-cleaning.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/editing/xlsx-formula-templates.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/tests/memory-semantic-continuity.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
+| src/tests/microcopy.editingTemplates.test.ts | MOVE | qa-certification | R2-MOVE | Test-only file under src should not count as runtime debt. |
 | src/types/express.d.ts | DELETE | legacy-migration | R2-DELETE | Legacy runtime subtree file is unreachable from active seeds. |
 

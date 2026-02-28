@@ -13,7 +13,20 @@
   },
   "config": {
     "enabled": true,
-    "filetype": "xlsx"
+    "filetype": "xlsx",
+    "pythonFallback": {
+      "enabled": true,
+      "operatorBankId": "allybi_python_operators",
+      "escalateWhen": [
+        "computation_exceeds_single_formula",
+        "multi_sheet_join_required",
+        "statistical_analysis_requested",
+        "chart_as_image_requested",
+        "data_cleaning_requires_fuzzy_match",
+        "time_series_forecast_requested",
+        "pivot_with_custom_aggregation"
+      ]
+    }
   },
   "operators": {
     "XLSX_SET_CELL_VALUE": {
@@ -998,6 +1011,163 @@
       "examples_pt": [
         "Excluir o gráfico",
         "Remover o gráfico de barras"
+      ]
+    },
+    "XLSX_REMOVE_DUPLICATES": {
+      "runtimeOperator": "COMPUTE",
+      "preview_render_type": "range_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "snapshot",
+      "schema": {
+        "type": "object",
+        "required": ["rangeA1"],
+        "properties": {
+          "rangeA1": {
+            "type": "string",
+            "description": "A1 range containing data to deduplicate"
+          },
+          "keyColumns": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "1-based column indices to use as dedup key (omit for all columns)"
+          },
+          "hasHeader": {
+            "type": "boolean",
+            "description": "Whether the first row is a header (default true)"
+          }
+        }
+      },
+      "examples_en": [
+        "Remove duplicates from this range",
+        "Deduplicate rows based on column A"
+      ],
+      "examples_pt": [
+        "Remover duplicatas deste intervalo",
+        "Deduplicar linhas com base na coluna A"
+      ]
+    },
+    "XLSX_TRIM_WHITESPACE": {
+      "runtimeOperator": "COMPUTE",
+      "preview_render_type": "range_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
+      "schema": {
+        "type": "object",
+        "required": ["rangeA1"],
+        "properties": {
+          "rangeA1": {
+            "type": "string",
+            "description": "A1 range of cells to trim whitespace from"
+          }
+        }
+      },
+      "examples_en": [
+        "Trim whitespace from these cells",
+        "Clean up extra spaces"
+      ],
+      "examples_pt": [
+        "Remover espaços em branco destas células",
+        "Limpar espaços extras"
+      ]
+    },
+    "XLSX_NORMALIZE_VALUES": {
+      "runtimeOperator": "COMPUTE",
+      "preview_render_type": "range_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
+      "schema": {
+        "type": "object",
+        "required": ["rangeA1", "normalization"],
+        "properties": {
+          "rangeA1": {
+            "type": "string",
+            "description": "A1 range of cells to normalize"
+          },
+          "normalization": {
+            "type": "string",
+            "enum": ["dates", "numbers", "text_case"],
+            "description": "Type of normalization to apply"
+          },
+          "textCase": {
+            "type": "string",
+            "enum": ["upper", "lower", "title"],
+            "description": "Target text case (only for text_case normalization)"
+          },
+          "dateFormat": {
+            "type": "string",
+            "description": "Target date format (only for dates normalization)"
+          }
+        }
+      },
+      "examples_en": [
+        "Normalize dates to ISO format",
+        "Standardize text to uppercase",
+        "Convert formatted numbers to plain numbers"
+      ],
+      "examples_pt": [
+        "Normalizar datas para formato ISO",
+        "Padronizar texto em maiúsculas",
+        "Converter números formatados para números simples"
+      ]
+    },
+    "XLSX_SET_PROTECTION": {
+      "runtimeOperator": "COMPUTE",
+      "preview_render_type": "sheet_info",
+      "requires_confirmation": true,
+      "undo_strategy": "snapshot",
+      "schema": {
+        "type": "object",
+        "required": ["sheetName"],
+        "properties": {
+          "sheetName": {
+            "type": "string",
+            "description": "Name of the sheet to protect"
+          },
+          "password": {
+            "type": "string",
+            "description": "Optional password for sheet protection"
+          }
+        }
+      },
+      "examples_en": [
+        "Protect this sheet",
+        "Lock the sheet with a password"
+      ],
+      "examples_pt": [
+        "Proteger esta planilha",
+        "Bloquear a planilha com senha"
+      ]
+    },
+    "XLSX_LOCK_CELLS": {
+      "runtimeOperator": "COMPUTE",
+      "preview_render_type": "range_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "snapshot",
+      "schema": {
+        "type": "object",
+        "required": ["rangeA1", "locked"],
+        "properties": {
+          "rangeA1": {
+            "type": "string",
+            "description": "A1 range of cells to lock or unlock"
+          },
+          "locked": {
+            "type": "boolean",
+            "description": "Whether to lock (true) or unlock (false) cells"
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": "Whether to hide cell formulas (default false)"
+          }
+        }
+      },
+      "examples_en": [
+        "Lock cells A1:D10",
+        "Unlock the header row"
+      ],
+      "examples_pt": [
+        "Bloquear células A1:D10",
+        "Desbloquear a linha de cabeçalho"
       ]
     }
   }

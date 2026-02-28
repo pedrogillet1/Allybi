@@ -57,6 +57,52 @@ function makeDecisionOutput(intentFamily: string): IntentDecisionOutput {
   };
 }
 
+function makeFileActionBank() {
+  return {
+    config: {
+      operatorDetection: {
+        enabled: true,
+        useRegex: true,
+        caseInsensitive: true,
+        stripDiacritics: true,
+        collapseWhitespace: true,
+        minConfidence: 0.55,
+        maxCandidatesPerMessage: 3,
+        guards: {
+          mustNotContain: {
+            en: ["\\bsummarize\\b"],
+            pt: [],
+          },
+          mustNotMatchWholeMessage: {
+            en: ["^\\s*hello\\s*$"],
+            pt: [],
+          },
+        },
+      },
+    },
+    detectionRules: [
+      {
+        id: "DET_OPEN",
+        operator: "open",
+        priority: 70,
+        confidence: 0.78,
+        patterns: {
+          en: ["\\bopen\\b"],
+        },
+      },
+      {
+        id: "DET_FILE_MOVE",
+        operator: "file_move",
+        priority: 78,
+        confidence: 0.74,
+        patterns: {
+          en: ["\\bmove\\b.{0,120}\\bto\\b"],
+        },
+      },
+    ],
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -275,5 +321,65 @@ describe("TurnRouterService.decide()", () => {
       const route = router.decide(ctx);
       expect(route).not.toBe("EDITOR");
     }
+  });
+
+  test("uses file_action detection rules to emit file_actions candidate operator", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest
+        .fn()
+        .mockImplementation(
+          (input: {
+            candidates: Array<{ operatorId?: string; intentFamily?: string }>;
+          }) => {
+            const fileCandidate = input.candidates.find(
+              (c) => c.intentFamily === "file_actions",
+            );
+            expect(fileCandidate?.operatorId).toBe("file_move");
+            return makeDecisionOutput("file_actions");
+          },
+        ),
+    };
+    const bank = makeFileActionBank();
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      ((bankId: string) =>
+        bankId === "file_action_operators" ? bank : null) as any,
+    );
+    const ctx = makeCtx({ messageText: "move report.pdf to Archive" });
+
+    expect(router.decide(ctx)).toBe("KNOWLEDGE");
+    expect(intentConfig.decide).toHaveBeenCalled();
+  });
+
+  test("suppresses file_action detection when global mustNotContain guard matches", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn(
+        (input: { candidates: Array<{ intentFamily?: string }> }) => {
+          const hasFileActions = input.candidates.some(
+            (c) => c.intentFamily === "file_actions",
+          );
+          expect(hasFileActions).toBe(false);
+          return makeDecisionOutput("help");
+        },
+      ),
+    };
+    const bank = makeFileActionBank();
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      ((bankId: string) =>
+        bankId === "file_action_operators" ? bank : null) as any,
+    );
+    const ctx = makeCtx({ messageText: "summarize this and open report.pdf" });
+
+    expect(router.decide(ctx)).toBe("GENERAL");
+    expect(intentConfig.decide).toHaveBeenCalled();
   });
 });

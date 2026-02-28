@@ -190,6 +190,9 @@ class KodaV3Container {
               missingCoreBanks: docInt.missingCoreBanks,
               missingRegistryEntries: docInt.missingRegistryEntries,
               missingBankFiles: docInt.missingBankFiles,
+              missingManifestBanks: docInt.missingManifestBanks,
+              missingDependencyNodes: docInt.missingDependencyNodes,
+              orphanBankIds: docInt.orphanBankIds,
               mapRequiredCoreCount: docInt.mapRequiredCoreCount,
               mapOptionalCount: docInt.mapOptionalCount,
             };
@@ -216,6 +219,40 @@ class KodaV3Container {
 
         this._banksInitialized = true;
         console.log("[Container] Banks initialized successfully");
+
+        try {
+          const { getDocumentIntelligenceBanksInstance } = await import(
+            "../services/core/banks/documentIntelligenceBanks.service"
+          );
+          const diagnostics =
+            getDocumentIntelligenceBanksInstance().listDiagnostics();
+          const sampleIds = diagnostics.loadedBankIds.slice(0, 20);
+          const versionSample = sampleIds.reduce(
+            (acc, id) => {
+              if (diagnostics.versions[id]) acc[id] = diagnostics.versions[id];
+              return acc;
+            },
+            {} as Record<string, string>,
+          );
+          const countSample = sampleIds.reduce(
+            (acc, id) => {
+              acc[id] = diagnostics.counts[id] ?? 0;
+              return acc;
+            },
+            {} as Record<string, number>,
+          );
+          console.log("[Container] Document intelligence bank diagnostics", {
+            loadedCount: diagnostics.loadedBankIds.length,
+            warningCount: diagnostics.validationWarnings.length,
+            loadedIdsSample: sampleIds,
+            versionSample,
+            countSample,
+          });
+        } catch (diagnosticsErr: any) {
+          console.warn(
+            `[Container] Document intelligence bank diagnostics failed: ${diagnosticsErr?.message || diagnosticsErr}`,
+          );
+        }
       } catch (e: any) {
         const env = coerceEnvName(process.env.NODE_ENV);
         const strict = env === "production" || env === "staging";

@@ -186,6 +186,23 @@ interface QueryResult {
 const REPORT_DIR = path.resolve(__dirname, "reports");
 const REPORT_FILE = path.join(REPORT_DIR, "query-test-100-results.json");
 const MAX_RESPONSE_WAIT_MS = 180_000; // 3 minutes per query
+function buildReportPayload(results: QueryResult[]) {
+  return {
+    meta: {
+      generatedAt: new Date().toISOString(),
+      totalQueries: RUN_QUERIES.length,
+      range: {
+        start: QUERY_START_INDEX + 1,
+        end: QUERY_START_INDEX + RUN_QUERIES.length,
+      },
+      documentsAttached: TARGET_DOCUMENTS.map((document) => ({
+        id: document.id,
+        name: document.name,
+      })),
+    },
+    results,
+  };
+}
 const TEST_EMAIL = process.env.E2E_TEST_EMAIL || "test@allybi.com";
 const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || "test123";
 const QUERY_START_INDEX = Math.max(
@@ -648,7 +665,10 @@ test.describe("100-Query Chat Test", () => {
       results.push(result);
 
       // Write intermediate results after each query (crash resilience)
-      fs.writeFileSync(REPORT_FILE, JSON.stringify(results, null, 2));
+      fs.writeFileSync(
+        REPORT_FILE,
+        JSON.stringify(buildReportPayload(results), null, 2),
+      );
 
       // Brief pause between queries
       await page.waitForTimeout(1000);

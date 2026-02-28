@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "id": "doc_identity_schema",
+    "version": "1.0.0",
+    "description": "Schema for document identity banks (taxonomy, archetypes, and aliases).",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/doc_identity_schema.any.json",
+    "title": "Document Identity Bank Schema",
+    "type": "object",
+    "required": [
+      "_meta",
+      "config"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "description",
+          "languages",
+          "lastUpdated"
+        ],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "additionalProperties": true
+      },
+      "domain": {
+        "type": "string"
+      },
+      "typeDefinitions": {
+        "type": "array"
+      },
+      "archetypes": {
+        "type": "array"
+      },
+      "aliases": {
+        "type": "array"
+      }
+    },
+    "allOf": [
+      {
+        "anyOf": [
+          {
+            "required": [
+              "typeDefinitions"
+            ]
+          },
+          {
+            "required": [
+              "archetypes",
+              "domain"
+            ]
+          },
+          {
+            "required": [
+              "aliases",
+              "domain"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

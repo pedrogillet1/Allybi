@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "id": "di_finance_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "Portuguese abbreviations for finance domain.",
+    "languages": ["pt"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "language": "pt"
+  },
+  "domain": "finance",
+  "abbreviations": [
+    { "abbr": "BP", "expansion": "Balanço Patrimonial" },
+    { "abbr": "CAPEX", "expansion": "Investimentos de Capital" },
+    { "abbr": "CMV", "expansion": "Custo das Mercadorias Vendidas" },
+    { "abbr": "CPV", "expansion": "Custo dos Produtos Vendidos" },
+    { "abbr": "CVM", "expansion": "Comissão de Valores Mobiliários" },
+    { "abbr": "DFC", "expansion": "Demonstração de Fluxo de Caixa" },
+    { "abbr": "DMPL", "expansion": "Demonstração das Mutações do Patrimônio Líquido" },
+    { "abbr": "DRE", "expansion": "Demonstração de Resultado do Exercício" },
+    { "abbr": "EBITDA", "expansion": "LAJIDA — Lucro Antes de Juros, Impostos, Depreciação e Amortização" },
+    { "abbr": "FCL", "expansion": "Fluxo de Caixa Livre" },
+    { "abbr": "IFRS", "expansion": "Normas Internacionais de Relatórios Financeiros" },
+    { "abbr": "LAJIDA", "expansion": "Lucro Antes de Juros, Impostos, Depreciação e Amortização" },
+    { "abbr": "LAJIR", "expansion": "Lucro Antes de Juros e Imposto de Renda" },
+    { "abbr": "LL", "expansion": "Lucro Líquido" },
+    { "abbr": "LPA", "expansion": "Lucro por Ação" },
+    { "abbr": "MB", "expansion": "Margem Bruta" },
+    { "abbr": "ML", "expansion": "Margem Líquida" },
+    { "abbr": "MO", "expansion": "Margem Operacional" },
+    { "abbr": "PL", "expansion": "Patrimônio Líquido" },
+    { "abbr": "ROE", "expansion": "Retorno sobre Patrimônio Líquido" },
+    { "abbr": "TIR", "expansion": "Taxa Interna de Retorno" },
+    { "abbr": "VPL", "expansion": "Valor Presente Líquido" },
+    { "abbr": "YoY", "expansion": "Ano contra Ano" },
+    { "abbr": "YTD", "expansion": "Acumulado no Ano" }
+  ]
+}

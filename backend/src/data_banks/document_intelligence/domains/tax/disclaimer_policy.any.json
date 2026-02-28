@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "id": "di_tax_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer templates for tax domain responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax"
+  },
+  "domain": "tax",
+  "disclaimers": [
+    {
+      "id": "tax_disc_001_not_tax_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This output summarizes uploaded tax documents and is not tax or legal advice. Consult a licensed professional for advice.",
+        "pt": "Esta resposta resume documentos tributarios enviados e nao constitui consultoria tributaria ou juridica. Consulte um profissional habilitado."
+      }
+    },
+    {
+      "id": "tax_disc_002_scope_lock",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Only the attached documents were used. No external records were inferred.",
+        "pt": "Apenas os documentos anexados foram usados. Nenhum registro externo foi inferido."
+      }
+    },
+    {
+      "id": "tax_disc_003_unverified_values",
+      "trigger": "contains_unverified_fields",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Some fields are marked unverified due to missing or unreadable source evidence.",
+        "pt": "Alguns campos foram marcados como nao verificados por falta de evidencia legivel ou completa."
+      }
+    },
+    {
+      "id": "tax_disc_004_deadline_warning",
+      "trigger": "contains_deadline_or_penalty_context",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Deadlines and penalties should be confirmed directly with the issuing authority.",
+        "pt": "Prazos e penalidades devem ser confirmados diretamente com a autoridade emissora."
+      }
+    },
+    {
+      "id": "tax_disc_005_redaction_notice",
+      "trigger": "pii_redacted",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Sensitive identifiers were redacted by default for privacy and security.",
+        "pt": "Identificadores sensiveis foram ocultados por padrao por privacidade e seguranca."
+      }
+    }
+  ]
+}

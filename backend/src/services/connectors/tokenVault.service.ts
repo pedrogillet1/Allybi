@@ -15,6 +15,20 @@ export interface ConnectorTokenPayload {
   metadata?: Record<string, unknown>;
 }
 
+export interface ConnectorConnectionInfo {
+  scopes: string[];
+  expiresAt: Date;
+  updatedAt: Date;
+  providerAccountId: string | null;
+}
+
+export interface EnsureConnectedAccessResult {
+  connected: boolean;
+  accessToken: string | null;
+  reason?: "not_connected" | "temp_unavailable" | "misconfigured";
+  info?: ConnectorConnectionInfo | null;
+}
+
 interface StoredProviderToken {
   provider: ConnectorProvider;
   wrappedRecordKey: string;
@@ -221,12 +235,7 @@ export class TokenVaultService {
   async getProviderConnectionInfo(
     userId: string,
     provider: ConnectorProvider,
-  ): Promise<{
-    scopes: string[];
-    expiresAt: Date;
-    updatedAt: Date;
-    providerAccountId: string | null;
-  } | null> {
+  ): Promise<ConnectorConnectionInfo | null> {
     const entry = await this.readProviderEntry(userId, provider);
     if (!entry) return null;
 
@@ -244,6 +253,102 @@ export class TokenVaultService {
       updatedAt: new Date(entry.updatedAt),
       providerAccountId,
     };
+  }
+
+  async ensureConnectedAccess(
+    userId: string,
+    provider: ConnectorProvider,
+    opts?: {
+      refreshFn?: ((arg: string | { userId: string }) => unknown) | null;
+      oauthService?: unknown;
+    },
+  ): Promise<EnsureConnectedAccessResult> {
+    const payload = await this.getDecryptedPayload(userId, provider).catch(
+      () => null,
+    );
+    if (!payload?.accessToken) {
+      return { connected: false, accessToken: null, reason: "not_connected" };
+    }
+
+    const info = await this.getProviderConnectionInfo(userId, provider).catch(
+      () => null,
+    );
+    if (!info) {
+      return { connected: false, accessToken: null, reason: "not_connected" };
+    }
+
+    const expirySafetyWindowMs = 60_000;
+    const expiredSoon =
+      info.expiresAt.getTime() <= Date.now() + expirySafetyWindowMs;
+    if (!expiredSoon) {
+      return { connected: true, accessToken: payload.accessToken, info };
+    }
+
+    const refreshFn = opts?.refreshFn;
+    if (typeof refreshFn !== "function") {
+      return {
+        connected: false,
+        accessToken: null,
+        reason: "not_connected",
+        info,
+      };
+    }
+
+    try {
+      await this.invokeRefresh(refreshFn, opts?.oauthService, userId);
+      const refreshedPayload = await this.getDecryptedPayload(
+        userId,
+        provider,
+      ).catch(() => null);
+      const refreshedInfo = await this.getProviderConnectionInfo(
+        userId,
+        provider,
+      ).catch(() => null);
+      if (!refreshedPayload?.accessToken || !refreshedInfo) {
+        return {
+          connected: false,
+          accessToken: null,
+          reason: "temp_unavailable",
+          info: refreshedInfo,
+        };
+      }
+      return {
+        connected: true,
+        accessToken: refreshedPayload.accessToken,
+        info: refreshedInfo,
+      };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      const lower = message.toLowerCase();
+      if (
+        lower.includes("invalid_grant") ||
+        lower.includes("invalid refresh") ||
+        lower.includes("refresh token") ||
+        lower.includes("reconnect") ||
+        lower.includes("no token")
+      ) {
+        await this.deleteToken(userId, provider).catch(() => {});
+        return { connected: false, accessToken: null, reason: "not_connected" };
+      }
+      if (
+        lower.includes("missing") ||
+        lower.includes("not configured") ||
+        lower.includes("environment")
+      ) {
+        return {
+          connected: false,
+          accessToken: null,
+          reason: "misconfigured",
+          info,
+        };
+      }
+      return {
+        connected: false,
+        accessToken: null,
+        reason: "temp_unavailable",
+        info,
+      };
+    }
   }
 
   private parseTokenBlob(encryptedBlob: string): ConnectorTokenPayload {
@@ -267,6 +372,19 @@ export class TokenVaultService {
 
   private makeAad(userId: string, provider: ConnectorProvider): string {
     return `connector-token:${userId}:${provider}`;
+  }
+
+  private async invokeRefresh(
+    fn: (arg: string | { userId: string }) => unknown,
+    oauthService: unknown,
+    userId: string,
+  ): Promise<void> {
+    try {
+      await Promise.resolve(fn.call(oauthService, userId));
+      return;
+    } catch {
+      await Promise.resolve(fn.call(oauthService, { userId }));
+    }
   }
 
   private decryptEntry(

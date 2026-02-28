@@ -56,8 +56,9 @@ export const connectorQueue = new Queue<ConnectorSyncJobData>(
 let connectorWorker: Worker<ConnectorSyncJobData> | null = null;
 
 export async function addConnectorSyncJob(data: ConnectorSyncJobData) {
+  const bucket = Math.floor(Date.now() / 300_000); // 5-minute dedupe window
   return connectorQueue.add("connector-sync", data, {
-    jobId: `connector:${data.provider}:${data.userId}:${Date.now()}`,
+    jobId: `connector:${data.provider}:${data.userId}:${data.forceResync === true ? "force" : "incremental"}:${bucket}`,
   });
 }
 

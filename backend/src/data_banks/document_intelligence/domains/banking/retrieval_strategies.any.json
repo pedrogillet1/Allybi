@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "id": "di_banking_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for banking domain documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "maxBoostRules": 15,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "banking",
+  "sectionPriority": [
+    {
+      "section": "summary",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "section": "transactions",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "locate",
+        "compare"
+      ]
+    },
+    {
+      "section": "balance_and_due",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate",
+        "calculate"
+      ]
+    },
+    {
+      "section": "payments_and_credits",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "section": "charges_and_fees",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "period",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "compare"
+      ]
+    },
+    {
+      "section": "issuer_and_customer",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "section": "footer_metadata",
+      "weight": 1.6,
+      "operators": [
+        "validate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "banking_boost_001_balance_trace",
+      "priority": 95,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "condition": "query asks where balance changed",
+      "boostSections": [
+        "transactions",
+        "balance_and_due",
+        "summary"
+      ]
+    },
+    {
+      "id": "banking_boost_002_card_dispute",
+      "priority": 92,
+      "weight": 2.4,
+      "operators": [
+        "evaluate",
+        "advise"
+      ],
+      "condition": "query asks about card charge dispute",
+      "boostSections": [
+        "transactions",
+        "payments_and_credits",
+        "notices_and_terms"
+      ]
+    },
+    {
+      "id": "banking_boost_003_loan_allocation",
+      "priority": 91,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate"
+      ],
+      "condition": "query asks principal vs interest split",
+      "boostSections": [
+        "charges_and_fees",
+        "summary",
+        "line_items"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bstatement\\b",
+      "expansions": [
+        "account statement",
+        "monthly statement",
+        "extrato"
+      ]
+    },
+    {
+      "trigger": "\\bbalance\\b",
+      "expansions": [
+        "opening balance",
+        "closing balance",
+        "running balance",
+        "saldo"
+      ]
+    },
+    {
+      "trigger": "\\bpayment\\b",
+      "expansions": [
+        "credit",
+        "settlement",
+        "pagamento",
+        "comprovante"
+      ]
+    },
+    {
+      "trigger": "\\bloan\\b",
+      "expansions": [
+        "principal",
+        "installment",
+        "interest",
+        "emprestimo"
+      ]
+    },
+    {
+      "trigger": "\\bcard\\b",
+      "expansions": [
+        "credit card",
+        "statement cycle",
+        "minimum payment",
+        "cartao"
+      ]
+    }
+  ]
+}

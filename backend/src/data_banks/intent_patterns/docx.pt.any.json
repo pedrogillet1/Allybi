@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "description": "Portuguese (pt-BR) intent patterns for DOCX editing operations.",
     "domain": "docx",
-    "lastUpdated": "2026-02-27",
+    "lastUpdated": "2026-02-28",
     "languages": [
       "pt"
     ]
@@ -53,7 +53,15 @@
           "tamanho",
           "traduza",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ],
         "regex_any": [
           "\\b(?:reescreva|reformule|melhore|reescrever|reformular|melhorar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho)\\b",
@@ -102,7 +110,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "reescreva",
+          "reformule"
+        ],
+        "penalizeIfTokensPresent": [
+          "alinhe",
+          "cabeçalho",
+          "combine",
+          "converter",
+          "cor",
+          "divida",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "lista de marcadores"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.formal",
@@ -136,7 +194,16 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -182,7 +249,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formal",
+          "profissional"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.concise",
@@ -219,7 +336,16 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -265,7 +391,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "resuma",
+          "resumir"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.expand",
@@ -303,7 +479,16 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -349,7 +534,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "expanda",
+          "expandir"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.replace.span",
@@ -377,7 +612,12 @@
           "reformule",
           "resuma",
           "todo o documento",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -412,6 +652,16 @@
           "slot": "replaceText",
           "ask_en": "What should I replace it with?",
           "ask_pt": "Com o que devo substituir?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "findText",
+          "ask_en": "What text should I find?",
+          "ask_pt": "Qual texto devo procurar?"
         }
       ],
       "examples": {
@@ -425,7 +675,37 @@
           "Localizar e substituir",
           "Substituir tudo no documento"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.replace_span",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "substitua",
+          "troque"
+        ],
+        "penalizeIfTokensPresent": [
+          "localizar",
+          "marcadores",
+          "melhore",
+          "numeração",
+          "reescreva",
+          "reformule",
+          "resuma",
+          "todo o documento",
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "sumário"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.find_replace",
+        "docx.rewrite.paragraph"
+      ]
     },
     {
       "id": "docx.rewrite.section",
@@ -458,7 +738,16 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -501,7 +790,59 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "seção",
+          "secao"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sectionId",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.find_replace",
@@ -546,7 +887,11 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -588,13 +933,43 @@
         "positive": [
           "Localizar e substituir 'antigo' por 'novo'",
           "Substitua todas as ocorrências de X por Y",
-          "Trocar tudo 'empresa' por 'companhia'"
+          "Trocar tudo 'empresa' por 'companhia'",
+          "Aplique find_replace no parágrafo selecionado."
         ],
         "negative": [
           "Substitua este trecho",
           "Reescreva o parágrafo"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.find_replace",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "substituir",
+          "localizar"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.find_replace.case_sensitive"
+      ]
     },
     {
       "id": "docx.find_replace.case_sensitive",
@@ -631,7 +1006,23 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "encontre",
+          "busque",
+          "substitua",
+          "troque",
+          "caixa",
+          "substituir",
+          "respeitando",
+          "maiusculas",
+          "minusculas",
+          "localizar"
         ]
       },
       "slotExtractors": [
@@ -673,13 +1064,43 @@
         "positive": [
           "Substituir respeitando maiúsculas e minúsculas",
           "Localizar e substituir mantendo a caixa",
-          "Trocar preservando capitalização"
+          "Trocar preservando capitalização",
+          "Aplique find_replace case_sensitive no parágrafo selecionado."
         ],
         "negative": [
           "Localizar e substituir simples",
           "Trocar tudo"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.find_replace",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "encontre",
+          "busque"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.find_replace"
+      ]
     },
     {
       "id": "docx.translate.section",
@@ -721,7 +1142,9 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario"
         ]
       },
       "slotExtractors": [
@@ -753,13 +1176,19 @@
           "slot": "targetLanguage",
           "ask_en": "Which language should I translate to?",
           "ask_pt": "Para qual idioma devo traduzir?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
         "positive": [
           "Traduza esta seção para inglês",
           "Traduzir o parágrafo para espanhol",
-          "Traduza esse trecho para francês"
+          "Traduza esse trecho para francês",
+          "Aplique traduzir section no parágrafo selecionado."
         ],
         "negative": [
           "Traduza o documento inteiro",
@@ -776,7 +1205,47 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.translate_scope",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "traduza",
+          "traduzir"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.translate.document",
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.summarize.to_bullets"
+      ]
     },
     {
       "id": "docx.translate.document",
@@ -814,7 +1283,18 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario"
+        ],
+        "tokens_any": [
+          "traduza",
+          "traducao",
+          "documento",
+          "inteiro",
+          "ingles",
+          "traduzir",
+          "tudo"
         ]
       },
       "slotExtractors": [
@@ -849,13 +1329,52 @@
         "positive": [
           "Traduza o documento inteiro para inglês",
           "Traduzir tudo para espanhol",
-          "Tradução completa do documento para francês"
+          "Tradução completa do documento para francês",
+          "Aplique traduzir document no parágrafo selecionado."
         ],
         "negative": [
           "Traduza este parágrafo",
           "Traduza a seção"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.translate_scope",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "traduza",
+          "traducao"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.translate.section",
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.summarize.to_bullets"
+      ]
     },
     {
       "id": "docx.format.bold",
@@ -891,7 +1410,12 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -929,7 +1453,40 @@
           "Remova o negrito",
           "Coloque em itálico"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.bold_toggle",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "negrito"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.remove_bold"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.format.italic",
@@ -965,7 +1522,12 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -1002,7 +1564,41 @@
           "Remova o itálico",
           "Coloque em negrito"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.italic_toggle",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "itálico",
+          "italico"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.remove_italic"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.format.underline",
@@ -1039,7 +1635,12 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -1076,7 +1677,41 @@
           "Remova o sublinhado",
           "Coloque em negrito"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.underline_toggle",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sublinhado",
+          "sublinhe"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.remove_underline"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.format.color",
@@ -1112,7 +1747,12 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -1148,6 +1788,11 @@
           "slot": "color",
           "ask_en": "What color should I apply?",
           "ask_pt": "Qual cor devo aplicar?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
@@ -1161,7 +1806,34 @@
           "Mude a fonte",
           "Mude o tamanho"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.format_color",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "cor"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.clear",
+        "docx.style.set"
+      ]
     },
     {
       "id": "docx.format.font",
@@ -1197,7 +1869,12 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -1233,6 +1910,11 @@
           "slot": "fontFamily",
           "ask_en": "Which font should I use?",
           "ask_pt": "Qual fonte devo usar?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
@@ -1246,7 +1928,34 @@
           "Mude a cor da fonte",
           "Mude o tamanho da fonte"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.format_font",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "fonte"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.clear",
+        "docx.style.set"
+      ]
     },
     {
       "id": "docx.format.font_size",
@@ -1282,7 +1991,12 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -1317,6 +2031,11 @@
           "slot": "fontSize",
           "ask_en": "What font size should I use?",
           "ask_pt": "Qual tamanho de fonte devo usar?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
@@ -1331,7 +2050,34 @@
           "Mude a fonte para Arial",
           "Mude a cor"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.format_font_size",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "tamanho"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.clear",
+        "docx.style.set"
+      ]
     },
     {
       "id": "docx.format.clear",
@@ -1364,7 +2110,23 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "formatacao",
+          "limpe",
+          "remova",
+          "texto",
+          "tire",
+          "toda"
         ]
       },
       "slotExtractors": [
@@ -1398,7 +2160,43 @@
           "Aplique negrito",
           "Mude a fonte"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.format_clear",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.bold",
+        "docx.format.italic",
+        "docx.format.underline"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.align.center",
@@ -1435,7 +2233,10 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario"
         ]
       },
       "slotExtractors": [
@@ -1470,7 +2271,43 @@
           "Alinhe à esquerda",
           "Justifique"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.align_mode",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "centralize",
+          "centralizar"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.align.left",
+        "docx.align.right",
+        "docx.align.justify"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.align.left",
@@ -1502,7 +2339,16 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario"
+        ],
+        "tokens_any": [
+          "alinhe",
+          "alinhamento",
+          "esquerda",
+          "alinhar"
         ]
       },
       "slotExtractors": [
@@ -1530,13 +2376,50 @@
         "positive": [
           "Alinhe à esquerda",
           "Alinhar à esquerda",
-          "Alinhamento à esquerda"
+          "Alinhamento à esquerda",
+          "Aplique align left no parágrafo selecionado."
         ],
         "negative": [
           "Alinhe à direita",
           "Centralize"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.align_mode",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "alinhe",
+          "alinhamento"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.align.center",
+        "docx.align.right",
+        "docx.align.justify"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.align.right",
@@ -1568,7 +2451,16 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario"
+        ],
+        "tokens_any": [
+          "alinhe",
+          "alinhamento",
+          "direita",
+          "alinhar"
         ]
       },
       "slotExtractors": [
@@ -1596,13 +2488,50 @@
         "positive": [
           "Alinhe à direita",
           "Alinhar à direita",
-          "Alinhamento à direita"
+          "Alinhamento à direita",
+          "Aplique align right no parágrafo selecionado."
         ],
         "negative": [
           "Alinhe à esquerda",
           "Centralize"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.align_mode",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "alinhe",
+          "alinhamento"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.align.center",
+        "docx.align.left",
+        "docx.align.justify"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.align.justify",
@@ -1639,7 +2568,10 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario"
         ]
       },
       "slotExtractors": [
@@ -1667,13 +2599,50 @@
         "positive": [
           "Justifique o texto",
           "Justificar este parágrafo",
-          "Alinhamento justificado"
+          "Alinhamento justificado",
+          "Aplique align justify no parágrafo selecionado."
         ],
         "negative": [
           "Centralize",
           "Alinhe à esquerda"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.align_mode",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "justifique",
+          "justificar"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.align.center",
+        "docx.align.left",
+        "docx.align.right"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.spacing.line",
@@ -1707,7 +2676,19 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario"
+        ],
+        "tokens_any": [
+          "espacamento",
+          "espaçamento",
+          "linhas",
+          "entre",
+          "mude",
+          "entrelinhas",
+          "ajuste"
         ]
       },
       "slotExtractors": [
@@ -1740,6 +2721,11 @@
           "slot": "lineSpacing",
           "ask_en": "What line spacing should I use? (e.g. 1.0, 1.5, 2.0)",
           "ask_pt": "Qual espaçamento entre linhas devo usar? (ex: 1.0, 1.5, 2.0)"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
@@ -1753,7 +2739,35 @@
           "Espaçamento entre parágrafos",
           "Aumente o recuo"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.spacing_line",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "espacamento",
+          "espaçamento"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.spacing.paragraph",
+        "docx.format.indent"
+      ]
     },
     {
       "id": "docx.spacing.paragraph",
@@ -1786,7 +2800,21 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario"
+        ],
+        "tokens_any": [
+          "espacamento",
+          "espaçamento",
+          "paragrafo",
+          "parágrafo",
+          "entre",
+          "paragrafos",
+          "espaco",
+          "12pt",
+          "aumente"
         ]
       },
       "slotExtractors": [
@@ -1825,13 +2853,54 @@
         "positive": [
           "Espaçamento entre parágrafos de 12pt",
           "Aumente o espaço entre parágrafos",
-          "Espaço antes do parágrafo 6pt"
+          "Espaço antes do parágrafo 6pt",
+          "Aplique spacing paragraph no parágrafo selecionado."
         ],
         "negative": [
           "Espaçamento entre linhas",
           "Aumente o recuo"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.spacing_paragraph",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "espacamento",
+          "espaçamento"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.spacing.line",
+        "docx.format.indent"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "beforePt",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.format.indent",
@@ -1869,7 +2938,12 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -1916,7 +2990,47 @@
           "Alinhe à esquerda",
           "Espaçamento entre linhas"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.indent",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "recuo",
+          "indentar"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.spacing.line",
+        "docx.spacing.paragraph"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "leftPt",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.list.bullets",
@@ -1949,7 +3063,13 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -1984,7 +3104,49 @@
           "Remova os marcadores",
           "Adicione numeração"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "marcadores",
+          "tópicos"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.list.numbering",
@@ -2017,7 +3179,13 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -2051,7 +3219,49 @@
           "Remova a numeração",
           "Adicione marcadores"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "numeração",
+          "numerada"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.list.remove",
@@ -2078,7 +3288,22 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "lista",
+          "marcadores",
+          "remova",
+          "tire",
+          "numeracao",
+          "apague",
+          "topicos"
         ]
       },
       "slotExtractors": [
@@ -2112,7 +3337,49 @@
           "Adicione marcadores",
           "Adicione numeração"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lista",
+          "marcadores"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.list.promote",
@@ -2141,7 +3408,21 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "lista",
+          "promova",
+          "rebaixe",
+          "nivel",
+          "item",
+          "topico"
         ]
       },
       "slotExtractors": [
@@ -2181,7 +3462,54 @@
           "Remova os marcadores",
           "Adicione numeração"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lista",
+          "promova"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "direction",
+          "ask_en": "Should I promote or demote?",
+          "ask_pt": "Devo promover ou rebaixar?"
+        }
+      ]
     },
     {
       "id": "docx.list.convert_to_paragraphs",
@@ -2193,6 +3521,27 @@
           "\\b(?:converta|converter|transforme|transformar)\\b.{0,30}\\b(?:os\\s+)?(?:t[oó]picos|marcadores|bullets|itens|lista)\\b.{0,20}\\b(?:em|para)\\b.{0,20}\\b(?:par[aá]grafos?|texto\\s+corrido)\\b",
           "\\b(?:remova|remover)\\b.{0,20}\\b(?:os\\s+)?(?:t[oó]picos|marcadores|bullets)\\b.{0,20}\\b(?:e\\s+)?(?:fa[cç]a|transforme)\\b.{0,20}\\b(?:par[aá]grafos?|texto)\\b",
           "\\b(?:juntar|unir)\\b.{0,20}\\b(?:os\\s+)?(?:t[oó]picos|itens)\\b.{0,20}\\b(?:em\\s+)?(?:um\\s+)?par[aá]grafo\\b"
+        ],
+        "tokens_any": [
+          "lista",
+          "converta",
+          "topicos",
+          "paragrafos",
+          "transforme",
+          "texto"
+        ],
+        "tokens_none": [
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "fonte",
+          "cor",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -2222,13 +3571,60 @@
         "positive": [
           "Converta os tópicos em parágrafos",
           "Transforme a lista em texto corrido",
-          "Junte os itens em um parágrafo"
+          "Junte os itens em um parágrafo",
+          "Aplique list convert_to_paragraphs no parágrafo selecionado."
         ],
         "negative": [
           "Adicione marcadores",
           "Faça uma lista"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lista",
+          "converta"
+        ],
+        "penalizeIfTokensPresent": [
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "fonte",
+          "cor",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "targets",
+          "ask_en": "Which targets should I change?",
+          "ask_pt": "Quais alvos devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.heading.set",
@@ -2251,7 +3647,16 @@
           "itálico",
           "negrito",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao",
+          "numeração",
+          "sumario",
+          "sumário"
         ]
       },
       "slotExtractors": [
@@ -2303,7 +3708,48 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.heading_mode",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "título"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "negrito",
+          "sublinhado",
+          "tamanho",
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.heading.normal",
+        "docx.heading.style_apply"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "headingLevel",
+          "ask_en": "Which heading level should I set?",
+          "ask_pt": "Qual nível de título devo definir?"
+        }
+      ]
     },
     {
       "id": "docx.heading.normal",
@@ -2323,7 +3769,27 @@
           "itálico",
           "negrito",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao",
+          "numeração",
+          "sumario",
+          "sumário"
+        ],
+        "tokens_any": [
+          "titulo",
+          "título",
+          "cabecalho",
+          "cabeçalho",
+          "normal",
+          "volte",
+          "remova",
+          "estilo",
+          "tire"
         ]
       },
       "slotExtractors": [
@@ -2370,7 +3836,44 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.heading_mode",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "titulo",
+          "título"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "negrito",
+          "sublinhado",
+          "tamanho",
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.heading.set",
+        "docx.heading.style_apply"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.insert.after",
@@ -2397,7 +3900,18 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "sumario",
+          "sumário"
+        ],
+        "tokens_any": [
+          "insira",
+          "adicione",
+          "depois",
+          "paragrafo",
+          "texto",
+          "deste"
         ]
       },
       "slotExtractors": [
@@ -2427,6 +3941,11 @@
           "slot": "afterText",
           "ask_en": "What text should the new paragraph contain?",
           "ask_pt": "Qual texto o novo parágrafo deve conter?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
@@ -2451,7 +3970,38 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.insert_position",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "insira",
+          "adicione"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.insert.before",
+        "docx.merge.paragraphs",
+        "docx.split.paragraph"
+      ]
     },
     {
       "id": "docx.insert.before",
@@ -2478,7 +4028,18 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "sumario",
+          "sumário"
+        ],
+        "tokens_any": [
+          "insira",
+          "adicione",
+          "antes",
+          "paragrafo",
+          "deste",
+          "texto"
         ]
       },
       "slotExtractors": [
@@ -2508,6 +4069,11 @@
           "slot": "afterText",
           "ask_en": "What text should the new paragraph contain?",
           "ask_pt": "Qual texto o novo parágrafo deve conter?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
@@ -2532,7 +4098,38 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.insert_position",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "insira",
+          "adicione"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.insert.after",
+        "docx.merge.paragraphs",
+        "docx.split.paragraph"
+      ]
     },
     {
       "id": "docx.delete.paragraph",
@@ -2558,7 +4155,19 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "sumario",
+          "sumário"
+        ],
+        "tokens_any": [
+          "exclua",
+          "remova",
+          "paragrafo",
+          "parágrafo",
+          "apague",
+          "delete",
+          "esse"
         ]
       },
       "slotExtractors": [
@@ -2600,7 +4209,44 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.delete_paragraph",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "exclua",
+          "remova"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.merge.paragraphs",
+        "docx.split.paragraph"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.merge.paragraphs",
@@ -2634,7 +4280,10 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "sumario",
+          "sumário"
         ]
       },
       "slotExtractors": [
@@ -2678,7 +4327,44 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.paragraph_structure",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "mescle",
+          "mesclar"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.split.paragraph",
+        "docx.insert.after",
+        "docx.insert.before",
+        "docx.delete.paragraph"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.split.paragraph",
@@ -2710,7 +4396,10 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "sumario",
+          "sumário"
         ]
       },
       "slotExtractors": [
@@ -2739,7 +4428,8 @@
         "positive": [
           "Divida o parágrafo",
           "Separe este parágrafo em dois",
-          "Quebre o parágrafo neste ponto"
+          "Quebre o parágrafo neste ponto",
+          "Aplique split paragraph no parágrafo selecionado."
         ],
         "negative": [
           "Mescle os parágrafos",
@@ -2756,7 +4446,49 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.paragraph_structure",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "divida",
+          "dividir"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.merge.paragraphs",
+        "docx.insert.after",
+        "docx.insert.before",
+        "docx.delete.paragraph"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "splitAt",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.style.set",
@@ -2797,7 +4529,12 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -2829,6 +4566,11 @@
           "slot": "styleName",
           "ask_en": "Which style should I apply?",
           "ask_pt": "Qual estilo devo aplicar?"
+        },
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
         }
       ],
       "examples": {
@@ -2842,7 +4584,35 @@
           "Aplique negrito",
           "Mude a fonte"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.style_set",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "estilo"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.heading.set",
+        "docx.heading.normal",
+        "docx.heading.style_apply"
+      ]
     },
     {
       "id": "docx.enrich.sources",
@@ -2880,7 +4650,19 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario"
+        ],
+        "tokens_any": [
+          "enriqueca",
+          "enriqueça",
+          "fontes",
+          "documento",
+          "melhorar",
+          "secao",
+          "base",
+          "arquivo"
         ]
       },
       "slotExtractors": [
@@ -2911,13 +4693,55 @@
         "positive": [
           "Use o documento X para melhorar esta seção",
           "Enriqueça com base no arquivo de referência",
-          "Complemente com informações do relatório"
+          "Complemente com informações do relatório",
+          "Aplique enrich sources no parágrafo selecionado."
         ],
         "negative": [
           "Reescreva o parágrafo",
           "Traduza o documento"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.enrich_sources",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "enriqueca",
+          "enriqueça"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.section",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "sources",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.numbering.repair",
@@ -2955,7 +4779,22 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "numeracao",
+          "numeração",
+          "repare",
+          "corrija",
+          "documento",
+          "conserte",
+          "errada",
+          "renumere"
         ]
       },
       "slotExtractors": [
@@ -2987,7 +4826,43 @@
           "Adicione numeração",
           "Remova a numeração"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.numbering_repair",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "numeracao",
+          "numeração"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "scope",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.informal",
@@ -3016,7 +4891,26 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
+        ],
+        "tokens_any": [
+          "reescreva",
+          "reformule",
+          "mais",
+          "deixe",
+          "informal",
+          "torne",
+          "texto",
+          "casual"
         ]
       },
       "slotExtractors": [
@@ -3060,7 +4954,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "reescreva",
+          "reformule"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.friendly",
@@ -3089,7 +5033,27 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
+        ],
+        "tokens_any": [
+          "reescreva",
+          "reformule",
+          "amigavel",
+          "amigável",
+          "mais",
+          "deixe",
+          "torne",
+          "acessivel",
+          "faca"
         ]
       },
       "slotExtractors": [
@@ -3115,7 +5079,8 @@
         "positive": [
           "Deixe mais amigável",
           "Torne mais acessível",
-          "Faça em tom acolhedor"
+          "Faça em tom acolhedor",
+          "Aplique reescrever friendly no parágrafo selecionado."
         ],
         "negative": [
           "Deixe mais formal",
@@ -3132,7 +5097,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "reescreva",
+          "reformule"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.list.restart_numbering",
@@ -3158,7 +5173,22 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "lista",
+          "reinicie",
+          "numeracao",
+          "numeração",
+          "recomece",
+          "partir",
+          "reiniciar"
         ]
       },
       "slotExtractors": [
@@ -3184,13 +5214,56 @@
         "positive": [
           "Reinicie a numeração",
           "Recomece a numeração a partir de 1",
-          "Reiniciar numeração da lista"
+          "Reiniciar numeração da lista",
+          "Aplique list restart_numbering no parágrafo selecionado."
         ],
         "negative": [
           "Corrija a numeração",
           "Remova a numeração"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lista",
+          "reinicie"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.correct_grammar",
@@ -3226,7 +5299,16 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -3270,7 +5352,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "corrija",
+          "corrigir"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.casual",
@@ -3300,7 +5432,25 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
+        ],
+        "tokens_any": [
+          "reescreva",
+          "reformule",
+          "casual",
+          "mais",
+          "torne",
+          "forma",
+          "descontraida"
         ]
       },
       "slotExtractors": [
@@ -3343,7 +5493,52 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "reescreva",
+          "reformule"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.format.remove_bold",
@@ -3374,7 +5569,23 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "negrito",
+          "remova",
+          "deste",
+          "texto",
+          "tire",
+          "desative"
         ]
       },
       "slotExtractors": [
@@ -3404,13 +5615,48 @@
         "positive": [
           "Remova o negrito deste texto",
           "Tire o negrito",
-          "Desative o negrito"
+          "Desative o negrito",
+          "Aplique formatar remove_bold no parágrafo selecionado."
         ],
         "negative": [
           "Coloque em negrito",
           "Remova o itálico"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.bold_toggle",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.bold"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.format.remove_italic",
@@ -3441,7 +5687,24 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "italico",
+          "itálico",
+          "remova",
+          "deste",
+          "texto",
+          "tire",
+          "desative"
         ]
       },
       "slotExtractors": [
@@ -3471,13 +5734,48 @@
         "positive": [
           "Remova o itálico deste texto",
           "Tire o itálico",
-          "Desative o itálico"
+          "Desative o itálico",
+          "Aplique formatar remove_italic no parágrafo selecionado."
         ],
         "negative": [
           "Coloque em itálico",
           "Remova o negrito"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.italic_toggle",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.italic"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.format.remove_underline",
@@ -3508,7 +5806,23 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "traduza",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "sublinhado",
+          "remova",
+          "deste",
+          "texto",
+          "tire",
+          "desative"
         ]
       },
       "slotExtractors": [
@@ -3538,13 +5852,48 @@
         "positive": [
           "Remova o sublinhado deste texto",
           "Tire o sublinhado",
-          "Desative o sublinhado"
+          "Desative o sublinhado",
+          "Aplique formatar remove_underline no parágrafo selecionado."
         ],
         "negative": [
           "Sublinhe este texto",
           "Remova o negrito"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.underline_toggle",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.format.underline"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.rewrite.instructions",
@@ -3573,7 +5922,27 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "italico",
+          "alinhamento",
+          "titulo",
+          "título",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção",
+          "traduza"
+        ],
+        "tokens_any": [
+          "reescreva",
+          "reformule",
+          "instrucoes",
+          "instruções",
+          "mais",
+          "paragrafo",
+          "forma",
+          "pareca",
+          "persuasivo"
         ]
       },
       "slotExtractors": [
@@ -3603,7 +5972,8 @@
         "positive": [
           "Reescreva este parágrafo de forma que pareça mais persuasivo",
           "Reformule para que soe mais adequado a um público jurídico",
-          "Altere o texto para que soe mais otimista"
+          "Altere o texto para que soe mais otimista",
+          "Aplique reescrever instructions no parágrafo selecionado."
         ],
         "negative": [
           "Reescreva este parágrafo",
@@ -3620,7 +5990,57 @@
           "todos os títulos"
         ],
         "ambiguityAction": "clarify"
-      }
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "reescreva",
+          "reformule"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.translate.section",
+        "docx.translate.document",
+        "docx.summarize.to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "instructions",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.case.title",
@@ -3652,7 +6072,22 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "caixa",
+          "titulo",
+          "título",
+          "coloque",
+          "titulos",
+          "iniciais",
+          "maiusculas",
+          "capitalizar",
+          "cada"
         ]
       },
       "slotExtractors": [
@@ -3680,13 +6115,50 @@
         "positive": [
           "Coloque todos os títulos com iniciais maiúsculas",
           "Capitalizar cada palavra",
-          "Deixe com a primeira letra maiúscula"
+          "Deixe com a primeira letra maiúscula",
+          "Aplique case title no parágrafo selecionado."
         ],
         "negative": [
           "Deixe em maiúsculas",
           "Coloque em negrito"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.text_case",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "caixa",
+          "titulo"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.case.upper",
+        "docx.case.lower",
+        "docx.case.sentence"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.case.upper",
@@ -3721,7 +6193,11 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -3756,7 +6232,43 @@
           "Deixe em minúsculas",
           "Coloque em negrito"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.text_case",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "maiúsculas",
+          "maiusculas"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.case.title",
+        "docx.case.lower",
+        "docx.case.sentence"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.case.lower",
@@ -3791,7 +6303,11 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
         ]
       },
       "slotExtractors": [
@@ -3819,13 +6335,50 @@
         "positive": [
           "Deixe em minúsculas",
           "Coloque em caixa baixa",
-          "Converter para minúsculas"
+          "Converter para minúsculas",
+          "Aplique case lower no parágrafo selecionado."
         ],
         "negative": [
           "Deixe em maiúsculas",
           "Coloque em negrito"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.text_case",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "minúsculas",
+          "minusculas"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.case.title",
+        "docx.case.upper",
+        "docx.case.sentence"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.case.sentence",
@@ -3857,7 +6410,20 @@
           "resumir",
           "sumário",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "numeracao",
+          "sumario",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "caixa",
+          "sentenca",
+          "sentença",
+          "frase",
+          "coloque",
+          "maiuscula",
+          "inicio"
         ]
       },
       "slotExtractors": [
@@ -3884,13 +6450,51 @@
       "examples": {
         "positive": [
           "Coloque em caixa de frase",
-          "Maiúscula só no início da frase"
+          "Maiúscula só no início da frase",
+          "Aplique case sentence no parágrafo selecionado.",
+          "Use case sentence nesta seção."
         ],
         "negative": [
           "Deixe em maiúsculas",
           "Coloque em caixa alta"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.text_case",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "caixa",
+          "sentenca"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "dividir",
+          "excluir",
+          "inserir",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "mesclar",
+          "numeração",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.case.title",
+        "docx.case.upper",
+        "docx.case.lower"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.summarize.to_bullets",
@@ -3905,7 +6509,23 @@
         ],
         "tokens_none": [
           "converter",
-          "transformar"
+          "transformar",
+          "numeracao",
+          "numeração",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "tokens_any": [
+          "resuma",
+          "resumo",
+          "marcadores",
+          "bullets",
+          "topicos",
+          "resumir",
+          "paragrafo",
+          "extraia"
         ]
       },
       "slotExtractors": [
@@ -3940,7 +6560,48 @@
           "Adicione marcadores",
           "Resuma esta seção em um parágrafo"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.summarize",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "resuma",
+          "resumo"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "transformar",
+          "numeracao",
+          "numeração",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.informal",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.list.paragraph_to_bullets",
@@ -3977,7 +6638,13 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ],
         "regex_any": [
           "\\b(?:converter?|transformar?)\\b.*\\b(?:em|para)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b",
@@ -4011,14 +6678,60 @@
         "positive": [
           "Converter este parágrafo em marcadores",
           "Transformar em lista de tópicos",
-          "Criar marcadores com este texto"
+          "Criar marcadores com este texto",
+          "Aplique list paragraph_to_bullets no parágrafo selecionado."
         ],
         "negative": [
           "Remover marcadores",
           "Converter marcadores em parágrafo",
           "Adicionar numeração"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "converter",
+          "transformar",
+          "para",
+          "marcadores",
+          "tópicos"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "excluir",
+          "fonte",
+          "itálico",
+          "limpar",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "numerada",
+          "numeração",
+          "reescreva",
+          "reescrever"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.list.bullets_to_paragraph",
@@ -4044,11 +6757,29 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ],
         "regex_any": [
           "\\b(?:converter?|transformar?)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b.*\\b(?:em|para)\\b.*\\bpar[aá]grafos?\\b",
           "\\b(?:remover?)\\b.*\\b(?:marcadores|tópicos)\\b.*\\b(?:converter?)\\b.*\\btexto\\b"
+        ],
+        "tokens_any": [
+          "lista",
+          "marcadores",
+          "bullets",
+          "paragrafo",
+          "parágrafo",
+          "paragrafos",
+          "converter",
+          "transformar",
+          "topicos",
+          "texto"
         ]
       },
       "slotExtractors": [
@@ -4075,13 +6806,56 @@
         "positive": [
           "Converter marcadores em parágrafos",
           "Transformar tópicos em texto corrido",
-          "Remover marcadores e deixar como parágrafos"
+          "Remover marcadores e deixar como parágrafos",
+          "Aplique list bullets_to_paragraph no parágrafo selecionado."
         ],
         "negative": [
           "Converter parágrafos em marcadores",
           "Adicionar marcadores"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lista",
+          "marcadores"
+        ],
+        "penalizeIfTokensPresent": [
+          "adicionar",
+          "aplicar",
+          "cor",
+          "criar",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "numeração",
+          "reescreva",
+          "reescrever"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.numbered_to_bullets",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.list.numbered_to_bullets",
@@ -4103,11 +6877,26 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ],
         "regex_any": [
           "\\b(?:converter?|transformar?|trocar?)\\b.*\\b(?:numer[aç]|lista\\s+numerada)\\b.*\\b(?:em|para)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b",
           "\\b(?:mudar?)\\b.*\\b(?:de\\s+)?numer[aç].*\\b(?:para|em)\\b.*\\b(?:marcadores|tópicos)\\b"
+        ],
+        "tokens_any": [
+          "lista",
+          "marcadores",
+          "bullets",
+          "numeracao",
+          "converter",
+          "trocar",
+          "numerada"
         ]
       },
       "slotExtractors": [
@@ -4139,13 +6928,56 @@
         "positive": [
           "Converter numeração em marcadores",
           "Trocar lista numerada por tópicos",
-          "Mudar de numeração para marcadores"
+          "Mudar de numeração para marcadores",
+          "Aplique list numbered_to_bullets no parágrafo selecionado."
         ],
         "negative": [
           "Converter marcadores em numeração",
           "Adicionar numeração"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lista",
+          "marcadores"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.bullets_to_numbered"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.list.bullets_to_numbered",
@@ -4167,11 +6999,26 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "alinhamento",
+          "sumario",
+          "sumário",
+          "quebra de pagina",
+          "quebra de seção"
         ],
         "regex_any": [
           "\\b(?:converter?|transformar?|trocar?)\\b.*\\b(?:marcadores|tópicos|bullets?)\\b.*\\b(?:em|para)\\b.*\\b(?:numer[aç]|lista\\s+numerada|passos)\\b",
           "\\b(?:mudar?)\\b.*\\b(?:de\\s+)?(?:marcadores|tópicos)\\b.*\\b(?:para|em)\\b.*\\bnumer[aç]\\b"
+        ],
+        "tokens_any": [
+          "lista",
+          "marcadores",
+          "bullets",
+          "converter",
+          "numeracao",
+          "trocar",
+          "topicos"
         ]
       },
       "slotExtractors": [
@@ -4204,13 +7051,56 @@
         "positive": [
           "Converter marcadores em numeração",
           "Trocar tópicos por lista numerada",
-          "Transformar marcadores em passos numerados"
+          "Transformar marcadores em passos numerados",
+          "Aplique list bullets_to_numbered no parágrafo selecionado."
         ],
         "negative": [
           "Converter numeração em marcadores",
           "Remover marcadores"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.list_transform",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lista",
+          "marcadores"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular",
+          "reformule",
+          "resuma",
+          "resumir"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.list.bullets",
+        "docx.list.numbering",
+        "docx.list.remove",
+        "docx.list.promote",
+        "docx.list.convert_to_paragraphs",
+        "docx.list.restart_numbering",
+        "docx.list.paragraph_to_bullets",
+        "docx.list.bullets_to_paragraph",
+        "docx.list.numbered_to_bullets"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     },
     {
       "id": "docx.section.remove",
@@ -4227,7 +7117,6 @@
         "tokens_all": [
           "seção",
           "secao",
-          "seção",
           "inteira"
         ],
         "tokens_none": [
@@ -4248,7 +7137,10 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "sumario",
+          "sumário"
         ],
         "regex_any": [
           "\\b(?:remov|exclu|delet|apag)[aeiou]*r?\\b.*\\b(?:esta|essa|a)\\b.*\\bse[çc][ãa]o\\b",
@@ -4293,13 +7185,57 @@
         "positive": [
           "Remover esta seção inteira",
           "Excluir a seção 3",
-          "Apagar toda a seção"
+          "Apagar toda a seção",
+          "Aplique section remove no parágrafo selecionado."
         ],
         "negative": [
           "Remover este parágrafo",
           "Excluir marcadores"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.section_remove",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "seção",
+          "secao",
+          "inteira",
+          "remover",
+          "excluir"
+        ],
+        "penalizeIfTokensPresent": [
+          "cor",
+          "fonte",
+          "formatação",
+          "itálico",
+          "marcadores",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "numeração",
+          "parágrafo",
+          "reescreva",
+          "reescrever"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.page_break",
+        "docx.section_break"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "scope",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.heading.style_apply",
@@ -4324,12 +7260,30 @@
           "sumário",
           "tamanho",
           "transformar",
-          "tópicos"
+          "tópicos",
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "numeracao",
+          "sumario"
         ],
         "regex_any": [
           "\\b(?:aplicar?)\\b.*\\b(?:estilo\\s+de\\s+)?(?:t[ií]tulo|heading|cabe[cç]alho)\\b.*\\b(?:em|para|a)\\b.*\\b(?:todos?|todas?)\\b",
           "\\b(?:formatar?)\\b.*\\b(?:todos?|todas?)\\b.*\\b(?:t[ií]tulos?|headings?)\\b.*\\b(?:como)\\b",
           "\\b(?:definir?)\\b.*\\b(?:como)\\b.*\\b(?:t[ií]tulo|heading)\\s*[1-6]\\b"
+        ],
+        "tokens_any": [
+          "titulo",
+          "título",
+          "cabecalho",
+          "cabeçalho",
+          "estilo",
+          "titulos",
+          "como",
+          "aplicar",
+          "secao",
+          "formatar"
         ]
       },
       "slotExtractors": [
@@ -4378,13 +7332,56 @@
         "positive": [
           "Aplicar Título 1 em todos os títulos de seção",
           "Formatar todos os títulos como Heading 2",
-          "Definir como Título 1"
+          "Definir como Título 1",
+          "Aplique titulo style_apply no parágrafo selecionado."
         ],
         "negative": [
           "Alterar o tamanho da fonte",
           "Remover título"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.heading_mode",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "titulo",
+          "título"
+        ],
+        "penalizeIfTokensPresent": [
+          "converter",
+          "cor",
+          "dividir",
+          "excluir",
+          "fonte",
+          "inserir",
+          "itálico",
+          "marcadores",
+          "mesclar",
+          "negrito",
+          "numeração",
+          "remover"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.heading.set",
+        "docx.heading.normal"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "headingLevel",
+          "ask_en": "Which heading level should I set?",
+          "ask_pt": "Qual nível de título devo definir?"
+        }
+      ]
     },
     {
       "id": "docx.toc.insert",
@@ -4409,11 +7406,27 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "marcadores",
+          "numeracao",
+          "numeração"
         ],
         "regex_any": [
           "\\b(?:inserir?|adicionar?|criar?)\\b.*\\b(?:sum[aá]rio|[ií]ndice|tabela\\s+de\\s+conte[uú]do|TOC)\\b",
           "\\b(?:sum[aá]rio|[ií]ndice)\\b.*\\b(?:autom[aá]tico)\\b"
+        ],
+        "tokens_any": [
+          "sumario",
+          "sumário",
+          "indice",
+          "índice",
+          "insira",
+          "adicione",
+          "inserir",
+          "adicionar",
+          "automatico",
+          "criar"
         ]
       },
       "slotExtractors": [
@@ -4457,7 +7470,50 @@
           "Remover sumário",
           "Atualizar índice"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.toc_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sumario",
+          "sumário"
+        ],
+        "penalizeIfTokensPresent": [
+          "atualizar",
+          "cor",
+          "fonte",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "refazer",
+          "reformular",
+          "reformule"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.toc.update",
+        "docx.page_break",
+        "docx.section_break"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        },
+        {
+          "slot": "llmGenerated",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "docx.toc.update",
@@ -4482,11 +7538,25 @@
           "resuma",
           "resumir",
           "sublinhado",
-          "tamanho"
+          "tamanho",
+          "traduza",
+          "marcadores",
+          "numeracao",
+          "numeração"
         ],
         "regex_any": [
           "\\b(?:atualizar?)\\b.*\\b(?:sum[aá]rio|[ií]ndice|tabela\\s+de\\s+conte[uú]do|TOC)\\b",
           "\\b(?:regenerar?|refazer?)\\b.*\\b(?:sum[aá]rio|[ií]ndice)\\b"
+        ],
+        "tokens_any": [
+          "sumario",
+          "sumário",
+          "indice",
+          "índice",
+          "atualizar",
+          "regenerar",
+          "tabela",
+          "conteudo"
         ]
       },
       "slotExtractors": [
@@ -4522,13 +7592,260 @@
         "positive": [
           "Atualizar sumário",
           "Regenerar índice",
-          "Atualizar tabela de conteúdo"
+          "Atualizar tabela de conteúdo",
+          "Aplique toc update no parágrafo selecionado."
         ],
         "negative": [
           "Inserir sumário",
           "Criar índice"
         ]
-      }
+      },
+      "disambiguationGroup": "docx.toc_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sumario",
+          "sumário"
+        ],
+        "penalizeIfTokensPresent": [
+          "adicionar",
+          "cor",
+          "criar",
+          "fonte",
+          "inserir",
+          "itálico",
+          "melhorar",
+          "melhore",
+          "negrito",
+          "reescreva",
+          "reescrever",
+          "reformular"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "selectionHint": true
+      },
+      "mutuallyExclusiveWith": [
+        "docx.toc.insert",
+        "docx.page_break",
+        "docx.section_break"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
+    },
+    {
+      "id": "docx.page_break",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "quebra de página",
+          "inserir quebra de página",
+          "adicionar quebra de página",
+          "nova página",
+          "quebrar página"
+        ],
+        "regex_any": [
+          "\\b(?:quebra\\\\s+de\\\\s+página|inserir\\\\s+quebra\\\\s+de\\\\s+página|adicionar\\\\s+quebra\\\\s+de\\\\s+página|nova\\\\s+página|quebrar\\\\s+página)\\b"
+        ],
+        "tokens_none": [
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao",
+          "numeração",
+          "fonte",
+          "cor",
+          "sumario",
+          "sumário"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este parágrafo",
+          "antes desta seção",
+          "após o título"
+        ],
+        "ambiguityAction": "clarify"
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_PAGE_BREAK",
+          "paragraphId": "$target",
+          "position": "before"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Inserir uma quebra de página antes deste parágrafo",
+          "Adicionar quebra de página aqui",
+          "Colocar quebra de página após a introdução",
+          "Aplique page_break no parágrafo selecionado."
+        ],
+        "negative": [
+          "Inserir uma quebra de seção",
+          "Excluir esta página"
+        ]
+      },
+      "disambiguationGroup": "docx.break_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "quebra de página",
+          "inserir quebra de página"
+        ],
+        "penalizeIfTokensPresent": [
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao",
+          "numeração",
+          "fonte",
+          "cor",
+          "sumario",
+          "sumário"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.section_break",
+        "docx.toc.insert",
+        "docx.toc.update"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
+    },
+    {
+      "id": "docx.section_break",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "quebra de seção",
+          "inserir quebra de seção",
+          "adicionar quebra de seção",
+          "nova seção",
+          "quebra contínua"
+        ],
+        "regex_any": [
+          "\\b(?:quebra\\\\s+de\\\\s+seção|inserir\\\\s+quebra\\\\s+de\\\\s+seção|adicionar\\\\s+quebra\\\\s+de\\\\s+seção|nova\\\\s+seção|quebra\\\\s+contínua)\\b"
+        ],
+        "tokens_none": [
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao",
+          "numeração",
+          "fonte",
+          "cor",
+          "sumario",
+          "sumário"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "resolverHints": {
+        "naturalTargets": [
+          "este parágrafo",
+          "antes desta seção",
+          "após o título"
+        ],
+        "ambiguityAction": "clarify"
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SECTION_BREAK",
+          "paragraphId": "$target",
+          "breakType": "nextPage"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Inserir uma quebra de seção aqui",
+          "Adicionar quebra de seção contínua",
+          "Inserir quebra de seção de próxima página antes do capítulo 3",
+          "Aplique section_break no parágrafo selecionado."
+        ],
+        "negative": [
+          "Inserir uma quebra de página",
+          "Excluir esta seção"
+        ]
+      },
+      "disambiguationGroup": "docx.break_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "quebra de seção",
+          "inserir quebra de seção"
+        ],
+        "penalizeIfTokensPresent": [
+          "reescreva",
+          "reformule",
+          "traduza",
+          "resuma",
+          "marcadores",
+          "numeracao",
+          "numeração",
+          "fonte",
+          "cor",
+          "sumario",
+          "sumário"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.page_break",
+        "docx.toc.insert",
+        "docx.toc.update"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
     }
   ]
 }

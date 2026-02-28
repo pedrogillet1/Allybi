@@ -49,6 +49,25 @@ function mkMeta(id, description) {
   };
 }
 
+function readJsonIfExists(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function stableSortBy(arr, keyFn) {
+  return [...arr].sort((a, b) => {
+    const ka = String(keyFn(a) ?? "").toLowerCase();
+    const kb = String(keyFn(b) ?? "").toLowerCase();
+    if (ka < kb) return -1;
+    if (ka > kb) return 1;
+    return 0;
+  });
+}
+
 /** @type {Array<{id:string,category:string,path:string,description:string,dependsOn?:string[],required?:boolean,payload:(id:string)=>any,optional?:boolean}>} */
 const defs = [];
 
@@ -110,7 +129,11 @@ add({
           .filter((d) => d.path.includes("quality/document_intelligence/"))
           .map((d) => d.id),
         retrieval: defs
-          .filter((d) => d.path.includes("retrieval/document_intelligence/"))
+          .filter((d) =>
+            /(^|\/)retrieval\/(boost_rules|query_rewrites|section_priority)\./.test(
+              d.path,
+            ),
+          )
           .map((d) => d.id),
         marketing: defs
           .filter((d) => d.path.includes("probes/marketing/"))
@@ -517,7 +540,7 @@ for (const domain of domains) {
   add({
     id: `query_rewrites_${domain}`,
     category: "retrieval",
-    path: `retrieval/document_intelligence/query_rewrites.${domain}.any.json`,
+    path: `retrieval/query_rewrites.${domain}.any.json`,
     description: `Domain query rewrite rules for ${domain} retrieval intent expansion.`,
     dependsOn: [`doc_aliases_${domain}`],
     required: true,
@@ -542,7 +565,7 @@ for (const domain of domains) {
   add({
     id: `boost_rules_${domain}`,
     category: "retrieval",
-    path: `retrieval/document_intelligence/boost_rules.${domain}.any.json`,
+    path: `retrieval/boost_rules.${domain}.any.json`,
     description: `Domain boost rules for ${domain} retrieval ranking by intent and document type.`,
     dependsOn: [`doc_archetypes_${domain}`],
     required: true,
@@ -567,7 +590,7 @@ for (const domain of domains) {
   add({
     id: `section_priority_${domain}`,
     category: "retrieval",
-    path: `retrieval/document_intelligence/section_priority.${domain}.any.json`,
+    path: `retrieval/section_priority.${domain}.any.json`,
     description: `Section-priority rules for ${domain} retrieval scanning order.`,
     dependsOn: [`doc_archetypes_${domain}`],
     required: true,
@@ -656,12 +679,25 @@ function ensureDir(filePath) {
 
 function writeJson(filePath, data) {
   ensureDir(filePath);
-  fs.writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+  const next = `${JSON.stringify(data, null, 2)}\n`;
+  const prev = fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : "";
+  if (prev !== next) {
+    fs.writeFileSync(filePath, next, "utf8");
+  }
 }
 
 for (const def of defs) {
   const bank = def.payload(def.id);
   const filePath = path.join(dataBanksRoot, def.path);
+  const existing = readJsonIfExists(filePath);
+  if (
+    existing &&
+    existing._meta &&
+    typeof existing._meta.lastUpdated === "string" &&
+    existing._meta.lastUpdated.trim()
+  ) {
+    bank._meta.lastUpdated = existing._meta.lastUpdated;
+  }
   writeJson(filePath, bank);
 }
 
@@ -669,6 +705,15 @@ const registry = JSON.parse(fs.readFileSync(registryPath, "utf8"));
 const registryById = new Map((registry.banks || []).map((b) => [b.id, b]));
 
 for (const def of defs) {
+  const existingEntry = registryById.get(def.id);
+  const checksumSha256 =
+    existingEntry && typeof existingEntry.checksumSha256 === "string"
+      ? existingEntry.checksumSha256
+      : "";
+  const lastUpdated =
+    existingEntry && typeof existingEntry.lastUpdated === "string" && existingEntry.lastUpdated
+      ? existingEntry.lastUpdated
+      : today;
   const entry = {
     id: def.id,
     category: def.category,
@@ -680,8 +725,8 @@ for (const def of defs) {
     dependsOn: Array.isArray(def.dependsOn) ? def.dependsOn : [],
     enabledByEnv: envMap(true),
     requiredByEnv: envMap(Boolean(def.required)),
-    checksumSha256: "",
-    lastUpdated: today,
+    checksumSha256,
+    lastUpdated,
   };
 
   if (registryById.has(def.id)) {
@@ -691,8 +736,6 @@ for (const def of defs) {
     registryById.set(def.id, entry);
   }
 }
-
-registry._meta.lastUpdated = today;
 writeJson(registryPath, registry);
 
 const deps = JSON.parse(fs.readFileSync(depsPath, "utf8"));
@@ -700,7 +743,7 @@ const depsById = new Map((deps.banks || []).map((b) => [b.id, b]));
 for (const def of defs) {
   const depEntry = {
     id: def.id,
-    dependsOn: Array.isArray(def.dependsOn) ? def.dependsOn : [],
+    dependsOn: stableSortBy(Array.isArray(def.dependsOn) ? def.dependsOn : [], (v) => v),
   };
   if (def.optional) depEntry.optional = true;
   if (depsById.has(def.id)) {
@@ -713,7 +756,7 @@ for (const def of defs) {
   }
 }
 
-deps._meta.lastUpdated = today;
+deps.banks = stableSortBy(Array.isArray(deps.banks) ? deps.banks : [], (entry) => entry.id);
 writeJson(depsPath, deps);
 
 const aliases = JSON.parse(fs.readFileSync(aliasesPath, "utf8"));
@@ -740,8 +783,7 @@ for (const def of defs) {
   }
 }
 
-aliases.aliases = aliasList;
-aliases._meta.lastUpdated = today;
+aliases.aliases = stableSortBy(aliasList, (entry) => `${entry.alias}|${entry.canonicalId}`);
 writeJson(aliasesPath, aliases);
 
 console.log(`Generated/updated ${defs.length} document-intelligence banks and manifest wiring.`);

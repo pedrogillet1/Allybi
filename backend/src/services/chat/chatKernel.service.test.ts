@@ -1,0 +1,133 @@
+import { describe, expect, test, jest } from "@jest/globals";
+
+import type { ChatRequest, ChatResult } from "./chat.types";
+import { ChatKernelService } from "./chatKernel.service";
+
+function makeResult(): ChatResult {
+  return {
+    conversationId: "conv-1",
+    userMessageId: "msg-u-1",
+    assistantMessageId: "msg-a-1",
+    assistantText: "ok",
+  };
+}
+
+function makeRequest(): ChatRequest {
+  return {
+    userId: "user-1",
+    message: "summarize this document",
+    preferredLanguage: "en",
+  };
+}
+
+describe("ChatKernelService intent metadata propagation", () => {
+  test("injects router decision into req.meta and context.intentState on chat turns", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeResult()),
+      streamChat: jest.fn(async () => makeResult()),
+    };
+    const kernel = new ChatKernelService(executor);
+    (kernel as any).router = {
+      decideWithIntent: () => ({
+        route: "KNOWLEDGE",
+        intentDecision: {
+          intentId: "documents",
+          intentFamily: "documents",
+          operatorId: "extract",
+          domainId: "finance",
+          confidence: 0.9,
+          decisionNotes: ["test"],
+          persistable: {
+            intentId: "documents",
+            operatorId: "extract",
+            intentFamily: "documents",
+            domainId: "finance",
+            confidence: 0.9,
+          },
+        },
+      }),
+    };
+
+    await kernel.handleTurn(makeRequest());
+
+    expect(executor.chat).toHaveBeenCalledTimes(1);
+    const forwardedReq = executor.chat.mock.calls[0][0] as ChatRequest;
+    expect((forwardedReq.meta || {}).intentFamily).toBe("documents");
+    expect((forwardedReq.meta || {}).operator).toBe("extract");
+    expect((forwardedReq.meta || {}).domain).toBe("finance");
+    expect((forwardedReq.meta || {}).domainId).toBe("finance");
+    expect((forwardedReq.context as any)?.intentState?.activeDomain).toBe(
+      "finance",
+    );
+    expect(
+      (forwardedReq.context as any)?.intentState?.lastRoutingDecision
+        ?.operatorId,
+    ).toBe("extract");
+  });
+
+  test("keeps request unchanged when router has no intent decision", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeResult()),
+      streamChat: jest.fn(async () => makeResult()),
+    };
+    const kernel = new ChatKernelService(executor);
+    (kernel as any).router = {
+      decideWithIntent: () => ({
+        route: "GENERAL",
+        intentDecision: null,
+      }),
+    };
+
+    const req = makeRequest();
+    await kernel.handleTurn(req);
+
+    expect(executor.chat).toHaveBeenCalledTimes(1);
+    const forwardedReq = executor.chat.mock.calls[0][0] as ChatRequest;
+    expect(forwardedReq.meta).toBeUndefined();
+    expect((forwardedReq.context as any)?.intentState).toBeUndefined();
+  });
+
+  test("injects router decision into stream turn payload", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeResult()),
+      streamChat: jest.fn(async () => makeResult()),
+    };
+    const kernel = new ChatKernelService(executor);
+    (kernel as any).router = {
+      decideWithIntent: () => ({
+        route: "KNOWLEDGE",
+        intentDecision: {
+          intentId: "file_actions",
+          intentFamily: "file_actions",
+          operatorId: "open",
+          domainId: "legal",
+          confidence: 0.88,
+          decisionNotes: ["test"],
+          persistable: {
+            intentId: "file_actions",
+            operatorId: "open",
+            intentFamily: "file_actions",
+            domainId: "legal",
+            confidence: 0.88,
+          },
+        },
+      }),
+    };
+
+    const sink = { isOpen: () => true } as any;
+    await kernel.streamTurn({
+      req: makeRequest(),
+      sink,
+      streamingConfig: {} as any,
+    });
+
+    expect(executor.streamChat).toHaveBeenCalledTimes(1);
+    const forwardedReq = executor.streamChat.mock.calls[0][0]
+      .req as ChatRequest;
+    expect((forwardedReq.meta || {}).operator).toBe("open");
+    expect((forwardedReq.meta || {}).domainId).toBe("legal");
+    expect((forwardedReq.context as any)?.intentState?.activeDomain).toBe(
+      "legal",
+    );
+  });
+});

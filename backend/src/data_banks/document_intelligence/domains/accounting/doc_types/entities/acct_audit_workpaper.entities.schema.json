@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_audit_workpaper",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for audit workpaper documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_audit_workpaper"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "workpaperRef",
+      "type": "string",
+      "required": true,
+      "description": "Workpaper reference code"
+    },
+    {
+      "id": "preparedBy",
+      "type": "string",
+      "required": false,
+      "description": "Preparer name"
+    },
+    {
+      "id": "reviewedBy",
+      "type": "string",
+      "required": false,
+      "description": "Reviewer name"
+    },
+    {
+      "id": "conclusion",
+      "type": "string",
+      "required": false,
+      "description": "Conclusion or result summary"
+    },
+    {
+      "id": "issueCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of findings/issues"
+    }
+  ]
+}

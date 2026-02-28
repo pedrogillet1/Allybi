@@ -1,0 +1,194 @@
+{
+  "_meta": {
+    "id": "di_banking_lexicon_en",
+    "version": "1.0.0",
+    "description": "EN lexicon for banking domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "language": "en"
+  },
+  "domain": "banking",
+  "terms": [
+    {
+      "id": "banking_lex_account_balance",
+      "canonical": "account balance",
+      "synonyms": [
+        "available balance",
+        "ledger balance"
+      ],
+      "display": "Account Balance"
+    },
+    {
+      "id": "banking_lex_auth_code",
+      "canonical": "authorization code",
+      "synonyms": [
+        "auth code",
+        "approval code"
+      ],
+      "display": "Authorization Code"
+    },
+    {
+      "id": "banking_lex_card_limit",
+      "canonical": "card limit",
+      "synonyms": [
+        "credit limit",
+        "line of credit"
+      ],
+      "display": "Card Limit"
+    },
+    {
+      "id": "banking_lex_chargeback",
+      "canonical": "chargeback",
+      "synonyms": [
+        "dispute reversal",
+        "transaction reversal"
+      ],
+      "display": "Chargeback"
+    },
+    {
+      "id": "banking_lex_closing_balance",
+      "canonical": "closing balance",
+      "synonyms": [
+        "ending balance"
+      ],
+      "display": "Closing Balance"
+    },
+    {
+      "id": "banking_lex_debit",
+      "canonical": "debit",
+      "synonyms": [
+        "debit posting",
+        "withdrawal"
+      ],
+      "display": "Debit"
+    },
+    {
+      "id": "banking_lex_deposit",
+      "canonical": "deposit",
+      "synonyms": [
+        "cash deposit",
+        "credit entry"
+      ],
+      "display": "Deposit"
+    },
+    {
+      "id": "banking_lex_installment",
+      "canonical": "installment",
+      "synonyms": [
+        "monthly payment",
+        "repayment"
+      ],
+      "display": "Installment"
+    },
+    {
+      "id": "banking_lex_interest",
+      "canonical": "interest",
+      "synonyms": [
+        "finance charge",
+        "interest charge"
+      ],
+      "display": "Interest"
+    },
+    {
+      "id": "banking_lex_loan_principal",
+      "canonical": "loan principal",
+      "synonyms": [
+        "principal balance"
+      ],
+      "display": "Loan Principal"
+    },
+    {
+      "id": "banking_lex_minimum_payment",
+      "canonical": "minimum payment",
+      "synonyms": [
+        "minimum due"
+      ],
+      "display": "Minimum Payment"
+    },
+    {
+      "id": "banking_lex_opening_balance",
+      "canonical": "opening balance",
+      "synonyms": [
+        "starting balance"
+      ],
+      "display": "Opening Balance"
+    },
+    {
+      "id": "banking_lex_overdraft",
+      "canonical": "overdraft",
+      "synonyms": [
+        "negative balance",
+        "overdrawn"
+      ],
+      "display": "Overdraft"
+    },
+    {
+      "id": "banking_lex_payment_receipt",
+      "canonical": "payment receipt",
+      "synonyms": [
+        "transfer receipt",
+        "proof of payment"
+      ],
+      "display": "Payment Receipt"
+    },
+    {
+      "id": "banking_lex_posted_date",
+      "canonical": "posted date",
+      "synonyms": [
+        "posting date",
+        "booking date"
+      ],
+      "display": "Posted Date"
+    },
+    {
+      "id": "banking_lex_reference",
+      "canonical": "reference number",
+      "synonyms": [
+        "transaction id",
+        "protocol"
+      ],
+      "display": "Reference Number"
+    },
+    {
+      "id": "banking_lex_running_balance",
+      "canonical": "running balance",
+      "synonyms": [
+        "progressive balance"
+      ],
+      "display": "Running Balance"
+    },
+    {
+      "id": "banking_lex_statement_period",
+      "canonical": "statement period",
+      "synonyms": [
+        "billing period",
+        "cycle"
+      ],
+      "display": "Statement Period"
+    },
+    {
+      "id": "banking_lex_transfer",
+      "canonical": "transfer",
+      "synonyms": [
+        "wire transfer",
+        "bank transfer"
+      ],
+      "display": "Transfer"
+    },
+    {
+      "id": "banking_lex_value_date",
+      "canonical": "value date",
+      "synonyms": [
+        "effective date",
+        "settlement date"
+      ],
+      "display": "Value Date"
+    }
+  ]
+}

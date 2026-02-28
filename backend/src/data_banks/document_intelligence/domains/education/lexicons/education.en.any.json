@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_education_lexicon_en",
+    "version": "1.0.0",
+    "description": "EN lexicon for education domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education",
+    "language": "en"
+  },
+  "domain": "education",
+  "terms": [
+    {
+      "id": "education_lex_academic_standing",
+      "canonical": "academic standing",
+      "synonyms": [
+        "status",
+        "standing"
+      ],
+      "display": "Academic Standing"
+    },
+    {
+      "id": "education_lex_advisor",
+      "canonical": "advisor",
+      "synonyms": [
+        "faculty advisor",
+        "counselor"
+      ],
+      "display": "Advisor"
+    },
+    {
+      "id": "education_lex_aid_award",
+      "canonical": "aid award",
+      "synonyms": [
+        "financial aid",
+        "grant award"
+      ],
+      "display": "Aid Award"
+    },
+    {
+      "id": "education_lex_attendance",
+      "canonical": "attendance",
+      "synonyms": [
+        "presence",
+        "attendance rate"
+      ],
+      "display": "Attendance"
+    },
+    {
+      "id": "education_lex_campus",
+      "canonical": "campus",
+      "synonyms": [
+        "location",
+        "branch"
+      ],
+      "display": "Campus"
+    },
+    {
+      "id": "education_lex_course_code",
+      "canonical": "course code",
+      "synonyms": [
+        "class code",
+        "subject code"
+      ],
+      "display": "Course Code"
+    },
+    {
+      "id": "education_lex_course_title",
+      "canonical": "course title",
+      "synonyms": [
+        "class title",
+        "subject title"
+      ],
+      "display": "Course Title"
+    },
+    {
+      "id": "education_lex_credential",
+      "canonical": "credential",
+      "synonyms": [
+        "degree",
+        "certificate"
+      ],
+      "display": "Credential"
+    },
+    {
+      "id": "education_lex_credits",
+      "canonical": "credits",
+      "synonyms": [
+        "credit hours",
+        "units"
+      ],
+      "display": "Credits"
+    },
+    {
+      "id": "education_lex_cumulative_gpa",
+      "canonical": "cumulative gpa",
+      "synonyms": [
+        "gpa",
+        "grade point average"
+      ],
+      "display": "Cumulative Gpa"
+    },
+    {
+      "id": "education_lex_enrollment",
+      "canonical": "enrollment",
+      "synonyms": [
+        "registration",
+        "matriculation"
+      ],
+      "display": "Enrollment"
+    },
+    {
+      "id": "education_lex_grade",
+      "canonical": "grade",
+      "synonyms": [
+        "mark",
+        "result"
+      ],
+      "display": "Grade"
+    },
+    {
+      "id": "education_lex_graduation_date",
+      "canonical": "graduation date",
+      "synonyms": [
+        "completion date",
+        "conferral date"
+      ],
+      "display": "Graduation Date"
+    },
+    {
+      "id": "education_lex_institution",
+      "canonical": "institution",
+      "synonyms": [
+        "school",
+        "university"
+      ],
+      "display": "Institution"
+    },
+    {
+      "id": "education_lex_program",
+      "canonical": "program",
+      "synonyms": [
+        "major",
+        "course of study"
+      ],
+      "display": "Program"
+    },
+    {
+      "id": "education_lex_registrar",
+      "canonical": "registrar",
+      "synonyms": [
+        "records office",
+        "academic office"
+      ],
+      "display": "Registrar"
+    },
+    {
+      "id": "education_lex_scholarship",
+      "canonical": "scholarship",
+      "synonyms": [
+        "grant",
+        "stipend"
+      ],
+      "display": "Scholarship"
+    },
+    {
+      "id": "education_lex_semester",
+      "canonical": "semester",
+      "synonyms": [
+        "term",
+        "session"
+      ],
+      "display": "Semester"
+    },
+    {
+      "id": "education_lex_student_id",
+      "canonical": "student id",
+      "synonyms": [
+        "learner id",
+        "matriculation number"
+      ],
+      "display": "Student Id"
+    },
+    {
+      "id": "education_lex_transcript",
+      "canonical": "transcript",
+      "synonyms": [
+        "academic record",
+        "grade report"
+      ],
+      "display": "Transcript"
+    }
+  ]
+}

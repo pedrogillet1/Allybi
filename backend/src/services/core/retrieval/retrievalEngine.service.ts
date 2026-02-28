@@ -25,6 +25,25 @@ import {
   resolveDocScopeLockFromSignals,
   type DocScopeLock,
 } from "./docScopeLock";
+import {
+  applyBoostScoring,
+  applyQueryRewrites,
+  enforceCrossDocPolicy,
+  type MatchedBoostRule,
+  matchBoostRules,
+  selectSectionScanPlan,
+  summarizeBoostRuleApplications,
+  type BoostRule,
+  type QueryVariant,
+  type RewriteRule,
+  type RuleMatchContext,
+  type SectionPriorityRule,
+} from "../../retrieval/document_intelligence/ruleInterpreter";
+import {
+  getDocumentIntelligenceBanksInstance,
+  type DocumentIntelligenceBanksService,
+  type DocumentIntelligenceDomain,
+} from "../banks/documentIntelligenceBanks.service";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 type AnswerMode =
@@ -84,6 +103,10 @@ export interface RetrievalRequest {
 
     // Optional domain hint for document-intelligence retrieval banks.
     domainHint?: string | null;
+    languageHint?: string | null;
+    explicitDocTypes?: string[] | null;
+    explicitDocIds?: string[] | null;
+    explicitDocDomains?: string[] | null;
 
     // Discovery mode can ignore doc lock for corpus search
     corpusSearchAllowed?: boolean;
@@ -150,6 +173,7 @@ export interface CandidateChunk {
   source: CandidateSource;
 
   docId: string;
+  docType?: string | null;
   title?: string | null;
   filename?: string | null;
 
@@ -176,6 +200,7 @@ export interface CandidateChunk {
     keywordBoost?: number;
     typeBoost?: number;
     recencyBoost?: number;
+    documentIntelligenceBoost?: number;
     penalties?: number;
     final?: number;
   };
@@ -255,6 +280,48 @@ export interface EvidencePack {
     phases: Array<{ phaseId: string; candidates: number; note?: string }>;
     reasonCodes: string[];
   };
+
+  telemetry?: {
+    ruleEvents: RetrievalRuleTelemetryEvent[];
+    summary: {
+      matchedBoostRuleIds: string[];
+      appliedBoostRuleIds: string[];
+      rewriteRuleIds: string[];
+      selectedSectionRuleId: string | null;
+      crossDocGatedReason: string | null;
+      classifiedDomain: string | null;
+      classifiedDocTypeId: string | null;
+      classificationReasons: string[];
+    };
+  };
+}
+
+export type RetrievalRuleTelemetryEventName =
+  | "retrieval.boost_rule_hit"
+  | "retrieval.boost_rule_applied"
+  | "retrieval.rewrite_applied"
+  | "retrieval.section_plan_selected"
+  | "retrieval.crossdoc_gated";
+
+export interface RetrievalRuleTelemetryEvent {
+  event: RetrievalRuleTelemetryEventName;
+  payload: Record<string, unknown>;
+}
+
+interface DocumentClassificationResult {
+  domain: DocumentIntelligenceDomain | null;
+  docTypeId: string | null;
+  confidence: number;
+  reasons: string[];
+  matchedDomainRuleIds: string[];
+}
+
+interface DocTypeBoostPlan {
+  domain: DocumentIntelligenceDomain;
+  docTypeId: string;
+  sectionAnchors: string[];
+  tableAnchors: string[];
+  reasons: string[];
 }
 
 interface RetrievalPhaseCounts {
@@ -262,6 +329,13 @@ interface RetrievalPhaseCounts {
   afterNegatives: number;
   afterBoosts: number;
   afterDiversification: number;
+}
+
+interface RetrievalQueryVariant {
+  text: string;
+  weight: number;
+  sourceRuleId: string;
+  reason: string;
 }
 
 type ScopeInvariantStage =
@@ -434,6 +508,18 @@ export class RetrievalEngineService {
     private readonly lexicalIndex: LexicalIndex,
     private readonly structuralIndex: StructuralIndex,
     private readonly queryNormalizer?: QueryNormalizer,
+    private readonly documentIntelligenceBanks: Pick<
+      DocumentIntelligenceBanksService,
+      | "getCrossDocGroundingPolicy"
+      | "getDocumentIntelligenceDomains"
+      | "getDocTypeCatalog"
+      | "getDocTypeSections"
+      | "getDocTypeTables"
+      | "getDomainDetectionRules"
+      | "getRetrievalBoostRules"
+      | "getQueryRewriteRules"
+      | "getSectionPriorityRules"
+    > = getDocumentIntelligenceBanksInstance(),
   ) {}
 
   /**
@@ -458,6 +544,8 @@ export class RetrievalEngineService {
     const diversification = this.getRequiredBank<any>("diversification_rules");
     const negatives = this.getRequiredBank<any>("retrieval_negatives");
     const packaging = this.getRequiredBank<any>("evidence_packaging");
+    const crossDocGrounding =
+      this.documentIntelligenceBanks.getCrossDocGroundingPolicy();
 
     // 2) Normalize query (bank-driven normalization should happen upstream, but we support it here too)
     const norm = await this.normalizeQuery(req);
@@ -472,7 +560,7 @@ export class RetrievalEngineService {
     };
 
     // 3) Determine scope docIds (strict on explicit doc locks/refs)
-    const scope = await this.resolveScope(req, signals, semanticCfg);
+    let scope = await this.resolveScope(req, signals, semanticCfg);
     if (scope.hardScopeActive && scope.candidateDocIds.length === 0) {
       const reasonCode = signals.explicitDocRef
         ? "explicit_doc_not_found"
@@ -480,6 +568,144 @@ export class RetrievalEngineService {
       return this.emptyPack(req, {
         reasonCodes: [reasonCode],
         note: "Hard scope active but no candidate documents resolved.",
+      });
+    }
+
+    const hintedDomain = this.normalizeDomainHint(signals.domainHint);
+    const explicitDocIds = this.resolveExplicitDocIds(signals);
+    const explicitDocTypes = this.resolveExplicitDocTypes(signals);
+    const explicitDocDomains = this.resolveExplicitDocDomains(signals);
+    const classification = this.classifyDocumentContext({
+      query: queryOriginal,
+      normalizedQuery: queryNormalized,
+      hintedDomain,
+      explicitDocTypes,
+      explicitDocDomains,
+    });
+    const domain = hintedDomain ?? classification.domain;
+    const resolvedDocTypes = explicitDocTypes.length
+      ? explicitDocTypes
+      : classification.docTypeId
+        ? [classification.docTypeId]
+        : [];
+    const resolvedDocDomains = explicitDocDomains.length
+      ? explicitDocDomains
+      : domain
+        ? [domain]
+        : [];
+    const ruleCtx: RuleMatchContext = {
+      query: queryOriginal,
+      normalizedQuery: queryNormalized,
+      intent: signals.intentFamily ?? null,
+      operator: signals.operator ?? null,
+      domain: domain || null,
+      docLock: this.isDocLockActive(signals),
+      explicitDocsCount: explicitDocIds.length,
+      explicitDocIds,
+      explicitDocTypes: resolvedDocTypes,
+      explicitDocDomains: resolvedDocDomains,
+      language: this.resolveLanguageHint(signals),
+    };
+    const retrievalRuleEvents: RetrievalRuleTelemetryEvent[] = [];
+    const matchedBoostRuleIds: string[] = [];
+    const appliedBoostRuleIds: string[] = [];
+    const rewriteRuleIds: string[] = [];
+    let selectedSectionRuleId: string | null = null;
+    let crossDocGatedReason: string | null = null;
+    const emitRuleEvent = (
+      event: RetrievalRuleTelemetryEventName,
+      payload: Record<string, unknown>,
+    ) => {
+      retrievalRuleEvents.push({ event, payload });
+    };
+
+    const crossDocDecision = enforceCrossDocPolicy(
+      {
+        ...ruleCtx,
+        candidateDocIds: scope.candidateDocIds,
+        isCompareIntent: this.isCompareIntent(signals, queryNormalized),
+      },
+      crossDocGrounding,
+    );
+    if (!crossDocDecision.allow) {
+      crossDocGatedReason = crossDocDecision.reasonCode || "cross_doc_blocked";
+      emitRuleEvent("retrieval.crossdoc_gated", {
+        reason: crossDocGatedReason,
+        requiredExplicitDocs: crossDocDecision.requiredExplicitDocs,
+        actualExplicitDocs: crossDocDecision.actualExplicitDocs,
+      });
+      return this.emptyPack(
+        req,
+        {
+          reasonCodes: [crossDocGatedReason],
+          note: crossDocDecision.askDisambiguation
+            ? "Cross-document retrieval requires explicit disambiguation."
+            : "Cross-document retrieval blocked by policy.",
+        },
+        this.buildTelemetryDiagnostics({
+          ruleEvents: retrievalRuleEvents,
+          matchedBoostRuleIds,
+          appliedBoostRuleIds,
+          rewriteRuleIds,
+          selectedSectionRuleId,
+          crossDocGatedReason,
+          classification,
+        }),
+      );
+    }
+    scope = {
+      ...scope,
+      candidateDocIds: crossDocDecision.allowedCandidateDocIds,
+    };
+
+    const domainBoostBank = domain
+      ? this.documentIntelligenceBanks.getRetrievalBoostRules(domain)
+      : null;
+    const domainRewriteBank = domain
+      ? this.documentIntelligenceBanks.getQueryRewriteRules(domain)
+      : null;
+    const sectionPriorityBank = domain
+      ? this.documentIntelligenceBanks.getSectionPriorityRules(domain)
+      : null;
+    const boostRules = Array.isArray(domainBoostBank?.rules)
+      ? (domainBoostBank.rules as BoostRule[])
+      : [];
+    const matchedBoostRules = matchBoostRules(
+      {
+        ...ruleCtx,
+        maxMatchedBoostRules: safeNumber(
+          domainBoostBank?.config?.maxMatchedRules,
+          3,
+        ),
+        maxDocumentIntelligenceBoost: safeNumber(
+          domainBoostBank?.config?.maxDocumentIntelligenceBoost,
+          0.45,
+        ),
+      },
+      boostRules,
+    );
+    let runtimeBoostRules: MatchedBoostRule[] = [...matchedBoostRules];
+    const docTypeBoostPlan =
+      domain && resolvedDocTypes.length > 0
+        ? this.buildDocTypeBoostPlan(domain, resolvedDocTypes[0])
+        : null;
+    const syntheticDocTypeRule = docTypeBoostPlan
+      ? this.buildDocTypeMatchedRule(docTypeBoostPlan)
+      : null;
+    if (syntheticDocTypeRule) {
+      runtimeBoostRules.push(syntheticDocTypeRule);
+    }
+    runtimeBoostRules = runtimeBoostRules.sort((a, b) => {
+      if (b.priority !== a.priority) return b.priority - a.priority;
+      return a.id.localeCompare(b.id);
+    });
+    for (const rule of runtimeBoostRules) {
+      matchedBoostRuleIds.push(rule.id);
+      emitRuleEvent("retrieval.boost_rule_hit", {
+        ruleId: rule.id,
+        domain: domain || "unknown",
+        operator: signals.operator ?? "unknown",
+        intent: signals.intentFamily ?? "unknown",
       });
     }
 
@@ -493,24 +719,67 @@ export class RetrievalEngineService {
         ? []
         : this.expandQuery(queryNormalized, signals)
       : [];
-    const domainRewriteQueries = this.getDomainRewriteQueries(
-      queryNormalized,
-      signals,
+    const rewriteRules = Array.isArray(domainRewriteBank?.rules)
+      ? (domainRewriteBank.rules as RewriteRule[])
+      : [];
+    const domainRewriteVariants = applyQueryRewrites(
+      {
+        ...ruleCtx,
+        contextText: queryNormalized,
+        maxQueryVariants: safeNumber(
+          domainRewriteBank?.config?.maxRewriteTerms,
+          12,
+        ),
+      },
+      rewriteRules,
     );
-    const queryForSearch = [
-      queryNormalized,
-      ...expandedQueries,
-      ...domainRewriteQueries,
-    ]
-      .map((q) => String(q || "").trim())
-      .filter(Boolean)
-      .join(" ");
-    const additionalStructuralAnchors =
-      this.getDomainStructuralAnchors(signals);
+    const rewriteVariantCounts = new Map<string, number>();
+    for (const variant of domainRewriteVariants) {
+      const ruleId = String(variant.sourceRuleId || "").trim();
+      if (!ruleId) continue;
+      rewriteVariantCounts.set(
+        ruleId,
+        (rewriteVariantCounts.get(ruleId) || 0) + 1,
+      );
+    }
+    const sortedRewriteCounts = Array.from(rewriteVariantCounts.entries()).sort(
+      (a, b) => a[0].localeCompare(b[0]),
+    );
+    for (const [ruleId, variantCount] of sortedRewriteCounts) {
+      rewriteRuleIds.push(ruleId);
+      emitRuleEvent("retrieval.rewrite_applied", {
+        ruleId,
+        variantCount,
+      });
+    }
+    const queryVariants = this.buildQueryVariants({
+      baseQuery: queryNormalized,
+      expandedQueries,
+      rewriteVariants: domainRewriteVariants,
+      maxVariants: safeNumber(domainRewriteBank?.config?.maxRewriteTerms, 12),
+    });
+    const sectionRules = Array.isArray(sectionPriorityBank?.priorities)
+      ? (sectionPriorityBank.priorities as SectionPriorityRule[])
+      : [];
+    const sectionScanPlan = selectSectionScanPlan(ruleCtx, sectionRules);
+    selectedSectionRuleId = sectionScanPlan.selectedRuleId;
+    if (selectedSectionRuleId) {
+      emitRuleEvent("retrieval.section_plan_selected", {
+        ruleId: selectedSectionRuleId,
+        anchorsCount: sectionScanPlan.sections.length,
+      });
+    }
+    const additionalStructuralAnchors = Array.from(
+      new Set([
+        ...sectionScanPlan.sections,
+        ...(docTypeBoostPlan?.sectionAnchors || []),
+        ...(docTypeBoostPlan?.tableAnchors || []),
+      ]),
+    );
 
     // 5) Execute hybrid retrieval phases (semantic + lexical rescue + structural anchors)
     const phaseResults = await this.runPhases({
-      query: queryForSearch,
+      queryVariants,
       scopeDocIds: scope.candidateDocIds,
       semanticCfg,
       additionalStructuralAnchors,
@@ -555,6 +824,39 @@ export class RetrievalEngineService {
       boostsType,
       boostsRecency,
     });
+    const documentIntelligenceBoostCtx: RuleMatchContext = {
+      ...ruleCtx,
+      maxMatchedBoostRules: safeNumber(
+        domainBoostBank?.config?.maxMatchedRules,
+        3,
+      ),
+      maxDocumentIntelligenceBoost: safeNumber(
+        domainBoostBank?.config?.maxDocumentIntelligenceBoost,
+        0.45,
+      ),
+    };
+    const boostDeltaSummaries = summarizeBoostRuleApplications(
+      documentIntelligenceBoostCtx,
+      candidates,
+      runtimeBoostRules,
+    );
+    for (const summary of boostDeltaSummaries) {
+      appliedBoostRuleIds.push(summary.ruleId);
+      emitRuleEvent("retrieval.boost_rule_applied", {
+        ruleId: summary.ruleId,
+        scoreDeltaSummary: {
+          candidateHits: summary.candidateHits,
+          totalDelta: summary.totalDelta,
+          averageDelta: summary.averageDelta,
+          maxDelta: summary.maxDelta,
+        },
+      });
+    }
+    candidates = applyBoostScoring(
+      documentIntelligenceBoostCtx,
+      candidates,
+      runtimeBoostRules,
+    ) as CandidateChunk[];
     phaseCounts.afterBoosts = candidates.length;
 
     // 9) Rank candidates using ranker config (weights + normalization + tie-breakers)
@@ -582,15 +884,21 @@ export class RetrievalEngineService {
     const pack = this.packageEvidence(candidates, req, signals, packaging, {
       queryOriginal,
       queryNormalized,
-      expandedQueries: [
-        ...expandedQueries,
-        ...domainRewriteQueries.filter(
-          (q) => !expandedQueries.includes(q) && q !== queryNormalized,
-        ),
-      ],
+      expandedQueries: queryVariants
+        .map((variant) => variant.text)
+        .filter((text) => text !== queryNormalized),
       scope,
       phaseCounts,
       scopeMetrics,
+    });
+    pack.telemetry = this.buildTelemetryDiagnostics({
+      ruleEvents: retrievalRuleEvents,
+      matchedBoostRuleIds,
+      appliedBoostRuleIds,
+      rewriteRuleIds,
+      selectedSectionRuleId,
+      crossDocGatedReason,
+      classification,
     });
     this.enforceScopeInvariant(
       pack.evidence.map((evidence) => evidence.docId),
@@ -715,9 +1023,10 @@ export class RetrievalEngineService {
         );
       }
       const allowedSet = new Set(docScopeLock.allowedDocumentIds);
-      const scopedDocIds = allDocIdsCapped.filter((docId) =>
-        allowedSet.has(docId),
-      );
+      // IMPORTANT: never apply corpus-wide max-candidate caps before enforcing
+      // an explicit docset lock. Attached-doc scope is the user's hard source
+      // of truth and must remain intact even when > maxCandidateDocsHard.
+      const scopedDocIds = allDocIds.filter((docId) => allowedSet.has(docId));
       return {
         candidateDocIds: scopedDocIds,
         hardScopeActive: true,
@@ -899,71 +1208,539 @@ export class RetrievalEngineService {
     return Array.from(expansions);
   }
 
-  private getDomainRewriteQueries(
-    normalizedQuery: string,
-    signals: RetrievalRequest["signals"],
-  ): string[] {
-    const domain = String(signals.domainHint || "")
+  private normalizeDomainHint(
+    domainHint: string | null | undefined,
+  ): DocumentIntelligenceDomain | null {
+    const normalized = String(domainHint || "")
       .trim()
       .toLowerCase();
-    if (!domain) return [];
+    if (!normalized) return null;
 
-    const bank = this.safeGetBank<any>(`query_rewrites_${domain}`);
-    if (!bank || !Array.isArray(bank.rules)) return [];
+    const aliasMap: Record<string, DocumentIntelligenceDomain> = {
+      accounting: "accounting",
+      banking: "banking",
+      billing: "billing",
+      education: "education",
+      finance: "finance",
+      housing: "housing",
+      hr: "hr_payroll",
+      "hr-payroll": "hr_payroll",
+      hr_payroll: "hr_payroll",
+      "human-resources": "hr_payroll",
+      human_resources: "hr_payroll",
+      identity: "identity",
+      insurance: "insurance",
+      legal: "legal",
+      medical: "medical",
+      ops: "ops",
+      operations: "ops",
+      tax: "tax",
+      taxation: "tax",
+      travel: "travel",
+    };
 
-    const out: string[] = [];
-    for (const rule of bank.rules) {
-      const rewrites = Array.isArray(rule?.rewrites)
-        ? rule.rewrites
-            .map((r: unknown) => String(r || "").trim())
-            .filter(Boolean)
-        : [];
-      if (!rewrites.length) continue;
-
-      const patterns = Array.isArray(rule?.patterns)
-        ? rule.patterns
-            .map((p: unknown) => String(p || "").trim())
-            .filter(Boolean)
-        : [];
-
-      if (patterns.length === 0) {
-        out.push(...rewrites);
-        continue;
-      }
-
-      const matched = patterns.some((pattern: string) => {
-        try {
-          return new RegExp(pattern, "i").test(normalizedQuery);
-        } catch {
-          return false;
-        }
-      });
-      if (matched) out.push(...rewrites);
-    }
-
-    return Array.from(new Set(out)).slice(0, 12);
+    return aliasMap[normalized] || null;
   }
 
-  private getDomainStructuralAnchors(
+  private resolveExplicitDocIds(
     signals: RetrievalRequest["signals"],
   ): string[] {
-    const domain = String(signals.domainHint || "")
+    const docScopeLock = resolveDocScopeLockFromSignals(signals);
+    const out = [
+      ...(Array.isArray(signals.explicitDocIds) ? signals.explicitDocIds : []),
+      ...(Array.isArray(signals.allowedDocumentIds)
+        ? signals.allowedDocumentIds
+        : []),
+      ...(Array.isArray(docScopeLock.allowedDocumentIds)
+        ? docScopeLock.allowedDocumentIds
+        : []),
+      signals.resolvedDocId ?? "",
+      signals.activeDocId ?? "",
+    ]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean);
+    return Array.from(new Set(out));
+  }
+
+  private resolveExplicitDocTypes(
+    signals: RetrievalRequest["signals"],
+  ): string[] {
+    if (!Array.isArray(signals.explicitDocTypes)) return [];
+    return Array.from(
+      new Set(
+        signals.explicitDocTypes
+          .map((value) => this.normalizeDocType(value))
+          .filter(Boolean) as string[],
+      ),
+    );
+  }
+
+  private resolveExplicitDocDomains(
+    signals: RetrievalRequest["signals"],
+  ): string[] {
+    if (!Array.isArray(signals.explicitDocDomains)) return [];
+    const out = signals.explicitDocDomains
+      .map((value) =>
+        String(value || "")
+          .trim()
+          .toLowerCase(),
+      )
+      .filter(Boolean);
+    return Array.from(new Set(out));
+  }
+
+  private isDocLockActive(signals: RetrievalRequest["signals"]): boolean {
+    const docScopeLock = resolveDocScopeLockFromSignals(signals);
+    return (
+      docScopeLock.mode !== "none" ||
+      Boolean(signals.explicitDocLock || signals.explicitDocRef)
+    );
+  }
+
+  private resolveLanguageHint(signals: RetrievalRequest["signals"]): string {
+    return String(signals.languageHint || "any")
       .trim()
       .toLowerCase();
-    if (!domain) return [];
+  }
 
-    const bank = this.safeGetBank<any>(`section_priority_${domain}`);
-    if (!bank || !Array.isArray(bank.priorities)) return [];
+  private isCompareIntent(
+    signals: RetrievalRequest["signals"],
+    normalizedQuery: string,
+  ): boolean {
+    void normalizedQuery;
+    const intent = String(signals.intentFamily || "").toLowerCase();
+    const operator = String(signals.operator || "").toLowerCase();
+    if (intent.includes("compare")) return true;
+    if (operator.includes("compare")) return true;
+    return false;
+  }
 
-    const anchors = new Set<string>();
-    for (const priority of bank.priorities) {
-      const sections = Array.isArray(priority?.sections) ? priority.sections : [];
-      for (const section of sections) {
-        const value = String(section || "").trim();
-        if (value) anchors.add(value);
+  private normalizeDocType(value: unknown): string | null {
+    const normalized = String(value || "")
+      .trim()
+      .toLowerCase();
+    return normalized || null;
+  }
+
+  private listClassificationDomains(): DocumentIntelligenceDomain[] {
+    const fallback: DocumentIntelligenceDomain[] = [
+      "accounting",
+      "banking",
+      "billing",
+      "education",
+      "finance",
+      "housing",
+      "hr_payroll",
+      "identity",
+      "insurance",
+      "legal",
+      "medical",
+      "ops",
+      "tax",
+      "travel",
+    ];
+    try {
+      const provider = this.documentIntelligenceBanks as any;
+      const domains =
+        typeof provider.getDocumentIntelligenceDomains === "function"
+          ? provider.getDocumentIntelligenceDomains()
+          : null;
+      return Array.isArray(domains) && domains.length ? domains : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private regexMatches(input: string, pattern: string): boolean {
+    try {
+      return new RegExp(pattern, "i").test(input);
+    } catch {
+      return false;
+    }
+  }
+
+  private classifyDocTypeForDomain(
+    domain: DocumentIntelligenceDomain,
+    normalizedQuery: string,
+  ): {
+    docTypeId: string;
+    score: number;
+    reasons: string[];
+  } | null {
+    const provider = this.documentIntelligenceBanks as any;
+    const catalog =
+      typeof provider.getDocTypeCatalog === "function"
+        ? provider.getDocTypeCatalog(domain)
+        : null;
+    const docTypes = Array.isArray(catalog?.docTypes) ? catalog.docTypes : [];
+    const matches: Array<{
+      docTypeId: string;
+      score: number;
+      reasons: string[];
+    }> = [];
+
+    for (const docType of docTypes) {
+      const docTypeId = this.normalizeDocType(docType?.id);
+      if (!docTypeId) continue;
+      const patterns = Array.isArray(docType?.detectionPatterns)
+        ? docType.detectionPatterns
+            .map((value: unknown) => String(value || "").trim())
+            .filter(Boolean)
+        : [];
+      let hitCount = 0;
+      const reasons: string[] = [];
+      for (const pattern of patterns) {
+        if (!this.regexMatches(normalizedQuery, pattern)) continue;
+        hitCount += 1;
+        reasons.push(`doc_type_pattern:${pattern}`);
+      }
+      if (!hitCount) continue;
+      const priority = safeNumber(docType?.priority, 0);
+      const score = hitCount + Math.max(0, priority) / 100;
+      matches.push({
+        docTypeId,
+        score,
+        reasons: reasons.slice(0, 6),
+      });
+    }
+
+    if (!matches.length) return null;
+    matches.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.docTypeId.localeCompare(b.docTypeId);
+    });
+    return matches[0];
+  }
+
+  private classifyDocumentContext(params: {
+    query: string;
+    normalizedQuery: string;
+    hintedDomain: DocumentIntelligenceDomain | null;
+    explicitDocTypes: string[];
+    explicitDocDomains: string[];
+  }): DocumentClassificationResult {
+    const reasons: string[] = [];
+    const matchedDomainRuleIds: string[] = [];
+    const domains = this.listClassificationDomains();
+
+    let domain = params.hintedDomain;
+    if (domain) {
+      reasons.push(`domain_hint:${domain}`);
+    }
+
+    if (!domain && params.explicitDocDomains.length > 0) {
+      const resolved = this.normalizeDomainHint(params.explicitDocDomains[0]);
+      if (resolved) {
+        domain = resolved;
+        reasons.push(`explicit_doc_domain:${resolved}`);
       }
     }
-    return Array.from(anchors).slice(0, 24);
+
+    if (!domain) {
+      const candidates: Array<{
+        domain: DocumentIntelligenceDomain;
+        score: number;
+        matchedRuleIds: string[];
+        reasons: string[];
+      }> = [];
+
+      for (const candidateDomain of domains) {
+        const provider = this.documentIntelligenceBanks as any;
+        const bank =
+          typeof provider.getDomainDetectionRules === "function"
+            ? provider.getDomainDetectionRules(candidateDomain)
+            : null;
+        const rules = Array.isArray(bank?.rules) ? bank.rules : [];
+        let score = 0;
+        const ruleIds: string[] = [];
+        const domainReasons: string[] = [];
+
+        for (const rule of rules) {
+          const ruleId = String(rule?.id || "").trim();
+          const patterns = Array.isArray(rule?.patterns)
+            ? rule.patterns
+                .map((value: unknown) => String(value || "").trim())
+                .filter(Boolean)
+            : [];
+          if (!patterns.length) continue;
+          const hasMatch = patterns.some((pattern: string) =>
+            this.regexMatches(params.normalizedQuery, pattern),
+          );
+          if (!hasMatch) continue;
+
+          const weight = safeNumber(
+            rule?.weight,
+            String(rule?.ruleType || "").toLowerCase() === "negative" ? -1 : 1,
+          );
+          score += weight;
+          if (ruleId) ruleIds.push(ruleId);
+          domainReasons.push(
+            `${ruleId || "rule"}:${weight > 0 ? "positive" : "negative"}`,
+          );
+        }
+
+        if (!ruleIds.length) continue;
+        candidates.push({
+          domain: candidateDomain,
+          score,
+          matchedRuleIds: ruleIds,
+          reasons: domainReasons,
+        });
+      }
+
+      if (candidates.length > 0) {
+        candidates.sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          if (b.matchedRuleIds.length !== a.matchedRuleIds.length) {
+            return b.matchedRuleIds.length - a.matchedRuleIds.length;
+          }
+          return a.domain.localeCompare(b.domain);
+        });
+        if (candidates[0].score > 0) {
+          domain = candidates[0].domain;
+          matchedDomainRuleIds.push(
+            ...Array.from(new Set(candidates[0].matchedRuleIds)),
+          );
+          reasons.push(...candidates[0].reasons.slice(0, 8));
+        }
+      }
+    }
+
+    let docTypeId: string | null = null;
+    if (params.explicitDocTypes.length > 0) {
+      docTypeId = this.normalizeDocType(params.explicitDocTypes[0]);
+      if (docTypeId) reasons.push(`explicit_doc_type:${docTypeId}`);
+    }
+
+    if (!docTypeId && domain) {
+      const docTypeMatch = this.classifyDocTypeForDomain(
+        domain,
+        params.normalizedQuery,
+      );
+      if (docTypeMatch) {
+        docTypeId = docTypeMatch.docTypeId;
+        reasons.push(...docTypeMatch.reasons.slice(0, 6));
+      }
+    }
+
+    // Fallback: infer domain from doc type if domain score was inconclusive.
+    if (!domain && docTypeId) {
+      for (const candidateDomain of domains) {
+        const provider = this.documentIntelligenceBanks as any;
+        const catalog =
+          typeof provider.getDocTypeCatalog === "function"
+            ? provider.getDocTypeCatalog(candidateDomain)
+            : null;
+        const docTypes = Array.isArray(catalog?.docTypes) ? catalog.docTypes : [];
+        const hasDocType = docTypes.some(
+          (entry: any) => this.normalizeDocType(entry?.id) === docTypeId,
+        );
+        if (hasDocType) {
+          domain = candidateDomain;
+          reasons.push(`doc_type_implied_domain:${candidateDomain}`);
+          break;
+        }
+      }
+    }
+
+    const confidence = clamp01(
+      (domain ? 0.45 : 0) +
+        (docTypeId ? 0.35 : 0) +
+        Math.min(0.2, matchedDomainRuleIds.length * 0.03),
+    );
+
+    return {
+      domain: domain || null,
+      docTypeId: docTypeId || null,
+      confidence,
+      reasons: Array.from(new Set(reasons)).slice(0, 12),
+      matchedDomainRuleIds: Array.from(new Set(matchedDomainRuleIds)).slice(
+        0,
+        12,
+      ),
+    };
+  }
+
+  private buildDocTypeBoostPlan(
+    domain: DocumentIntelligenceDomain,
+    docTypeId: string,
+  ): DocTypeBoostPlan | null {
+    const normalizedDocType = this.normalizeDocType(docTypeId);
+    if (!normalizedDocType) return null;
+
+    const provider = this.documentIntelligenceBanks as any;
+    const sectionsBank =
+      typeof provider.getDocTypeSections === "function"
+        ? provider.getDocTypeSections(domain, normalizedDocType)
+        : null;
+    const tablesBank =
+      typeof provider.getDocTypeTables === "function"
+        ? provider.getDocTypeTables(domain, normalizedDocType)
+        : null;
+    const sections = Array.isArray(sectionsBank?.sections)
+      ? sectionsBank.sections
+      : [];
+    const tableMappings = Array.isArray(tablesBank?.tableHeaderMappings)
+      ? tablesBank.tableHeaderMappings
+      : [];
+    const tables = Array.isArray(tablesBank?.tables) ? tablesBank.tables : [];
+
+    const sectionAnchors = sections
+      .map((section: any) => {
+        const order = safeNumber(section?.order, 9999);
+        const sectionId = String(section?.id || "")
+          .trim()
+          .toLowerCase();
+        const en = String(section?.name?.en || "")
+          .trim()
+          .toLowerCase();
+        const pt = String(section?.name?.pt || "")
+          .trim()
+          .toLowerCase();
+        return {
+          order,
+          values: [sectionId, en, pt].filter(Boolean),
+        };
+      })
+      .sort((a, b) => a.order - b.order)
+      .flatMap((entry) => entry.values);
+
+    const tableAnchors = [
+      ...tableMappings.flatMap((mapping: any) => [
+        String(mapping?.canonicalHeader || "")
+          .trim()
+          .toLowerCase(),
+        ...(Array.isArray(mapping?.synonyms)
+          ? mapping.synonyms.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            )
+          : []),
+      ]),
+      ...tables.flatMap((table: any) => [
+        String(table?.id || "")
+          .trim()
+          .toLowerCase(),
+        String(table?.name?.en || "")
+          .trim()
+          .toLowerCase(),
+        String(table?.name?.pt || "")
+          .trim()
+          .toLowerCase(),
+        ...(Array.isArray(table?.expectedColumns)
+          ? table.expectedColumns.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            )
+          : []),
+      ]),
+    ].filter(Boolean);
+
+    const normalizedSectionAnchors = Array.from(new Set(sectionAnchors)).slice(
+      0,
+      16,
+    );
+    const normalizedTableAnchors = Array.from(new Set(tableAnchors)).slice(
+      0,
+      16,
+    );
+
+    return {
+      domain,
+      docTypeId: normalizedDocType,
+      sectionAnchors: normalizedSectionAnchors,
+      tableAnchors: normalizedTableAnchors,
+      reasons: [
+        `doc_type_sections:${normalizedSectionAnchors.length}`,
+        `doc_type_tables:${normalizedTableAnchors.length}`,
+      ],
+    };
+  }
+
+  private buildDocTypeMatchedRule(
+    plan: DocTypeBoostPlan,
+  ): MatchedBoostRule | null {
+    const docType = this.normalizeDocType(plan.docTypeId);
+    if (!docType) return null;
+    const sectionWeights: Record<string, number> = {};
+    for (let i = 0; i < plan.sectionAnchors.length; i += 1) {
+      const section = this.normalizeDocType(plan.sectionAnchors[i]);
+      if (!section) continue;
+      sectionWeights[section] = Math.max(1, 3 - i * 0.08);
+    }
+    return {
+      id: `doc_type_pack_${docType}`,
+      priority: 999,
+      weight: 1,
+      docTypeWeights: {
+        [docType]: 3,
+      },
+      sectionWeights,
+    };
+  }
+
+  private buildQueryVariants(opts: {
+    baseQuery: string;
+    expandedQueries: string[];
+    rewriteVariants: QueryVariant[];
+    maxVariants: number;
+  }): RetrievalQueryVariant[] {
+    const maxVariants = Math.max(1, Math.floor(Number(opts.maxVariants || 12)));
+    const base: RetrievalQueryVariant = {
+      text: opts.baseQuery,
+      weight: 1,
+      sourceRuleId: "base_query",
+      reason: "normalized query",
+    };
+
+    const expansionVariants: RetrievalQueryVariant[] = opts.expandedQueries
+      .map((query) =>
+        String(query || "")
+          .trim()
+          .toLowerCase(),
+      )
+      .filter((query) => query && query !== opts.baseQuery)
+      .map((query, index) => ({
+        text: query,
+        weight: 0.85,
+        sourceRuleId: `synonym_expansion_${index + 1}`,
+        reason: "synonym expansion",
+      }));
+
+    const rewriteVariants: RetrievalQueryVariant[] = (
+      opts.rewriteVariants || []
+    )
+      .map((variant) => ({
+        text: String(variant.text || "")
+          .trim()
+          .toLowerCase(),
+        weight: Math.max(0.1, Math.min(safeNumber(variant.weight, 1), 3)),
+        sourceRuleId: String(variant.sourceRuleId || "rewrite_rule"),
+        reason: String(variant.reason || "rewrite rule"),
+      }))
+      .filter((variant) => variant.text && variant.text !== opts.baseQuery);
+
+    const extras = [...rewriteVariants, ...expansionVariants];
+    extras.sort((a, b) => {
+      if (b.weight !== a.weight) return b.weight - a.weight;
+      if (a.sourceRuleId !== b.sourceRuleId)
+        return a.sourceRuleId.localeCompare(b.sourceRuleId);
+      return a.text.localeCompare(b.text);
+    });
+
+    const out: RetrievalQueryVariant[] = [base];
+    const seen = new Set<string>([opts.baseQuery.toLowerCase()]);
+    for (const variant of extras) {
+      const key = variant.text.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(variant);
+      if (out.length >= maxVariants) break;
+    }
+
+    return out;
   }
 
   private escapeRegex(str: string): string {
@@ -975,7 +1752,7 @@ export class RetrievalEngineService {
   // -----------------------------
 
   private async runPhases(opts: {
-    query: string;
+    queryVariants: RetrievalQueryVariant[];
     scopeDocIds: string[];
     semanticCfg: any;
     additionalStructuralAnchors?: string[];
@@ -989,57 +1766,80 @@ export class RetrievalEngineService {
       hits: any[];
     }> = [];
 
-    for (const phase of phases) {
-      if (!phase?.enabled) continue;
+    const variants =
+      Array.isArray(opts.queryVariants) && opts.queryVariants.length
+        ? opts.queryVariants
+        : [
+            {
+              text: "",
+              weight: 1,
+              sourceRuleId: "base_query",
+              reason: "default",
+            },
+          ];
 
-      if (phase.type === "semantic") {
-        const k = safeNumber(phase.k, 80);
-        const hits = await this.semanticIndex.search({
-          query: opts.query,
-          docIds: opts.scopeDocIds,
-          k,
-        });
-        results.push({
-          phaseId: phase.id ?? "phase_semantic",
-          source: "semantic",
-          hits,
-        });
-      } else if (phase.type === "lexical") {
-        const k = safeNumber(phase.k, 120);
-        const hits = await this.lexicalIndex.search({
-          query: opts.query,
-          docIds: opts.scopeDocIds,
-          k,
-        });
-        results.push({
-          phaseId: phase.id ?? "phase_lexical",
-          source: "lexical",
-          hits,
-        });
-      } else if (phase.type === "structural") {
-        const k = safeNumber(phase.k, 60);
-        const phaseAnchors = Array.isArray(phase.anchors)
-          ? phase.anchors
-          : ["headings", "table_headers"];
-        const anchors = Array.from(
-          new Set([
-            ...phaseAnchors,
-            ...(Array.isArray(opts.additionalStructuralAnchors)
-              ? opts.additionalStructuralAnchors
-              : []),
-          ]),
-        ).slice(0, 24);
-        const hits = await this.structuralIndex.search({
-          query: opts.query,
-          docIds: opts.scopeDocIds,
-          k,
-          anchors,
-        });
-        results.push({
-          phaseId: phase.id ?? "phase_structural",
-          source: "structural",
-          hits,
-        });
+    for (const variant of variants) {
+      for (const phase of phases) {
+        if (!phase?.enabled) continue;
+
+        if (phase.type === "semantic") {
+          const k = safeNumber(phase.k, 80);
+          const hits = await this.semanticIndex.search({
+            query: variant.text,
+            docIds: opts.scopeDocIds,
+            k,
+          });
+          results.push({
+            phaseId: `${phase.id ?? "phase_semantic"}::${variant.sourceRuleId}`,
+            source: "semantic",
+            hits: hits.map((hit) => ({
+              ...hit,
+              score: clamp01(safeNumber(hit.score, 0) * variant.weight),
+            })),
+          });
+        } else if (phase.type === "lexical") {
+          const k = safeNumber(phase.k, 120);
+          const hits = await this.lexicalIndex.search({
+            query: variant.text,
+            docIds: opts.scopeDocIds,
+            k,
+          });
+          results.push({
+            phaseId: `${phase.id ?? "phase_lexical"}::${variant.sourceRuleId}`,
+            source: "lexical",
+            hits: hits.map((hit) => ({
+              ...hit,
+              score: clamp01(safeNumber(hit.score, 0) * variant.weight),
+            })),
+          });
+        } else if (phase.type === "structural") {
+          const k = safeNumber(phase.k, 60);
+          const phaseAnchors = Array.isArray(phase.anchors)
+            ? phase.anchors
+            : ["headings", "table_headers"];
+          const anchors = Array.from(
+            new Set([
+              ...phaseAnchors,
+              ...(Array.isArray(opts.additionalStructuralAnchors)
+                ? opts.additionalStructuralAnchors
+                : []),
+            ]),
+          ).slice(0, 24);
+          const hits = await this.structuralIndex.search({
+            query: variant.text,
+            docIds: opts.scopeDocIds,
+            k,
+            anchors,
+          });
+          results.push({
+            phaseId: `${phase.id ?? "phase_structural"}::${variant.sourceRuleId}`,
+            source: "structural",
+            hits: hits.map((hit) => ({
+              ...hit,
+              score: clamp01(safeNumber(hit.score, 0) * variant.weight),
+            })),
+          });
+        }
       }
     }
 
@@ -1061,7 +1861,7 @@ export class RetrievalEngineService {
     req: RetrievalRequest,
   ): CandidateChunk[] {
     const out: CandidateChunk[] = [];
-    const seen = new Set<string>();
+    const seen = new Map<string, CandidateChunk>();
 
     for (const phase of phaseResults) {
       for (let i = 0; i < phase.hits.length; i++) {
@@ -1084,19 +1884,47 @@ export class RetrievalEngineService {
         );
 
         const dedupeKey = `${docId}|${locationKey}|${candidateId}`;
-        if (seen.has(dedupeKey)) continue;
-        seen.add(dedupeKey);
+        const existing = seen.get(dedupeKey);
+        if (existing) {
+          if (phase.source === "semantic") {
+            existing.scores.semantic = Math.max(
+              existing.scores.semantic ?? 0,
+              score,
+            );
+          } else if (phase.source === "lexical") {
+            existing.scores.lexical = Math.max(
+              existing.scores.lexical ?? 0,
+              score,
+            );
+          } else if (phase.source === "structural") {
+            existing.scores.structural = Math.max(
+              existing.scores.structural ?? 0,
+              score,
+            );
+            existing.signals.isAnchorMatch = true;
+          }
+          if ((hit.snippet ?? "").length > (existing.snippet ?? "").length) {
+            existing.snippet = String(hit.snippet ?? "").trim();
+          }
+          continue;
+        }
 
         // Minimal provenance requirement: docId + (location OR stable locationKey) + snippet
         const snippet = String(hit.snippet ?? "").trim();
         const provenanceOk = Boolean(docId && locationKey && snippet);
 
-        out.push({
+        const candidate: CandidateChunk = {
           candidateId,
           type: "text",
           source: phase.source,
 
           docId,
+          docType:
+            this.normalizeDocType(
+              (hit as any).docType ??
+                (hit as any).documentType ??
+                (hit as any).mimeType,
+            ) ?? null,
           title: hit.title ?? null,
           filename: hit.filename ?? null,
 
@@ -1121,7 +1949,9 @@ export class RetrievalEngineService {
           },
 
           provenanceOk,
-        });
+        };
+        seen.set(dedupeKey, candidate);
+        out.push(candidate);
       }
     }
 
@@ -1350,6 +2180,7 @@ export class RetrievalEngineService {
       lexical: 0.22,
       structural: 0.14,
       titleBoost: 0.06,
+      documentIntelligenceBoost: 0.08,
       typeBoost: 0.03,
       recencyBoost: 0.03,
     };
@@ -1361,6 +2192,9 @@ export class RetrievalEngineService {
       const titleBoost = clamp01(
         (c.scores.titleBoost ?? 0) + (c.scores.keywordBoost ?? 0) * 0.5,
       );
+      const documentIntelligenceBoost = clamp01(
+        c.scores.documentIntelligenceBoost ?? 0,
+      );
       const typeBoost = clamp01(c.scores.typeBoost ?? 0);
       const recencyBoost = clamp01(c.scores.recencyBoost ?? 0);
 
@@ -1371,6 +2205,8 @@ export class RetrievalEngineService {
         weights.lexical * lexical +
         weights.structural * structural +
         weights.titleBoost * titleBoost +
+        safeNumber(weights.documentIntelligenceBoost, 0.08) *
+          documentIntelligenceBoost +
         weights.typeBoost * typeBoost +
         weights.recencyBoost * recencyBoost -
         penalties;
@@ -1593,6 +2429,7 @@ export class RetrievalEngineService {
           boosts: {
             keywordBoost: c.scores.keywordBoost ?? 0,
             titleBoost: c.scores.titleBoost ?? 0,
+            documentIntelligenceBoost: c.scores.documentIntelligenceBoost ?? 0,
             typeBoost: c.scores.typeBoost ?? 0,
             recencyBoost: c.scores.recencyBoost ?? 0,
           },
@@ -1724,9 +2561,46 @@ export class RetrievalEngineService {
       .filter(Boolean);
   }
 
+  private buildTelemetryDiagnostics(params: {
+    ruleEvents: RetrievalRuleTelemetryEvent[];
+    matchedBoostRuleIds: string[];
+    appliedBoostRuleIds: string[];
+    rewriteRuleIds: string[];
+    selectedSectionRuleId: string | null;
+    crossDocGatedReason: string | null;
+    classification: DocumentClassificationResult;
+  }): EvidencePack["telemetry"] {
+    const dedupe = (values: string[]) =>
+      Array.from(
+        new Set(
+          values.map((value) => String(value || "").trim()).filter(Boolean),
+        ),
+      ).sort((a, b) => a.localeCompare(b));
+    return {
+      ruleEvents: (params.ruleEvents || []).slice(),
+      summary: {
+        matchedBoostRuleIds: dedupe(params.matchedBoostRuleIds),
+        appliedBoostRuleIds: dedupe(params.appliedBoostRuleIds),
+        rewriteRuleIds: dedupe(params.rewriteRuleIds),
+        selectedSectionRuleId: params.selectedSectionRuleId || null,
+        crossDocGatedReason: params.crossDocGatedReason || null,
+        classifiedDomain: params.classification.domain || null,
+        classifiedDocTypeId: params.classification.docTypeId || null,
+        classificationReasons: Array.from(
+          new Set(
+            (params.classification.reasons || [])
+              .map((value) => String(value || "").trim())
+              .filter(Boolean),
+          ),
+        ).slice(0, 12),
+      },
+    };
+  }
+
   private emptyPack(
     req: RetrievalRequest,
     dbg: { reasonCodes: string[]; note?: string },
+    telemetry?: EvidencePack["telemetry"],
   ): EvidencePack {
     return {
       query: { original: req.query, normalized: (req.query ?? "").trim() },
@@ -1752,6 +2626,7 @@ export class RetrievalEngineService {
         scoreGap: null,
       },
       evidence: [],
+      telemetry,
       debug: isProduction(req.env)
         ? undefined
         : { phases: [], reasonCodes: dbg.reasonCodes },

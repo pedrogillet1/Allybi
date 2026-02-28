@@ -1,0 +1,1404 @@
+{
+  "_meta": {
+    "id": "query_rewrites_legal",
+    "version": "1.0.0",
+    "description": "Domain query rewrite rules for legal retrieval with tight synonym expansion and phrase normalization.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "maxRewriteTerms": 12,
+    "avoidGenericExplosions": true
+  },
+  "domain": "legal",
+  "rules": [
+    {
+      "id": "legal_rewrite_001",
+      "priority": 90,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\btermination\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "end of term",
+          "weight": 1
+        },
+        {
+          "value": "contract ending",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_002",
+      "priority": 88,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brescisao\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "termination",
+          "weight": 1
+        },
+        {
+          "value": "contract rescission",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_003",
+      "priority": 87,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brescission\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "termination",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_004",
+      "priority": 86,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bliability cap\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "limitation of liability cap",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_005",
+      "priority": 84,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bindemnity\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "indemnification",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_006",
+      "priority": 83,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bgoverning law\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "applicable law",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_007",
+      "priority": 82,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bvenue\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "forum",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_008",
+      "priority": 80,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bpayment terms\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "invoice terms",
+          "weight": 1
+        },
+        {
+          "value": "net payment terms",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_009",
+      "priority": 79,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\blate fee\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "default interest",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_010",
+      "priority": 78,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bnotice period\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "notice window",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_011",
+      "priority": 76,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcure period\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "remedy period",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_012",
+      "priority": 75,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bauto renewal\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "automatic renewal",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_013",
+      "priority": 74,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bassignment\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "transfer of agreement",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_014",
+      "priority": 72,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bforce majeure\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "act of god clause",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_015",
+      "priority": 71,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bconfidentiality\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "non disclosure obligations",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_016",
+      "priority": 70,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bnda\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "non disclosure agreement",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_017",
+      "priority": 68,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdpa\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "data processing agreement",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_018",
+      "priority": 67,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmsa\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "master service agreement",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_019",
+      "priority": 66,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bsow\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "statement of work",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_020",
+      "priority": 64,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bwarranty disclaimer\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "as is disclaimer",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_021",
+      "priority": 63,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bliquidated damages\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "pre agreed damages",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_022",
+      "priority": 62,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmaterial breach\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "fundamental breach",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_023",
+      "priority": 60,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bclause comparison\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "compare clauses",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_024",
+      "priority": 59,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bjurisdiction\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "court venue",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_025",
+      "priority": 58,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\barbitration\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "dispute resolution arbitration",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_026",
+      "priority": 56,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bpayment default\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "non payment event",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_027",
+      "priority": 55,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bprivity\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "contracting parties relationship",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_028",
+      "priority": 54,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bsubprocessor\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "sub processor",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_029",
+      "priority": 52,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdata transfer\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "cross border transfer",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_030",
+      "priority": 51,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bretention period\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "data retention",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_031",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bgoverning\\s+language\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "contract language clause",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_032",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bresolucao\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "termination",
+          "weight": 1
+        },
+        {
+          "value": "rescission",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_033",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bindenizacao\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "indemnity",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_034",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\blimitacao\\s+de\\s+responsabilidade\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "liability cap",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_035",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bprazo\\s+de\\s+pagamento\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "payment terms",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "legal_rewrite_036",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\blei\\s+aplicavel\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "governing law",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    }
+  ]
+}

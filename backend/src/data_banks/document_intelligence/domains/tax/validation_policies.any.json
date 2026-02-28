@@ -1,0 +1,111 @@
+{
+  "_meta": {
+    "id": "di_tax_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for tax domain with consistency and quality checks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax"
+  },
+  "domain": "tax",
+  "policies": [
+    {
+      "id": "tax_val_001_amount_consistency",
+      "severity": "error",
+      "description": "Line-item tax components must reconcile to total due/refund.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "amount_reconciliation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "tax_val_002_period_consistency",
+      "severity": "error",
+      "description": "Amounts compared across claims must belong to same tax period unless explicitly labeled otherwise.",
+      "applies": [
+        "compare",
+        "calculate"
+      ],
+      "check": "period_match",
+      "failureAction": "BLOCK_AND_REGEN"
+    },
+    {
+      "id": "tax_val_003_jurisdiction_consistency",
+      "severity": "error",
+      "description": "Authority and jurisdiction labels must be consistent throughout output.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "check": "jurisdiction_match",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "tax_val_004_identifier_presence",
+      "severity": "error",
+      "description": "Critical identity fields cannot be implied when absent.",
+      "applies": [
+        "extract",
+        "validate",
+        "evaluate"
+      ],
+      "check": "critical_field_presence",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "tax_val_005_currency_consistency",
+      "severity": "warning",
+      "description": "Mixed currencies require explicit conversion context.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "check": "currency_match",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "tax_val_006_staleness",
+      "severity": "warning",
+      "description": "Documents older than 24 months should be flagged as potentially stale.",
+      "applies": [
+        "summarize",
+        "evaluate",
+        "monitor"
+      ],
+      "check": "data_freshness",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "tax_val_007_due_date_validity",
+      "severity": "warning",
+      "description": "Due dates must parse as valid calendar dates and be tied to a specific obligation.",
+      "applies": [
+        "extract",
+        "locate",
+        "monitor"
+      ],
+      "check": "date_validity",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "tax_val_008_no_scope_leak",
+      "severity": "error",
+      "description": "Output must remain scoped to attached documents only.",
+      "applies": [
+        "all"
+      ],
+      "check": "wrong_doc_scope_lock",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

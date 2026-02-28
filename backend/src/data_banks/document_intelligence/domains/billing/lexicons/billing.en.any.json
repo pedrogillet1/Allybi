@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_billing_lexicon_en",
+    "version": "1.0.0",
+    "description": "EN lexicon for billing domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "language": "en"
+  },
+  "domain": "billing",
+  "terms": [
+    {
+      "id": "billing_lex_amount_due",
+      "canonical": "amount due",
+      "synonyms": [
+        "total due",
+        "payment due",
+        "outstanding amount"
+      ],
+      "display": "Amount Due"
+    },
+    {
+      "id": "billing_lex_autopay",
+      "canonical": "autopay",
+      "synonyms": [
+        "automatic payment",
+        "direct debit"
+      ],
+      "display": "Autopay"
+    },
+    {
+      "id": "billing_lex_billing_cycle",
+      "canonical": "billing cycle",
+      "synonyms": [
+        "cycle",
+        "statement cycle"
+      ],
+      "display": "Billing Cycle"
+    },
+    {
+      "id": "billing_lex_consumption",
+      "canonical": "consumption",
+      "synonyms": [
+        "usage",
+        "volume"
+      ],
+      "display": "Consumption"
+    },
+    {
+      "id": "billing_lex_credit",
+      "canonical": "credit",
+      "synonyms": [
+        "credit adjustment",
+        "credit note"
+      ],
+      "display": "Credit"
+    },
+    {
+      "id": "billing_lex_discount",
+      "canonical": "discount",
+      "synonyms": [
+        "rebate",
+        "promotion"
+      ],
+      "display": "Discount"
+    },
+    {
+      "id": "billing_lex_due_date",
+      "canonical": "due date",
+      "synonyms": [
+        "pay by date",
+        "deadline"
+      ],
+      "display": "Due Date"
+    },
+    {
+      "id": "billing_lex_invoice",
+      "canonical": "invoice",
+      "synonyms": [
+        "bill",
+        "tax invoice"
+      ],
+      "display": "Invoice"
+    },
+    {
+      "id": "billing_lex_late_fee",
+      "canonical": "late fee",
+      "synonyms": [
+        "penalty",
+        "arrears charge"
+      ],
+      "display": "Late Fee"
+    },
+    {
+      "id": "billing_lex_line_item",
+      "canonical": "line item",
+      "synonyms": [
+        "item row",
+        "charge line"
+      ],
+      "display": "Line Item"
+    },
+    {
+      "id": "billing_lex_meter_reading",
+      "canonical": "meter reading",
+      "synonyms": [
+        "current reading",
+        "previous reading"
+      ],
+      "display": "Meter Reading"
+    },
+    {
+      "id": "billing_lex_minimum_payment",
+      "canonical": "minimum payment",
+      "synonyms": [
+        "minimum due",
+        "minimum amount due"
+      ],
+      "display": "Minimum Payment"
+    },
+    {
+      "id": "billing_lex_overage",
+      "canonical": "overage",
+      "synonyms": [
+        "excess usage",
+        "out-of-plan usage"
+      ],
+      "display": "Overage"
+    },
+    {
+      "id": "billing_lex_payment_method",
+      "canonical": "payment method",
+      "synonyms": [
+        "payment channel",
+        "method"
+      ],
+      "display": "Payment Method"
+    },
+    {
+      "id": "billing_lex_previous_balance",
+      "canonical": "previous balance",
+      "synonyms": [
+        "prior balance",
+        "balance forward"
+      ],
+      "display": "Previous Balance"
+    },
+    {
+      "id": "billing_lex_receipt",
+      "canonical": "receipt",
+      "synonyms": [
+        "payment receipt",
+        "proof of payment"
+      ],
+      "display": "Receipt"
+    },
+    {
+      "id": "billing_lex_service_fee",
+      "canonical": "service fee",
+      "synonyms": [
+        "admin fee",
+        "maintenance fee"
+      ],
+      "display": "Service Fee"
+    },
+    {
+      "id": "billing_lex_subtotal",
+      "canonical": "subtotal",
+      "synonyms": [
+        "pre-tax total"
+      ],
+      "display": "Subtotal"
+    },
+    {
+      "id": "billing_lex_tariff",
+      "canonical": "tariff",
+      "synonyms": [
+        "rate plan",
+        "price table"
+      ],
+      "display": "Tariff"
+    },
+    {
+      "id": "billing_lex_usage_plan",
+      "canonical": "usage plan",
+      "synonyms": [
+        "plan tier",
+        "service plan"
+      ],
+      "display": "Usage Plan"
+    }
+  ]
+}

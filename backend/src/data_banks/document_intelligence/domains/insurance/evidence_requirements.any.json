@@ -1,0 +1,201 @@
+{
+  "_meta": {
+    "id": "di_insurance_evidence_requirements",
+    "version": "2.0.0",
+    "description": "Insurance evidence requirements enforcing citation quality and no-missing-field inference boundaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "insurance",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "insurer_issued_policy_or_notice",
+      "label": {
+        "en": "Insurer-issued policy/notice",
+        "pt": "Apolice/aviso emitido pela seguradora"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "adjudicated_claim_or_eob",
+      "label": {
+        "en": "Adjudicated claim/EOB",
+        "pt": "Sinistro julgado/EOB"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "provider_billing_attachment",
+      "label": {
+        "en": "Provider billing attachment",
+        "pt": "Anexo de cobranca do prestador"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 4,
+      "type": "member_submitted_support",
+      "label": {
+        "en": "Member-submitted support",
+        "pt": "Suporte enviado pelo beneficiario"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "draft_or_partial_scan",
+      "label": {
+        "en": "Draft/partial scan",
+        "pt": "Rascunho/scan parcial"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "ins_ev_amount_claim_requires_billed_allowed_paid",
+      "description": "Amount claims require billed/allowed/paid context with source location.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "requiredDimensions": [
+        "billed_amount",
+        "allowed_amount",
+        "paid_amount",
+        "currency",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "ins_ev_policy_claim_requires_policy_identifier",
+      "description": "Policy-level claims require policy number and issuer.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "policy_number",
+        "issuer_name",
+        "effective_date",
+        "source_location"
+      ],
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "ins_ev_coverage_status_requires_clause_anchor",
+      "description": "Coverage status requires clause anchor or adjudication code.",
+      "applies": [
+        "evaluate",
+        "summarize",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "status",
+        "clause_or_code",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "ins_ev_no_inference_missing_critical_fields",
+      "description": "Forbid inference of missing critical fields such as policy number, claim number, insured identity, or adjudication status.",
+      "applies": [
+        "extract",
+        "summarize",
+        "evaluate",
+        "advise",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "critical_field_presence",
+        "source_location"
+      ],
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "ins_ev_dates_require_timeline_anchor",
+      "description": "Coverage and billing dates require explicit timeline anchor.",
+      "applies": [
+        "extract",
+        "locate",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "effective_date",
+        "expiry_or_due_date",
+        "section_anchor",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "ins_ev_annex_reference_required",
+      "description": "Details sourced from attachments require annex/exhibit reference.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "annex_id",
+        "page",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "ins_req_policy_identity",
+      "field": "policy identity",
+      "minSources": 1,
+      "sourceTypes": [
+        "insurer_issued_policy_or_notice"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "ins_req_claim_identity",
+      "field": "claim identity and status",
+      "minSources": 1,
+      "sourceTypes": [
+        "adjudicated_claim_or_eob",
+        "insurer_issued_policy_or_notice"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "ins_req_amounts",
+      "field": "allowed/paid/member responsibility amounts",
+      "minSources": 1,
+      "sourceTypes": [
+        "adjudicated_claim_or_eob",
+        "provider_billing_attachment"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "ins_req_timeline",
+      "field": "effective, expiration, due and service dates",
+      "minSources": 1,
+      "sourceTypes": [
+        "insurer_issued_policy_or_notice",
+        "adjudicated_claim_or_eob"
+      ],
+      "failureBehavior": "ask_clarifying_question"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Certification Summary
 
-- Generated: 2026-02-27T19:36:36.253Z
+- Generated: 2026-02-28T03:00:02.886Z
 - Passed: yes
 - Passed gates: 14/14
 
@@ -44,12 +44,12 @@
 ## editing-capabilities
 - Passed: yes
 - Failures: none
-- Metrics: `{"totalRows":67,"supportedRows":61,"unsupportedRows":6,"docxRows":30,"xlsxRows":37,"versionHash":"075df2d653f907fa894cf101295e5ff26be204edc3aaed45db292cde7ba1cdac"}`
+- Metrics: `{"totalRows":78,"supportedRows":72,"unsupportedRows":6,"docxRows":36,"xlsxRows":42,"versionHash":"09848adea0d70de69e1ab2e67df9393047fd2dded016382e15b51de7c3e15151"}`
 
 ## editing-eval-suite
 - Passed: yes
 - Failures: none
-- Metrics: `{"docxTotal":208,"docxPassed":208,"docxPassRate":1,"docxPlanP95Ms":0,"xlsxTotal":288,"xlsxPassed":288,"xlsxPassRate":1,"xlsxPlanP95Ms":0,"adversarialTotal":192,"adversarialPassed":192,"adversarialPassRate":1,"adversarialP95Ms":0}`
+- Metrics: `{"docxTotal":256,"docxPassed":256,"docxPassRate":1,"docxPlanP95Ms":0,"xlsxTotal":328,"xlsxPassed":328,"xlsxPassRate":1,"xlsxPlanP95Ms":0,"adversarialTotal":192,"adversarialPassed":192,"adversarialPassRate":1,"adversarialP95Ms":0}`
 
 ## editing-slo
 - Passed: yes
@@ -59,7 +59,7 @@
 ## runtime-wiring
 - Passed: yes
 - Failures: none
-- Metrics: `{"commandStatus":0,"reachableFiles":403,"reachableRuntimeFiles":374,"runtimeCoverage":0.992,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
+- Metrics: `{"commandStatus":0,"reachableFiles":410,"reachableRuntimeFiles":381,"runtimeCoverage":0.9922,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
 
 ## enforcer-failclosed
 - Passed: yes

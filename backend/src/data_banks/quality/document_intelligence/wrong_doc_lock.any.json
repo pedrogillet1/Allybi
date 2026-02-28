@@ -11,11 +11,314 @@
   "config": {
     "enabled": true
   },
-  "rules": [],
+  "rules": [
+    {
+      "id": "WDL_001_explicit_ref_must_match",
+      "trigger": "query contains an explicit filename and chosen document does not match",
+      "check": "context.explicitDocRef.present == true AND context.chosenDocs.allMatchExplicit == false",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["User asks about 'invoice_2025.pdf' but answer uses 'invoice_2024.pdf'.", "'Show contract_A.docx' but retrieval returned contract_B.docx."]
+    },
+    {
+      "id": "WDL_002_active_doc_ref_drift",
+      "trigger": "state.activeDocRef has silently changed to a different document",
+      "check": "context.state.activeDocRef.present == true AND context.state.activeDocRef.matchesExplicit == false AND context.explicitDocRef.present == true",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Active ref drifted from budget.xlsx to forecast.xlsx.", "User set docRef to A, system switched to B."]
+    },
+    {
+      "id": "WDL_003_source_buttons_cross_doc",
+      "trigger": "explicit doc ref active and source buttons contain non-matching documents",
+      "check": "context.explicitDocRef.present == true AND attachments.source_buttons.containsNonExplicit == true",
+      "failureAction": "STRIP_WRONG_SOURCES",
+      "severity": "error",
+      "examples": ["User locked to report.pdf, pills show budget.xlsx too.", "Source buttons include 3 docs when only 1 is referenced."]
+    },
+    {
+      "id": "WDL_004_retrieval_mixed_with_wrong_doc",
+      "trigger": "retrieval results contain passages from documents other than the explicitly referenced one",
+      "check": "context.explicitDocRef.present == true AND context.retrievedPassages.any(p => p.docId != context.explicitDocRef.id)",
+      "failureAction": "FILTER_RETRIEVAL_RESULTS",
+      "severity": "warning",
+      "examples": ["Retrieval returns 5 passages, 2 from wrong doc.", "Cross-doc contamination in retrieval set."]
+    },
+    {
+      "id": "WDL_005_answer_data_from_wrong_doc",
+      "trigger": "answer contains factual data that only exists in a non-referenced document",
+      "check": "context.explicitDocRef.present == true AND output.facts.any(f => f.sourceDocId != context.explicitDocRef.id)",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Revenue figure from budget.xlsx appears in answer about invoice.pdf.", "Clause from contract B in answer about contract A."]
+    },
+    {
+      "id": "WDL_006_doc_lock_on_filename_mention",
+      "trigger": "user mentions a specific filename in the query and no doc lock is active",
+      "check": "context.queryFilenameRef.present == true AND context.docLock.active == false",
+      "failureAction": "ACTIVATE_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["User says 'in report.pdf' — should activate doc lock.", "'Look at budget.xlsx' — needs lock."]
+    },
+    {
+      "id": "WDL_007_doc_lock_persists_followup",
+      "trigger": "follow-up query doesn't mention a filename but previous turn had an explicit doc lock",
+      "check": "context.docLock.active == true AND context.currentQuery.filenameRef == null AND context.conversationContinued == true",
+      "failureAction": "MAINTAIN_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["T1: 'What's in report.pdf?' T2: 'What about page 3?' — lock should persist.", "Follow-up pronoun should inherit lock."]
+    },
+    {
+      "id": "WDL_008_doc_lock_release_on_new_ref",
+      "trigger": "query explicitly references a different document than the current lock",
+      "check": "context.docLock.active == true AND context.queryFilenameRef.present == true AND context.queryFilenameRef.id != context.docLock.docId",
+      "failureAction": "SWITCH_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["Locked to A.pdf, user now asks about B.xlsx.", "Explicit new doc ref should switch the lock."]
+    },
+    {
+      "id": "WDL_009_doc_lock_release_on_broad_query",
+      "trigger": "query is explicitly cross-document and current doc lock should be released",
+      "check": "context.docLock.active == true AND context.queryIntent == 'cross_document_comparison'",
+      "failureAction": "RELEASE_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["'Compare all reports' should release single-doc lock.", "'Across all documents' signals broad scope."]
+    },
+    {
+      "id": "WDL_010_wrong_doc_hard_block",
+      "trigger": "high-confidence wrong-doc detection — answer is about an entirely different document",
+      "check": "context.wrongDocConfidence >= 0.9 AND context.explicitDocRef.present == true",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["User asks about tax return, answer discusses employment contract.", "Asked about Q3 report, answer from Q1 report."]
+    },
+    {
+      "id": "WDL_011_similar_filename_disambiguation",
+      "trigger": "multiple documents have similar filenames and query could match any",
+      "check": "context.similarFilenames.count > 1 AND context.explicitDocRef.exactMatch == false",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'report.pdf' and 'report_v2.pdf' both exist.", "'budget_2024.xlsx' and 'budget_2025.xlsx'."]
+    },
+    {
+      "id": "WDL_012_doc_type_mismatch",
+      "trigger": "query asks about a specific document type but answer uses a different type",
+      "check": "context.queryDocType != null AND context.answerDocType != context.queryDocType",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Asked about 'the spreadsheet' but answer cites a PDF.", "'The contract' query answered with data from an invoice."]
+    },
+    {
+      "id": "WDL_013_multi_doc_answer_needs_disclosure",
+      "trigger": "answer synthesizes from multiple documents without explicit user permission",
+      "check": "output.sourceDocs.count > 1 AND context.crossDocPermission == false AND context.explicitDocRef.present == true",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["User asked about one doc, answer blends data from 3.", "Cross-doc synthesis without disclosure."]
+    },
+    {
+      "id": "WDL_014_doc_not_found_in_corpus",
+      "trigger": "user references a document name that doesn't exist in the uploaded corpus",
+      "check": "context.queryFilenameRef.present == true AND context.queryFilenameRef.matchInCorpus == false",
+      "failureAction": "EMIT_DOC_NOT_FOUND",
+      "severity": "error",
+      "examples": ["User asks about 'report_2030.pdf' which doesn't exist.", "Filename typo — no match in corpus."]
+    },
+    {
+      "id": "WDL_015_partial_filename_match_guard",
+      "trigger": "query uses a partial filename that matches multiple documents",
+      "check": "context.queryFilenameRef.partialMatch == true AND context.queryFilenameRef.candidates.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'The report' matches 'annual_report.pdf' and 'quarterly_report.pdf'.", "'Budget' matches 3 budget files."]
+    },
+    {
+      "id": "WDL_016_version_suffix_awareness",
+      "trigger": "documents have version suffixes and query doesn't specify which version",
+      "check": "context.docVersionSuffixes.count > 1 AND context.versionRef == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'contract_v1.pdf', 'contract_v2.pdf', 'contract_final.pdf'.", "'draft' vs 'final' version."]
+    },
+    {
+      "id": "WDL_017_date_suffix_disambiguation",
+      "trigger": "documents have date-based names and query doesn't specify the date",
+      "check": "context.dateSuffixedDocs.count > 1 AND context.dateRef == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'report_jan.pdf' and 'report_feb.pdf'.", "'invoice_2024_01' through 'invoice_2024_12'."]
+    },
+    {
+      "id": "WDL_018_editing_scope_lock",
+      "trigger": "editing mode is active and edit targets a different document than the active one",
+      "check": "answerMode == 'editing' AND context.editTarget.docId != context.activeDoc.id",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["User is editing contract A, edit applies to contract B.", "Edit operation crosses document boundary."]
+    },
+    {
+      "id": "WDL_019_tab_context_mismatch",
+      "trigger": "user has a document open in a tab and query references a different document",
+      "check": "context.openTab.docId != null AND context.queryDocRef != context.openTab.docId AND context.queryDocRef != null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["Tab shows invoice.pdf, user asks about 'the contract'.", "Open doc differs from referenced doc."]
+    },
+    {
+      "id": "WDL_020_discovery_exception_nav",
+      "trigger": "nav_pills mode should always search across all documents — no doc lock in nav mode",
+      "check": "answerMode.in(['nav_pills','nav_pill']) == true AND context.docLock.active == true",
+      "failureAction": "RELEASE_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["Nav search should span all docs.", "Doc lock should not restrict nav discovery."]
+    },
+    {
+      "id": "WDL_021_discovery_exception_list_all",
+      "trigger": "query explicitly asks to list all documents — discovery exception",
+      "check": "context.queryIntent == 'list_all_docs' AND context.docLock.active == true",
+      "failureAction": "RELEASE_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["'Show me all my documents' should override lock.", "'List uploaded files' is a discovery query."]
+    },
+    {
+      "id": "WDL_022_discovery_exception_search_all",
+      "trigger": "query uses 'across all' or 'in any document' phrasing — discovery exception",
+      "check": "context.queryBroadScope == true AND context.docLock.active == true",
+      "failureAction": "RELEASE_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["'Find this term across all documents.'", "'In any of my files, where does it say...?'"]
+    },
+    {
+      "id": "WDL_023_sheet_tab_within_xlsx",
+      "trigger": "user references a specific sheet tab in an xlsx and answer uses data from a different sheet",
+      "check": "context.sheetTabRef.present == true AND output.sourceSheet != context.sheetTabRef.name",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["User asks about 'Sheet2' but answer uses 'Sheet1' data.", "Tab 'Revenue' referenced, 'Expenses' tab used."]
+    },
+    {
+      "id": "WDL_024_slide_number_lock",
+      "trigger": "user references a specific slide number in a pptx and answer uses a different slide",
+      "check": "context.slideRef.present == true AND output.sourceSlide != context.slideRef.number",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["Asked about slide 5, answer from slide 12.", "Specific slide referenced but data from another."]
+    },
+    {
+      "id": "WDL_025_doc_alias_resolution",
+      "trigger": "user uses a nickname or alias for a document and system resolves to wrong doc",
+      "check": "context.docAliasUsed == true AND context.resolvedDocId != context.expectedDocId",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'The quarterly' resolves to annual report.", "'NDA' resolves to wrong non-disclosure agreement."]
+    },
+    {
+      "id": "WDL_026_doc_lock_no_stale_ref",
+      "trigger": "doc lock references a document that has been deleted or replaced",
+      "check": "context.docLock.active == true AND context.docLock.docExists == false",
+      "failureAction": "RELEASE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Locked to deleted file.", "Document was re-uploaded with different ID."]
+    },
+    {
+      "id": "WDL_027_attachment_doc_mismatch",
+      "trigger": "response includes an attachment (table, chart) from a document that is not the locked doc",
+      "check": "context.docLock.active == true AND output.attachments.any(a => a.sourceDocId != context.docLock.docId)",
+      "failureAction": "STRIP_WRONG_SOURCES",
+      "severity": "error",
+      "examples": ["Table from wrong spreadsheet in response.", "Chart pulled from unlocked document."]
+    },
+    {
+      "id": "WDL_028_concurrent_doc_edit_guard",
+      "trigger": "two edit operations target different documents in the same turn",
+      "check": "context.editOperations.count > 1 AND context.editOperations.distinctDocs > 1",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Single turn tries to edit both invoice.docx and report.docx.", "Cross-doc edit in one request."]
+    },
+    {
+      "id": "WDL_029_implicit_doc_from_context",
+      "trigger": "no explicit doc ref but conversation context strongly implies a specific document",
+      "check": "context.explicitDocRef.present == false AND context.impliedDocRef.confidence >= 0.85",
+      "failureAction": "ACTIVATE_DOC_LOCK",
+      "severity": "warning",
+      "examples": ["Discussing contract details for 3 turns — implied lock.", "Follow-up clearly about the same doc."]
+    },
+    {
+      "id": "WDL_030_wrong_doc_in_summary",
+      "trigger": "summary or comparison includes data points from a document the user didn't ask about",
+      "check": "context.queryIntent.in(['summarize','compare']) == true AND output.sourceDocs.any(d => context.requestedDocs.includes(d) == false)",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Summary includes unrequested document.", "Comparison adds a third doc not asked for."]
+    },
+    {
+      "id": "WDL_031_doc_lock_audit_trail",
+      "trigger": "doc lock state changed but no audit event was emitted",
+      "check": "context.docLock.stateChanged == true AND context.docLock.auditEmitted == false",
+      "failureAction": "EMIT_AUDIT_EVENT",
+      "severity": "warning",
+      "examples": ["Lock activated without telemetry.", "Lock released silently."]
+    },
+    {
+      "id": "WDL_032_multi_workspace_isolation",
+      "trigger": "answer references documents from a different workspace than the user's current one",
+      "check": "output.sourceDocs.any(d => d.workspaceId != context.currentWorkspaceId)",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Cross-workspace doc leak.", "Data from team B's workspace in team A's answer."]
+    },
+    {
+      "id": "WDL_033_attached_docs_only_enforcement",
+      "trigger": "user scope is explicitly limited to attached documents only",
+      "check": "context.attachedDocsOnly == true AND output.sourceDocs.any(d => context.attachedDocIds.includes(d) == false)",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": [
+        "User asks 'use only attached docs' but answer cites indexed corpus docs.",
+        "Attached-only request includes a source from a non-attached file."
+      ]
+    },
+    {
+      "id": "WDL_034_compare_requires_two_explicit_docs",
+      "trigger": "query intent is compare and fewer than two explicit documents are resolved",
+      "check": "context.queryIntent == 'compare' AND context.explicitDocsResolved.count < 2",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": [
+        "User says 'compare these' but only one document is explicitly identified.",
+        "Comparison requested without two explicit docs in scope."
+      ]
+    }
+  ],
   "templates": {
-    "finance": [],
-    "legal": [],
-    "medical": [],
-    "ops": []
+    "finance": [
+      "I found multiple financial documents matching '{{queryRef}}'. Which one do you mean: {{candidateList}}?",
+      "Your question references '{{docRef}}' but I can only find '{{closestMatch}}'. Should I use that?",
+      "I'm currently focused on {{lockedDoc}}. Would you like me to look at {{otherDoc}} instead?",
+      "Multiple budget files exist: {{fileList}}. Which fiscal period?",
+      "The figure you're asking about appears in both {{docA}} and {{docB}} — which is authoritative?"
+    ],
+    "legal": [
+      "I see {{count}} versions of '{{contractName}}'. Which version: {{versionList}}?",
+      "Amendment or original? Both contain clause {{clauseRef}}.",
+      "This clause appears in {{docA}} and {{docB}}. Which contract governs?",
+      "Document '{{docRef}}' was not found. Did you mean '{{suggestion}}'?",
+      "I'm locked to {{currentDoc}}. The term you mentioned is in {{otherDoc}} — switch?"
+    ],
+    "medical": [
+      "Multiple patient records match. Which encounter: {{encounterList}}?",
+      "Lab results exist in {{docA}} and {{docB}}. Which panel date: {{dateList}}?",
+      "I'm focused on {{currentDoc}}. Switch to {{otherDoc}} for {{dataType}}?",
+      "Prescription record '{{rxRef}}' not found — closest match is '{{suggestion}}'.",
+      "Results from {{labDate}} or {{labDate2}}? Both contain {{testName}}."
+    ],
+    "ops": [
+      "Multiple reports match '{{queryRef}}': {{candidateList}}. Which one?",
+      "Data exists in {{sheetA}} and {{sheetB}}. Which sheet?",
+      "Currently locked to {{currentDoc}} ({{department}}). Switch to {{otherDoc}}?",
+      "Inventory data appears in {{count}} documents. Which warehouse/location?",
+      "Report '{{docRef}}' has {{versionCount}} versions. Date range or version number?"
+    ]
   }
 }

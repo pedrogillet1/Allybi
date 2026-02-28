@@ -1,0 +1,668 @@
+{
+  "_meta": {
+    "id": "legal_sla_extraction_hints",
+    "version": "2.0.0",
+    "description": "Extraction hints and pitfalls for Service Level Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_sla"
+  },
+  "hints": [
+    {
+      "id": "legal_sla_hint_001",
+      "entity": "document_title",
+      "anchors": [
+        "document title",
+        "service level agreement document title",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document title in legal_sla",
+        "document_header document title"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_002",
+      "entity": "document_version",
+      "anchors": [
+        "document version",
+        "service level agreement document version",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document version in legal_sla",
+        "parties document version"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_003",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "service level agreement effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "effective date in legal_sla",
+        "recitals_background effective date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_004",
+      "entity": "execution_date",
+      "anchors": [
+        "execution date",
+        "service level agreement execution date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "execution date in legal_sla",
+        "definitions execution date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_005",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "service level agreement expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "expiration date in legal_sla",
+        "scope_of_services expiration date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_006",
+      "entity": "renewal_term_days",
+      "anchors": [
+        "renewal term days",
+        "service level agreement renewal term days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "renewal term days in legal_sla",
+        "fees_and_payment renewal term days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_007",
+      "entity": "notice_period_days",
+      "anchors": [
+        "notice period days",
+        "service level agreement notice period days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "notice period days in legal_sla",
+        "term_and_renewal notice period days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_008",
+      "entity": "governing_law",
+      "anchors": [
+        "governing law",
+        "service level agreement governing law",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "governing law in legal_sla",
+        "termination governing law"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_009",
+      "entity": "jurisdiction_venue",
+      "anchors": [
+        "jurisdiction venue",
+        "service level agreement jurisdiction venue",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "jurisdiction venue in legal_sla",
+        "confidentiality_privacy jurisdiction venue"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_010",
+      "entity": "arbitration_forum",
+      "anchors": [
+        "arbitration forum",
+        "service level agreement arbitration forum",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "arbitration forum in legal_sla",
+        "security_compliance arbitration forum"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_011",
+      "entity": "party_one_name",
+      "anchors": [
+        "party one name",
+        "service level agreement party one name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "ip_and_license",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one name in legal_sla",
+        "ip_and_license party one name"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_012",
+      "entity": "party_one_role",
+      "anchors": [
+        "party one role",
+        "service level agreement party one role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "liability_and_indemnity",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one role in legal_sla",
+        "liability_and_indemnity party one role"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_sla_hint_013",
+      "entity": "party_one_address",
+      "anchors": [
+        "party one address",
+        "service level agreement party one address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "dispute_resolution",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one address in legal_sla",
+        "dispute_resolution party one address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_014",
+      "entity": "party_two_name",
+      "anchors": [
+        "party two name",
+        "service level agreement party two name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "notices_misc",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two name in legal_sla",
+        "notices_misc party two name"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_015",
+      "entity": "party_two_role",
+      "anchors": [
+        "party two role",
+        "service level agreement party two role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "signatures",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two role in legal_sla",
+        "signatures party two role"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_016",
+      "entity": "party_two_address",
+      "anchors": [
+        "party two address",
+        "service level agreement party two address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "annexes_schedules",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two address in legal_sla",
+        "annexes_schedules party two address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_017",
+      "entity": "affiliate_definition",
+      "anchors": [
+        "affiliate definition",
+        "service level agreement affiliate definition",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "affiliate definition in legal_sla",
+        "document_header affiliate definition"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_018",
+      "entity": "services_description",
+      "anchors": [
+        "services description",
+        "service level agreement services description",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "services description in legal_sla",
+        "parties services description"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_019",
+      "entity": "deliverables_summary",
+      "anchors": [
+        "deliverables summary",
+        "service level agreement deliverables summary",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "deliverables summary in legal_sla",
+        "recitals_background deliverables summary"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_020",
+      "entity": "service_level_target",
+      "anchors": [
+        "service level target",
+        "service level agreement service level target",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "service level target in legal_sla",
+        "definitions service level target"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_sla_hint_021",
+      "entity": "fee_amount",
+      "anchors": [
+        "fee amount",
+        "service level agreement fee amount",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee amount in legal_sla",
+        "scope_of_services fee amount"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_sla_hint_022",
+      "entity": "fee_currency",
+      "anchors": [
+        "fee currency",
+        "service level agreement fee currency",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee currency in legal_sla",
+        "fees_and_payment fee currency"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_sla_hint_023",
+      "entity": "payment_terms_days",
+      "anchors": [
+        "payment terms days",
+        "service level agreement payment terms days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "payment terms days in legal_sla",
+        "term_and_renewal payment terms days"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_sla_hint_024",
+      "entity": "late_fee_rate",
+      "anchors": [
+        "late fee rate",
+        "service level agreement late fee rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "late fee rate in legal_sla",
+        "termination late fee rate"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_sla_hint_025",
+      "entity": "liability_cap_text",
+      "anchors": [
+        "liability cap text",
+        "service level agreement liability cap text",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "liability cap text in legal_sla",
+        "confidentiality_privacy liability cap text"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_sla_hint_026",
+      "entity": "indemnity_scope",
+      "anchors": [
+        "indemnity scope",
+        "service level agreement indemnity scope",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "indemnity scope in legal_sla",
+        "security_compliance indemnity scope"
+      ],
+      "confidenceBias": "low"
+    }
+  ]
+}

@@ -1,0 +1,854 @@
+{
+  "_meta": {
+    "id": "di_section_ontology",
+    "version": "1.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "di_domain_ontology",
+      "di_doc_type_ontology"
+    ],
+    "usedBy": [
+      "di_entity_ontology",
+      "di_metric_ontology"
+    ],
+    "tests": [
+      "SSOT_SECTION_001"
+    ],
+    "lastUpdated": "2026-02-27",
+    "description": "di_section_ontology (document_intelligence) configuration bank."
+  },
+  "config": {
+    "enabled": true
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "label": "Abstract",
+      "labelPt": "Resumo",
+      "category": "overview",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Brief summary of document content and key findings",
+      "purposePt": "Breve resumo do conteúdo do documento e principais conclusões"
+    },
+    {
+      "id": "action_items",
+      "label": "Action Items",
+      "labelPt": "Itens de Ação",
+      "category": "operational",
+      "domains": [
+        "finance",
+        "legal",
+        "operations"
+      ],
+      "purpose": "List of tasks, owners, and deadlines arising from the document",
+      "purposePt": "Lista de tarefas, responsáveis e prazos decorrentes do documento"
+    },
+    {
+      "id": "appendix",
+      "label": "Appendix",
+      "labelPt": "Apêndice",
+      "category": "appendix",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Supplementary material referenced in the main body",
+      "purposePt": "Material suplementar referenciado no corpo principal"
+    },
+    {
+      "id": "approvals",
+      "label": "Approvals",
+      "labelPt": "Aprovações",
+      "category": "approval",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Sign-off records from authorized reviewers or decision-makers",
+      "purposePt": "Registros de aprovação de revisores ou tomadores de decisão autorizados"
+    },
+    {
+      "id": "assessment_plan",
+      "label": "Assessment & Plan",
+      "labelPt": "Avaliação e Plano",
+      "category": "clinical",
+      "domains": [
+        "medical"
+      ],
+      "purpose": "Clinical assessment of findings and proposed treatment plan",
+      "purposePt": "Avaliação clínica dos achados e plano de tratamento proposto"
+    },
+    {
+      "id": "assumptions",
+      "label": "Assumptions",
+      "labelPt": "Premissas",
+      "category": "methodology",
+      "domains": [
+        "finance",
+        "legal",
+        "operations"
+      ],
+      "purpose": "Stated assumptions underlying the analysis or projections",
+      "purposePt": "Premissas declaradas que fundamentam a análise ou projeções"
+    },
+    {
+      "id": "attachments",
+      "label": "Attachments",
+      "labelPt": "Anexos",
+      "category": "appendix",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "External documents or files attached to the main document",
+      "purposePt": "Documentos ou arquivos externos anexados ao documento principal"
+    },
+    {
+      "id": "audit_trail",
+      "label": "Audit Trail",
+      "labelPt": "Trilha de Auditoria",
+      "category": "compliance",
+      "domains": [
+        "finance",
+        "legal",
+        "operations"
+      ],
+      "purpose": "Chronological record of actions taken on the document or process",
+      "purposePt": "Registro cronológico das ações realizadas no documento ou processo"
+    },
+    {
+      "id": "authorization",
+      "label": "Authorization",
+      "labelPt": "Autorização",
+      "category": "approval",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Formal authorization granting permission or authority to proceed",
+      "purposePt": "Autorização formal concedendo permissão ou autoridade para prosseguir"
+    },
+    {
+      "id": "budget_summary",
+      "label": "Budget Summary",
+      "labelPt": "Resumo do Orçamento",
+      "category": "financial",
+      "domains": [
+        "finance",
+        "operations"
+      ],
+      "purpose": "High-level overview of budgeted vs. actual figures",
+      "purposePt": "Visão geral de alto nível dos valores orçados versus realizados"
+    },
+    {
+      "id": "certifications",
+      "label": "Certifications",
+      "labelPt": "Certificações",
+      "category": "compliance",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Formal attestations of compliance with standards or regulations",
+      "purposePt": "Atestados formais de conformidade com normas ou regulamentos"
+    },
+    {
+      "id": "compliance_section",
+      "label": "Compliance",
+      "labelPt": "Conformidade",
+      "category": "compliance",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Assessment of adherence to regulatory or policy requirements",
+      "purposePt": "Avaliação da aderência aos requisitos regulatórios ou de políticas"
+    },
+    {
+      "id": "confidentiality_clause",
+      "label": "Confidentiality Clause",
+      "labelPt": "Cláusula de Confidencialidade",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Terms governing the protection of sensitive information",
+      "purposePt": "Termos que regem a proteção de informações sensíveis"
+    },
+    {
+      "id": "criteria",
+      "label": "Criteria",
+      "labelPt": "Critérios",
+      "category": "methodology",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Standards or benchmarks used to evaluate or assess",
+      "purposePt": "Padrões ou referências utilizados para avaliar ou aferir"
+    },
+    {
+      "id": "data_tables",
+      "label": "Data Tables",
+      "labelPt": "Tabelas de Dados",
+      "category": "detail",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Structured tabular data supporting the analysis",
+      "purposePt": "Dados tabulares estruturados que suportam a análise"
+    },
+    {
+      "id": "definitions",
+      "label": "Definitions",
+      "labelPt": "Definições",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Precise meanings of key terms used throughout the document",
+      "purposePt": "Significados precisos dos termos-chave utilizados no documento"
+    },
+    {
+      "id": "dependencies",
+      "label": "Dependencies",
+      "labelPt": "Dependências",
+      "category": "operational",
+      "domains": [
+        "operations",
+        "finance"
+      ],
+      "purpose": "External factors or prerequisites that the plan relies upon",
+      "purposePt": "Fatores externos ou pré-requisitos dos quais o plano depende"
+    },
+    {
+      "id": "detailed_analysis",
+      "label": "Detailed Analysis",
+      "labelPt": "Análise Detalhada",
+      "category": "detail",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "In-depth examination of the subject matter",
+      "purposePt": "Exame aprofundado do assunto em questão"
+    },
+    {
+      "id": "disclaimers",
+      "label": "Disclaimers",
+      "labelPt": "Isenções de Responsabilidade",
+      "category": "risk",
+      "domains": [
+        "finance",
+        "legal",
+        "medical"
+      ],
+      "purpose": "Statements limiting liability or scope of the document",
+      "purposePt": "Declarações que limitam a responsabilidade ou o escopo do documento"
+    },
+    {
+      "id": "discussion",
+      "label": "Discussion",
+      "labelPt": "Discussão",
+      "category": "detail",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Interpretation and contextualization of results or findings",
+      "purposePt": "Interpretação e contextualização dos resultados ou achados"
+    },
+    {
+      "id": "dispute_resolution",
+      "label": "Dispute Resolution",
+      "labelPt": "Resolução de Disputas",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Mechanisms for resolving disagreements between parties",
+      "purposePt": "Mecanismos para resolução de divergências entre as partes"
+    },
+    {
+      "id": "distribution_list",
+      "label": "Distribution List",
+      "labelPt": "Lista de Distribuição",
+      "category": "metadata",
+      "domains": [
+        "finance",
+        "legal",
+        "operations"
+      ],
+      "purpose": "Recipients or stakeholders who receive copies of the document",
+      "purposePt": "Destinatários ou partes interessadas que recebem cópias do documento"
+    },
+    {
+      "id": "document_metadata",
+      "label": "Document Metadata",
+      "labelPt": "Metadados do Documento",
+      "category": "metadata",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Identifying information such as title, author, date, and version",
+      "purposePt": "Informações de identificação como título, autor, data e versão"
+    },
+    {
+      "id": "executive_summary",
+      "label": "Executive Summary",
+      "labelPt": "Resumo Executivo",
+      "category": "overview",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "High-level overview of document content for decision-makers",
+      "purposePt": "Visão geral de alto nível do conteúdo do documento para tomadores de decisão"
+    },
+    {
+      "id": "exhibits",
+      "label": "Exhibits",
+      "labelPt": "Documentos Probatórios",
+      "category": "appendix",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Formal evidentiary documents referenced by the main text",
+      "purposePt": "Documentos probatórios formais referenciados pelo texto principal"
+    },
+    {
+      "id": "financial_highlights",
+      "label": "Financial Highlights",
+      "labelPt": "Destaques Financeiros",
+      "category": "financial",
+      "domains": [
+        "finance"
+      ],
+      "purpose": "Key financial metrics and performance indicators at a glance",
+      "purposePt": "Principais métricas financeiras e indicadores de desempenho em resumo"
+    },
+    {
+      "id": "financial_statements",
+      "label": "Financial Statements",
+      "labelPt": "Demonstrações Financeiras",
+      "category": "financial",
+      "domains": [
+        "finance"
+      ],
+      "purpose": "Formal accounting reports including balance sheet, income statement, and cash flow",
+      "purposePt": "Relatórios contábeis formais incluindo balanço patrimonial, demonstração de resultados e fluxo de caixa"
+    },
+    {
+      "id": "findings",
+      "label": "Findings",
+      "labelPt": "Achados",
+      "category": "detail",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Key observations or discoveries from the analysis",
+      "purposePt": "Principais observações ou descobertas da análise"
+    },
+    {
+      "id": "glossary",
+      "label": "Glossary",
+      "labelPt": "Glossário",
+      "category": "appendix",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Alphabetical list of terms and their definitions",
+      "purposePt": "Lista alfabética de termos e suas definições"
+    },
+    {
+      "id": "governing_law",
+      "label": "Governing Law",
+      "labelPt": "Lei Aplicável",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Jurisdiction and legal framework that governs the agreement",
+      "purposePt": "Jurisdição e arcabouço jurídico que rege o acordo"
+    },
+    {
+      "id": "header",
+      "label": "Header",
+      "labelPt": "Cabeçalho",
+      "category": "metadata",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Document header containing logos, titles, and reference numbers",
+      "purposePt": "Cabeçalho do documento contendo logotipos, títulos e números de referência"
+    },
+    {
+      "id": "history_present_illness",
+      "label": "History of Present Illness",
+      "labelPt": "História da Doença Atual",
+      "category": "clinical",
+      "domains": [
+        "medical"
+      ],
+      "purpose": "Chronological description of the patient's current medical condition",
+      "purposePt": "Descrição cronológica da condição médica atual do paciente"
+    },
+    {
+      "id": "indemnification",
+      "label": "Indemnification",
+      "labelPt": "Indenização",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Obligations of one party to compensate the other for losses",
+      "purposePt": "Obrigações de uma parte de compensar a outra por perdas"
+    },
+    {
+      "id": "introduction",
+      "label": "Introduction",
+      "labelPt": "Introdução",
+      "category": "overview",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Background context and objectives of the document",
+      "purposePt": "Contexto e objetivos do documento"
+    },
+    {
+      "id": "limitations",
+      "label": "Limitations",
+      "labelPt": "Limitações",
+      "category": "risk",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Constraints or boundaries that affect the scope or reliability of the analysis",
+      "purposePt": "Restrições ou limites que afetam o escopo ou a confiabilidade da análise"
+    },
+    {
+      "id": "line_items",
+      "label": "Line Items",
+      "labelPt": "Itens de Linha",
+      "category": "detail",
+      "domains": [
+        "finance",
+        "operations"
+      ],
+      "purpose": "Individual entries in an itemized list such as invoices or budgets",
+      "purposePt": "Entradas individuais em uma lista detalhada como faturas ou orçamentos"
+    },
+    {
+      "id": "medications",
+      "label": "Medications",
+      "labelPt": "Medicações",
+      "category": "clinical",
+      "domains": [
+        "medical"
+      ],
+      "purpose": "Current and prescribed medications with dosages and schedules",
+      "purposePt": "Medicações atuais e prescritas com dosagens e horários"
+    },
+    {
+      "id": "methodology",
+      "label": "Methodology",
+      "labelPt": "Metodologia",
+      "category": "methodology",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Description of approaches, methods, and techniques used in the analysis",
+      "purposePt": "Descrição das abordagens, métodos e técnicas utilizados na análise"
+    },
+    {
+      "id": "milestones",
+      "label": "Milestones",
+      "labelPt": "Marcos",
+      "category": "operational",
+      "domains": [
+        "operations",
+        "finance"
+      ],
+      "purpose": "Key dates or achievements marking progress toward objectives",
+      "purposePt": "Datas ou conquistas-chave marcando progresso em direção aos objetivos"
+    },
+    {
+      "id": "orders",
+      "label": "Orders",
+      "labelPt": "Pedidos Médicos",
+      "category": "clinical",
+      "domains": [
+        "medical"
+      ],
+      "purpose": "Physician orders for tests, treatments, or procedures",
+      "purposePt": "Pedidos médicos para exames, tratamentos ou procedimentos"
+    },
+    {
+      "id": "patient_demographics",
+      "label": "Patient Demographics",
+      "labelPt": "Dados Demográficos do Paciente",
+      "category": "clinical",
+      "domains": [
+        "medical"
+      ],
+      "purpose": "Patient identifying information including name, age, sex, and contact details",
+      "purposePt": "Informações de identificação do paciente incluindo nome, idade, sexo e dados de contato"
+    },
+    {
+      "id": "physical_examination",
+      "label": "Physical Examination",
+      "labelPt": "Exame Físico",
+      "category": "clinical",
+      "domains": [
+        "medical"
+      ],
+      "purpose": "Documented findings from the clinical physical examination",
+      "purposePt": "Achados documentados do exame físico clínico"
+    },
+    {
+      "id": "procedures",
+      "label": "Procedures",
+      "labelPt": "Procedimentos",
+      "category": "methodology",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Step-by-step instructions or processes to be followed",
+      "purposePt": "Instruções ou processos passo a passo a serem seguidos"
+    },
+    {
+      "id": "projections",
+      "label": "Projections",
+      "labelPt": "Projeções",
+      "category": "financial",
+      "domains": [
+        "finance"
+      ],
+      "purpose": "Forward-looking financial estimates and forecasts",
+      "purposePt": "Estimativas e previsões financeiras prospectivas"
+    },
+    {
+      "id": "protocols",
+      "label": "Protocols",
+      "labelPt": "Protocolos",
+      "category": "methodology",
+      "domains": [
+        "medical",
+        "operations"
+      ],
+      "purpose": "Standardized procedures or guidelines for specific situations",
+      "purposePt": "Procedimentos ou diretrizes padronizados para situações específicas"
+    },
+    {
+      "id": "recitals",
+      "label": "Recitals",
+      "labelPt": "Considerandos",
+      "category": "legal",
+      "domains": [
+        "legal"
+      ],
+      "purpose": "Whereas clauses providing background and context for the agreement",
+      "purposePt": "Cláusulas de consideração fornecendo contexto para o acordo"
+    },
+    {
+      "id": "recommendations",
+      "label": "Recommendations",
+      "labelPt": "Recomendações",
+      "category": "operational",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Suggested courses of action based on the analysis or findings",
+      "purposePt": "Cursos de ação sugeridos com base na análise ou nos achados"
+    },
+    {
+      "id": "red_flags",
+      "label": "Red Flags",
+      "labelPt": "Sinais de Alerta",
+      "category": "risk",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Warning indicators that require immediate attention or investigation",
+      "purposePt": "Indicadores de alerta que requerem atenção ou investigação imediata"
+    },
+    {
+      "id": "regulatory_references",
+      "label": "Regulatory References",
+      "labelPt": "Referências Regulatórias",
+      "category": "compliance",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Citations of applicable laws, regulations, or standards",
+      "purposePt": "Citações de leis, regulamentos ou normas aplicáveis"
+    },
+    {
+      "id": "representations_warranties",
+      "label": "Representations & Warranties",
+      "labelPt": "Declarações e Garantias",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Formal statements of fact and promises made by parties to the agreement",
+      "purposePt": "Declarações formais de fato e promessas feitas pelas partes do acordo"
+    },
+    {
+      "id": "resources",
+      "label": "Resources",
+      "labelPt": "Recursos",
+      "category": "operational",
+      "domains": [
+        "operations",
+        "finance"
+      ],
+      "purpose": "Personnel, budget, or materials allocated to the initiative",
+      "purposePt": "Pessoal, orçamento ou materiais alocados à iniciativa"
+    },
+    {
+      "id": "results",
+      "label": "Results",
+      "labelPt": "Resultados",
+      "category": "detail",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Outcomes or outputs produced by the analysis or process",
+      "purposePt": "Resultados ou produtos gerados pela análise ou processo"
+    },
+    {
+      "id": "review_notes",
+      "label": "Review Notes",
+      "labelPt": "Notas de Revisão",
+      "category": "approval",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Comments and feedback from reviewers during the approval process",
+      "purposePt": "Comentários e feedback dos revisores durante o processo de aprovação"
+    },
+    {
+      "id": "revision_history",
+      "label": "Revision History",
+      "labelPt": "Histórico de Revisões",
+      "category": "metadata",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Log of document changes including dates, authors, and descriptions",
+      "purposePt": "Registro de alterações do documento incluindo datas, autores e descrições"
+    },
+    {
+      "id": "risk_assessment",
+      "label": "Risk Assessment",
+      "labelPt": "Avaliação de Risco",
+      "category": "risk",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Evaluation of potential risks, their likelihood, and impact",
+      "purposePt": "Avaliação de riscos potenciais, sua probabilidade e impacto"
+    },
+    {
+      "id": "risk_factors",
+      "label": "Risk Factors",
+      "labelPt": "Fatores de Risco",
+      "category": "risk",
+      "domains": [
+        "finance",
+        "legal",
+        "medical"
+      ],
+      "purpose": "Specific conditions or circumstances that could lead to adverse outcomes",
+      "purposePt": "Condições ou circunstâncias específicas que podem levar a resultados adversos"
+    },
+    {
+      "id": "scope",
+      "label": "Scope",
+      "labelPt": "Escopo",
+      "category": "overview",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Boundaries and extent of the document's coverage or analysis",
+      "purposePt": "Limites e extensão da cobertura ou análise do documento"
+    },
+    {
+      "id": "signatures",
+      "label": "Signatures",
+      "labelPt": "Assinaturas",
+      "category": "approval",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Formal signature blocks for authorized parties",
+      "purposePt": "Blocos de assinatura formais para partes autorizadas"
+    },
+    {
+      "id": "supporting_documents",
+      "label": "Supporting Documents",
+      "labelPt": "Documentos de Suporte",
+      "category": "appendix",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Additional documents that corroborate or supplement the main content",
+      "purposePt": "Documentos adicionais que corroboram ou complementam o conteúdo principal"
+    },
+    {
+      "id": "table_of_contents",
+      "label": "Table of Contents",
+      "labelPt": "Sumário",
+      "category": "metadata",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "purpose": "Structured listing of document sections and their page numbers",
+      "purposePt": "Listagem estruturada das seções do documento e seus números de página"
+    },
+    {
+      "id": "termination",
+      "label": "Termination",
+      "labelPt": "Rescisão",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "purpose": "Conditions and procedures under which the agreement may be ended",
+      "purposePt": "Condições e procedimentos sob os quais o acordo pode ser encerrado"
+    },
+    {
+      "id": "timeline",
+      "label": "Timeline",
+      "labelPt": "Cronograma",
+      "category": "operational",
+      "domains": [
+        "operations",
+        "finance",
+        "legal"
+      ],
+      "purpose": "Chronological schedule of planned activities and deliverables",
+      "purposePt": "Cronograma de atividades planejadas e entregas"
+    },
+    {
+      "id": "variance_analysis",
+      "label": "Variance Analysis",
+      "labelPt": "Análise de Variação",
+      "category": "financial",
+      "domains": [
+        "finance"
+      ],
+      "purpose": "Comparison of actual results against budgeted or expected figures with explanations",
+      "purposePt": "Comparação dos resultados reais com os valores orçados ou esperados com explicações"
+    },
+    {
+      "id": "vitals",
+      "label": "Vitals",
+      "labelPt": "Sinais Vitais",
+      "category": "clinical",
+      "domains": [
+        "medical"
+      ],
+      "purpose": "Recorded vital signs including blood pressure, heart rate, temperature, and respiration",
+      "purposePt": "Sinais vitais registrados incluindo pressão arterial, frequência cardíaca, temperatura e respiração"
+    }
+  ]
+}

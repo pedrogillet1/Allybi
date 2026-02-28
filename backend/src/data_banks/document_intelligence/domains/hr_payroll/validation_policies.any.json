@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for hr_payroll extraction and reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll"
+  },
+  "domain": "hr_payroll",
+  "policies": [
+    {
+      "id": "hr_val_001_net_pay_reconciliation",
+      "severity": "error",
+      "description": "Gross pay minus deductions plus reimbursements must reconcile to net pay.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "hr_payroll_total_reconciliation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "hr_val_002_hours_reconciliation",
+      "severity": "warning",
+      "description": "Regular plus overtime hours should reconcile with reported total hours.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "hr_hours_reconciliation",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "hr_val_003_expense_reconciliation",
+      "severity": "error",
+      "description": "Expense line totals plus tax/tip components must match report total reimbursement.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "hr_expense_total_reconciliation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "hr_val_004_currency_consistency",
+      "severity": "warning",
+      "description": "Payroll and expense monetary fields should use a consistent currency.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "currency_consistency",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "hr_val_005_scope_lock",
+      "severity": "error",
+      "description": "Do not combine data across different employees or periods unless explicitly requested and cited.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "single_document_scope_lock",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

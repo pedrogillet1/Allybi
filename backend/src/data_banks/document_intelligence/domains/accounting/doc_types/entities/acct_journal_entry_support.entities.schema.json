@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_journal_entry_support",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for journal entry support documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_journal_entry_support"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "journalEntryId",
+      "type": "string",
+      "required": true,
+      "description": "Journal entry identifier"
+    },
+    {
+      "id": "journalDate",
+      "type": "date",
+      "required": true,
+      "description": "Journal entry date"
+    },
+    {
+      "id": "totalDebits",
+      "type": "currency",
+      "required": true,
+      "description": "Total debits for entry"
+    },
+    {
+      "id": "totalCredits",
+      "type": "currency",
+      "required": true,
+      "description": "Total credits for entry"
+    },
+    {
+      "id": "approver",
+      "type": "string",
+      "required": false,
+      "description": "Approver name or role"
+    }
+  ]
+}

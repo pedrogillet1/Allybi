@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_pbc_list",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for pbc list documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_pbc_list"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "requestCount",
+      "type": "number",
+      "required": true,
+      "description": "Total number of requests"
+    },
+    {
+      "id": "providedCount",
+      "type": "number",
+      "required": false,
+      "description": "Requests already provided"
+    },
+    {
+      "id": "pendingCount",
+      "type": "number",
+      "required": false,
+      "description": "Requests pending"
+    },
+    {
+      "id": "dueDate",
+      "type": "date",
+      "required": false,
+      "description": "Overall due date"
+    },
+    {
+      "id": "owner",
+      "type": "string",
+      "required": false,
+      "description": "Request owner/coordinator"
+    }
+  ]
+}

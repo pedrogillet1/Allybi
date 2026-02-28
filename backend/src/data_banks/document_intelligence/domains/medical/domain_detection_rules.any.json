@@ -1,0 +1,340 @@
+{
+  "_meta": {
+    "id": "medical_domain_detection_rules",
+    "version": "2.0.0",
+    "description": "Rules for detecting medical document domain and subtype hints.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "minScore": 0.64,
+    "maxRulesPerDocument": 60
+  },
+  "domain": "medical",
+  "rules": [
+    {
+      "id": "medical_detect_001",
+      "priority": 120,
+      "weight": 3.1,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bsoap\\b",
+        "\\bassessment[ -]?plan\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: soap + assessment plan"
+    },
+    {
+      "id": "medical_detect_002",
+      "priority": 119,
+      "weight": 3.05,
+      "signal": "table_header",
+      "patterns": [
+        "\\bhistory[ -]?and[ -]?physical\\b",
+        "\\bchief[ -]?complaint\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: history and physical + chief complaint"
+    },
+    {
+      "id": "medical_detect_003",
+      "priority": 118,
+      "weight": 3,
+      "signal": "content",
+      "patterns": [
+        "\\bprogress[ -]?note\\b",
+        "\\binterval[ -]?history\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: progress note + interval history"
+    },
+    {
+      "id": "medical_detect_004",
+      "priority": 117,
+      "weight": 2.95,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bconsult[ -]?note\\b",
+        "\\breason[ -]?for[ -]?consult\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: consult note + reason for consult"
+    },
+    {
+      "id": "medical_detect_005",
+      "priority": 116,
+      "weight": 2.9,
+      "signal": "table_header",
+      "patterns": [
+        "\\bemergency[ -]?note\\b",
+        "\\btriage\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: emergency note + triage"
+    },
+    {
+      "id": "medical_detect_006",
+      "priority": 115,
+      "weight": 2.85,
+      "signal": "content",
+      "patterns": [
+        "\\bnursing[ -]?note\\b",
+        "\\bnursing[ -]?assessment\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: nursing note + nursing assessment"
+    },
+    {
+      "id": "medical_detect_007",
+      "priority": 114,
+      "weight": 2.8,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bcare[ -]?plan\\b",
+        "\\bgoals[ -]?interventions\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: care plan + goals interventions"
+    },
+    {
+      "id": "medical_detect_008",
+      "priority": 113,
+      "weight": 2.75,
+      "signal": "table_header",
+      "patterns": [
+        "\\bdischarge[ -]?summary\\b",
+        "\\bdischarge[ -]?diagnosis\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: discharge summary + discharge diagnosis"
+    },
+    {
+      "id": "medical_detect_009",
+      "priority": 112,
+      "weight": 2.7,
+      "signal": "content",
+      "patterns": [
+        "\\bfollow[ -]?up[ -]?instructions\\b",
+        "\\breturn[ -]?precautions\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: follow-up instructions + return precautions"
+    },
+    {
+      "id": "medical_detect_010",
+      "priority": 111,
+      "weight": 2.65,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\breferral[ -]?letter\\b",
+        "\\bspecialist[ -]?referral\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: referral letter + specialist referral"
+    },
+    {
+      "id": "medical_detect_011",
+      "priority": 110,
+      "weight": 2.6,
+      "signal": "table_header",
+      "patterns": [
+        "\\blab[ -]?results\\b",
+        "\\breference[ -]?range\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: lab results + reference range"
+    },
+    {
+      "id": "medical_detect_012",
+      "priority": 109,
+      "weight": 2.55,
+      "signal": "content",
+      "patterns": [
+        "\\bradiology[ -]?report\\b",
+        "\\bimpression\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: radiology report + impression"
+    },
+    {
+      "id": "medical_detect_013",
+      "priority": 108,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bpathology[ -]?report\\b",
+        "\\bspecimen\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: pathology report + specimen"
+    },
+    {
+      "id": "medical_detect_014",
+      "priority": 107,
+      "weight": 2.45,
+      "signal": "table_header",
+      "patterns": [
+        "\\becg[ -]?report\\b",
+        "\\brhythm\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: ecg report + rhythm"
+    },
+    {
+      "id": "medical_detect_015",
+      "priority": 106,
+      "weight": 2.4,
+      "signal": "content",
+      "patterns": [
+        "\\bvitals[ -]?chart\\b",
+        "\\bblood[ -]?pressure\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: vitals chart + blood pressure"
+    },
+    {
+      "id": "medical_detect_016",
+      "priority": 105,
+      "weight": 2.35,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bmedication[ -]?list\\b",
+        "\\bdose[ -]?route[ -]?frequency\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: medication list + dose route frequency"
+    },
+    {
+      "id": "medical_detect_017",
+      "priority": 104,
+      "weight": 2.3,
+      "signal": "table_header",
+      "patterns": [
+        "\\bprescription\\b",
+        "\\bsig\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: prescription + sig"
+    },
+    {
+      "id": "medical_detect_018",
+      "priority": 103,
+      "weight": 2.25,
+      "signal": "content",
+      "patterns": [
+        "\\ballergy[ -]?list\\b",
+        "\\badverse[ -]?reaction\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: allergy list + adverse reaction"
+    },
+    {
+      "id": "medical_detect_019",
+      "priority": 102,
+      "weight": 2.2,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bimmunization[ -]?record\\b",
+        "\\bvaccine[ -]?lot\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: immunization record + vaccine lot"
+    },
+    {
+      "id": "medical_detect_020",
+      "priority": 101,
+      "weight": 2.15,
+      "signal": "table_header",
+      "patterns": [
+        "\\bproblem[ -]?list\\b",
+        "\\bactive[ -]?problems\\b"
+      ],
+      "negativePatterns": [
+        "\\bmaster service agreement\\b",
+        "\\bgoverning law\\b",
+        "\\bboard resolution\\b"
+      ],
+      "description": "Medical signal: problem list + active problems"
+    }
+  ]
+}

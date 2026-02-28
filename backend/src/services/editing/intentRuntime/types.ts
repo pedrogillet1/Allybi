@@ -101,6 +101,33 @@ export interface IntentPattern {
     /** Hard-block tokens: if ANY of these are found, this pattern scores 0. */
     tokens_none?: string[];
   };
+  /**
+   * Optional conflict group for deterministic tie resolution.
+   * Patterns in the same group are reduced to the top-scoring candidate.
+   */
+  disambiguationGroup?: string;
+  /**
+   * Explicit pattern IDs that should be dropped when this pattern wins.
+   * Used to prevent semantically incompatible operator plans.
+   */
+  mutuallyExclusiveWith?: string[];
+  /**
+   * Optional hard context requirements checked at matcher time.
+   */
+  requiresContext?: {
+    explicitRange?: boolean;
+    sheetReference?: boolean;
+    selectionHint?: boolean;
+  };
+  /**
+   * Optional deterministic score tuning hooks.
+   */
+  scoreAdjustments?: {
+    boostIfTokensPresent?: string[];
+    penalizeIfTokensPresent?: string[];
+    boostPoints?: number;
+    penaltyPoints?: number;
+  };
   /** Ordered slot extraction rules, run in sequence. */
   slotExtractors: SlotExtractor[];
   /** Scope resolution configuration. */

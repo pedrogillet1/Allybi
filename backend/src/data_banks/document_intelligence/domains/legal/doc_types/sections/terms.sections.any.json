@@ -1,0 +1,498 @@
+{
+  "_meta": {
+    "id": "legal_terms_sections",
+    "version": "1.0.0",
+    "description": "Section map for Terms of Service.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "terms"
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "name": {
+        "en": "Abstract",
+        "pt": "Resumo"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Abstract",
+        "Terms of Service Abstract",
+        "Abstract clause",
+        "Resumo"
+      ]
+    },
+    {
+      "id": "action_items",
+      "name": {
+        "en": "Action Items",
+        "pt": "Itens de Ação"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Action Items",
+        "Terms of Service Action Items",
+        "Action Items clause",
+        "Itens de Ação"
+      ]
+    },
+    {
+      "id": "appendix",
+      "name": {
+        "en": "Appendix",
+        "pt": "Apêndice"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Appendix",
+        "Terms of Service Appendix",
+        "Appendix clause",
+        "Apêndice"
+      ]
+    },
+    {
+      "id": "approvals",
+      "name": {
+        "en": "Approvals",
+        "pt": "Aprovações"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Approvals",
+        "Terms of Service Approvals",
+        "Approvals clause",
+        "Aprovações"
+      ]
+    },
+    {
+      "id": "assumptions",
+      "name": {
+        "en": "Assumptions",
+        "pt": "Premissas"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "Assumptions",
+        "Terms of Service Assumptions",
+        "Assumptions clause",
+        "Premissas"
+      ]
+    },
+    {
+      "id": "attachments",
+      "name": {
+        "en": "Attachments",
+        "pt": "Anexos"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Attachments",
+        "Terms of Service Attachments",
+        "Attachments clause",
+        "Anexos"
+      ]
+    },
+    {
+      "id": "audit_trail",
+      "name": {
+        "en": "Audit Trail",
+        "pt": "Trilha de Auditoria"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Audit Trail",
+        "Terms of Service Audit Trail",
+        "Audit Trail clause",
+        "Trilha de Auditoria"
+      ]
+    },
+    {
+      "id": "authorization",
+      "name": {
+        "en": "Authorization",
+        "pt": "Autorização"
+      },
+      "required": true,
+      "order": 8,
+      "headingAnchors": [
+        "Authorization",
+        "Terms of Service Authorization",
+        "Authorization clause",
+        "Autorização"
+      ]
+    },
+    {
+      "id": "certifications",
+      "name": {
+        "en": "Certifications",
+        "pt": "Certificações"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Certifications",
+        "Terms of Service Certifications",
+        "Certifications clause",
+        "Certificações"
+      ]
+    },
+    {
+      "id": "compliance_section",
+      "name": {
+        "en": "Compliance",
+        "pt": "Conformidade"
+      },
+      "required": true,
+      "order": 10,
+      "headingAnchors": [
+        "Compliance",
+        "Terms of Service Compliance",
+        "Compliance clause",
+        "Conformidade"
+      ]
+    },
+    {
+      "id": "confidentiality_clause",
+      "name": {
+        "en": "Confidentiality Clause",
+        "pt": "Cláusula de Confidencialidade"
+      },
+      "required": true,
+      "order": 11,
+      "headingAnchors": [
+        "Confidentiality Clause",
+        "Terms of Service Confidentiality Clause",
+        "Confidentiality Clause clause",
+        "Cláusula de Confidencialidade"
+      ]
+    },
+    {
+      "id": "criteria",
+      "name": {
+        "en": "Criteria",
+        "pt": "Critérios"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Criteria",
+        "Terms of Service Criteria",
+        "Criteria clause",
+        "Critérios"
+      ]
+    },
+    {
+      "id": "data_tables",
+      "name": {
+        "en": "Data Tables",
+        "pt": "Tabelas de Dados"
+      },
+      "required": true,
+      "order": 13,
+      "headingAnchors": [
+        "Data Tables",
+        "Terms of Service Data Tables",
+        "Data Tables clause",
+        "Tabelas de Dados"
+      ]
+    },
+    {
+      "id": "definitions",
+      "name": {
+        "en": "Definitions",
+        "pt": "Definições"
+      },
+      "required": true,
+      "order": 14,
+      "headingAnchors": [
+        "Definitions",
+        "Terms of Service Definitions",
+        "Definitions clause",
+        "Definições"
+      ]
+    },
+    {
+      "id": "detailed_analysis",
+      "name": {
+        "en": "Detailed Analysis",
+        "pt": "Análise Detalhada"
+      },
+      "required": true,
+      "order": 15,
+      "headingAnchors": [
+        "Detailed Analysis",
+        "Terms of Service Detailed Analysis",
+        "Detailed Analysis clause",
+        "Análise Detalhada"
+      ]
+    },
+    {
+      "id": "disclaimers",
+      "name": {
+        "en": "Disclaimers",
+        "pt": "Isenções de Responsabilidade"
+      },
+      "required": true,
+      "order": 16,
+      "headingAnchors": [
+        "Disclaimers",
+        "Terms of Service Disclaimers",
+        "Disclaimers clause",
+        "Isenções de Responsabilidade"
+      ]
+    },
+    {
+      "id": "discussion",
+      "name": {
+        "en": "Discussion",
+        "pt": "Discussão"
+      },
+      "required": false,
+      "order": 17,
+      "headingAnchors": [
+        "Discussion",
+        "Terms of Service Discussion",
+        "Discussion clause",
+        "Discussão"
+      ]
+    },
+    {
+      "id": "dispute_resolution",
+      "name": {
+        "en": "Dispute Resolution",
+        "pt": "Resolução de Disputas"
+      },
+      "required": false,
+      "order": 18,
+      "headingAnchors": [
+        "Dispute Resolution",
+        "Terms of Service Dispute Resolution",
+        "Dispute Resolution clause",
+        "Resolução de Disputas"
+      ]
+    },
+    {
+      "id": "distribution_list",
+      "name": {
+        "en": "Distribution List",
+        "pt": "Lista de Distribuição"
+      },
+      "required": false,
+      "order": 19,
+      "headingAnchors": [
+        "Distribution List",
+        "Terms of Service Distribution List",
+        "Distribution List clause",
+        "Lista de Distribuição"
+      ]
+    },
+    {
+      "id": "document_metadata",
+      "name": {
+        "en": "Document Metadata",
+        "pt": "Metadados do Documento"
+      },
+      "required": false,
+      "order": 20,
+      "headingAnchors": [
+        "Document Metadata",
+        "Terms of Service Document Metadata",
+        "Document Metadata clause",
+        "Metadados do Documento"
+      ]
+    },
+    {
+      "id": "executive_summary",
+      "name": {
+        "en": "Executive Summary",
+        "pt": "Resumo Executivo"
+      },
+      "required": false,
+      "order": 21,
+      "headingAnchors": [
+        "Executive Summary",
+        "Terms of Service Executive Summary",
+        "Executive Summary clause",
+        "Resumo Executivo"
+      ]
+    },
+    {
+      "id": "exhibits",
+      "name": {
+        "en": "Exhibits",
+        "pt": "Documentos Probatórios"
+      },
+      "required": false,
+      "order": 22,
+      "headingAnchors": [
+        "Exhibits",
+        "Terms of Service Exhibits",
+        "Exhibits clause",
+        "Documentos Probatórios"
+      ]
+    },
+    {
+      "id": "findings",
+      "name": {
+        "en": "Findings",
+        "pt": "Achados"
+      },
+      "required": false,
+      "order": 23,
+      "headingAnchors": [
+        "Findings",
+        "Terms of Service Findings",
+        "Findings clause",
+        "Achados"
+      ]
+    },
+    {
+      "id": "glossary",
+      "name": {
+        "en": "Glossary",
+        "pt": "Glossário"
+      },
+      "required": false,
+      "order": 24,
+      "headingAnchors": [
+        "Glossary",
+        "Terms of Service Glossary",
+        "Glossary clause",
+        "Glossário"
+      ]
+    },
+    {
+      "id": "governing_law",
+      "name": {
+        "en": "Governing Law",
+        "pt": "Lei Aplicável"
+      },
+      "required": false,
+      "order": 25,
+      "headingAnchors": [
+        "Governing Law",
+        "Terms of Service Governing Law",
+        "Governing Law clause",
+        "Lei Aplicável"
+      ]
+    },
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabeçalho"
+      },
+      "required": false,
+      "order": 26,
+      "headingAnchors": [
+        "Header",
+        "Terms of Service Header",
+        "Header clause",
+        "Cabeçalho"
+      ]
+    },
+    {
+      "id": "indemnification",
+      "name": {
+        "en": "Indemnification",
+        "pt": "Indenização"
+      },
+      "required": false,
+      "order": 27,
+      "headingAnchors": [
+        "Indemnification",
+        "Terms of Service Indemnification",
+        "Indemnification clause",
+        "Indenização"
+      ]
+    },
+    {
+      "id": "introduction",
+      "name": {
+        "en": "Introduction",
+        "pt": "Introdução"
+      },
+      "required": false,
+      "order": 28,
+      "headingAnchors": [
+        "Introduction",
+        "Terms of Service Introduction",
+        "Introduction clause",
+        "Introdução"
+      ]
+    },
+    {
+      "id": "limitations",
+      "name": {
+        "en": "Limitations",
+        "pt": "Limitações"
+      },
+      "required": false,
+      "order": 29,
+      "headingAnchors": [
+        "Limitations",
+        "Terms of Service Limitations",
+        "Limitations clause",
+        "Limitações"
+      ]
+    },
+    {
+      "id": "methodology",
+      "name": {
+        "en": "Methodology",
+        "pt": "Metodologia"
+      },
+      "required": false,
+      "order": 30,
+      "headingAnchors": [
+        "Methodology",
+        "Terms of Service Methodology",
+        "Methodology clause",
+        "Metodologia"
+      ]
+    },
+    {
+      "id": "procedures",
+      "name": {
+        "en": "Procedures",
+        "pt": "Procedimentos"
+      },
+      "required": false,
+      "order": 31,
+      "headingAnchors": [
+        "Procedures",
+        "Terms of Service Procedures",
+        "Procedures clause",
+        "Procedimentos"
+      ]
+    },
+    {
+      "id": "recitals",
+      "name": {
+        "en": "Recitals",
+        "pt": "Considerandos"
+      },
+      "required": false,
+      "order": 32,
+      "headingAnchors": [
+        "Recitals",
+        "Terms of Service Recitals",
+        "Recitals clause",
+        "Considerandos"
+      ]
+    }
+  ]
+}

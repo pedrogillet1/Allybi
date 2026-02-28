@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_banking_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer style rules for banking domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "audienceProfiles": [
+    {
+      "id": "retail_customer",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "low"
+    },
+    {
+      "id": "operations",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "risk_analyst",
+      "tone": "analytical",
+      "defaultDepth": "decision_memo",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "banking_style_001_balance_context",
+      "rule": "Always pair balance values with effective date.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "banking_style_002_transaction_format",
+      "rule": "Present transactions as date - description - amount - resulting balance when available.",
+      "applies": [
+        "extract",
+        "locate",
+        "compare"
+      ]
+    },
+    {
+      "id": "banking_style_003_sign_clarity",
+      "rule": "Explicitly indicate debit or credit direction to avoid sign ambiguity.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "id": "banking_style_004_reference_codes",
+      "rule": "Include transfer/reference codes when discussing specific payments.",
+      "applies": [
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "id": "banking_style_005_uncertainty",
+      "rule": "If transaction category is inferred, state that it is inferred and why.",
+      "applies": [
+        "evaluate",
+        "summarize"
+      ]
+    }
+  ]
+}

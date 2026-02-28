@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "id": "di_insurance_doc_type_catalog",
+    "version": "2.0.0",
+    "description": "Insurance doc-type catalog with complete pack references.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "enforcePackRefs": true
+  },
+  "domain": "insurance",
+  "docTypes": [
+    {
+      "id": "ins_claim_submission",
+      "name": {
+        "en": "Insurance Claim Submission",
+        "pt": "Submissao de Sinistro"
+      },
+      "description": "Claim submission packet with incident details, claimant data, and requested amounts.",
+      "archetypeId": "insurance_claim_submission",
+      "detectionPatterns": [
+        "\\bins\\s*claim\\s*submission\\b",
+        "\\binsurance\\s+claim\\s+submission\\b",
+        "\\bsubmissao\\s+de\\s+sinistro\\b"
+      ],
+      "priority": 130,
+      "detectionHintsRefs": [
+        "di_insurance_domain_detection_rules",
+        "doc_aliases_insurance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_insurance_sections_ins_claim_submission"
+        ],
+        "entities": [
+          "di_insurance_entities_ins_claim_submission"
+        ],
+        "tables": [
+          "di_insurance_tables_ins_claim_submission"
+        ],
+        "extraction": [
+          "di_insurance_extraction_ins_claim_submission"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "claim_amount",
+        "claim_status",
+        "incident_date",
+        "supporting_doc_count"
+      ]
+    },
+    {
+      "id": "ins_explanation_of_benefits",
+      "name": {
+        "en": "Explanation of Benefits",
+        "pt": "Demonstrativo de Beneficios"
+      },
+      "description": "EOB document detailing billed, allowed, paid, and member responsibility amounts.",
+      "archetypeId": "insurance_benefit_adjudication",
+      "detectionPatterns": [
+        "\\bins\\s*explanation\\s*of\\s*benefits\\b",
+        "\\bexplanation\\s+of\\s+benefits\\b|\\beob\\b",
+        "\\bdemonstrativo\\s+de\\s+beneficios\\b"
+      ],
+      "priority": 129,
+      "detectionHintsRefs": [
+        "di_insurance_domain_detection_rules",
+        "doc_aliases_insurance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_insurance_sections_ins_explanation_of_benefits"
+        ],
+        "entities": [
+          "di_insurance_entities_ins_explanation_of_benefits"
+        ],
+        "tables": [
+          "di_insurance_tables_ins_explanation_of_benefits"
+        ],
+        "extraction": [
+          "di_insurance_extraction_ins_explanation_of_benefits"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "billed_amount",
+        "allowed_amount",
+        "paid_amount",
+        "member_responsibility"
+      ]
+    },
+    {
+      "id": "ins_policy_document",
+      "name": {
+        "en": "Insurance Policy Document",
+        "pt": "Documento de Apolice de Seguro"
+      },
+      "description": "Insurance policy contract with coverage terms, exclusions, endorsements, and limits.",
+      "archetypeId": "insurance_policy_contract",
+      "detectionPatterns": [
+        "\\bins\\s*policy\\s*document\\b",
+        "\\binsurance\\s+policy\\s+document\\b",
+        "\\bdocumento\\s+de\\s+apolice\\s+de\\s+seguro\\b"
+      ],
+      "priority": 128,
+      "detectionHintsRefs": [
+        "di_insurance_domain_detection_rules",
+        "doc_aliases_insurance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_insurance_sections_ins_policy_document"
+        ],
+        "entities": [
+          "di_insurance_entities_ins_policy_document"
+        ],
+        "tables": [
+          "di_insurance_tables_ins_policy_document"
+        ],
+        "extraction": [
+          "di_insurance_extraction_ins_policy_document"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "sum_insured",
+        "deductible",
+        "coverage_limit",
+        "policy_term"
+      ]
+    },
+    {
+      "id": "ins_premium_invoice",
+      "name": {
+        "en": "Insurance Premium Invoice",
+        "pt": "Fatura de Premio de Seguro"
+      },
+      "description": "Premium invoice showing billed premium, taxes/fees, due date, and payment status.",
+      "archetypeId": "insurance_billing_invoice",
+      "detectionPatterns": [
+        "\\bins\\s*premium\\s*invoice\\b",
+        "\\binsurance\\s+premium\\s+invoice\\b",
+        "\\bfatura\\s+de\\s+premio\\s+de\\s+seguro\\b"
+      ],
+      "priority": 127,
+      "detectionHintsRefs": [
+        "di_insurance_domain_detection_rules",
+        "doc_aliases_insurance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_insurance_sections_ins_premium_invoice"
+        ],
+        "entities": [
+          "di_insurance_entities_ins_premium_invoice"
+        ],
+        "tables": [
+          "di_insurance_tables_ins_premium_invoice"
+        ],
+        "extraction": [
+          "di_insurance_extraction_ins_premium_invoice"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "premium_amount",
+        "taxes_fees",
+        "total_due",
+        "due_date"
+      ]
+    }
+  ]
+}

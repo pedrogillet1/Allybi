@@ -1,0 +1,125 @@
+{
+  "_meta": {
+    "id": "di_identity_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer styling rules for identity domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity"
+  },
+  "domain": "identity",
+  "audienceProfiles": [
+    {
+      "id": "kyc_analyst",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "compliance_officer",
+      "tone": "formal",
+      "defaultDepth": "decision_memo",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "operations",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "auditor",
+      "tone": "skeptical",
+      "defaultDepth": "audit_trail",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "id_style_001_field_label_pair",
+      "rule": "Return identity fields with label-value pairs and page/zone citation.",
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ]
+    },
+    {
+      "id": "id_style_002_mask_identifiers",
+      "rule": "Mask sensitive identifiers (document number, tax id, address) by default.",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "id_style_003_validity_context",
+      "rule": "Always include issue and expiry context for validity claims.",
+      "applies": [
+        "extract",
+        "validate",
+        "monitor"
+      ]
+    },
+    {
+      "id": "id_style_004_unverified_marker",
+      "rule": "Never fill missing identity fields by inference; mark as unverified.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "advise",
+        "summarize"
+      ]
+    },
+    {
+      "id": "id_style_005_scope_lock",
+      "rule": "Maintain attached-document scope lock and avoid external identity assumptions.",
+      "applies": [
+        "all"
+      ]
+    },
+    {
+      "id": "id_style_006_security_feature_notation",
+      "rule": "When present, cite barcode/qr/mrz/security features as observed evidence only.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "id_style_007_language_neutrality",
+      "rule": "Use neutral verification language: observed, matched, unverified, mismatch.",
+      "applies": [
+        "evaluate",
+        "validate",
+        "summarize"
+      ]
+    }
+  ]
+}

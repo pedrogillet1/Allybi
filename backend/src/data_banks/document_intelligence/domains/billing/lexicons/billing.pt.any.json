@@ -1,0 +1,194 @@
+{
+  "_meta": {
+    "id": "di_billing_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for billing domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "language": "pt"
+  },
+  "domain": "billing",
+  "terms": [
+    {
+      "id": "billing_lex_pt_valor_pagar",
+      "canonical": "valor a pagar",
+      "synonyms": [
+        "total a pagar",
+        "valor devido"
+      ],
+      "display": "Valor a Pagar"
+    },
+    {
+      "id": "billing_lex_pt_debito_automatico",
+      "canonical": "debito automatico",
+      "synonyms": [
+        "pagamento automatico"
+      ],
+      "display": "Debito Automatico"
+    },
+    {
+      "id": "billing_lex_pt_ciclo",
+      "canonical": "ciclo de cobranca",
+      "synonyms": [
+        "ciclo",
+        "periodo da fatura"
+      ],
+      "display": "Ciclo de Cobranca"
+    },
+    {
+      "id": "billing_lex_pt_consumo",
+      "canonical": "consumo",
+      "synonyms": [
+        "uso",
+        "volume"
+      ],
+      "display": "Consumo"
+    },
+    {
+      "id": "billing_lex_pt_credito",
+      "canonical": "credito",
+      "synonyms": [
+        "ajuste de credito",
+        "abono"
+      ],
+      "display": "Credito"
+    },
+    {
+      "id": "billing_lex_pt_desconto",
+      "canonical": "desconto",
+      "synonyms": [
+        "rebate",
+        "promocao"
+      ],
+      "display": "Desconto"
+    },
+    {
+      "id": "billing_lex_pt_vencimento",
+      "canonical": "data de vencimento",
+      "synonyms": [
+        "vencimento",
+        "prazo"
+      ],
+      "display": "Data de Vencimento"
+    },
+    {
+      "id": "billing_lex_pt_fatura",
+      "canonical": "fatura",
+      "synonyms": [
+        "conta",
+        "nota"
+      ],
+      "display": "Fatura"
+    },
+    {
+      "id": "billing_lex_pt_multa",
+      "canonical": "multa",
+      "synonyms": [
+        "juros de mora",
+        "encargo"
+      ],
+      "display": "Multa"
+    },
+    {
+      "id": "billing_lex_pt_item",
+      "canonical": "item",
+      "synonyms": [
+        "linha",
+        "item de cobranca"
+      ],
+      "display": "Item"
+    },
+    {
+      "id": "billing_lex_pt_leitura",
+      "canonical": "leitura do medidor",
+      "synonyms": [
+        "leitura",
+        "medicao"
+      ],
+      "display": "Leitura do Medidor"
+    },
+    {
+      "id": "billing_lex_pt_pagamento_minimo",
+      "canonical": "pagamento minimo",
+      "synonyms": [
+        "minimo a pagar"
+      ],
+      "display": "Pagamento Minimo"
+    },
+    {
+      "id": "billing_lex_pt_excedente",
+      "canonical": "excedente",
+      "synonyms": [
+        "uso fora do plano",
+        "consumo excedente"
+      ],
+      "display": "Excedente"
+    },
+    {
+      "id": "billing_lex_pt_forma_pagamento",
+      "canonical": "forma de pagamento",
+      "synonyms": [
+        "metodo de pagamento"
+      ],
+      "display": "Forma de Pagamento"
+    },
+    {
+      "id": "billing_lex_pt_saldo_anterior",
+      "canonical": "saldo anterior",
+      "synonyms": [
+        "saldo previo",
+        "saldo acumulado"
+      ],
+      "display": "Saldo Anterior"
+    },
+    {
+      "id": "billing_lex_pt_recibo",
+      "canonical": "recibo",
+      "synonyms": [
+        "comprovante",
+        "comprovante de pagamento"
+      ],
+      "display": "Recibo"
+    },
+    {
+      "id": "billing_lex_pt_taxa_servico",
+      "canonical": "taxa de servico",
+      "synonyms": [
+        "taxa administrativa"
+      ],
+      "display": "Taxa de Servico"
+    },
+    {
+      "id": "billing_lex_pt_subtotal",
+      "canonical": "subtotal",
+      "synonyms": [
+        "total antes de impostos"
+      ],
+      "display": "Subtotal"
+    },
+    {
+      "id": "billing_lex_pt_tarifa",
+      "canonical": "tarifa",
+      "synonyms": [
+        "plano tarifario",
+        "preco"
+      ],
+      "display": "Tarifa"
+    },
+    {
+      "id": "billing_lex_pt_plano",
+      "canonical": "plano",
+      "synonyms": [
+        "plano de servico",
+        "franquia"
+      ],
+      "display": "Plano"
+    }
+  ]
+}

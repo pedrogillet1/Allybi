@@ -1,0 +1,183 @@
+{
+  "_meta": {
+    "id": "di_insurance_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "Portuguese abbreviations for insurance domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "language": "pt"
+  },
+  "domain": "insurance",
+  "abbreviations": [
+    {
+      "abbr": "ANS",
+      "expansion": "Agencia Nacional de Saude Suplementar"
+    },
+    {
+      "abbr": "APOL",
+      "expansion": "Apolice"
+    },
+    {
+      "abbr": "AVP",
+      "expansion": "Aviso de Pagamento"
+    },
+    {
+      "abbr": "BO",
+      "expansion": "Boletim de Ocorrencia"
+    },
+    {
+      "abbr": "CAD",
+      "expansion": "Cadastro"
+    },
+    {
+      "abbr": "CAR",
+      "expansion": "Carencia"
+    },
+    {
+      "abbr": "CID",
+      "expansion": "Classificacao Internacional de Doencas"
+    },
+    {
+      "abbr": "CNES",
+      "expansion": "Cadastro Nacional de Estabelecimentos de Saude"
+    },
+    {
+      "abbr": "CNS",
+      "expansion": "Cartao Nacional de Saude"
+    },
+    {
+      "abbr": "COB",
+      "expansion": "Coordenacao de Beneficios"
+    },
+    {
+      "abbr": "COP",
+      "expansion": "Coparticipacao"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoas Fisicas"
+    },
+    {
+      "abbr": "CRM",
+      "expansion": "Conselho Regional de Medicina"
+    },
+    {
+      "abbr": "CS",
+      "expansion": "Capital Segurado"
+    },
+    {
+      "abbr": "DAS",
+      "expansion": "Demonstrativo de Atendimento"
+    },
+    {
+      "abbr": "DCB",
+      "expansion": "Demonstrativo de Cobertura"
+    },
+    {
+      "abbr": "DCBEN",
+      "expansion": "Demonstrativo de Beneficios"
+    },
+    {
+      "abbr": "DPS",
+      "expansion": "Declaracao Pessoal de Saude"
+    },
+    {
+      "abbr": "EOB",
+      "expansion": "Explanation of Benefits"
+    },
+    {
+      "abbr": "FRA",
+      "expansion": "Franquia"
+    },
+    {
+      "abbr": "GLOS",
+      "expansion": "Glosa"
+    },
+    {
+      "abbr": "HOSP",
+      "expansion": "Hospitalar"
+    },
+    {
+      "abbr": "IND",
+      "expansion": "Indenizacao"
+    },
+    {
+      "abbr": "LMI",
+      "expansion": "Limite Maximo de Indenizacao"
+    },
+    {
+      "abbr": "NIP",
+      "expansion": "Notificacao de Intermediacao Preliminar"
+    },
+    {
+      "abbr": "PA",
+      "expansion": "Pre-autorizacao"
+    },
+    {
+      "abbr": "PD",
+      "expansion": "Premio Devido"
+    },
+    {
+      "abbr": "PG",
+      "expansion": "Premio Ganho"
+    },
+    {
+      "abbr": "PL",
+      "expansion": "Plano"
+    },
+    {
+      "abbr": "PPO",
+      "expansion": "Preferred Provider Organization"
+    },
+    {
+      "abbr": "PS",
+      "expansion": "Pronto Socorro"
+    },
+    {
+      "abbr": "RCF",
+      "expansion": "Responsabilidade Civil Facultativa"
+    },
+    {
+      "abbr": "REC",
+      "expansion": "Reembolso"
+    },
+    {
+      "abbr": "REF",
+      "expansion": "Referencia"
+    },
+    {
+      "abbr": "REG",
+      "expansion": "Regulacao"
+    },
+    {
+      "abbr": "RN",
+      "expansion": "Resolucao Normativa"
+    },
+    {
+      "abbr": "SIN",
+      "expansion": "Sinistro"
+    },
+    {
+      "abbr": "SLA",
+      "expansion": "Acordo de Nivel de Servico"
+    },
+    {
+      "abbr": "SUSEP",
+      "expansion": "Superintendencia de Seguros Privados"
+    },
+    {
+      "abbr": "TPA",
+      "expansion": "Administradora Terceirizada"
+    },
+    {
+      "abbr": "VIG",
+      "expansion": "Vigencia"
+    }
+  ]
+}

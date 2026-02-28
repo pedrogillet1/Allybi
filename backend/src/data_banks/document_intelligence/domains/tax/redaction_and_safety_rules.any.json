@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "id": "di_tax_redaction_and_safety_rules",
+    "version": "2.0.0",
+    "description": "Tax redaction and safety rules with strict PII safeguards.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax"
+  },
+  "domain": "tax",
+  "redactionRules": [
+    {
+      "id": "tax_redaction_001_taxpayer_name",
+      "dataType": "taxpayer_name",
+      "pattern": "\\b(?:taxpayer|contribuinte)\\s*(?:name|nome)[: ]+[A-Za-z][A-Za-z .'-]{1,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_TAXPAYER_NAME]"
+    },
+    {
+      "id": "tax_redaction_002_tax_id",
+      "dataType": "tax_id",
+      "pattern": "\\b(?:TIN|ITIN|EIN|CPF|CNPJ)[:# ]?[0-9A-Z./-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_TAX_ID]"
+    },
+    {
+      "id": "tax_redaction_003_ssn",
+      "dataType": "ssn",
+      "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_SSN]"
+    },
+    {
+      "id": "tax_redaction_004_address",
+      "dataType": "address",
+      "pattern": "\\b\\d{1,6}\\s+[A-Za-z0-9 .'-]+\\s(?:Street|St|Avenue|Ave|Road|Rd|Rua|Av|Alameda|Travessa)\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ADDRESS]"
+    },
+    {
+      "id": "tax_redaction_005_email",
+      "dataType": "email",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "action": "REDACT",
+      "replacement": "[REDACTED_EMAIL]"
+    },
+    {
+      "id": "tax_redaction_006_phone",
+      "dataType": "phone",
+      "pattern": "\\+?[0-9][0-9() -]{7,}[0-9]",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PHONE]"
+    },
+    {
+      "id": "tax_redaction_007_bank_account",
+      "dataType": "bank_account",
+      "pattern": "\\b(?:account|conta)\\s*(?:no\\.?|number|#)?\\s*:?\\s*[0-9-]{6,20}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_BANK_ACCOUNT]"
+    },
+    {
+      "id": "tax_redaction_008_routing",
+      "dataType": "routing",
+      "pattern": "\\b(?:routing|aba)\\s*(?:no\\.?|number|#)?\\s*:?\\s*\\d{9}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ROUTING]"
+    },
+    {
+      "id": "tax_redaction_009_passport",
+      "dataType": "passport_number",
+      "pattern": "\\b(?:passport|passaporte)\\s*(?:no\\.?|number|#)?\\s*:?\\s*[A-Z0-9]{6,12}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PASSPORT]"
+    },
+    {
+      "id": "tax_redaction_010_payment_reference",
+      "dataType": "payment_reference",
+      "pattern": "\\b(?:payment\\s*reference|linha\\s*digitavel|codigo\\s*de\\s*pagamento)[:# ]?[A-Z0-9 .-]{8,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PAYMENT_REFERENCE]"
+    },
+    {
+      "id": "tax_redaction_011_qr_payload",
+      "dataType": "qr_payload",
+      "pattern": "\\b(?:pix|qr)[: ]?[A-Za-z0-9+/=._:-]{20,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_QR_PAYLOAD]"
+    },
+    {
+      "id": "tax_redaction_012_barcode_payload",
+      "dataType": "barcode_payload",
+      "pattern": "\\b\\d{44,48}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_BARCODE]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "tax_safety_001_no_tax_advice",
+      "severity": "error",
+      "trigger": "request_for_tax_planning_or_legal_advice",
+      "description": "Do not provide tax planning/legal advice; summarize document facts only.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "tax_safety_002_no_missing_field_inference",
+      "severity": "error",
+      "trigger": "missing_critical_field_detected",
+      "description": "Never infer missing critical fields (taxpayer id, period, amount due, due date).",
+      "action": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "tax_safety_003_scope_lock",
+      "severity": "error",
+      "trigger": "request_uses_unattached_document_context",
+      "description": "Maintain attached-document scope lock for all responses.",
+      "action": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "tax_safety_004_strong_pii_redaction",
+      "severity": "error",
+      "trigger": "pii_detected_in_output",
+      "description": "Apply strict PII redaction by default for taxpayer and payment identifiers.",
+      "action": "WARN_AND_RESTRICT"
+    },
+    {
+      "id": "tax_safety_005_disputed_notice",
+      "severity": "warning",
+      "trigger": "assessment_dispute_context",
+      "description": "Use neutral language and cite exact notice fields when dispute status is discussed.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "tax_safety_006_unverified_source",
+      "severity": "warning",
+      "trigger": "partial_or_low_quality_scan",
+      "description": "Mark extracted values as unverified when OCR/source quality is insufficient.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "tax_safety_007_deadline_risk",
+      "severity": "warning",
+      "trigger": "overdue_or_imminent_deadline",
+      "description": "Highlight deadline risk without prescribing legal action.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "tax_safety_008_sensitive_account_data",
+      "severity": "error",
+      "trigger": "bank_or_payment_credentials_detected",
+      "description": "Never expose full account, routing, or payment token values.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    }
+  ]
+}

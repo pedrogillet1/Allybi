@@ -1,0 +1,6141 @@
+{
+  "_meta": {
+    "id": "doc_aliases_housing",
+    "version": "1.0.0",
+    "description": "Housing document alias normalization bank with EN/PT/slang coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.62
+  },
+  "domain": "housing",
+  "aliases": [
+    {
+      "phrase": "acao de despejo",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar acao de despejo do ultimo periodo",
+        "comparar acao de despejo por property"
+      ]
+    },
+    {
+      "phrase": "acordo de compra de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar acordo de compra de imovel do ultimo periodo",
+        "comparar acordo de compra de imovel por property"
+      ]
+    },
+    {
+      "phrase": "acordo de manutencao predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar acordo de manutencao predial do ultimo periodo",
+        "comparar acordo de manutencao predial por property"
+      ]
+    },
+    {
+      "phrase": "acordo de servico condominio",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar acordo de servico condominio do ultimo periodo",
+        "comparar acordo de servico condominio por property"
+      ]
+    },
+    {
+      "phrase": "acquisition of rental property",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show acquisition of rental property for the last period",
+        "compare acquisition of rental property by property"
+      ]
+    },
+    {
+      "phrase": "aditivo de aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar aditivo de aluguel do ultimo periodo",
+        "comparar aditivo de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "aditivo de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar aditivo de locacao do ultimo periodo",
+        "comparar aditivo de locacao por property"
+      ]
+    },
+    {
+      "phrase": "aditivo de locação",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar aditivo de locação do ultimo periodo",
+        "comparar aditivo de locação por property"
+      ]
+    },
+    {
+      "phrase": "aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar aluguel do ultimo periodo",
+        "comparar aluguel por property"
+      ]
+    },
+    {
+      "phrase": "anexo de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar anexo de locacao do ultimo periodo",
+        "comparar anexo de locacao por property"
+      ]
+    },
+    {
+      "phrase": "apartment lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show apartment lease for the last period",
+        "compare apartment lease by property"
+      ]
+    },
+    {
+      "phrase": "apartment rules notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show apartment rules notice for the last period",
+        "compare apartment rules notice by property"
+      ]
+    },
+    {
+      "phrase": "appliance maintenance contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show appliance maintenance contract for the last period",
+        "compare appliance maintenance contract by property"
+      ]
+    },
+    {
+      "phrase": "aquisicao de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar aquisicao de imovel do ultimo periodo",
+        "comparar aquisicao de imovel por property"
+      ]
+    },
+    {
+      "phrase": "arras de compra e venda",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar arras de compra e venda do ultimo periodo",
+        "comparar arras de compra e venda por property"
+      ]
+    },
+    {
+      "phrase": "arrears warning",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show arrears warning for the last period",
+        "compare arrears warning by property"
+      ]
+    },
+    {
+      "phrase": "arrendamento",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar arrendamento do ultimo periodo",
+        "comparar arrendamento por property"
+      ]
+    },
+    {
+      "phrase": "arrendamento residencial",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar arrendamento residencial do ultimo periodo",
+        "comparar arrendamento residencial por property"
+      ]
+    },
+    {
+      "phrase": "asset purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show asset purchase agreement for the last period",
+        "compare asset purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "asset register for properties",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show asset register for properties for the last period",
+        "compare asset register for properties by property"
+      ]
+    },
+    {
+      "phrase": "aviso ao inquilino",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso ao inquilino do ultimo periodo",
+        "comparar aviso ao inquilino por property"
+      ]
+    },
+    {
+      "phrase": "aviso de aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de aluguel do ultimo periodo",
+        "comparar aviso de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "aviso de atraso do aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de atraso do aluguel do ultimo periodo",
+        "comparar aviso de atraso do aluguel por property"
+      ]
+    },
+    {
+      "phrase": "aviso de cobrança de aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de cobrança de aluguel do ultimo periodo",
+        "comparar aviso de cobrança de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "aviso de compliance condominial",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar aviso de compliance condominial do ultimo periodo",
+        "comparar aviso de compliance condominial por property"
+      ]
+    },
+    {
+      "phrase": "aviso de debito de aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de debito de aluguel do ultimo periodo",
+        "comparar aviso de debito de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "aviso de desocupacao",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de desocupacao do ultimo periodo",
+        "comparar aviso de desocupacao por property"
+      ]
+    },
+    {
+      "phrase": "aviso de desocupação",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de desocupação do ultimo periodo",
+        "comparar aviso de desocupação por property"
+      ]
+    },
+    {
+      "phrase": "aviso de politica condominial",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar aviso de politica condominial do ultimo periodo",
+        "comparar aviso de politica condominial por property"
+      ]
+    },
+    {
+      "phrase": "aviso de reajuste de aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de reajuste de aluguel do ultimo periodo",
+        "comparar aviso de reajuste de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "aviso de regras do condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar aviso de regras do condominio do ultimo periodo",
+        "comparar aviso de regras do condominio por property"
+      ]
+    },
+    {
+      "phrase": "aviso de rescisao",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de rescisao do ultimo periodo",
+        "comparar aviso de rescisao por property"
+      ]
+    },
+    {
+      "phrase": "aviso de vacancia",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso de vacancia do ultimo periodo",
+        "comparar aviso de vacancia por property"
+      ]
+    },
+    {
+      "phrase": "aviso para desocupar",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar aviso para desocupar do ultimo periodo",
+        "comparar aviso para desocupar por property"
+      ]
+    },
+    {
+      "phrase": "building acquisition agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show building acquisition agreement for the last period",
+        "compare building acquisition agreement by property"
+      ]
+    },
+    {
+      "phrase": "building compliance certificate",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show building compliance certificate for the last period",
+        "compare building compliance certificate by property"
+      ]
+    },
+    {
+      "phrase": "building lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show building lease for the last period",
+        "compare building lease by property"
+      ]
+    },
+    {
+      "phrase": "building maintenance contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show building maintenance contract for the last period",
+        "compare building maintenance contract by property"
+      ]
+    },
+    {
+      "phrase": "building operating expenses",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show building operating expenses for the last period",
+        "compare building operating expenses by property"
+      ]
+    },
+    {
+      "phrase": "building rules notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show building rules notice for the last period",
+        "compare building rules notice by property"
+      ]
+    },
+    {
+      "phrase": "buy-side property agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show buy-side property agreement for the last period",
+        "compare buy-side property agreement by property"
+      ]
+    },
+    {
+      "phrase": "capex by property",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show capex by property for the last period",
+        "compare capex by property by property"
+      ]
+    },
+    {
+      "phrase": "capex por imovel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar capex por imovel do ultimo periodo",
+        "comparar capex por imovel por property"
+      ]
+    },
+    {
+      "phrase": "carta de advertencia ao inquilino",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar carta de advertencia ao inquilino do ultimo periodo",
+        "comparar carta de advertencia ao inquilino por property"
+      ]
+    },
+    {
+      "phrase": "carta de cobranca do aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar carta de cobranca do aluguel do ultimo periodo",
+        "comparar carta de cobranca do aluguel por property"
+      ]
+    },
+    {
+      "phrase": "carta de cobrança locatícia",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar carta de cobrança locatícia do ultimo periodo",
+        "comparar carta de cobrança locatícia por property"
+      ]
+    },
+    {
+      "phrase": "carta de despejo",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar carta de despejo do ultimo periodo",
+        "comparar carta de despejo por property"
+      ]
+    },
+    {
+      "phrase": "carta de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar carta de locacao do ultimo periodo",
+        "comparar carta de locacao por property"
+      ]
+    },
+    {
+      "phrase": "caucao de aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar caucao de aluguel do ultimo periodo",
+        "comparar caucao de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "certificado de conformidade predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar certificado de conformidade predial do ultimo periodo",
+        "comparar certificado de conformidade predial por property"
+      ]
+    },
+    {
+      "phrase": "certificado de ocupacao",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar certificado de ocupacao do ultimo periodo",
+        "comparar certificado de ocupacao por property"
+      ]
+    },
+    {
+      "phrase": "certificado de segurança predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar certificado de segurança predial do ultimo periodo",
+        "comparar certificado de segurança predial por property"
+      ]
+    },
+    {
+      "phrase": "certificado de vistoria",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar certificado de vistoria do ultimo periodo",
+        "comparar certificado de vistoria por property"
+      ]
+    },
+    {
+      "phrase": "cessao de direitos imobiliarios",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cessao de direitos imobiliarios do ultimo periodo",
+        "comparar cessao de direitos imobiliarios por property"
+      ]
+    },
+    {
+      "phrase": "clausulas de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar clausulas de locacao do ultimo periodo",
+        "comparar clausulas de locacao por property"
+      ]
+    },
+    {
+      "phrase": "cleaning service agreement",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show cleaning service agreement for the last period",
+        "compare cleaning service agreement by property"
+      ]
+    },
+    {
+      "phrase": "closing contract property",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show closing contract property for the last period",
+        "compare closing contract property by property"
+      ]
+    },
+    {
+      "phrase": "cobranca de aluguel em atraso",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar cobranca de aluguel em atraso do ultimo periodo",
+        "comparar cobranca de aluguel em atraso por property"
+      ]
+    },
+    {
+      "phrase": "code compliance certificate",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show code compliance certificate for the last period",
+        "compare code compliance certificate by property"
+      ]
+    },
+    {
+      "phrase": "commercial lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show commercial lease for the last period",
+        "compare commercial lease by property"
+      ]
+    },
+    {
+      "phrase": "community compliance notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show community compliance notice for the last period",
+        "compare community compliance notice by property"
+      ]
+    },
+    {
+      "phrase": "community rules notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show community rules notice for the last period",
+        "compare community rules notice by property"
+      ]
+    },
+    {
+      "phrase": "compra de unidade residencial",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar compra de unidade residencial do ultimo periodo",
+        "comparar compra de unidade residencial por property"
+      ]
+    },
+    {
+      "phrase": "compra e venda de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar compra e venda de imovel do ultimo periodo",
+        "comparar compra e venda de imovel por property"
+      ]
+    },
+    {
+      "phrase": "comunicado condominial ao morador",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar comunicado condominial ao morador do ultimo periodo",
+        "comparar comunicado condominial ao morador por property"
+      ]
+    },
+    {
+      "phrase": "comunicado do condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar comunicado do condominio do ultimo periodo",
+        "comparar comunicado do condominio por property"
+      ]
+    },
+    {
+      "phrase": "condo bylaws notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show condo bylaws notice for the last period",
+        "compare condo bylaws notice by property"
+      ]
+    },
+    {
+      "phrase": "condo policy notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show condo policy notice for the last period",
+        "compare condo policy notice by property"
+      ]
+    },
+    {
+      "phrase": "condo vendor contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show condo vendor contract for the last period",
+        "compare condo vendor contract by property"
+      ]
+    },
+    {
+      "phrase": "conformidade do corpo de bombeiros",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar conformidade do corpo de bombeiros do ultimo periodo",
+        "comparar conformidade do corpo de bombeiros por property"
+      ]
+    },
+    {
+      "phrase": "contrato de aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar contrato de aluguel do ultimo periodo",
+        "comparar contrato de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "contrato de arrendamento",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar contrato de arrendamento do ultimo periodo",
+        "comparar contrato de arrendamento por property"
+      ]
+    },
+    {
+      "phrase": "contrato de coleta de lixo condominio",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de coleta de lixo condominio do ultimo periodo",
+        "comparar contrato de coleta de lixo condominio por property"
+      ]
+    },
+    {
+      "phrase": "contrato de compra de casa",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar contrato de compra de casa do ultimo periodo",
+        "comparar contrato de compra de casa por property"
+      ]
+    },
+    {
+      "phrase": "contrato de compra de terreno",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar contrato de compra de terreno do ultimo periodo",
+        "comparar contrato de compra de terreno por property"
+      ]
+    },
+    {
+      "phrase": "contrato de compra e venda",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar contrato de compra e venda do ultimo periodo",
+        "comparar contrato de compra e venda por property"
+      ]
+    },
+    {
+      "phrase": "contrato de compra e venda de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar contrato de compra e venda de imovel do ultimo periodo",
+        "comparar contrato de compra e venda de imovel por property"
+      ]
+    },
+    {
+      "phrase": "contrato de jardinagem condominio",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de jardinagem condominio do ultimo periodo",
+        "comparar contrato de jardinagem condominio por property"
+      ]
+    },
+    {
+      "phrase": "contrato de limpeza predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de limpeza predial do ultimo periodo",
+        "comparar contrato de limpeza predial por property"
+      ]
+    },
+    {
+      "phrase": "contrato de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar contrato de locacao do ultimo periodo",
+        "comparar contrato de locacao por property"
+      ]
+    },
+    {
+      "phrase": "contrato de locação",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar contrato de locação do ultimo periodo",
+        "comparar contrato de locação por property"
+      ]
+    },
+    {
+      "phrase": "contrato de manutencao",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de manutencao do ultimo periodo",
+        "comparar contrato de manutencao por property"
+      ]
+    },
+    {
+      "phrase": "contrato de manutencao de elevador",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de manutencao de elevador do ultimo periodo",
+        "comparar contrato de manutencao de elevador por property"
+      ]
+    },
+    {
+      "phrase": "contrato de portaria",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de portaria do ultimo periodo",
+        "comparar contrato de portaria por property"
+      ]
+    },
+    {
+      "phrase": "contrato de prestacao de servico predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de prestacao de servico predial do ultimo periodo",
+        "comparar contrato de prestacao de servico predial por property"
+      ]
+    },
+    {
+      "phrase": "contrato de seguranca predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de seguranca predial do ultimo periodo",
+        "comparar contrato de seguranca predial por property"
+      ]
+    },
+    {
+      "phrase": "contrato de sinal e principio de pagamento",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar contrato de sinal e principio de pagamento do ultimo periodo",
+        "comparar contrato de sinal e principio de pagamento por property"
+      ]
+    },
+    {
+      "phrase": "contrato de venda de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar contrato de venda de imovel do ultimo periodo",
+        "comparar contrato de venda de imovel por property"
+      ]
+    },
+    {
+      "phrase": "contrato de zeladoria",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar contrato de zeladoria do ultimo periodo",
+        "comparar contrato de zeladoria por property"
+      ]
+    },
+    {
+      "phrase": "contrato locatario",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar contrato locatario do ultimo periodo",
+        "comparar contrato locatario por property"
+      ]
+    },
+    {
+      "phrase": "convencao de condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar convencao de condominio do ultimo periodo",
+        "comparar convencao de condominio por property"
+      ]
+    },
+    {
+      "phrase": "copia do contrato de aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar copia do contrato de aluguel do ultimo periodo",
+        "comparar copia do contrato de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "deed purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show deed purchase agreement for the last period",
+        "compare deed purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "demonstrativo de despesas do imovel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar demonstrativo de despesas do imovel do ultimo periodo",
+        "comparar demonstrativo de despesas do imovel por property"
+      ]
+    },
+    {
+      "phrase": "demonstrativo de receitas de aluguel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar demonstrativo de receitas de aluguel do ultimo periodo",
+        "comparar demonstrativo de receitas de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "despesa de condominio",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar despesa de condominio do ultimo periodo",
+        "comparar despesa de condominio por property"
+      ]
+    },
+    {
+      "phrase": "despesa do imovel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar despesa do imovel do ultimo periodo",
+        "comparar despesa do imovel por property"
+      ]
+    },
+    {
+      "phrase": "dre do imovel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar dre do imovel do ultimo periodo",
+        "comparar dre do imovel por property"
+      ]
+    },
+    {
+      "phrase": "elevator maintenance contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show elevator maintenance contract for the last period",
+        "compare elevator maintenance contract by property"
+      ]
+    },
+    {
+      "phrase": "escritura de compra e venda",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar escritura de compra e venda do ultimo periodo",
+        "comparar escritura de compra e venda por property"
+      ]
+    },
+    {
+      "phrase": "eviction notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show eviction notice for the last period",
+        "compare eviction notice by property"
+      ]
+    },
+    {
+      "phrase": "facility service contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show facility service contract for the last period",
+        "compare facility service contract by property"
+      ]
+    },
+    {
+      "phrase": "fechamento de compra de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar fechamento de compra de imovel do ultimo periodo",
+        "comparar fechamento de compra de imovel por property"
+      ]
+    },
+    {
+      "phrase": "fiador do aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar fiador do aluguel do ultimo periodo",
+        "comparar fiador do aluguel por property"
+      ]
+    },
+    {
+      "phrase": "fire safety inspection certificate",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show fire safety inspection certificate for the last period",
+        "compare fire safety inspection certificate by property"
+      ]
+    },
+    {
+      "phrase": "flat lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show flat lease for the last period",
+        "compare flat lease by property"
+      ]
+    },
+    {
+      "phrase": "fluxo de caixa de aluguel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar fluxo de caixa de aluguel do ultimo periodo",
+        "comparar fluxo de caixa de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "formal rent claim",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show formal rent claim for the last period",
+        "compare formal rent claim by property"
+      ]
+    },
+    {
+      "phrase": "fornecedor de condominio",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar fornecedor de condominio do ultimo periodo",
+        "comparar fornecedor de condominio por property"
+      ]
+    },
+    {
+      "phrase": "fornecedor predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar fornecedor predial do ultimo periodo",
+        "comparar fornecedor predial por property"
+      ]
+    },
+    {
+      "phrase": "garantia locaticia",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar garantia locaticia do ultimo periodo",
+        "comparar garantia locaticia por property"
+      ]
+    },
+    {
+      "phrase": "gate security contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show gate security contract for the last period",
+        "compare gate security contract by property"
+      ]
+    },
+    {
+      "phrase": "hoa covenant notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show hoa covenant notice for the last period",
+        "compare hoa covenant notice by property"
+      ]
+    },
+    {
+      "phrase": "hoa policy",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show hoa policy for the last period",
+        "compare hoa policy by property"
+      ]
+    },
+    {
+      "phrase": "hoa rules",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show hoa rules for the last period",
+        "compare hoa rules by property"
+      ]
+    },
+    {
+      "phrase": "home lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show home lease for the last period",
+        "compare home lease by property"
+      ]
+    },
+    {
+      "phrase": "home purchase contract",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show home purchase contract for the last period",
+        "compare home purchase contract by property"
+      ]
+    },
+    {
+      "phrase": "house lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show house lease for the last period",
+        "compare house lease by property"
+      ]
+    },
+    {
+      "phrase": "house purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show house purchase agreement for the last period",
+        "compare house purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "housing community policy",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show housing community policy for the last period",
+        "compare housing community policy by property"
+      ]
+    },
+    {
+      "phrase": "housing maintenance agreement",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show housing maintenance agreement for the last period",
+        "compare housing maintenance agreement by property"
+      ]
+    },
+    {
+      "phrase": "housing notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show housing notice for the last period",
+        "compare housing notice by property"
+      ]
+    },
+    {
+      "phrase": "imobilizado de imoveis",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar imobilizado de imoveis do ultimo periodo",
+        "comparar imobilizado de imoveis por property"
+      ]
+    },
+    {
+      "phrase": "imovel em aquisicao",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar imovel em aquisicao do ultimo periodo",
+        "comparar imovel em aquisicao por property"
+      ]
+    },
+    {
+      "phrase": "inadimplencia do inquilino",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar inadimplencia do inquilino do ultimo periodo",
+        "comparar inadimplencia do inquilino por property"
+      ]
+    },
+    {
+      "phrase": "inquilino em atraso",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar inquilino em atraso do ultimo periodo",
+        "comparar inquilino em atraso por property"
+      ]
+    },
+    {
+      "phrase": "instrumento de compra e venda",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar instrumento de compra e venda do ultimo periodo",
+        "comparar instrumento de compra e venda por property"
+      ]
+    },
+    {
+      "phrase": "janitorial contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show janitorial contract for the last period",
+        "compare janitorial contract by property"
+      ]
+    },
+    {
+      "phrase": "land purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show land purchase agreement for the last period",
+        "compare land purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "landlord income statement",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show landlord income statement for the last period",
+        "compare landlord income statement by property"
+      ]
+    },
+    {
+      "phrase": "landlord lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show landlord lease for the last period",
+        "compare landlord lease by property"
+      ]
+    },
+    {
+      "phrase": "landlord notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show landlord notice for the last period",
+        "compare landlord notice by property"
+      ]
+    },
+    {
+      "phrase": "landscaping contract property",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show landscaping contract property for the last period",
+        "compare landscaping contract property by property"
+      ]
+    },
+    {
+      "phrase": "late rent notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show late rent notice for the last period",
+        "compare late rent notice by property"
+      ]
+    },
+    {
+      "phrase": "laudo de conformidade do imovel",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar laudo de conformidade do imovel do ultimo periodo",
+        "comparar laudo de conformidade do imovel por property"
+      ]
+    },
+    {
+      "phrase": "lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease for the last period",
+        "compare lease by property"
+      ]
+    },
+    {
+      "phrase": "lease addendum",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease addendum for the last period",
+        "compare lease addendum by property"
+      ]
+    },
+    {
+      "phrase": "lease agreement",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease agreement for the last period",
+        "compare lease agreement by property"
+      ]
+    },
+    {
+      "phrase": "lease amendment",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease amendment for the last period",
+        "compare lease amendment by property"
+      ]
+    },
+    {
+      "phrase": "lease annex",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease annex for the last period",
+        "compare lease annex by property"
+      ]
+    },
+    {
+      "phrase": "lease contract",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease contract for the last period",
+        "compare lease contract by property"
+      ]
+    },
+    {
+      "phrase": "lease copy",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease copy for the last period",
+        "compare lease copy by property"
+      ]
+    },
+    {
+      "phrase": "lease document",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease document for the last period",
+        "compare lease document by property"
+      ]
+    },
+    {
+      "phrase": "lease enforcement notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show lease enforcement notice for the last period",
+        "compare lease enforcement notice by property"
+      ]
+    },
+    {
+      "phrase": "lease extension",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease extension for the last period",
+        "compare lease extension by property"
+      ]
+    },
+    {
+      "phrase": "lease paperwork",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease paperwork for the last period",
+        "compare lease paperwork by property"
+      ]
+    },
+    {
+      "phrase": "lease renewal",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease renewal for the last period",
+        "compare lease renewal by property"
+      ]
+    },
+    {
+      "phrase": "lease renewal addendum",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease renewal addendum for the last period",
+        "compare lease renewal addendum by property"
+      ]
+    },
+    {
+      "phrase": "lease rider",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease rider for the last period",
+        "compare lease rider by property"
+      ]
+    },
+    {
+      "phrase": "lease side letter",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease side letter for the last period",
+        "compare lease side letter by property"
+      ]
+    },
+    {
+      "phrase": "lease terms",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease terms for the last period",
+        "compare lease terms by property"
+      ]
+    },
+    {
+      "phrase": "lease transfer clause",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show lease transfer clause for the last period",
+        "compare lease transfer clause by property"
+      ]
+    },
+    {
+      "phrase": "lease violation notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show lease violation notice for the last period",
+        "compare lease violation notice by property"
+      ]
+    },
+    {
+      "phrase": "lista de ativos imobiliarios",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar lista de ativos imobiliarios do ultimo periodo",
+        "comparar lista de ativos imobiliarios por property"
+      ]
+    },
+    {
+      "phrase": "locacao comercial",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar locacao comercial do ultimo periodo",
+        "comparar locacao comercial por property"
+      ]
+    },
+    {
+      "phrase": "locação comercial",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar locação comercial do ultimo periodo",
+        "comparar locação comercial por property"
+      ]
+    },
+    {
+      "phrase": "locacao de apartamento",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar locacao de apartamento do ultimo periodo",
+        "comparar locacao de apartamento por property"
+      ]
+    },
+    {
+      "phrase": "locacao de casa",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar locacao de casa do ultimo periodo",
+        "comparar locacao de casa por property"
+      ]
+    },
+    {
+      "phrase": "locacao residencial",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar locacao residencial do ultimo periodo",
+        "comparar locacao residencial por property"
+      ]
+    },
+    {
+      "phrase": "locação residencial",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar locação residencial do ultimo periodo",
+        "comparar locação residencial por property"
+      ]
+    },
+    {
+      "phrase": "locador e locatario",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar locador e locatario do ultimo periodo",
+        "comparar locador e locatario por property"
+      ]
+    },
+    {
+      "phrase": "maintenance vendor agreement",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show maintenance vendor agreement for the last period",
+        "compare maintenance vendor agreement by property"
+      ]
+    },
+    {
+      "phrase": "manual do morador",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar manual do morador do ultimo periodo",
+        "comparar manual do morador por property"
+      ]
+    },
+    {
+      "phrase": "manutencao do predio",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar manutencao do predio do ultimo periodo",
+        "comparar manutencao do predio por property"
+      ]
+    },
+    {
+      "phrase": "minuta compra e venda",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar minuta compra e venda do ultimo periodo",
+        "comparar minuta compra e venda por property"
+      ]
+    },
+    {
+      "phrase": "monthly lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show monthly lease for the last period",
+        "compare monthly lease by property"
+      ]
+    },
+    {
+      "phrase": "move-out notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show move-out notice for the last period",
+        "compare move-out notice by property"
+      ]
+    },
+    {
+      "phrase": "noise policy notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show noise policy notice for the last period",
+        "compare noise policy notice by property"
+      ]
+    },
+    {
+      "phrase": "normas do condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar normas do condominio do ultimo periodo",
+        "comparar normas do condominio por property"
+      ]
+    },
+    {
+      "phrase": "notice of arrears",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show notice of arrears for the last period",
+        "compare notice of arrears by property"
+      ]
+    },
+    {
+      "phrase": "notice of rental increase",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show notice of rental increase for the last period",
+        "compare notice of rental increase by property"
+      ]
+    },
+    {
+      "phrase": "notice to tenant",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show notice to tenant for the last period",
+        "compare notice to tenant by property"
+      ]
+    },
+    {
+      "phrase": "notice to vacate",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show notice to vacate for the last period",
+        "compare notice to vacate by property"
+      ]
+    },
+    {
+      "phrase": "notificacao de aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar notificacao de aluguel do ultimo periodo",
+        "comparar notificacao de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "notificação de aluguel vencido",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar notificação de aluguel vencido do ultimo periodo",
+        "comparar notificação de aluguel vencido por property"
+      ]
+    },
+    {
+      "phrase": "notificação de débito",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar notificação de débito do ultimo periodo",
+        "comparar notificação de débito por property"
+      ]
+    },
+    {
+      "phrase": "notificacao de mora",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar notificacao de mora do ultimo periodo",
+        "comparar notificacao de mora por property"
+      ]
+    },
+    {
+      "phrase": "notificacao de quebra contratual",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar notificacao de quebra contratual do ultimo periodo",
+        "comparar notificacao de quebra contratual por property"
+      ]
+    },
+    {
+      "phrase": "notificacao para inquilino",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar notificacao para inquilino do ultimo periodo",
+        "comparar notificacao para inquilino por property"
+      ]
+    },
+    {
+      "phrase": "occupancy compliance certificate",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show occupancy compliance certificate for the last period",
+        "compare occupancy compliance certificate by property"
+      ]
+    },
+    {
+      "phrase": "occupancy notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show occupancy notice for the last period",
+        "compare occupancy notice by property"
+      ]
+    },
+    {
+      "phrase": "office lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show office lease for the last period",
+        "compare office lease by property"
+      ]
+    },
+    {
+      "phrase": "opex by property",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show opex by property for the last period",
+        "compare opex by property by property"
+      ]
+    },
+    {
+      "phrase": "opex por imovel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar opex por imovel do ultimo periodo",
+        "comparar opex por imovel por property"
+      ]
+    },
+    {
+      "phrase": "parking policy notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show parking policy notice for the last period",
+        "compare parking policy notice by property"
+      ]
+    },
+    {
+      "phrase": "past due rent notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show past due rent notice for the last period",
+        "compare past due rent notice by property"
+      ]
+    },
+    {
+      "phrase": "pedido de desocupacao",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar pedido de desocupacao do ultimo periodo",
+        "comparar pedido de desocupacao por property"
+      ]
+    },
+    {
+      "phrase": "pet policy notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show pet policy notice for the last period",
+        "compare pet policy notice by property"
+      ]
+    },
+    {
+      "phrase": "politica de condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar politica de condominio do ultimo periodo",
+        "comparar politica de condominio por property"
+      ]
+    },
+    {
+      "phrase": "politica de moradores",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar politica de moradores do ultimo periodo",
+        "comparar politica de moradores por property"
+      ]
+    },
+    {
+      "phrase": "politica de vagas de garagem",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar politica de vagas de garagem do ultimo periodo",
+        "comparar politica de vagas de garagem por property"
+      ]
+    },
+    {
+      "phrase": "politica de visitantes",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar politica de visitantes do ultimo periodo",
+        "comparar politica de visitantes por property"
+      ]
+    },
+    {
+      "phrase": "politica para pets condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar politica para pets condominio do ultimo periodo",
+        "comparar politica para pets condominio por property"
+      ]
+    },
+    {
+      "phrase": "pool maintenance agreement",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show pool maintenance agreement for the last period",
+        "compare pool maintenance agreement by property"
+      ]
+    },
+    {
+      "phrase": "prazo de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar prazo de locacao do ultimo periodo",
+        "comparar prazo de locacao por property"
+      ]
+    },
+    {
+      "phrase": "pre-closing purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show pre-closing purchase agreement for the last period",
+        "compare pre-closing purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "prestador de servico do condominio",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar prestador de servico do condominio do ultimo periodo",
+        "comparar prestador de servico do condominio por property"
+      ]
+    },
+    {
+      "phrase": "promessa de compra e venda",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar promessa de compra e venda do ultimo periodo",
+        "comparar promessa de compra e venda por property"
+      ]
+    },
+    {
+      "phrase": "property acquisition contract",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show property acquisition contract for the last period",
+        "compare property acquisition contract by property"
+      ]
+    },
+    {
+      "phrase": "property assignment agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show property assignment agreement for the last period",
+        "compare property assignment agreement by property"
+      ]
+    },
+    {
+      "phrase": "property cash yield report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show property cash yield report for the last period",
+        "compare property cash yield report by property"
+      ]
+    },
+    {
+      "phrase": "property closing terms",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show property closing terms for the last period",
+        "compare property closing terms by property"
+      ]
+    },
+    {
+      "phrase": "property expense report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show property expense report for the last period",
+        "compare property expense report by property"
+      ]
+    },
+    {
+      "phrase": "property fixed asset register",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show property fixed asset register for the last period",
+        "compare property fixed asset register by property"
+      ]
+    },
+    {
+      "phrase": "property handyman contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show property handyman contract for the last period",
+        "compare property handyman contract by property"
+      ]
+    },
+    {
+      "phrase": "property income report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show property income report for the last period",
+        "compare property income report by property"
+      ]
+    },
+    {
+      "phrase": "property lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show property lease for the last period",
+        "compare property lease by property"
+      ]
+    },
+    {
+      "phrase": "property management notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show property management notice for the last period",
+        "compare property management notice by property"
+      ]
+    },
+    {
+      "phrase": "property management service agreement",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show property management service agreement for the last period",
+        "compare property management service agreement by property"
+      ]
+    },
+    {
+      "phrase": "property operating report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show property operating report for the last period",
+        "compare property operating report by property"
+      ]
+    },
+    {
+      "phrase": "property p&l",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show property p&l for the last period",
+        "compare property p&l by property"
+      ]
+    },
+    {
+      "phrase": "property purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show property purchase agreement for the last period",
+        "compare property purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "property sale deed agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show property sale deed agreement for the last period",
+        "compare property sale deed agreement by property"
+      ]
+    },
+    {
+      "phrase": "property vendor contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show property vendor contract for the last period",
+        "compare property vendor contract by property"
+      ]
+    },
+    {
+      "phrase": "proposta de compra de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar proposta de compra de imovel do ultimo periodo",
+        "comparar proposta de compra de imovel por property"
+      ]
+    },
+    {
+      "phrase": "purchase and sale agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show purchase and sale agreement for the last period",
+        "compare purchase and sale agreement by property"
+      ]
+    },
+    {
+      "phrase": "purchase offer agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show purchase offer agreement for the last period",
+        "compare purchase offer agreement by property"
+      ]
+    },
+    {
+      "phrase": "reajuste de aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar reajuste de aluguel do ultimo periodo",
+        "comparar reajuste de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "real estate expense ledger",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show real estate expense ledger for the last period",
+        "compare real estate expense ledger by property"
+      ]
+    },
+    {
+      "phrase": "real estate income statement",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show real estate income statement for the last period",
+        "compare real estate income statement by property"
+      ]
+    },
+    {
+      "phrase": "real estate purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show real estate purchase agreement for the last period",
+        "compare real estate purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "real estate sale contract",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show real estate sale contract for the last period",
+        "compare real estate sale contract by property"
+      ]
+    },
+    {
+      "phrase": "receita de aluguel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar receita de aluguel do ultimo periodo",
+        "comparar receita de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "receita por unidade locada",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar receita por unidade locada do ultimo periodo",
+        "comparar receita por unidade locada por property"
+      ]
+    },
+    {
+      "phrase": "reclamacao de aluguel",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar reclamacao de aluguel do ultimo periodo",
+        "comparar reclamacao de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "regimento interno",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar regimento interno do ultimo periodo",
+        "comparar regimento interno por property"
+      ]
+    },
+    {
+      "phrase": "regra de barulho condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar regra de barulho condominio do ultimo periodo",
+        "comparar regra de barulho condominio por property"
+      ]
+    },
+    {
+      "phrase": "regra de lixo condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar regra de lixo condominio do ultimo periodo",
+        "comparar regra de lixo condominio por property"
+      ]
+    },
+    {
+      "phrase": "regras da associacao de moradores",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar regras da associacao de moradores do ultimo periodo",
+        "comparar regras da associacao de moradores por property"
+      ]
+    },
+    {
+      "phrase": "regras de area comum",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar regras de area comum do ultimo periodo",
+        "comparar regras de area comum por property"
+      ]
+    },
+    {
+      "phrase": "regras do predio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar regras do predio do ultimo periodo",
+        "comparar regras do predio por property"
+      ]
+    },
+    {
+      "phrase": "regras para inquilino no condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar regras para inquilino no condominio do ultimo periodo",
+        "comparar regras para inquilino no condominio por property"
+      ]
+    },
+    {
+      "phrase": "relatorio de aluguel por unidade",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar relatorio de aluguel por unidade do ultimo periodo",
+        "comparar relatorio de aluguel por unidade por property"
+      ]
+    },
+    {
+      "phrase": "relatorio de conformidade predial",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar relatorio de conformidade predial do ultimo periodo",
+        "comparar relatorio de conformidade predial por property"
+      ]
+    },
+    {
+      "phrase": "relatorio de despesas de locacao",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar relatorio de despesas de locacao do ultimo periodo",
+        "comparar relatorio de despesas de locacao por property"
+      ]
+    },
+    {
+      "phrase": "relatorio de performance de aluguel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar relatorio de performance de aluguel do ultimo periodo",
+        "comparar relatorio de performance de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "relatorio de vacancia e aluguel",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar relatorio de vacancia e aluguel do ultimo periodo",
+        "comparar relatorio de vacancia e aluguel por property"
+      ]
+    },
+    {
+      "phrase": "renovacao de aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar renovacao de aluguel do ultimo periodo",
+        "comparar renovacao de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "renovacao de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar renovacao de locacao do ultimo periodo",
+        "comparar renovacao de locacao por property"
+      ]
+    },
+    {
+      "phrase": "rent adjustment notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show rent adjustment notice for the last period",
+        "compare rent adjustment notice by property"
+      ]
+    },
+    {
+      "phrase": "rent collection performance",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show rent collection performance for the last period",
+        "compare rent collection performance by property"
+      ]
+    },
+    {
+      "phrase": "rent demand letter",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show rent demand letter for the last period",
+        "compare rent demand letter by property"
+      ]
+    },
+    {
+      "phrase": "rent dispute notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show rent dispute notice for the last period",
+        "compare rent dispute notice by property"
+      ]
+    },
+    {
+      "phrase": "rent due notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show rent due notice for the last period",
+        "compare rent due notice by property"
+      ]
+    },
+    {
+      "phrase": "rent reminder",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show rent reminder for the last period",
+        "compare rent reminder by property"
+      ]
+    },
+    {
+      "phrase": "rent roll",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar rent roll do ultimo periodo",
+        "comparar rent roll por property"
+      ]
+    },
+    {
+      "phrase": "rent roll summary",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show rent roll summary for the last period",
+        "compare rent roll summary by property"
+      ]
+    },
+    {
+      "phrase": "rental default notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show rental default notice for the last period",
+        "compare rental default notice by property"
+      ]
+    },
+    {
+      "phrase": "rental expense report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show rental expense report for the last period",
+        "compare rental expense report by property"
+      ]
+    },
+    {
+      "phrase": "rental income report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show rental income report for the last period",
+        "compare rental income report by property"
+      ]
+    },
+    {
+      "phrase": "rental lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show rental lease for the last period",
+        "compare rental lease by property"
+      ]
+    },
+    {
+      "phrase": "rental performance report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show rental performance report for the last period",
+        "compare rental performance report by property"
+      ]
+    },
+    {
+      "phrase": "rental policy notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show rental policy notice for the last period",
+        "compare rental policy notice by property"
+      ]
+    },
+    {
+      "phrase": "repair service contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show repair service contract for the last period",
+        "compare repair service contract by property"
+      ]
+    },
+    {
+      "phrase": "rescisao de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar rescisao de locacao do ultimo periodo",
+        "comparar rescisao de locacao por property"
+      ]
+    },
+    {
+      "phrase": "rescisao por inadimplencia",
+      "normalized": "aviso_aluguel_inquilino",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar rescisao por inadimplencia do ultimo periodo",
+        "comparar rescisao por inadimplencia por property"
+      ]
+    },
+    {
+      "phrase": "resident handbook policy",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show resident handbook policy for the last period",
+        "compare resident handbook policy by property"
+      ]
+    },
+    {
+      "phrase": "resident policy notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show resident policy notice for the last period",
+        "compare resident policy notice by property"
+      ]
+    },
+    {
+      "phrase": "residential lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show residential lease for the last period",
+        "compare residential lease by property"
+      ]
+    },
+    {
+      "phrase": "resultado imobiliario",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar resultado imobiliario do ultimo periodo",
+        "comparar resultado imobiliario por property"
+      ]
+    },
+    {
+      "phrase": "resumo de despesas do predio",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar resumo de despesas do predio do ultimo periodo",
+        "comparar resumo de despesas do predio por property"
+      ]
+    },
+    {
+      "phrase": "resumo de receita de locacao",
+      "normalized": "receita_despesa_locacao",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar resumo de receita de locacao do ultimo periodo",
+        "comparar resumo de receita de locacao por property"
+      ]
+    },
+    {
+      "phrase": "sale and purchase contract",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show sale and purchase contract for the last period",
+        "compare sale and purchase contract by property"
+      ]
+    },
+    {
+      "phrase": "security service agreement",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show security service agreement for the last period",
+        "compare security service agreement by property"
+      ]
+    },
+    {
+      "phrase": "seguro fianca locatícia",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar seguro fianca locatícia do ultimo periodo",
+        "comparar seguro fianca locatícia por property"
+      ]
+    },
+    {
+      "phrase": "sell-side property agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show sell-side property agreement for the last period",
+        "compare sell-side property agreement by property"
+      ]
+    },
+    {
+      "phrase": "seller buyer agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show seller buyer agreement for the last period",
+        "compare seller buyer agreement by property"
+      ]
+    },
+    {
+      "phrase": "service level property vendor",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show service level property vendor for the last period",
+        "compare service level property vendor by property"
+      ]
+    },
+    {
+      "phrase": "servico de reparo do imovel",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar servico de reparo do imovel do ultimo periodo",
+        "comparar servico de reparo do imovel por property"
+      ]
+    },
+    {
+      "phrase": "servico de sindicancia",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar servico de sindicancia do ultimo periodo",
+        "comparar servico de sindicancia por property"
+      ]
+    },
+    {
+      "phrase": "servico predial terceirizado",
+      "normalized": "servico_fornecedor_imovel",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar servico predial terceirizado do ultimo periodo",
+        "comparar servico predial terceirizado por property"
+      ]
+    },
+    {
+      "phrase": "shared area policy",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show shared area policy for the last period",
+        "compare shared area policy by property"
+      ]
+    },
+    {
+      "phrase": "shop lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show shop lease for the last period",
+        "compare shop lease by property"
+      ]
+    },
+    {
+      "phrase": "signed lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show signed lease for the last period",
+        "compare signed lease by property"
+      ]
+    },
+    {
+      "phrase": "strata policy notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show strata policy notice for the last period",
+        "compare strata policy notice by property"
+      ]
+    },
+    {
+      "phrase": "tenant breach notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tenant breach notice for the last period",
+        "compare tenant breach notice by property"
+      ]
+    },
+    {
+      "phrase": "tenant claim filing",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tenant claim filing for the last period",
+        "compare tenant claim filing by property"
+      ]
+    },
+    {
+      "phrase": "tenant community rules",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show tenant community rules for the last period",
+        "compare tenant community rules by property"
+      ]
+    },
+    {
+      "phrase": "tenant delinquency notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tenant delinquency notice for the last period",
+        "compare tenant delinquency notice by property"
+      ]
+    },
+    {
+      "phrase": "tenant dispute notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tenant dispute notice for the last period",
+        "compare tenant dispute notice by property"
+      ]
+    },
+    {
+      "phrase": "tenant lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show tenant lease for the last period",
+        "compare tenant lease by property"
+      ]
+    },
+    {
+      "phrase": "tenant payment notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tenant payment notice for the last period",
+        "compare tenant payment notice by property"
+      ]
+    },
+    {
+      "phrase": "tenant service agreement",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tenant service agreement for the last period",
+        "compare tenant service agreement by property"
+      ]
+    },
+    {
+      "phrase": "tenant warning letter",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tenant warning letter for the last period",
+        "compare tenant warning letter by property"
+      ]
+    },
+    {
+      "phrase": "termo de aquisicao de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar termo de aquisicao de imovel do ultimo periodo",
+        "comparar termo de aquisicao de imovel por property"
+      ]
+    },
+    {
+      "phrase": "termo de convivencia condominio",
+      "normalized": "politica_condominio",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar termo de convivencia condominio do ultimo periodo",
+        "comparar termo de convivencia condominio por property"
+      ]
+    },
+    {
+      "phrase": "termos de aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar termos de aluguel do ultimo periodo",
+        "comparar termos de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "termos de locacao",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar termos de locacao do ultimo periodo",
+        "comparar termos de locacao por property"
+      ]
+    },
+    {
+      "phrase": "title transfer agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show title transfer agreement for the last period",
+        "compare title transfer agreement by property"
+      ]
+    },
+    {
+      "phrase": "transferencia de titularidade de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar transferencia de titularidade de imovel do ultimo periodo",
+        "comparar transferencia de titularidade de imovel por property"
+      ]
+    },
+    {
+      "phrase": "unit lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show unit lease for the last period",
+        "compare unit lease by property"
+      ]
+    },
+    {
+      "phrase": "unit purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show unit purchase agreement for the last period",
+        "compare unit purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "unit-level rent report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show unit-level rent report for the last period",
+        "compare unit-level rent report by property"
+      ]
+    },
+    {
+      "phrase": "unpaid rent notice",
+      "normalized": "rent_tenant_notice",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_policy_notice",
+        "legal_statement_of_claim"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show unpaid rent notice for the last period",
+        "compare unpaid rent notice by property"
+      ]
+    },
+    {
+      "phrase": "vacancy and rent report",
+      "normalized": "rental_revenue_expense",
+      "docTypeIds": [
+        "fin_revenue_report",
+        "fin_expense_report",
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "property_or_unit",
+        "formatHint": "report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show vacancy and rent report for the last period",
+        "compare vacancy and rent report by property"
+      ]
+    },
+    {
+      "phrase": "vencimento do contrato de aluguel",
+      "normalized": "contrato_locacao",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "mostrar vencimento do contrato de aluguel do ultimo periodo",
+        "comparar vencimento do contrato de aluguel por property"
+      ]
+    },
+    {
+      "phrase": "venda de apartamento",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar venda de apartamento do ultimo periodo",
+        "comparar venda de apartamento por property"
+      ]
+    },
+    {
+      "phrase": "venda de casa",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar venda de casa do ultimo periodo",
+        "comparar venda de casa por property"
+      ]
+    },
+    {
+      "phrase": "venda de imovel",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar venda de imovel do ultimo periodo",
+        "comparar venda de imovel por property"
+      ]
+    },
+    {
+      "phrase": "venda de terreno",
+      "normalized": "compra_venda_imovel",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar venda de terreno do ultimo periodo",
+        "comparar venda de terreno por property"
+      ]
+    },
+    {
+      "phrase": "vendor compliance certificate",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show vendor compliance certificate for the last period",
+        "compare vendor compliance certificate by property"
+      ]
+    },
+    {
+      "phrase": "villa purchase agreement",
+      "normalized": "property_purchase_sale",
+      "docTypeIds": [
+        "legal_purchase_agreement",
+        "legal_asset_purchase_agreement",
+        "legal_share_purchase_agreement"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "buyer_or_seller",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show villa purchase agreement for the last period",
+        "compare villa purchase agreement by property"
+      ]
+    },
+    {
+      "phrase": "visitor policy notice",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show visitor policy notice for the last period",
+        "compare visitor policy notice by property"
+      ]
+    },
+    {
+      "phrase": "warehouse lease",
+      "normalized": "lease_agreement",
+      "docTypeIds": [
+        "legal_lease_agreement",
+        "legal_addendum",
+        "legal_amendment"
+      ],
+      "hints": {
+        "periodHint": "contract_term",
+        "entityHint": "landlord_or_tenant",
+        "formatHint": "contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "show warehouse lease for the last period",
+        "compare warehouse lease by property"
+      ]
+    },
+    {
+      "phrase": "waste collection contract",
+      "normalized": "property_service_vendor",
+      "docTypeIds": [
+        "legal_service_agreement",
+        "legal_vendor_agreement",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "service_period",
+        "entityHint": "service_provider",
+        "formatHint": "service_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show waste collection contract for the last period",
+        "compare waste collection contract by property"
+      ]
+    },
+    {
+      "phrase": "waste disposal policy",
+      "normalized": "hoa_condo_policy",
+      "docTypeIds": [
+        "legal_policy_notice",
+        "legal_terms_of_service",
+        "legal_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "policy_period",
+        "entityHint": "community_or_resident",
+        "formatHint": "policy_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show waste disposal policy for the last period",
+        "compare waste disposal policy by property"
+      ]
+    }
+  ]
+}

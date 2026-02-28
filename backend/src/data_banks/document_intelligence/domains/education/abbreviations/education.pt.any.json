@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_education_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for education domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education",
+    "language": "pt"
+  },
+  "domain": "education",
+  "abbreviations": [
+    {
+      "abbr": "AVA",
+      "expansion": "Ambiente Virtual de Aprendizagem"
+    },
+    {
+      "abbr": "CH",
+      "expansion": "Carga Horaria"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoa Fisica"
+    },
+    {
+      "abbr": "CR",
+      "expansion": "Coeficiente de Rendimento"
+    },
+    {
+      "abbr": "DP",
+      "expansion": "Dependencia"
+    },
+    {
+      "abbr": "EAD",
+      "expansion": "Educacao a Distancia"
+    },
+    {
+      "abbr": "ENEM",
+      "expansion": "Exame Nacional do Ensino Medio"
+    },
+    {
+      "abbr": "IES",
+      "expansion": "Instituicao de Ensino Superior"
+    },
+    {
+      "abbr": "INEP",
+      "expansion": "Instituto Nacional de Estudos e Pesquisas Educacionais"
+    },
+    {
+      "abbr": "MEC",
+      "expansion": "Ministerio da Educacao"
+    },
+    {
+      "abbr": "N/A",
+      "expansion": "Nao Aplicavel"
+    },
+    {
+      "abbr": "P/F",
+      "expansion": "Aprovado Reprovado"
+    },
+    {
+      "abbr": "PP",
+      "expansion": "Periodo Parcial"
+    },
+    {
+      "abbr": "RA",
+      "expansion": "Registro Academico"
+    },
+    {
+      "abbr": "RG",
+      "expansion": "Registro Geral"
+    },
+    {
+      "abbr": "RGM",
+      "expansion": "Registro Geral de Matricula"
+    },
+    {
+      "abbr": "SEI",
+      "expansion": "Sistema Eletronico de Informacoes"
+    },
+    {
+      "abbr": "SIGA",
+      "expansion": "Sistema Integrado de Gestao Academica"
+    },
+    {
+      "abbr": "TCC",
+      "expansion": "Trabalho de Conclusao de Curso"
+    },
+    {
+      "abbr": "TI",
+      "expansion": "Tempo Integral"
+    }
+  ]
+}

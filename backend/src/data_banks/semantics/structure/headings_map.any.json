@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "headings_map",
-    "version": "1.0.0",
-    "description": "Canonical heading ontology with multilingual synonyms for structural section detection.",
+    "version": "1.1.0",
+    "description": "Canonical heading ontology with multilingual synonyms for cross-domain section detection across everyday documents.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -17,18 +17,6279 @@
   },
   "headings": [
     {
-      "canonical": "termination",
+      "canonical": "abbreviations",
       "synonyms": {
         "en": [
-          "termination"
+          "abbreviations",
+          "acronyms",
+          "list of abbreviations"
         ],
         "pt": [
-          "rescisao",
-          "encerramento"
+          "abreviaturas",
+          "lista de abreviaturas",
+          "siglas"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "abstract",
+      "synonyms": {
+        "en": [
+          "abstract",
+          "brief summary",
+          "synopsis"
+        ],
+        "pt": [
+          "resumo",
+          "sinopse",
+          "sumario executivo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "acceptance_criteria",
+      "synonyms": {
+        "en": [
+          "acceptance conditions",
+          "acceptance criteria",
+          "acceptance requirements"
+        ],
+        "pt": [
+          "condicoes de aceitacao",
+          "criterios de aceitacao",
+          "requisitos de aceitacao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "account_holder_information",
+      "synonyms": {
+        "en": [
+          "account holder information",
+          "Account Holder Information"
+        ],
+        "pt": [
+          "conta titular information",
+          "Conta Titular Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "account_identifier_block",
+      "synonyms": {
+        "en": [
+          "account identifier block",
+          "Account Identifier Block"
+        ],
+        "pt": [
+          "conta identifier block",
+          "Conta Identifier Block"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "account_summary",
+      "synonyms": {
+        "en": [
+          "account summary",
+          "Account Summary"
+        ],
+        "pt": [
+          "conta resumo",
+          "Conta Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "accounts_payable",
+      "synonyms": {
+        "en": [
+          "accounts payable",
+          "ap",
+          "payables",
+          "trade payables"
+        ],
+        "pt": [
+          "contas a pagar",
+          "fornecedores",
+          "obrigacoes a pagar"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "accounts_receivable",
+      "synonyms": {
+        "en": [
+          "accounts receivable",
+          "ar",
+          "receivables",
+          "trade receivables"
+        ],
+        "pt": [
+          "clientes",
+          "contas a receber",
+          "recebiveis"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "acknowledgements",
+      "synonyms": {
+        "en": [
+          "acknowledgements",
+          "acknowledgments",
+          "credits"
+        ],
+        "pt": [
+          "agradecimentos",
+          "reconhecimentos"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "action_items",
+      "synonyms": {
+        "en": [
+          "action items",
+          "action points",
+          "tasks",
+          "to-do"
+        ],
+        "pt": [
+          "acoes pendentes",
+          "itens de acao",
+          "tarefas"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "additional_services",
+      "synonyms": {
+        "en": [
+          "additional services",
+          "Additional Services"
+        ],
+        "pt": [
+          "additional services",
+          "Additional Services"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "address_block",
+      "synonyms": {
+        "en": [
+          "address block",
+          "Address Block"
+        ],
+        "pt": [
+          "endereco block",
+          "Endereco Block"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "adjustments_section",
+      "synonyms": {
+        "en": [
+          "adjustments section",
+          "Adjustments Section"
+        ],
+        "pt": [
+          "adjustments secao",
+          "Adjustments Secao"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "agent_information",
+      "synonyms": {
+        "en": [
+          "agent information",
+          "Agent Information"
+        ],
+        "pt": [
+          "agent information",
+          "Agent Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "allergies",
+      "synonyms": {
+        "en": [
+          "allergies",
+          "allergy list",
+          "drug allergies",
+          "known allergies"
+        ],
+        "pt": [
+          "alergias",
+          "alergias conhecidas",
+          "lista de alergias"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "amendments",
+      "synonyms": {
+        "en": [
+          "amendments",
+          "changes",
+          "modifications",
+          "revisions"
+        ],
+        "pt": [
+          "aditivos",
+          "alteracoes",
+          "emendas",
+          "modificacoes"
         ]
       },
       "domainTags": [
         "legal"
+      ]
+    },
+    {
+      "canonical": "amortization",
+      "synonyms": {
+        "en": [
+          "amortisation",
+          "amortization",
+          "intangible amortization"
+        ],
+        "pt": [
+          "amortizacao",
+          "amortizacao de intangiveis"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "amount_due_summary",
+      "synonyms": {
+        "en": [
+          "amount due summary",
+          "Amount Due Summary"
+        ],
+        "pt": [
+          "valor vencimento resumo",
+          "Valor Vencimento Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "annual_totals",
+      "synonyms": {
+        "en": [
+          "annual totals",
+          "Annual Totals"
+        ],
+        "pt": [
+          "annual totals",
+          "Annual Totals"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "appeal_instructions",
+      "synonyms": {
+        "en": [
+          "appeal instructions",
+          "Appeal Instructions"
+        ],
+        "pt": [
+          "appeal instructions",
+          "Appeal Instructions"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "appendix",
+      "synonyms": {
+        "en": [
+          "annex",
+          "annexes",
+          "appendices",
+          "appendix",
+          "exhibit"
+        ],
+        "pt": [
+          "anexo",
+          "anexos",
+          "apendice"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "application_metadata",
+      "synonyms": {
+        "en": [
+          "application metadata",
+          "Application Metadata"
+        ],
+        "pt": [
+          "application metadata",
+          "Application Metadata"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "approval",
+      "synonyms": {
+        "en": [
+          "approval",
+          "authorization",
+          "endorsement",
+          "sign-off"
+        ],
+        "pt": [
+          "aprovacao",
+          "autorizacao",
+          "homologacao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "approval_status",
+      "synonyms": {
+        "en": [
+          "approval status",
+          "Approval Status"
+        ],
+        "pt": [
+          "approval status",
+          "Approval Status"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "arbitration",
+      "synonyms": {
+        "en": [
+          "arbitration",
+          "arbitration clause",
+          "binding arbitration"
+        ],
+        "pt": [
+          "arbitragem",
+          "arbitragem vinculante",
+          "clausula de arbitragem"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "arrears_breakdown",
+      "synonyms": {
+        "en": [
+          "arrears breakdown",
+          "Arrears Breakdown"
+        ],
+        "pt": [
+          "arrears breakdown",
+          "Arrears Breakdown"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "assessment",
+      "synonyms": {
+        "en": [
+          "assessment",
+          "clinical assessment",
+          "evaluation"
+        ],
+        "pt": [
+          "avaliacao",
+          "avaliacao clinica",
+          "parecer"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "assessment_summary",
+      "synonyms": {
+        "en": [
+          "assessment summary",
+          "Assessment Summary"
+        ],
+        "pt": [
+          "assessment resumo",
+          "Assessment Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "assets",
+      "synonyms": {
+        "en": [
+          "asset schedule",
+          "assets",
+          "total assets"
+        ],
+        "pt": [
+          "ativos",
+          "bens",
+          "total de ativos"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "assignment",
+      "synonyms": {
+        "en": [
+          "assignment",
+          "assignment clause",
+          "transfer"
+        ],
+        "pt": [
+          "cessao",
+          "clausula de cessao",
+          "transferencia"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "auditor_report",
+      "synonyms": {
+        "en": [
+          "audit opinion",
+          "auditor report",
+          "auditors report",
+          "independent auditor"
+        ],
+        "pt": [
+          "parecer do auditor",
+          "relatorio de auditoria",
+          "relatorio do auditor"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "authorization_code_block",
+      "synonyms": {
+        "en": [
+          "authorization code block",
+          "Authorization Code Block"
+        ],
+        "pt": [
+          "authorization codigo block",
+          "Authorization Codigo Block"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "autopay_configuration",
+      "synonyms": {
+        "en": [
+          "autopay configuration",
+          "Autopay Configuration"
+        ],
+        "pt": [
+          "autopay configuration",
+          "Autopay Configuration"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "average_daily_usage",
+      "synonyms": {
+        "en": [
+          "average daily usage",
+          "Average Daily Usage"
+        ],
+        "pt": [
+          "average daily uso",
+          "Average Daily Uso"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "balance_forward",
+      "synonyms": {
+        "en": [
+          "balance forward",
+          "Balance Forward"
+        ],
+        "pt": [
+          "saldo forward",
+          "Saldo Forward"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "balance_reconciliation",
+      "synonyms": {
+        "en": [
+          "balance reconciliation",
+          "Balance Reconciliation"
+        ],
+        "pt": [
+          "saldo reconciliation",
+          "Saldo Reconciliation"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "balance_sheet",
+      "synonyms": {
+        "en": [
+          "balance sheet",
+          "financial position",
+          "statement of financial position"
+        ],
+        "pt": [
+          "balanco",
+          "balanco patrimonial",
+          "posicao financeira"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "bank_branch_details",
+      "synonyms": {
+        "en": [
+          "bank branch details",
+          "Bank Branch Details"
+        ],
+        "pt": [
+          "bank branch detalhes",
+          "Bank Branch Detalhes"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "bank_contact_details",
+      "synonyms": {
+        "en": [
+          "bank contact details",
+          "Bank Contact Details"
+        ],
+        "pt": [
+          "bank contact detalhes",
+          "Bank Contact Detalhes"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "banking_activity_summary",
+      "synonyms": {
+        "en": [
+          "banking activity summary",
+          "Banking Activity Summary"
+        ],
+        "pt": [
+          "banking activity resumo",
+          "Banking Activity Resumo"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "beneficiary_details",
+      "synonyms": {
+        "en": [
+          "beneficiary details",
+          "Beneficiary Details"
+        ],
+        "pt": [
+          "beneficiary detalhes",
+          "Beneficiary Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "benefit_schedule",
+      "synonyms": {
+        "en": [
+          "benefit schedule",
+          "Benefit Schedule"
+        ],
+        "pt": [
+          "benefit schedule",
+          "Benefit Schedule"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "billing_address",
+      "synonyms": {
+        "en": [
+          "billing address",
+          "Billing Address"
+        ],
+        "pt": [
+          "billing endereco",
+          "Billing Endereco"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "billing_cycle",
+      "synonyms": {
+        "en": [
+          "billing cycle",
+          "Billing Cycle"
+        ],
+        "pt": [
+          "billing cycle",
+          "Billing Cycle"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "billing_dispute_process",
+      "synonyms": {
+        "en": [
+          "billing dispute process",
+          "Billing Dispute Process"
+        ],
+        "pt": [
+          "billing contestacao process",
+          "Billing Contestacao Process"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "billing_period",
+      "synonyms": {
+        "en": [
+          "billing period",
+          "Billing Period"
+        ],
+        "pt": [
+          "billing periodo",
+          "Billing Periodo"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "billing_summary",
+      "synonyms": {
+        "en": [
+          "billing summary",
+          "Billing Summary"
+        ],
+        "pt": [
+          "billing resumo",
+          "Billing Resumo"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "boarding_group",
+      "synonyms": {
+        "en": [
+          "boarding group",
+          "Boarding Group"
+        ],
+        "pt": [
+          "embarque group",
+          "Embarque Group"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "travel"
+      ]
+    },
+    {
+      "canonical": "boarding_instructions",
+      "synonyms": {
+        "en": [
+          "boarding instructions",
+          "Boarding Instructions"
+        ],
+        "pt": [
+          "embarque instructions",
+          "Embarque Instructions"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "travel"
+      ]
+    },
+    {
+      "canonical": "budget",
+      "synonyms": {
+        "en": [
+          "budget",
+          "budget allocation",
+          "budget overview",
+          "project budget"
+        ],
+        "pt": [
+          "dotacao orcamentaria",
+          "orcamento",
+          "previsao orcamentaria"
+        ]
+      },
+      "domainTags": [
+        "finance",
+        "ops"
+      ]
+    },
+    {
+      "canonical": "budget_variance",
+      "synonyms": {
+        "en": [
+          "budget variance",
+          "budget vs actual",
+          "variance analysis"
+        ],
+        "pt": [
+          "analise de variacao",
+          "orcado vs realizado",
+          "variacao orcamentaria"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "call_detail_records",
+      "synonyms": {
+        "en": [
+          "call detail records",
+          "Call Detail Records"
+        ],
+        "pt": [
+          "call detail records",
+          "Call Detail Records"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "call_usage_summary",
+      "synonyms": {
+        "en": [
+          "call usage summary",
+          "Call Usage Summary"
+        ],
+        "pt": [
+          "call uso resumo",
+          "Call Uso Resumo"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "campus_information",
+      "synonyms": {
+        "en": [
+          "campus information",
+          "Campus Information"
+        ],
+        "pt": [
+          "campus information",
+          "Campus Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "capital_expenditure",
+      "synonyms": {
+        "en": [
+          "capex",
+          "capital expenditure",
+          "capital investment",
+          "capital spending"
+        ],
+        "pt": [
+          "capex",
+          "despesas de capital",
+          "investimentos de capital"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "carrier_information",
+      "synonyms": {
+        "en": [
+          "carrier information",
+          "Carrier Information"
+        ],
+        "pt": [
+          "operadora information",
+          "Operadora Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "cash_flow",
+      "synonyms": {
+        "en": [
+          "cash flow",
+          "cash flow statement",
+          "statement of cash flows"
+        ],
+        "pt": [
+          "demonstracao do fluxo de caixa",
+          "dfc",
+          "fluxo de caixa"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "cashback_rewards",
+      "synonyms": {
+        "en": [
+          "cashback rewards",
+          "Cashback Rewards"
+        ],
+        "pt": [
+          "cashback rewards",
+          "Cashback Rewards"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "change_log",
+      "synonyms": {
+        "en": [
+          "change history",
+          "change log",
+          "changelog",
+          "revision history"
+        ],
+        "pt": [
+          "historico de alteracoes",
+          "log de mudancas",
+          "registro de alteracoes"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "charges_breakdown",
+      "synonyms": {
+        "en": [
+          "charges breakdown",
+          "Charges Breakdown"
+        ],
+        "pt": [
+          "charges breakdown",
+          "Charges Breakdown"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "check_in_details",
+      "synonyms": {
+        "en": [
+          "check in details",
+          "Check In Details"
+        ],
+        "pt": [
+          "check in detalhes",
+          "Check In Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "check_out_details",
+      "synonyms": {
+        "en": [
+          "check out details",
+          "Check Out Details"
+        ],
+        "pt": [
+          "check out detalhes",
+          "Check Out Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "chief_complaint",
+      "synonyms": {
+        "en": [
+          "cc",
+          "chief complaint",
+          "presenting complaint",
+          "reason for visit"
+        ],
+        "pt": [
+          "motivo da consulta",
+          "queixa inicial",
+          "queixa principal"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "claim_details",
+      "synonyms": {
+        "en": [
+          "claim details",
+          "Claim Details"
+        ],
+        "pt": [
+          "sinistro detalhes",
+          "Sinistro Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "claim_filing_window",
+      "synonyms": {
+        "en": [
+          "claim filing window",
+          "Claim Filing Window"
+        ],
+        "pt": [
+          "sinistro filing window",
+          "Sinistro Filing Window"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "claim_number_block",
+      "synonyms": {
+        "en": [
+          "claim number block",
+          "Claim Number Block"
+        ],
+        "pt": [
+          "sinistro numero block",
+          "Sinistro Numero Block"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "claim_status",
+      "synonyms": {
+        "en": [
+          "claim status",
+          "Claim Status"
+        ],
+        "pt": [
+          "sinistro status",
+          "Sinistro Status"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "class_schedule",
+      "synonyms": {
+        "en": [
+          "class schedule",
+          "Class Schedule"
+        ],
+        "pt": [
+          "class schedule",
+          "Class Schedule"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "co_insurance_details",
+      "synonyms": {
+        "en": [
+          "co insurance details",
+          "Co Insurance Details"
+        ],
+        "pt": [
+          "co insurance detalhes",
+          "Co Insurance Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "co_pay_details",
+      "synonyms": {
+        "en": [
+          "co pay details",
+          "Co Pay Details"
+        ],
+        "pt": [
+          "co pay detalhes",
+          "Co Pay Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "collateral_details",
+      "synonyms": {
+        "en": [
+          "collateral details",
+          "Collateral Details"
+        ],
+        "pt": [
+          "collateral detalhes",
+          "Collateral Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "compliance",
+      "synonyms": {
+        "en": [
+          "compliance",
+          "compliance requirements",
+          "regulatory compliance"
+        ],
+        "pt": [
+          "compliance",
+          "conformidade",
+          "requisitos regulatorios"
+        ]
+      },
+      "domainTags": [
+        "legal",
+        "ops"
+      ]
+    },
+    {
+      "canonical": "conclusion",
+      "synonyms": {
+        "en": [
+          "closing",
+          "conclusion",
+          "conclusions",
+          "final remarks"
+        ],
+        "pt": [
+          "conclusao",
+          "consideracoes finais",
+          "encerramento"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "confidentiality",
+      "synonyms": {
+        "en": [
+          "confidential information",
+          "confidentiality",
+          "nda",
+          "non-disclosure"
+        ],
+        "pt": [
+          "confidencialidade",
+          "informacao confidencial",
+          "sigilo"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "consultation_notes",
+      "synonyms": {
+        "en": [
+          "consult notes",
+          "consultation notes",
+          "specialist consultation"
+        ],
+        "pt": [
+          "interconsulta",
+          "notas de consulta",
+          "parecer de especialista"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "consumer_notice",
+      "synonyms": {
+        "en": [
+          "consumer notice",
+          "Consumer Notice"
+        ],
+        "pt": [
+          "consumer notice",
+          "Consumer Notice"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "contact_information",
+      "synonyms": {
+        "en": [
+          "contact information",
+          "Contact Information"
+        ],
+        "pt": [
+          "contact information",
+          "Contact Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "contingent_liabilities",
+      "synonyms": {
+        "en": [
+          "contingencies",
+          "contingent liabilities",
+          "contingent obligations"
+        ],
+        "pt": [
+          "contingencias",
+          "passivos contingentes",
+          "provisoes para contingencias"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "contract_reference",
+      "synonyms": {
+        "en": [
+          "contract reference",
+          "Contract Reference"
+        ],
+        "pt": [
+          "contract referencia",
+          "Contract Referencia"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "cost_of_goods_sold",
+      "synonyms": {
+        "en": [
+          "cogs",
+          "cost of goods sold",
+          "cost of revenue",
+          "cost of sales"
+        ],
+        "pt": [
+          "cmv",
+          "cpv",
+          "custo das mercadorias vendidas",
+          "custo dos produtos vendidos"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "counterparts",
+      "synonyms": {
+        "en": [
+          "counterparts",
+          "duplicate originals",
+          "execution in counterparts"
+        ],
+        "pt": [
+          "contrapartes",
+          "vias",
+          "vias de igual teor"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "course_credits",
+      "synonyms": {
+        "en": [
+          "course credits",
+          "Course Credits"
+        ],
+        "pt": [
+          "course credits",
+          "Course Credits"
+        ]
+      },
+      "domainTags": [
+        "education",
+        "general"
+      ]
+    },
+    {
+      "canonical": "course_grades",
+      "synonyms": {
+        "en": [
+          "course grades",
+          "Course Grades"
+        ],
+        "pt": [
+          "course grades",
+          "Course Grades"
+        ]
+      },
+      "domainTags": [
+        "education",
+        "general"
+      ]
+    },
+    {
+      "canonical": "course_list",
+      "synonyms": {
+        "en": [
+          "course list",
+          "Course List"
+        ],
+        "pt": [
+          "course list",
+          "Course List"
+        ]
+      },
+      "domainTags": [
+        "education",
+        "general"
+      ]
+    },
+    {
+      "canonical": "coverage_limits",
+      "synonyms": {
+        "en": [
+          "coverage limits",
+          "Coverage Limits"
+        ],
+        "pt": [
+          "coverage limits",
+          "Coverage Limits"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "coverage_period",
+      "synonyms": {
+        "en": [
+          "coverage period",
+          "Coverage Period"
+        ],
+        "pt": [
+          "coverage periodo",
+          "Coverage Periodo"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "coverage_summary",
+      "synonyms": {
+        "en": [
+          "coverage summary",
+          "Coverage Summary"
+        ],
+        "pt": [
+          "coverage resumo",
+          "Coverage Resumo"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "credit_limit_details",
+      "synonyms": {
+        "en": [
+          "credit limit details",
+          "Credit Limit Details"
+        ],
+        "pt": [
+          "credito limite detalhes",
+          "Credito Limite Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "credit_score_snapshot",
+      "synonyms": {
+        "en": [
+          "credit score snapshot",
+          "Credit Score Snapshot"
+        ],
+        "pt": [
+          "credito score snapshot",
+          "Credito Score Snapshot"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "currency_notes",
+      "synonyms": {
+        "en": [
+          "currency notes",
+          "Currency Notes"
+        ],
+        "pt": [
+          "currency notas",
+          "Currency Notas"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "customer_service_contacts",
+      "synonyms": {
+        "en": [
+          "customer service contacts",
+          "Customer Service Contacts"
+        ],
+        "pt": [
+          "cliente service contacts",
+          "Cliente Service Contacts"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "data_allowance",
+      "synonyms": {
+        "en": [
+          "data allowance",
+          "Data Allowance"
+        ],
+        "pt": [
+          "dados allowance",
+          "Dados Allowance"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "data_protection",
+      "synonyms": {
+        "en": [
+          "data privacy",
+          "data protection",
+          "gdpr",
+          "personal data",
+          "privacy"
+        ],
+        "pt": [
+          "dados pessoais",
+          "lgpd",
+          "privacidade",
+          "protecao de dados"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "data_usage_summary",
+      "synonyms": {
+        "en": [
+          "data usage summary",
+          "Data Usage Summary"
+        ],
+        "pt": [
+          "dados uso resumo",
+          "Dados Uso Resumo"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "debt_schedule",
+      "synonyms": {
+        "en": [
+          "debt maturity",
+          "debt obligations",
+          "debt schedule",
+          "loan schedule"
+        ],
+        "pt": [
+          "cronograma de divida",
+          "quadro de emprestimos",
+          "vencimento de dividas"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "deductible_details",
+      "synonyms": {
+        "en": [
+          "deductible details",
+          "Deductible Details"
+        ],
+        "pt": [
+          "franquia detalhes",
+          "Franquia Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "deductions_breakdown",
+      "synonyms": {
+        "en": [
+          "deductions breakdown",
+          "Deductions Breakdown"
+        ],
+        "pt": [
+          "deductions breakdown",
+          "Deductions Breakdown"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "hr_payroll",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "definitions",
+      "synonyms": {
+        "en": [
+          "defined terms",
+          "definitions",
+          "glossary of terms",
+          "interpretation"
+        ],
+        "pt": [
+          "definicoes",
+          "interpretacao",
+          "termos definidos"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "delinquency_notice",
+      "synonyms": {
+        "en": [
+          "delinquency notice",
+          "Delinquency Notice"
+        ],
+        "pt": [
+          "delinquency notice",
+          "Delinquency Notice"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "deliverables",
+      "synonyms": {
+        "en": [
+          "deliverables",
+          "outputs",
+          "project deliverables",
+          "work products"
+        ],
+        "pt": [
+          "entregaveis",
+          "produtos do trabalho",
+          "resultados"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "delivery_address",
+      "synonyms": {
+        "en": [
+          "delivery address",
+          "Delivery Address"
+        ],
+        "pt": [
+          "delivery endereco",
+          "Delivery Endereco"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "department_information",
+      "synonyms": {
+        "en": [
+          "department information",
+          "Department Information"
+        ],
+        "pt": [
+          "department information",
+          "Department Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "dependencies",
+      "synonyms": {
+        "en": [
+          "blockers",
+          "dependencies",
+          "dependency map",
+          "prerequisite"
+        ],
+        "pt": [
+          "bloqueios",
+          "dependencias",
+          "pre-requisitos"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "dependent_information",
+      "synonyms": {
+        "en": [
+          "dependent information",
+          "Dependent Information"
+        ],
+        "pt": [
+          "dependent information",
+          "Dependent Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "deployment_plan",
+      "synonyms": {
+        "en": [
+          "deployment plan",
+          "go-live plan",
+          "implementation plan",
+          "release plan"
+        ],
+        "pt": [
+          "plano de go-live",
+          "plano de implantacao",
+          "plano de lancamento"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "deposit_history",
+      "synonyms": {
+        "en": [
+          "deposit history",
+          "Deposit History"
+        ],
+        "pt": [
+          "deposit history",
+          "Deposit History"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "depreciation",
+      "synonyms": {
+        "en": [
+          "accumulated depreciation",
+          "depreciation",
+          "depreciation schedule"
+        ],
+        "pt": [
+          "cronograma de depreciacao",
+          "depreciacao",
+          "depreciacao acumulada"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "device_information",
+      "synonyms": {
+        "en": [
+          "device information",
+          "Device Information"
+        ],
+        "pt": [
+          "device information",
+          "Device Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "diagnosis",
+      "synonyms": {
+        "en": [
+          "clinical diagnosis",
+          "diagnoses",
+          "diagnosis",
+          "final diagnosis"
+        ],
+        "pt": [
+          "diagnostico",
+          "diagnostico clinico",
+          "diagnostico final",
+          "diagnosticos"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "differential_diagnosis",
+      "synonyms": {
+        "en": [
+          "ddx",
+          "differential diagnosis",
+          "differentials"
+        ],
+        "pt": [
+          "diagnostico diferencial",
+          "diagnosticos diferenciais"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "digital_signature_block",
+      "synonyms": {
+        "en": [
+          "digital signature block",
+          "Digital Signature Block"
+        ],
+        "pt": [
+          "digital signature block",
+          "Digital Signature Block"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "disbursement_history",
+      "synonyms": {
+        "en": [
+          "disbursement history",
+          "Disbursement History"
+        ],
+        "pt": [
+          "disbursement history",
+          "Disbursement History"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "discharge_summary",
+      "synonyms": {
+        "en": [
+          "discharge note",
+          "discharge report",
+          "discharge summary"
+        ],
+        "pt": [
+          "nota de alta",
+          "relatorio de alta",
+          "resumo de alta"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "discounts_and_promotions",
+      "synonyms": {
+        "en": [
+          "discounts & promotions",
+          "discounts and promotions",
+          "Discounts And Promotions"
+        ],
+        "pt": [
+          "discounts and promotions",
+          "Discounts And Promotions"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "dispute_resolution",
+      "synonyms": {
+        "en": [
+          "conflict resolution",
+          "dispute resolution",
+          "disputes",
+          "resolution of disputes"
+        ],
+        "pt": [
+          "resolucao de conflitos",
+          "resolucao de disputas",
+          "solucao de controversias"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "dividends",
+      "synonyms": {
+        "en": [
+          "dividend distribution",
+          "dividend policy",
+          "dividends"
+        ],
+        "pt": [
+          "distribuicao de dividendos",
+          "dividendos",
+          "politica de dividendos"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "document_issuer_details",
+      "synonyms": {
+        "en": [
+          "document issuer details",
+          "Document Issuer Details"
+        ],
+        "pt": [
+          "document emissor detalhes",
+          "Document Emissor Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "document_verification_block",
+      "synonyms": {
+        "en": [
+          "document verification block",
+          "Document Verification Block"
+        ],
+        "pt": [
+          "document verificacao block",
+          "Document Verificacao Block"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "due_date_information",
+      "synonyms": {
+        "en": [
+          "due date information",
+          "Due Date Information"
+        ],
+        "pt": [
+          "vencimento data information",
+          "Vencimento Data Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "ebitda",
+      "synonyms": {
+        "en": [
+          "adjusted ebitda",
+          "earnings before interest taxes depreciation amortization",
+          "ebitda"
+        ],
+        "pt": [
+          "ebitda",
+          "ebitda ajustado",
+          "lajida"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "education_institution_details",
+      "synonyms": {
+        "en": [
+          "education institution details",
+          "Education Institution Details"
+        ],
+        "pt": [
+          "education institution detalhes",
+          "Education Institution Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "effective_date",
+      "synonyms": {
+        "en": [
+          "commencement date",
+          "effective date",
+          "start date"
+        ],
+        "pt": [
+          "data de inicio",
+          "data de vigencia",
+          "data efetiva"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "eligibility_details",
+      "synonyms": {
+        "en": [
+          "eligibility details",
+          "Eligibility Details"
+        ],
+        "pt": [
+          "eligibility detalhes",
+          "Eligibility Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "email_contacts",
+      "synonyms": {
+        "en": [
+          "email contacts",
+          "Email Contacts"
+        ],
+        "pt": [
+          "email contacts",
+          "Email Contacts"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "emergency_contacts",
+      "synonyms": {
+        "en": [
+          "emergency contacts",
+          "Emergency Contacts"
+        ],
+        "pt": [
+          "emergency contacts",
+          "Emergency Contacts"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "employee_information",
+      "synonyms": {
+        "en": [
+          "employee information",
+          "Employee Information"
+        ],
+        "pt": [
+          "employee information",
+          "Employee Information"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "hr_payroll"
+      ]
+    },
+    {
+      "canonical": "employer_information",
+      "synonyms": {
+        "en": [
+          "employer information",
+          "Employer Information"
+        ],
+        "pt": [
+          "employer information",
+          "Employer Information"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "hr_payroll"
+      ]
+    },
+    {
+      "canonical": "enrollment_details",
+      "synonyms": {
+        "en": [
+          "enrollment details",
+          "Enrollment Details"
+        ],
+        "pt": [
+          "matricula detalhes",
+          "Matricula Detalhes"
+        ]
+      },
+      "domainTags": [
+        "education",
+        "general"
+      ]
+    },
+    {
+      "canonical": "entire_agreement",
+      "synonyms": {
+        "en": [
+          "entire agreement",
+          "integration clause",
+          "merger clause",
+          "whole agreement"
+        ],
+        "pt": [
+          "acordo integral",
+          "clausula de integracao",
+          "inteiro teor"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "entity_identifiers",
+      "synonyms": {
+        "en": [
+          "entity identifiers",
+          "Entity Identifiers"
+        ],
+        "pt": [
+          "entity identifiers",
+          "Entity Identifiers"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "equity",
+      "synonyms": {
+        "en": [
+          "equity",
+          "net worth",
+          "shareholders equity",
+          "stockholders equity"
+        ],
+        "pt": [
+          "capital proprio",
+          "patrimonio dos acionistas",
+          "patrimonio liquido"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "escalation_matrix",
+      "synonyms": {
+        "en": [
+          "escalation matrix",
+          "escalation path",
+          "escalation procedures"
+        ],
+        "pt": [
+          "caminho de escalacao",
+          "matriz de escalacao",
+          "procedimentos de escalacao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "exam_scores",
+      "synonyms": {
+        "en": [
+          "exam scores",
+          "Exam Scores"
+        ],
+        "pt": [
+          "exam scores",
+          "Exam Scores"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "exchange_rate_notes",
+      "synonyms": {
+        "en": [
+          "exchange rate notes",
+          "Exchange Rate Notes"
+        ],
+        "pt": [
+          "exchange taxa notas",
+          "Exchange Taxa Notas"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "exclusivity",
+      "synonyms": {
+        "en": [
+          "exclusive dealing",
+          "exclusive rights",
+          "exclusivity"
+        ],
+        "pt": [
+          "clausula de exclusividade",
+          "direitos exclusivos",
+          "exclusividade"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "executive_summary",
+      "synonyms": {
+        "en": [
+          "executive summary",
+          "highlights",
+          "overview",
+          "summary"
+        ],
+        "pt": [
+          "destaques",
+          "resumo executivo",
+          "sumario",
+          "visao geral"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "expenses",
+      "synonyms": {
+        "en": [
+          "expenditures",
+          "expenses",
+          "operating expenses",
+          "total expenses"
+        ],
+        "pt": [
+          "despesas",
+          "despesas operacionais",
+          "dispendios",
+          "gastos"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "fair_value",
+      "synonyms": {
+        "en": [
+          "fair market value",
+          "fair value",
+          "fmv",
+          "mark to market"
+        ],
+        "pt": [
+          "marcacao a mercado",
+          "valor de mercado",
+          "valor justo"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "family_history",
+      "synonyms": {
+        "en": [
+          "family history",
+          "family medical history",
+          "fhx"
+        ],
+        "pt": [
+          "antecedentes familiares",
+          "historia familiar",
+          "historico familiar"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "fare_rules",
+      "synonyms": {
+        "en": [
+          "fare rules",
+          "Fare Rules"
+        ],
+        "pt": [
+          "fare rules",
+          "Fare Rules"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "fee_schedule",
+      "synonyms": {
+        "en": [
+          "fee schedule",
+          "Fee Schedule"
+        ],
+        "pt": [
+          "taxa schedule",
+          "Taxa Schedule"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "filing_status",
+      "synonyms": {
+        "en": [
+          "filing status",
+          "Filing Status"
+        ],
+        "pt": [
+          "filing status",
+          "Filing Status"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "financial_aid_summary",
+      "synonyms": {
+        "en": [
+          "financial aid summary",
+          "Financial Aid Summary"
+        ],
+        "pt": [
+          "financial aid resumo",
+          "Financial Aid Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "financial_summary",
+      "synonyms": {
+        "en": [
+          "financial highlights",
+          "financial overview",
+          "financial summary"
+        ],
+        "pt": [
+          "destaques financeiros",
+          "resumo financeiro",
+          "visao geral financeira"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "flight_details",
+      "synonyms": {
+        "en": [
+          "flight details",
+          "Flight Details"
+        ],
+        "pt": [
+          "flight detalhes",
+          "Flight Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "travel"
+      ]
+    },
+    {
+      "canonical": "follow_up",
+      "synonyms": {
+        "en": [
+          "follow up",
+          "follow-up",
+          "next steps",
+          "return visit"
+        ],
+        "pt": [
+          "acompanhamento",
+          "proximos passos",
+          "retorno",
+          "seguimento"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "force_majeure",
+      "synonyms": {
+        "en": [
+          "act of god",
+          "force majeure",
+          "unforeseeable circumstances"
+        ],
+        "pt": [
+          "caso fortuito",
+          "circunstancias imprevisiveis",
+          "forca maior"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "foreign_transaction_fees",
+      "synonyms": {
+        "en": [
+          "foreign transaction fees",
+          "Foreign Transaction Fees"
+        ],
+        "pt": [
+          "foreign transacao fees",
+          "Foreign Transacao Fees"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "forex_exposure",
+      "synonyms": {
+        "en": [
+          "currency risk",
+          "foreign exchange",
+          "forex exposure",
+          "fx exposure"
+        ],
+        "pt": [
+          "exposicao cambial",
+          "risco cambial",
+          "variacao cambial"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "fraud_alerts",
+      "synonyms": {
+        "en": [
+          "fraud alerts",
+          "Fraud Alerts"
+        ],
+        "pt": [
+          "fraud alerts",
+          "Fraud Alerts"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "fuel_surcharge_details",
+      "synonyms": {
+        "en": [
+          "fuel surcharge details",
+          "Fuel Surcharge Details"
+        ],
+        "pt": [
+          "fuel surcharge detalhes",
+          "Fuel Surcharge Detalhes"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "glossary",
+      "synonyms": {
+        "en": [
+          "definitions",
+          "glossary",
+          "terminology",
+          "terms"
+        ],
+        "pt": [
+          "glossario",
+          "terminologia",
+          "termos"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "governing_law",
+      "synonyms": {
+        "en": [
+          "applicable law",
+          "choice of law",
+          "governing jurisdiction",
+          "governing law"
+        ],
+        "pt": [
+          "foro",
+          "legislacao aplicavel",
+          "lei aplicavel",
+          "lei regente"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "gpa_summary",
+      "synonyms": {
+        "en": [
+          "gpa summary",
+          "Gpa Summary"
+        ],
+        "pt": [
+          "gpa resumo",
+          "Gpa Resumo"
+        ]
+      },
+      "domainTags": [
+        "education",
+        "general"
+      ]
+    },
+    {
+      "canonical": "grace_period_terms",
+      "synonyms": {
+        "en": [
+          "grace period terms",
+          "Grace Period Terms"
+        ],
+        "pt": [
+          "grace periodo terms",
+          "Grace Periodo Terms"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "gross_profit",
+      "synonyms": {
+        "en": [
+          "gross income",
+          "gross margin",
+          "gross profit"
+        ],
+        "pt": [
+          "lucro bruto",
+          "margem bruta",
+          "resultado bruto"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "guarantor_information",
+      "synonyms": {
+        "en": [
+          "guarantor information",
+          "Guarantor Information"
+        ],
+        "pt": [
+          "guarantor information",
+          "Guarantor Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "health_plan_details",
+      "synonyms": {
+        "en": [
+          "health plan details",
+          "Health Plan Details"
+        ],
+        "pt": [
+          "health plano detalhes",
+          "Health Plano Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "historical_comparison",
+      "synonyms": {
+        "en": [
+          "historical comparison",
+          "Historical Comparison"
+        ],
+        "pt": [
+          "historical comparison",
+          "Historical Comparison"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "history_of_present_illness",
+      "synonyms": {
+        "en": [
+          "history of illness",
+          "history of present illness",
+          "hpi",
+          "present illness"
+        ],
+        "pt": [
+          "hda",
+          "historia da doenca atual",
+          "historia da molestia atual",
+          "hma"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "home_address",
+      "synonyms": {
+        "en": [
+          "home address",
+          "Home Address"
+        ],
+        "pt": [
+          "home endereco",
+          "Home Endereco"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "housing_cost_breakdown",
+      "synonyms": {
+        "en": [
+          "housing cost breakdown",
+          "Housing Cost Breakdown"
+        ],
+        "pt": [
+          "housing cost breakdown",
+          "Housing Cost Breakdown"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "housing"
+      ]
+    },
+    {
+      "canonical": "identity_document_details",
+      "synonyms": {
+        "en": [
+          "identity document details",
+          "Identity Document Details"
+        ],
+        "pt": [
+          "identidade document detalhes",
+          "Identidade Document Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "imaging_results",
+      "synonyms": {
+        "en": [
+          "diagnostic imaging",
+          "imaging results",
+          "imaging studies",
+          "radiology"
+        ],
+        "pt": [
+          "exames de imagem",
+          "radiologia",
+          "resultados de imagem"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "immunization_history",
+      "synonyms": {
+        "en": [
+          "immunization history",
+          "immunizations",
+          "vaccination history",
+          "vaccine record"
+        ],
+        "pt": [
+          "carteira de vacinacao",
+          "historico de vacinacao",
+          "imunizacoes"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "impairment",
+      "synonyms": {
+        "en": [
+          "asset impairment",
+          "goodwill impairment",
+          "impairment",
+          "impairment loss"
+        ],
+        "pt": [
+          "impairment",
+          "perda por desvalorizacao",
+          "reducao ao valor recuperavel"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "incident_details",
+      "synonyms": {
+        "en": [
+          "incident details",
+          "Incident Details"
+        ],
+        "pt": [
+          "incident detalhes",
+          "Incident Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "incident_report",
+      "synonyms": {
+        "en": [
+          "event report",
+          "incident details",
+          "incident report",
+          "incident summary"
+        ],
+        "pt": [
+          "registro de incidente",
+          "relato de ocorrencia",
+          "relatorio de incidente"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "income_summary",
+      "synonyms": {
+        "en": [
+          "income summary",
+          "Income Summary"
+        ],
+        "pt": [
+          "income resumo",
+          "Income Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "indemnification",
+      "synonyms": {
+        "en": [
+          "hold harmless",
+          "indemnification",
+          "indemnification clause",
+          "indemnity"
+        ],
+        "pt": [
+          "clausula de indenizacao",
+          "indenizacao",
+          "ressarcimento"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "informed_consent",
+      "synonyms": {
+        "en": [
+          "consent form",
+          "informed consent",
+          "patient consent"
+        ],
+        "pt": [
+          "consentimento informado",
+          "tcle",
+          "termo de consentimento"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "installment_schedule",
+      "synonyms": {
+        "en": [
+          "installment schedule",
+          "Installment Schedule"
+        ],
+        "pt": [
+          "installment schedule",
+          "Installment Schedule"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "insurance_plan_summary",
+      "synonyms": {
+        "en": [
+          "insurance plan summary",
+          "Insurance Plan Summary"
+        ],
+        "pt": [
+          "insurance plano resumo",
+          "Insurance Plano Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "insured_party_details",
+      "synonyms": {
+        "en": [
+          "insured party details",
+          "Insured Party Details"
+        ],
+        "pt": [
+          "insured party detalhes",
+          "Insured Party Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "intellectual_property",
+      "synonyms": {
+        "en": [
+          "intellectual property",
+          "ip ownership",
+          "ip rights",
+          "proprietary rights"
+        ],
+        "pt": [
+          "direitos autorais",
+          "direitos de pi",
+          "propriedade intelectual"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "interest_calculation",
+      "synonyms": {
+        "en": [
+          "interest calculation",
+          "Interest Calculation"
+        ],
+        "pt": [
+          "juros calculation",
+          "Juros Calculation"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "interest_expense",
+      "synonyms": {
+        "en": [
+          "borrowing costs",
+          "finance costs",
+          "interest charges",
+          "interest expense"
+        ],
+        "pt": [
+          "custos financeiros",
+          "despesa de juros",
+          "encargos financeiros"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "interest_rate_details",
+      "synonyms": {
+        "en": [
+          "interest rate details",
+          "Interest Rate Details"
+        ],
+        "pt": [
+          "juros taxa detalhes",
+          "Juros Taxa Detalhes"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "introduction",
+      "synonyms": {
+        "en": [
+          "background",
+          "context",
+          "introduction",
+          "preamble"
+        ],
+        "pt": [
+          "apresentacao",
+          "contexto",
+          "introducao",
+          "preambulo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "inventory",
+      "synonyms": {
+        "en": [
+          "inventory",
+          "inventory list",
+          "stock",
+          "stock levels"
+        ],
+        "pt": [
+          "estoque",
+          "inventario",
+          "niveis de estoque"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "investment_portfolio",
+      "synonyms": {
+        "en": [
+          "investment portfolio",
+          "investments",
+          "portfolio holdings"
+        ],
+        "pt": [
+          "carteira de investimentos",
+          "investimentos",
+          "portfolio de investimentos"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "invoice_line_items",
+      "synonyms": {
+        "en": [
+          "invoice line items",
+          "Invoice Line Items"
+        ],
+        "pt": [
+          "nota linha items",
+          "Nota Linha Items"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "issuer_address",
+      "synonyms": {
+        "en": [
+          "issuer address",
+          "Issuer Address"
+        ],
+        "pt": [
+          "emissor endereco",
+          "Emissor Endereco"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "issuer_tax_information",
+      "synonyms": {
+        "en": [
+          "issuer tax information",
+          "Issuer Tax Information"
+        ],
+        "pt": [
+          "emissor imposto information",
+          "Emissor Imposto Information"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "jurisdiction",
+      "synonyms": {
+        "en": [
+          "competent court",
+          "forum selection",
+          "jurisdiction",
+          "venue"
+        ],
+        "pt": [
+          "foro competente",
+          "foro de eleicao",
+          "jurisdicao"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "lab_results",
+      "synonyms": {
+        "en": [
+          "lab findings",
+          "lab results",
+          "lab values",
+          "laboratory results"
+        ],
+        "pt": [
+          "exames laboratoriais",
+          "resultados de laboratorio",
+          "resultados laboratoriais"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "late_fee_terms",
+      "synonyms": {
+        "en": [
+          "late fee terms",
+          "Late Fee Terms"
+        ],
+        "pt": [
+          "late taxa terms",
+          "Late Taxa Terms"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "lease_terms",
+      "synonyms": {
+        "en": [
+          "lease terms",
+          "Lease Terms"
+        ],
+        "pt": [
+          "locacao terms",
+          "Locacao Terms"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "housing"
+      ]
+    },
+    {
+      "canonical": "legal_disclaimer",
+      "synonyms": {
+        "en": [
+          "legal disclaimer",
+          "Legal Disclaimer"
+        ],
+        "pt": [
+          "legal disclaimer",
+          "Legal Disclaimer"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "lessons_learned",
+      "synonyms": {
+        "en": [
+          "key learnings",
+          "lessons learned",
+          "post-mortem",
+          "retrospective"
+        ],
+        "pt": [
+          "aprendizados",
+          "licoes aprendidas",
+          "retrospectiva"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "liabilities",
+      "synonyms": {
+        "en": [
+          "debt",
+          "liabilities",
+          "obligations",
+          "total liabilities"
+        ],
+        "pt": [
+          "dividas",
+          "obrigacoes",
+          "passivos",
+          "total de passivos"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "limitation_of_liability",
+      "synonyms": {
+        "en": [
+          "liability cap",
+          "liability limitation",
+          "limitation of liability",
+          "limited liability"
+        ],
+        "pt": [
+          "limitacao de responsabilidade",
+          "limite de responsabilidade",
+          "teto de responsabilidade"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "loan_amortization_schedule",
+      "synonyms": {
+        "en": [
+          "loan amortization schedule",
+          "Loan Amortization Schedule"
+        ],
+        "pt": [
+          "emprestimo amortization schedule",
+          "Emprestimo Amortization Schedule"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "loan_balance_summary",
+      "synonyms": {
+        "en": [
+          "loan balance summary",
+          "Loan Balance Summary"
+        ],
+        "pt": [
+          "emprestimo saldo resumo",
+          "Emprestimo Saldo Resumo"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "loan_payment_history",
+      "synonyms": {
+        "en": [
+          "loan payment history",
+          "Loan Payment History"
+        ],
+        "pt": [
+          "emprestimo pagamento history",
+          "Emprestimo Pagamento History"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "logistics",
+      "synonyms": {
+        "en": [
+          "distribution",
+          "freight",
+          "logistics",
+          "shipping"
+        ],
+        "pt": [
+          "distribuicao",
+          "frete",
+          "logistica",
+          "transporte"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "maintenance_schedule",
+      "synonyms": {
+        "en": [
+          "maintenance plan",
+          "maintenance schedule",
+          "preventive maintenance"
+        ],
+        "pt": [
+          "cronograma de manutencao",
+          "manutencao preventiva",
+          "plano de manutencao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "mediation",
+      "synonyms": {
+        "en": [
+          "alternative dispute resolution",
+          "mediation",
+          "mediation clause",
+          "mediator"
+        ],
+        "pt": [
+          "clausula de mediacao",
+          "mediacao",
+          "mediador"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "medications",
+      "synonyms": {
+        "en": [
+          "current medications",
+          "drugs",
+          "medication list",
+          "medications",
+          "prescriptions"
+        ],
+        "pt": [
+          "lista de medicamentos",
+          "medicacoes",
+          "medicamentos",
+          "receituario"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "merchant_details",
+      "synonyms": {
+        "en": [
+          "merchant details",
+          "Merchant Details"
+        ],
+        "pt": [
+          "merchant detalhes",
+          "Merchant Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "meter_readings",
+      "synonyms": {
+        "en": [
+          "meter readings",
+          "Meter Readings"
+        ],
+        "pt": [
+          "medidor readings",
+          "Medidor Readings"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "methodology",
+      "synonyms": {
+        "en": [
+          "approach",
+          "methodology",
+          "methods",
+          "research methodology"
+        ],
+        "pt": [
+          "abordagem",
+          "metodologia",
+          "metodos"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "milestones",
+      "synonyms": {
+        "en": [
+          "checkpoints",
+          "key milestones",
+          "milestone schedule",
+          "milestones"
+        ],
+        "pt": [
+          "marcos",
+          "marcos do projeto",
+          "pontos de verificacao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "minimum_payment_information",
+      "synonyms": {
+        "en": [
+          "minimum payment information",
+          "Minimum Payment Information"
+        ],
+        "pt": [
+          "minimo pagamento information",
+          "Minimo Pagamento Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "mobile_plan_summary",
+      "synonyms": {
+        "en": [
+          "mobile plan summary",
+          "Mobile Plan Summary"
+        ],
+        "pt": [
+          "mobile plano resumo",
+          "Mobile Plano Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "monthly_totals",
+      "synonyms": {
+        "en": [
+          "monthly totals",
+          "Monthly Totals"
+        ],
+        "pt": [
+          "monthly totals",
+          "Monthly Totals"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "mortgage_terms",
+      "synonyms": {
+        "en": [
+          "mortgage terms",
+          "Mortgage Terms"
+        ],
+        "pt": [
+          "hipoteca terms",
+          "Hipoteca Terms"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "housing"
+      ]
+    },
+    {
+      "canonical": "national_id_details",
+      "synonyms": {
+        "en": [
+          "national id details",
+          "National Id Details"
+        ],
+        "pt": [
+          "national id detalhes",
+          "National Id Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "net_income",
+      "synonyms": {
+        "en": [
+          "bottom line",
+          "net earnings",
+          "net income",
+          "net profit"
+        ],
+        "pt": [
+          "lucro do exercicio",
+          "lucro liquido",
+          "resultado liquido"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "net_pay_summary",
+      "synonyms": {
+        "en": [
+          "net pay summary",
+          "Net Pay Summary"
+        ],
+        "pt": [
+          "net pay resumo",
+          "Net Pay Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "next_payment_information",
+      "synonyms": {
+        "en": [
+          "next payment information",
+          "Next Payment Information"
+        ],
+        "pt": [
+          "next pagamento information",
+          "Next Pagamento Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "non_compete",
+      "synonyms": {
+        "en": [
+          "competition restriction",
+          "non-compete",
+          "non-competition",
+          "restrictive covenant"
+        ],
+        "pt": [
+          "clausula de nao competicao",
+          "nao concorrencia",
+          "restricao de concorrencia"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "non_covered_items",
+      "synonyms": {
+        "en": [
+          "non covered items",
+          "Non Covered Items"
+        ],
+        "pt": [
+          "non covered items",
+          "Non Covered Items"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "non_solicitation",
+      "synonyms": {
+        "en": [
+          "no solicitation",
+          "non-solicitation",
+          "non-solicitation clause"
+        ],
+        "pt": [
+          "clausula de nao solicitacao",
+          "nao aliciamento",
+          "proibicao de aliciamento"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "notes_to_financial_statements",
+      "synonyms": {
+        "en": [
+          "explanatory notes",
+          "financial notes",
+          "footnotes",
+          "notes to financial statements"
+        ],
+        "pt": [
+          "notas as demonstracoes financeiras",
+          "notas explicativas"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "notices",
+      "synonyms": {
+        "en": [
+          "communications",
+          "notice provisions",
+          "notices",
+          "notification"
+        ],
+        "pt": [
+          "avisos",
+          "comunicacoes",
+          "notificacoes"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "notification_preferences",
+      "synonyms": {
+        "en": [
+          "notification preferences",
+          "Notification Preferences"
+        ],
+        "pt": [
+          "notification preferences",
+          "Notification Preferences"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "nursing_notes",
+      "synonyms": {
+        "en": [
+          "nurse notes",
+          "nursing assessment",
+          "nursing documentation",
+          "nursing notes"
+        ],
+        "pt": [
+          "anotacoes de enfermagem",
+          "evolucao de enfermagem",
+          "notas de enfermagem"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "obligations",
+      "synonyms": {
+        "en": [
+          "covenants",
+          "duties",
+          "obligations",
+          "responsibilities"
+        ],
+        "pt": [
+          "compromissos",
+          "deveres",
+          "obrigacoes",
+          "responsabilidades"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "occupancy_details",
+      "synonyms": {
+        "en": [
+          "occupancy details",
+          "Occupancy Details"
+        ],
+        "pt": [
+          "occupancy detalhes",
+          "Occupancy Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "onboarding",
+      "synonyms": {
+        "en": [
+          "induction",
+          "new hire",
+          "onboarding",
+          "orientation"
+        ],
+        "pt": [
+          "integracao",
+          "onboarding",
+          "orientacao de novos funcionarios"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "opening_balance",
+      "synonyms": {
+        "en": [
+          "opening balance",
+          "Opening Balance"
+        ],
+        "pt": [
+          "abertura saldo",
+          "Abertura Saldo"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "operating_hours",
+      "synonyms": {
+        "en": [
+          "operating hours",
+          "Operating Hours"
+        ],
+        "pt": [
+          "operating hours",
+          "Operating Hours"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "operating_income",
+      "synonyms": {
+        "en": [
+          "ebit",
+          "operating earnings",
+          "operating income",
+          "operating profit"
+        ],
+        "pt": [
+          "ebit",
+          "lucro operacional",
+          "resultado operacional"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "operative_report",
+      "synonyms": {
+        "en": [
+          "operation notes",
+          "operative report",
+          "procedure report",
+          "surgical report"
+        ],
+        "pt": [
+          "descricao cirurgica",
+          "notas operatorias",
+          "relatorio cirurgico"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "out_of_network_details",
+      "synonyms": {
+        "en": [
+          "out of network details",
+          "Out Of Network Details"
+        ],
+        "pt": [
+          "out of rede detalhes",
+          "Out Of Rede Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "outstanding_items",
+      "synonyms": {
+        "en": [
+          "outstanding items",
+          "Outstanding Items"
+        ],
+        "pt": [
+          "outstanding items",
+          "Outstanding Items"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "overage_charges",
+      "synonyms": {
+        "en": [
+          "overage charges",
+          "Overage Charges"
+        ],
+        "pt": [
+          "excedente charges",
+          "Excedente Charges"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "ownership_information",
+      "synonyms": {
+        "en": [
+          "ownership information",
+          "Ownership Information"
+        ],
+        "pt": [
+          "ownership information",
+          "Ownership Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "parking_details",
+      "synonyms": {
+        "en": [
+          "parking details",
+          "Parking Details"
+        ],
+        "pt": [
+          "parking detalhes",
+          "Parking Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "passenger_information",
+      "synonyms": {
+        "en": [
+          "passenger information",
+          "Passenger Information"
+        ],
+        "pt": [
+          "passenger information",
+          "Passenger Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "passport_information",
+      "synonyms": {
+        "en": [
+          "passport information",
+          "Passport Information"
+        ],
+        "pt": [
+          "passaporte information",
+          "Passaporte Information"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "past_due_summary",
+      "synonyms": {
+        "en": [
+          "past due summary",
+          "Past Due Summary"
+        ],
+        "pt": [
+          "past vencimento resumo",
+          "Past Vencimento Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "past_medical_history",
+      "synonyms": {
+        "en": [
+          "medical history",
+          "past medical history",
+          "pmh",
+          "previous medical history"
+        ],
+        "pt": [
+          "antecedentes patologicos",
+          "antecedentes pessoais",
+          "historico medico"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "pathology_report",
+      "synonyms": {
+        "en": [
+          "biopsy results",
+          "histopathology",
+          "pathology report",
+          "pathology results"
+        ],
+        "pt": [
+          "histopatologia",
+          "laudo patologico",
+          "resultado de biopsia"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "patient_demographics",
+      "synonyms": {
+        "en": [
+          "demographics",
+          "patient demographics",
+          "patient information",
+          "personal data"
+        ],
+        "pt": [
+          "dados demograficos",
+          "dados do paciente",
+          "informacoes do paciente"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "payment_allocation",
+      "synonyms": {
+        "en": [
+          "payment allocation",
+          "Payment Allocation"
+        ],
+        "pt": [
+          "pagamento allocation",
+          "Pagamento Allocation"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "payment_channel_information",
+      "synonyms": {
+        "en": [
+          "payment channel information",
+          "Payment Channel Information"
+        ],
+        "pt": [
+          "pagamento canal information",
+          "Pagamento Canal Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "payment_history",
+      "synonyms": {
+        "en": [
+          "payment history",
+          "Payment History"
+        ],
+        "pt": [
+          "pagamento history",
+          "Pagamento History"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "payment_instructions",
+      "synonyms": {
+        "en": [
+          "payment instructions",
+          "Payment Instructions"
+        ],
+        "pt": [
+          "pagamento instructions",
+          "Pagamento Instructions"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "payment_method_details",
+      "synonyms": {
+        "en": [
+          "payment method details",
+          "Payment Method Details"
+        ],
+        "pt": [
+          "pagamento metodo detalhes",
+          "Pagamento Metodo Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "payment_receipt_details",
+      "synonyms": {
+        "en": [
+          "payment receipt details",
+          "Payment Receipt Details"
+        ],
+        "pt": [
+          "pagamento recibo detalhes",
+          "Pagamento Recibo Detalhes"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "payment_terms",
+      "synonyms": {
+        "en": [
+          "billing terms",
+          "payment conditions",
+          "payment schedule",
+          "payment terms"
+        ],
+        "pt": [
+          "condicoes de pagamento",
+          "prazos de pagamento",
+          "termos de pagamento"
+        ]
+      },
+      "domainTags": [
+        "finance",
+        "legal"
+      ]
+    },
+    {
+      "canonical": "payroll_period",
+      "synonyms": {
+        "en": [
+          "payroll period",
+          "Payroll Period"
+        ],
+        "pt": [
+          "folha periodo",
+          "Folha Periodo"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "hr_payroll"
+      ]
+    },
+    {
+      "canonical": "penalties",
+      "synonyms": {
+        "en": [
+          "fines",
+          "liquidated damages",
+          "penalties",
+          "penalty clause"
+        ],
+        "pt": [
+          "clausula penal",
+          "multas",
+          "penalidades",
+          "sancoes"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "penalty_terms",
+      "synonyms": {
+        "en": [
+          "penalty terms",
+          "Penalty Terms"
+        ],
+        "pt": [
+          "penalty terms",
+          "Penalty Terms"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "performance_indicators",
+      "synonyms": {
+        "en": [
+          "key metrics",
+          "kpis",
+          "performance indicators",
+          "performance metrics"
+        ],
+        "pt": [
+          "indicadores de desempenho",
+          "kpis",
+          "metricas de desempenho"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "period_totals",
+      "synonyms": {
+        "en": [
+          "period totals",
+          "Period Totals"
+        ],
+        "pt": [
+          "periodo totals",
+          "Periodo Totals"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "personal_details",
+      "synonyms": {
+        "en": [
+          "personal details",
+          "Personal Details"
+        ],
+        "pt": [
+          "personal detalhes",
+          "Personal Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "physical_examination",
+      "synonyms": {
+        "en": [
+          "clinical examination",
+          "pe",
+          "physical exam",
+          "physical examination"
+        ],
+        "pt": [
+          "ef",
+          "exame clinico",
+          "exame fisico"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "plan",
+      "synonyms": {
+        "en": [
+          "care plan",
+          "management plan",
+          "plan",
+          "treatment approach"
+        ],
+        "pt": [
+          "conduta",
+          "plano",
+          "plano de cuidados",
+          "plano terapeutico"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "plan_allowances",
+      "synonyms": {
+        "en": [
+          "plan allowances",
+          "Plan Allowances"
+        ],
+        "pt": [
+          "plano allowances",
+          "Plano Allowances"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "plan_change_history",
+      "synonyms": {
+        "en": [
+          "plan change history",
+          "Plan Change History"
+        ],
+        "pt": [
+          "plano change history",
+          "Plano Change History"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "policy_holder_details",
+      "synonyms": {
+        "en": [
+          "policy holder details",
+          "Policy Holder Details"
+        ],
+        "pt": [
+          "apolice titular detalhes",
+          "Apolice Titular Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "policy_terms",
+      "synonyms": {
+        "en": [
+          "policy terms",
+          "Policy Terms"
+        ],
+        "pt": [
+          "apolice terms",
+          "Apolice Terms"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance"
+      ]
+    },
+    {
+      "canonical": "portfolio_overview",
+      "synonyms": {
+        "en": [
+          "portfolio overview",
+          "Portfolio Overview"
+        ],
+        "pt": [
+          "portfolio overview",
+          "Portfolio Overview"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "postal_information",
+      "synonyms": {
+        "en": [
+          "postal information",
+          "Postal Information"
+        ],
+        "pt": [
+          "postal information",
+          "Postal Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "pre_authorization_details",
+      "synonyms": {
+        "en": [
+          "pre authorization details",
+          "Pre Authorization Details"
+        ],
+        "pt": [
+          "pre authorization detalhes",
+          "Pre Authorization Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "preventive_care",
+      "synonyms": {
+        "en": [
+          "health maintenance",
+          "preventive care",
+          "screening",
+          "wellness"
+        ],
+        "pt": [
+          "cuidados preventivos",
+          "prevencao",
+          "rastreamento"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "previous_balance",
+      "synonyms": {
+        "en": [
+          "previous balance",
+          "Previous Balance"
+        ],
+        "pt": [
+          "previous saldo",
+          "Previous Saldo"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "pricing_tiers",
+      "synonyms": {
+        "en": [
+          "pricing tiers",
+          "Pricing Tiers"
+        ],
+        "pt": [
+          "pricing tiers",
+          "Pricing Tiers"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "principal_balance",
+      "synonyms": {
+        "en": [
+          "principal balance",
+          "Principal Balance"
+        ],
+        "pt": [
+          "principal saldo",
+          "Principal Saldo"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "prognosis",
+      "synonyms": {
+        "en": [
+          "clinical prognosis",
+          "expected outcome",
+          "outlook",
+          "prognosis"
+        ],
+        "pt": [
+          "perspectiva",
+          "prognostico",
+          "resultado esperado"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "progress_notes",
+      "synonyms": {
+        "en": [
+          "clinical notes",
+          "daily notes",
+          "progress notes",
+          "soap notes"
+        ],
+        "pt": [
+          "evolucao clinica",
+          "evolucao diaria",
+          "notas de evolucao"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "project_overview",
+      "synonyms": {
+        "en": [
+          "project description",
+          "project overview",
+          "project scope",
+          "project summary"
+        ],
+        "pt": [
+          "descricao do projeto",
+          "resumo do projeto",
+          "visao geral do projeto"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "property_information",
+      "synonyms": {
+        "en": [
+          "property information",
+          "Property Information"
+        ],
+        "pt": [
+          "imovel information",
+          "Imovel Information"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "housing"
+      ]
+    },
+    {
+      "canonical": "provider_information",
+      "synonyms": {
+        "en": [
+          "provider information",
+          "Provider Information"
+        ],
+        "pt": [
+          "prestador information",
+          "Prestador Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "purchase_summary",
+      "synonyms": {
+        "en": [
+          "purchase summary",
+          "Purchase Summary"
+        ],
+        "pt": [
+          "purchase resumo",
+          "Purchase Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "quality_control",
+      "synonyms": {
+        "en": [
+          "qa",
+          "qc",
+          "quality assurance",
+          "quality control"
+        ],
+        "pt": [
+          "controle de qualidade",
+          "cq",
+          "garantia de qualidade"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "rail_segment_details",
+      "synonyms": {
+        "en": [
+          "rail segment details",
+          "Rail Segment Details"
+        ],
+        "pt": [
+          "rail segment detalhes",
+          "Rail Segment Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "rate_plan_information",
+      "synonyms": {
+        "en": [
+          "rate plan information",
+          "Rate Plan Information"
+        ],
+        "pt": [
+          "taxa plano information",
+          "Taxa Plano Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "recitals",
+      "synonyms": {
+        "en": [
+          "background",
+          "preamble",
+          "recitals",
+          "whereas"
+        ],
+        "pt": [
+          "clausulas iniciais",
+          "considerandos",
+          "preambulo"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "references",
+      "synonyms": {
+        "en": [
+          "bibliography",
+          "references",
+          "sources",
+          "works cited"
+        ],
+        "pt": [
+          "bibliografia",
+          "fontes",
+          "obras citadas",
+          "referencias"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "referral",
+      "synonyms": {
+        "en": [
+          "consultation request",
+          "referral",
+          "referral letter",
+          "specialist referral"
+        ],
+        "pt": [
+          "encaminhamento",
+          "referencia",
+          "solicitacao de interconsulta"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "refund_policy",
+      "synonyms": {
+        "en": [
+          "refund policy",
+          "Refund Policy"
+        ],
+        "pt": [
+          "refund apolice",
+          "Refund Apolice"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "insurance",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "regulatory_notices",
+      "synonyms": {
+        "en": [
+          "regulatory notices",
+          "Regulatory Notices"
+        ],
+        "pt": [
+          "regulatory notices",
+          "Regulatory Notices"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "regulatory_requirements",
+      "synonyms": {
+        "en": [
+          "regulations",
+          "regulatory framework",
+          "regulatory requirements",
+          "statutory requirements"
+        ],
+        "pt": [
+          "marco regulatorio",
+          "regulamentos",
+          "requisitos regulatorios"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "related_party_transactions",
+      "synonyms": {
+        "en": [
+          "intercompany transactions",
+          "related parties",
+          "related party transactions"
+        ],
+        "pt": [
+          "operacoes intercompany",
+          "partes relacionadas",
+          "transacoes com partes relacionadas"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "remaining_allowance",
+      "synonyms": {
+        "en": [
+          "remaining allowance",
+          "Remaining Allowance"
+        ],
+        "pt": [
+          "remaining allowance",
+          "Remaining Allowance"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "renewal_terms",
+      "synonyms": {
+        "en": [
+          "renewal terms",
+          "Renewal Terms"
+        ],
+        "pt": [
+          "renewal terms",
+          "Renewal Terms"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "rent_schedule",
+      "synonyms": {
+        "en": [
+          "rent schedule",
+          "Rent Schedule"
+        ],
+        "pt": [
+          "rent schedule",
+          "Rent Schedule"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "housing"
+      ]
+    },
+    {
+      "canonical": "representations_and_warranties",
+      "synonyms": {
+        "en": [
+          "representations",
+          "representations and warranties",
+          "reps and warranties",
+          "warranties"
+        ],
+        "pt": [
+          "declaracoes e garantias",
+          "representacoes e garantias"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "reservation_details",
+      "synonyms": {
+        "en": [
+          "reservation details",
+          "Reservation Details"
+        ],
+        "pt": [
+          "reservation detalhes",
+          "Reservation Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "tax",
+        "travel"
+      ]
+    },
+    {
+      "canonical": "residence_information",
+      "synonyms": {
+        "en": [
+          "residence information",
+          "Residence Information"
+        ],
+        "pt": [
+          "residence information",
+          "Residence Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "resources",
+      "synonyms": {
+        "en": [
+          "resource allocation",
+          "resources",
+          "staffing",
+          "team resources"
+        ],
+        "pt": [
+          "alocacao de recursos",
+          "equipe",
+          "recursos"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "retained_earnings",
+      "synonyms": {
+        "en": [
+          "accumulated earnings",
+          "retained earnings",
+          "retained profits"
+        ],
+        "pt": [
+          "lucros acumulados",
+          "lucros retidos",
+          "reserva de lucros"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "revenue",
+      "synonyms": {
+        "en": [
+          "income",
+          "revenue",
+          "sales",
+          "top line",
+          "turnover"
+        ],
+        "pt": [
+          "faturamento",
+          "receita",
+          "receita bruta",
+          "vendas"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "review_of_systems",
+      "synonyms": {
+        "en": [
+          "review of systems",
+          "ros",
+          "system review",
+          "systems review"
+        ],
+        "pt": [
+          "interrogatorio sintomatologico",
+          "revisao de sistemas",
+          "revisao por aparelhos"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "rewards_points_summary",
+      "synonyms": {
+        "en": [
+          "rewards points summary",
+          "Rewards Points Summary"
+        ],
+        "pt": [
+          "rewards points resumo",
+          "Rewards Points Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "risk_assessment",
+      "synonyms": {
+        "en": [
+          "risk analysis",
+          "risk assessment",
+          "risk matrix",
+          "risk register"
+        ],
+        "pt": [
+          "analise de riscos",
+          "avaliacao de riscos",
+          "matriz de riscos"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "roaming_charges",
+      "synonyms": {
+        "en": [
+          "roaming charges",
+          "Roaming Charges"
+        ],
+        "pt": [
+          "roaming charges",
+          "Roaming Charges"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "rollback_plan",
+      "synonyms": {
+        "en": [
+          "contingency plan",
+          "fallback plan",
+          "revert plan",
+          "rollback plan"
+        ],
+        "pt": [
+          "plano de contingencia",
+          "plano de fallback",
+          "plano de reversao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "root_cause_analysis",
+      "synonyms": {
+        "en": [
+          "failure analysis",
+          "rca",
+          "root cause",
+          "root cause analysis"
+        ],
+        "pt": [
+          "analise de causa raiz",
+          "analise de falhas",
+          "rca"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "route_information",
+      "synonyms": {
+        "en": [
+          "route information",
+          "Route Information"
+        ],
+        "pt": [
+          "route information",
+          "Route Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "salary_components",
+      "synonyms": {
+        "en": [
+          "salary components",
+          "Salary Components"
+        ],
+        "pt": [
+          "salary components",
+          "Salary Components"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "hr_payroll"
+      ]
+    },
+    {
+      "canonical": "scholarship_information",
+      "synonyms": {
+        "en": [
+          "scholarship information",
+          "Scholarship Information"
+        ],
+        "pt": [
+          "scholarship information",
+          "Scholarship Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "scope",
+      "synonyms": {
+        "en": [
+          "project scope",
+          "scope",
+          "scope of services",
+          "scope of work"
+        ],
+        "pt": [
+          "escopo",
+          "escopo de servicos",
+          "escopo de trabalho",
+          "objeto"
+        ]
+      },
+      "domainTags": [
+        "legal",
+        "ops"
+      ]
+    },
+    {
+      "canonical": "security_deposit_details",
+      "synonyms": {
+        "en": [
+          "security deposit details",
+          "Security Deposit Details"
+        ],
+        "pt": [
+          "security deposit detalhes",
+          "Security Deposit Detalhes"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "segment_reporting",
+      "synonyms": {
+        "en": [
+          "business segments",
+          "operating segments",
+          "segment information",
+          "segment reporting"
+        ],
+        "pt": [
+          "informacao por segmento",
+          "relatorio por segmento",
+          "segmentos de negocio"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "service_address",
+      "synonyms": {
+        "en": [
+          "service address",
+          "Service Address"
+        ],
+        "pt": [
+          "service endereco",
+          "Service Endereco"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "service_period",
+      "synonyms": {
+        "en": [
+          "service period",
+          "Service Period"
+        ],
+        "pt": [
+          "service periodo",
+          "Service Periodo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "service_provider_details",
+      "synonyms": {
+        "en": [
+          "service provider details",
+          "Service Provider Details"
+        ],
+        "pt": [
+          "service prestador detalhes",
+          "Service Prestador Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "settlement_details",
+      "synonyms": {
+        "en": [
+          "settlement details",
+          "Settlement Details"
+        ],
+        "pt": [
+          "settlement detalhes",
+          "Settlement Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "severability",
+      "synonyms": {
+        "en": [
+          "partial invalidity",
+          "severability",
+          "severability clause"
+        ],
+        "pt": [
+          "clausula de divisibilidade",
+          "divisibilidade",
+          "validade parcial"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "shipping_details",
+      "synonyms": {
+        "en": [
+          "shipping details",
+          "Shipping Details"
+        ],
+        "pt": [
+          "shipping detalhes",
+          "Shipping Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "sign_off",
+      "synonyms": {
+        "en": [
+          "acceptance",
+          "final approval",
+          "sign off",
+          "sign-off"
+        ],
+        "pt": [
+          "aceite",
+          "aprovacao final",
+          "homologacao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "signature_attestation",
+      "synonyms": {
+        "en": [
+          "signature attestation",
+          "Signature Attestation"
+        ],
+        "pt": [
+          "signature attestation",
+          "Signature Attestation"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "sla_metrics",
+      "synonyms": {
+        "en": [
+          "service level agreement",
+          "service levels",
+          "sla metrics",
+          "sla targets"
+        ],
+        "pt": [
+          "acordo de nivel de servico",
+          "metricas de sla",
+          "niveis de servico"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "sms_usage_summary",
+      "synonyms": {
+        "en": [
+          "sms usage summary",
+          "Sms Usage Summary"
+        ],
+        "pt": [
+          "sms uso resumo",
+          "Sms Uso Resumo"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "social_history",
+      "synonyms": {
+        "en": [
+          "lifestyle",
+          "psychosocial history",
+          "social history",
+          "social hx"
+        ],
+        "pt": [
+          "antecedentes sociais",
+          "habitos de vida",
+          "historia social"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "special_conditions",
+      "synonyms": {
+        "en": [
+          "special conditions",
+          "Special Conditions"
+        ],
+        "pt": [
+          "special conditions",
+          "Special Conditions"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "stakeholders",
+      "synonyms": {
+        "en": [
+          "interested parties",
+          "key stakeholders",
+          "stakeholder list",
+          "stakeholders"
+        ],
+        "pt": [
+          "interessados",
+          "partes interessadas",
+          "stakeholders"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "statement_period",
+      "synonyms": {
+        "en": [
+          "statement period",
+          "Statement Period"
+        ],
+        "pt": [
+          "extrato periodo",
+          "Extrato Periodo"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "status_overview",
+      "synonyms": {
+        "en": [
+          "status overview",
+          "Status Overview"
+        ],
+        "pt": [
+          "status overview",
+          "Status Overview"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "status_update",
+      "synonyms": {
+        "en": [
+          "progress report",
+          "status report",
+          "status update",
+          "weekly update"
+        ],
+        "pt": [
+          "atualizacao de status",
+          "informe de situacao",
+          "relatorio de progresso"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "student_information",
+      "synonyms": {
+        "en": [
+          "student information",
+          "Student Information"
+        ],
+        "pt": [
+          "student information",
+          "Student Information"
+        ]
+      },
+      "domainTags": [
+        "education",
+        "general"
+      ]
+    },
+    {
+      "canonical": "subsidy_information",
+      "synonyms": {
+        "en": [
+          "subsidy information",
+          "Subsidy Information"
+        ],
+        "pt": [
+          "subsidy information",
+          "Subsidy Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "supply_chain",
+      "synonyms": {
+        "en": [
+          "procurement",
+          "sourcing",
+          "supply chain",
+          "supply management"
+        ],
+        "pt": [
+          "aquisicoes",
+          "cadeia de suprimentos",
+          "compras",
+          "gestao de fornecedores"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "supporting_documents",
+      "synonyms": {
+        "en": [
+          "supporting documents",
+          "Supporting Documents"
+        ],
+        "pt": [
+          "supporting documents",
+          "Supporting Documents"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "surcharge_breakdown",
+      "synonyms": {
+        "en": [
+          "surcharge breakdown",
+          "Surcharge Breakdown"
+        ],
+        "pt": [
+          "surcharge breakdown",
+          "Surcharge Breakdown"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "surgical_history",
+      "synonyms": {
+        "en": [
+          "past surgical history",
+          "previous surgeries",
+          "psh",
+          "surgical history"
+        ],
+        "pt": [
+          "antecedentes cirurgicos",
+          "cirurgias previas",
+          "historico cirurgico"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "survival",
+      "synonyms": {
+        "en": [
+          "survival",
+          "survival clause",
+          "surviving provisions"
+        ],
+        "pt": [
+          "clausulas sobreviventes",
+          "disposicoes remanescentes",
+          "sobrevivencia"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "table_of_contents",
+      "synonyms": {
+        "en": [
+          "contents",
+          "index",
+          "table of contents",
+          "toc"
+        ],
+        "pt": [
+          "indice",
+          "sumario",
+          "tabela de conteudos"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "tax_breakdown",
+      "synonyms": {
+        "en": [
+          "tax breakdown",
+          "Tax Breakdown"
+        ],
+        "pt": [
+          "imposto breakdown",
+          "Imposto Breakdown"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "tax_identification",
+      "synonyms": {
+        "en": [
+          "tax identification",
+          "Tax Identification"
+        ],
+        "pt": [
+          "imposto identification",
+          "Imposto Identification"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "tax_provision",
+      "synonyms": {
+        "en": [
+          "income tax",
+          "tax expense",
+          "tax liability",
+          "tax provision"
+        ],
+        "pt": [
+          "despesa tributaria",
+          "imposto de renda",
+          "provisao para impostos"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "tax_withholding_summary",
+      "synonyms": {
+        "en": [
+          "tax withholding summary",
+          "Tax Withholding Summary"
+        ],
+        "pt": [
+          "imposto retencao resumo",
+          "Imposto Retencao Resumo"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "taxpayer_information",
+      "synonyms": {
+        "en": [
+          "taxpayer information",
+          "Taxpayer Information"
+        ],
+        "pt": [
+          "contribuinte information",
+          "Contribuinte Information"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "term_and_duration",
+      "synonyms": {
+        "en": [
+          "agreement period",
+          "contract term",
+          "duration",
+          "term",
+          "term and duration"
+        ],
+        "pt": [
+          "duracao do contrato",
+          "prazo",
+          "prazo e vigencia",
+          "vigencia"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "term_dates",
+      "synonyms": {
+        "en": [
+          "term dates",
+          "Term Dates"
+        ],
+        "pt": [
+          "term dates",
+          "Term Dates"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "termination",
+      "synonyms": {
+        "en": [
+          "cancellation",
+          "early termination",
+          "termination",
+          "termination clause"
+        ],
+        "pt": [
+          "cancelamento",
+          "encerramento",
+          "rescisao",
+          "resolucao"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "termination_conditions",
+      "synonyms": {
+        "en": [
+          "termination conditions",
+          "Termination Conditions"
+        ],
+        "pt": [
+          "termination conditions",
+          "Termination Conditions"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "test_results",
+      "synonyms": {
+        "en": [
+          "qa results",
+          "test results",
+          "testing results",
+          "validation results"
+        ],
+        "pt": [
+          "resultados de qa",
+          "resultados de testes",
+          "resultados de validacao"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "ticket_information",
+      "synonyms": {
+        "en": [
+          "ticket information",
+          "Ticket Information"
+        ],
+        "pt": [
+          "ticket information",
+          "Ticket Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "time_and_attendance",
+      "synonyms": {
+        "en": [
+          "time & attendance",
+          "time and attendance",
+          "Time And Attendance"
+        ],
+        "pt": [
+          "time and attendance",
+          "Time And Attendance"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "timeline",
+      "synonyms": {
+        "en": [
+          "gantt chart",
+          "project timeline",
+          "schedule",
+          "timeline"
+        ],
+        "pt": [
+          "agenda do projeto",
+          "cronograma",
+          "linha do tempo"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "toll_usage_summary",
+      "synonyms": {
+        "en": [
+          "toll usage summary",
+          "Toll Usage Summary"
+        ],
+        "pt": [
+          "toll uso resumo",
+          "Toll Uso Resumo"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "total_due",
+      "synonyms": {
+        "en": [
+          "total due",
+          "Total Due"
+        ],
+        "pt": [
+          "total vencimento",
+          "Total Vencimento"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "training_plan",
+      "synonyms": {
+        "en": [
+          "learning plan",
+          "skill development",
+          "training plan",
+          "training schedule"
+        ],
+        "pt": [
+          "cronograma de treinamento",
+          "plano de capacitacao",
+          "plano de treinamento"
+        ]
+      },
+      "domainTags": [
+        "ops"
+      ]
+    },
+    {
+      "canonical": "transaction_history",
+      "synonyms": {
+        "en": [
+          "transaction history",
+          "Transaction History"
+        ],
+        "pt": [
+          "transacao history",
+          "Transacao History"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "transaction_summary",
+      "synonyms": {
+        "en": [
+          "transaction summary",
+          "Transaction Summary"
+        ],
+        "pt": [
+          "transacao resumo",
+          "Transacao Resumo"
+        ]
+      },
+      "domainTags": [
+        "banking",
+        "general"
+      ]
+    },
+    {
+      "canonical": "travel_document_details",
+      "synonyms": {
+        "en": [
+          "travel document details",
+          "Travel Document Details"
+        ],
+        "pt": [
+          "travel document detalhes",
+          "Travel Document Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "identity"
+      ]
+    },
+    {
+      "canonical": "treasury",
+      "synonyms": {
+        "en": [
+          "cash management",
+          "treasury",
+          "treasury operations"
+        ],
+        "pt": [
+          "gestao de caixa",
+          "operacoes de tesouraria",
+          "tesouraria"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "treatment_plan",
+      "synonyms": {
+        "en": [
+          "care plan",
+          "management plan",
+          "therapeutic plan",
+          "treatment plan"
+        ],
+        "pt": [
+          "conduta",
+          "plano de cuidados",
+          "plano de tratamento",
+          "plano terapeutico"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "tuition_summary",
+      "synonyms": {
+        "en": [
+          "tuition summary",
+          "Tuition Summary"
+        ],
+        "pt": [
+          "tuition resumo",
+          "Tuition Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "unit_rates",
+      "synonyms": {
+        "en": [
+          "unit rates",
+          "Unit Rates"
+        ],
+        "pt": [
+          "unidade rates",
+          "Unidade Rates"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "usage_alerts",
+      "synonyms": {
+        "en": [
+          "usage alerts",
+          "Usage Alerts"
+        ],
+        "pt": [
+          "uso alerts",
+          "Uso Alerts"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "usage_by_category",
+      "synonyms": {
+        "en": [
+          "usage by category",
+          "Usage By Category"
+        ],
+        "pt": [
+          "uso by category",
+          "Uso By Category"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "utility_service_details",
+      "synonyms": {
+        "en": [
+          "utility service details",
+          "Utility Service Details"
+        ],
+        "pt": [
+          "utility service detalhes",
+          "Utility Service Detalhes"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "validation_notes",
+      "synonyms": {
+        "en": [
+          "validation notes",
+          "Validation Notes"
+        ],
+        "pt": [
+          "validation notas",
+          "Validation Notas"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "vehicle_information",
+      "synonyms": {
+        "en": [
+          "vehicle information",
+          "Vehicle Information"
+        ],
+        "pt": [
+          "vehicle information",
+          "Vehicle Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "verification_results",
+      "synonyms": {
+        "en": [
+          "verification results",
+          "Verification Results"
+        ],
+        "pt": [
+          "verificacao results",
+          "Verificacao Results"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "visa_information",
+      "synonyms": {
+        "en": [
+          "visa information",
+          "Visa Information"
+        ],
+        "pt": [
+          "visa information",
+          "Visa Information"
+        ]
+      },
+      "domainTags": [
+        "general"
+      ]
+    },
+    {
+      "canonical": "vital_signs",
+      "synonyms": {
+        "en": [
+          "vital parameters",
+          "vital signs",
+          "vitals",
+          "vs"
+        ],
+        "pt": [
+          "parametros vitais",
+          "sinais",
+          "sinais vitais"
+        ]
+      },
+      "domainTags": [
+        "medical"
+      ]
+    },
+    {
+      "canonical": "waiver",
+      "synonyms": {
+        "en": [
+          "waiver",
+          "waiver clause",
+          "waiver of rights"
+        ],
+        "pt": [
+          "clausula de renuncia",
+          "desistencia de direitos",
+          "renuncia"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "water_sewer_usage",
+      "synonyms": {
+        "en": [
+          "water sewer usage",
+          "Water Sewer Usage"
+        ],
+        "pt": [
+          "water sewer uso",
+          "Water Sewer Uso"
+        ]
+      },
+      "domainTags": [
+        "billing",
+        "general"
+      ]
+    },
+    {
+      "canonical": "whereas_clauses",
+      "synonyms": {
+        "en": [
+          "background clauses",
+          "recital clauses",
+          "whereas",
+          "whereas clauses"
+        ],
+        "pt": [
+          "clausulas considerando",
+          "considerandos",
+          "premissas"
+        ]
+      },
+      "domainTags": [
+        "legal"
+      ]
+    },
+    {
+      "canonical": "withholding_details",
+      "synonyms": {
+        "en": [
+          "withholding details",
+          "Withholding Details"
+        ],
+        "pt": [
+          "retencao detalhes",
+          "Retencao Detalhes"
+        ]
+      },
+      "domainTags": [
+        "general",
+        "tax"
+      ]
+    },
+    {
+      "canonical": "working_capital",
+      "synonyms": {
+        "en": [
+          "current capital",
+          "net working capital",
+          "working capital"
+        ],
+        "pt": [
+          "capital circulante liquido",
+          "capital de giro",
+          "capital de trabalho"
+        ]
+      },
+      "domainTags": [
+        "finance"
+      ]
+    },
+    {
+      "canonical": "year_to_date_summary",
+      "synonyms": {
+        "en": [
+          "year to date summary",
+          "Year To Date Summary"
+        ],
+        "pt": [
+          "year to data resumo",
+          "Year To Data Resumo"
+        ]
+      },
+      "domainTags": [
+        "general"
       ]
     }
   ]

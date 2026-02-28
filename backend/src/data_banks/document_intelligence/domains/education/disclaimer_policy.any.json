@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "di_education_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer policy for education responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education"
+  },
+  "domain": "education",
+  "disclaimers": [
+    {
+      "id": "education_disc_001_not_official_eval",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This output summarizes the uploaded education document and is not an official institutional evaluation.",
+        "pt": "Esta saida resume o documento educacional enviado e nao substitui avaliacao oficial da instituicao."
+      }
+    },
+    {
+      "id": "education_disc_002_scope_lock",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Extracted fields are limited to the provided file and may omit external registrar records.",
+        "pt": "Os campos extraidos sao limitados ao arquivo fornecido e podem omitir registros externos da secretaria academica."
+      }
+    },
+    {
+      "id": "education_disc_003_policy_check",
+      "trigger": "analysis_involves_eligibility",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Scholarship and aid eligibility must be confirmed with institutional policy.",
+        "pt": "Elegibilidade para bolsa e auxilio deve ser confirmada pela politica institucional."
+      }
+    }
+  ]
+}

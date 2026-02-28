@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "id": "di_accounting_abbreviations_en",
+    "version": "1.0.0",
+    "description": "English abbreviations for accounting domain.",
+    "languages": ["en"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "language": "en"
+  },
+  "domain": "accounting",
+  "abbreviations": [
+    { "abbr": "AFDA", "expansion": "Allowance for Doubtful Accounts" },
+    { "abbr": "AJE", "expansion": "Adjusting Journal Entry" },
+    { "abbr": "AP", "expansion": "Accounts Payable" },
+    { "abbr": "AR", "expansion": "Accounts Receivable" },
+    { "abbr": "COA", "expansion": "Chart of Accounts" },
+    { "abbr": "CR", "expansion": "Credit" },
+    { "abbr": "DR", "expansion": "Debit" },
+    { "abbr": "EOM", "expansion": "End of Month" },
+    { "abbr": "EOY", "expansion": "End of Year" },
+    { "abbr": "FIFO", "expansion": "First In, First Out" },
+    { "abbr": "GAAP", "expansion": "Generally Accepted Accounting Principles" },
+    { "abbr": "GL", "expansion": "General Ledger" },
+    { "abbr": "IFRS", "expansion": "International Financial Reporting Standards" },
+    { "abbr": "JE", "expansion": "Journal Entry" },
+    { "abbr": "LIFO", "expansion": "Last In, First Out" },
+    { "abbr": "PBC", "expansion": "Prepared by Client" },
+    { "abbr": "PP&E", "expansion": "Property, Plant, and Equipment" },
+    { "abbr": "RJE", "expansion": "Reversing Journal Entry" },
+    { "abbr": "SOD", "expansion": "Segregation of Duties" },
+    { "abbr": "TB", "expansion": "Trial Balance" },
+    { "abbr": "WIP", "expansion": "Work in Progress" },
+    { "abbr": "WP", "expansion": "Working Paper / Workpaper" }
+  ]
+}

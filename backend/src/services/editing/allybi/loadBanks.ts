@@ -18,6 +18,7 @@ export interface AllybiBanks {
   excelFormulaCatalog: any;
   excelShortcuts: any;
   excelEditRegression: any;
+  editingRouting: any;
   // Intent runtime banks
   operatorCatalog: any;
   intentPatternsExcelEn: any;
@@ -64,6 +65,7 @@ export function loadAllybiBanks(): AllybiBanks {
     excelFormulaCatalog: safeBank("excel_formula_catalog"),
     excelShortcuts: safeBank("excel_shortcuts"),
     excelEditRegression: safeBank("excel_edit_regression"),
+    editingRouting: safeBank("editing_routing"),
     // Intent runtime banks
     operatorCatalog: safeBank("operator_catalog"),
     intentPatternsExcelEn: safeBank("intent_patterns_excel_en"),

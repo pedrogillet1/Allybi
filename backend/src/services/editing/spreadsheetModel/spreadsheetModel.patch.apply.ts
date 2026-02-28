@@ -602,9 +602,15 @@ export function applyPatchOpsToSpreadsheetModel(
         const set = new Set(sheet.grid.hiddenRows);
         for (const row of op.rows) {
           if (op.hidden) {
-            if (!set.has(row)) { set.add(row); changed = true; }
+            if (!set.has(row)) {
+              set.add(row);
+              changed = true;
+            }
           } else {
-            if (set.has(row)) { set.delete(row); changed = true; }
+            if (set.has(row)) {
+              set.delete(row);
+              changed = true;
+            }
           }
         }
         sheet.grid.hiddenRows = Array.from(set).sort((a, b) => a - b);
@@ -614,12 +620,130 @@ export function applyPatchOpsToSpreadsheetModel(
         const set = new Set(sheet.grid.hiddenColumns);
         for (const col of op.cols) {
           if (op.hidden) {
-            if (!set.has(col)) { set.add(col); changed = true; }
+            if (!set.has(col)) {
+              set.add(col);
+              changed = true;
+            }
           } else {
-            if (set.has(col)) { set.delete(col); changed = true; }
+            if (set.has(col)) {
+              set.delete(col);
+              changed = true;
+            }
           }
         }
         sheet.grid.hiddenColumns = Array.from(set).sort((a, b) => a - b);
+      } else if (op.op === "REMOVE_DUPLICATES") {
+        const parsed = parseA1Range(op.range, op.sheet);
+        const sheet = ensureSheetByName(model, parsed.sheetName);
+        const hasHeader = op.hasHeader !== false;
+        const dataStart = hasHeader ? parsed.start.row + 1 : parsed.start.row;
+        if (dataStart <= parsed.end.row) {
+          const width = parsed.end.col - parsed.start.col + 1;
+          const keyCols =
+            Array.isArray(op.keyColumns) && op.keyColumns.length > 0
+              ? op.keyColumns.map((c) => c - 1)
+              : Array.from({ length: width }, (_, i) => i);
+          const seen = new Set<string>();
+          const dupeRows: number[] = [];
+          for (let r = dataStart; r <= parsed.end.row; r += 1) {
+            const parts: string[] = [];
+            for (const ki of keyCols) {
+              const c = parsed.start.col + ki;
+              const cell = sheet.cells[cellKey(r, c)];
+              parts.push(JSON.stringify(cell?.v ?? ""));
+            }
+            const fp = parts.join("|");
+            if (seen.has(fp)) {
+              dupeRows.push(r);
+            } else {
+              seen.add(fp);
+            }
+          }
+          // Delete bottom-up to keep indices stable
+          for (let i = dupeRows.length - 1; i >= 0; i -= 1) {
+            shiftRows(sheet, dupeRows[i], 1, "delete");
+            changed = true;
+          }
+          if (changed) changedStructuresCount += 1;
+        }
+      } else if (op.op === "TRIM_WHITESPACE") {
+        const parsed = parseA1Range(op.range, op.sheet);
+        const sheet = ensureSheetByName(model, parsed.sheetName);
+        forEachCellInRange(parsed, (row, col) => {
+          const key = cellKey(row, col);
+          const cell = sheet.cells[key];
+          if (cell && typeof cell.v === "string") {
+            const trimmed = cell.v.trim();
+            if (trimmed !== cell.v) {
+              changed =
+                setCellValuePreserveStyle(sheet, row, col, trimmed) || changed;
+            }
+          }
+        });
+      } else if (op.op === "NORMALIZE_VALUES") {
+        const parsed = parseA1Range(op.range, op.sheet);
+        const sheet = ensureSheetByName(model, parsed.sheetName);
+        forEachCellInRange(parsed, (row, col) => {
+          const key = cellKey(row, col);
+          const cell = sheet.cells[key];
+          if (!cell || cell.v == null) return;
+
+          if (op.normalization === "text_case" && typeof cell.v === "string") {
+            const mode = op.textCase || "lower";
+            let next: string;
+            if (mode === "upper") next = cell.v.toUpperCase();
+            else if (mode === "title")
+              next = cell.v.replace(/\b\w/g, (ch) => ch.toUpperCase());
+            else next = cell.v.toLowerCase();
+            if (next !== cell.v) {
+              changed =
+                setCellValuePreserveStyle(sheet, row, col, next) || changed;
+            }
+          } else if (
+            op.normalization === "numbers" &&
+            typeof cell.v === "string"
+          ) {
+            const cleaned = cell.v.replace(/[,$\s%]/g, "");
+            const n = Number(cleaned);
+            if (Number.isFinite(n)) {
+              changed =
+                setCellValuePreserveStyle(sheet, row, col, n) || changed;
+            }
+          } else if (
+            op.normalization === "dates" &&
+            typeof cell.v === "string"
+          ) {
+            const d = new Date(cell.v);
+            if (!Number.isNaN(d.getTime())) {
+              const fmt = op.dateFormat || "YYYY-MM-DD";
+              const iso = d.toISOString().slice(0, 10);
+              const formatted = fmt === "YYYY-MM-DD" ? iso : iso;
+              changed =
+                setCellValuePreserveStyle(sheet, row, col, formatted) ||
+                changed;
+            }
+          }
+        });
+      } else if (op.op === "SET_SHEET_PROTECTION") {
+        const sheet = ensureSheetByName(model, op.sheet);
+        (sheet as any).protection = {
+          enabled: true,
+          ...(op.password ? { password: op.password } : {}),
+          ...(op.options || {}),
+        };
+        changed = true;
+      } else if (op.op === "SET_CELL_PROTECTION") {
+        const parsed = parseA1Range(op.range, op.sheet);
+        const sheet = ensureSheetByName(model, parsed.sheetName);
+        forEachCellInRange(parsed, (row, col) => {
+          const key = cellKey(row, col);
+          if (!sheet.cells[key]) sheet.cells[key] = {};
+          (sheet.cells[key] as any).protection = {
+            locked: op.locked,
+            ...(op.hidden != null ? { hidden: op.hidden } : {}),
+          };
+          changed = true;
+        });
       } else if (op.op === "SET_COL_WIDTH") {
         const sheet = ensureSheetByName(model, op.sheet);
         if (!sheet.grid.colWidths) sheet.grid.colWidths = {};

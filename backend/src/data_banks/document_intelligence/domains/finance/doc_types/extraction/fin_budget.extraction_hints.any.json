@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "di_finance_extraction_fin_budget",
+    "version": "2.0.0",
+    "description": "Extraction hints for fin_budget.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_budget"
+  },
+  "hints": [
+    {
+      "id": "hint_1_period",
+      "entity": "kpi_planned_revenue",
+      "anchors": [
+        "period",
+        "budget",
+        "orcamento"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_2_currency",
+      "entity": "kpi_planned_opex",
+      "anchors": [
+        "currency",
+        "budget",
+        "orcamento"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_3_unit",
+      "entity": "kpi_planned_capex",
+      "anchors": [
+        "unit",
+        "budget",
+        "orcamento"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_4_total",
+      "entity": "kpi_planned_headcount",
+      "anchors": [
+        "total",
+        "budget",
+        "orcamento"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_5_variance",
+      "entity": "variance",
+      "anchors": [
+        "variance",
+        "budget",
+        "orcamento"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_6_guidance",
+      "entity": "guidance",
+      "anchors": [
+        "guidance",
+        "budget",
+        "orcamento"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_7_assumption",
+      "entity": "assumption",
+      "anchors": [
+        "assumption",
+        "budget",
+        "orcamento"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_8_notes",
+      "entity": "notes",
+      "anchors": [
+        "notes",
+        "budget",
+        "orcamento"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    }
+  ]
+}

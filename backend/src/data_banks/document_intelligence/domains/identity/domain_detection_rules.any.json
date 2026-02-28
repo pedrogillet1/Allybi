@@ -1,0 +1,164 @@
+{
+  "_meta": {
+    "id": "di_identity_domain_detection_rules",
+    "version": "2.0.0",
+    "description": "Identity domain detection rules with explicit negative disambiguation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "minScore": 0.65,
+    "maxRulesPerDocument": 64
+  },
+  "domain": "identity",
+  "rules": [
+    {
+      "id": "identity_detect_pos_driver_license_markers",
+      "priority": 220,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bdriver\\s+license\\b|\\bdriving\\s+licence\\b",
+        "\\bcnh\\b|\\bcarteira\\s+nacional\\s+de\\s+habilitacao\\b"
+      ],
+      "description": "Driver license markers."
+    },
+    {
+      "id": "identity_detect_pos_passport_markers",
+      "priority": 219,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bpassport\\b|\\bmachine\\s+readable\\s+zone\\b|\\bmrz\\b",
+        "\\bpassaporte\\b|\\bzona\\s+de\\s+leitura\\s+mecanica\\b"
+      ],
+      "description": "Passport markers."
+    },
+    {
+      "id": "identity_detect_pos_proof_of_address_markers",
+      "priority": 218,
+      "weight": 2.3,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bproof\\s+of\\s+address\\b|\\butility\\s+bill\\b",
+        "\\bcomprovante\\s+de\\s+endereco\\b|\\bconta\\s+de\\s+luz\\b|\\bconta\\s+de\\s+agua\\b"
+      ],
+      "description": "Proof-of-address markers."
+    },
+    {
+      "id": "identity_detect_pos_business_registration_markers",
+      "priority": 217,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bbusiness\\s+registration\\s+certificate\\b|\\bincorporation\\s+certificate\\b",
+        "\\bcertificado\\s+de\\s+registro\\s+empresarial\\b|\\bjunta\\s+comercial\\b"
+      ],
+      "description": "Business registration markers."
+    },
+    {
+      "id": "identity_detect_pos_identity_layout_markers",
+      "priority": 216,
+      "weight": 2.2,
+      "signal": "layout",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bdate\\s+of\\s+birth\\b|\\bissuing\\s+authority\\b|\\bdocument\\s+number\\b",
+        "\\bdata\\s+de\\s+nascimento\\b|\\borgao\\s+emissor\\b|\\bnumero\\s+do\\s+documento\\b"
+      ],
+      "description": "Identity layout fields markers."
+    },
+    {
+      "id": "identity_detect_pos_security_feature_markers",
+      "priority": 215,
+      "weight": 2.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bbarcode\\b|\\bqr\\s*code\\b|\\bhologram\\b",
+        "\\bcodigo\\s+de\\s+barras\\b|\\bcodigo\\s+qr\\b|\\bselo\\s+de\\s+seguranca\\b"
+      ],
+      "description": "Security feature markers."
+    },
+    {
+      "id": "identity_detect_pos_ctx_context_identity_01",
+      "priority": 214,
+      "weight": 1.7,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(name|surname|birth|nationality|nome|sobrenome|nascimento|nacionalidade)\\b",
+        "\\b(number|id|document|numero|documento)\\b"
+      ],
+      "description": "Identity core fields context."
+    },
+    {
+      "id": "identity_detect_pos_ctx_context_validity_02",
+      "priority": 213,
+      "weight": 1.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(issue\\s+date|expiry|valid\\s+thru|data\\s+de\\s+emissao|validade)\\b",
+        "\\b(authority|orgao\\s+emissor|jurisdiction|uf)\\b"
+      ],
+      "description": "Issue/expiry and issuing authority context."
+    },
+    {
+      "id": "identity_detect_pos_ctx_context_company_03",
+      "priority": 212,
+      "weight": 1.4,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(company|business|registration|incorporation)\\b",
+        "\\bempresa|registro|constituicao|razao\\s+social\\b"
+      ],
+      "description": "Business registration context."
+    },
+    {
+      "id": "identity_detect_neg_insurance_conflict",
+      "priority": 211,
+      "weight": -2,
+      "signal": "heading_or_content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bpolicy\\s+number\\b|\\bclaim\\s+number\\b|\\beob\\b",
+        "\\bapolice\\b|\\bsinistro\\b|\\bdemonstrativo\\s+de\\s+beneficios\\b"
+      ],
+      "description": "Negative disambiguation against insurance docs."
+    },
+    {
+      "id": "identity_detect_neg_tax_conflict",
+      "priority": 210,
+      "weight": -1.9,
+      "signal": "heading_or_content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\btax\\s+return\\b|\\bassessment\\s+notice\\b|\\btax\\s+payment\\b",
+        "\\bdeclaracao\\s+de\\s+imposto\\b|\\blancamento\\s+tributario\\b|\\bguia\\s+de\\s+pagamento\\b"
+      ],
+      "description": "Negative disambiguation against tax docs."
+    },
+    {
+      "id": "identity_detect_neg_medical_conflict",
+      "priority": 209,
+      "weight": -1.8,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bdiagnosis\\b|\\blab\\s+report\\b|\\bdischarge\\s+summary\\b",
+        "\\bdiagnostico\\b|\\brelatorio\\s+laboratorial\\b|\\balta\\s+medica\\b"
+      ],
+      "description": "Negative disambiguation against medical docs."
+    }
+  ]
+}

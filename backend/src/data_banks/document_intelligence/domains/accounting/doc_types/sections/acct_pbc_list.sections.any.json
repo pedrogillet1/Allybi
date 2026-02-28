@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "id": "di_accounting_sections_acct_pbc_list",
+    "version": "1.1.0",
+    "description": "Section map for pbc list documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_pbc_list"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "PBC List",
+        "Lista PBC",
+        "Period",
+        "Entity"
+      ]
+    },
+    {
+      "id": "line_items",
+      "name": {
+        "en": "Line Items",
+        "pt": "Itens"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Detail",
+        "Transactions",
+        "Lines",
+        "Detalhes"
+      ]
+    },
+    {
+      "id": "summary",
+      "name": {
+        "en": "Summary",
+        "pt": "Resumo"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Summary",
+        "Totals",
+        "Resumo",
+        "Totais"
+      ]
+    },
+    {
+      "id": "signoff",
+      "name": {
+        "en": "Sign-off",
+        "pt": "Aprovacao"
+      },
+      "required": false,
+      "order": 4,
+      "headingAnchors": [
+        "Approval",
+        "Reviewed by",
+        "Approved by",
+        "Aprovado por"
+      ]
+    }
+  ]
+}

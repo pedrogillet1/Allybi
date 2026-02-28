@@ -1,0 +1,209 @@
+{
+  "_meta": {
+    "id": "di_housing_tables_housing_rent_receipt",
+    "version": "1.0.0",
+    "description": "Expected table patterns for housing_rent_receipt.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "docType": "housing_rent_receipt"
+  },
+  "tables": [
+    {
+      "id": "table_01_header_summary",
+      "name": {
+        "en": "Header Summary",
+        "pt": "Resumo do Cabecalho"
+      },
+      "section": "header",
+      "expectedColumns": [
+        "field",
+        "value"
+      ],
+      "keyRows": [
+        "document_id",
+        "document_date"
+      ]
+    },
+    {
+      "id": "table_02_profile",
+      "name": {
+        "en": "Issuer/Recipient Profile",
+        "pt": "Perfil Emissor/Destinatario"
+      },
+      "section": "issuer_profile",
+      "expectedColumns": [
+        "attribute",
+        "value"
+      ],
+      "keyRows": [
+        "issuer_name",
+        "recipient_name"
+      ]
+    },
+    {
+      "id": "table_03_reference",
+      "name": {
+        "en": "Reference Details",
+        "pt": "Detalhes de Referencia"
+      },
+      "section": "account_or_reference",
+      "expectedColumns": [
+        "reference_type",
+        "reference_value"
+      ],
+      "keyRows": [
+        "account_reference"
+      ]
+    },
+    {
+      "id": "table_04_period",
+      "name": {
+        "en": "Period/Schedule",
+        "pt": "Periodo/Agenda"
+      },
+      "section": "period_or_schedule",
+      "expectedColumns": [
+        "start",
+        "end",
+        "status"
+      ],
+      "keyRows": [
+        "period_start",
+        "period_end"
+      ]
+    },
+    {
+      "id": "table_05_line_items",
+      "name": {
+        "en": "Line Items",
+        "pt": "Itens"
+      },
+      "section": "line_items_or_events",
+      "expectedColumns": [
+        "item",
+        "description",
+        "quantity",
+        "amount"
+      ],
+      "keyRows": [
+        "line_total"
+      ]
+    },
+    {
+      "id": "table_06_charges",
+      "name": {
+        "en": "Charges",
+        "pt": "Cobrancas"
+      },
+      "section": "charges_or_amounts",
+      "expectedColumns": [
+        "charge_type",
+        "description",
+        "amount"
+      ],
+      "keyRows": [
+        "subtotal"
+      ]
+    },
+    {
+      "id": "table_07_taxes",
+      "name": {
+        "en": "Taxes",
+        "pt": "Impostos"
+      },
+      "section": "taxes_or_adjustments",
+      "expectedColumns": [
+        "tax_code",
+        "tax_base",
+        "tax_amount"
+      ],
+      "keyRows": [
+        "tax_total"
+      ]
+    },
+    {
+      "id": "table_08_adjustments",
+      "name": {
+        "en": "Adjustments",
+        "pt": "Ajustes"
+      },
+      "section": "taxes_or_adjustments",
+      "expectedColumns": [
+        "adjustment_type",
+        "reason",
+        "amount"
+      ],
+      "keyRows": [
+        "net_adjustment"
+      ]
+    },
+    {
+      "id": "table_09_payments",
+      "name": {
+        "en": "Payments",
+        "pt": "Pagamentos"
+      },
+      "section": "payments_or_status",
+      "expectedColumns": [
+        "payment_date",
+        "reference",
+        "amount"
+      ],
+      "keyRows": [
+        "payment_total"
+      ]
+    },
+    {
+      "id": "table_10_status",
+      "name": {
+        "en": "Status and Due",
+        "pt": "Status e Vencimento"
+      },
+      "section": "payments_or_status",
+      "expectedColumns": [
+        "status",
+        "due_date",
+        "balance_due"
+      ],
+      "keyRows": [
+        "current_status"
+      ]
+    },
+    {
+      "id": "table_11_totals",
+      "name": {
+        "en": "Totals",
+        "pt": "Totais"
+      },
+      "section": "totals",
+      "expectedColumns": [
+        "metric",
+        "amount"
+      ],
+      "keyRows": [
+        "total_amount"
+      ]
+    },
+    {
+      "id": "table_12_metadata",
+      "name": {
+        "en": "Metadata",
+        "pt": "Metadados"
+      },
+      "section": "footer_metadata",
+      "expectedColumns": [
+        "key",
+        "value"
+      ],
+      "keyRows": [
+        "source_system"
+      ]
+    }
+  ]
+}

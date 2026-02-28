@@ -1,0 +1,45 @@
+{
+  "_meta": {
+    "id": "di_identity_domain_profile",
+    "version": "2.0.0",
+    "description": "Identity domain profile for document interpretation and grounded extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity"
+  },
+  "domain": "identity",
+  "displayName": {
+    "en": "Identity",
+    "pt": "Identidade"
+  },
+  "scope": "Identity verification documents including personal IDs, passports, proof-of-address, and business registration certificates.",
+  "supportedDocTypes": [
+    "id_business_registration_certificate",
+    "id_driver_license",
+    "id_passport",
+    "id_proof_of_address"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "negativeBoundaries": [
+    "Do not classify tax, insurance, or legal contracts as identity documents without strong identity-layout markers.",
+    "Do not infer person or company identity details when key fields are missing, expired, or unreadable."
+  ],
+  "ontologyPrefix": "id"
+}

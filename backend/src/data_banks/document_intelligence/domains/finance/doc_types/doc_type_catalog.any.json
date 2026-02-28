@@ -1,0 +1,916 @@
+{
+  "_meta": {
+    "id": "di_finance_doc_type_catalog",
+    "version": "2.0.0",
+    "description": "Finance doc-type catalog with full pack references for detection and interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "enforcePackRefs": true
+  },
+  "domain": "finance",
+  "docTypes": [
+    {
+      "id": "fin_10k",
+      "name": {
+        "en": "10-K Annual Report",
+        "pt": "Relatorio Anual 10-K"
+      },
+      "description": "10-K Annual Report document intelligence profile.",
+      "archetypeId": "finance_filings_disclosure",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?10k\\b",
+        "\\b10-k\\s+annual\\s+report\\b",
+        "\\brelatorio\\s+anual\\s+10-k\\b"
+      ],
+      "priority": 130,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_10k"
+        ],
+        "entities": [
+          "di_finance_entities_fin_10k"
+        ],
+        "tables": [
+          "di_finance_tables_fin_10k"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_10k"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "revenue",
+        "ebitda",
+        "net_income",
+        "operating_cash_flow"
+      ]
+    },
+    {
+      "id": "fin_10q",
+      "name": {
+        "en": "10-Q Quarterly Report",
+        "pt": "Relatorio Trimestral 10-Q"
+      },
+      "description": "10-Q Quarterly Report document intelligence profile.",
+      "archetypeId": "finance_filings_disclosure",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?10q\\b",
+        "\\b10-q\\s+quarterly\\s+report\\b",
+        "\\brelatorio\\s+trimestral\\s+10-q\\b"
+      ],
+      "priority": 129,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_10q"
+        ],
+        "entities": [
+          "di_finance_entities_fin_10q"
+        ],
+        "tables": [
+          "di_finance_tables_fin_10q"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_10q"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "revenue",
+        "gross_margin",
+        "operating_income",
+        "eps"
+      ]
+    },
+    {
+      "id": "fin_8k",
+      "name": {
+        "en": "8-K Current Report",
+        "pt": "Relatorio 8-K de Evento Relevante"
+      },
+      "description": "8-K Current Report document intelligence profile.",
+      "archetypeId": "finance_filings_disclosure",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?8k\\b",
+        "\\b8-k\\s+current\\s+report\\b",
+        "\\brelatorio\\s+8-k\\s+de\\s+evento\\s+relevante\\b"
+      ],
+      "priority": 128,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_8k"
+        ],
+        "entities": [
+          "di_finance_entities_fin_8k"
+        ],
+        "tables": [
+          "di_finance_tables_fin_8k"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_8k"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "guidance_change",
+        "material_event",
+        "debt",
+        "liquidity"
+      ]
+    },
+    {
+      "id": "fin_arr_mrr_report",
+      "name": {
+        "en": "ARR/MRR Report",
+        "pt": "Relatorio ARR/MRR"
+      },
+      "description": "ARR/MRR Report document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?arr[\\s_-]?mrr[\\s_-]?report\\b",
+        "\\barr/mrr\\s+report\\b",
+        "\\brelatorio\\s+arr/mrr\\b"
+      ],
+      "priority": 110,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_arr_mrr_report"
+        ],
+        "entities": [
+          "di_finance_entities_fin_arr_mrr_report"
+        ],
+        "tables": [
+          "di_finance_tables_fin_arr_mrr_report"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_arr_mrr_report"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "arr",
+        "mrr",
+        "nrr",
+        "churn"
+      ]
+    },
+    {
+      "id": "fin_bank_statement",
+      "name": {
+        "en": "Bank Statement",
+        "pt": "Extrato Bancario"
+      },
+      "description": "Bank Statement document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?bank[\\s_-]?statement\\b",
+        "\\bbank\\s+statement\\b",
+        "\\bextrato\\s+bancario\\b"
+      ],
+      "priority": 115,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_bank_statement"
+        ],
+        "entities": [
+          "di_finance_entities_fin_bank_statement"
+        ],
+        "tables": [
+          "di_finance_tables_fin_bank_statement"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_bank_statement"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "opening_balance",
+        "closing_balance",
+        "debit",
+        "credit"
+      ]
+    },
+    {
+      "id": "fin_board_deck_finance",
+      "name": {
+        "en": "Finance Board Deck",
+        "pt": "Deck Financeiro para Conselho"
+      },
+      "description": "Finance Board Deck document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?board[\\s_-]?deck[\\s_-]?finance\\b",
+        "\\bfinance\\s+board\\s+deck\\b",
+        "\\bdeck\\s+financeiro\\s+para\\s+conselho\\b"
+      ],
+      "priority": 117,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_board_deck_finance"
+        ],
+        "entities": [
+          "di_finance_entities_fin_board_deck_finance"
+        ],
+        "tables": [
+          "di_finance_tables_fin_board_deck_finance"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_board_deck_finance"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "runway",
+        "burn_multiple",
+        "cash_position",
+        "strategic_kpi"
+      ]
+    },
+    {
+      "id": "fin_budget",
+      "name": {
+        "en": "Budget",
+        "pt": "Orcamento"
+      },
+      "description": "Budget document intelligence profile.",
+      "archetypeId": "finance_planning_forecast",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?budget\\b",
+        "\\bbudget\\b",
+        "\\borcamento\\b"
+      ],
+      "priority": 123,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_budget"
+        ],
+        "entities": [
+          "di_finance_entities_fin_budget"
+        ],
+        "tables": [
+          "di_finance_tables_fin_budget"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_budget"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "planned_revenue",
+        "planned_opex",
+        "planned_capex",
+        "planned_headcount"
+      ]
+    },
+    {
+      "id": "fin_cap_table",
+      "name": {
+        "en": "Cap Table",
+        "pt": "Tabela de Capitalizacao"
+      },
+      "description": "Cap Table document intelligence profile.",
+      "archetypeId": "finance_capital_compliance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?cap[\\s_-]?table\\b",
+        "\\bcap\\s+table\\b",
+        "\\btabela\\s+de\\s+capitalizacao\\b"
+      ],
+      "priority": 112,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_cap_table"
+        ],
+        "entities": [
+          "di_finance_entities_fin_cap_table"
+        ],
+        "tables": [
+          "di_finance_tables_fin_cap_table"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_cap_table"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "ownership_percent",
+        "fully_diluted_shares",
+        "option_pool",
+        "share_class"
+      ]
+    },
+    {
+      "id": "fin_cash_forecast",
+      "name": {
+        "en": "Cash Forecast",
+        "pt": "Previsao de Caixa"
+      },
+      "description": "Cash Forecast document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?cash[\\s_-]?forecast\\b",
+        "\\bcash\\s+forecast\\b",
+        "\\bprevisao\\s+de\\s+caixa\\b"
+      ],
+      "priority": 116,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_cash_forecast"
+        ],
+        "entities": [
+          "di_finance_entities_fin_cash_forecast"
+        ],
+        "tables": [
+          "di_finance_tables_fin_cash_forecast"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_cash_forecast"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "cash_in",
+        "cash_out",
+        "net_cash",
+        "minimum_cash"
+      ]
+    },
+    {
+      "id": "fin_cohort_analysis",
+      "name": {
+        "en": "Cohort Analysis",
+        "pt": "Analise de Coorte"
+      },
+      "description": "Cohort Analysis document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?cohort[\\s_-]?analysis\\b",
+        "\\bcohort\\s+analysis\\b",
+        "\\banalise\\s+de\\s+coorte\\b"
+      ],
+      "priority": 108,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_cohort_analysis"
+        ],
+        "entities": [
+          "di_finance_entities_fin_cohort_analysis"
+        ],
+        "tables": [
+          "di_finance_tables_fin_cohort_analysis"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_cohort_analysis"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "retention",
+        "expansion",
+        "churn",
+        "cohort_ltv"
+      ]
+    },
+    {
+      "id": "fin_covenant_compliance_certificate",
+      "name": {
+        "en": "Covenant Compliance Certificate",
+        "pt": "Certificado de Compliance de Covenants"
+      },
+      "description": "Covenant Compliance Certificate document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?covenant[\\s_-]?compliance[\\s_-]?certificate\\b",
+        "\\bcovenant\\s+compliance\\s+certificate\\b",
+        "\\bcertificado\\s+de\\s+compliance\\s+de\\s+covenants\\b"
+      ],
+      "priority": 113,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_covenant_compliance_certificate"
+        ],
+        "entities": [
+          "di_finance_entities_fin_covenant_compliance_certificate"
+        ],
+        "tables": [
+          "di_finance_tables_fin_covenant_compliance_certificate"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_covenant_compliance_certificate"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "leverage_ratio",
+        "interest_coverage",
+        "dscr",
+        "compliance_status"
+      ]
+    },
+    {
+      "id": "fin_debt_schedule",
+      "name": {
+        "en": "Debt Schedule",
+        "pt": "Cronograma de Divida"
+      },
+      "description": "Debt Schedule document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?debt[\\s_-]?schedule\\b",
+        "\\bdebt\\s+schedule\\b",
+        "\\bcronograma\\s+de\\s+divida\\b"
+      ],
+      "priority": 114,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_debt_schedule"
+        ],
+        "entities": [
+          "di_finance_entities_fin_debt_schedule"
+        ],
+        "tables": [
+          "di_finance_tables_fin_debt_schedule"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_debt_schedule"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "principal",
+        "interest",
+        "maturity",
+        "covenant_ratio"
+      ]
+    },
+    {
+      "id": "fin_earnings_release",
+      "name": {
+        "en": "Earnings Release",
+        "pt": "Comunicado de Resultados"
+      },
+      "description": "Earnings Release document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?earnings[\\s_-]?release\\b",
+        "\\bearnings\\s+release\\b",
+        "\\bcomunicado\\s+de\\s+resultados\\b"
+      ],
+      "priority": 127,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_earnings_release"
+        ],
+        "entities": [
+          "di_finance_entities_fin_earnings_release"
+        ],
+        "tables": [
+          "di_finance_tables_fin_earnings_release"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_earnings_release"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "revenue",
+        "eps",
+        "ebitda",
+        "free_cash_flow"
+      ]
+    },
+    {
+      "id": "fin_esg_report",
+      "name": {
+        "en": "ESG Report",
+        "pt": "Relatorio ESG"
+      },
+      "description": "ESG Report document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?esg[\\s_-]?report\\b",
+        "\\besg\\s+report\\b",
+        "\\brelatorio\\s+esg\\b"
+      ],
+      "priority": 125,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_esg_report"
+        ],
+        "entities": [
+          "di_finance_entities_fin_esg_report"
+        ],
+        "tables": [
+          "di_finance_tables_fin_esg_report"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_esg_report"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "scope1",
+        "scope2",
+        "diversity",
+        "governance_score"
+      ]
+    },
+    {
+      "id": "fin_forecast",
+      "name": {
+        "en": "Forecast",
+        "pt": "Previsao Financeira"
+      },
+      "description": "Forecast document intelligence profile.",
+      "archetypeId": "finance_planning_forecast",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?forecast\\b",
+        "\\bforecast\\b",
+        "\\bprevisao\\s+financeira\\b"
+      ],
+      "priority": 122,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_forecast"
+        ],
+        "entities": [
+          "di_finance_entities_fin_forecast"
+        ],
+        "tables": [
+          "di_finance_tables_fin_forecast"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_forecast"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "projected_revenue",
+        "projected_ebitda",
+        "projected_cash",
+        "assumption"
+      ]
+    },
+    {
+      "id": "fin_investor_presentation",
+      "name": {
+        "en": "Investor Presentation",
+        "pt": "Apresentacao para Investidores"
+      },
+      "description": "Investor Presentation document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?investor[\\s_-]?presentation\\b",
+        "\\binvestor\\s+presentation\\b",
+        "\\bapresentacao\\s+para\\s+investidores\\b"
+      ],
+      "priority": 126,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_investor_presentation"
+        ],
+        "entities": [
+          "di_finance_entities_fin_investor_presentation"
+        ],
+        "tables": [
+          "di_finance_tables_fin_investor_presentation"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_investor_presentation"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "growth_rate",
+        "margin",
+        "guidance",
+        "cash_burn"
+      ]
+    },
+    {
+      "id": "fin_kpi_dashboard",
+      "name": {
+        "en": "KPI Dashboard",
+        "pt": "Dashboard de KPIs"
+      },
+      "description": "KPI Dashboard document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?kpi[\\s_-]?dashboard\\b",
+        "\\bkpi\\s+dashboard\\b",
+        "\\bdashboard\\s+de\\s+kpis\\b"
+      ],
+      "priority": 119,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_kpi_dashboard"
+        ],
+        "entities": [
+          "di_finance_entities_fin_kpi_dashboard"
+        ],
+        "tables": [
+          "di_finance_tables_fin_kpi_dashboard"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_kpi_dashboard"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "arr",
+        "mrr",
+        "cac",
+        "ltv"
+      ]
+    },
+    {
+      "id": "fin_monthly_close_pack",
+      "name": {
+        "en": "Monthly Close Pack",
+        "pt": "Pacote de Fechamento Mensal"
+      },
+      "description": "Monthly Close Pack document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?monthly[\\s_-]?close[\\s_-]?pack\\b",
+        "\\bmonthly\\s+close\\s+pack\\b",
+        "\\bpacote\\s+de\\s+fechamento\\s+mensal\\b"
+      ],
+      "priority": 118,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_monthly_close_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_monthly_close_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_monthly_close_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_monthly_close_pack"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "month_end_revenue",
+        "month_end_expense",
+        "close_adjustment",
+        "accrual"
+      ]
+    },
+    {
+      "id": "fin_pipeline_report",
+      "name": {
+        "en": "Pipeline Report",
+        "pt": "Relatorio de Pipeline"
+      },
+      "description": "Pipeline Report document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?pipeline[\\s_-]?report\\b",
+        "\\bpipeline\\s+report\\b",
+        "\\brelatorio\\s+de\\s+pipeline\\b"
+      ],
+      "priority": 109,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_pipeline_report"
+        ],
+        "entities": [
+          "di_finance_entities_fin_pipeline_report"
+        ],
+        "tables": [
+          "di_finance_tables_fin_pipeline_report"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_pipeline_report"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "pipeline_value",
+        "win_rate",
+        "avg_deal_size",
+        "coverage_ratio"
+      ]
+    },
+    {
+      "id": "fin_rolling_forecast",
+      "name": {
+        "en": "Rolling Forecast",
+        "pt": "Forecast Rolling"
+      },
+      "description": "Rolling Forecast document intelligence profile.",
+      "archetypeId": "finance_planning_forecast",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?rolling[\\s_-]?forecast\\b",
+        "\\brolling\\s+forecast\\b",
+        "\\bforecast\\s+rolling\\b"
+      ],
+      "priority": 121,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_rolling_forecast"
+        ],
+        "entities": [
+          "di_finance_entities_fin_rolling_forecast"
+        ],
+        "tables": [
+          "di_finance_tables_fin_rolling_forecast"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_rolling_forecast"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "rolling_revenue",
+        "rolling_opex",
+        "rolling_cash",
+        "run_rate"
+      ]
+    },
+    {
+      "id": "fin_statements_pack",
+      "name": {
+        "en": "Financial Statements Pack",
+        "pt": "Pacote de Demonstracoes Financeiras"
+      },
+      "description": "Financial Statements Pack document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?statements[\\s_-]?pack\\b",
+        "\\bfinancial\\s+statements\\s+pack\\b",
+        "\\bpacote\\s+de\\s+demonstracoes\\s+financeiras\\b"
+      ],
+      "priority": 124,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_statements_pack"
+        ],
+        "entities": [
+          "di_finance_entities_fin_statements_pack"
+        ],
+        "tables": [
+          "di_finance_tables_fin_statements_pack"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_statements_pack"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "revenue",
+        "gross_profit",
+        "total_assets",
+        "cash"
+      ]
+    },
+    {
+      "id": "fin_unit_economics_model",
+      "name": {
+        "en": "Unit Economics Model",
+        "pt": "Modelo de Unit Economics"
+      },
+      "description": "Unit Economics Model document intelligence profile.",
+      "archetypeId": "finance_statements_performance",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?unit[\\s_-]?economics[\\s_-]?model\\b",
+        "\\bunit\\s+economics\\s+model\\b",
+        "\\bmodelo\\s+de\\s+unit\\s+economics\\b"
+      ],
+      "priority": 111,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_unit_economics_model"
+        ],
+        "entities": [
+          "di_finance_entities_fin_unit_economics_model"
+        ],
+        "tables": [
+          "di_finance_tables_fin_unit_economics_model"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_unit_economics_model"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "cac",
+        "ltv",
+        "contribution_margin",
+        "payback_months"
+      ]
+    },
+    {
+      "id": "fin_variance_report",
+      "name": {
+        "en": "Variance Report",
+        "pt": "Relatorio de Variacao"
+      },
+      "description": "Variance Report document intelligence profile.",
+      "archetypeId": "finance_planning_forecast",
+      "detectionPatterns": [
+        "\\bfin[\\s_-]?variance[\\s_-]?report\\b",
+        "\\bvariance\\s+report\\b",
+        "\\brelatorio\\s+de\\s+variacao\\b"
+      ],
+      "priority": 120,
+      "detectionHintsRefs": [
+        "di_finance_domain_detection_rules",
+        "doc_aliases_finance"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_finance_sections_fin_variance_report"
+        ],
+        "entities": [
+          "di_finance_entities_fin_variance_report"
+        ],
+        "tables": [
+          "di_finance_tables_fin_variance_report"
+        ],
+        "extraction": [
+          "di_finance_extraction_fin_variance_report"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "budget_variance",
+        "actual_variance",
+        "variance_percent",
+        "driver"
+      ]
+    }
+  ]
+}

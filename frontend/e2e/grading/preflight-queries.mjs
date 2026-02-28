@@ -70,7 +70,7 @@ function loadLatestScorecard() {
 function assertGo(scorecard, pack) {
   const verdict = String(scorecard?.summary?.verdict || 'NO_GO');
   const finalScore = Number(scorecard?.summary?.finalScore || 0);
-  if (verdict !== 'GO' || finalScore < 90) {
+  if (verdict !== 'GO' || finalScore < 95) {
     throw new Error(`Pack ${pack} did not pass readiness gate (verdict=${verdict}, score=${finalScore})`);
   }
 }

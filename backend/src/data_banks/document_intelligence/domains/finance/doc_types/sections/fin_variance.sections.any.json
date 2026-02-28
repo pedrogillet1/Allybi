@@ -1,0 +1,11 @@
+{
+  "_meta": { "id": "di_finance_sections_fin_variance", "version": "1.0.0", "description": "Section map for variance analysis reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "finance", "docType": "fin_variance" },
+  "sections": [
+    { "id": "commentary", "name": { "en": "Management Commentary", "pt": "Comentário da Administração" }, "required": false, "order": 5, "headingAnchors": ["Commentary", "Explanation", "Key Drivers"] },
+    { "id": "executive_summary", "name": { "en": "Executive Summary", "pt": "Resumo Executivo" }, "required": false, "order": 1, "headingAnchors": ["Executive Summary", "Overview"] },
+    { "id": "expense_variance", "name": { "en": "Expense Variance", "pt": "Variação de Despesas" }, "required": true, "order": 3, "headingAnchors": ["Expense Variance", "Cost Variance"] },
+    { "id": "pnl_variance", "name": { "en": "P&L Variance Summary", "pt": "Resumo de Variação P&L" }, "required": true, "order": 4, "headingAnchors": ["P&L Variance", "Income Statement Variance", "Total Variance"] },
+    { "id": "revenue_variance", "name": { "en": "Revenue Variance", "pt": "Variação de Receita" }, "required": true, "order": 2, "headingAnchors": ["Revenue Variance", "Revenue Analysis"] }
+  ]
+}

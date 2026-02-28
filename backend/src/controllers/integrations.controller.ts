@@ -12,8 +12,8 @@ import {
   validateConnectorEnv,
   type ConnectorProvider,
 } from "../services/connectors/connectorsRegistry";
+import { verifyEmailSendConfirmationToken } from "../services/connectors/emailSendConfirmation.service";
 import { addConnectorSyncJob } from "../queues/connector.queue";
-import { TokenVaultService } from "../services/connectors/tokenVault.service";
 
 interface ApiError {
   code: string;
@@ -227,7 +227,15 @@ function mapHandlerError(error: string): { code: string; status: number } {
     return { code: "INVALID_CONTEXT", status: 400 };
   if (e.includes("queue unavailable"))
     return { code: "QUEUE_UNAVAILABLE", status: 503 };
-  if (e.includes("token") || e.includes("expired") || e.includes("refresh"))
+  if (
+    e.includes("no active") ||
+    e.includes("not connected") ||
+    e.includes("reconnect") ||
+    e.includes("token")
+  ) {
+    return { code: "CONNECTOR_NOT_CONNECTED", status: 401 };
+  }
+  if (e.includes("expired") || e.includes("refresh"))
     return { code: "TOKEN_ERROR", status: 401 };
   if (e.includes("not authenticated") || e.includes("unauthorized"))
     return { code: "AUTH_ERROR", status: 401 };
@@ -457,7 +465,20 @@ export class IntegrationsController {
             capabilities: getConnectorCapabilities(provider),
             env,
             ok: result.ok,
-            ...(result.ok ? { status: result.data } : { error: result.error }),
+            ...(result.ok
+              ? {
+                  status: {
+                    connected: Boolean(result.data?.connected),
+                    reason:
+                      (result.data?.reason as string | null | undefined) ||
+                      null,
+                    indexedDocuments:
+                      Number(result.data?.indexedDocuments || 0) || 0,
+                    providerAccountId:
+                      (result.data?.providerAccountId as string | null) || null,
+                  },
+                }
+              : { error: result.error }),
           };
         } catch (e) {
           // Don't let one provider failure break the entire status response
@@ -598,9 +619,46 @@ export class IntegrationsController {
       return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const body = (req.body || {}) as Record<string, unknown>;
-    const to = asString(body.to);
-    const subject = asString(body.subject) || "";
-    const emailBody = asString(body.body) || "";
+    const confirmationTokenRaw =
+      asString(body.confirmationId) || asString(body.confirmationToken);
+    if (!confirmationTokenRaw) {
+      return sendErr(
+        res,
+        "CONFIRMATION_REQUIRED",
+        "A valid confirmation token is required to send email.",
+        400,
+      );
+    }
+
+    let confirmed;
+    try {
+      confirmed = verifyEmailSendConfirmationToken(confirmationTokenRaw);
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : "Invalid confirmation token.";
+      return sendErr(res, "INVALID_CONFIRMATION", message, 400);
+    }
+
+    if (confirmed.userId !== context.userId) {
+      return sendErr(
+        res,
+        "INVALID_CONFIRMATION_USER",
+        "Confirmation token does not belong to this user.",
+        403,
+      );
+    }
+    if (confirmed.provider !== providerRaw) {
+      return sendErr(
+        res,
+        "INVALID_CONFIRMATION_PROVIDER",
+        "Confirmation token provider does not match the selected provider.",
+        400,
+      );
+    }
+
+    const to = asString(confirmed.to);
+    const subject = confirmed.subject || "";
+    const emailBody = confirmed.body || "";
     const cc = asString(body.cc) || undefined;
     const bcc = asString(body.bcc) || undefined;
 
@@ -619,6 +677,7 @@ export class IntegrationsController {
       to,
       subject,
       body: emailBody,
+      confirmationId: confirmationTokenRaw,
       cc,
       bcc,
     });
@@ -654,17 +713,28 @@ export class IntegrationsController {
     if (!context)
       return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
-    try {
-      const vault = new TokenVaultService();
-      await vault.deleteToken(context.userId, providerRaw as ConnectorProvider);
-      return sendOk(res, { provider: providerRaw, disconnected: true });
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to disconnect provider.";
-      return sendErr(res, "DISCONNECT_FAILED", message, 500);
+    const result = await this.connectorHandler.execute({
+      action: "disconnect",
+      provider: providerRaw,
+      context,
+    });
+
+    if (!result.ok) {
+      const mapped = mapHandlerError(result.error || "disconnect failed");
+      return sendErr(
+        res,
+        mapped.code,
+        result.error || "Failed to disconnect provider.",
+        mapped.status,
+      );
     }
+
+    return sendOk(res, {
+      provider: providerRaw,
+      disconnected: true,
+      revokeAttempted: Boolean(result.data?.revokeAttempted),
+      revoked: Boolean(result.data?.revoked),
+    });
   };
 }
 

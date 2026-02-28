@@ -33,6 +33,7 @@ export interface ConnectorHandlerRequest {
   to?: string;
   subject?: string;
   body?: string;
+  confirmationId?: string;
   cc?: string;
   bcc?: string;
   attachments?: Array<{ filename: string; mimeType: string; content: Buffer }>;
@@ -84,23 +85,39 @@ export class ConnectorHandlerService {
       };
     }
 
+    let module: {
+      oauthService?: unknown;
+      syncService?: unknown;
+      clientService?: unknown;
+    } | null = null;
+    try {
+      module = await getConnector(provider);
+    } catch {
+      module = null;
+    }
+
     if (req.action === "status") {
-      let oauthService: unknown;
-      try {
-        const module = await getConnector(provider);
-        oauthService = module.oauthService;
-      } catch {
-        /* module not registered; status still works without refresh */
-      }
-      return this.getStatus(provider, req.context.userId, oauthService);
+      return this.getStatus(provider, req.context.userId, module?.oauthService);
     }
 
     if (req.action === "disconnect") {
-      return this.disconnect(provider, req.context.userId);
+      return this.disconnect(
+        provider,
+        req.context.userId,
+        module?.oauthService,
+      );
+    }
+
+    if (!module) {
+      return {
+        ok: false,
+        action: req.action,
+        provider,
+        error: `Connector provider ${provider} is not registered.`,
+      };
     }
 
     try {
-      const module = await getConnector(provider);
       if (req.action === "connect")
         return await this.connect(provider, module.oauthService, req);
       if (req.action === "sync")
@@ -143,51 +160,19 @@ export class ConnectorHandlerService {
       },
     });
 
-    const tokenMeta = await this.tokenVault
-      .getProviderConnectionInfo(userId, provider)
-      .catch(() => null);
-
-    let connected = Boolean(tokenMeta);
-    let expired = false;
-    let refreshed = false;
-
-    // Check if token is expired or about to expire (60s safety window, same as tokenVault)
-    if (tokenMeta?.expiresAt) {
-      const expiresAtMs = new Date(tokenMeta.expiresAt).getTime();
-      if (expiresAtMs <= Date.now() + 60_000) {
-        expired = true;
-        connected = false;
-
-        // Attempt token refresh if oauthService is available
-        const svc = oauthService as Record<string, unknown> | undefined;
-        const refreshFn = svc?.refreshAccessToken ?? svc?.refreshToken;
-        if (typeof refreshFn === "function") {
-          try {
-            // Connector refresh implementations vary: some take `userId: string`,
-            // others take `{ userId }`. Try string first, then object.
-            try {
-              await Promise.resolve(
-                (refreshFn as (arg: unknown) => unknown).call(
-                  oauthService,
-                  userId,
-                ),
-              );
-            } catch {
-              await Promise.resolve(
-                (refreshFn as (arg: unknown) => unknown).call(oauthService, {
-                  userId,
-                }),
-              );
-            }
-            connected = true;
-            expired = false;
-            refreshed = true;
-          } catch {
-            // Refresh failed — token stays expired
-          }
-        }
-      }
-    }
+    const ensured = await this.tokenVault.ensureConnectedAccess(
+      userId,
+      provider,
+      {
+        refreshFn: this.getRefreshFn(oauthService),
+        oauthService,
+      },
+    );
+    const tokenMeta =
+      ensured.info ||
+      (await this.tokenVault
+        .getProviderConnectionInfo(userId, provider)
+        .catch(() => null));
 
     return {
       ok: true,
@@ -196,9 +181,8 @@ export class ConnectorHandlerService {
       data: {
         provider,
         capabilities: caps,
-        connected,
-        expired,
-        refreshed,
+        connected: ensured.connected,
+        reason: ensured.connected ? null : ensured.reason || "not_connected",
         tokenUpdatedAt: tokenMeta?.updatedAt?.toISOString?.() ?? null,
         tokenExpiresAt: tokenMeta?.expiresAt?.toISOString?.() ?? null,
         providerAccountId: tokenMeta?.providerAccountId ?? null,
@@ -271,7 +255,29 @@ export class ConnectorHandlerService {
   private async disconnect(
     provider: ConnectorProvider,
     userId: string,
+    oauthService?: unknown,
   ): Promise<ConnectorHandlerResult> {
+    let revokeAttempted = false;
+    let revoked = false;
+    const serviceRecord = oauthService as Record<string, unknown> | undefined;
+    const revokeFn =
+      (serviceRecord?.revokeAccess as
+        | ((arg: string | { userId: string }) => unknown)
+        | undefined) ||
+      (serviceRecord?.revokeToken as
+        | ((arg: string | { userId: string }) => unknown)
+        | undefined);
+
+    if (typeof revokeFn === "function") {
+      revokeAttempted = true;
+      try {
+        const out = await Promise.resolve(revokeFn.call(oauthService, userId));
+        revoked = out === true;
+      } catch {
+        revoked = false;
+      }
+    }
+
     await this.tokenVault.deleteToken(userId, provider);
     return {
       ok: true,
@@ -280,6 +286,8 @@ export class ConnectorHandlerService {
       data: {
         provider,
         disconnected: true,
+        revokeAttempted,
+        revoked,
       },
     };
   }
@@ -289,6 +297,14 @@ export class ConnectorHandlerService {
     syncService: unknown,
     req: ConnectorHandlerRequest,
   ): Promise<ConnectorHandlerResult> {
+    const connected = await this.ensureConnected(
+      provider,
+      req.context.userId,
+      req,
+      true,
+    );
+    if (!connected.ok) return connected.result;
+
     const queued = await this.enqueueSync(
       req.context.userId,
       provider,
@@ -336,6 +352,7 @@ export class ConnectorHandlerService {
         provider,
         data: {
           mode: "direct",
+          ...(this.normalizeSyncMetrics(out) || {}),
           result: out ?? null,
         },
       };
@@ -409,6 +426,14 @@ export class ConnectorHandlerService {
     provider: ConnectorProvider,
     req: ConnectorHandlerRequest,
   ): Promise<ConnectorHandlerResult> {
+    const connected = await this.ensureConnected(
+      provider,
+      req.context.userId,
+      req,
+      true,
+    );
+    if (!connected.ok) return connected.result;
+
     const q = (req.query || "").trim();
     if (!q)
       return {
@@ -422,10 +447,19 @@ export class ConnectorHandlerService {
     const docs = await prisma.document.findMany({
       where: {
         userId: req.context.userId,
-        filename: { startsWith: `${provider}_` },
+        encryptedFilename: { contains: `/connectors/${provider}/` },
         OR: [
           { filename: { contains: q, mode: "insensitive" } },
           { displayTitle: { contains: q, mode: "insensitive" } },
+          { rawText: { contains: q, mode: "insensitive" } },
+          { previewText: { contains: q, mode: "insensitive" } },
+          {
+            metadata: {
+              is: {
+                extractedText: { contains: q, mode: "insensitive" },
+              },
+            },
+          },
         ],
       },
       orderBy: { updatedAt: "desc" },
@@ -434,13 +468,24 @@ export class ConnectorHandlerService {
         id: true,
         filename: true,
         displayTitle: true,
+        rawText: true,
+        previewText: true,
+        metadata: { select: { extractedText: true } },
       },
     });
 
     const hits: ConnectorSearchHit[] = docs.map((doc) => ({
       documentId: doc.id,
       title: doc.displayTitle || doc.filename || "(untitled)",
-      snippet: this.buildSnippet(doc.displayTitle || doc.filename || "", q),
+      snippet: this.buildSnippet(
+        doc.rawText ||
+          doc.previewText ||
+          doc.metadata?.extractedText ||
+          doc.displayTitle ||
+          doc.filename ||
+          "",
+        q,
+      ),
       source: provider,
     }));
 
@@ -480,11 +525,15 @@ export class ConnectorHandlerService {
       };
     }
 
-    // Get the access token for this provider (refresh if expired).
-    let tokenPayload = await this.tokenVault
-      .getDecryptedPayload(req.context.userId, provider)
-      .catch(() => null);
-    if (!tokenPayload?.accessToken) {
+    const ensured = await this.tokenVault.ensureConnectedAccess(
+      req.context.userId,
+      provider,
+      {
+        refreshFn: this.getRefreshFn(oauthService),
+        oauthService,
+      },
+    );
+    if (!ensured.connected || !ensured.accessToken) {
       return {
         ok: false,
         action: "send",
@@ -493,43 +542,8 @@ export class ConnectorHandlerService {
       };
     }
 
-    const meta = await this.tokenVault
-      .getProviderTokenMeta(req.context.userId, provider)
-      .catch(() => null);
-    if (meta?.expiresAt) {
-      const expiresAtMs = meta.expiresAt.getTime();
-      if (expiresAtMs <= Date.now() + 60_000) {
-        const svc = oauthService as Record<string, unknown> | null;
-        const refreshFn =
-          svc && typeof svc.refreshAccessToken === "function"
-            ? (svc.refreshAccessToken as any)
-            : null;
-        if (refreshFn) {
-          try {
-            const refreshed = await Promise.resolve(
-              refreshFn.call(oauthService, req.context.userId),
-            );
-            const newAccessToken = (refreshed as any)?.accessToken;
-            if (typeof newAccessToken === "string" && newAccessToken.trim()) {
-              tokenPayload = { ...tokenPayload, accessToken: newAccessToken };
-            } else {
-              // Fall back to reading updated payload from vault.
-              tokenPayload = await this.tokenVault
-                .getDecryptedPayload(req.context.userId, provider)
-                .catch(() => tokenPayload);
-            }
-          } catch {
-            // Refresh failed — proceed; API call may fail and return a clearer error.
-          }
-        }
-      }
-    }
-
     // Check for send scope
-    const scopeInfo = await this.tokenVault
-      .getProviderConnectionInfo(req.context.userId, provider)
-      .catch(() => null);
-    const scopes = (scopeInfo as Record<string, unknown> | null)?.scopes;
+    const scopes = ensured.info?.scopes;
     const scopeList = Array.isArray(scopes)
       ? scopes.join(" ")
       : String(scopes || "");
@@ -566,7 +580,7 @@ export class ConnectorHandlerService {
       };
     }
 
-    const accessToken = tokenPayload?.accessToken;
+    const accessToken = ensured.accessToken;
     if (!accessToken) {
       return {
         ok: false,
@@ -616,5 +630,94 @@ export class ConnectorHandlerService {
     const start = Math.max(0, idx - 80);
     const end = Math.min(rawText.length, idx + query.length + 120);
     return rawText.slice(start, end);
+  }
+
+  private getRefreshFn(
+    oauthService: unknown,
+  ): ((arg: string | { userId: string }) => unknown) | null {
+    const svc = oauthService as Record<string, unknown> | undefined;
+    const fn =
+      (svc?.refreshAccessToken as
+        | ((arg: string | { userId: string }) => unknown)
+        | undefined) ||
+      (svc?.refreshToken as
+        | ((arg: string | { userId: string }) => unknown)
+        | undefined);
+    return typeof fn === "function" ? fn : null;
+  }
+
+  private async ensureConnected(
+    provider: ConnectorProvider,
+    userId: string,
+    req: ConnectorHandlerRequest,
+    includeInfo = false,
+  ): Promise<{
+    ok: boolean;
+    accessToken?: string | null;
+    info?: Record<string, unknown> | null;
+    result: ConnectorHandlerResult;
+  }> {
+    let oauthService: unknown;
+    try {
+      const module = await getConnector(provider);
+      oauthService = module.oauthService;
+    } catch {
+      oauthService = undefined;
+    }
+
+    const ensured = await this.tokenVault.ensureConnectedAccess(
+      userId,
+      provider,
+      {
+        refreshFn: this.getRefreshFn(oauthService),
+        oauthService,
+      },
+    );
+
+    if (!ensured.connected || !ensured.accessToken) {
+      return {
+        ok: false,
+        result: {
+          ok: false,
+          action: req.action,
+          provider,
+          error: `No active ${provider} connection. Reconnect required.`,
+          data: includeInfo
+            ? { reason: ensured.reason || "not_connected" }
+            : undefined,
+        },
+      };
+    }
+
+    return {
+      ok: true,
+      accessToken: ensured.accessToken,
+      info: (ensured.info as Record<string, unknown> | null) || null,
+      result: {
+        ok: true,
+        action: req.action,
+        provider,
+      },
+    };
+  }
+
+  private normalizeSyncMetrics(out: unknown): Record<string, unknown> | null {
+    if (!out || typeof out !== "object") return null;
+    const record = out as Record<string, unknown>;
+    const fetchedCount = Number(record.fetchedCount);
+    const ingestedCount = Number(record.ingestedCount);
+    const createdCount = Number(record.createdCount);
+    const existingCount = Number(record.existingCount);
+    const syncedCount = Number(record.syncedCount);
+
+    const metrics: Record<string, unknown> = {};
+    if (Number.isFinite(fetchedCount)) metrics.fetchedCount = fetchedCount;
+    if (Number.isFinite(ingestedCount)) metrics.ingestedCount = ingestedCount;
+    if (Number.isFinite(createdCount)) metrics.createdCount = createdCount;
+    if (Number.isFinite(existingCount)) metrics.existingCount = existingCount;
+    if (Number.isFinite(syncedCount)) metrics.syncedCount = syncedCount;
+
+    const hasAny = Object.keys(metrics).length > 0;
+    return hasAny ? metrics : null;
   }
 }

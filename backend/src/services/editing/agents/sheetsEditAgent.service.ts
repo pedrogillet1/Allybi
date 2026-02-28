@@ -45,8 +45,7 @@ interface ResolvedFormulaCols {
 
 const FORMULA_TEMPLATES: FormulaTemplate[] = [
   {
-    pattern:
-      /\b(profit\s*margin|margem\s*de\s*lucro)\b/i,
+    pattern: /\b(profit\s*margin|margem\s*de\s*lucro)\b/i,
     build: ({ value, secondary, lastRow: _lr }) => {
       const rev = value;
       const cost = secondary || String.fromCharCode(value.charCodeAt(0) + 1);
@@ -58,8 +57,7 @@ const FORMULA_TEMPLATES: FormulaTemplate[] = [
     build: ({ value }) => `=SUM($${value}$2:${value}{r})`,
   },
   {
-    pattern:
-      /\b(percent(age)?\s*of\s*total|percentual\s*do\s*total)\b/i,
+    pattern: /\b(percent(age)?\s*of\s*total|percentual\s*do\s*total)\b/i,
     build: ({ value, lastRow }) =>
       `=${value}{r}/SUM(${value}$2:${value}$${lastRow})`,
   },
@@ -72,13 +70,47 @@ const FORMULA_TEMPLATES: FormulaTemplate[] = [
   },
   {
     pattern: /\b(growth\s*rate|taxa\s*de\s*crescimento)\b/i,
-    build: ({ value }) =>
-      `=(${value}{r}-${value}{r-1})/${value}{r-1}`,
+    build: ({ value }) => `=(${value}{r}-${value}{r-1})/${value}{r-1}`,
   },
   {
     pattern: /\b(average|m[eé]dia)\b/i,
+    build: ({ value, lastRow }) => `=AVERAGE(${value}$2:${value}$${lastRow})`,
+  },
+  {
+    pattern: /\b(sumifs?|sum\s+if|conditional\s+sum|soma\s+condicional)\b/i,
     build: ({ value, lastRow }) =>
-      `=AVERAGE(${value}$2:${value}$${lastRow})`,
+      `=SUMIFS(${value}$2:${value}$${lastRow},{criteria_range},{criteria})`,
+  },
+  {
+    pattern: /\b(countifs?|count\s+if|contar\s+se)\b/i,
+    build: ({ value, lastRow }) =>
+      `=COUNTIFS(${value}$2:${value}$${lastRow},{criteria})`,
+  },
+  {
+    pattern: /\b(xlookup|vlookup|lookup|buscar|procurar)\b/i,
+    build: ({ value, secondary, lastRow }) => {
+      const returnCol =
+        secondary || String.fromCharCode(value.charCodeAt(0) + 1);
+      return `=XLOOKUP({lookup_value},${value}$2:${value}$${lastRow},${returnCol}$2:${returnCol}$${lastRow})`;
+    },
+  },
+  {
+    pattern: /\b(index\s*match)\b/i,
+    build: ({ value, secondary, lastRow }) => {
+      const returnCol =
+        secondary || String.fromCharCode(value.charCodeAt(0) + 1);
+      return `=INDEX(${returnCol}$2:${returnCol}$${lastRow},MATCH({lookup_value},${value}$2:${value}$${lastRow},0))`;
+    },
+  },
+  {
+    pattern: /\b(cagr|compound.*growth|crescimento.*composta)\b/i,
+    build: ({ value, lastRow }) =>
+      `=(${value}$${lastRow}/${value}$2)^(1/{periods})-1`,
+  },
+  {
+    pattern: /\b(rank|ranking|classificar)\b/i,
+    build: ({ value, lastRow }) =>
+      `=RANK(${value}{r},${value}$2:${value}$${lastRow})`,
   },
 ];
 
@@ -165,8 +197,7 @@ const MULTI_OP_EXPANSIONS: MultiOpExpansion[] = [
     },
   },
   {
-    pattern:
-      /\b(format\s*as\s*table|formatar\s*como\s*tabela)\b/i,
+    pattern: /\b(format\s*as\s*table|formatar\s*como\s*tabela)\b/i,
     expand: (op, context) => {
       const result: Array<Record<string, unknown>> = [];
       const sheetName =
@@ -311,10 +342,7 @@ export class SheetsEditAgentService implements EditingDomainAgent {
         const meta = candidateAny?.metadata;
         if (meta && typeof meta === "object" && "sheets" in (meta as object)) {
           const maybeModel = meta as unknown as SpreadsheetModel;
-          if (
-            maybeModel.version === 1 &&
-            Array.isArray(maybeModel.sheets)
-          ) {
+          if (maybeModel.version === 1 && Array.isArray(maybeModel.sheets)) {
             return maybeModel;
           }
         }
@@ -359,9 +387,7 @@ export class SheetsEditAgentService implements EditingDomainAgent {
 
       // Try to resolve across all sheets (prefer sheet specified in op).
       const targetSheet =
-        typeof op.sheetName === "string"
-          ? op.sheetName
-          : context.sheetNames[0];
+        typeof op.sheetName === "string" ? op.sheetName : context.sheetNames[0];
       const idx = targetSheet
         ? context.semanticIndices[targetSheet]
         : Object.values(context.semanticIndices)[0];
@@ -415,9 +441,7 @@ export class SheetsEditAgentService implements EditingDomainAgent {
       }
       // Tier 2: synonym match
       else if (
-        idx.columnSynonyms[colNumber]?.some(
-          (syn) => syn.toLowerCase() === q,
-        )
+        idx.columnSynonyms[colNumber]?.some((syn) => syn.toLowerCase() === q)
       ) {
         score = 0.8;
       }
@@ -438,13 +462,18 @@ export class SheetsEditAgentService implements EditingDomainAgent {
     return best;
   }
 
-  private queryMatchesKind(
-    query: string,
-    kind: string | undefined,
-  ): boolean {
+  private queryMatchesKind(query: string, kind: string | undefined): boolean {
     if (!kind) return false;
     const kindAliases: Record<string, string[]> = {
-      currency: ["money", "dollar", "cost", "revenue", "price", "valor", "dinheiro"],
+      currency: [
+        "money",
+        "dollar",
+        "cost",
+        "revenue",
+        "price",
+        "valor",
+        "dinheiro",
+      ],
       percent: ["percentage", "ratio", "rate", "margem", "taxa"],
       date: ["time", "when", "period", "data", "periodo"],
       text: ["name", "label", "description", "nome", "descricao"],
@@ -522,10 +551,7 @@ export class SheetsEditAgentService implements EditingDomainAgent {
 
     const numericCols: number[] = [];
     for (const [colStr, typeInfo] of Object.entries(idx.columnTypeInference)) {
-      if (
-        typeInfo.kind === "currency" ||
-        typeInfo.kind === "number"
-      ) {
+      if (typeInfo.kind === "currency" || typeInfo.kind === "number") {
         numericCols.push(Number(colStr));
       }
     }
@@ -576,9 +602,10 @@ export class SheetsEditAgentService implements EditingDomainAgent {
   // 5. Validate before apply
   // -------------------------------------------------------------------------
 
-  private validateBeforeApply(
-    ops: Array<Record<string, unknown>>,
-  ): { valid: boolean; warnings: string[] } {
+  private validateBeforeApply(ops: Array<Record<string, unknown>>): {
+    valid: boolean;
+    warnings: string[];
+  } {
     const warnings: string[] = [];
 
     for (const op of ops) {
@@ -719,9 +746,7 @@ export class SheetsEditAgentService implements EditingDomainAgent {
     for (const template of FORMULA_TEMPLATES) {
       if (template.pattern.test(instruction)) {
         const sheetName = context.sheetNames[0];
-        const idx = sheetName
-          ? context.semanticIndices[sheetName]
-          : null;
+        const idx = sheetName ? context.semanticIndices[sheetName] : null;
         const valueCol = this.findPrimaryValueColumn(idx);
         if (!valueCol) break;
 

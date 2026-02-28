@@ -1,4 +1,7 @@
-import { getOptionalBank } from "../core/banks/bankLoader.service";
+import {
+  getDocumentIntelligenceBanksInstance,
+  type DocumentIntelligenceBanksService,
+} from "../core/banks/documentIntelligenceBanks.service";
 
 type Locale = "en" | "pt" | "es";
 
@@ -47,11 +50,19 @@ export class TurnRoutePolicyService {
   private readonly connectorsRouting: RoutingBank | null;
   private readonly emailRouting: RoutingBank | null;
   private readonly strict: boolean;
+  private readonly banks: Pick<
+    DocumentIntelligenceBanksService,
+    "getRoutingBank"
+  >;
 
-  constructor(opts?: { strict?: boolean }) {
+  constructor(opts?: {
+    strict?: boolean;
+    banks?: Pick<DocumentIntelligenceBanksService, "getRoutingBank">;
+  }) {
     this.strict = opts?.strict ?? isStrictEnv();
-    this.connectorsRouting = getOptionalBank<RoutingBank>("connectors_routing");
-    this.emailRouting = getOptionalBank<RoutingBank>("email_routing");
+    this.banks = opts?.banks ?? getDocumentIntelligenceBanksInstance();
+    this.connectorsRouting = this.banks.getRoutingBank("connectors_routing");
+    this.emailRouting = this.banks.getRoutingBank("email_routing");
 
     const missingBanks: string[] = [];
     if (!this.connectorsRouting) missingBanks.push("connectors_routing");

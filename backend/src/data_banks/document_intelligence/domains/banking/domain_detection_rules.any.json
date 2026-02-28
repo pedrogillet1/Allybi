@@ -1,0 +1,143 @@
+{
+  "_meta": {
+    "id": "di_banking_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting banking documents from headings, content, and table structure.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 30
+  },
+  "domain": "banking",
+  "rules": [
+    {
+      "id": "banking_detect_001_bank_statement",
+      "priority": 100,
+      "weight": 3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bbank\\s+statement\\b",
+        "\\baccount\\s+statement\\b",
+        "\\bopening\\s+balance\\b",
+        "\\bclosing\\s+balance\\b",
+        "\\bextrato\\s+bancario\\b"
+      ],
+      "description": "Bank statement markers"
+    },
+    {
+      "id": "banking_detect_002_credit_card_statement",
+      "priority": 98,
+      "weight": 2.8,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bcredit\\s+card\\s+statement\\b",
+        "\\bminimum\\s+payment\\b",
+        "\\bcard\\s+ending\\b",
+        "\\bfatura\\s+de\\s+cartao\\b"
+      ],
+      "description": "Credit card statement markers"
+    },
+    {
+      "id": "banking_detect_003_loan_statement",
+      "priority": 97,
+      "weight": 2.7,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bloan\\s+statement\\b",
+        "\\bprincipal\\s+balance\\b",
+        "\\binterest\\s+rate\\b",
+        "\\bextrato\\s+de\\s+emprestimo\\b"
+      ],
+      "description": "Loan statement markers"
+    },
+    {
+      "id": "banking_detect_004_payment_receipt",
+      "priority": 96,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bpayment\\s+receipt\\b",
+        "\\btransfer\\s+receipt\\b",
+        "\\bauthorization\\s+code\\b",
+        "\\bcomprovante\\s+de\\s+pagamento\\b"
+      ],
+      "description": "Bank payment receipt markers"
+    },
+    {
+      "id": "banking_detect_005_transaction_columns",
+      "priority": 90,
+      "weight": 2,
+      "signal": "table_header",
+      "patterns": [
+        "\\btransaction\\s+date\\b",
+        "\\bdescription\\b",
+        "\\bdebit\\b",
+        "\\bcredit\\b",
+        "\\bbalance\\b"
+      ],
+      "description": "Canonical banking transaction table columns"
+    },
+    {
+      "id": "banking_detect_006_reference_identifiers",
+      "priority": 85,
+      "weight": 1.8,
+      "signal": "content",
+      "patterns": [
+        "\\bauthorization\\s+code\\b",
+        "\\btransaction\\s+id\\b",
+        "\\bnsu\\b",
+        "\\bend-to-end\\b",
+        "\\bprotocolo\\b"
+      ],
+      "description": "Banking transaction identifiers"
+    },
+    {
+      "id": "banking_detect_007_interest_and_fees",
+      "priority": 84,
+      "weight": 1.7,
+      "signal": "content",
+      "patterns": [
+        "\\binterest\\b",
+        "\\bannual\\s+percentage\\s+rate\\b",
+        "\\bmaintenance\\s+fee\\b",
+        "\\biof\\b",
+        "\\btarifa\\b"
+      ],
+      "description": "Interest and fee terms"
+    },
+    {
+      "id": "banking_detect_008_payment_channels",
+      "priority": 80,
+      "weight": 1.5,
+      "signal": "content",
+      "patterns": [
+        "\\bpix\\b",
+        "\\bted\\b",
+        "\\bdoc\\b",
+        "\\bwire\\s+transfer\\b",
+        "\\bdebit\\s+card\\b"
+      ],
+      "description": "Common banking payment channels"
+    },
+    {
+      "id": "banking_detect_009_negative_nonfinancial",
+      "priority": 120,
+      "weight": -3.5,
+      "signal": "negative_heading_or_content",
+      "patterns": [
+        "\\blab\\s+report\\b",
+        "\\bpatient\\b",
+        "\\bdiagnosis\\b",
+        "\\bprescription\\b",
+        "\\bmedical\\s+record\\b"
+      ],
+      "description": "Negative medical markers reduce banking classification confidence"
+    }
+  ]
+}

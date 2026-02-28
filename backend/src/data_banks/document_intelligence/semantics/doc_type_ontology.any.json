@@ -1,0 +1,2731 @@
+{
+  "_meta": {
+    "id": "di_doc_type_ontology",
+    "version": "1.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "di_domain_ontology"
+    ],
+    "usedBy": [
+      "di_section_ontology",
+      "di_entity_ontology"
+    ],
+    "tests": [
+      "SSOT_DOCTYPE_001"
+    ],
+    "lastUpdated": "2026-02-28",
+    "description": "di_doc_type_ontology (document_intelligence) configuration bank."
+  },
+  "config": {
+    "enabled": true
+  },
+  "categories": [
+    "agreement",
+    "catalog",
+    "checklist",
+    "dashboard",
+    "form",
+    "letter",
+    "log",
+    "manual",
+    "map",
+    "matrix",
+    "memo",
+    "note",
+    "plan",
+    "playbook",
+    "policy",
+    "protocol",
+    "record",
+    "register",
+    "report",
+    "request",
+    "review",
+    "schedule",
+    "statement"
+  ],
+  "docTypes": [
+    {
+      "id": "access_control_policy",
+      "domainId": "operations",
+      "label": "Access Control Policy",
+      "labelPt": "Política de Controle de Acesso",
+      "category": "policy"
+    },
+    {
+      "id": "accounts_payable_aging",
+      "domainId": "finance",
+      "label": "Accounts Payable Aging",
+      "labelPt": "Aging de Contas a Pagar",
+      "category": "report"
+    },
+    {
+      "id": "accounts_receivable_aging",
+      "domainId": "finance",
+      "label": "Accounts Receivable Aging",
+      "labelPt": "Aging de Contas a Receber",
+      "category": "report"
+    },
+    {
+      "id": "affidavit",
+      "domainId": "legal",
+      "label": "Affidavit",
+      "labelPt": "Declaração Juramentada",
+      "category": "form"
+    },
+    {
+      "id": "allergy_list",
+      "domainId": "medical",
+      "label": "Allergy List",
+      "labelPt": "Lista de Alergias",
+      "category": "record"
+    },
+    {
+      "id": "amendment",
+      "domainId": "legal",
+      "label": "Amendment",
+      "labelPt": "Aditivo",
+      "category": "agreement"
+    },
+    {
+      "id": "anesthesia_record",
+      "domainId": "medical",
+      "label": "Anesthesia Record",
+      "labelPt": "Registro de Anestesia",
+      "category": "record"
+    },
+    {
+      "id": "annual_report",
+      "domainId": "finance",
+      "label": "Annual Report",
+      "labelPt": "Relatório Anual",
+      "category": "report"
+    },
+    {
+      "id": "anti_corruption_policy",
+      "domainId": "legal",
+      "label": "Anti-Corruption Policy",
+      "labelPt": "Política Anticorrupção",
+      "category": "policy"
+    },
+    {
+      "id": "audit_adjustment_schedule",
+      "domainId": "finance",
+      "label": "Audit Adjustment Schedule",
+      "labelPt": "Cronograma de Ajustes de Auditoria",
+      "category": "schedule"
+    },
+    {
+      "id": "audit_checklist",
+      "domainId": "operations",
+      "label": "Audit Checklist",
+      "labelPt": "Checklist de Auditoria",
+      "category": "checklist"
+    },
+    {
+      "id": "balance_sheet",
+      "domainId": "finance",
+      "label": "Balance Sheet",
+      "labelPt": "Balanço Patrimonial",
+      "category": "statement"
+    },
+    {
+      "id": "bank_reconciliation",
+      "domainId": "finance",
+      "label": "Bank Reconciliation",
+      "labelPt": "Reconciliação Bancária",
+      "category": "report"
+    },
+    {
+      "id": "banking_account_opening_confirmation",
+      "domainId": "banking",
+      "label": "Banking Account Opening Confirmation",
+      "labelPt": "Banking Account Opening Confirmation",
+      "displayName": "Banking Account Opening Confirmation",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "banking_bank_statement",
+      "domainId": "banking",
+      "label": "Banking Bank Statement",
+      "labelPt": "Banking Bank Statement",
+      "displayName": "Banking Bank Statement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "banking_credit_card_statement",
+      "domainId": "banking",
+      "label": "Banking Credit Card Statement",
+      "labelPt": "Banking Credit Card Statement",
+      "displayName": "Banking Credit Card Statement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "banking_loan_statement",
+      "domainId": "banking",
+      "label": "Banking Loan Statement",
+      "labelPt": "Banking Loan Statement",
+      "displayName": "Banking Loan Statement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "banking_mortgage_statement",
+      "domainId": "banking",
+      "label": "Banking Mortgage Statement",
+      "labelPt": "Banking Mortgage Statement",
+      "displayName": "Banking Mortgage Statement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "banking_payment_receipt",
+      "domainId": "banking",
+      "label": "Banking Payment Receipt",
+      "labelPt": "Banking Payment Receipt",
+      "displayName": "Banking Payment Receipt",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "banking_transaction_export_csv",
+      "domainId": "banking",
+      "label": "Banking Transaction Export CSV",
+      "labelPt": "Banking Transaction Export CSV",
+      "displayName": "Banking Transaction Export CSV",
+      "supportedFormats": [
+        "csv",
+        "xlsx",
+        "pdf"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "banking_wire_transfer_confirmation",
+      "domainId": "banking",
+      "label": "Banking Wire Transfer Confirmation",
+      "labelPt": "Banking Wire Transfer Confirmation",
+      "displayName": "Banking Wire Transfer Confirmation",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "bcp_plan",
+      "domainId": "operations",
+      "label": "BCP Plan",
+      "labelPt": "Plano de Continuidade de Negócios",
+      "category": "plan"
+    },
+    {
+      "id": "billing_cable_streaming_invoice",
+      "domainId": "billing",
+      "label": "Billing Cable Streaming Invoice",
+      "labelPt": "Billing Cable Streaming Invoice",
+      "displayName": "Billing Cable Streaming Invoice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_ecommerce_receipt",
+      "domainId": "billing",
+      "label": "Billing Ecommerce Receipt",
+      "labelPt": "Billing Ecommerce Receipt",
+      "displayName": "Billing Ecommerce Receipt",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_electricity_bill",
+      "domainId": "billing",
+      "label": "Billing Electricity Bill",
+      "labelPt": "Billing Electricity Bill",
+      "displayName": "Billing Electricity Bill",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_gas_bill",
+      "domainId": "billing",
+      "label": "Billing Gas Bill",
+      "labelPt": "Billing Gas Bill",
+      "displayName": "Billing Gas Bill",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_hoa_condo_fee_statement",
+      "domainId": "billing",
+      "label": "Billing HOA Condo Fee Statement",
+      "labelPt": "Billing HOA Condo Fee Statement",
+      "displayName": "Billing HOA Condo Fee Statement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_internet_bill",
+      "domainId": "billing",
+      "label": "Billing Internet Bill",
+      "labelPt": "Billing Internet Bill",
+      "displayName": "Billing Internet Bill",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_invoice_business",
+      "domainId": "billing",
+      "label": "Billing Invoice Business",
+      "labelPt": "Billing Invoice Business",
+      "displayName": "Billing Invoice Business",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_medical_invoice",
+      "domainId": "billing",
+      "label": "Billing Medical Invoice",
+      "labelPt": "Billing Medical Invoice",
+      "displayName": "Billing Medical Invoice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_membership_subscription_invoice",
+      "domainId": "billing",
+      "label": "Billing Membership Subscription Invoice",
+      "labelPt": "Billing Membership Subscription Invoice",
+      "displayName": "Billing Membership Subscription Invoice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_pharmacy_receipt",
+      "domainId": "billing",
+      "label": "Billing Pharmacy Receipt",
+      "labelPt": "Billing Pharmacy Receipt",
+      "displayName": "Billing Pharmacy Receipt",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_phone_bill_fixed",
+      "domainId": "billing",
+      "label": "Billing Phone Bill Fixed",
+      "labelPt": "Billing Phone Bill Fixed",
+      "displayName": "Billing Phone Bill Fixed",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_phone_bill_mobile",
+      "domainId": "billing",
+      "label": "Billing Phone Bill Mobile",
+      "labelPt": "Billing Phone Bill Mobile",
+      "displayName": "Billing Phone Bill Mobile",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_rent_receipt",
+      "domainId": "billing",
+      "label": "Billing Rent Receipt",
+      "labelPt": "Billing Rent Receipt",
+      "displayName": "Billing Rent Receipt",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_retail_receipt",
+      "domainId": "billing",
+      "label": "Billing Retail Receipt",
+      "labelPt": "Billing Retail Receipt",
+      "displayName": "Billing Retail Receipt",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_shipping_invoice",
+      "domainId": "billing",
+      "label": "Billing Shipping Invoice",
+      "labelPt": "Billing Shipping Invoice",
+      "displayName": "Billing Shipping Invoice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_trash_waste_bill",
+      "domainId": "billing",
+      "label": "Billing Trash Waste Bill",
+      "labelPt": "Billing Trash Waste Bill",
+      "displayName": "Billing Trash Waste Bill",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_tuition_invoice",
+      "domainId": "billing",
+      "label": "Billing Tuition Invoice",
+      "labelPt": "Billing Tuition Invoice",
+      "displayName": "Billing Tuition Invoice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "billing_water_sewer_bill",
+      "domainId": "billing",
+      "label": "Billing Water Sewer Bill",
+      "labelPt": "Billing Water Sewer Bill",
+      "displayName": "Billing Water Sewer Bill",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "board_pack",
+      "domainId": "finance",
+      "label": "Board Pack",
+      "labelPt": "Pacote do Conselho",
+      "category": "report"
+    },
+    {
+      "id": "board_resolution",
+      "domainId": "legal",
+      "label": "Board Resolution",
+      "labelPt": "Resolução do Conselho",
+      "category": "record"
+    },
+    {
+      "id": "budget",
+      "domainId": "finance",
+      "label": "Budget",
+      "labelPt": "Orçamento",
+      "category": "plan"
+    },
+    {
+      "id": "budget_variance",
+      "domainId": "finance",
+      "label": "Budget Variance",
+      "labelPt": "Variação Orçamentária",
+      "category": "report"
+    },
+    {
+      "id": "business_requirements_document",
+      "domainId": "operations",
+      "label": "Business Requirements Document",
+      "labelPt": "Documento de Requisitos de Negócios",
+      "category": "report"
+    },
+    {
+      "id": "capacity_plan",
+      "domainId": "operations",
+      "label": "Capacity Plan",
+      "labelPt": "Plano de Capacidade",
+      "category": "plan"
+    },
+    {
+      "id": "capex_request",
+      "domainId": "finance",
+      "label": "Capex Request",
+      "labelPt": "Solicitação de Capex",
+      "category": "request"
+    },
+    {
+      "id": "care_plan",
+      "domainId": "medical",
+      "label": "Care Plan",
+      "labelPt": "Plano de Cuidados",
+      "category": "plan"
+    },
+    {
+      "id": "case_management_note",
+      "domainId": "medical",
+      "label": "Case Management Note",
+      "labelPt": "Nota de Gestão de Caso",
+      "category": "note"
+    },
+    {
+      "id": "cash_flow_statement",
+      "domainId": "finance",
+      "label": "Cash Flow Statement",
+      "labelPt": "Demonstração de Fluxo de Caixa",
+      "category": "statement"
+    },
+    {
+      "id": "cash_position_report",
+      "domainId": "finance",
+      "label": "Cash Position Report",
+      "labelPt": "Relatório de Posição de Caixa",
+      "category": "report"
+    },
+    {
+      "id": "cease_and_desist",
+      "domainId": "legal",
+      "label": "Cease and Desist",
+      "labelPt": "Notificação de Cessação",
+      "category": "letter"
+    },
+    {
+      "id": "change_request",
+      "domainId": "operations",
+      "label": "Change Request",
+      "labelPt": "Solicitação de Mudança",
+      "category": "request"
+    },
+    {
+      "id": "chart_of_accounts",
+      "domainId": "finance",
+      "label": "Chart of Accounts",
+      "labelPt": "Plano de Contas",
+      "category": "register"
+    },
+    {
+      "id": "clinical_trial_protocol",
+      "domainId": "medical",
+      "label": "Clinical Trial Protocol",
+      "labelPt": "Protocolo de Ensaio Clínico",
+      "category": "protocol"
+    },
+    {
+      "id": "complaint",
+      "domainId": "legal",
+      "label": "Complaint",
+      "labelPt": "Petição Inicial",
+      "category": "form"
+    },
+    {
+      "id": "compliance_certificate",
+      "domainId": "legal",
+      "label": "Compliance Certificate",
+      "labelPt": "Certificado de Conformidade",
+      "category": "record"
+    },
+    {
+      "id": "compliance_runbook",
+      "domainId": "operations",
+      "label": "Compliance Runbook",
+      "labelPt": "Runbook de Conformidade",
+      "category": "playbook"
+    },
+    {
+      "id": "confidentiality_agreement",
+      "domainId": "legal",
+      "label": "Confidentiality Agreement",
+      "labelPt": "Acordo de Confidencialidade",
+      "category": "agreement"
+    },
+    {
+      "id": "consult_note",
+      "domainId": "medical",
+      "label": "Consult Note",
+      "labelPt": "Nota de Consulta",
+      "category": "note"
+    },
+    {
+      "id": "consulting_agreement",
+      "domainId": "legal",
+      "label": "Consulting Agreement",
+      "labelPt": "Contrato de Consultoria",
+      "category": "agreement"
+    },
+    {
+      "id": "contract_addendum",
+      "domainId": "legal",
+      "label": "Contract Addendum",
+      "labelPt": "Adendo Contratual",
+      "category": "agreement"
+    },
+    {
+      "id": "cost_center_report",
+      "domainId": "finance",
+      "label": "Cost Center Report",
+      "labelPt": "Relatório de Centro de Custo",
+      "category": "report"
+    },
+    {
+      "id": "covenant_report",
+      "domainId": "finance",
+      "label": "Covenant Report",
+      "labelPt": "Relatório de Covenants",
+      "category": "report"
+    },
+    {
+      "id": "credit_memo",
+      "domainId": "finance",
+      "label": "Credit Memo",
+      "labelPt": "Nota de Crédito",
+      "category": "memo"
+    },
+    {
+      "id": "customer_support_playbook",
+      "domainId": "operations",
+      "label": "Customer Support Playbook",
+      "labelPt": "Playbook de Suporte ao Cliente",
+      "category": "playbook"
+    },
+    {
+      "id": "data_processing_agreement",
+      "domainId": "legal",
+      "label": "Data Processing Agreement",
+      "labelPt": "Acordo de Processamento de Dados",
+      "category": "agreement"
+    },
+    {
+      "id": "data_retention_schedule",
+      "domainId": "operations",
+      "label": "Data Retention Schedule",
+      "labelPt": "Cronograma de Retenção de Dados",
+      "category": "schedule"
+    },
+    {
+      "id": "debt_schedule",
+      "domainId": "finance",
+      "label": "Debt Schedule",
+      "labelPt": "Cronograma de Dívidas",
+      "category": "schedule"
+    },
+    {
+      "id": "demand_letter",
+      "domainId": "legal",
+      "label": "Demand Letter",
+      "labelPt": "Carta de Cobrança",
+      "category": "letter"
+    },
+    {
+      "id": "diagnosis_summary",
+      "domainId": "medical",
+      "label": "Diagnosis Summary",
+      "labelPt": "Resumo Diagnóstico",
+      "category": "report"
+    },
+    {
+      "id": "disaster_recovery_plan",
+      "domainId": "operations",
+      "label": "Disaster Recovery Plan",
+      "labelPt": "Plano de Recuperação de Desastres",
+      "category": "plan"
+    },
+    {
+      "id": "discharge_summary",
+      "domainId": "medical",
+      "label": "Discharge Summary",
+      "labelPt": "Resumo de Alta",
+      "category": "report"
+    },
+    {
+      "id": "discovery_request",
+      "domainId": "legal",
+      "label": "Discovery Request",
+      "labelPt": "Pedido de Produção de Provas",
+      "category": "request"
+    },
+    {
+      "id": "edu_course_syllabus",
+      "domainId": "education",
+      "label": "Edu Course Syllabus",
+      "labelPt": "Edu Course Syllabus",
+      "displayName": "Edu Course Syllabus",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "edu_diploma_certificate",
+      "domainId": "education",
+      "label": "Edu Diploma Certificate",
+      "labelPt": "Edu Diploma Certificate",
+      "displayName": "Edu Diploma Certificate",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "edu_enrollment_letter",
+      "domainId": "education",
+      "label": "Edu Enrollment Letter",
+      "labelPt": "Edu Enrollment Letter",
+      "displayName": "Edu Enrollment Letter",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "letter"
+    },
+    {
+      "id": "edu_student_financial_aid_award",
+      "domainId": "education",
+      "label": "Edu Student Financial Aid Award",
+      "labelPt": "Edu Student Financial Aid Award",
+      "displayName": "Edu Student Financial Aid Award",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "edu_student_schedule",
+      "domainId": "education",
+      "label": "Edu Student Schedule",
+      "labelPt": "Edu Student Schedule",
+      "displayName": "Edu Student Schedule",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "schedule"
+    },
+    {
+      "id": "edu_transcript",
+      "domainId": "education",
+      "label": "Edu Transcript",
+      "labelPt": "Edu Transcript",
+      "displayName": "Edu Transcript",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "electronic_health_record_extract",
+      "domainId": "medical",
+      "label": "Electronic Health Record Extract",
+      "labelPt": "Extrato de Prontuário Eletrônico",
+      "category": "record"
+    },
+    {
+      "id": "emergency_department_note",
+      "domainId": "medical",
+      "label": "Emergency Department Note",
+      "labelPt": "Nota de Pronto-Socorro",
+      "category": "note"
+    },
+    {
+      "id": "employment_agreement",
+      "domainId": "legal",
+      "label": "Employment Agreement",
+      "labelPt": "Contrato de Trabalho",
+      "category": "agreement"
+    },
+    {
+      "id": "end_user_license_agreement",
+      "domainId": "legal",
+      "label": "End User License Agreement",
+      "labelPt": "Contrato de Licença de Usuário Final",
+      "category": "agreement"
+    },
+    {
+      "id": "escalation_matrix",
+      "domainId": "operations",
+      "label": "Escalation Matrix",
+      "labelPt": "Matriz de Escalonamento",
+      "category": "matrix"
+    },
+    {
+      "id": "expense_policy",
+      "domainId": "finance",
+      "label": "Expense Policy",
+      "labelPt": "Política de Despesas",
+      "category": "policy"
+    },
+    {
+      "id": "expense_report",
+      "domainId": "finance",
+      "label": "Expense Report",
+      "labelPt": "Relatório de Despesas",
+      "category": "report"
+    },
+    {
+      "id": "financial_forecast",
+      "domainId": "finance",
+      "label": "Financial Forecast",
+      "labelPt": "Projeção Financeira",
+      "category": "report"
+    },
+    {
+      "id": "fixed_asset_register",
+      "domainId": "finance",
+      "label": "Fixed Asset Register",
+      "labelPt": "Registro de Ativos Fixos",
+      "category": "register"
+    },
+    {
+      "id": "franchise_agreement",
+      "domainId": "legal",
+      "label": "Franchise Agreement",
+      "labelPt": "Contrato de Franquia",
+      "category": "agreement"
+    },
+    {
+      "id": "general_ledger_extract",
+      "domainId": "finance",
+      "label": "General Ledger Extract",
+      "labelPt": "Extrato do Razão Geral",
+      "category": "record"
+    },
+    {
+      "id": "housing_hoa_statement",
+      "domainId": "housing",
+      "label": "Housing HOA Statement",
+      "labelPt": "Housing HOA Statement",
+      "displayName": "Housing HOA Statement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "housing_home_inspection_report",
+      "domainId": "housing",
+      "label": "Housing Home Inspection Report",
+      "labelPt": "Housing Home Inspection Report",
+      "displayName": "Housing Home Inspection Report",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "report"
+    },
+    {
+      "id": "housing_lease_summary",
+      "domainId": "housing",
+      "label": "Housing Lease Summary",
+      "labelPt": "Housing Lease Summary",
+      "displayName": "Housing Lease Summary",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "report"
+    },
+    {
+      "id": "housing_mortgage_statement",
+      "domainId": "housing",
+      "label": "Housing Mortgage Statement",
+      "labelPt": "Housing Mortgage Statement",
+      "displayName": "Housing Mortgage Statement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "housing_property_tax_bill",
+      "domainId": "housing",
+      "label": "Housing Property Tax Bill",
+      "labelPt": "Housing Property Tax Bill",
+      "displayName": "Housing Property Tax Bill",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "housing_rent_receipt",
+      "domainId": "housing",
+      "label": "Housing Rent Receipt",
+      "labelPt": "Housing Rent Receipt",
+      "displayName": "Housing Rent Receipt",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "hr_benefits_enrollment_summary",
+      "domainId": "hr_payroll",
+      "label": "HR Benefits Enrollment Summary",
+      "labelPt": "HR Benefits Enrollment Summary",
+      "displayName": "HR Benefits Enrollment Summary",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "report"
+    },
+    {
+      "id": "hr_employment_verification_letter",
+      "domainId": "hr_payroll",
+      "label": "HR Employment Verification Letter",
+      "labelPt": "HR Employment Verification Letter",
+      "displayName": "HR Employment Verification Letter",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "letter"
+    },
+    {
+      "id": "hr_expense_report",
+      "domainId": "hr_payroll",
+      "label": "HR Expense Report",
+      "labelPt": "HR Expense Report",
+      "displayName": "HR Expense Report",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "report"
+    },
+    {
+      "id": "hr_pay_stub",
+      "domainId": "hr_payroll",
+      "label": "HR Pay Stub",
+      "labelPt": "HR Pay Stub",
+      "displayName": "HR Pay Stub",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "hr_timesheet",
+      "domainId": "hr_payroll",
+      "label": "HR Timesheet",
+      "labelPt": "HR Timesheet",
+      "displayName": "HR Timesheet",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "schedule"
+    },
+    {
+      "id": "id_birth_certificate",
+      "domainId": "identity",
+      "label": "ID Birth Certificate",
+      "labelPt": "ID Birth Certificate",
+      "displayName": "ID Birth Certificate",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_business_registration_certificate",
+      "domainId": "identity",
+      "label": "ID Business Registration Certificate",
+      "labelPt": "ID Business Registration Certificate",
+      "displayName": "ID Business Registration Certificate",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_driver_license",
+      "domainId": "identity",
+      "label": "ID Driver License",
+      "labelPt": "ID Driver License",
+      "displayName": "ID Driver License",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_marriage_certificate",
+      "domainId": "identity",
+      "label": "ID Marriage Certificate",
+      "labelPt": "ID Marriage Certificate",
+      "displayName": "ID Marriage Certificate",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_national_id_card",
+      "domainId": "identity",
+      "label": "ID National ID Card",
+      "labelPt": "ID National ID Card",
+      "displayName": "ID National ID Card",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_passport",
+      "domainId": "identity",
+      "label": "ID Passport",
+      "labelPt": "ID Passport",
+      "displayName": "ID Passport",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_proof_of_address",
+      "domainId": "identity",
+      "label": "ID Proof Of Address",
+      "labelPt": "ID Proof Of Address",
+      "displayName": "ID Proof Of Address",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_tax_id_card",
+      "domainId": "identity",
+      "label": "ID Tax ID Card",
+      "labelPt": "ID Tax ID Card",
+      "displayName": "ID Tax ID Card",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "id_vehicle_registration",
+      "domainId": "identity",
+      "label": "ID Vehicle Registration",
+      "labelPt": "ID Vehicle Registration",
+      "displayName": "ID Vehicle Registration",
+      "supportedFormats": [
+        "pdf",
+        "jpg",
+        "png"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "imaging_report",
+      "domainId": "medical",
+      "label": "Imaging Report",
+      "labelPt": "Laudo de Imagem",
+      "category": "report"
+    },
+    {
+      "id": "immunization_record",
+      "domainId": "medical",
+      "label": "Immunization Record",
+      "labelPt": "Registro de Imunização",
+      "category": "record"
+    },
+    {
+      "id": "incident_postmortem",
+      "domainId": "operations",
+      "label": "Incident Postmortem",
+      "labelPt": "Post-Mortem de Incidente",
+      "category": "report"
+    },
+    {
+      "id": "incident_report",
+      "domainId": "operations",
+      "label": "Incident Report",
+      "labelPt": "Relatório de Incidente",
+      "category": "report"
+    },
+    {
+      "id": "income_statement",
+      "domainId": "finance",
+      "label": "Income Statement",
+      "labelPt": "Demonstração de Resultado",
+      "category": "statement"
+    },
+    {
+      "id": "indemnity_agreement",
+      "domainId": "legal",
+      "label": "Indemnity Agreement",
+      "labelPt": "Acordo de Indenização",
+      "category": "agreement"
+    },
+    {
+      "id": "informed_consent",
+      "domainId": "legal",
+      "label": "Informed Consent",
+      "labelPt": "Consentimento Informado",
+      "category": "form"
+    },
+    {
+      "id": "ins_certificate_of_insurance",
+      "domainId": "insurance",
+      "label": "Ins Certificate Of Insurance",
+      "labelPt": "Ins Certificate Of Insurance",
+      "displayName": "Ins Certificate Of Insurance",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "ins_claim_status_letter",
+      "domainId": "insurance",
+      "label": "Ins Claim Status Letter",
+      "labelPt": "Ins Claim Status Letter",
+      "displayName": "Ins Claim Status Letter",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "letter"
+    },
+    {
+      "id": "ins_claim_submission",
+      "domainId": "insurance",
+      "label": "Ins Claim Submission",
+      "labelPt": "Ins Claim Submission",
+      "displayName": "Ins Claim Submission",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "ins_coverage_summary",
+      "domainId": "insurance",
+      "label": "Ins Coverage Summary",
+      "labelPt": "Ins Coverage Summary",
+      "displayName": "Ins Coverage Summary",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "report"
+    },
+    {
+      "id": "ins_denial_letter",
+      "domainId": "insurance",
+      "label": "Ins Denial Letter",
+      "labelPt": "Ins Denial Letter",
+      "displayName": "Ins Denial Letter",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "letter"
+    },
+    {
+      "id": "ins_explanation_of_benefits",
+      "domainId": "insurance",
+      "label": "Ins Explanation Of Benefits",
+      "labelPt": "Ins Explanation Of Benefits",
+      "displayName": "Ins Explanation Of Benefits",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "ins_policy_document",
+      "domainId": "insurance",
+      "label": "Ins Policy Document",
+      "labelPt": "Ins Policy Document",
+      "displayName": "Ins Policy Document",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "policy"
+    },
+    {
+      "id": "ins_premium_invoice",
+      "domainId": "insurance",
+      "label": "Ins Premium Invoice",
+      "labelPt": "Ins Premium Invoice",
+      "displayName": "Ins Premium Invoice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "insurance_authorization",
+      "domainId": "medical",
+      "label": "Insurance Authorization",
+      "labelPt": "Autorização de Seguro",
+      "category": "form"
+    },
+    {
+      "id": "inventory_report",
+      "domainId": "operations",
+      "label": "Inventory Report",
+      "labelPt": "Relatório de Inventário",
+      "category": "report"
+    },
+    {
+      "id": "invoice",
+      "domainId": "finance",
+      "label": "Invoice",
+      "labelPt": "Fatura",
+      "category": "record"
+    },
+    {
+      "id": "ip_assignment",
+      "domainId": "legal",
+      "label": "IP Assignment",
+      "labelPt": "Cessão de Propriedade Intelectual",
+      "category": "agreement"
+    },
+    {
+      "id": "it_asset_register",
+      "domainId": "operations",
+      "label": "IT Asset Register",
+      "labelPt": "Registro de Ativos de TI",
+      "category": "register"
+    },
+    {
+      "id": "journal_entry_support",
+      "domainId": "finance",
+      "label": "Journal Entry Support",
+      "labelPt": "Suporte de Lançamento Contábil",
+      "category": "record"
+    },
+    {
+      "id": "kpi_dashboard",
+      "domainId": "operations",
+      "label": "KPI Dashboard",
+      "labelPt": "Painel de KPIs",
+      "category": "dashboard"
+    },
+    {
+      "id": "lab_report",
+      "domainId": "medical",
+      "label": "Lab Report",
+      "labelPt": "Laudo Laboratorial",
+      "category": "report"
+    },
+    {
+      "id": "lease_agreement",
+      "domainId": "legal",
+      "label": "Lease Agreement",
+      "labelPt": "Contrato de Locação",
+      "category": "agreement"
+    },
+    {
+      "id": "legal_opinion",
+      "domainId": "legal",
+      "label": "Legal Opinion",
+      "labelPt": "Parecer Jurídico",
+      "category": "letter"
+    },
+    {
+      "id": "litigation_hold_notice",
+      "domainId": "legal",
+      "label": "Litigation Hold Notice",
+      "labelPt": "Aviso de Preservação de Documentos",
+      "category": "letter"
+    },
+    {
+      "id": "loan_agreement",
+      "domainId": "finance",
+      "label": "Loan Agreement",
+      "labelPt": "Contrato de Empréstimo",
+      "category": "agreement"
+    },
+    {
+      "id": "maintenance_log",
+      "domainId": "operations",
+      "label": "Maintenance Log",
+      "labelPt": "Registro de Manutenção",
+      "category": "log"
+    },
+    {
+      "id": "management_accounts",
+      "domainId": "finance",
+      "label": "Management Accounts",
+      "labelPt": "Contabilidade Gerencial",
+      "category": "report"
+    },
+    {
+      "id": "master_service_agreement",
+      "domainId": "legal",
+      "label": "Master Service Agreement",
+      "labelPt": "Contrato Mestre de Serviços",
+      "category": "agreement"
+    },
+    {
+      "id": "medication_administration_record",
+      "domainId": "medical",
+      "label": "Medication Administration Record",
+      "labelPt": "Registro de Administração de Medicamentos",
+      "category": "record"
+    },
+    {
+      "id": "medication_list",
+      "domainId": "medical",
+      "label": "Medication List",
+      "labelPt": "Lista de Medicamentos",
+      "category": "record"
+    },
+    {
+      "id": "meeting_minutes",
+      "domainId": "operations",
+      "label": "Meeting Minutes",
+      "labelPt": "Ata de Reunião",
+      "category": "record"
+    },
+    {
+      "id": "merger_agreement",
+      "domainId": "legal",
+      "label": "Merger Agreement",
+      "labelPt": "Acordo de Fusão",
+      "category": "agreement"
+    },
+    {
+      "id": "non_disclosure_agreement",
+      "domainId": "legal",
+      "label": "Non-Disclosure Agreement",
+      "labelPt": "Acordo de Não Divulgação",
+      "category": "agreement"
+    },
+    {
+      "id": "nursing_note",
+      "domainId": "medical",
+      "label": "Nursing Note",
+      "labelPt": "Anotação de Enfermagem",
+      "category": "note"
+    },
+    {
+      "id": "onboarding_checklist",
+      "domainId": "operations",
+      "label": "Onboarding Checklist",
+      "labelPt": "Checklist de Integração",
+      "category": "checklist"
+    },
+    {
+      "id": "operative_report",
+      "domainId": "medical",
+      "label": "Operative Report",
+      "labelPt": "Relatório Operatório",
+      "category": "report"
+    },
+    {
+      "id": "pathology_report",
+      "domainId": "medical",
+      "label": "Pathology Report",
+      "labelPt": "Laudo de Patologia",
+      "category": "report"
+    },
+    {
+      "id": "patient_consent",
+      "domainId": "medical",
+      "label": "Patient Consent",
+      "labelPt": "Consentimento do Paciente",
+      "category": "form"
+    },
+    {
+      "id": "patient_intake_form",
+      "domainId": "medical",
+      "label": "Patient Intake Form",
+      "labelPt": "Ficha de Admissão do Paciente",
+      "category": "form"
+    },
+    {
+      "id": "payroll_register",
+      "domainId": "finance",
+      "label": "Payroll Register",
+      "labelPt": "Registro de Folha de Pagamento",
+      "category": "register"
+    },
+    {
+      "id": "physical_therapy_note",
+      "domainId": "medical",
+      "label": "Physical Therapy Note",
+      "labelPt": "Nota de Fisioterapia",
+      "category": "note"
+    },
+    {
+      "id": "policy_manual",
+      "domainId": "operations",
+      "label": "Policy Manual",
+      "labelPt": "Manual de Políticas",
+      "category": "manual"
+    },
+    {
+      "id": "power_of_attorney",
+      "domainId": "legal",
+      "label": "Power of Attorney",
+      "labelPt": "Procuração",
+      "category": "form"
+    },
+    {
+      "id": "prescription",
+      "domainId": "medical",
+      "label": "Prescription",
+      "labelPt": "Prescrição Médica",
+      "category": "form"
+    },
+    {
+      "id": "privacy_policy",
+      "domainId": "legal",
+      "label": "Privacy Policy",
+      "labelPt": "Política de Privacidade",
+      "category": "policy"
+    },
+    {
+      "id": "process_map",
+      "domainId": "operations",
+      "label": "Process Map",
+      "labelPt": "Mapa de Processos",
+      "category": "map"
+    },
+    {
+      "id": "procurement_request",
+      "domainId": "operations",
+      "label": "Procurement Request",
+      "labelPt": "Solicitação de Compras",
+      "category": "request"
+    },
+    {
+      "id": "procurement_spend_analysis",
+      "domainId": "finance",
+      "label": "Procurement Spend Analysis",
+      "labelPt": "Análise de Gastos de Compras",
+      "category": "report"
+    },
+    {
+      "id": "progress_note",
+      "domainId": "medical",
+      "label": "Progress Note",
+      "labelPt": "Nota de Evolução",
+      "category": "note"
+    },
+    {
+      "id": "project_status_report",
+      "domainId": "operations",
+      "label": "Project Status Report",
+      "labelPt": "Relatório de Status do Projeto",
+      "category": "report"
+    },
+    {
+      "id": "psychiatric_evaluation",
+      "domainId": "medical",
+      "label": "Psychiatric Evaluation",
+      "labelPt": "Avaliação Psiquiátrica",
+      "category": "report"
+    },
+    {
+      "id": "quality_assurance_checklist",
+      "domainId": "operations",
+      "label": "Quality Assurance Checklist",
+      "labelPt": "Checklist de Garantia de Qualidade",
+      "category": "checklist"
+    },
+    {
+      "id": "radiology_request",
+      "domainId": "medical",
+      "label": "Radiology Request",
+      "labelPt": "Solicitação de Radiologia",
+      "category": "request"
+    },
+    {
+      "id": "referral_letter",
+      "domainId": "medical",
+      "label": "Referral Letter",
+      "labelPt": "Carta de Encaminhamento",
+      "category": "letter"
+    },
+    {
+      "id": "rehab_plan",
+      "domainId": "medical",
+      "label": "Rehab Plan",
+      "labelPt": "Plano de Reabilitação",
+      "category": "plan"
+    },
+    {
+      "id": "release_checklist",
+      "domainId": "operations",
+      "label": "Release Checklist",
+      "labelPt": "Checklist de Release",
+      "category": "checklist"
+    },
+    {
+      "id": "risk_register",
+      "domainId": "operations",
+      "label": "Risk Register",
+      "labelPt": "Registro de Riscos",
+      "category": "register"
+    },
+    {
+      "id": "runbook",
+      "domainId": "operations",
+      "label": "Runbook",
+      "labelPt": "Runbook",
+      "category": "playbook"
+    },
+    {
+      "id": "service_catalog",
+      "domainId": "operations",
+      "label": "Service Catalog",
+      "labelPt": "Catálogo de Serviços",
+      "category": "catalog"
+    },
+    {
+      "id": "service_level_agreement",
+      "domainId": "operations",
+      "label": "Service Level Agreement",
+      "labelPt": "Acordo de Nível de Serviço",
+      "category": "agreement"
+    },
+    {
+      "id": "settlement_agreement",
+      "domainId": "legal",
+      "label": "Settlement Agreement",
+      "labelPt": "Acordo de Transação",
+      "category": "agreement"
+    },
+    {
+      "id": "share_purchase_agreement",
+      "domainId": "legal",
+      "label": "Share Purchase Agreement",
+      "labelPt": "Contrato de Compra de Ações",
+      "category": "agreement"
+    },
+    {
+      "id": "standard_operating_procedure",
+      "domainId": "operations",
+      "label": "Standard Operating Procedure",
+      "labelPt": "Procedimento Operacional Padrão",
+      "category": "manual"
+    },
+    {
+      "id": "surgical_clearance",
+      "domainId": "medical",
+      "label": "Surgical Clearance",
+      "labelPt": "Liberação Cirúrgica",
+      "category": "form"
+    },
+    {
+      "id": "tax_assessment_notice",
+      "domainId": "tax",
+      "label": "Tax Assessment Notice",
+      "labelPt": "Tax Assessment Notice",
+      "displayName": "Tax Assessment Notice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "letter"
+    },
+    {
+      "id": "tax_business_income_return",
+      "domainId": "tax",
+      "label": "Tax Business Income Return",
+      "labelPt": "Tax Business Income Return",
+      "displayName": "Tax Business Income Return",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "form"
+    },
+    {
+      "id": "tax_individual_income_return",
+      "domainId": "tax",
+      "label": "Tax Individual Income Return",
+      "labelPt": "Tax Individual Income Return",
+      "displayName": "Tax Individual Income Return",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "form"
+    },
+    {
+      "id": "tax_payment_slip",
+      "domainId": "tax",
+      "label": "Tax Payment Slip",
+      "labelPt": "Tax Payment Slip",
+      "displayName": "Tax Payment Slip",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "tax_payroll_withholding_filing",
+      "domainId": "tax",
+      "label": "Tax Payroll Withholding Filing",
+      "labelPt": "Tax Payroll Withholding Filing",
+      "displayName": "Tax Payroll Withholding Filing",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "form"
+    },
+    {
+      "id": "tax_property_tax_bill",
+      "domainId": "tax",
+      "label": "Tax Property Tax Bill",
+      "labelPt": "Tax Property Tax Bill",
+      "displayName": "Tax Property Tax Bill",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "statement"
+    },
+    {
+      "id": "tax_refund_notice",
+      "domainId": "tax",
+      "label": "Tax Refund Notice",
+      "labelPt": "Tax Refund Notice",
+      "displayName": "Tax Refund Notice",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "letter"
+    },
+    {
+      "id": "tax_return",
+      "domainId": "finance",
+      "label": "Tax Return",
+      "labelPt": "Declaração de Imposto",
+      "category": "form"
+    },
+    {
+      "id": "tax_tax_id_registration",
+      "domainId": "tax",
+      "label": "Tax Tax ID Registration",
+      "labelPt": "Tax Tax ID Registration",
+      "displayName": "Tax Tax ID Registration",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "tax_vat_gst_return",
+      "domainId": "tax",
+      "label": "Tax VAT GST Return",
+      "labelPt": "Tax VAT GST Return",
+      "displayName": "Tax VAT GST Return",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "form"
+    },
+    {
+      "id": "terms_and_conditions",
+      "domainId": "legal",
+      "label": "Terms and Conditions",
+      "labelPt": "Termos e Condições",
+      "category": "policy"
+    },
+    {
+      "id": "training_manual",
+      "domainId": "operations",
+      "label": "Training Manual",
+      "labelPt": "Manual de Treinamento",
+      "category": "manual"
+    },
+    {
+      "id": "travel_boarding_pass",
+      "domainId": "travel",
+      "label": "Travel Boarding Pass",
+      "labelPt": "Travel Boarding Pass",
+      "displayName": "Travel Boarding Pass",
+      "supportedFormats": [
+        "pdf",
+        "png",
+        "jpg"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "travel_car_rental_agreement",
+      "domainId": "travel",
+      "label": "Travel Car Rental Agreement",
+      "labelPt": "Travel Car Rental Agreement",
+      "displayName": "Travel Car Rental Agreement",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "agreement"
+    },
+    {
+      "id": "travel_hotel_booking_confirmation",
+      "domainId": "travel",
+      "label": "Travel Hotel Booking Confirmation",
+      "labelPt": "Travel Hotel Booking Confirmation",
+      "displayName": "Travel Hotel Booking Confirmation",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "record"
+    },
+    {
+      "id": "travel_itinerary",
+      "domainId": "travel",
+      "label": "Travel Itinerary",
+      "labelPt": "Travel Itinerary",
+      "displayName": "Travel Itinerary",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "report"
+    },
+    {
+      "id": "travel_travel_insurance_policy",
+      "domainId": "travel",
+      "label": "Travel Travel Insurance Policy",
+      "labelPt": "Travel Travel Insurance Policy",
+      "displayName": "Travel Travel Insurance Policy",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "policy"
+    },
+    {
+      "id": "travel_visa_application_receipt",
+      "domainId": "travel",
+      "label": "Travel Visa Application Receipt",
+      "labelPt": "Travel Visa Application Receipt",
+      "displayName": "Travel Visa Application Receipt",
+      "supportedFormats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "csv"
+      ],
+      "languages": [
+        "en",
+        "pt"
+      ],
+      "packRefs": {
+        "sections": [],
+        "entities": [],
+        "tables": [],
+        "extraction": []
+      },
+      "category": "form"
+    },
+    {
+      "id": "treasury_position",
+      "domainId": "finance",
+      "label": "Treasury Position",
+      "labelPt": "Posição de Tesouraria",
+      "category": "report"
+    },
+    {
+      "id": "treatment_plan",
+      "domainId": "medical",
+      "label": "Treatment Plan",
+      "labelPt": "Plano de Tratamento",
+      "category": "plan"
+    },
+    {
+      "id": "triage_note",
+      "domainId": "medical",
+      "label": "Triage Note",
+      "labelPt": "Nota de Triagem",
+      "category": "note"
+    },
+    {
+      "id": "vendor_contract",
+      "domainId": "legal",
+      "label": "Vendor Contract",
+      "labelPt": "Contrato de Fornecedor",
+      "category": "agreement"
+    },
+    {
+      "id": "vendor_performance_review",
+      "domainId": "operations",
+      "label": "Vendor Performance Review",
+      "labelPt": "Avaliação de Desempenho de Fornecedor",
+      "category": "review"
+    },
+    {
+      "id": "vital_signs_chart",
+      "domainId": "medical",
+      "label": "Vital Signs Chart",
+      "labelPt": "Gráfico de Sinais Vitais",
+      "category": "record"
+    },
+    {
+      "id": "working_capital_report",
+      "domainId": "finance",
+      "label": "Working Capital Report",
+      "labelPt": "Relatório de Capital de Giro",
+      "category": "report"
+    }
+  ]
+}

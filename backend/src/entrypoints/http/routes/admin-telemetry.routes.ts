@@ -22,6 +22,9 @@ import {
   adminTelemetryFileDetail,
   // Queries
   adminTelemetryQueries,
+  adminTelemetryRetrievalTopRewriteRules,
+  adminTelemetryRetrievalTopBoostRules,
+  adminTelemetryRetrievalWorstRules,
   // Intents
   adminTelemetryIntents,
   adminTelemetryIntentDetail,
@@ -105,6 +108,12 @@ router.get("/files/:fileId", adminTelemetryFileDetail);
 // QUERIES
 // ============================================================================
 router.get("/queries", adminTelemetryQueries);
+router.get(
+  "/retrieval/rules/rewrite/top",
+  adminTelemetryRetrievalTopRewriteRules,
+);
+router.get("/retrieval/rules/boost/top", adminTelemetryRetrievalTopBoostRules);
+router.get("/retrieval/rules/worst", adminTelemetryRetrievalWorstRules);
 
 // ============================================================================
 // INTENTS

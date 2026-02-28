@@ -1,18 +1,5713 @@
 {
   "_meta": {
     "id": "finance_doc_logic",
-    "version": "1.0.0",
-    "description": "Finance document interpretation logic for budget-vs-actual-vs-forecast decisions.",
+    "version": "1.1.0",
+    "description": "Finance document logic for budget/forecast/actual precedence, evidence controls, and period/currency/entity guardrails.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
     "domain": "finance"
   },
   "domain": "finance",
-  "definitions": [],
-  "rules": []
+  "definitions": [
+    {
+      "id": "doc_actuals_file",
+      "canonicalName": "Actuals File",
+      "definition": {
+        "en": "Posted accounting results and realized performance.",
+        "pt": "Posted accounting results and realized performance."
+      },
+      "synonyms": {
+        "en": [
+          "actuals",
+          "actuals file",
+          "realized"
+        ],
+        "pt": [
+          "actuals file",
+          "realizado",
+          "resultado real"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 3
+    },
+    {
+      "id": "doc_allocation_model",
+      "canonicalName": "Allocation Model",
+      "definition": {
+        "en": "Model allocating shared costs to units/products.",
+        "pt": "Model allocating shared costs to units/products."
+      },
+      "synonyms": {
+        "en": [
+          "allocation model",
+          "cost allocation model"
+        ],
+        "pt": [
+          "allocation model",
+          "modelo de rateio"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 38
+    },
+    {
+      "id": "doc_annual_plan",
+      "canonicalName": "Annual Plan",
+      "definition": {
+        "en": "Full-year strategic financial plan.",
+        "pt": "Full-year strategic financial plan."
+      },
+      "synonyms": {
+        "en": [
+          "annual operating plan",
+          "annual plan",
+          "aop"
+        ],
+        "pt": [
+          "annual plan",
+          "plano anual"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 34
+    },
+    {
+      "id": "doc_balance_sheet",
+      "canonicalName": "Balance Sheet",
+      "definition": {
+        "en": "Assets, liabilities, and equity at a date.",
+        "pt": "Assets, liabilities, and equity at a date."
+      },
+      "synonyms": {
+        "en": [
+          "balance sheet",
+          "statement of financial position"
+        ],
+        "pt": [
+          "balance sheet",
+          "balanço patrimonial"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 6
+    },
+    {
+      "id": "doc_board_pack",
+      "canonicalName": "Board Pack",
+      "definition": {
+        "en": "Executive-level summary prepared for board meetings.",
+        "pt": "Executive-level summary prepared for board meetings."
+      },
+      "synonyms": {
+        "en": [
+          "board deck",
+          "board pack"
+        ],
+        "pt": [
+          "board pack",
+          "material de conselho"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 13
+    },
+    {
+      "id": "doc_bookings_backlog_report",
+      "canonicalName": "Bookings & Backlog Report",
+      "definition": {
+        "en": "Contracted bookings and revenue backlog position.",
+        "pt": "Contracted bookings and revenue backlog position."
+      },
+      "synonyms": {
+        "en": [
+          "bookings backlog report",
+          "bookings report"
+        ],
+        "pt": [
+          "bookings backlog report",
+          "relatório de bookings e backlog"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 40
+    },
+    {
+      "id": "doc_budget_assumptions_memo",
+      "canonicalName": "Budget Assumptions Memo",
+      "definition": {
+        "en": "Narrative assumptions underpinning the budget.",
+        "pt": "Narrative assumptions underpinning the budget."
+      },
+      "synonyms": {
+        "en": [
+          "budget assumptions memo",
+          "planning assumptions"
+        ],
+        "pt": [
+          "budget assumptions memo",
+          "memorial de premissas orçamentárias"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 46
+    },
+    {
+      "id": "doc_budget_file",
+      "canonicalName": "Budget File",
+      "definition": {
+        "en": "Planned amounts approved before the period starts.",
+        "pt": "Planned amounts approved before the period starts."
+      },
+      "synonyms": {
+        "en": [
+          "budget",
+          "budget file",
+          "plan"
+        ],
+        "pt": [
+          "budget file",
+          "orçamento",
+          "planejado"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 1
+    },
+    {
+      "id": "doc_capex_plan",
+      "canonicalName": "Capex Plan",
+      "definition": {
+        "en": "Planned capital projects and investment spend.",
+        "pt": "Planned capital projects and investment spend."
+      },
+      "synonyms": {
+        "en": [
+          "capex plan",
+          "investment plan"
+        ],
+        "pt": [
+          "capex plan",
+          "plano de capex"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 11
+    },
+    {
+      "id": "doc_cash_collections_report",
+      "canonicalName": "Cash Collections Report",
+      "definition": {
+        "en": "Collections versus due receivables.",
+        "pt": "Collections versus due receivables."
+      },
+      "synonyms": {
+        "en": [
+          "cash collections report",
+          "collections performance"
+        ],
+        "pt": [
+          "cash collections report",
+          "relatório de cobrança"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 41
+    },
+    {
+      "id": "doc_cash_flow_statement",
+      "canonicalName": "Cash Flow Statement",
+      "definition": {
+        "en": "Cash inflows/outflows split by activity class.",
+        "pt": "Cash inflows/outflows split by activity class."
+      },
+      "synonyms": {
+        "en": [
+          "cash flow",
+          "cash flow statement"
+        ],
+        "pt": [
+          "cash flow statement",
+          "fluxo de caixa"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 7
+    },
+    {
+      "id": "doc_cost_center_rollup",
+      "canonicalName": "Cost Center Rollup",
+      "definition": {
+        "en": "Aggregation by cost center hierarchy.",
+        "pt": "Aggregation by cost center hierarchy."
+      },
+      "synonyms": {
+        "en": [
+          "cost center rollup",
+          "cost center summary"
+        ],
+        "pt": [
+          "consolidação por centro de custo",
+          "cost center rollup"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 23
+    },
+    {
+      "id": "doc_country_report",
+      "canonicalName": "Country Report",
+      "definition": {
+        "en": "Performance by country/legal entity.",
+        "pt": "Performance by country/legal entity."
+      },
+      "synonyms": {
+        "en": [
+          "country report",
+          "geo report"
+        ],
+        "pt": [
+          "country report",
+          "relatório por país"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 25
+    },
+    {
+      "id": "doc_customer_profitability",
+      "canonicalName": "Customer Profitability",
+      "definition": {
+        "en": "Gross/net profit by customer.",
+        "pt": "Gross/net profit by customer."
+      },
+      "synonyms": {
+        "en": [
+          "account profitability",
+          "customer profitability"
+        ],
+        "pt": [
+          "customer profitability",
+          "rentabilidade por cliente"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 26
+    },
+    {
+      "id": "doc_debt_covenant_pack",
+      "canonicalName": "Debt Covenant Pack",
+      "definition": {
+        "en": "Metrics and tests for financing covenants.",
+        "pt": "Metrics and tests for financing covenants."
+      },
+      "synonyms": {
+        "en": [
+          "covenant report",
+          "debt covenant pack"
+        ],
+        "pt": [
+          "debt covenant pack",
+          "pacote de covenants"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 37
+    },
+    {
+      "id": "doc_expense_schedule",
+      "canonicalName": "Expense Schedule",
+      "definition": {
+        "en": "Detailed expense by nature/center/period.",
+        "pt": "Detailed expense by nature/center/period."
+      },
+      "synonyms": {
+        "en": [
+          "cost schedule",
+          "expense schedule"
+        ],
+        "pt": [
+          "expense schedule",
+          "grade de despesas"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 22
+    },
+    {
+      "id": "doc_forecast_file",
+      "canonicalName": "Forecast File",
+      "definition": {
+        "en": "Expected values updated during the period.",
+        "pt": "Expected values updated during the period."
+      },
+      "synonyms": {
+        "en": [
+          "forecast",
+          "forecast file",
+          "projection"
+        ],
+        "pt": [
+          "forecast file",
+          "previsão",
+          "projeção"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 2
+    },
+    {
+      "id": "doc_headcount_report",
+      "canonicalName": "Headcount Report",
+      "definition": {
+        "en": "Workforce counts and cost drivers by function.",
+        "pt": "Workforce counts and cost drivers by function."
+      },
+      "synonyms": {
+        "en": [
+          "fte report",
+          "headcount report"
+        ],
+        "pt": [
+          "headcount report",
+          "relatório de headcount"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 8
+    },
+    {
+      "id": "doc_hotel_performance_pack",
+      "canonicalName": "Hotel Performance Pack",
+      "definition": {
+        "en": "Hospitality metrics including RevPAR/ADR/Occupancy.",
+        "pt": "Hospitality metrics including RevPAR/ADR/Occupancy."
+      },
+      "synonyms": {
+        "en": [
+          "hotel dashboard",
+          "hotel performance pack"
+        ],
+        "pt": [
+          "hotel performance pack",
+          "pacote de performance hoteleira"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 28
+    },
+    {
+      "id": "doc_inventory_turn_report",
+      "canonicalName": "Inventory Turn Report",
+      "definition": {
+        "en": "Inventory turnover and slow-moving stock.",
+        "pt": "Inventory turnover and slow-moving stock."
+      },
+      "synonyms": {
+        "en": [
+          "inventory turn report",
+          "inventory turnover"
+        ],
+        "pt": [
+          "inventory turn report",
+          "relatório de giro de estoque"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 44
+    },
+    {
+      "id": "doc_investor_update",
+      "canonicalName": "Investor Update",
+      "definition": {
+        "en": "Periodic investor communication of financial performance.",
+        "pt": "Periodic investor communication of financial performance."
+      },
+      "synonyms": {
+        "en": [
+          "investor update",
+          "shareholder update"
+        ],
+        "pt": [
+          "atualização para investidores",
+          "investor update"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 14
+    },
+    {
+      "id": "doc_journal_dump",
+      "canonicalName": "Journal Dump",
+      "definition": {
+        "en": "Detailed posting-level accounting entries.",
+        "pt": "Detailed posting-level accounting entries."
+      },
+      "synonyms": {
+        "en": [
+          "journal dump",
+          "journal entries"
+        ],
+        "pt": [
+          "journal dump",
+          "lançamentos contábeis"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 20
+    },
+    {
+      "id": "doc_kpi_dashboard",
+      "canonicalName": "KPI Dashboard",
+      "definition": {
+        "en": "Curated KPI view with targets and trends.",
+        "pt": "Curated KPI view with targets and trends."
+      },
+      "synonyms": {
+        "en": [
+          "kpi dashboard",
+          "metrics dashboard"
+        ],
+        "pt": [
+          "kpi dashboard",
+          "painel de indicadores"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 18
+    },
+    {
+      "id": "doc_management_pnl",
+      "canonicalName": "Management P&L",
+      "definition": {
+        "en": "Internal profit and loss report by management dimensions.",
+        "pt": "Internal profit and loss report by management dimensions."
+      },
+      "synonyms": {
+        "en": [
+          "management pnl",
+          "management statement"
+        ],
+        "pt": [
+          "dre gerencial",
+          "management pnl"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 4
+    },
+    {
+      "id": "doc_monthly_close_pack",
+      "canonicalName": "Monthly Close Pack",
+      "definition": {
+        "en": "Close process pack with reconciliations and commentary.",
+        "pt": "Close process pack with reconciliations and commentary."
+      },
+      "synonyms": {
+        "en": [
+          "month-end close",
+          "monthly close pack"
+        ],
+        "pt": [
+          "monthly close pack",
+          "pacote de fechamento mensal"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 32
+    },
+    {
+      "id": "doc_opex_bridge",
+      "canonicalName": "OPEX Bridge",
+      "definition": {
+        "en": "Bridge explaining operating expense movement.",
+        "pt": "Bridge explaining operating expense movement."
+      },
+      "synonyms": {
+        "en": [
+          "expense bridge",
+          "opex bridge"
+        ],
+        "pt": [
+          "opex bridge",
+          "ponte de despesas"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 10
+    },
+    {
+      "id": "doc_payables_aging_report",
+      "canonicalName": "Payables Aging Report",
+      "definition": {
+        "en": "Supplier payment obligations by aging bucket.",
+        "pt": "Supplier payment obligations by aging bucket."
+      },
+      "synonyms": {
+        "en": [
+          "ap aging",
+          "payables aging report"
+        ],
+        "pt": [
+          "aging de contas a pagar",
+          "payables aging report"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 42
+    },
+    {
+      "id": "doc_pricing_model",
+      "canonicalName": "Pricing Model",
+      "definition": {
+        "en": "Model translating cost and target margin to prices.",
+        "pt": "Model translating cost and target margin to prices."
+      },
+      "synonyms": {
+        "en": [
+          "price waterfall",
+          "pricing model"
+        ],
+        "pt": [
+          "modelo de precificação",
+          "pricing model"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 39
+    },
+    {
+      "id": "doc_procurement_spend_report",
+      "canonicalName": "Procurement Spend Report",
+      "definition": {
+        "en": "Supplier/category spend breakdown.",
+        "pt": "Supplier/category spend breakdown."
+      },
+      "synonyms": {
+        "en": [
+          "procurement spend report",
+          "spend analysis"
+        ],
+        "pt": [
+          "procurement spend report",
+          "relatório de gastos de compras"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 35
+    },
+    {
+      "id": "doc_product_margin_matrix",
+      "canonicalName": "Product Margin Matrix",
+      "definition": {
+        "en": "Margin profile by product family.",
+        "pt": "Margin profile by product family."
+      },
+      "synonyms": {
+        "en": [
+          "product margin matrix",
+          "sku margin matrix"
+        ],
+        "pt": [
+          "matriz de margem por produto",
+          "product margin matrix"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 27
+    },
+    {
+      "id": "doc_profit_bridge_report",
+      "canonicalName": "Profit Bridge Report",
+      "definition": {
+        "en": "Bridge from prior profit to current profit.",
+        "pt": "Bridge from prior profit to current profit."
+      },
+      "synonyms": {
+        "en": [
+          "earnings bridge",
+          "profit bridge report"
+        ],
+        "pt": [
+          "ponte de lucro",
+          "profit bridge report"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 45
+    },
+    {
+      "id": "doc_quarterly_review_pack",
+      "canonicalName": "Quarterly Review Pack",
+      "definition": {
+        "en": "Quarterly business review package.",
+        "pt": "Quarterly business review package."
+      },
+      "synonyms": {
+        "en": [
+          "qbr",
+          "quarterly review pack"
+        ],
+        "pt": [
+          "pacote de revisão trimestral",
+          "quarterly review pack"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 33
+    },
+    {
+      "id": "doc_real_estate_asset_pack",
+      "canonicalName": "Real Estate Asset Pack",
+      "definition": {
+        "en": "Property-level NOI/cap-rate/occupancy details.",
+        "pt": "Property-level NOI/cap-rate/occupancy details."
+      },
+      "synonyms": {
+        "en": [
+          "property pack",
+          "real estate asset pack"
+        ],
+        "pt": [
+          "pacote de ativos imobiliários",
+          "real estate asset pack"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 29
+    },
+    {
+      "id": "doc_receivables_aging_report",
+      "canonicalName": "Receivables Aging Report",
+      "definition": {
+        "en": "Customer receivable exposure by aging bucket.",
+        "pt": "Customer receivable exposure by aging bucket."
+      },
+      "synonyms": {
+        "en": [
+          "ar aging",
+          "receivables aging report"
+        ],
+        "pt": [
+          "aging de contas a receber",
+          "receivables aging report"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 43
+    },
+    {
+      "id": "doc_revenue_schedule",
+      "canonicalName": "Revenue Schedule",
+      "definition": {
+        "en": "Detailed revenue by customer/product/period.",
+        "pt": "Detailed revenue by customer/product/period."
+      },
+      "synonyms": {
+        "en": [
+          "revenue schedule",
+          "sales schedule"
+        ],
+        "pt": [
+          "grade de receita",
+          "revenue schedule"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 21
+    },
+    {
+      "id": "doc_rolling_12m_report",
+      "canonicalName": "Rolling 12M Report",
+      "definition": {
+        "en": "TTM rolling view for revenue and profit metrics.",
+        "pt": "TTM rolling view for revenue and profit metrics."
+      },
+      "synonyms": {
+        "en": [
+          "rolling 12m report",
+          "ttm report"
+        ],
+        "pt": [
+          "relatório últimos 12 meses",
+          "rolling 12m report"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 30
+    },
+    {
+      "id": "doc_sales_waterfall",
+      "canonicalName": "Sales Waterfall",
+      "definition": {
+        "en": "Bridge explaining revenue movement between periods.",
+        "pt": "Bridge explaining revenue movement between periods."
+      },
+      "synonyms": {
+        "en": [
+          "sales waterfall",
+          "waterfall bridge"
+        ],
+        "pt": [
+          "ponte de receita",
+          "sales waterfall"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 9
+    },
+    {
+      "id": "doc_scenario_model",
+      "canonicalName": "Scenario Model",
+      "definition": {
+        "en": "Model with base/upside/downside assumptions.",
+        "pt": "Model with base/upside/downside assumptions."
+      },
+      "synonyms": {
+        "en": [
+          "scenario model",
+          "scenario planning"
+        ],
+        "pt": [
+          "modelo de cenários",
+          "scenario model"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 16
+    },
+    {
+      "id": "doc_segment_report",
+      "canonicalName": "Segment Report",
+      "definition": {
+        "en": "Performance by segment/business unit.",
+        "pt": "Performance by segment/business unit."
+      },
+      "synonyms": {
+        "en": [
+          "business unit report",
+          "segment report"
+        ],
+        "pt": [
+          "relatório por segmento",
+          "segment report"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 24
+    },
+    {
+      "id": "doc_sensitivity_table",
+      "canonicalName": "Sensitivity Table",
+      "definition": {
+        "en": "Output table showing metric response to assumptions.",
+        "pt": "Output table showing metric response to assumptions."
+      },
+      "synonyms": {
+        "en": [
+          "sensitivity table",
+          "what-if table"
+        ],
+        "pt": [
+          "sensitivity table",
+          "tabela de sensibilidade"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 17
+    },
+    {
+      "id": "doc_statutory_pnl",
+      "canonicalName": "Statutory P&L",
+      "definition": {
+        "en": "External P&L prepared under reporting standards.",
+        "pt": "External P&L prepared under reporting standards."
+      },
+      "synonyms": {
+        "en": [
+          "statutory income statement",
+          "statutory pnl"
+        ],
+        "pt": [
+          "dre societária",
+          "statutory pnl"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 5
+    },
+    {
+      "id": "doc_treasury_liquidity_report",
+      "canonicalName": "Treasury Liquidity Report",
+      "definition": {
+        "en": "Cash positions, debt maturity, liquidity buffers.",
+        "pt": "Cash positions, debt maturity, liquidity buffers."
+      },
+      "synonyms": {
+        "en": [
+          "liquidity report",
+          "treasury liquidity report"
+        ],
+        "pt": [
+          "relatório de liquidez",
+          "treasury liquidity report"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 36
+    },
+    {
+      "id": "doc_trial_balance",
+      "canonicalName": "Trial Balance",
+      "definition": {
+        "en": "Ledger account balances before adjustments.",
+        "pt": "Ledger account balances before adjustments."
+      },
+      "synonyms": {
+        "en": [
+          "tb",
+          "trial balance"
+        ],
+        "pt": [
+          "balancete",
+          "trial balance"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 19
+    },
+    {
+      "id": "doc_variance_report",
+      "canonicalName": "Variance Report",
+      "definition": {
+        "en": "Report focused on budget/forecast deltas and drivers.",
+        "pt": "Report focused on budget/forecast deltas and drivers."
+      },
+      "synonyms": {
+        "en": [
+          "variance analysis",
+          "variance report"
+        ],
+        "pt": [
+          "relatório de variação",
+          "variance report"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 15
+    },
+    {
+      "id": "doc_weekly_flash",
+      "canonicalName": "Weekly Flash",
+      "definition": {
+        "en": "Rapid weekly indicators for short-cycle steering.",
+        "pt": "Rapid weekly indicators for short-cycle steering."
+      },
+      "synonyms": {
+        "en": [
+          "weekly flash",
+          "weekly pulse"
+        ],
+        "pt": [
+          "flash semanal",
+          "weekly flash"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 31
+    },
+    {
+      "id": "doc_working_capital_pack",
+      "canonicalName": "Working Capital Pack",
+      "definition": {
+        "en": "Receivable/payable/inventory diagnostics.",
+        "pt": "Receivable/payable/inventory diagnostics."
+      },
+      "synonyms": {
+        "en": [
+          "wc pack",
+          "working capital pack"
+        ],
+        "pt": [
+          "pacote de capital de giro",
+          "working capital pack"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 12
+    },
+    {
+      "id": "doc_audit_adjustment_schedule",
+      "canonicalName": "Audit Adjustment Schedule",
+      "definition": {
+        "en": "Schedule listing audit adjustments proposed or accepted during an audit engagement.",
+        "pt": "Cronograma listando ajustes de auditoria propostos ou aceitos durante um trabalho de auditoria."
+      },
+      "synonyms": {
+        "en": [
+          "audit adjustment schedule",
+          "audit adjustments",
+          "proposed adjustments",
+          "passed adjustments"
+        ],
+        "pt": [
+          "cronograma de ajustes de auditoria",
+          "ajustes de auditoria",
+          "ajustes propostos"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 47
+    },
+    {
+      "id": "doc_bank_reconciliation",
+      "canonicalName": "Bank Reconciliation",
+      "definition": {
+        "en": "Statement reconciling book balance to bank statement balance with outstanding items.",
+        "pt": "Demonstrativo que concilia o saldo contábil com o saldo do extrato bancário incluindo itens pendentes."
+      },
+      "synonyms": {
+        "en": [
+          "bank reconciliation",
+          "bank rec",
+          "cash reconciliation",
+          "bank statement reconciliation"
+        ],
+        "pt": [
+          "conciliação bancária",
+          "reconciliação bancária",
+          "conciliação de caixa"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 48
+    },
+    {
+      "id": "doc_capex_request_form",
+      "canonicalName": "Capex Request Form",
+      "definition": {
+        "en": "Capital expenditure authorization request with business case and ROI justification.",
+        "pt": "Formulário de solicitação de investimento de capital com caso de negócio e justificativa de retorno."
+      },
+      "synonyms": {
+        "en": [
+          "capex request form",
+          "capex request",
+          "capital request",
+          "capital expenditure request"
+        ],
+        "pt": [
+          "formulário de solicitação de capex",
+          "solicitação de investimento",
+          "requisição de capital"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 49
+    },
+    {
+      "id": "doc_chart_of_accounts",
+      "canonicalName": "Chart of Accounts",
+      "definition": {
+        "en": "Hierarchical listing of all general ledger accounts used by the entity.",
+        "pt": "Listagem hierárquica de todas as contas do razão geral utilizadas pela entidade."
+      },
+      "synonyms": {
+        "en": [
+          "chart of accounts",
+          "COA",
+          "account listing",
+          "GL account structure"
+        ],
+        "pt": [
+          "plano de contas",
+          "estrutura de contas",
+          "elenco de contas"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": false,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 50
+    },
+    {
+      "id": "doc_cost_center_report",
+      "canonicalName": "Cost Center Report",
+      "definition": {
+        "en": "Report detailing expenses and allocations for a specific cost center.",
+        "pt": "Relatório detalhando despesas e alocações para um centro de custo específico."
+      },
+      "synonyms": {
+        "en": [
+          "cost center report",
+          "cost center summary",
+          "departmental cost report"
+        ],
+        "pt": [
+          "relatório de centro de custo",
+          "resumo de centro de custo",
+          "relatório departamental de custos"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 51
+    },
+    {
+      "id": "doc_credit_memo",
+      "canonicalName": "Credit Memo",
+      "definition": {
+        "en": "Document issued to reduce the amount owed by a customer, referencing an original invoice.",
+        "pt": "Documento emitido para reduzir o valor devido por um cliente, referenciando a fatura original."
+      },
+      "synonyms": {
+        "en": [
+          "credit memo",
+          "credit note",
+          "credit memorandum",
+          "CN"
+        ],
+        "pt": [
+          "nota de crédito",
+          "memorando de crédito",
+          "aviso de crédito"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 52
+    },
+    {
+      "id": "doc_debt_schedule",
+      "canonicalName": "Debt Schedule",
+      "definition": {
+        "en": "Schedule of outstanding debt instruments with maturity dates, interest rates, and covenants.",
+        "pt": "Cronograma de instrumentos de dívida em aberto com datas de vencimento, taxas de juros e cláusulas."
+      },
+      "synonyms": {
+        "en": [
+          "debt schedule",
+          "debt maturity schedule",
+          "borrowings summary",
+          "loan schedule"
+        ],
+        "pt": [
+          "cronograma de dívida",
+          "quadro de endividamento",
+          "cronograma de empréstimos"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 53
+    },
+    {
+      "id": "doc_expense_policy",
+      "canonicalName": "Expense Policy",
+      "definition": {
+        "en": "Corporate policy document defining reimbursable expense categories, limits, and approval workflows.",
+        "pt": "Documento de política corporativa definindo categorias de despesas reembolsáveis, limites e fluxos de aprovação."
+      },
+      "synonyms": {
+        "en": [
+          "expense policy",
+          "travel and expense policy",
+          "T&E policy",
+          "reimbursement policy"
+        ],
+        "pt": [
+          "política de despesas",
+          "política de reembolso",
+          "política de viagens e despesas"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": false,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 54
+    },
+    {
+      "id": "doc_expense_report",
+      "canonicalName": "Expense Report",
+      "definition": {
+        "en": "Itemized report of employee expenditures submitted for reimbursement with approval status.",
+        "pt": "Relatório detalhado de despesas do funcionário submetido para reembolso com status de aprovação."
+      },
+      "synonyms": {
+        "en": [
+          "expense report",
+          "expense claim",
+          "reimbursement request",
+          "T&E report"
+        ],
+        "pt": [
+          "relatório de despesas",
+          "prestação de contas",
+          "solicitação de reembolso"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 55
+    },
+    {
+      "id": "doc_fixed_asset_register",
+      "canonicalName": "Fixed Asset Register",
+      "definition": {
+        "en": "Register of fixed assets with acquisition cost, depreciation method, and net book value.",
+        "pt": "Registro de ativos fixos com custo de aquisição, método de depreciação e valor contábil líquido."
+      },
+      "synonyms": {
+        "en": [
+          "fixed asset register",
+          "FAR",
+          "asset register",
+          "PP&E schedule"
+        ],
+        "pt": [
+          "registro de ativos fixos",
+          "controle patrimonial",
+          "imobilizado"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 56
+    },
+    {
+      "id": "doc_general_ledger_extract",
+      "canonicalName": "General Ledger Extract",
+      "definition": {
+        "en": "Extract of general ledger transactions for a specified account range and period.",
+        "pt": "Extrato de transações do razão geral para uma faixa de contas e período especificados."
+      },
+      "synonyms": {
+        "en": [
+          "general ledger extract",
+          "GL extract",
+          "GL detail",
+          "ledger dump"
+        ],
+        "pt": [
+          "extrato do razão geral",
+          "extrato do razão",
+          "detalhe do razão"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 57
+    },
+    {
+      "id": "doc_invoice",
+      "canonicalName": "Invoice",
+      "definition": {
+        "en": "Commercial document requesting payment for goods or services delivered.",
+        "pt": "Documento comercial solicitando pagamento por bens ou serviços entregues."
+      },
+      "synonyms": {
+        "en": [
+          "invoice",
+          "sales invoice",
+          "billing statement",
+          "bill"
+        ],
+        "pt": [
+          "fatura",
+          "nota fiscal",
+          "boleto",
+          "cobrança"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 58
+    },
+    {
+      "id": "doc_journal_entry_support",
+      "canonicalName": "Journal Entry Support",
+      "definition": {
+        "en": "Supporting documentation for manual journal entries including calculations and approvals.",
+        "pt": "Documentação de suporte para lançamentos contábeis manuais incluindo cálculos e aprovações."
+      },
+      "synonyms": {
+        "en": [
+          "journal entry support",
+          "JE support",
+          "journal voucher",
+          "journal backup"
+        ],
+        "pt": [
+          "suporte de lançamento contábil",
+          "comprovante de lançamento",
+          "documentação de diário"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 59
+    },
+    {
+      "id": "doc_loan_agreement",
+      "canonicalName": "Loan Agreement",
+      "definition": {
+        "en": "Legal agreement specifying loan terms, repayment schedule, interest rate, and covenants.",
+        "pt": "Contrato legal especificando termos do empréstimo, cronograma de pagamento, taxa de juros e cláusulas."
+      },
+      "synonyms": {
+        "en": [
+          "loan agreement",
+          "credit agreement",
+          "facility agreement",
+          "credit facility"
+        ],
+        "pt": [
+          "contrato de empréstimo",
+          "contrato de crédito",
+          "acordo de financiamento"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 60
+    },
+    {
+      "id": "doc_management_accounts",
+      "canonicalName": "Management Accounts",
+      "definition": {
+        "en": "Internally prepared financial statements for management decision-making, not externally audited.",
+        "pt": "Demonstrações financeiras preparadas internamente para tomada de decisão gerencial, não auditadas externamente."
+      },
+      "synonyms": {
+        "en": [
+          "management accounts",
+          "management financials",
+          "internal accounts",
+          "MIS reports"
+        ],
+        "pt": [
+          "demonstrações gerenciais",
+          "contas gerenciais",
+          "relatório gerencial"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 61
+    },
+    {
+      "id": "doc_payroll_register",
+      "canonicalName": "Payroll Register",
+      "definition": {
+        "en": "Detailed listing of employee compensation, deductions, and net pay for a pay period.",
+        "pt": "Listagem detalhada de remuneração, deduções e salário líquido dos funcionários por período de pagamento."
+      },
+      "synonyms": {
+        "en": [
+          "payroll register",
+          "payroll summary",
+          "payroll report",
+          "pay register"
+        ],
+        "pt": [
+          "folha de pagamento",
+          "registro de folha",
+          "resumo da folha de pagamento"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 62
+    },
+    {
+      "id": "doc_procurement_spend_analysis",
+      "canonicalName": "Procurement Spend Analysis",
+      "definition": {
+        "en": "Analytical report categorizing procurement expenditures by vendor, category, and period.",
+        "pt": "Relatório analítico categorizando gastos de compras por fornecedor, categoria e período."
+      },
+      "synonyms": {
+        "en": [
+          "procurement spend analysis",
+          "spend analysis",
+          "procurement analytics",
+          "vendor spend report"
+        ],
+        "pt": [
+          "análise de gastos de compras",
+          "análise de gastos",
+          "relatório de gastos com fornecedores"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 63
+    },
+    {
+      "id": "doc_tax_return",
+      "canonicalName": "Tax Return",
+      "definition": {
+        "en": "Filed tax return document for a specific jurisdiction and tax year.",
+        "pt": "Declaração de imposto de renda arquivada para uma jurisdição e ano fiscal específicos."
+      },
+      "synonyms": {
+        "en": [
+          "tax return",
+          "tax filing",
+          "income tax return",
+          "corporate tax return"
+        ],
+        "pt": [
+          "declaração de imposto de renda",
+          "declaração fiscal",
+          "IRPJ",
+          "retorno fiscal"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 64
+    },
+    {
+      "id": "doc_treasury_position_report",
+      "canonicalName": "Treasury Position Report",
+      "definition": {
+        "en": "Report showing current cash positions, investments, and borrowings across all bank accounts.",
+        "pt": "Relatório mostrando posições atuais de caixa, investimentos e empréstimos em todas as contas bancárias."
+      },
+      "synonyms": {
+        "en": [
+          "treasury position report",
+          "cash position report",
+          "treasury dashboard",
+          "daily cash position"
+        ],
+        "pt": [
+          "relatório de posição de tesouraria",
+          "posição de caixa",
+          "painel de tesouraria"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 65
+    },
+    {
+      "id": "doc_working_capital_report",
+      "canonicalName": "Working Capital Report",
+      "definition": {
+        "en": "Analytical report on current assets minus current liabilities with trend analysis.",
+        "pt": "Relatório analítico sobre ativos circulantes menos passivos circulantes com análise de tendência."
+      },
+      "synonyms": {
+        "en": [
+          "working capital report",
+          "WC report",
+          "net working capital analysis"
+        ],
+        "pt": [
+          "relatório de capital de giro",
+          "análise de capital de giro líquido",
+          "relatório de capital circulante"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 66
+    },
+    {
+      "id": "doc_accounts_payable_aging",
+      "canonicalName": "Accounts Payable Aging",
+      "definition": {
+        "en": "Report aging outstanding vendor payables by days past due brackets.",
+        "pt": "Relatório que classifica contas a pagar de fornecedores por faixas de dias de atraso."
+      },
+      "synonyms": {
+        "en": [
+          "accounts payable aging",
+          "AP aging",
+          "payables aging report",
+          "vendor aging"
+        ],
+        "pt": [
+          "aging de contas a pagar",
+          "vencimento de contas a pagar",
+          "relatório de fornecedores em atraso"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 67
+    },
+    {
+      "id": "doc_accounts_receivable_aging",
+      "canonicalName": "Accounts Receivable Aging",
+      "definition": {
+        "en": "Report aging outstanding customer receivables by days past due brackets.",
+        "pt": "Relatório que classifica contas a receber de clientes por faixas de dias de atraso."
+      },
+      "synonyms": {
+        "en": [
+          "accounts receivable aging",
+          "AR aging",
+          "receivables aging report",
+          "customer aging"
+        ],
+        "pt": [
+          "aging de contas a receber",
+          "vencimento de contas a receber",
+          "relatório de clientes em atraso"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 68
+    },
+    {
+      "id": "doc_financial_forecast",
+      "canonicalName": "Financial Forecast",
+      "definition": {
+        "en": "Forward-looking financial projection based on assumptions and trend extrapolation.",
+        "pt": "Projeção financeira prospectiva baseada em premissas e extrapolação de tendências."
+      },
+      "synonyms": {
+        "en": [
+          "financial forecast",
+          "financial projection",
+          "forecast model",
+          "forward projection"
+        ],
+        "pt": [
+          "previsão financeira",
+          "projeção financeira",
+          "modelo de previsão"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 69
+    },
+    {
+      "id": "doc_annual_report",
+      "canonicalName": "Annual Report",
+      "definition": {
+        "en": "Comprehensive yearly report including audited financials, management discussion, and governance disclosures.",
+        "pt": "Relatório anual abrangente incluindo demonstrações financeiras auditadas, discussão da administração e divulgações de governança."
+      },
+      "synonyms": {
+        "en": [
+          "annual report",
+          "yearly report",
+          "annual review",
+          "shareholder report"
+        ],
+        "pt": [
+          "relatório anual",
+          "balanço anual",
+          "relatório aos acionistas"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 70
+    },
+    {
+      "id": "doc_covenant_report",
+      "canonicalName": "Covenant Report",
+      "definition": {
+        "en": "Report measuring compliance with financial covenants in loan or bond agreements.",
+        "pt": "Relatório medindo conformidade com cláusulas financeiras em contratos de empréstimo ou títulos."
+      },
+      "synonyms": {
+        "en": [
+          "covenant report",
+          "covenant compliance report",
+          "covenant certificate",
+          "covenant test"
+        ],
+        "pt": [
+          "relatório de covenants",
+          "relatório de cláusulas financeiras",
+          "certificado de covenants"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 71
+    },
+    {
+      "id": "doc_intercompany_reconciliation",
+      "canonicalName": "Intercompany Reconciliation",
+      "definition": {
+        "en": "Reconciliation of balances and transactions between related legal entities within a group.",
+        "pt": "Conciliação de saldos e transações entre entidades legais relacionadas dentro de um grupo."
+      },
+      "synonyms": {
+        "en": [
+          "intercompany reconciliation",
+          "IC reconciliation",
+          "interco rec",
+          "related party reconciliation"
+        ],
+        "pt": [
+          "conciliação intercompany",
+          "reconciliação entre empresas",
+          "conciliação de partes relacionadas"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 72
+    },
+    {
+      "id": "doc_transfer_pricing_documentation",
+      "canonicalName": "Transfer Pricing Documentation",
+      "definition": {
+        "en": "Documentation supporting arm's length pricing for intercompany transactions across jurisdictions.",
+        "pt": "Documentação que fundamenta preços de transferência em condições de mercado para transações intercompany entre jurisdições."
+      },
+      "synonyms": {
+        "en": [
+          "transfer pricing documentation",
+          "TP documentation",
+          "transfer pricing study",
+          "TP report"
+        ],
+        "pt": [
+          "documentação de preços de transferência",
+          "estudo de preços de transferência",
+          "relatório de TP"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 73
+    },
+    {
+      "id": "doc_investor_relations_deck",
+      "canonicalName": "Investor Relations Deck",
+      "definition": {
+        "en": "Presentation deck prepared for investor communications with key financial highlights and outlook.",
+        "pt": "Apresentação preparada para comunicação com investidores com destaques financeiros e perspectivas."
+      },
+      "synonyms": {
+        "en": [
+          "investor relations deck",
+          "IR deck",
+          "investor presentation",
+          "shareholder deck"
+        ],
+        "pt": [
+          "apresentação de relações com investidores",
+          "deck de RI",
+          "apresentação para investidores"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 74
+    },
+    {
+      "id": "doc_earnings_release",
+      "canonicalName": "Earnings Release",
+      "definition": {
+        "en": "Public announcement of quarterly or annual financial results including GAAP and non-GAAP measures.",
+        "pt": "Comunicado público de resultados financeiros trimestrais ou anuais incluindo medidas GAAP e não-GAAP."
+      },
+      "synonyms": {
+        "en": [
+          "earnings release",
+          "earnings announcement",
+          "quarterly earnings",
+          "press release financials"
+        ],
+        "pt": [
+          "comunicado de resultados",
+          "divulgação de resultados",
+          "release de resultados"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 75
+    },
+    {
+      "id": "doc_regulatory_filing",
+      "canonicalName": "Regulatory Filing",
+      "definition": {
+        "en": "Filing submitted to a regulatory body such as SEC (10-K, 10-Q, 8-K) or equivalent authority.",
+        "pt": "Arquivo submetido a um órgão regulador como a SEC (10-K, 10-Q, 8-K) ou autoridade equivalente."
+      },
+      "synonyms": {
+        "en": [
+          "regulatory filing",
+          "SEC filing",
+          "10-K",
+          "10-Q",
+          "8-K",
+          "annual filing"
+        ],
+        "pt": [
+          "arquivo regulatório",
+          "declaração regulatória",
+          "formulário SEC",
+          "declaração CVM"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 76
+    },
+    {
+      "id": "doc_proxy_statement",
+      "canonicalName": "Proxy Statement",
+      "definition": {
+        "en": "Document filed with regulators providing shareholders with voting and governance information.",
+        "pt": "Documento arquivado junto a reguladores fornecendo aos acionistas informações de votação e governança."
+      },
+      "synonyms": {
+        "en": [
+          "proxy statement",
+          "DEF 14A",
+          "proxy filing",
+          "shareholder proxy"
+        ],
+        "pt": [
+          "declaração de procuração",
+          "instrumento de procuração",
+          "proxy de acionistas"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 77
+    },
+    {
+      "id": "doc_footnotes_financial_statements",
+      "canonicalName": "Footnotes to Financial Statements",
+      "definition": {
+        "en": "Explanatory notes accompanying financial statements with accounting policies and detail disclosures.",
+        "pt": "Notas explicativas que acompanham as demonstrações financeiras com políticas contábeis e divulgações detalhadas."
+      },
+      "synonyms": {
+        "en": [
+          "footnotes to financial statements",
+          "financial statement notes",
+          "notes to accounts",
+          "disclosure notes"
+        ],
+        "pt": [
+          "notas explicativas",
+          "notas às demonstrações financeiras",
+          "notas de rodapé contábeis"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 78
+    },
+    {
+      "id": "doc_segment_reporting",
+      "canonicalName": "Segment Reporting",
+      "definition": {
+        "en": "Financial reporting broken down by operating segments as defined by accounting standards.",
+        "pt": "Relatório financeiro segmentado por segmentos operacionais conforme definido pelas normas contábeis."
+      },
+      "synonyms": {
+        "en": [
+          "segment reporting",
+          "segment analysis",
+          "business segment report",
+          "operating segment disclosure"
+        ],
+        "pt": [
+          "relatório por segmento",
+          "análise por segmento",
+          "divulgação por segmento operacional"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 79
+    },
+    {
+      "id": "doc_going_concern_assessment",
+      "canonicalName": "Going Concern Assessment",
+      "definition": {
+        "en": "Assessment evaluating an entity's ability to continue operations for at least 12 months.",
+        "pt": "Avaliação que analisa a capacidade de uma entidade de continuar operando por pelo menos 12 meses."
+      },
+      "synonyms": {
+        "en": [
+          "going concern assessment",
+          "going concern evaluation",
+          "continuity assessment",
+          "viability assessment"
+        ],
+        "pt": [
+          "avaliação de continuidade operacional",
+          "avaliação de empresa em funcionamento",
+          "análise de viabilidade"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 80
+    },
+    {
+      "id": "doc_goodwill_impairment_test",
+      "canonicalName": "Goodwill Impairment Test",
+      "definition": {
+        "en": "Analysis testing whether goodwill carrying value exceeds fair value for each reporting unit.",
+        "pt": "Análise que testa se o valor contábil do ágio excede o valor justo para cada unidade geradora de caixa."
+      },
+      "synonyms": {
+        "en": [
+          "goodwill impairment test",
+          "impairment analysis",
+          "goodwill write-down test",
+          "ASC 350 test"
+        ],
+        "pt": [
+          "teste de impairment de ágio",
+          "teste de redução ao valor recuperável",
+          "análise de impairment"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 81
+    },
+    {
+      "id": "doc_pension_valuation",
+      "canonicalName": "Pension Valuation",
+      "definition": {
+        "en": "Actuarial valuation of defined benefit pension obligations and plan assets.",
+        "pt": "Avaliação atuarial das obrigações de planos de previdência de benefício definido e ativos do plano."
+      },
+      "synonyms": {
+        "en": [
+          "pension valuation",
+          "pension actuarial report",
+          "defined benefit valuation",
+          "retirement plan valuation"
+        ],
+        "pt": [
+          "avaliação de previdência",
+          "laudo atuarial",
+          "avaliação de plano de aposentadoria"
+        ]
+      },
+      "extractionHints": {
+        "primaryAnchors": [
+          "title",
+          "section_heading",
+          "table_header"
+        ],
+        "requiredPeriodSignal": true,
+        "requiredEntitySignal": true
+      },
+      "sortOrder": 82
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule_finance_doc_actual_over_plan_for_facts",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "actual",
+            "posted",
+            "realized"
+          ],
+          "pt": [
+            "contabilizado",
+            "realizado"
+          ]
+        }
+      },
+      "check": {
+        "type": "actuals_have_precedence_for_factual_statements",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_SCOPE_CONFLICT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I prioritize actuals over budget/forecast for this factual answer?",
+          "pt": "Devo priorizar realizado sobre orçamento/previsão para esta resposta factual?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_budget_over_actual_for_targets",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "goal",
+            "plan",
+            "target"
+          ],
+          "pt": [
+            "meta",
+            "objetivo",
+            "plano"
+          ]
+        }
+      },
+      "check": {
+        "type": "budget/plan_has_precedence_for_target_questions",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TARGET_SCOPE_CONFLICT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should target values come from budget or forecast?",
+          "pt": "Os valores de meta devem vir do orçamento ou da previsão?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_actuals_file",
+      "appliesTo": [
+        "doc_actuals_file"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "actuals",
+            "actuals file",
+            "Actuals File"
+          ],
+          "pt": [
+            "actuals file",
+            "Actuals File",
+            "realizado"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_ACTUALS_FILE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Actuals File for retrieval priority?",
+          "pt": "Devo tratar este documento como Actuals File para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_allocation_model",
+      "appliesTo": [
+        "doc_allocation_model"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "allocation model",
+            "Allocation Model",
+            "cost allocation model"
+          ],
+          "pt": [
+            "allocation model",
+            "Allocation Model",
+            "modelo de rateio"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_ALLOCATION_MODEL",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Allocation Model for retrieval priority?",
+          "pt": "Devo tratar este documento como Allocation Model para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_annual_plan",
+      "appliesTo": [
+        "doc_annual_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "annual plan",
+            "Annual Plan",
+            "aop"
+          ],
+          "pt": [
+            "annual plan",
+            "Annual Plan",
+            "plano anual"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_ANNUAL_PLAN",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Annual Plan for retrieval priority?",
+          "pt": "Devo tratar este documento como Annual Plan para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_balance_sheet",
+      "appliesTo": [
+        "doc_balance_sheet"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "balance sheet",
+            "Balance Sheet",
+            "statement of financial position"
+          ],
+          "pt": [
+            "balance sheet",
+            "Balance Sheet",
+            "balanço patrimonial"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_BALANCE_SHEET",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Balance Sheet for retrieval priority?",
+          "pt": "Devo tratar este documento como Balance Sheet para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_board_pack",
+      "appliesTo": [
+        "doc_board_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "board deck",
+            "board pack",
+            "Board Pack"
+          ],
+          "pt": [
+            "board pack",
+            "Board Pack",
+            "material de conselho"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_BOARD_PACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Board Pack for retrieval priority?",
+          "pt": "Devo tratar este documento como Board Pack para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_bookings_backlog_report",
+      "appliesTo": [
+        "doc_bookings_backlog_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "Bookings & Backlog Report",
+            "bookings backlog report",
+            "bookings report"
+          ],
+          "pt": [
+            "Bookings & Backlog Report",
+            "bookings backlog report",
+            "relatório de bookings e backlog"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_BOOKINGS_BACKLOG_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Bookings & Backlog Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Bookings & Backlog Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_budget_assumptions_memo",
+      "appliesTo": [
+        "doc_budget_assumptions_memo"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "budget assumptions memo",
+            "Budget Assumptions Memo",
+            "planning assumptions"
+          ],
+          "pt": [
+            "budget assumptions memo",
+            "Budget Assumptions Memo",
+            "memorial de premissas orçamentárias"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_BUDGET_ASSUMPTIONS_MEMO",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Budget Assumptions Memo for retrieval priority?",
+          "pt": "Devo tratar este documento como Budget Assumptions Memo para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_budget_file",
+      "appliesTo": [
+        "doc_budget_file"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "budget",
+            "budget file",
+            "Budget File"
+          ],
+          "pt": [
+            "budget file",
+            "Budget File",
+            "orçamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_BUDGET_FILE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Budget File for retrieval priority?",
+          "pt": "Devo tratar este documento como Budget File para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_capex_plan",
+      "appliesTo": [
+        "doc_capex_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "capex plan",
+            "Capex Plan",
+            "investment plan"
+          ],
+          "pt": [
+            "capex plan",
+            "Capex Plan",
+            "plano de capex"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_CAPEX_PLAN",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Capex Plan for retrieval priority?",
+          "pt": "Devo tratar este documento como Capex Plan para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_cash_collections_report",
+      "appliesTo": [
+        "doc_cash_collections_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cash collections report",
+            "Cash Collections Report",
+            "collections performance"
+          ],
+          "pt": [
+            "cash collections report",
+            "Cash Collections Report",
+            "relatório de cobrança"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_CASH_COLLECTIONS_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Cash Collections Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Cash Collections Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_cash_flow_statement",
+      "appliesTo": [
+        "doc_cash_flow_statement"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cash flow",
+            "cash flow statement",
+            "Cash Flow Statement"
+          ],
+          "pt": [
+            "cash flow statement",
+            "Cash Flow Statement",
+            "fluxo de caixa"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_CASH_FLOW_STATEMENT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Cash Flow Statement for retrieval priority?",
+          "pt": "Devo tratar este documento como Cash Flow Statement para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_cost_center_rollup",
+      "appliesTo": [
+        "doc_cost_center_rollup"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cost center rollup",
+            "Cost Center Rollup",
+            "cost center summary"
+          ],
+          "pt": [
+            "consolidação por centro de custo",
+            "cost center rollup",
+            "Cost Center Rollup"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_COST_CENTER_ROLLUP",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Cost Center Rollup for retrieval priority?",
+          "pt": "Devo tratar este documento como Cost Center Rollup para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_country_report",
+      "appliesTo": [
+        "doc_country_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "country report",
+            "Country Report",
+            "geo report"
+          ],
+          "pt": [
+            "country report",
+            "Country Report",
+            "relatório por país"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_COUNTRY_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Country Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Country Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_customer_profitability",
+      "appliesTo": [
+        "doc_customer_profitability"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "account profitability",
+            "customer profitability",
+            "Customer Profitability"
+          ],
+          "pt": [
+            "customer profitability",
+            "Customer Profitability",
+            "rentabilidade por cliente"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_CUSTOMER_PROFITABILITY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Customer Profitability for retrieval priority?",
+          "pt": "Devo tratar este documento como Customer Profitability para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_debt_covenant_pack",
+      "appliesTo": [
+        "doc_debt_covenant_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "covenant report",
+            "debt covenant pack",
+            "Debt Covenant Pack"
+          ],
+          "pt": [
+            "debt covenant pack",
+            "Debt Covenant Pack",
+            "pacote de covenants"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_DEBT_COVENANT_PACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Debt Covenant Pack for retrieval priority?",
+          "pt": "Devo tratar este documento como Debt Covenant Pack para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_expense_schedule",
+      "appliesTo": [
+        "doc_expense_schedule"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cost schedule",
+            "expense schedule",
+            "Expense Schedule"
+          ],
+          "pt": [
+            "expense schedule",
+            "Expense Schedule",
+            "grade de despesas"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_EXPENSE_SCHEDULE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Expense Schedule for retrieval priority?",
+          "pt": "Devo tratar este documento como Expense Schedule para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_forecast_file",
+      "appliesTo": [
+        "doc_forecast_file"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "forecast",
+            "forecast file",
+            "Forecast File"
+          ],
+          "pt": [
+            "forecast file",
+            "Forecast File",
+            "previsão"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_FORECAST_FILE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Forecast File for retrieval priority?",
+          "pt": "Devo tratar este documento como Forecast File para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_headcount_report",
+      "appliesTo": [
+        "doc_headcount_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "fte report",
+            "headcount report",
+            "Headcount Report"
+          ],
+          "pt": [
+            "headcount report",
+            "Headcount Report",
+            "relatório de headcount"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_HEADCOUNT_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Headcount Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Headcount Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_hotel_performance_pack",
+      "appliesTo": [
+        "doc_hotel_performance_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "hotel dashboard",
+            "hotel performance pack",
+            "Hotel Performance Pack"
+          ],
+          "pt": [
+            "hotel performance pack",
+            "Hotel Performance Pack",
+            "pacote de performance hoteleira"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_HOTEL_PERFORMANCE_PACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Hotel Performance Pack for retrieval priority?",
+          "pt": "Devo tratar este documento como Hotel Performance Pack para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_inventory_turn_report",
+      "appliesTo": [
+        "doc_inventory_turn_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "inventory turn report",
+            "Inventory Turn Report",
+            "inventory turnover"
+          ],
+          "pt": [
+            "inventory turn report",
+            "Inventory Turn Report",
+            "relatório de giro de estoque"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_INVENTORY_TURN_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Inventory Turn Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Inventory Turn Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_investor_update",
+      "appliesTo": [
+        "doc_investor_update"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "investor update",
+            "Investor Update",
+            "shareholder update"
+          ],
+          "pt": [
+            "atualização para investidores",
+            "investor update",
+            "Investor Update"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_INVESTOR_UPDATE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Investor Update for retrieval priority?",
+          "pt": "Devo tratar este documento como Investor Update para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_journal_dump",
+      "appliesTo": [
+        "doc_journal_dump"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "journal dump",
+            "Journal Dump",
+            "journal entries"
+          ],
+          "pt": [
+            "journal dump",
+            "Journal Dump",
+            "lançamentos contábeis"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_JOURNAL_DUMP",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Journal Dump for retrieval priority?",
+          "pt": "Devo tratar este documento como Journal Dump para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_kpi_dashboard",
+      "appliesTo": [
+        "doc_kpi_dashboard"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "kpi dashboard",
+            "KPI Dashboard",
+            "metrics dashboard"
+          ],
+          "pt": [
+            "kpi dashboard",
+            "KPI Dashboard",
+            "painel de indicadores"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_KPI_DASHBOARD",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as KPI Dashboard for retrieval priority?",
+          "pt": "Devo tratar este documento como KPI Dashboard para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_management_pnl",
+      "appliesTo": [
+        "doc_management_pnl"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "Management P&L",
+            "management pnl",
+            "management statement"
+          ],
+          "pt": [
+            "dre gerencial",
+            "Management P&L",
+            "management pnl"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_MANAGEMENT_PNL",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Management P&L for retrieval priority?",
+          "pt": "Devo tratar este documento como Management P&L para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_monthly_close_pack",
+      "appliesTo": [
+        "doc_monthly_close_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "month-end close",
+            "monthly close pack",
+            "Monthly Close Pack"
+          ],
+          "pt": [
+            "monthly close pack",
+            "Monthly Close Pack",
+            "pacote de fechamento mensal"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_MONTHLY_CLOSE_PACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Monthly Close Pack for retrieval priority?",
+          "pt": "Devo tratar este documento como Monthly Close Pack para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_opex_bridge",
+      "appliesTo": [
+        "doc_opex_bridge"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "expense bridge",
+            "opex bridge",
+            "OPEX Bridge"
+          ],
+          "pt": [
+            "opex bridge",
+            "OPEX Bridge",
+            "ponte de despesas"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_OPEX_BRIDGE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as OPEX Bridge for retrieval priority?",
+          "pt": "Devo tratar este documento como OPEX Bridge para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_payables_aging_report",
+      "appliesTo": [
+        "doc_payables_aging_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "ap aging",
+            "payables aging report",
+            "Payables Aging Report"
+          ],
+          "pt": [
+            "aging de contas a pagar",
+            "payables aging report",
+            "Payables Aging Report"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_PAYABLES_AGING_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Payables Aging Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Payables Aging Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_pricing_model",
+      "appliesTo": [
+        "doc_pricing_model"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "price waterfall",
+            "pricing model",
+            "Pricing Model"
+          ],
+          "pt": [
+            "modelo de precificação",
+            "pricing model",
+            "Pricing Model"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_PRICING_MODEL",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Pricing Model for retrieval priority?",
+          "pt": "Devo tratar este documento como Pricing Model para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_procurement_spend_report",
+      "appliesTo": [
+        "doc_procurement_spend_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "procurement spend report",
+            "Procurement Spend Report",
+            "spend analysis"
+          ],
+          "pt": [
+            "procurement spend report",
+            "Procurement Spend Report",
+            "relatório de gastos de compras"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_PROCUREMENT_SPEND_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Procurement Spend Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Procurement Spend Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_product_margin_matrix",
+      "appliesTo": [
+        "doc_product_margin_matrix"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "product margin matrix",
+            "Product Margin Matrix",
+            "sku margin matrix"
+          ],
+          "pt": [
+            "matriz de margem por produto",
+            "product margin matrix",
+            "Product Margin Matrix"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_PRODUCT_MARGIN_MATRIX",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Product Margin Matrix for retrieval priority?",
+          "pt": "Devo tratar este documento como Product Margin Matrix para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_profit_bridge_report",
+      "appliesTo": [
+        "doc_profit_bridge_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "earnings bridge",
+            "profit bridge report",
+            "Profit Bridge Report"
+          ],
+          "pt": [
+            "ponte de lucro",
+            "profit bridge report",
+            "Profit Bridge Report"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_PROFIT_BRIDGE_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Profit Bridge Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Profit Bridge Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_quarterly_review_pack",
+      "appliesTo": [
+        "doc_quarterly_review_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "qbr",
+            "quarterly review pack",
+            "Quarterly Review Pack"
+          ],
+          "pt": [
+            "pacote de revisão trimestral",
+            "quarterly review pack",
+            "Quarterly Review Pack"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_QUARTERLY_REVIEW_PACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Quarterly Review Pack for retrieval priority?",
+          "pt": "Devo tratar este documento como Quarterly Review Pack para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_real_estate_asset_pack",
+      "appliesTo": [
+        "doc_real_estate_asset_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "property pack",
+            "real estate asset pack",
+            "Real Estate Asset Pack"
+          ],
+          "pt": [
+            "pacote de ativos imobiliários",
+            "real estate asset pack",
+            "Real Estate Asset Pack"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_REAL_ESTATE_ASSET_PACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Real Estate Asset Pack for retrieval priority?",
+          "pt": "Devo tratar este documento como Real Estate Asset Pack para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_receivables_aging_report",
+      "appliesTo": [
+        "doc_receivables_aging_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "ar aging",
+            "receivables aging report",
+            "Receivables Aging Report"
+          ],
+          "pt": [
+            "aging de contas a receber",
+            "receivables aging report",
+            "Receivables Aging Report"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_RECEIVABLES_AGING_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Receivables Aging Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Receivables Aging Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_revenue_schedule",
+      "appliesTo": [
+        "doc_revenue_schedule"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "revenue schedule",
+            "Revenue Schedule",
+            "sales schedule"
+          ],
+          "pt": [
+            "grade de receita",
+            "revenue schedule",
+            "Revenue Schedule"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_REVENUE_SCHEDULE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Revenue Schedule for retrieval priority?",
+          "pt": "Devo tratar este documento como Revenue Schedule para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_rolling_12m_report",
+      "appliesTo": [
+        "doc_rolling_12m_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "rolling 12m report",
+            "Rolling 12M Report",
+            "ttm report"
+          ],
+          "pt": [
+            "relatório últimos 12 meses",
+            "rolling 12m report",
+            "Rolling 12M Report"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_ROLLING_12M_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Rolling 12M Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Rolling 12M Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_sales_waterfall",
+      "appliesTo": [
+        "doc_sales_waterfall"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "sales waterfall",
+            "Sales Waterfall",
+            "waterfall bridge"
+          ],
+          "pt": [
+            "ponte de receita",
+            "sales waterfall",
+            "Sales Waterfall"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_SALES_WATERFALL",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Sales Waterfall for retrieval priority?",
+          "pt": "Devo tratar este documento como Sales Waterfall para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_scenario_model",
+      "appliesTo": [
+        "doc_scenario_model"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "scenario model",
+            "Scenario Model",
+            "scenario planning"
+          ],
+          "pt": [
+            "modelo de cenários",
+            "scenario model",
+            "Scenario Model"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_SCENARIO_MODEL",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Scenario Model for retrieval priority?",
+          "pt": "Devo tratar este documento como Scenario Model para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_segment_report",
+      "appliesTo": [
+        "doc_segment_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "business unit report",
+            "segment report",
+            "Segment Report"
+          ],
+          "pt": [
+            "relatório por segmento",
+            "segment report",
+            "Segment Report"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_SEGMENT_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Segment Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Segment Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_sensitivity_table",
+      "appliesTo": [
+        "doc_sensitivity_table"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "sensitivity table",
+            "Sensitivity Table",
+            "what-if table"
+          ],
+          "pt": [
+            "sensitivity table",
+            "Sensitivity Table",
+            "tabela de sensibilidade"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_SENSITIVITY_TABLE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Sensitivity Table for retrieval priority?",
+          "pt": "Devo tratar este documento como Sensitivity Table para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_statutory_pnl",
+      "appliesTo": [
+        "doc_statutory_pnl"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "statutory income statement",
+            "Statutory P&L",
+            "statutory pnl"
+          ],
+          "pt": [
+            "dre societária",
+            "Statutory P&L",
+            "statutory pnl"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_STATUTORY_PNL",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Statutory P&L for retrieval priority?",
+          "pt": "Devo tratar este documento como Statutory P&L para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_treasury_liquidity_report",
+      "appliesTo": [
+        "doc_treasury_liquidity_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "liquidity report",
+            "treasury liquidity report",
+            "Treasury Liquidity Report"
+          ],
+          "pt": [
+            "relatório de liquidez",
+            "treasury liquidity report",
+            "Treasury Liquidity Report"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_TREASURY_LIQUIDITY_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Treasury Liquidity Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Treasury Liquidity Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_trial_balance",
+      "appliesTo": [
+        "doc_trial_balance"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "tb",
+            "trial balance",
+            "Trial Balance"
+          ],
+          "pt": [
+            "balancete",
+            "trial balance",
+            "Trial Balance"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_TRIAL_BALANCE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Trial Balance for retrieval priority?",
+          "pt": "Devo tratar este documento como Trial Balance para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_variance_report",
+      "appliesTo": [
+        "doc_variance_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "variance analysis",
+            "variance report",
+            "Variance Report"
+          ],
+          "pt": [
+            "relatório de variação",
+            "variance report",
+            "Variance Report"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_VARIANCE_REPORT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Variance Report for retrieval priority?",
+          "pt": "Devo tratar este documento como Variance Report para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_weekly_flash",
+      "appliesTo": [
+        "doc_weekly_flash"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "weekly flash",
+            "Weekly Flash",
+            "weekly pulse"
+          ],
+          "pt": [
+            "flash semanal",
+            "weekly flash",
+            "Weekly Flash"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_WEEKLY_FLASH",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Weekly Flash for retrieval priority?",
+          "pt": "Devo tratar este documento como Weekly Flash para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_classify_doc_working_capital_pack",
+      "appliesTo": [
+        "doc_working_capital_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "wc pack",
+            "working capital pack",
+            "Working Capital Pack"
+          ],
+          "pt": [
+            "pacote de capital de giro",
+            "working capital pack",
+            "Working Capital Pack"
+          ]
+        }
+      },
+      "check": {
+        "type": "doc_type_classification",
+        "requireHeaderAndTableSignal": true,
+        "requirePeriodAndEntityContext": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TYPE_AMBIGUOUS_DOC_WORKING_CAPITAL_PACK",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I treat this document as Working Capital Pack for retrieval priority?",
+          "pt": "Devo tratar este documento como Working Capital Pack para prioridade de busca?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_commentary_vs_numeric_guard",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "commentary",
+            "narrative"
+          ],
+          "pt": [
+            "comentário",
+            "narrativa"
+          ]
+        }
+      },
+      "check": {
+        "type": "narrative_commentary_cannot_override_numeric_evidence",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_NUMERIC_CONFLICT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Numeric table and commentary disagree. Should I prioritize numeric evidence?",
+          "pt": "Tabela numérica e comentário divergem. Devo priorizar evidência numérica?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_cross_entity_guard",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "country",
+            "entity",
+            "subsidiary"
+          ],
+          "pt": [
+            "entidade",
+            "país",
+            "subsidiária"
+          ]
+        }
+      },
+      "check": {
+        "type": "cross-entity_comparison_requires_explicit_entity_list",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_ENTITY_LIST_REQUIRED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which entities should be included in this comparison?",
+          "pt": "Quais entidades devem ser incluídas nesta comparação?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_currency_disclosure",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "brl",
+            "currency",
+            "eur",
+            "usd"
+          ],
+          "pt": [
+            "brl",
+            "eur",
+            "moeda",
+            "usd"
+          ]
+        }
+      },
+      "check": {
+        "type": "source_currency_must_be_surfaced_in_outputs",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_CURRENCY_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "I found values without explicit currency. Which currency should I assume?",
+          "pt": "Encontrei valores sem moeda explícita. Qual moeda devo assumir?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_duplicate_table_guard",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "duplicate table",
+            "same table"
+          ],
+          "pt": [
+            "mesma tabela",
+            "tabela duplicada"
+          ]
+        }
+      },
+      "check": {
+        "type": "duplicate_tables_should_be_deduped_by_title+period+entity",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_DUPLICATE_TABLE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "I detected duplicate tables. Should I keep the most recent or the audited version?",
+          "pt": "Detectei tabelas duplicadas. Devo manter a versão mais recente ou auditada?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_forecast_for_latest_outlook",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "expected",
+            "outlook",
+            "projected"
+          ],
+          "pt": [
+            "expectativa",
+            "projeção"
+          ]
+        }
+      },
+      "check": {
+        "type": "forecast_has_precedence_for_outlook_questions",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_OUTLOOK_SCOPE_CONFLICT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I use the latest forecast version for outlook?",
+          "pt": "Devo usar a versão mais recente da previsão para outlook?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_missing_evidence_guard",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "missing section",
+            "not found"
+          ],
+          "pt": [
+            "não encontrado",
+            "seção ausente"
+          ]
+        }
+      },
+      "check": {
+        "type": "if_required_section_missing,_ask_exactly_one_question",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_SECTION_NOT_FOUND",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "I could not find the required section. Which section name should I search next?",
+          "pt": "Não encontrei a seção necessária. Qual nome de seção devo buscar em seguida?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_period_disclosure",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "month",
+            "period",
+            "quarter",
+            "year"
+          ],
+          "pt": [
+            "ano",
+            "mês",
+            "período",
+            "trimestre"
+          ]
+        }
+      },
+      "check": {
+        "type": "period_label_is_mandatory_in_result_blocks",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_PERIOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which reporting period should I anchor this answer to?",
+          "pt": "A qual período de reporte devo ancorar esta resposta?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_version_recency",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "updated",
+            "v2",
+            "version"
+          ],
+          "pt": [
+            "atualizado",
+            "versão"
+          ]
+        }
+      },
+      "check": {
+        "type": "newer_version_supersedes_older_version_with_same_scope",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_VERSION_AMBIGUOUS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "I found multiple versions. Should I keep only the latest approved one?",
+          "pt": "Encontrei múltiplas versões. Devo manter apenas a mais recente aprovada?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_cross_gaap_comparison_guard",
+      "appliesTo": [
+        "all_finance_documents"
+      ],
+      "trigger": {
+        "operators": [
+          "compare",
+          "validate",
+          "extract"
+        ],
+        "keywords": {
+          "en": [
+            "GAAP",
+            "IFRS",
+            "US GAAP",
+            "accounting framework"
+          ],
+          "pt": [
+            "GAAP",
+            "IFRS",
+            "norma contábil",
+            "padrão contábil"
+          ]
+        }
+      },
+      "check": {
+        "type": "never_compare_figures_across_different_gaap_frameworks_without_disclosure",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_GAAP_MISMATCH",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "These figures appear to come from different accounting frameworks. Should I flag the GAAP vs IFRS difference?",
+          "pt": "Estes valores parecem vir de normas contábeis diferentes. Devo sinalizar a diferença entre GAAP e IFRS?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_intercompany_elimination_guard",
+      "appliesTo": [
+        "doc_intercompany_reconciliation"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "intercompany",
+            "elimination",
+            "IC balance",
+            "related party"
+          ],
+          "pt": [
+            "intercompany",
+            "eliminação",
+            "saldo IC",
+            "partes relacionadas"
+          ]
+        }
+      },
+      "check": {
+        "type": "intercompany_reconciliation_requires_elimination_journal_identification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_IC_ELIMINATION_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I identify and pair the elimination journals for these intercompany balances?",
+          "pt": "Devo identificar e associar os lançamentos de eliminação para estes saldos intercompany?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_transfer_pricing_arms_length",
+      "appliesTo": [
+        "doc_transfer_pricing_documentation"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "transfer pricing",
+            "arm's length",
+            "comparable",
+            "TP method"
+          ],
+          "pt": [
+            "preço de transferência",
+            "arm's length",
+            "comparável",
+            "método de TP"
+          ]
+        }
+      },
+      "check": {
+        "type": "transfer_pricing_must_cite_arms_length_standard",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TP_ARMS_LENGTH_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "This transfer pricing document needs arm's length standard reference. Which TP method applies?",
+          "pt": "Este documento de preços de transferência precisa de referência ao padrão arm's length. Qual método de TP se aplica?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_board_pack_version_date",
+      "appliesTo": [
+        "doc_board_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "board pack",
+            "board materials",
+            "projection",
+            "forecast"
+          ],
+          "pt": [
+            "pacote do conselho",
+            "materiais do conselho",
+            "projeção",
+            "previsão"
+          ]
+        }
+      },
+      "check": {
+        "type": "board_packs_need_version_date_coupling_before_quoting_projections",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_BOARD_PACK_VERSION_UNDATED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "This board pack projection needs a version date. Which version date should I anchor to?",
+          "pt": "Esta projeção do pacote do conselho precisa de uma data de versão. Qual data de versão devo utilizar?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_covenant_measurement_period",
+      "appliesTo": [
+        "doc_covenant_report",
+        "doc_debt_covenant_pack"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "covenant",
+            "compliance",
+            "measurement period",
+            "threshold"
+          ],
+          "pt": [
+            "covenant",
+            "conformidade",
+            "período de medição",
+            "limite"
+          ]
+        }
+      },
+      "check": {
+        "type": "covenant_reports_must_identify_measurement_period_and_compliance_status",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_COVENANT_PERIOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which measurement period and compliance status should I reference for this covenant test?",
+          "pt": "Qual período de medição e status de conformidade devo referenciar para este teste de covenant?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_audit_adjustment_pre_post",
+      "appliesTo": [
+        "doc_audit_adjustment_schedule"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "audit adjustment",
+            "proposed adjustment",
+            "pre-adjustment",
+            "post-adjustment"
+          ],
+          "pt": [
+            "ajuste de auditoria",
+            "ajuste proposto",
+            "pré-ajuste",
+            "pós-ajuste"
+          ]
+        }
+      },
+      "check": {
+        "type": "audit_adjustments_must_state_pre_vs_post_adjustment_figures",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_AUDIT_ADJ_INCOMPLETE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I show both pre-adjustment and post-adjustment figures for this audit entry?",
+          "pt": "Devo mostrar os valores pré-ajuste e pós-ajuste para este lançamento de auditoria?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_gl_account_hierarchy",
+      "appliesTo": [
+        "doc_general_ledger_extract"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "general ledger",
+            "GL extract",
+            "account hierarchy",
+            "ledger detail"
+          ],
+          "pt": [
+            "razão geral",
+            "extrato do razão",
+            "hierarquia de contas",
+            "detalhe do razão"
+          ]
+        }
+      },
+      "check": {
+        "type": "general_ledger_extracts_need_account_hierarchy_context",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_GL_HIERARCHY_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "This GL extract lacks account hierarchy context. Which level of the chart of accounts should I map to?",
+          "pt": "Este extrato do razão não possui contexto de hierarquia de contas. A qual nível do plano de contas devo mapear?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_payroll_pay_period",
+      "appliesTo": [
+        "doc_payroll_register"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "payroll",
+            "pay period",
+            "pay date",
+            "compensation"
+          ],
+          "pt": [
+            "folha de pagamento",
+            "período de pagamento",
+            "data de pagamento",
+            "remuneração"
+          ]
+        }
+      },
+      "check": {
+        "type": "payroll_registers_require_pay_period_boundaries",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_PAYROLL_PERIOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which pay period boundaries (start/end dates) should I use for this payroll data?",
+          "pt": "Quais limites de período de pagamento (datas de início/fim) devo usar para estes dados de folha?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_expense_approval_status",
+      "appliesTo": [
+        "doc_expense_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "expense report",
+            "approval",
+            "reimbursement",
+            "submitted"
+          ],
+          "pt": [
+            "relatório de despesas",
+            "aprovação",
+            "reembolso",
+            "submetido"
+          ]
+        }
+      },
+      "check": {
+        "type": "expense_reports_need_approval_workflow_status",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_EXPENSE_APPROVAL_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "This expense report needs approval status. Should I include only approved items or all submissions?",
+          "pt": "Este relatório de despesas precisa de status de aprovação. Devo incluir apenas itens aprovados ou todas as submissões?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_tax_jurisdiction",
+      "appliesTo": [
+        "doc_tax_return"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "tax return",
+            "jurisdiction",
+            "federal",
+            "state",
+            "foreign"
+          ],
+          "pt": [
+            "declaração fiscal",
+            "jurisdição",
+            "federal",
+            "estadual",
+            "estrangeiro"
+          ]
+        }
+      },
+      "check": {
+        "type": "tax_returns_require_jurisdiction_identification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_TAX_JURISDICTION_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which tax jurisdiction (federal, state, or foreign) does this return apply to?",
+          "pt": "A qual jurisdição fiscal (federal, estadual ou estrangeira) esta declaração se aplica?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_fixed_asset_depreciation",
+      "appliesTo": [
+        "doc_fixed_asset_register"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "fixed asset",
+            "depreciation",
+            "useful life",
+            "net book value"
+          ],
+          "pt": [
+            "ativo fixo",
+            "depreciação",
+            "vida útil",
+            "valor contábil líquido"
+          ]
+        }
+      },
+      "check": {
+        "type": "fixed_asset_register_needs_depreciation_method_disclosure",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_DEPRECIATION_METHOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which depreciation method (straight-line, declining balance, etc.) is used for these assets?",
+          "pt": "Qual método de depreciação (linear, saldo decrescente, etc.) é utilizado para estes ativos?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_debt_maturity_profile",
+      "appliesTo": [
+        "doc_debt_schedule",
+        "doc_loan_agreement"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "debt schedule",
+            "maturity",
+            "repayment",
+            "amortization"
+          ],
+          "pt": [
+            "cronograma de dívida",
+            "vencimento",
+            "amortização",
+            "pagamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "debt_schedules_must_show_maturity_profile",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_MATURITY_PROFILE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I break down the debt by maturity bands (current, 1-3 years, 3-5 years, 5+ years)?",
+          "pt": "Devo detalhar a dívida por faixas de vencimento (corrente, 1-3 anos, 3-5 anos, 5+ anos)?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_bank_rec_outstanding_items",
+      "appliesTo": [
+        "doc_bank_reconciliation"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "bank reconciliation",
+            "outstanding items",
+            "reconciling items",
+            "uncleared"
+          ],
+          "pt": [
+            "conciliação bancária",
+            "itens pendentes",
+            "itens de conciliação",
+            "não compensados"
+          ]
+        }
+      },
+      "check": {
+        "type": "bank_reconciliation_needs_outstanding_items_segregation",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_BANK_REC_ITEMS_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I segregate outstanding deposits in transit from outstanding checks?",
+          "pt": "Devo separar os depósitos em trânsito dos cheques pendentes de compensação?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_invoice_aging_brackets",
+      "appliesTo": [
+        "doc_invoice",
+        "doc_accounts_payable_aging",
+        "doc_accounts_receivable_aging"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "invoice",
+            "aging",
+            "overdue",
+            "days past due"
+          ],
+          "pt": [
+            "fatura",
+            "aging",
+            "vencido",
+            "dias de atraso"
+          ]
+        }
+      },
+      "check": {
+        "type": "invoice_analysis_requires_aging_bracket_identification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_AGING_BRACKET_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which aging brackets should I use (0-30, 31-60, 61-90, 90+ days)?",
+          "pt": "Quais faixas de vencimento devo usar (0-30, 31-60, 61-90, 90+ dias)?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_management_vs_audited",
+      "appliesTo": [
+        "doc_management_accounts",
+        "doc_management_pnl"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "compare",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "management accounts",
+            "audited",
+            "unaudited",
+            "internal financials"
+          ],
+          "pt": [
+            "demonstrações gerenciais",
+            "auditado",
+            "não auditado",
+            "relatório interno"
+          ]
+        }
+      },
+      "check": {
+        "type": "management_accounts_vs_audited_financials_must_be_clearly_distinguished",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_AUDIT_STATUS_AMBIGUOUS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Are these management (unaudited) figures or audited financials? This distinction affects reliability.",
+          "pt": "Estes são valores gerenciais (não auditados) ou demonstrações auditadas? Esta distinção afeta a confiabilidade."
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_regulatory_form_type",
+      "appliesTo": [
+        "doc_regulatory_filing"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize",
+          "locate"
+        ],
+        "keywords": {
+          "en": [
+            "regulatory filing",
+            "SEC",
+            "10-K",
+            "10-Q",
+            "8-K"
+          ],
+          "pt": [
+            "arquivo regulatório",
+            "SEC",
+            "10-K",
+            "10-Q",
+            "CVM"
+          ]
+        }
+      },
+      "check": {
+        "type": "regulatory_filings_require_sec_form_type_identification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_FORM_TYPE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which regulatory form type is this (10-K, 10-Q, 8-K, or other)?",
+          "pt": "Qual é o tipo de formulário regulatório (10-K, 10-Q, 8-K ou outro)?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_earnings_gaap_nongaap",
+      "appliesTo": [
+        "doc_earnings_release"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "compare",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "earnings",
+            "non-GAAP",
+            "adjusted",
+            "reconciliation"
+          ],
+          "pt": [
+            "resultados",
+            "não-GAAP",
+            "ajustado",
+            "reconciliação"
+          ]
+        }
+      },
+      "check": {
+        "type": "earnings_releases_need_gaap_vs_nongaap_reconciliation",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_GAAP_NONGAAP_UNRECONCILED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I present GAAP figures alongside non-GAAP adjustments with a reconciliation table?",
+          "pt": "Devo apresentar os valores GAAP junto com os ajustes não-GAAP com uma tabela de reconciliação?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_segment_aggregation",
+      "appliesTo": [
+        "doc_segment_reporting",
+        "doc_segment_report"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "summarize",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "segment",
+            "aggregation",
+            "operating segment",
+            "reportable segment"
+          ],
+          "pt": [
+            "segmento",
+            "agregação",
+            "segmento operacional",
+            "segmento reportável"
+          ]
+        }
+      },
+      "check": {
+        "type": "segment_reporting_requires_aggregation_criteria_disclosure",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_SEGMENT_CRITERIA_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which aggregation criteria define these operating segments?",
+          "pt": "Quais critérios de agregação definem estes segmentos operacionais?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_going_concern_window",
+      "appliesTo": [
+        "doc_going_concern_assessment"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "going concern",
+            "continuity",
+            "viability",
+            "12 months"
+          ],
+          "pt": [
+            "continuidade operacional",
+            "viabilidade",
+            "empresa em funcionamento",
+            "12 meses"
+          ]
+        }
+      },
+      "check": {
+        "type": "going_concern_needs_12_month_forward_looking_window_specification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_GOING_CONCERN_WINDOW_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the 12-month forward-looking assessment date for this going concern evaluation?",
+          "pt": "Qual é a data base da avaliação prospectiva de 12 meses para esta análise de continuidade operacional?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_goodwill_reporting_unit",
+      "appliesTo": [
+        "doc_goodwill_impairment_test"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "goodwill",
+            "impairment",
+            "reporting unit",
+            "fair value"
+          ],
+          "pt": [
+            "ágio",
+            "impairment",
+            "unidade geradora de caixa",
+            "valor justo"
+          ]
+        }
+      },
+      "check": {
+        "type": "goodwill_impairment_tests_need_reporting_unit_identification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_REPORTING_UNIT_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which reporting unit does this goodwill impairment test apply to?",
+          "pt": "A qual unidade geradora de caixa este teste de impairment de ágio se aplica?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_pension_actuarial_assumptions",
+      "appliesTo": [
+        "doc_pension_valuation"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "pension",
+            "actuarial",
+            "discount rate",
+            "mortality table"
+          ],
+          "pt": [
+            "previdência",
+            "atuarial",
+            "taxa de desconto",
+            "tábua de mortalidade"
+          ]
+        }
+      },
+      "check": {
+        "type": "pension_valuations_need_actuarial_assumption_set_identification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_ACTUARIAL_ASSUMPTIONS_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which actuarial assumption set (discount rate, salary growth, mortality table) applies to this valuation?",
+          "pt": "Qual conjunto de premissas atuariais (taxa de desconto, crescimento salarial, tábua de mortalidade) se aplica a esta avaliação?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_footnotes_line_item_linkage",
+      "appliesTo": [
+        "doc_footnotes_financial_statements"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "footnote",
+            "note",
+            "disclosure",
+            "line item"
+          ],
+          "pt": [
+            "nota explicativa",
+            "nota",
+            "divulgação",
+            "rubrica"
+          ]
+        }
+      },
+      "check": {
+        "type": "footnotes_must_be_linked_to_specific_line_items",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_FOOTNOTE_LINKAGE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which financial statement line item does this footnote relate to?",
+          "pt": "A qual rubrica das demonstrações financeiras esta nota explicativa se refere?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_coa_hierarchy_depth",
+      "appliesTo": [
+        "doc_chart_of_accounts"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "locate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "chart of accounts",
+            "COA",
+            "account hierarchy",
+            "account level"
+          ],
+          "pt": [
+            "plano de contas",
+            "hierarquia de contas",
+            "nível de conta"
+          ]
+        }
+      },
+      "check": {
+        "type": "chart_of_accounts_needs_hierarchy_depth_specification",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_COA_DEPTH_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "At which hierarchy level should I extract accounts (parent, child, or leaf level)?",
+          "pt": "Em qual nível hierárquico devo extrair as contas (nível pai, filho ou folha)?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_credit_memo_invoice_linkage",
+      "appliesTo": [
+        "doc_credit_memo"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "validate",
+          "locate"
+        ],
+        "keywords": {
+          "en": [
+            "credit memo",
+            "credit note",
+            "originating invoice",
+            "original invoice"
+          ],
+          "pt": [
+            "nota de crédito",
+            "memorando de crédito",
+            "fatura original",
+            "fatura de origem"
+          ]
+        }
+      },
+      "check": {
+        "type": "credit_memos_require_originating_invoice_linkage",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_CREDIT_MEMO_NO_INVOICE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which originating invoice number does this credit memo reference?",
+          "pt": "A qual número de fatura original este memorando de crédito se refere?"
+        }
+      }
+    },
+    {
+      "id": "rule_finance_doc_capex_budget_variance",
+      "appliesTo": [
+        "doc_capex_request_form",
+        "doc_capex_plan"
+      ],
+      "trigger": {
+        "operators": [
+          "extract",
+          "compare",
+          "validate"
+        ],
+        "keywords": {
+          "en": [
+            "capex",
+            "capital expenditure",
+            "budget variance",
+            "approved amount"
+          ],
+          "pt": [
+            "capex",
+            "investimento de capital",
+            "variação orçamentária",
+            "valor aprovado"
+          ]
+        }
+      },
+      "check": {
+        "type": "capex_requests_need_budget_vs_actual_variance_context",
+        "deterministic": true,
+        "requireSingleScopeDecision": true
+      },
+      "failureAction": {
+        "code": "FIN_DOC_CAPEX_VARIANCE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I compare this capex request against the approved budget and show the variance?",
+          "pt": "Devo comparar esta solicitação de capex com o orçamento aprovado e mostrar a variação?"
+        }
+      }
+    }
+  ]
 }

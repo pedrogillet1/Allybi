@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "id": "retrieval_document_intelligence_schema",
+    "version": "1.0.0",
+    "description": "Schema for retrieval document-intelligence banks (boost rules, rewrites, section priority).",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/retrieval_document_intelligence_schema.any.json",
+    "title": "Retrieval Document Intelligence Schema",
+    "type": "object",
+    "required": [
+      "_meta",
+      "config"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "description",
+          "languages",
+          "lastUpdated"
+        ],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "additionalProperties": true
+      },
+      "domain": {
+        "type": "string"
+      },
+      "rules": {
+        "type": "array"
+      },
+      "priorities": {
+        "type": "array"
+      }
+    },
+    "anyOf": [
+      {
+        "required": [
+          "rules"
+        ]
+      },
+      {
+        "required": [
+          "priorities"
+        ]
+      }
+    ]
+  }
+}

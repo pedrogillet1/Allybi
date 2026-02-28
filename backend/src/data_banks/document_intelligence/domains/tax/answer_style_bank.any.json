@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "id": "di_tax_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer styling rules for tax domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax"
+  },
+  "domain": "tax",
+  "audienceProfiles": [
+    {
+      "id": "taxpayer",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "tax_preparer",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "auditor",
+      "tone": "skeptical",
+      "defaultDepth": "audit_trail",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "executive",
+      "tone": "concise",
+      "defaultDepth": "executive_brief",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "tax_style_001_amount_context",
+      "rule": "Always pair tax amounts with currency and tax period.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "summarize"
+      ]
+    },
+    {
+      "id": "tax_style_002_deadline_context",
+      "rule": "Always include due date and timezone/jurisdiction context when available.",
+      "applies": [
+        "extract",
+        "locate",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "id": "tax_style_003_status_language",
+      "rule": "Use explicit status labels: filed, pending, paid, overdue, under review.",
+      "applies": [
+        "extract",
+        "summarize",
+        "monitor"
+      ]
+    },
+    {
+      "id": "tax_style_004_uncertainty_marker",
+      "rule": "Mark uncertain values as unverified; never fill blanks by inference.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "id": "tax_style_005_reference_requirements",
+      "rule": "Include notice id or return reference for every determination claim.",
+      "applies": [
+        "extract",
+        "validate",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "tax_style_006_scope_lock",
+      "rule": "Respond only from attached documents and keep wrong-doc scope lock explicit.",
+      "applies": [
+        "all"
+      ]
+    },
+    {
+      "id": "tax_style_007_mask_identifiers",
+      "rule": "Mask taxpayer identifiers except last four characters unless user explicitly requests redaction-free admin mode.",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare"
+      ]
+    }
+  ]
+}

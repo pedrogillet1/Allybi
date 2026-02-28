@@ -1,0 +1,11 @@
+{
+  "_meta": { "id": "di_finance_extraction_fin_covenant", "version": "1.0.0", "description": "Extraction hints for covenant compliance reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "finance", "docType": "fin_covenant" },
+  "hints": [
+    { "id": "hint_compliance_status", "entity": "overall_compliance", "anchors": ["compliance status", "overall status", "compliant", "in compliance"], "location": "compliance_summary", "extractionMethod": "section_first_paragraph" },
+    { "id": "hint_dscr", "entity": "dscr_actual", "anchors": ["DSCR", "debt service coverage"], "location": "compliance_matrix_table", "extractionMethod": "table_cell_match" },
+    { "id": "hint_interest_coverage", "entity": "interest_coverage_actual", "anchors": ["interest coverage", "EBITDA / interest"], "location": "compliance_matrix_table", "extractionMethod": "table_cell_match" },
+    { "id": "hint_leverage", "entity": "leverage_ratio_actual", "anchors": ["leverage ratio", "total debt / EBITDA", "net debt / EBITDA"], "location": "compliance_matrix_table", "extractionMethod": "table_cell_match" },
+    { "id": "hint_measurement_period", "entity": "measurement_period", "anchors": ["measurement period", "testing period", "trailing twelve months", "LTM"], "location": "compliance_summary", "extractionMethod": "heading_proximity" }
+  ]
+}

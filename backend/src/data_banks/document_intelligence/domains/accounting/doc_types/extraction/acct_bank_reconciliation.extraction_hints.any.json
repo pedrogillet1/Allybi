@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "id": "di_accounting_extraction_acct_bank_reconciliation",
+    "version": "1.1.0",
+    "description": "Extraction hints for bank reconciliation documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_bank_reconciliation"
+  },
+  "hints": [
+    {
+      "id": "hint_period",
+      "entity": "period",
+      "anchors": [
+        "period",
+        "reporting period",
+        "competencia",
+        "periodo"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_entity",
+      "entity": "entity",
+      "anchors": [
+        "entity",
+        "company",
+        "legal entity",
+        "empresa"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_currency",
+      "entity": "currency",
+      "anchors": [
+        "currency",
+        "moeda",
+        "curr",
+        "reporting currency"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_basis",
+      "entity": "basis",
+      "anchors": [
+        "basis",
+        "accounting basis",
+        "base contabil",
+        "regime"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_source_system",
+      "entity": "sourceSystem",
+      "anchors": [
+        "source system",
+        "erp",
+        "sistema origem",
+        "origem"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_reconciliationDate",
+      "entity": "reconciliationDate",
+      "anchors": [
+        "reconciliation date",
+        "reconciliation Date",
+        "reconciliationDate"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_bookBalance",
+      "entity": "bookBalance",
+      "anchors": [
+        "book balance",
+        "book Balance",
+        "bookBalance"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_bankBalance",
+      "entity": "bankBalance",
+      "anchors": [
+        "bank balance",
+        "bank Balance",
+        "bankBalance"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_adjustedBookBalance",
+      "entity": "adjustedBookBalance",
+      "anchors": [
+        "adjusted book balance",
+        "adjusted Book Balance",
+        "adjustedBookBalance"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    }
+  ]
+}

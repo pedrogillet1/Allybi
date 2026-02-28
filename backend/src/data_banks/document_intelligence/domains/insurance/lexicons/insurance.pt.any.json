@@ -1,0 +1,649 @@
+{
+  "_meta": {
+    "id": "di_insurance_lexicon_pt",
+    "version": "1.0.0",
+    "description": "Portuguese lexicon for insurance domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "language": "pt"
+  },
+  "domain": "insurance",
+  "terms": [
+    {
+      "id": "insurance_lex_pt_accident_date",
+      "canonical": "data do sinistro",
+      "synonyms": [
+        "data do acidente",
+        "data da ocorrencia"
+      ],
+      "display": "Data do Sinistro",
+      "enRef": "insurance_lex_accident_date"
+    },
+    {
+      "id": "insurance_lex_pt_adjuster",
+      "canonical": "regulador de sinistro",
+      "synonyms": [
+        "analista de sinistro",
+        "regulador"
+      ],
+      "display": "Regulador de Sinistro",
+      "enRef": "insurance_lex_adjuster"
+    },
+    {
+      "id": "insurance_lex_pt_allowed_amount",
+      "canonical": "valor elegivel",
+      "synonyms": [
+        "valor autorizado",
+        "valor permitido"
+      ],
+      "display": "Valor Elegivel",
+      "enRef": "insurance_lex_allowed_amount"
+    },
+    {
+      "id": "insurance_lex_pt_appeal_window",
+      "canonical": "prazo de recurso",
+      "synonyms": [
+        "janela de recurso",
+        "prazo de reconsideracao"
+      ],
+      "display": "Prazo de Recurso",
+      "enRef": "insurance_lex_appeal_window"
+    },
+    {
+      "id": "insurance_lex_pt_approved_amount",
+      "canonical": "valor aprovado",
+      "synonyms": [
+        "valor autorizado",
+        "valor liberado"
+      ],
+      "display": "Valor Aprovado",
+      "enRef": "insurance_lex_approved_amount"
+    },
+    {
+      "id": "insurance_lex_pt_authorization",
+      "canonical": "autorizacao",
+      "synonyms": [
+        "autorizacao previa",
+        "pre-autorizacao"
+      ],
+      "display": "Autorizacao",
+      "enRef": "insurance_lex_authorization"
+    },
+    {
+      "id": "insurance_lex_pt_beneficiary",
+      "canonical": "beneficiario",
+      "synonyms": [
+        "pessoa coberta",
+        "favorecido"
+      ],
+      "display": "Beneficiario",
+      "enRef": "insurance_lex_beneficiary"
+    },
+    {
+      "id": "insurance_lex_pt_benefit_limit",
+      "canonical": "limite de beneficio",
+      "synonyms": [
+        "teto de cobertura",
+        "limite maximo"
+      ],
+      "display": "Limite de Beneficio",
+      "enRef": "insurance_lex_benefit_limit"
+    },
+    {
+      "id": "insurance_lex_pt_benefit_period",
+      "canonical": "periodo de beneficio",
+      "synonyms": [
+        "periodo de cobertura",
+        "ano de cobertura"
+      ],
+      "display": "Periodo de Beneficio",
+      "enRef": "insurance_lex_benefit_period"
+    },
+    {
+      "id": "insurance_lex_pt_billing_period",
+      "canonical": "periodo de cobranca",
+      "synonyms": [
+        "competencia da fatura",
+        "periodo do premio"
+      ],
+      "display": "Periodo de Cobranca",
+      "enRef": "insurance_lex_billing_period"
+    },
+    {
+      "id": "insurance_lex_pt_broker",
+      "canonical": "corretor",
+      "synonyms": [
+        "intermediario",
+        "agente"
+      ],
+      "display": "Corretor",
+      "enRef": "insurance_lex_broker"
+    },
+    {
+      "id": "insurance_lex_pt_claim",
+      "canonical": "sinistro",
+      "synonyms": [
+        "pedido de indenizacao",
+        "reclamacao"
+      ],
+      "display": "Sinistro",
+      "enRef": "insurance_lex_claim"
+    },
+    {
+      "id": "insurance_lex_pt_claim_amount",
+      "canonical": "valor reclamado",
+      "synonyms": [
+        "valor do sinistro",
+        "montante pleiteado"
+      ],
+      "display": "Valor Reclamado",
+      "enRef": "insurance_lex_claim_amount"
+    },
+    {
+      "id": "insurance_lex_pt_claim_number",
+      "canonical": "numero do sinistro",
+      "synonyms": [
+        "id do sinistro",
+        "numero do caso"
+      ],
+      "display": "Numero do Sinistro",
+      "enRef": "insurance_lex_claim_number"
+    },
+    {
+      "id": "insurance_lex_pt_claim_status",
+      "canonical": "status do sinistro",
+      "synonyms": [
+        "situacao do sinistro",
+        "resultado"
+      ],
+      "display": "Status do Sinistro",
+      "enRef": "insurance_lex_claim_status"
+    },
+    {
+      "id": "insurance_lex_pt_claimant",
+      "canonical": "reclamante",
+      "synonyms": [
+        "solicitante",
+        "autor do sinistro"
+      ],
+      "display": "Reclamante",
+      "enRef": "insurance_lex_claimant"
+    },
+    {
+      "id": "insurance_lex_pt_coinsurance",
+      "canonical": "cosseguro",
+      "synonyms": [
+        "co-participacao percentual",
+        "coparticipacao"
+      ],
+      "display": "Cosseguro",
+      "enRef": "insurance_lex_coinsurance"
+    },
+    {
+      "id": "insurance_lex_pt_coordination_of_benefits",
+      "canonical": "coordenacao de beneficios",
+      "synonyms": [
+        "cob",
+        "coordenacao"
+      ],
+      "display": "Coordenacao de Beneficios",
+      "enRef": "insurance_lex_coordination_of_benefits"
+    },
+    {
+      "id": "insurance_lex_pt_copay",
+      "canonical": "coparticipacao",
+      "synonyms": [
+        "copagamento",
+        "valor fixo"
+      ],
+      "display": "Coparticipacao",
+      "enRef": "insurance_lex_copay"
+    },
+    {
+      "id": "insurance_lex_pt_coverage",
+      "canonical": "cobertura",
+      "synonyms": [
+        "servicos cobertos",
+        "risco coberto"
+      ],
+      "display": "Cobertura",
+      "enRef": "insurance_lex_coverage"
+    },
+    {
+      "id": "insurance_lex_pt_coverage_end",
+      "canonical": "fim da cobertura",
+      "synonyms": [
+        "vigencia final",
+        "expiracao"
+      ],
+      "display": "Fim da Cobertura",
+      "enRef": "insurance_lex_coverage_end"
+    },
+    {
+      "id": "insurance_lex_pt_coverage_start",
+      "canonical": "inicio da cobertura",
+      "synonyms": [
+        "vigencia inicial",
+        "inicio da apolice"
+      ],
+      "display": "Inicio da Cobertura",
+      "enRef": "insurance_lex_coverage_start"
+    },
+    {
+      "id": "insurance_lex_pt_coverage_type",
+      "canonical": "tipo de cobertura",
+      "synonyms": [
+        "tipo de plano",
+        "modalidade"
+      ],
+      "display": "Tipo de Cobertura",
+      "enRef": "insurance_lex_coverage_type"
+    },
+    {
+      "id": "insurance_lex_pt_deductible",
+      "canonical": "franquia",
+      "synonyms": [
+        "valor de franquia",
+        "dedutivel"
+      ],
+      "display": "Franquia",
+      "enRef": "insurance_lex_deductible"
+    },
+    {
+      "id": "insurance_lex_pt_denial_reason",
+      "canonical": "motivo da negativa",
+      "synonyms": [
+        "codigo de negativa",
+        "fundamento da recusa"
+      ],
+      "display": "Motivo da Negativa",
+      "enRef": "insurance_lex_denial_reason"
+    },
+    {
+      "id": "insurance_lex_pt_dependent",
+      "canonical": "dependente",
+      "synonyms": [
+        "beneficiario dependente",
+        "familiar"
+      ],
+      "display": "Dependente",
+      "enRef": "insurance_lex_dependent"
+    },
+    {
+      "id": "insurance_lex_pt_endorsement",
+      "canonical": "endosso",
+      "synonyms": [
+        "aditivo",
+        "clausula adicional"
+      ],
+      "display": "Endosso",
+      "enRef": "insurance_lex_endorsement"
+    },
+    {
+      "id": "insurance_lex_pt_eob",
+      "canonical": "demonstrativo de beneficios",
+      "synonyms": [
+        "eob",
+        "extrato de beneficios"
+      ],
+      "display": "Demonstrativo de Beneficios",
+      "enRef": "insurance_lex_eob"
+    },
+    {
+      "id": "insurance_lex_pt_exclusion",
+      "canonical": "exclusao de cobertura",
+      "synonyms": [
+        "item excluido",
+        "exclusao contratual"
+      ],
+      "display": "Exclusao de Cobertura",
+      "enRef": "insurance_lex_exclusion"
+    },
+    {
+      "id": "insurance_lex_pt_fraud_alert",
+      "canonical": "alerta de fraude",
+      "synonyms": [
+        "indicador de fraude",
+        "sinal de fraude"
+      ],
+      "display": "Alerta de Fraude",
+      "enRef": "insurance_lex_fraud_alert"
+    },
+    {
+      "id": "insurance_lex_pt_grace_period",
+      "canonical": "periodo de carencia de pagamento",
+      "synonyms": [
+        "prazo de tolerancia",
+        "graca"
+      ],
+      "display": "Periodo de Tolerancia",
+      "enRef": "insurance_lex_grace_period"
+    },
+    {
+      "id": "insurance_lex_pt_in_network",
+      "canonical": "rede credenciada",
+      "synonyms": [
+        "rede referenciada",
+        "prestador da rede"
+      ],
+      "display": "Rede Credenciada",
+      "enRef": "insurance_lex_in_network"
+    },
+    {
+      "id": "insurance_lex_pt_incident_description",
+      "canonical": "descricao do sinistro",
+      "synonyms": [
+        "narrativa do evento",
+        "descricao da ocorrencia"
+      ],
+      "display": "Descricao do Sinistro",
+      "enRef": "insurance_lex_incident_description"
+    },
+    {
+      "id": "insurance_lex_pt_invoice",
+      "canonical": "fatura de premio",
+      "synonyms": [
+        "boleto de premio",
+        "fatura"
+      ],
+      "display": "Fatura de Premio",
+      "enRef": "insurance_lex_invoice"
+    },
+    {
+      "id": "insurance_lex_pt_invoice_number",
+      "canonical": "numero da fatura",
+      "synonyms": [
+        "id da fatura",
+        "numero do boleto"
+      ],
+      "display": "Numero da Fatura",
+      "enRef": "insurance_lex_invoice_number"
+    },
+    {
+      "id": "insurance_lex_pt_itemized_charge",
+      "canonical": "cobranca detalhada",
+      "synonyms": [
+        "item de cobranca",
+        "valor por item"
+      ],
+      "display": "Cobranca Detalhada",
+      "enRef": "insurance_lex_itemized_charge"
+    },
+    {
+      "id": "insurance_lex_pt_member_id",
+      "canonical": "id do beneficiario",
+      "synonyms": [
+        "numero da carteirinha",
+        "id do segurado"
+      ],
+      "display": "ID do Beneficiario",
+      "enRef": "insurance_lex_member_id"
+    },
+    {
+      "id": "insurance_lex_pt_noncovered_amount",
+      "canonical": "valor nao coberto",
+      "synonyms": [
+        "valor glosado",
+        "valor excluido"
+      ],
+      "display": "Valor Nao Coberto",
+      "enRef": "insurance_lex_noncovered_amount"
+    },
+    {
+      "id": "insurance_lex_pt_notice",
+      "canonical": "aviso da seguradora",
+      "synonyms": [
+        "notificacao",
+        "comunicado"
+      ],
+      "display": "Aviso da Seguradora",
+      "enRef": "insurance_lex_notice"
+    },
+    {
+      "id": "insurance_lex_pt_out_of_network",
+      "canonical": "fora da rede",
+      "synonyms": [
+        "rede nao credenciada",
+        "prestador externo"
+      ],
+      "display": "Fora da Rede",
+      "enRef": "insurance_lex_out_of_network"
+    },
+    {
+      "id": "insurance_lex_pt_out_of_pocket_max",
+      "canonical": "limite maximo de desembolso",
+      "synonyms": [
+        "teto de desembolso",
+        "oop max"
+      ],
+      "display": "Limite Maximo de Desembolso",
+      "enRef": "insurance_lex_out_of_pocket_max"
+    },
+    {
+      "id": "insurance_lex_pt_paid_amount",
+      "canonical": "valor pago",
+      "synonyms": [
+        "indenizacao paga",
+        "pagamento efetuado"
+      ],
+      "display": "Valor Pago",
+      "enRef": "insurance_lex_paid_amount"
+    },
+    {
+      "id": "insurance_lex_pt_patient_responsibility",
+      "canonical": "responsabilidade do beneficiario",
+      "synonyms": [
+        "coparticipacao do beneficiario",
+        "responsabilidade do segurado"
+      ],
+      "display": "Responsabilidade do Beneficiario",
+      "enRef": "insurance_lex_patient_responsibility"
+    },
+    {
+      "id": "insurance_lex_pt_payer",
+      "canonical": "pagador",
+      "synonyms": [
+        "operadora",
+        "seguradora"
+      ],
+      "display": "Pagador",
+      "enRef": "insurance_lex_payer"
+    },
+    {
+      "id": "insurance_lex_pt_payment_reference",
+      "canonical": "referencia de pagamento",
+      "synonyms": [
+        "codigo de pagamento",
+        "linha digitavel"
+      ],
+      "display": "Referencia de Pagamento",
+      "enRef": "insurance_lex_payment_reference"
+    },
+    {
+      "id": "insurance_lex_pt_policy_holder",
+      "canonical": "titular da apolice",
+      "synonyms": [
+        "segurado titular",
+        "contratante"
+      ],
+      "display": "Titular da Apolice",
+      "enRef": "insurance_lex_policy_holder"
+    },
+    {
+      "id": "insurance_lex_pt_policy_number",
+      "canonical": "numero da apolice",
+      "synonyms": [
+        "id da apolice",
+        "numero do contrato"
+      ],
+      "display": "Numero da Apolice",
+      "enRef": "insurance_lex_policy_number"
+    },
+    {
+      "id": "insurance_lex_pt_policy_term",
+      "canonical": "vigencia da apolice",
+      "synonyms": [
+        "prazo da apolice",
+        "termo contratual"
+      ],
+      "display": "Vigencia da Apolice",
+      "enRef": "insurance_lex_policy_term"
+    },
+    {
+      "id": "insurance_lex_pt_premium",
+      "canonical": "premio",
+      "synonyms": [
+        "valor do premio",
+        "premio mensal"
+      ],
+      "display": "Premio",
+      "enRef": "insurance_lex_premium"
+    },
+    {
+      "id": "insurance_lex_pt_premium_due_date",
+      "canonical": "vencimento do premio",
+      "synonyms": [
+        "data de vencimento",
+        "prazo de pagamento"
+      ],
+      "display": "Vencimento do Premio",
+      "enRef": "insurance_lex_premium_due_date"
+    },
+    {
+      "id": "insurance_lex_pt_prior_authorization",
+      "canonical": "autorizacao previa",
+      "synonyms": [
+        "pa",
+        "pre-autorizacao"
+      ],
+      "display": "Autorizacao Previa",
+      "enRef": "insurance_lex_prior_authorization"
+    },
+    {
+      "id": "insurance_lex_pt_provider",
+      "canonical": "prestador",
+      "synonyms": [
+        "fornecedor de servico",
+        "prestador assistencial"
+      ],
+      "display": "Prestador",
+      "enRef": "insurance_lex_provider"
+    },
+    {
+      "id": "insurance_lex_pt_reimbursement",
+      "canonical": "reembolso",
+      "synonyms": [
+        "pagamento de sinistro",
+        "ressarcimento"
+      ],
+      "display": "Reembolso",
+      "enRef": "insurance_lex_reimbursement"
+    },
+    {
+      "id": "insurance_lex_pt_renewal",
+      "canonical": "renovacao da apolice",
+      "synonyms": [
+        "renovacao",
+        "prorrogacao"
+      ],
+      "display": "Renovacao da Apolice",
+      "enRef": "insurance_lex_renewal"
+    },
+    {
+      "id": "insurance_lex_pt_risk_class",
+      "canonical": "classe de risco",
+      "synonyms": [
+        "faixa de risco",
+        "categoria de risco"
+      ],
+      "display": "Classe de Risco",
+      "enRef": "insurance_lex_risk_class"
+    },
+    {
+      "id": "insurance_lex_pt_service_date",
+      "canonical": "data do atendimento",
+      "synonyms": [
+        "data do servico",
+        "dos"
+      ],
+      "display": "Data do Atendimento",
+      "enRef": "insurance_lex_service_date"
+    },
+    {
+      "id": "insurance_lex_pt_subrogation",
+      "canonical": "sub-rogacao",
+      "synonyms": [
+        "direito de regresso",
+        "recuperacao"
+      ],
+      "display": "Sub-rogacao",
+      "enRef": "insurance_lex_subrogation"
+    },
+    {
+      "id": "insurance_lex_pt_subscriber",
+      "canonical": "assinante",
+      "synonyms": [
+        "segurado principal",
+        "titular"
+      ],
+      "display": "Assinante",
+      "enRef": "insurance_lex_subscriber"
+    },
+    {
+      "id": "insurance_lex_pt_sum_insured",
+      "canonical": "capital segurado",
+      "synonyms": [
+        "valor segurado",
+        "limite segurado"
+      ],
+      "display": "Capital Segurado",
+      "enRef": "insurance_lex_sum_insured"
+    },
+    {
+      "id": "insurance_lex_pt_third_party_admin",
+      "canonical": "administradora terceirizada",
+      "synonyms": [
+        "tpa",
+        "administradora"
+      ],
+      "display": "Administradora Terceirizada",
+      "enRef": "insurance_lex_third_party_admin"
+    },
+    {
+      "id": "insurance_lex_pt_underwriting",
+      "canonical": "subscricao",
+      "synonyms": [
+        "analise de risco",
+        "aceitacao"
+      ],
+      "display": "Subscricao",
+      "enRef": "insurance_lex_underwriting"
+    },
+    {
+      "id": "insurance_lex_pt_waiting_period",
+      "canonical": "periodo de carencia",
+      "synonyms": [
+        "carencia",
+        "tempo de espera"
+      ],
+      "display": "Periodo de Carencia",
+      "enRef": "insurance_lex_waiting_period"
+    },
+    {
+      "id": "insurance_lex_pt_writeoff",
+      "canonical": "glosa",
+      "synonyms": [
+        "ajuste contratual",
+        "desconto contratual"
+      ],
+      "display": "Glosa",
+      "enRef": "insurance_lex_writeoff"
+    }
+  ]
+}

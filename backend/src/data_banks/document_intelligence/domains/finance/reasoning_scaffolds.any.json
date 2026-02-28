@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "id": "di_finance_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for finance domain — structured thinking patterns for financial analysis.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "scaffolds": [
+    {
+      "id": "fin_scaffold_001_ratio_analysis",
+      "name": "Financial Ratio Analysis",
+      "operators": ["calculate", "evaluate"],
+      "steps": [
+        "Identify the ratio requested and its standard formula",
+        "Locate numerator and denominator values in the document with exact citations",
+        "Verify both values are from the same period and same accounting basis",
+        "Compute the ratio showing the formula with actual numbers",
+        "Compare against industry benchmarks or prior periods if available",
+        "State whether the ratio indicates strength, weakness, or neutrality"
+      ]
+    },
+    {
+      "id": "fin_scaffold_002_variance_analysis",
+      "name": "Budget vs. Actual Variance",
+      "operators": ["compare", "evaluate"],
+      "steps": [
+        "Identify the line item(s) and periods under comparison",
+        "Extract budget/plan figure and actual figure with citations",
+        "Compute absolute and percentage variance",
+        "Classify variance as favorable or unfavorable",
+        "Identify likely drivers from MD&A or notes if available",
+        "Assess materiality relative to the total budget"
+      ]
+    },
+    {
+      "id": "fin_scaffold_003_covenant_check",
+      "name": "Debt Covenant Compliance Check",
+      "operators": ["validate", "monitor"],
+      "steps": [
+        "Locate the covenant definition (threshold, formula, measurement period)",
+        "Extract the required financial metrics with citations",
+        "Compute the covenant ratio or metric using the defined formula",
+        "Compare computed value against the covenant threshold",
+        "Determine compliance status: pass, fail, or within warning range",
+        "Note cure period or waiver provisions if covenant is breached"
+      ]
+    },
+    {
+      "id": "fin_scaffold_004_trend_analysis",
+      "name": "Multi-Period Trend Analysis",
+      "operators": ["compare", "monitor", "summarize"],
+      "steps": [
+        "Identify the metric and all available periods",
+        "Extract values for each period with citations",
+        "Compute period-over-period changes (absolute and percentage)",
+        "Identify inflection points or significant changes",
+        "Correlate with known events (acquisitions, restructuring, market shifts)",
+        "Project direction if sufficient data points exist, with uncertainty qualifier"
+      ]
+    },
+    {
+      "id": "fin_scaffold_005_cap_table_analysis",
+      "name": "Cap Table Analysis",
+      "operators": ["extract", "calculate"],
+      "steps": [
+        "Identify all share classes and their terms",
+        "Extract outstanding shares, options, warrants for each class",
+        "Compute fully-diluted share count",
+        "Calculate ownership percentages per holder or class",
+        "Identify liquidation preferences and anti-dilution provisions",
+        "Note any vesting schedules or exercise price thresholds"
+      ]
+    },
+    {
+      "id": "fin_scaffold_006_earnings_analysis",
+      "name": "Earnings Release Analysis",
+      "operators": ["summarize", "evaluate", "compare"],
+      "steps": [
+        "Extract headline figures: revenue, net income, EPS (GAAP and non-GAAP)",
+        "Compare against consensus estimates if referenced",
+        "Identify management guidance for next period",
+        "Note one-time items or adjustments",
+        "Summarize segment performance",
+        "Highlight management commentary on outlook"
+      ]
+    }
+  ]
+}

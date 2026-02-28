@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "di_banking_redaction_and_safety_rules",
+    "version": "1.0.0",
+    "description": "Redaction and safety rules for banking domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "redactionRules": [
+    {
+      "id": "banking_redact_001_account",
+      "dataType": "bank_account_number",
+      "pattern": "\\b(?:account\\s*(?:number|no\\.?|#)?\\s*:?\\s*)\\d{8,20}\\b",
+      "action": "REDACT",
+      "replacement": "[BANK ACCOUNT REDACTED]"
+    },
+    {
+      "id": "banking_redact_002_card_pan",
+      "dataType": "card_pan",
+      "pattern": "\\b(?:\\d[ -]*?){13,19}\\b",
+      "action": "MASK_KEEP_LAST4",
+      "replacement": "[CARD MASKED]"
+    },
+    {
+      "id": "banking_redact_003_iban_swift",
+      "dataType": "iban_or_swift",
+      "pattern": "\\b(?:[A-Z]{2}\\d{2}[A-Z0-9]{11,30}|[A-Z]{6}[A-Z0-9]{2,5})\\b",
+      "action": "REDACT",
+      "replacement": "[BANK ROUTING REDACTED]"
+    },
+    {
+      "id": "banking_redact_004_personal_id",
+      "dataType": "personal_id",
+      "pattern": "\\b(?:\\d{3}-\\d{2}-\\d{4}|\\d{11})\\b",
+      "action": "REDACT",
+      "replacement": "[PERSONAL ID REDACTED]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "banking_safety_001_no_investment_advice",
+      "severity": "warning",
+      "description": "Do not provide investment suitability recommendations from statement data.",
+      "trigger": "user asks investment advice",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "banking_safety_002_no_fraud_accusation",
+      "severity": "error",
+      "description": "Do not accuse counterparties of fraud; flag suspicious indicators neutrally.",
+      "trigger": "anomaly detected",
+      "action": "NEUTRAL_FLAG"
+    },
+    {
+      "id": "banking_safety_003_no_pin_or_secret_handling",
+      "severity": "error",
+      "description": "Never request or expose PINs, CVV, passwords, or OTP data.",
+      "trigger": "credential data present",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "banking_safety_004_replay_protection",
+      "severity": "warning",
+      "description": "Treat screenshots and receipts as informational only; cannot guarantee transaction finality.",
+      "trigger": "receipt-only evidence",
+      "action": "STATE_UNCERTAINTY"
+    }
+  ]
+}

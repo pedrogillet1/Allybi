@@ -81,9 +81,9 @@
     {
       "id": "connectors",
       "priority": 93,
-      "description": "Connector lifecycle operations: connect, sync, status, disconnect (Gmail/Outlook/Slack).",
+      "description": "Connector lifecycle operations: connect, sync, search, status, disconnect (Gmail/Outlook/Slack).",
       "requiresDocs": false,
-      "operatorsAllowed": ["CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_STATUS", "CONNECTOR_DISCONNECT"]
+      "operatorsAllowed": ["CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_SEARCH", "CONNECTOR_STATUS", "CONNECTOR_DISCONNECT"]
     },
     {
       "id": "email",
@@ -166,11 +166,11 @@
       "id": "connectors_request",
       "intentFamily": "connectors",
       "priority": 93,
-      "description": "User wants to connect/sync/check/disconnect an integration (Gmail/Outlook/Slack).",
+      "description": "User wants to connect/sync/search/check/disconnect an integration (Gmail/Outlook/Slack).",
       "keywords": {
-        "en": ["connect gmail", "connect outlook", "connect slack", "sync gmail", "sync outlook", "sync slack", "connector status", "disconnect gmail", "disconnect outlook", "disconnect slack"],
-        "pt": ["conectar gmail", "conectar outlook", "conectar slack", "sincronizar gmail", "sincronizar outlook", "sincronizar slack", "status do conector", "desconectar gmail", "desconectar outlook", "desconectar slack"],
-        "es": ["conectar gmail", "conectar outlook", "conectar slack", "sincronizar gmail", "sincronizar outlook", "sincronizar slack", "estado del conector", "desconectar gmail", "desconectar outlook", "desconectar slack"]
+        "en": ["connect gmail", "connect outlook", "connect slack", "sync gmail", "sync outlook", "sync slack", "search gmail", "search outlook", "search slack", "connector status", "disconnect gmail", "disconnect outlook", "disconnect slack"],
+        "pt": ["conectar gmail", "conectar outlook", "conectar slack", "sincronizar gmail", "sincronizar outlook", "sincronizar slack", "pesquisar gmail", "pesquisar outlook", "pesquisar slack", "status do conector", "desconectar gmail", "desconectar outlook", "desconectar slack"],
+        "es": ["conectar gmail", "conectar outlook", "conectar slack", "sincronizar gmail", "sincronizar outlook", "sincronizar slack", "buscar gmail", "buscar outlook", "buscar slack", "estado del conector", "desconectar gmail", "desconectar outlook", "desconectar slack"]
       }
     },
     {

@@ -94,6 +94,12 @@ export const EditRequestSchema = z
 // EditApplyResult
 // ---------------------------------------------------------------------------
 
+const EditValidationEntrySchema = z.object({
+  id: z.string(),
+  pass: z.boolean(),
+  detail: z.string().optional(),
+});
+
 export const EditApplyResultSchema = z
   .object({
     ok: z.boolean(),
@@ -107,6 +113,9 @@ export const EditApplyResultSchema = z
       "blocked",
     ]),
     revisionId: z.string().optional(),
+    requestId: z.string().optional(),
+    validations: z.array(EditValidationEntrySchema).optional(),
+    followups: z.array(z.string()).optional(),
     error: z.string().optional(),
     proof: z
       .object({

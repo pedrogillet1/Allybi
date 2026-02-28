@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_lexicon_en",
+    "version": "1.0.0",
+    "description": "EN lexicon for hr_payroll domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll",
+    "language": "en"
+  },
+  "domain": "hr_payroll",
+  "terms": [
+    {
+      "id": "hr_payroll_lex_benefits_enrollment",
+      "canonical": "benefits enrollment",
+      "synonyms": [
+        "benefits selection",
+        "coverage enrollment"
+      ],
+      "display": "Benefits Enrollment"
+    },
+    {
+      "id": "hr_payroll_lex_deduction",
+      "canonical": "deduction",
+      "synonyms": [
+        "withholding",
+        "payroll deduction"
+      ],
+      "display": "Deduction"
+    },
+    {
+      "id": "hr_payroll_lex_department",
+      "canonical": "department",
+      "synonyms": [
+        "business unit",
+        "team"
+      ],
+      "display": "Department"
+    },
+    {
+      "id": "hr_payroll_lex_earnings",
+      "canonical": "earnings",
+      "synonyms": [
+        "income",
+        "compensation"
+      ],
+      "display": "Earnings"
+    },
+    {
+      "id": "hr_payroll_lex_employee_id",
+      "canonical": "employee id",
+      "synonyms": [
+        "worker id",
+        "associate id"
+      ],
+      "display": "Employee Id"
+    },
+    {
+      "id": "hr_payroll_lex_employer",
+      "canonical": "employer",
+      "synonyms": [
+        "company",
+        "legal employer"
+      ],
+      "display": "Employer"
+    },
+    {
+      "id": "hr_payroll_lex_expense_category",
+      "canonical": "expense category",
+      "synonyms": [
+        "expense type",
+        "cost type"
+      ],
+      "display": "Expense Category"
+    },
+    {
+      "id": "hr_payroll_lex_expense_report",
+      "canonical": "expense report",
+      "synonyms": [
+        "expense claim",
+        "reimbursement request"
+      ],
+      "display": "Expense Report"
+    },
+    {
+      "id": "hr_payroll_lex_gross_pay",
+      "canonical": "gross pay",
+      "synonyms": [
+        "gross earnings",
+        "gross wages"
+      ],
+      "display": "Gross Pay"
+    },
+    {
+      "id": "hr_payroll_lex_hire_date",
+      "canonical": "hire date",
+      "synonyms": [
+        "employment start date",
+        "start date"
+      ],
+      "display": "Hire Date"
+    },
+    {
+      "id": "hr_payroll_lex_hours_worked",
+      "canonical": "hours worked",
+      "synonyms": [
+        "worked hours",
+        "labor hours"
+      ],
+      "display": "Hours Worked"
+    },
+    {
+      "id": "hr_payroll_lex_net_pay",
+      "canonical": "net pay",
+      "synonyms": [
+        "take-home pay",
+        "net earnings"
+      ],
+      "display": "Net Pay"
+    },
+    {
+      "id": "hr_payroll_lex_overtime",
+      "canonical": "overtime",
+      "synonyms": [
+        "ot",
+        "extra hours"
+      ],
+      "display": "Overtime"
+    },
+    {
+      "id": "hr_payroll_lex_pay_period",
+      "canonical": "pay period",
+      "synonyms": [
+        "pay cycle",
+        "payroll period"
+      ],
+      "display": "Pay Period"
+    },
+    {
+      "id": "hr_payroll_lex_pay_stub",
+      "canonical": "pay stub",
+      "synonyms": [
+        "payslip",
+        "salary slip"
+      ],
+      "display": "Pay Stub"
+    },
+    {
+      "id": "hr_payroll_lex_reimbursement",
+      "canonical": "reimbursement",
+      "synonyms": [
+        "repayment",
+        "expense reimbursement"
+      ],
+      "display": "Reimbursement"
+    },
+    {
+      "id": "hr_payroll_lex_tax_withholding",
+      "canonical": "tax withholding",
+      "synonyms": [
+        "withheld tax",
+        "payroll tax"
+      ],
+      "display": "Tax Withholding"
+    },
+    {
+      "id": "hr_payroll_lex_timesheet",
+      "canonical": "timesheet",
+      "synonyms": [
+        "timecard",
+        "time log"
+      ],
+      "display": "Timesheet"
+    },
+    {
+      "id": "hr_payroll_lex_verification_letter",
+      "canonical": "verification letter",
+      "synonyms": [
+        "employment letter",
+        "proof of employment"
+      ],
+      "display": "Verification Letter"
+    },
+    {
+      "id": "hr_payroll_lex_ytd_total",
+      "canonical": "ytd total",
+      "synonyms": [
+        "year-to-date total",
+        "annual cumulative"
+      ],
+      "display": "Ytd Total"
+    }
+  ]
+}

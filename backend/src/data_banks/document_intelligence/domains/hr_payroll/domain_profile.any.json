@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_domain_profile",
+    "version": "1.0.0",
+    "description": "Hr Payroll domain profile with scope, detection signals, and supported operators.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll"
+  },
+  "domain": "hr_payroll",
+  "displayName": {
+    "en": "HR and Payroll",
+    "pt": "RH e Folha"
+  },
+  "scope": "Employment and payroll documents including pay stubs, timesheets, benefits enrollment, expense reports, and verification letters.",
+  "coreConcepts": [
+    "benefit_plan",
+    "contribution",
+    "coverage_level",
+    "currency",
+    "deductions",
+    "department",
+    "effective_date",
+    "employee_id",
+    "employer",
+    "expense_total",
+    "gross_pay",
+    "hire_date",
+    "hours_worked",
+    "job_title",
+    "net_pay",
+    "overtime",
+    "pay_period",
+    "reimbursement",
+    "supervisor",
+    "tax_withholding"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "deductions",
+      "employee_id",
+      "employer",
+      "expense_total",
+      "gross_pay",
+      "hours_worked",
+      "net_pay",
+      "overtime",
+      "pay_period",
+      "tax_withholding"
+    ],
+    "mediumConfidence": [
+      "benefit_plan",
+      "contribution",
+      "coverage_level",
+      "currency",
+      "department",
+      "effective_date",
+      "hire_date",
+      "job_title",
+      "reimbursement",
+      "supervisor"
+    ]
+  },
+  "relatedDomains": [
+    "accounting",
+    "finance",
+    "identity"
+  ],
+  "ontologyPrefix": "hr_payroll"
+}

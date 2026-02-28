@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "id": "di_accounting_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for accounting domain — structured thinking patterns for bookkeeping and audit analysis.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting"
+  },
+  "domain": "accounting",
+  "scaffolds": [
+    {
+      "id": "acct_scaffold_001_reconciliation",
+      "name": "Bank Reconciliation Analysis",
+      "operators": ["validate", "compare"],
+      "steps": [
+        "Identify the book balance (per GL) and the bank balance (per statement) with their dates",
+        "List all outstanding checks (issued but not yet cleared)",
+        "List all deposits in transit (recorded but not yet credited by bank)",
+        "Identify bank charges, interest, or errors not yet recorded in books",
+        "Compute adjusted book balance and adjusted bank balance",
+        "Verify the two adjusted balances agree; flag any remaining difference"
+      ]
+    },
+    {
+      "id": "acct_scaffold_002_trial_balance_review",
+      "name": "Trial Balance Review",
+      "operators": ["validate", "extract"],
+      "steps": [
+        "Verify total debits equal total credits",
+        "Identify unusual balances (credit balances in normally-debit accounts, or vice versa)",
+        "Flag accounts with zero balance that are expected to have activity",
+        "Check for large round-number entries that may indicate estimates or adjustments",
+        "Cross-reference key accounts (cash, AR, AP) against subsidiary ledgers",
+        "Note any suspense or clearing accounts with remaining balances"
+      ]
+    },
+    {
+      "id": "acct_scaffold_003_journal_entry_validation",
+      "name": "Journal Entry Validation",
+      "operators": ["validate", "evaluate"],
+      "steps": [
+        "Verify the entry balances (total debits = total credits)",
+        "Check that account codes are valid per chart of accounts",
+        "Verify the posting date falls within the correct period",
+        "Assess whether the entry has proper approval/authorization",
+        "Evaluate the business rationale for the entry",
+        "Flag if the entry is a reversal, adjustment, or standard recurring entry"
+      ]
+    },
+    {
+      "id": "acct_scaffold_004_aging_analysis",
+      "name": "Aging Schedule Analysis",
+      "operators": ["monitor", "evaluate"],
+      "steps": [
+        "Extract total balances by aging bucket (current, 1-30, 31-60, 61-90, 90+)",
+        "Calculate the percentage of balance in each bucket",
+        "Identify the top concentrations (largest individual balances in 90+ bucket)",
+        "Compare current aging to prior period aging for trend",
+        "Assess adequacy of allowance/provision based on aging mix",
+        "Flag any customer/vendor with sudden jump to delinquent status"
+      ]
+    },
+    {
+      "id": "acct_scaffold_005_controls_evaluation",
+      "name": "Internal Controls Evaluation",
+      "operators": ["evaluate", "validate"],
+      "steps": [
+        "Identify the control objective (e.g., 'all disbursements are properly authorized')",
+        "Describe the control activity as documented",
+        "Assess whether the control is preventive or detective",
+        "Evaluate the evidence of control operation (signatures, system logs, reconciliations)",
+        "Identify any gaps or deficiencies in the control design",
+        "Rate the control as effective, partially effective, or ineffective"
+      ]
+    },
+    {
+      "id": "acct_scaffold_006_account_analysis",
+      "name": "GL Account Activity Analysis",
+      "operators": ["extract", "calculate", "compare"],
+      "steps": [
+        "Extract the opening balance for the period",
+        "List significant transactions (journal entries) affecting the account",
+        "Compute the running balance after each significant posting",
+        "Verify the closing balance matches the ending balance on the trial balance",
+        "Identify any unusual or large entries that warrant further investigation",
+        "Summarize net activity (total debits, total credits, net change)"
+      ]
+    }
+  ]
+}

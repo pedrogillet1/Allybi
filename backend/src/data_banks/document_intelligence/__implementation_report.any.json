@@ -1,0 +1,85 @@
+{
+  "_meta": {
+    "id": "document_intelligence_implementation_report",
+    "version": "1.0.0",
+    "description": "Automated verification report for document intelligence registry, schemas, dependencies, runtime wiring, and orphan policy.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "generatedAt": "2026-02-28T03:59:40.263Z",
+  "strict": true,
+  "loadedBankCount": 200,
+  "expectedBankCount": 200,
+  "coverageByFamily": {
+    "taxonomy": {
+      "expected": 6,
+      "loaded": 6,
+      "coverage": 1
+    },
+    "structure": {
+      "expected": 7,
+      "loaded": 7,
+      "coverage": 1
+    },
+    "entities": {
+      "expected": 4,
+      "loaded": 4,
+      "coverage": 1
+    },
+    "domain": {
+      "expected": 9,
+      "loaded": 9,
+      "coverage": 1
+    },
+    "operators": {
+      "expected": 44,
+      "loaded": 44,
+      "coverage": 1
+    },
+    "reasoning": {
+      "expected": 9,
+      "loaded": 9,
+      "coverage": 1
+    },
+    "quality": {
+      "expected": 4,
+      "loaded": 4,
+      "coverage": 1
+    },
+    "retrieval": {
+      "expected": 12,
+      "loaded": 12,
+      "coverage": 1
+    },
+    "marketing": {
+      "expected": 9,
+      "loaded": 9,
+      "coverage": 1
+    },
+    "domain_packs_legal_medical": {
+      "expected": 20,
+      "loaded": 20,
+      "coverage": 1
+    },
+    "doc_type_structures_legal_medical": {
+      "expected": 54,
+      "loaded": 54,
+      "coverage": 1
+    }
+  },
+  "checks": {
+    "strict": true,
+    "requiredCore": 102,
+    "optional": 91,
+    "totalChecked": 193,
+    "loadedBankCount": 200,
+    "schemaValidatedCount": 200,
+    "warningCount": 0,
+    "failureCount": 0
+  },
+  "failedChecks": [],
+  "warnings": [],
+  "unresolvedBlockers": []
+}

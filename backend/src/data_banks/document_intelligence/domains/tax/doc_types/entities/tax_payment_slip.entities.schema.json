@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "id": "di_tax_entities_tax_payment_slip",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for tax_payment_slip.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "docType": "tax_payment_slip"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Document issuer or authority"
+    },
+    {
+      "id": "subject_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary subject referenced by the document"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": false,
+      "description": "Official document number"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": false,
+      "description": "Document effective date"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Jurisdiction or governing authority"
+    },
+    {
+      "id": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current processing or legal status"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code when monetary values are present"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total document amount when applicable"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date for payment or action"
+    },
+    {
+      "id": "reference_id",
+      "type": "string",
+      "required": false,
+      "description": "External reference id"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "payment_code",
+      "type": "string",
+      "required": true,
+      "description": "Payment or revenue code"
+    },
+    {
+      "id": "barcode_value",
+      "type": "string",
+      "required": false,
+      "description": "Barcode/line digit payload"
+    },
+    {
+      "id": "principal_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Principal amount"
+    },
+    {
+      "id": "penalty_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Penalty amount"
+    },
+    {
+      "id": "interest_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Interest amount"
+    },
+    {
+      "id": "total_due",
+      "type": "currency",
+      "required": true,
+      "description": "Total due amount"
+    },
+    {
+      "id": "settlement_date",
+      "type": "date",
+      "required": false,
+      "description": "Settlement date if paid"
+    },
+    {
+      "id": "payment_channel",
+      "type": "string",
+      "required": false,
+      "description": "Bank/channel of payment"
+    },
+    {
+      "id": "payment_status",
+      "type": "string",
+      "required": true,
+      "description": "Paid/pending/overdue status"
+    },
+    {
+      "id": "receipt_reference",
+      "type": "string",
+      "required": false,
+      "description": "Receipt reference id"
+    },
+    {
+      "id": "tax_doc_type",
+      "type": "string",
+      "required": true,
+      "description": "Resolved doc type: tax_payment_slip"
+    }
+  ]
+}

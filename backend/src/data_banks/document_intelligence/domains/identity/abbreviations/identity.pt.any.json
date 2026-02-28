@@ -1,0 +1,151 @@
+{
+  "_meta": {
+    "id": "di_identity_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "Portuguese abbreviations for identity domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "language": "pt"
+  },
+  "domain": "identity",
+  "abbreviations": [
+    {
+      "abbr": "AR",
+      "expansion": "Auto de Registro"
+    },
+    {
+      "abbr": "BAR",
+      "expansion": "Codigo de Barras"
+    },
+    {
+      "abbr": "CART",
+      "expansion": "Cartorio"
+    },
+    {
+      "abbr": "CEP",
+      "expansion": "Codigo de Enderecamento Postal"
+    },
+    {
+      "abbr": "CNAE",
+      "expansion": "Classificacao Nacional de Atividades Economicas"
+    },
+    {
+      "abbr": "CNH",
+      "expansion": "Carteira Nacional de Habilitacao"
+    },
+    {
+      "abbr": "CNPJ",
+      "expansion": "Cadastro Nacional da Pessoa Juridica"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoas Fisicas"
+    },
+    {
+      "abbr": "CRLV",
+      "expansion": "Certificado de Registro e Licenciamento de Veiculo"
+    },
+    {
+      "abbr": "CTPS",
+      "expansion": "Carteira de Trabalho e Previdencia Social"
+    },
+    {
+      "abbr": "DNE",
+      "expansion": "Documento Nacional de Estrangeiro"
+    },
+    {
+      "abbr": "DNV",
+      "expansion": "Data de Nascimento"
+    },
+    {
+      "abbr": "DVL",
+      "expansion": "Data de Validade"
+    },
+    {
+      "abbr": "EMI",
+      "expansion": "Data de Emissao"
+    },
+    {
+      "abbr": "IE",
+      "expansion": "Inscricao Estadual"
+    },
+    {
+      "abbr": "IM",
+      "expansion": "Inscricao Municipal"
+    },
+    {
+      "abbr": "JUCESP",
+      "expansion": "Junta Comercial do Estado de Sao Paulo"
+    },
+    {
+      "abbr": "MRZ",
+      "expansion": "Zona de Leitura Mecanica"
+    },
+    {
+      "abbr": "NIRE",
+      "expansion": "Numero de Identificacao do Registro de Empresas"
+    },
+    {
+      "abbr": "NIS",
+      "expansion": "Numero de Identificacao Social"
+    },
+    {
+      "abbr": "NIT",
+      "expansion": "Numero de Identificacao do Trabalhador"
+    },
+    {
+      "abbr": "ORG",
+      "expansion": "Orgao Emissor"
+    },
+    {
+      "abbr": "PASS",
+      "expansion": "Passaporte"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Comprovante de Endereco"
+    },
+    {
+      "abbr": "QR",
+      "expansion": "Codigo QR"
+    },
+    {
+      "abbr": "RA",
+      "expansion": "Registro Academico"
+    },
+    {
+      "abbr": "RENAVAM",
+      "expansion": "Registro Nacional de Veiculos Automotores"
+    },
+    {
+      "abbr": "RG",
+      "expansion": "Registro Geral"
+    },
+    {
+      "abbr": "RNE",
+      "expansion": "Registro Nacional de Estrangeiro"
+    },
+    {
+      "abbr": "RNM",
+      "expansion": "Registro Nacional Migratorio"
+    },
+    {
+      "abbr": "SELO",
+      "expansion": "Selo de Autenticidade"
+    },
+    {
+      "abbr": "UF",
+      "expansion": "Unidade Federativa"
+    },
+    {
+      "abbr": "VIZ",
+      "expansion": "Zona de Inspecao Visual"
+    }
+  ]
+}

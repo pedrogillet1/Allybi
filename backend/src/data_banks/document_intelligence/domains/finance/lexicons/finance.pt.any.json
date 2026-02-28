@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "id": "di_finance_lexicon_pt",
+    "version": "1.0.0",
+    "description": "Portuguese lexicon for finance domain — canonical terms, synonyms, and display forms.",
+    "languages": ["pt"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "language": "pt"
+  },
+  "domain": "finance",
+  "terms": [
+    { "id": "fin_lex_pt_accounts_payable", "canonical": "contas a pagar", "synonyms": ["fornecedores", "obrigações a pagar"], "display": "Contas a Pagar", "enRef": "fin_lex_accounts_payable" },
+    { "id": "fin_lex_pt_accounts_receivable", "canonical": "contas a receber", "synonyms": ["clientes", "recebíveis"], "display": "Contas a Receber", "enRef": "fin_lex_accounts_receivable" },
+    { "id": "fin_lex_pt_balance_sheet", "canonical": "balanço patrimonial", "synonyms": ["BP", "demonstração de posição financeira"], "display": "Balanço Patrimonial", "enRef": "fin_lex_balance_sheet" },
+    { "id": "fin_lex_pt_capex", "canonical": "investimentos de capital", "synonyms": ["capex", "imobilizações"], "display": "Investimentos de Capital", "enRef": "fin_lex_capex" },
+    { "id": "fin_lex_pt_cash_flow", "canonical": "demonstração de fluxo de caixa", "synonyms": ["fluxo de caixa", "DFC"], "display": "Fluxo de Caixa", "enRef": "fin_lex_cash_flow" },
+    { "id": "fin_lex_pt_cogs", "canonical": "custo dos produtos vendidos", "synonyms": ["CPV", "custo das mercadorias vendidas", "CMV"], "display": "Custo dos Produtos Vendidos", "enRef": "fin_lex_cogs" },
+    { "id": "fin_lex_pt_current_ratio", "canonical": "índice de liquidez corrente", "synonyms": ["liquidez corrente"], "display": "Liquidez Corrente", "enRef": "fin_lex_current_ratio" },
+    { "id": "fin_lex_pt_dte", "canonical": "índice de endividamento", "synonyms": ["dívida sobre patrimônio", "alavancagem"], "display": "Endividamento", "enRef": "fin_lex_dte" },
+    { "id": "fin_lex_pt_ebitda", "canonical": "LAJIDA", "synonyms": ["EBITDA", "lucro antes de juros impostos depreciação e amortização"], "display": "LAJIDA", "enRef": "fin_lex_ebitda" },
+    { "id": "fin_lex_pt_eps", "canonical": "lucro por ação", "synonyms": ["LPA"], "display": "Lucro por Ação", "enRef": "fin_lex_eps" },
+    { "id": "fin_lex_pt_ev", "canonical": "valor da empresa", "synonyms": ["EV", "enterprise value"], "display": "Valor da Empresa", "enRef": "fin_lex_ev" },
+    { "id": "fin_lex_pt_fcf", "canonical": "fluxo de caixa livre", "synonyms": ["FCL"], "display": "Fluxo de Caixa Livre", "enRef": "fin_lex_fcf" },
+    { "id": "fin_lex_pt_goodwill", "canonical": "ágio", "synonyms": ["goodwill", "fundo de comércio"], "display": "Ágio", "enRef": "fin_lex_goodwill" },
+    { "id": "fin_lex_pt_gross_margin", "canonical": "margem bruta", "synonyms": ["MB"], "display": "Margem Bruta", "enRef": "fin_lex_gross_margin" },
+    { "id": "fin_lex_pt_income_statement", "canonical": "demonstração de resultados", "synonyms": ["DRE", "demonstração de resultado do exercício", "P&L"], "display": "Demonstração de Resultados", "enRef": "fin_lex_income_statement" },
+    { "id": "fin_lex_pt_market_cap", "canonical": "capitalização de mercado", "synonyms": ["valor de mercado"], "display": "Capitalização de Mercado", "enRef": "fin_lex_market_cap" },
+    { "id": "fin_lex_pt_net_income", "canonical": "lucro líquido", "synonyms": ["resultado líquido", "LL"], "display": "Lucro Líquido", "enRef": "fin_lex_net_income" },
+    { "id": "fin_lex_pt_operating_income", "canonical": "lucro operacional", "synonyms": ["LAJIR", "resultado operacional", "EBIT"], "display": "Lucro Operacional", "enRef": "fin_lex_operating_income" },
+    { "id": "fin_lex_pt_revenue", "canonical": "receita", "synonyms": ["receita líquida", "receita total", "faturamento", "vendas"], "display": "Receita", "enRef": "fin_lex_revenue" },
+    { "id": "fin_lex_pt_roe", "canonical": "retorno sobre patrimônio líquido", "synonyms": ["ROE", "rentabilidade do PL"], "display": "Retorno sobre PL", "enRef": "fin_lex_roe" },
+    { "id": "fin_lex_pt_working_capital", "canonical": "capital de giro", "synonyms": ["capital circulante líquido"], "display": "Capital de Giro", "enRef": "fin_lex_working_capital" }
+  ]
+}

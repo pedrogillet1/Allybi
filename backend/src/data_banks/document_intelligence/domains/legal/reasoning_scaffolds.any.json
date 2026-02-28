@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "id": "legal_reasoning_scaffolds",
+    "version": "2.0.0",
+    "description": "Reasoning scaffolds for legal interpretation and extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "scaffolds": [
+    {
+      "id": "legal_scaffold_clause_extraction",
+      "name": "Clause-first extraction scaffold",
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ],
+      "steps": [
+        "identify candidate doc type",
+        "map required clauses",
+        "extract parties/dates/obligations",
+        "resolve cross-references",
+        "emit citation-backed fields",
+        "flag unresolved ambiguity"
+      ]
+    },
+    {
+      "id": "legal_scaffold_comparison",
+      "name": "Version/redline comparison scaffold",
+      "operators": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "align sections by headings",
+        "detect additions/deletions",
+        "classify risk-impacting changes",
+        "quantify commercial/legal impact",
+        "produce diff summary with citations"
+      ]
+    },
+    {
+      "id": "legal_scaffold_policy_review",
+      "name": "Policy control review scaffold",
+      "operators": [
+        "evaluate",
+        "advise",
+        "monitor"
+      ],
+      "steps": [
+        "extract policy controls",
+        "map to owner/frequency",
+        "identify control gaps",
+        "cross-check retention/security/privacy obligations",
+        "emit remediation actions"
+      ]
+    },
+    {
+      "id": "legal_scaffold_dispute_analysis",
+      "name": "Dispute and litigation scaffold",
+      "operators": [
+        "extract",
+        "summarize",
+        "monitor"
+      ],
+      "steps": [
+        "extract procedural posture",
+        "capture claims/defenses",
+        "identify deadlines/orders",
+        "estimate risk exposure from cited text",
+        "draft next-step checklist"
+      ]
+    }
+  ]
+}

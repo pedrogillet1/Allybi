@@ -1,0 +1,355 @@
+{
+  "_meta": {
+    "id": "di_banking_extraction_banking_payment_receipt",
+    "version": "1.0.0",
+    "description": "Extraction hints for  documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "docType": "banking_payment_receipt"
+  },
+  "hints": [
+    {
+      "id": "hint_01_docType",
+      "entity": "docType",
+      "anchors": [
+        "document type",
+        "statement type",
+        "bill type",
+        "banking_payment_receipt"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_issuerName",
+      "entity": "issuerName",
+      "anchors": [
+        "issuer",
+        "provider",
+        "bank",
+        "merchant",
+        "company"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_03_issuerTaxId",
+      "entity": "issuerTaxId",
+      "anchors": [
+        "tax id",
+        "ein",
+        "cnpj",
+        "cpf",
+        "tin"
+      ],
+      "location": "issuer_and_customer",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_04_issuerAddress",
+      "entity": "issuerAddress",
+      "anchors": [
+        "issuer address",
+        "provider address",
+        "endereco"
+      ],
+      "location": "issuer_and_customer",
+      "extractionMethod": "block_capture"
+    },
+    {
+      "id": "hint_05_issuerPhone",
+      "entity": "issuerPhone",
+      "anchors": [
+        "contact",
+        "support",
+        "telefone",
+        "phone"
+      ],
+      "location": "issuer_and_customer",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_06_issuerWebsite",
+      "entity": "issuerWebsite",
+      "anchors": [
+        "website",
+        "portal",
+        "site"
+      ],
+      "location": "issuer_and_customer",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_07_customerName",
+      "entity": "customerName",
+      "anchors": [
+        "customer",
+        "account holder",
+        "subscriber",
+        "cliente"
+      ],
+      "location": "issuer_and_customer",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_08_customerId",
+      "entity": "customerId",
+      "anchors": [
+        "customer id",
+        "client id",
+        "codigo cliente"
+      ],
+      "location": "issuer_and_customer",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_09_accountNumber",
+      "entity": "accountNumber",
+      "anchors": [
+        "account number",
+        "account no",
+        "numero da conta"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_10_maskedAccountNumber",
+      "entity": "maskedAccountNumber",
+      "anchors": [
+        "ending in",
+        "last digits",
+        "final"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_11_serviceAddress",
+      "entity": "serviceAddress",
+      "anchors": [
+        "service address",
+        "billing address",
+        "endereco de servico"
+      ],
+      "location": "issuer_and_customer",
+      "extractionMethod": "block_capture"
+    },
+    {
+      "id": "hint_12_statementNumber",
+      "entity": "statementNumber",
+      "anchors": [
+        "statement number",
+        "extrato numero"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_13_invoiceNumber",
+      "entity": "invoiceNumber",
+      "anchors": [
+        "invoice",
+        "fatura",
+        "nota"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_14_receiptNumber",
+      "entity": "receiptNumber",
+      "anchors": [
+        "receipt",
+        "recibo",
+        "comprovante"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_15_referenceNumber",
+      "entity": "referenceNumber",
+      "anchors": [
+        "reference",
+        "barcode",
+        "nosso numero",
+        "linha digitavel"
+      ],
+      "location": "footer_metadata",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_16_issueDate",
+      "entity": "issueDate",
+      "anchors": [
+        "issue date",
+        "emission date",
+        "data emissao"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_17_statementDate",
+      "entity": "statementDate",
+      "anchors": [
+        "statement date",
+        "data do extrato"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_18_billingPeriodStart",
+      "entity": "billingPeriodStart",
+      "anchors": [
+        "period start",
+        "from",
+        "inicio"
+      ],
+      "location": "period",
+      "extractionMethod": "date_range_parse"
+    },
+    {
+      "id": "hint_19_billingPeriodEnd",
+      "entity": "billingPeriodEnd",
+      "anchors": [
+        "period end",
+        "to",
+        "fim"
+      ],
+      "location": "period",
+      "extractionMethod": "date_range_parse"
+    },
+    {
+      "id": "hint_20_dueDate",
+      "entity": "dueDate",
+      "anchors": [
+        "due date",
+        "vencimento",
+        "pay by"
+      ],
+      "location": "balance_and_due",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_21_paymentDate",
+      "entity": "paymentDate",
+      "anchors": [
+        "payment date",
+        "paid on",
+        "data pagamento"
+      ],
+      "location": "payments_and_credits",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_22_currency",
+      "entity": "currency",
+      "anchors": [
+        "currency",
+        "moeda",
+        "usd",
+        "brl",
+        "eur"
+      ],
+      "location": "header",
+      "extractionMethod": "symbol_and_code"
+    },
+    {
+      "id": "hint_23_subtotalAmount",
+      "entity": "subtotalAmount",
+      "anchors": [
+        "subtotal",
+        "sub total",
+        "valor parcial"
+      ],
+      "location": "summary",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_24_taxAmount",
+      "entity": "taxAmount",
+      "anchors": [
+        "tax",
+        "imposto",
+        "icms",
+        "vat"
+      ],
+      "location": "taxes",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_25_feeAmount",
+      "entity": "feeAmount",
+      "anchors": [
+        "fees",
+        "tarifa",
+        "encargos"
+      ],
+      "location": "charges_and_fees",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_26_discountAmount",
+      "entity": "discountAmount",
+      "anchors": [
+        "discount",
+        "desconto",
+        "rebate"
+      ],
+      "location": "charges_and_fees",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_27_adjustmentAmount",
+      "entity": "adjustmentAmount",
+      "anchors": [
+        "adjustment",
+        "ajuste",
+        "correction"
+      ],
+      "location": "adjustments_and_disputes",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_28_previousBalance",
+      "entity": "previousBalance",
+      "anchors": [
+        "previous balance",
+        "saldo anterior"
+      ],
+      "location": "balance_and_due",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_29_paymentsCredits",
+      "entity": "paymentsCredits",
+      "anchors": [
+        "payments and credits",
+        "pagamentos e creditos"
+      ],
+      "location": "payments_and_credits",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_30_amountDue",
+      "entity": "amountDue",
+      "anchors": [
+        "amount due",
+        "total due",
+        "valor a pagar"
+      ],
+      "location": "balance_and_due",
+      "extractionMethod": "amount_parse"
+    }
+  ]
+}

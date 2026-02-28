@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_travel_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for travel domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "language": "pt"
+  },
+  "domain": "travel",
+  "abbreviations": [
+    {
+      "abbr": "ANAC",
+      "expansion": "Agencia Nacional de Aviacao Civil"
+    },
+    {
+      "abbr": "AP",
+      "expansion": "Apolice"
+    },
+    {
+      "abbr": "BAG",
+      "expansion": "Bagagem"
+    },
+    {
+      "abbr": "CIA",
+      "expansion": "Companhia Aerea"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoa Fisica"
+    },
+    {
+      "abbr": "DES",
+      "expansion": "Desembarque"
+    },
+    {
+      "abbr": "DOC",
+      "expansion": "Documento"
+    },
+    {
+      "abbr": "EMB",
+      "expansion": "Embarque"
+    },
+    {
+      "abbr": "ETA",
+      "expansion": "Horario Estimado de Chegada"
+    },
+    {
+      "abbr": "ETD",
+      "expansion": "Horario Estimado de Partida"
+    },
+    {
+      "abbr": "LATAM",
+      "expansion": "Linha Aerea"
+    },
+    {
+      "abbr": "LOC",
+      "expansion": "Localizador"
+    },
+    {
+      "abbr": "N/A",
+      "expansion": "Nao Aplicavel"
+    },
+    {
+      "abbr": "PNR",
+      "expansion": "Registro do Passageiro"
+    },
+    {
+      "abbr": "RG",
+      "expansion": "Registro Geral"
+    },
+    {
+      "abbr": "SEG",
+      "expansion": "Segmento de Viagem"
+    },
+    {
+      "abbr": "SEGU",
+      "expansion": "Seguro"
+    },
+    {
+      "abbr": "TRE",
+      "expansion": "Trecho"
+    },
+    {
+      "abbr": "VCH",
+      "expansion": "Voucher"
+    },
+    {
+      "abbr": "VST",
+      "expansion": "Visto"
+    }
+  ]
+}

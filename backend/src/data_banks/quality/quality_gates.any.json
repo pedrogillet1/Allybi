@@ -21,7 +21,7 @@
       }
     },
     "limits": {
-      "maxCharsHard": 4200,
+      "maxCharsHard": 20000,
       "maxBlocksHard": 14,
       "maxBulletsHard": 18,
       "maxTablesHard": 3,

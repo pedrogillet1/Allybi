@@ -1,0 +1,1976 @@
+{
+  "_meta": {
+    "id": "boost_rules_medical",
+    "version": "1.0.0",
+    "description": "Domain boost rules for medical retrieval ranking by intent, operator, doc type, and section anchors.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "maxMatchedRules": 6,
+    "maxDocumentIntelligenceBoost": 0.45,
+    "coefficientRange": "0..3"
+  },
+  "domain": "medical",
+  "rules": [
+    {
+      "id": "medical_advise_general_unlock",
+      "priority": 90,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "assessment",
+          "weight": 2.5
+        },
+        {
+          "section": "plan",
+          "weight": 2.3
+        },
+        {
+          "section": "safety_alerts",
+          "weight": 2.1
+        },
+        {
+          "section": "red_flags",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_advise_doc_lock",
+      "priority": 89,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "assessment",
+          "weight": 1.9
+        },
+        {
+          "section": "plan",
+          "weight": 1.75
+        },
+        {
+          "section": "safety_alerts",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_advise_explicit_doc_type",
+      "priority": 88,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "plan",
+          "weight": 2.2
+        },
+        {
+          "section": "safety_alerts",
+          "weight": 2.02
+        },
+        {
+          "section": "red_flags",
+          "weight": 1.84
+        },
+        {
+          "section": "follow_up",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_calculate_general_unlock",
+      "priority": 87,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 2.5
+        },
+        {
+          "section": "trend_table",
+          "weight": 2.3
+        },
+        {
+          "section": "dose_table",
+          "weight": 2.1
+        },
+        {
+          "section": "vitals_table",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_calculate_doc_lock",
+      "priority": 86,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 1.9
+        },
+        {
+          "section": "trend_table",
+          "weight": 1.75
+        },
+        {
+          "section": "dose_table",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_calculate_explicit_doc_type",
+      "priority": 85,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "trend_table",
+          "weight": 2.2
+        },
+        {
+          "section": "dose_table",
+          "weight": 2.02
+        },
+        {
+          "section": "vitals_table",
+          "weight": 1.84
+        },
+        {
+          "section": "reference_range",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_compare_general_unlock",
+      "priority": 84,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 2.5
+        },
+        {
+          "section": "reference_range",
+          "weight": 2.3
+        },
+        {
+          "section": "trend_table",
+          "weight": 2.1
+        },
+        {
+          "section": "assessment",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_compare_doc_lock",
+      "priority": 83,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 1.9
+        },
+        {
+          "section": "reference_range",
+          "weight": 1.75
+        },
+        {
+          "section": "trend_table",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_compare_explicit_doc_type",
+      "priority": 82,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "reference_range",
+          "weight": 2.2
+        },
+        {
+          "section": "trend_table",
+          "weight": 2.02
+        },
+        {
+          "section": "assessment",
+          "weight": 1.84
+        },
+        {
+          "section": "plan",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_evaluate_general_unlock",
+      "priority": 81,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "assessment",
+          "weight": 2.5
+        },
+        {
+          "section": "red_flags",
+          "weight": 2.3
+        },
+        {
+          "section": "safety_alerts",
+          "weight": 2.1
+        },
+        {
+          "section": "medication_list",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_evaluate_doc_lock",
+      "priority": 80,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "assessment",
+          "weight": 1.9
+        },
+        {
+          "section": "red_flags",
+          "weight": 1.75
+        },
+        {
+          "section": "safety_alerts",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_evaluate_explicit_doc_type",
+      "priority": 79,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "red_flags",
+          "weight": 2.2
+        },
+        {
+          "section": "safety_alerts",
+          "weight": 2.02
+        },
+        {
+          "section": "medication_list",
+          "weight": 1.84
+        },
+        {
+          "section": "plan",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_extract_general_unlock",
+      "priority": 78,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 2.5
+        },
+        {
+          "section": "medication_list",
+          "weight": 2.3
+        },
+        {
+          "section": "allergies",
+          "weight": 2.1
+        },
+        {
+          "section": "diagnoses",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_extract_doc_lock",
+      "priority": 77,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 1.9
+        },
+        {
+          "section": "medication_list",
+          "weight": 1.75
+        },
+        {
+          "section": "allergies",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_extract_explicit_doc_type",
+      "priority": 76,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "medication_list",
+          "weight": 2.2
+        },
+        {
+          "section": "allergies",
+          "weight": 2.02
+        },
+        {
+          "section": "diagnoses",
+          "weight": 1.84
+        },
+        {
+          "section": "procedures",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_locate_general_unlock",
+      "priority": 75,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "results_index",
+          "weight": 2.3
+        },
+        {
+          "section": "medication_section",
+          "weight": 2.1
+        },
+        {
+          "section": "assessment",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_locate_doc_lock",
+      "priority": 74,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "results_index",
+          "weight": 1.75
+        },
+        {
+          "section": "medication_section",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_locate_explicit_doc_type",
+      "priority": 73,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results_index",
+          "weight": 2.2
+        },
+        {
+          "section": "medication_section",
+          "weight": 2.02
+        },
+        {
+          "section": "assessment",
+          "weight": 1.84
+        },
+        {
+          "section": "plan",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_monitor_general_unlock",
+      "priority": 72,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "vital_trends",
+          "weight": 2.5
+        },
+        {
+          "section": "critical_values",
+          "weight": 2.3
+        },
+        {
+          "section": "alerts",
+          "weight": 2.1
+        },
+        {
+          "section": "medication_changes",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_monitor_doc_lock",
+      "priority": 71,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "vital_trends",
+          "weight": 1.9
+        },
+        {
+          "section": "critical_values",
+          "weight": 1.75
+        },
+        {
+          "section": "alerts",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_monitor_explicit_doc_type",
+      "priority": 70,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "critical_values",
+          "weight": 2.2
+        },
+        {
+          "section": "alerts",
+          "weight": 2.02
+        },
+        {
+          "section": "medication_changes",
+          "weight": 1.84
+        },
+        {
+          "section": "follow_up_tasks",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_navigate_general_unlock",
+      "priority": 69,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "results_index",
+          "weight": 2.3
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.1
+        },
+        {
+          "section": "section_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_navigate_doc_lock",
+      "priority": 68,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "results_index",
+          "weight": 1.75
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_navigate_explicit_doc_type",
+      "priority": 67,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results_index",
+          "weight": 2.2
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.02
+        },
+        {
+          "section": "section_index",
+          "weight": 1.84
+        },
+        {
+          "section": "timeline_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_open_general_unlock",
+      "priority": 66,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "results_index",
+          "weight": 2.3
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.1
+        },
+        {
+          "section": "section_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_open_doc_lock",
+      "priority": 65,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "results_index",
+          "weight": 1.75
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_open_explicit_doc_type",
+      "priority": 64,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results_index",
+          "weight": 2.2
+        },
+        {
+          "section": "bookmarks",
+          "weight": 2.02
+        },
+        {
+          "section": "section_index",
+          "weight": 1.84
+        },
+        {
+          "section": "timeline_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_summarize_general_unlock",
+      "priority": 63,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "impression",
+          "weight": 2.5
+        },
+        {
+          "section": "assessment",
+          "weight": 2.3
+        },
+        {
+          "section": "plan",
+          "weight": 2.1
+        },
+        {
+          "section": "key_results",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_summarize_doc_lock",
+      "priority": 62,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "impression",
+          "weight": 1.9
+        },
+        {
+          "section": "assessment",
+          "weight": 1.75
+        },
+        {
+          "section": "plan",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_summarize_explicit_doc_type",
+      "priority": 61,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "assessment",
+          "weight": 2.2
+        },
+        {
+          "section": "plan",
+          "weight": 2.02
+        },
+        {
+          "section": "key_results",
+          "weight": 1.84
+        },
+        {
+          "section": "follow_up",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_validate_general_unlock",
+      "priority": 60,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.35
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.1
+        },
+        {
+          "docType": "imaging_report",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 2.5
+        },
+        {
+          "section": "reference_range",
+          "weight": 2.3
+        },
+        {
+          "section": "units",
+          "weight": 2.1
+        },
+        {
+          "section": "sample_info",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_validate_doc_lock",
+      "priority": 59,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 1.9
+        },
+        {
+          "section": "reference_range",
+          "weight": 1.75
+        },
+        {
+          "section": "units",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_validate_explicit_doc_type",
+      "priority": 58,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "explicitDocTypes": [
+        "lab_report",
+        "cbc_panel"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "explicitDocTypes": [
+          "lab_report",
+          "cbc_panel"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "cbc_panel",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "reference_range",
+          "weight": 2.2
+        },
+        {
+          "section": "units",
+          "weight": 2.02
+        },
+        {
+          "section": "sample_info",
+          "weight": 1.84
+        },
+        {
+          "section": "critical_values",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "medical_advise_safety_gate",
+      "priority": 68,
+      "weight": 1.9,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.8
+        },
+        {
+          "docType": "discharge_summary",
+          "weight": 2.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "reference_range",
+          "weight": 2.9
+        },
+        {
+          "section": "red_flags",
+          "weight": 2.9
+        },
+        {
+          "section": "safety_alerts",
+          "weight": 2.8
+        },
+        {
+          "section": "plan",
+          "weight": 2.6
+        }
+      ],
+      "guardrails": {
+        "consultProfessionalGate": true
+      }
+    },
+    {
+      "id": "medical_validate_reference_ranges",
+      "priority": 67,
+      "weight": 1.8,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "cbc_panel",
+          "weight": 2.8
+        },
+        {
+          "docType": "metabolic_panel",
+          "weight": 2.7
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "results",
+          "weight": 2.8
+        },
+        {
+          "section": "reference_range",
+          "weight": 2.9
+        },
+        {
+          "section": "critical_values",
+          "weight": 2.7
+        }
+      ],
+      "guardrails": {
+        "unitConsistencyRequired": true
+      }
+    },
+    {
+      "id": "medical_compare_trends",
+      "priority": 66,
+      "weight": 1.7,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ],
+        "docLock": false,
+        "minExplicitResolvedDocs": 2
+      },
+      "boostDocTypes": [
+        {
+          "docType": "lab_report",
+          "weight": 2.7
+        },
+        {
+          "docType": "vital_signs_chart",
+          "weight": 2.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "trend_table",
+          "weight": 2.9
+        },
+        {
+          "section": "results",
+          "weight": 2.7
+        },
+        {
+          "section": "assessment",
+          "weight": 2.5
+        }
+      ],
+      "guardrails": {
+        "trendNeedsDatedEvidence": true
+      }
+    }
+  ]
+}

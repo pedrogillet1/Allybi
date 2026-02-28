@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_billing_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer style rules for billing domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing"
+  },
+  "domain": "billing",
+  "audienceProfiles": [
+    {
+      "id": "consumer",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "low"
+    },
+    {
+      "id": "finance_ops",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "analyst",
+      "tone": "analytical",
+      "defaultDepth": "decision_memo",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "billing_style_001_currency",
+      "rule": "Always include currency when presenting monetary values.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "id": "billing_style_002_date",
+      "rule": "Use ISO date format (YYYY-MM-DD) and include timezone assumptions only if explicit in document.",
+      "applies": [
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "id": "billing_style_003_due_first",
+      "rule": "When user asks payment questions, present amount due and due date in the first sentence.",
+      "applies": [
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "id": "billing_style_004_component_breakdown",
+      "rule": "Break totals into subtotal, taxes, fees, discounts, and adjustments when available.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "id": "billing_style_005_unknowns",
+      "rule": "Explicitly state missing fields as unavailable rather than guessing.",
+      "applies": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5721 @@
+{
+  "_meta": {
+    "id": "doc_aliases_billing",
+    "version": "1.0.0",
+    "description": "Billing document alias normalization bank with EN/PT/slang coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.62
+  },
+  "domain": "billing",
+  "aliases": [
+    {
+      "phrase": "2a via da fatura",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar 2a via da fatura do ultimo periodo",
+        "comparar 2a via da fatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "a/p aging",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show a/p aging for the last period",
+        "compare a/p aging by counterparty"
+      ]
+    },
+    {
+      "phrase": "a/r aging",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show a/r aging for the last period",
+        "compare a/r aging by counterparty"
+      ]
+    },
+    {
+      "phrase": "a/r invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show a/r invoice for the last period",
+        "compare a/r invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "acao de cobranca",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar acao de cobranca do ultimo periodo",
+        "comparar acao de cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "accounts payable",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show accounts payable for the last period",
+        "compare accounts payable by counterparty"
+      ]
+    },
+    {
+      "phrase": "accounts payable aging",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show accounts payable aging for the last period",
+        "compare accounts payable aging by counterparty"
+      ]
+    },
+    {
+      "phrase": "accounts receivable",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show accounts receivable for the last period",
+        "compare accounts receivable by counterparty"
+      ]
+    },
+    {
+      "phrase": "accounts receivable aging",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show accounts receivable aging for the last period",
+        "compare accounts receivable aging by counterparty"
+      ]
+    },
+    {
+      "phrase": "accounts receivable invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show accounts receivable invoice for the last period",
+        "compare accounts receivable invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "agenda de pagamentos",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar agenda de pagamentos do ultimo periodo",
+        "comparar agenda de pagamentos por counterparty"
+      ]
+    },
+    {
+      "phrase": "aging ap",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show aging ap for the last period",
+        "compare aging ap by counterparty"
+      ]
+    },
+    {
+      "phrase": "aging de clientes",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aging de clientes do ultimo periodo",
+        "comparar aging de clientes por counterparty"
+      ]
+    },
+    {
+      "phrase": "aging de fornecedores",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aging de fornecedores do ultimo periodo",
+        "comparar aging de fornecedores por counterparty"
+      ]
+    },
+    {
+      "phrase": "amount due bill",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show amount due bill for the last period",
+        "compare amount due bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "ap aging",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ap aging for the last period",
+        "compare ap aging by counterparty"
+      ]
+    },
+    {
+      "phrase": "ap check run",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show ap check run for the last period",
+        "compare ap check run by counterparty"
+      ]
+    },
+    {
+      "phrase": "ap ledger",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ap ledger for the last period",
+        "compare ap ledger by counterparty"
+      ]
+    },
+    {
+      "phrase": "ap open items",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ap open items for the last period",
+        "compare ap open items by counterparty"
+      ]
+    },
+    {
+      "phrase": "ap report",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ap report for the last period",
+        "compare ap report by counterparty"
+      ]
+    },
+    {
+      "phrase": "ap schedule",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ap schedule for the last period",
+        "compare ap schedule by counterparty"
+      ]
+    },
+    {
+      "phrase": "ap summary",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ap summary for the last period",
+        "compare ap summary by counterparty"
+      ]
+    },
+    {
+      "phrase": "approved bills",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show approved bills for the last period",
+        "compare approved bills by counterparty"
+      ]
+    },
+    {
+      "phrase": "aprovacao de pagamento",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aprovacao de pagamento do ultimo periodo",
+        "comparar aprovacao de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "apuracao de tributos",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar apuracao de tributos do ultimo periodo",
+        "comparar apuracao de tributos por counterparty"
+      ]
+    },
+    {
+      "phrase": "ar aging",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ar aging for the last period",
+        "compare ar aging by counterparty"
+      ]
+    },
+    {
+      "phrase": "ar ledger",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ar ledger for the last period",
+        "compare ar ledger by counterparty"
+      ]
+    },
+    {
+      "phrase": "ar open items",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ar open items for the last period",
+        "compare ar open items by counterparty"
+      ]
+    },
+    {
+      "phrase": "ar report",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ar report for the last period",
+        "compare ar report by counterparty"
+      ]
+    },
+    {
+      "phrase": "ar schedule",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ar schedule for the last period",
+        "compare ar schedule by counterparty"
+      ]
+    },
+    {
+      "phrase": "ar summary",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show ar summary for the last period",
+        "compare ar summary by counterparty"
+      ]
+    },
+    {
+      "phrase": "arquivo de pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar arquivo de pagamento do ultimo periodo",
+        "comparar arquivo de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "arquivo remessa pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar arquivo remessa pagamento do ultimo periodo",
+        "comparar arquivo remessa pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "assinatura anual cobrada",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar assinatura anual cobrada do ultimo periodo",
+        "comparar assinatura anual cobrada por counterparty"
+      ]
+    },
+    {
+      "phrase": "assinatura mensal",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar assinatura mensal do ultimo periodo",
+        "comparar assinatura mensal por counterparty"
+      ]
+    },
+    {
+      "phrase": "auto-renew invoice",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show auto-renew invoice for the last period",
+        "compare auto-renew invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "batch payment file",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show batch payment file for the last period",
+        "compare batch payment file by counterparty"
+      ]
+    },
+    {
+      "phrase": "bill copy",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bill copy for the last period",
+        "compare bill copy by counterparty"
+      ]
+    },
+    {
+      "phrase": "bill detail",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bill detail for the last period",
+        "compare bill detail by counterparty"
+      ]
+    },
+    {
+      "phrase": "bill payment batch",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show bill payment batch for the last period",
+        "compare bill payment batch by counterparty"
+      ]
+    },
+    {
+      "phrase": "bill statement",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bill statement for the last period",
+        "compare bill statement by counterparty"
+      ]
+    },
+    {
+      "phrase": "billing claim",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show billing claim for the last period",
+        "compare billing claim by counterparty"
+      ]
+    },
+    {
+      "phrase": "billing dispute",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show billing dispute for the last period",
+        "compare billing dispute by counterparty"
+      ]
+    },
+    {
+      "phrase": "billing invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show billing invoice for the last period",
+        "compare billing invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "billing memo",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show billing memo for the last period",
+        "compare billing memo by counterparty"
+      ]
+    },
+    {
+      "phrase": "billing statement",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show billing statement for the last period",
+        "compare billing statement by counterparty"
+      ]
+    },
+    {
+      "phrase": "boleto de assinatura",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar boleto de assinatura do ultimo periodo",
+        "comparar boleto de assinatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "boleto de cobranca",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar boleto de cobranca do ultimo periodo",
+        "comparar boleto de cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "boleto de imposto",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar boleto de imposto do ultimo periodo",
+        "comparar boleto de imposto por counterparty"
+      ]
+    },
+    {
+      "phrase": "boleto em aberto",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar boleto em aberto do ultimo periodo",
+        "comparar boleto em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "boletos a pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar boletos a pagar do ultimo periodo",
+        "comparar boletos a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "bordereau de pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar bordereau de pagamento do ultimo periodo",
+        "comparar bordereau de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "carta de contestacao de fatura",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar carta de contestacao de fatura do ultimo periodo",
+        "comparar carta de contestacao de fatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "carteira de recebiveis",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carteira de recebiveis do ultimo periodo",
+        "comparar carteira de recebiveis por counterparty"
+      ]
+    },
+    {
+      "phrase": "cash collection report",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show cash collection report for the last period",
+        "compare cash collection report by counterparty"
+      ]
+    },
+    {
+      "phrase": "charge dispute",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show charge dispute for the last period",
+        "compare charge dispute by counterparty"
+      ]
+    },
+    {
+      "phrase": "check run",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show check run for the last period",
+        "compare check run by counterparty"
+      ]
+    },
+    {
+      "phrase": "claim about overbilling",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show claim about overbilling for the last period",
+        "compare claim about overbilling by counterparty"
+      ]
+    },
+    {
+      "phrase": "claim for unpaid bill",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show claim for unpaid bill for the last period",
+        "compare claim for unpaid bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "claim notice for charges",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show claim notice for charges for the last period",
+        "compare claim notice for charges by counterparty"
+      ]
+    },
+    {
+      "phrase": "claim over invoice",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show claim over invoice for the last period",
+        "compare claim over invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "client invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show client invoice for the last period",
+        "compare client invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "clientes inadimplentes",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar clientes inadimplentes do ultimo periodo",
+        "comparar clientes inadimplentes por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar cobranca do ultimo periodo",
+        "comparar cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca de assinatura",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cobranca de assinatura do ultimo periodo",
+        "comparar cobranca de assinatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca de licenca",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cobranca de licenca do ultimo periodo",
+        "comparar cobranca de licenca por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca em aberto",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cobranca em aberto do ultimo periodo",
+        "comparar cobranca em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca indevida",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar cobranca indevida do ultimo periodo",
+        "comparar cobranca indevida por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca mensal",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar cobranca mensal do ultimo periodo",
+        "comparar cobranca mensal por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca por uso",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cobranca por uso do ultimo periodo",
+        "comparar cobranca por uso por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca por usuario",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cobranca por usuario do ultimo periodo",
+        "comparar cobranca por usuario por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobranca recorrente",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cobranca recorrente do ultimo periodo",
+        "comparar cobranca recorrente por counterparty"
+      ]
+    },
+    {
+      "phrase": "cobrancas a receber",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cobrancas a receber do ultimo periodo",
+        "comparar cobrancas a receber por counterparty"
+      ]
+    },
+    {
+      "phrase": "collection backlog",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show collection backlog for the last period",
+        "compare collection backlog by counterparty"
+      ]
+    },
+    {
+      "phrase": "collection queue",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show collection queue for the last period",
+        "compare collection queue by counterparty"
+      ]
+    },
+    {
+      "phrase": "conta de fornecedor",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar conta de fornecedor do ultimo periodo",
+        "comparar conta de fornecedor por counterparty"
+      ]
+    },
+    {
+      "phrase": "conta de imposto",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar conta de imposto do ultimo periodo",
+        "comparar conta de imposto por counterparty"
+      ]
+    },
+    {
+      "phrase": "conta para pagar",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conta para pagar do ultimo periodo",
+        "comparar conta para pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "conta vencida",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conta vencida do ultimo periodo",
+        "comparar conta vencida por counterparty"
+      ]
+    },
+    {
+      "phrase": "contas a pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar contas a pagar do ultimo periodo",
+        "comparar contas a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "contas a pagar em aberto",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar contas a pagar em aberto do ultimo periodo",
+        "comparar contas a pagar em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "contas a receber",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar contas a receber do ultimo periodo",
+        "comparar contas a receber por counterparty"
+      ]
+    },
+    {
+      "phrase": "contas a receber em aberto",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar contas a receber em aberto do ultimo periodo",
+        "comparar contas a receber em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "contas pagas no lote",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar contas pagas no lote do ultimo periodo",
+        "comparar contas pagas no lote por counterparty"
+      ]
+    },
+    {
+      "phrase": "contas pendentes fornecedor",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar contas pendentes fornecedor do ultimo periodo",
+        "comparar contas pendentes fornecedor por counterparty"
+      ]
+    },
+    {
+      "phrase": "contestacao de cobranca",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar contestacao de cobranca do ultimo periodo",
+        "comparar contestacao de cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "contestacao de fatura",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar contestacao de fatura do ultimo periodo",
+        "comparar contestacao de fatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "contestacao de mensalidade",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar contestacao de mensalidade do ultimo periodo",
+        "comparar contestacao de mensalidade por counterparty"
+      ]
+    },
+    {
+      "phrase": "contestacao de tarifa",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar contestacao de tarifa do ultimo periodo",
+        "comparar contestacao de tarifa por counterparty"
+      ]
+    },
+    {
+      "phrase": "contestacao por supercobranca",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar contestacao por supercobranca do ultimo periodo",
+        "comparar contestacao por supercobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "contestar boleto",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar contestar boleto do ultimo periodo",
+        "comparar contestar boleto por counterparty"
+      ]
+    },
+    {
+      "phrase": "contested invoice claim",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show contested invoice claim for the last period",
+        "compare contested invoice claim by counterparty"
+      ]
+    },
+    {
+      "phrase": "controle de recebimento",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar controle de recebimento do ultimo periodo",
+        "comparar controle de recebimento por counterparty"
+      ]
+    },
+    {
+      "phrase": "customer balances due",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show customer balances due for the last period",
+        "compare customer balances due by counterparty"
+      ]
+    },
+    {
+      "phrase": "customer bill",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show customer bill for the last period",
+        "compare customer bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "customer collections",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show customer collections for the last period",
+        "compare customer collections by counterparty"
+      ]
+    },
+    {
+      "phrase": "customer invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show customer invoice for the last period",
+        "compare customer invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "customer receivables",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show customer receivables for the last period",
+        "compare customer receivables by counterparty"
+      ]
+    },
+    {
+      "phrase": "darf a pagar",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar darf a pagar do ultimo periodo",
+        "comparar darf a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "detailed invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show detailed invoice for the last period",
+        "compare detailed invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "disbursement run",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show disbursement run for the last period",
+        "compare disbursement run by counterparty"
+      ]
+    },
+    {
+      "phrase": "disputa de pagamento",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar disputa de pagamento do ultimo periodo",
+        "comparar disputa de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "disputed charge filing",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show disputed charge filing for the last period",
+        "compare disputed charge filing by counterparty"
+      ]
+    },
+    {
+      "phrase": "due from customers",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show due from customers for the last period",
+        "compare due from customers by counterparty"
+      ]
+    },
+    {
+      "phrase": "due to suppliers",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show due to suppliers for the last period",
+        "compare due to suppliers by counterparty"
+      ]
+    },
+    {
+      "phrase": "execucao de pagamentos",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar execucao de pagamentos do ultimo periodo",
+        "comparar execucao de pagamentos por counterparty"
+      ]
+    },
+    {
+      "phrase": "expected collections",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show expected collections for the last period",
+        "compare expected collections by counterparty"
+      ]
+    },
+    {
+      "phrase": "extrato de contas a pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar extrato de contas a pagar do ultimo periodo",
+        "comparar extrato de contas a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "extrato de contas a receber",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar extrato de contas a receber do ultimo periodo",
+        "comparar extrato de contas a receber por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura do ultimo periodo",
+        "comparar fatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura aberta",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura aberta do ultimo periodo",
+        "comparar fatura aberta por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura atrasada",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura atrasada do ultimo periodo",
+        "comparar fatura atrasada por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura contestada",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar fatura contestada do ultimo periodo",
+        "comparar fatura contestada por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura de assinatura",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar fatura de assinatura do ultimo periodo",
+        "comparar fatura de assinatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura de cliente",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura de cliente do ultimo periodo",
+        "comparar fatura de cliente por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura de mensalidade",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar fatura de mensalidade do ultimo periodo",
+        "comparar fatura de mensalidade por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura de renovacao",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar fatura de renovacao do ultimo periodo",
+        "comparar fatura de renovacao por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura de servico",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura de servico do ultimo periodo",
+        "comparar fatura de servico por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura do fornecedor",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura do fornecedor do ultimo periodo",
+        "comparar fatura do fornecedor por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura emitida",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura emitida do ultimo periodo",
+        "comparar fatura emitida por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura mensal",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura mensal do ultimo periodo",
+        "comparar fatura mensal por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura pendente",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura pendente do ultimo periodo",
+        "comparar fatura pendente por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura proforma",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura proforma do ultimo periodo",
+        "comparar fatura proforma por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura recorrente",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar fatura recorrente do ultimo periodo",
+        "comparar fatura recorrente por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura resumo",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura resumo do ultimo periodo",
+        "comparar fatura resumo por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura simplificada",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura simplificada do ultimo periodo",
+        "comparar fatura simplificada por counterparty"
+      ]
+    },
+    {
+      "phrase": "fatura vencida",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fatura vencida do ultimo periodo",
+        "comparar fatura vencida por counterparty"
+      ]
+    },
+    {
+      "phrase": "faturamento de assinatura",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar faturamento de assinatura do ultimo periodo",
+        "comparar faturamento de assinatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "faturas de clientes em aberto",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar faturas de clientes em aberto do ultimo periodo",
+        "comparar faturas de clientes em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "faturas de fornecedor em aberto",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar faturas de fornecedor em aberto do ultimo periodo",
+        "comparar faturas de fornecedor em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "fila de cobranca",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fila de cobranca do ultimo periodo",
+        "comparar fila de cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "fila de pagamento",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fila de pagamento do ultimo periodo",
+        "comparar fila de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "fornecedor em atraso",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fornecedor em atraso do ultimo periodo",
+        "comparar fornecedor em atraso por counterparty"
+      ]
+    },
+    {
+      "phrase": "fornecedor para pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fornecedor para pagar do ultimo periodo",
+        "comparar fornecedor para pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "fornecedor vencido",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fornecedor vencido do ultimo periodo",
+        "comparar fornecedor vencido por counterparty"
+      ]
+    },
+    {
+      "phrase": "glosa de faturamento",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar glosa de faturamento do ultimo periodo",
+        "comparar glosa de faturamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "guia de imposto",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar guia de imposto do ultimo periodo",
+        "comparar guia de imposto por counterparty"
+      ]
+    },
+    {
+      "phrase": "imposto a pagar",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar imposto a pagar do ultimo periodo",
+        "comparar imposto a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "imposto a recolher",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar imposto a recolher do ultimo periodo",
+        "comparar imposto a recolher por counterparty"
+      ]
+    },
+    {
+      "phrase": "imposto devido",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar imposto devido do ultimo periodo",
+        "comparar imposto devido por counterparty"
+      ]
+    },
+    {
+      "phrase": "imposto em aberto",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar imposto em aberto do ultimo periodo",
+        "comparar imposto em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "inadimplencia de clientes",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar inadimplencia de clientes do ultimo periodo",
+        "comparar inadimplencia de clientes por counterparty"
+      ]
+    },
+    {
+      "phrase": "indirect tax payable",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show indirect tax payable for the last period",
+        "compare indirect tax payable by counterparty"
+      ]
+    },
+    {
+      "phrase": "insurance billing claim",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show insurance billing claim for the last period",
+        "compare insurance billing claim by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show invoice for the last period",
+        "compare invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice copy",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show invoice copy for the last period",
+        "compare invoice copy by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice detail",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show invoice detail for the last period",
+        "compare invoice detail by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice dispute filing",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show invoice dispute filing for the last period",
+        "compare invoice dispute filing by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice list",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show invoice list for the last period",
+        "compare invoice list by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice register",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show invoice register for the last period",
+        "compare invoice register by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice statement",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show invoice statement for the last period",
+        "compare invoice statement by counterparty"
+      ]
+    },
+    {
+      "phrase": "invoice summary",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show invoice summary for the last period",
+        "compare invoice summary by counterparty"
+      ]
+    },
+    {
+      "phrase": "irrf a recolher",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar irrf a recolher do ultimo periodo",
+        "comparar irrf a recolher por counterparty"
+      ]
+    },
+    {
+      "phrase": "license billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show license billing for the last period",
+        "compare license billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "lista de faturas",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar lista de faturas do ultimo periodo",
+        "comparar lista de faturas por counterparty"
+      ]
+    },
+    {
+      "phrase": "lista de fornecedores a pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar lista de fornecedores a pagar do ultimo periodo",
+        "comparar lista de fornecedores a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "lista de recebiveis",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar lista de recebiveis do ultimo periodo",
+        "comparar lista de recebiveis por counterparty"
+      ]
+    },
+    {
+      "phrase": "lote de pagamentos",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar lote de pagamentos do ultimo periodo",
+        "comparar lote de pagamentos por counterparty"
+      ]
+    },
+    {
+      "phrase": "lote de pix",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar lote de pix do ultimo periodo",
+        "comparar lote de pix por counterparty"
+      ]
+    },
+    {
+      "phrase": "lote de ted",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar lote de ted do ultimo periodo",
+        "comparar lote de ted por counterparty"
+      ]
+    },
+    {
+      "phrase": "lote de transferencia",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar lote de transferencia do ultimo periodo",
+        "comparar lote de transferencia por counterparty"
+      ]
+    },
+    {
+      "phrase": "mapa de contas a pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar mapa de contas a pagar do ultimo periodo",
+        "comparar mapa de contas a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "mapa de pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar mapa de pagamento do ultimo periodo",
+        "comparar mapa de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "mapa de recebiveis",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar mapa de recebiveis do ultimo periodo",
+        "comparar mapa de recebiveis por counterparty"
+      ]
+    },
+    {
+      "phrase": "medical claim bill",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show medical claim bill for the last period",
+        "compare medical claim bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "member billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show member billing for the last period",
+        "compare member billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "mensalidade",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar mensalidade do ultimo periodo",
+        "comparar mensalidade por counterparty"
+      ]
+    },
+    {
+      "phrase": "mensalidade da plataforma",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar mensalidade da plataforma do ultimo periodo",
+        "comparar mensalidade da plataforma por counterparty"
+      ]
+    },
+    {
+      "phrase": "monthly invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show monthly invoice for the last period",
+        "compare monthly invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "monthly subscription charge",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show monthly subscription charge for the last period",
+        "compare monthly subscription charge by counterparty"
+      ]
+    },
+    {
+      "phrase": "monthly tax payable",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show monthly tax payable for the last period",
+        "compare monthly tax payable by counterparty"
+      ]
+    },
+    {
+      "phrase": "nfe",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar nfe do ultimo periodo",
+        "comparar nfe por counterparty"
+      ]
+    },
+    {
+      "phrase": "nfs-e",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar nfs-e do ultimo periodo",
+        "comparar nfs-e por counterparty"
+      ]
+    },
+    {
+      "phrase": "nota de cobranca",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar nota de cobranca do ultimo periodo",
+        "comparar nota de cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "nota fiscal de servico",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar nota fiscal de servico do ultimo periodo",
+        "comparar nota fiscal de servico por counterparty"
+      ]
+    },
+    {
+      "phrase": "nota fiscal eletronica",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar nota fiscal eletronica do ultimo periodo",
+        "comparar nota fiscal eletronica por counterparty"
+      ]
+    },
+    {
+      "phrase": "o que devemos ao fornecedor",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar o que devemos ao fornecedor do ultimo periodo",
+        "comparar o que devemos ao fornecedor por counterparty"
+      ]
+    },
+    {
+      "phrase": "open invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show open invoice for the last period",
+        "compare open invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "open payables",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show open payables for the last period",
+        "compare open payables by counterparty"
+      ]
+    },
+    {
+      "phrase": "open receivables",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show open receivables for the last period",
+        "compare open receivables by counterparty"
+      ]
+    },
+    {
+      "phrase": "outbound payments",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show outbound payments for the last period",
+        "compare outbound payments by counterparty"
+      ]
+    },
+    {
+      "phrase": "outstanding invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show outstanding invoice for the last period",
+        "compare outstanding invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "outstanding payables",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show outstanding payables for the last period",
+        "compare outstanding payables by counterparty"
+      ]
+    },
+    {
+      "phrase": "outstanding receivables",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show outstanding receivables for the last period",
+        "compare outstanding receivables by counterparty"
+      ]
+    },
+    {
+      "phrase": "pagamento a fornecedor",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar pagamento a fornecedor do ultimo periodo",
+        "comparar pagamento a fornecedor por counterparty"
+      ]
+    },
+    {
+      "phrase": "pagamento em lote",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar pagamento em lote do ultimo periodo",
+        "comparar pagamento em lote por counterparty"
+      ]
+    },
+    {
+      "phrase": "pagamento fornecedor em lote",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar pagamento fornecedor em lote do ultimo periodo",
+        "comparar pagamento fornecedor em lote por counterparty"
+      ]
+    },
+    {
+      "phrase": "pagamento programado",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar pagamento programado do ultimo periodo",
+        "comparar pagamento programado por counterparty"
+      ]
+    },
+    {
+      "phrase": "pagamentos de saida",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar pagamentos de saida do ultimo periodo",
+        "comparar pagamentos de saida por counterparty"
+      ]
+    },
+    {
+      "phrase": "pagamentos pendentes",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar pagamentos pendentes do ultimo periodo",
+        "comparar pagamentos pendentes por counterparty"
+      ]
+    },
+    {
+      "phrase": "past due invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show past due invoice for the last period",
+        "compare past due invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "past due receivables",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show past due receivables for the last period",
+        "compare past due receivables by counterparty"
+      ]
+    },
+    {
+      "phrase": "payables list",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show payables list for the last period",
+        "compare payables list by counterparty"
+      ]
+    },
+    {
+      "phrase": "payables report",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show payables report for the last period",
+        "compare payables report by counterparty"
+      ]
+    },
+    {
+      "phrase": "payables schedule",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show payables schedule for the last period",
+        "compare payables schedule by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment batch",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment batch for the last period",
+        "compare payment batch by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment dispute letter",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show payment dispute letter for the last period",
+        "compare payment dispute letter by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment file",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment file for the last period",
+        "compare payment file by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment register",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment register for the last period",
+        "compare payment register by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment run",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment run for the last period",
+        "compare payment run by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment run list",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment run list for the last period",
+        "compare payment run list by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment run report",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment run report for the last period",
+        "compare payment run report by counterparty"
+      ]
+    },
+    {
+      "phrase": "payment run summary",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment run summary for the last period",
+        "compare payment run summary by counterparty"
+      ]
+    },
+    {
+      "phrase": "payments batch",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payments batch for the last period",
+        "compare payments batch by counterparty"
+      ]
+    },
+    {
+      "phrase": "pedido de reembolso",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar pedido de reembolso do ultimo periodo",
+        "comparar pedido de reembolso por counterparty"
+      ]
+    },
+    {
+      "phrase": "pendencias de pagamento",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar pendencias de pagamento do ultimo periodo",
+        "comparar pendencias de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "pendencias de recebimento",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar pendencias de recebimento do ultimo periodo",
+        "comparar pendencias de recebimento por counterparty"
+      ]
+    },
+    {
+      "phrase": "pending invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show pending invoice for the last period",
+        "compare pending invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "pending vendor bills",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show pending vendor bills for the last period",
+        "compare pending vendor bills by counterparty"
+      ]
+    },
+    {
+      "phrase": "pis cofins a recolher",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar pis cofins a recolher do ultimo periodo",
+        "comparar pis cofins a recolher por counterparty"
+      ]
+    },
+    {
+      "phrase": "plan billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show plan billing for the last period",
+        "compare plan billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "plano recorrente",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar plano recorrente do ultimo periodo",
+        "comparar plano recorrente por counterparty"
+      ]
+    },
+    {
+      "phrase": "previsao de recebimento",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar previsao de recebimento do ultimo periodo",
+        "comparar previsao de recebimento por counterparty"
+      ]
+    },
+    {
+      "phrase": "pro forma invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show pro forma invoice for the last period",
+        "compare pro forma invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "processo de cobranca",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar processo de cobranca do ultimo periodo",
+        "comparar processo de cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "programacao de pagamentos",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar programacao de pagamentos do ultimo periodo",
+        "comparar programacao de pagamentos por counterparty"
+      ]
+    },
+    {
+      "phrase": "quanto clientes devem",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar quanto clientes devem do ultimo periodo",
+        "comparar quanto clientes devem por counterparty"
+      ]
+    },
+    {
+      "phrase": "quarterly tax payable",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show quarterly tax payable for the last period",
+        "compare quarterly tax payable by counterparty"
+      ]
+    },
+    {
+      "phrase": "recebimentos previstos",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar recebimentos previstos do ultimo periodo",
+        "comparar recebimentos previstos por counterparty"
+      ]
+    },
+    {
+      "phrase": "recebiveis vencidos",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar recebiveis vencidos do ultimo periodo",
+        "comparar recebiveis vencidos por counterparty"
+      ]
+    },
+    {
+      "phrase": "receita a receber",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar receita a receber do ultimo periodo",
+        "comparar receita a receber por counterparty"
+      ]
+    },
+    {
+      "phrase": "receivable invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show receivable invoice for the last period",
+        "compare receivable invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "receivables list",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show receivables list for the last period",
+        "compare receivables list by counterparty"
+      ]
+    },
+    {
+      "phrase": "receivables report",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show receivables report for the last period",
+        "compare receivables report by counterparty"
+      ]
+    },
+    {
+      "phrase": "receivables schedule",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show receivables schedule for the last period",
+        "compare receivables schedule by counterparty"
+      ]
+    },
+    {
+      "phrase": "reclamacao de cobranca",
+      "normalized": "contestacao_cobranca",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostrar reclamacao de cobranca do ultimo periodo",
+        "comparar reclamacao de cobranca por counterparty"
+      ]
+    },
+    {
+      "phrase": "recurring billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show recurring billing for the last period",
+        "compare recurring billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "recurring charge",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show recurring charge for the last period",
+        "compare recurring charge by counterparty"
+      ]
+    },
+    {
+      "phrase": "reimbursement claim",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show reimbursement claim for the last period",
+        "compare reimbursement claim by counterparty"
+      ]
+    },
+    {
+      "phrase": "relatorio de tributos",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar relatorio de tributos do ultimo periodo",
+        "comparar relatorio de tributos por counterparty"
+      ]
+    },
+    {
+      "phrase": "remessa bancaria pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar remessa bancaria pagamento do ultimo periodo",
+        "comparar remessa bancaria pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "renewal billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show renewal billing for the last period",
+        "compare renewal billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "renovacao de assinatura",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar renovacao de assinatura do ultimo periodo",
+        "comparar renovacao de assinatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "renovacao recorrente",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar renovacao recorrente do ultimo periodo",
+        "comparar renovacao recorrente por counterparty"
+      ]
+    },
+    {
+      "phrase": "resumo contas a pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar resumo contas a pagar do ultimo periodo",
+        "comparar resumo contas a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "resumo contas a receber",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar resumo contas a receber do ultimo periodo",
+        "comparar resumo contas a receber por counterparty"
+      ]
+    },
+    {
+      "phrase": "resumo de faturamento",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar resumo de faturamento do ultimo periodo",
+        "comparar resumo de faturamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "resumo de impostos",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar resumo de impostos do ultimo periodo",
+        "comparar resumo de impostos por counterparty"
+      ]
+    },
+    {
+      "phrase": "rodada de pagamentos",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar rodada de pagamentos do ultimo periodo",
+        "comparar rodada de pagamentos por counterparty"
+      ]
+    },
+    {
+      "phrase": "rodada semanal de pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar rodada semanal de pagamento do ultimo periodo",
+        "comparar rodada semanal de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "roteiro de pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar roteiro de pagamento do ultimo periodo",
+        "comparar roteiro de pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "saas billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show saas billing for the last period",
+        "compare saas billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "saida de caixa pagamento",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar saida de caixa pagamento do ultimo periodo",
+        "comparar saida de caixa pagamento por counterparty"
+      ]
+    },
+    {
+      "phrase": "saldo a pagar fornecedor",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar saldo a pagar fornecedor do ultimo periodo",
+        "comparar saldo a pagar fornecedor por counterparty"
+      ]
+    },
+    {
+      "phrase": "saldo a receber cliente",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar saldo a receber cliente do ultimo periodo",
+        "comparar saldo a receber cliente por counterparty"
+      ]
+    },
+    {
+      "phrase": "saldo de imposto",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar saldo de imposto do ultimo periodo",
+        "comparar saldo de imposto por counterparty"
+      ]
+    },
+    {
+      "phrase": "sales invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show sales invoice for the last period",
+        "compare sales invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "sales tax bill",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show sales tax bill for the last period",
+        "compare sales tax bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "scheduled disbursements",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show scheduled disbursements for the last period",
+        "compare scheduled disbursements by counterparty"
+      ]
+    },
+    {
+      "phrase": "seat billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show seat billing for the last period",
+        "compare seat billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "segunda via do boleto",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar segunda via do boleto do ultimo periodo",
+        "comparar segunda via do boleto por counterparty"
+      ]
+    },
+    {
+      "phrase": "segunda via fatura",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar segunda via fatura do ultimo periodo",
+        "comparar segunda via fatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "service charge claim",
+      "normalized": "billing_dispute_claim",
+      "docTypeIds": [
+        "legal_statement_of_claim",
+        "med_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_period",
+        "entityHint": "counterparty",
+        "formatHint": "claim_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show service charge claim for the last period",
+        "compare service charge claim by counterparty"
+      ]
+    },
+    {
+      "phrase": "subscription bill",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show subscription bill for the last period",
+        "compare subscription bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "subscription billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show subscription billing for the last period",
+        "compare subscription billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "subscription charge",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show subscription charge for the last period",
+        "compare subscription charge by counterparty"
+      ]
+    },
+    {
+      "phrase": "subscription invoice",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show subscription invoice for the last period",
+        "compare subscription invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "subscription plan charge",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show subscription plan charge for the last period",
+        "compare subscription plan charge by counterparty"
+      ]
+    },
+    {
+      "phrase": "subscription renewal invoice",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show subscription renewal invoice for the last period",
+        "compare subscription renewal invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "subscription statement",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show subscription statement for the last period",
+        "compare subscription statement by counterparty"
+      ]
+    },
+    {
+      "phrase": "sumario de pagamentos",
+      "normalized": "rodada_pagamentos",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar sumario de pagamentos do ultimo periodo",
+        "comparar sumario de pagamentos por counterparty"
+      ]
+    },
+    {
+      "phrase": "supplier aging report",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show supplier aging report for the last period",
+        "compare supplier aging report by counterparty"
+      ]
+    },
+    {
+      "phrase": "supplier payables",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show supplier payables for the last period",
+        "compare supplier payables by counterparty"
+      ]
+    },
+    {
+      "phrase": "supplier payment run",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show supplier payment run for the last period",
+        "compare supplier payment run by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax bill",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax bill for the last period",
+        "compare tax bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax due report",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax due report for the last period",
+        "compare tax due report by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show tax invoice for the last period",
+        "compare tax invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax liability report",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax liability report for the last period",
+        "compare tax liability report by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax payable report",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax payable report for the last period",
+        "compare tax payable report by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax payment schedule",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax payment schedule for the last period",
+        "compare tax payment schedule by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax reconciliation",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax reconciliation for the last period",
+        "compare tax reconciliation by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax remittance",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax remittance for the last period",
+        "compare tax remittance by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax settlement report",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax settlement report for the last period",
+        "compare tax settlement report by counterparty"
+      ]
+    },
+    {
+      "phrase": "tax statement",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show tax statement for the last period",
+        "compare tax statement by counterparty"
+      ]
+    },
+    {
+      "phrase": "taxa de assinatura",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar taxa de assinatura do ultimo periodo",
+        "comparar taxa de assinatura por counterparty"
+      ]
+    },
+    {
+      "phrase": "tiered billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show tiered billing for the last period",
+        "compare tiered billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "titulos a pagar",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar titulos a pagar do ultimo periodo",
+        "comparar titulos a pagar por counterparty"
+      ]
+    },
+    {
+      "phrase": "titulos a receber",
+      "normalized": "fatura_cobranca",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar titulos a receber do ultimo periodo",
+        "comparar titulos a receber por counterparty"
+      ]
+    },
+    {
+      "phrase": "tributo a recolher",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar tributo a recolher do ultimo periodo",
+        "comparar tributo a recolher por counterparty"
+      ]
+    },
+    {
+      "phrase": "tributos em aberto",
+      "normalized": "tributos_a_pagar",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar tributos em aberto do ultimo periodo",
+        "comparar tributos em aberto por counterparty"
+      ]
+    },
+    {
+      "phrase": "unpaid customer invoices",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show unpaid customer invoices for the last period",
+        "compare unpaid customer invoices by counterparty"
+      ]
+    },
+    {
+      "phrase": "unpaid supplier invoices",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show unpaid supplier invoices for the last period",
+        "compare unpaid supplier invoices by counterparty"
+      ]
+    },
+    {
+      "phrase": "usage based billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show usage based billing for the last period",
+        "compare usage based billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "usage billing",
+      "normalized": "subscription_billing",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show usage billing for the last period",
+        "compare usage billing by counterparty"
+      ]
+    },
+    {
+      "phrase": "uso recorrente",
+      "normalized": "assinatura_cobranca",
+      "docTypeIds": [
+        "legal_subscription_agreement",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "subscription",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar uso recorrente do ultimo periodo",
+        "comparar uso recorrente por counterparty"
+      ]
+    },
+    {
+      "phrase": "valores a receber",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar valores a receber do ultimo periodo",
+        "comparar valores a receber por counterparty"
+      ]
+    },
+    {
+      "phrase": "vat bill",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show vat bill for the last period",
+        "compare vat bill by counterparty"
+      ]
+    },
+    {
+      "phrase": "vencidos de clientes",
+      "normalized": "contas_a_receber",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar vencidos de clientes do ultimo periodo",
+        "comparar vencidos de clientes por counterparty"
+      ]
+    },
+    {
+      "phrase": "vencimento de fornecedor",
+      "normalized": "contas_a_pagar",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar vencimento de fornecedor do ultimo periodo",
+        "comparar vencimento de fornecedor por counterparty"
+      ]
+    },
+    {
+      "phrase": "vendor balance due",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show vendor balance due for the last period",
+        "compare vendor balance due by counterparty"
+      ]
+    },
+    {
+      "phrase": "vendor disbursement",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show vendor disbursement for the last period",
+        "compare vendor disbursement by counterparty"
+      ]
+    },
+    {
+      "phrase": "vendor invoice",
+      "normalized": "invoice_billing",
+      "docTypeIds": [
+        "acct_invoice_register",
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer_or_vendor",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show vendor invoice for the last period",
+        "compare vendor invoice by counterparty"
+      ]
+    },
+    {
+      "phrase": "vendor payables",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show vendor payables for the last period",
+        "compare vendor payables by counterparty"
+      ]
+    },
+    {
+      "phrase": "vendor payment file",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show vendor payment file for the last period",
+        "compare vendor payment file by counterparty"
+      ]
+    },
+    {
+      "phrase": "vendor payment queue",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show vendor payment queue for the last period",
+        "compare vendor payment queue by counterparty"
+      ]
+    },
+    {
+      "phrase": "weekly payment run",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show weekly payment run for the last period",
+        "compare weekly payment run by counterparty"
+      ]
+    },
+    {
+      "phrase": "what customers owe us",
+      "normalized": "accounts_receivable",
+      "docTypeIds": [
+        "acct_ar_aging",
+        "fin_revenue_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "customer",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show what customers owe us for the last period",
+        "compare what customers owe us by counterparty"
+      ]
+    },
+    {
+      "phrase": "what we owe vendors",
+      "normalized": "accounts_payable",
+      "docTypeIds": [
+        "acct_ap_aging",
+        "acct_payment_run"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "vendor",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show what we owe vendors for the last period",
+        "compare what we owe vendors by counterparty"
+      ]
+    },
+    {
+      "phrase": "wire batch",
+      "normalized": "payment_run",
+      "docTypeIds": [
+        "acct_payment_run",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_or_vendor",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show wire batch for the last period",
+        "compare wire batch by counterparty"
+      ]
+    },
+    {
+      "phrase": "withholding tax payable",
+      "normalized": "tax_billing",
+      "docTypeIds": [
+        "acct_tax_reconciliation",
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "tax_period",
+        "entityHint": "tax_authority",
+        "formatHint": "tax_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show withholding tax payable for the last period",
+        "compare withholding tax payable by counterparty"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "_meta": {
+    "id": "di_identity_abbreviations_en",
+    "version": "1.0.0",
+    "description": "English abbreviations for identity domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "language": "en"
+  },
+  "domain": "identity",
+  "abbreviations": [
+    {
+      "abbr": "AAMVA",
+      "expansion": "American Association of Motor Vehicle Administrators"
+    },
+    {
+      "abbr": "BAR",
+      "expansion": "Barcode"
+    },
+    {
+      "abbr": "BRN",
+      "expansion": "Business Registration Number"
+    },
+    {
+      "abbr": "CN",
+      "expansion": "Card Number"
+    },
+    {
+      "abbr": "DL",
+      "expansion": "Driver License"
+    },
+    {
+      "abbr": "DLD",
+      "expansion": "Driver License Document"
+    },
+    {
+      "abbr": "DOB",
+      "expansion": "Date of Birth"
+    },
+    {
+      "abbr": "DOE",
+      "expansion": "Date of Expiry"
+    },
+    {
+      "abbr": "DOI",
+      "expansion": "Date of Issue"
+    },
+    {
+      "abbr": "FN",
+      "expansion": "First Name"
+    },
+    {
+      "abbr": "ID",
+      "expansion": "Identity Document"
+    },
+    {
+      "abbr": "IDN",
+      "expansion": "Identity Number"
+    },
+    {
+      "abbr": "ISO",
+      "expansion": "International Organization for Standardization"
+    },
+    {
+      "abbr": "ISS",
+      "expansion": "Issuing State"
+    },
+    {
+      "abbr": "JPG",
+      "expansion": "JPEG Image Format"
+    },
+    {
+      "abbr": "LN",
+      "expansion": "Last Name"
+    },
+    {
+      "abbr": "MRZ",
+      "expansion": "Machine Readable Zone"
+    },
+    {
+      "abbr": "NFC",
+      "expansion": "Near Field Communication"
+    },
+    {
+      "abbr": "NID",
+      "expansion": "National ID"
+    },
+    {
+      "abbr": "OCR",
+      "expansion": "Optical Character Recognition"
+    },
+    {
+      "abbr": "PAS",
+      "expansion": "Passport"
+    },
+    {
+      "abbr": "PDF417",
+      "expansion": "Two Dimensional Barcode Standard"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Proof of Address"
+    },
+    {
+      "abbr": "POB",
+      "expansion": "Place of Birth"
+    },
+    {
+      "abbr": "QR",
+      "expansion": "Quick Response Code"
+    },
+    {
+      "abbr": "REG",
+      "expansion": "Registration"
+    },
+    {
+      "abbr": "SID",
+      "expansion": "State ID"
+    },
+    {
+      "abbr": "SN",
+      "expansion": "Serial Number"
+    },
+    {
+      "abbr": "TIN",
+      "expansion": "Tax Identification Number"
+    },
+    {
+      "abbr": "UID",
+      "expansion": "Unique Identifier"
+    },
+    {
+      "abbr": "VIZ",
+      "expansion": "Visual Inspection Zone"
+    },
+    {
+      "abbr": "XML",
+      "expansion": "Extensible Markup Language"
+    }
+  ]
+}

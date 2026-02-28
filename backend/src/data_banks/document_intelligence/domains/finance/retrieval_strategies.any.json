@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "id": "di_finance_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for finance domain — section prioritization, boost rules, and query expansion.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "maxBoostRules": 10,
+    "maxQueryExpansionTerms": 8
+  },
+  "domain": "finance",
+  "sectionPriority": [
+    { "section": "management_discussion_and_analysis", "weight": 2.5, "operators": ["advise", "summarize", "evaluate"] },
+    { "section": "financial_statements", "weight": 3.0, "operators": ["extract", "calculate", "validate"] },
+    { "section": "notes_to_financial_statements", "weight": 2.8, "operators": ["extract", "locate", "validate"] },
+    { "section": "risk_factors", "weight": 2.0, "operators": ["advise", "evaluate", "monitor"] },
+    { "section": "executive_summary", "weight": 2.0, "operators": ["summarize", "navigate"] },
+    { "section": "auditor_report", "weight": 1.8, "operators": ["validate", "evaluate"] },
+    { "section": "revenue_breakdown", "weight": 2.2, "operators": ["extract", "calculate", "compare"] },
+    { "section": "segment_reporting", "weight": 2.0, "operators": ["extract", "compare"] },
+    { "section": "covenant_schedule", "weight": 2.5, "operators": ["validate", "monitor"] },
+    { "section": "cap_table", "weight": 2.5, "operators": ["extract", "calculate"] }
+  ],
+  "boostRules": [
+    {
+      "id": "fin_boost_001_numeric_extract",
+      "priority": 95,
+      "weight": 2.5,
+      "operators": ["extract", "calculate"],
+      "condition": "query mentions specific financial metric or line item",
+      "boostSections": ["financial_statements", "notes_to_financial_statements", "revenue_breakdown"]
+    },
+    {
+      "id": "fin_boost_002_risk_evaluation",
+      "priority": 90,
+      "weight": 2.0,
+      "operators": ["evaluate", "advise"],
+      "condition": "query asks about risk, exposure, or downside",
+      "boostSections": ["risk_factors", "management_discussion_and_analysis", "notes_to_financial_statements"]
+    },
+    {
+      "id": "fin_boost_003_trend_comparison",
+      "priority": 85,
+      "weight": 1.8,
+      "operators": ["compare", "monitor"],
+      "condition": "query involves period-over-period or peer comparison",
+      "boostSections": ["financial_statements", "segment_reporting", "management_discussion_and_analysis"]
+    },
+    {
+      "id": "fin_boost_004_covenant_check",
+      "priority": 92,
+      "weight": 2.8,
+      "operators": ["validate", "monitor"],
+      "condition": "query references debt covenants or compliance ratios",
+      "boostSections": ["covenant_schedule", "notes_to_financial_statements"]
+    }
+  ],
+  "queryExpansion": [
+    { "trigger": "\\brevenue\\b", "expansions": ["net revenue", "gross revenue", "top line", "receita"] },
+    { "trigger": "\\bprofit\\b", "expansions": ["net income", "operating income", "gross profit", "lucro"] },
+    { "trigger": "\\bdebt\\b", "expansions": ["long-term debt", "short-term borrowings", "notes payable", "dívida"] },
+    { "trigger": "\\bmargin\\b", "expansions": ["gross margin", "operating margin", "net margin", "EBITDA margin"] },
+    { "trigger": "\\bcash\\b", "expansions": ["cash and cash equivalents", "free cash flow", "operating cash flow"] },
+    { "trigger": "\\bEPS\\b", "expansions": ["earnings per share", "diluted EPS", "basic EPS"] }
+  ]
+}

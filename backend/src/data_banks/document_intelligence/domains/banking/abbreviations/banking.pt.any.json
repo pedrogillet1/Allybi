@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_banking_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for banking domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "language": "pt"
+  },
+  "domain": "banking",
+  "abbreviations": [
+    {
+      "abbr": "BACEN",
+      "expansion": "Banco Central do Brasil"
+    },
+    {
+      "abbr": "BIC",
+      "expansion": "Bank Identifier Code"
+    },
+    {
+      "abbr": "CET",
+      "expansion": "Custo Efetivo Total"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoas Fisicas"
+    },
+    {
+      "abbr": "CNPJ",
+      "expansion": "Cadastro Nacional da Pessoa Juridica"
+    },
+    {
+      "abbr": "CVV",
+      "expansion": "Codigo de Verificacao do Cartao"
+    },
+    {
+      "abbr": "DOC",
+      "expansion": "Documento de Ordem de Credito"
+    },
+    {
+      "abbr": "E2E",
+      "expansion": "End-to-End Identifier"
+    },
+    {
+      "abbr": "IBAN",
+      "expansion": "International Bank Account Number"
+    },
+    {
+      "abbr": "IOF",
+      "expansion": "Imposto sobre Operacoes Financeiras"
+    },
+    {
+      "abbr": "NSU",
+      "expansion": "Numero Sequencial Unico"
+    },
+    {
+      "abbr": "OTP",
+      "expansion": "Senha de Uso Unico"
+    },
+    {
+      "abbr": "PAN",
+      "expansion": "Numero Primario da Conta"
+    },
+    {
+      "abbr": "PIX",
+      "expansion": "Pagamento Instantaneo"
+    },
+    {
+      "abbr": "POS",
+      "expansion": "Ponto de Venda"
+    },
+    {
+      "abbr": "SAC",
+      "expansion": "Servico de Atendimento ao Consumidor"
+    },
+    {
+      "abbr": "SELIC",
+      "expansion": "Sistema Especial de Liquidacao e Custodia"
+    },
+    {
+      "abbr": "SWIFT",
+      "expansion": "Codigo Internacional de Transferencia Bancaria"
+    },
+    {
+      "abbr": "TED",
+      "expansion": "Transferencia Eletronica Disponivel"
+    },
+    {
+      "abbr": "TRN",
+      "expansion": "Numero de Referencia da Transacao"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import React from "react";
-import FilePill from "./FilePill";
+import FilePill from "../pills/FilePill";
 
 /**
  * FileActionCard.jsx

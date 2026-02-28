@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Padrões de intenção em português para operações de edição Excel/XLSX.",
     "domain": "excel",
-    "lastUpdated": "2026-02-12",
+    "lastUpdated": "2026-02-28",
     "languages": [
       "pt"
     ]
@@ -47,7 +47,36 @@
           "filtre",
           "gráfico",
           "fórmula",
-          "mescle"
+          "mescle",
+          "formatar",
+          "percentual",
+          "decimal",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "mesclar",
+          "quebrar linha",
+          "congelar",
+          "validação",
+          "validacao",
+          "formatação condicional",
+          "formatacao condicional",
+          "barras de dados",
+          "escala de cor",
+          "top n",
+          "italico"
         ],
         "regex_any": [
           "\\b(?:defina|altere|substitua|troque|coloque|escreva|insira)\\b.*\\b(?:para|=|valor|com)\\b",
@@ -85,6 +114,16 @@
         {
           "slot": "value",
           "ask_pt": "Qual valor devo definir?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
@@ -100,7 +139,41 @@
           "Crie um gráfico",
           "Classifique pela coluna A"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "valor",
+          "defina",
+          "altere"
+        ],
+        "penalizeIfTokensPresent": [
+          "formate",
+          "formato",
+          "moeda",
+          "porcentagem",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "ordene",
+          "filtre",
+          "gráfico"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.set_value.range",
@@ -131,7 +204,36 @@
           "filtre",
           "gráfico",
           "fórmula",
-          "mescle"
+          "mescle",
+          "formatar",
+          "percentual",
+          "decimal",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "mesclar",
+          "quebrar linha",
+          "congelar",
+          "validação",
+          "validacao",
+          "formatação condicional",
+          "formatacao condicional",
+          "barras de dados",
+          "escala de cor",
+          "top n",
+          "italico"
         ],
         "regex_any": [
           "\\b(?:defina|preencha|altere|substitua|troque|coloque)\\b.*\\b(?:toda|todo|todas|todos|cada|c[eé]lulas?|sele[cç][aã]o|c[eé]lulas?\\s+selecionadas?)\\b.*\\b(?:para|=|com)\\b"
@@ -168,6 +270,16 @@
         {
           "slot": "value",
           "ask_pt": "Qual valor devo preencher?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
@@ -181,6 +293,41 @@
           "Defina fórmula =SOMA(A1:A10)",
           "Formate A1:A10 como moeda"
         ]
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "defina",
+          "preencha"
+        ],
+        "penalizeIfTokensPresent": [
+          "formate",
+          "formato",
+          "moeda",
+          "porcentagem",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "ordene",
+          "filtre",
+          "gráfico"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
       }
     },
     {
@@ -200,6 +347,47 @@
         "regex_any": [
           "\\bconvert(?:a|er)\\b.*\\bnuméric(?:o|os)\\b",
           "\\bpara\\s+númer(?:o|ico)\\b"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "mesclar",
+          "quebrar linha",
+          "congelar",
+          "validação",
+          "validacao",
+          "formatação condicional",
+          "formatacao condicional",
+          "barras de dados",
+          "escala de cor",
+          "top n",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -229,13 +417,60 @@
         "positive": [
           "Converta SUMMARY 1!D35:D48 para valores numéricos",
           "Altere os números em texto para números reais em A1:A50",
-          "Converta o intervalo para números"
+          "Converta o intervalo para números",
+          "Em Planilha1!A1:A10, aplique set_value numeric_convert."
         ],
         "negative": [
           "Converta para PDF",
           "Converta gráfico para barras"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "numérico",
+          "converta",
+          "converter"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.formula.single",
@@ -250,6 +485,38 @@
         "regex_any": [
           "\\b(?:defina|aplique|escreva|coloque|insira)\\b.*\\bfórmula\\b",
           "\\bfórmula\\b.*=\\s*[A-Z]"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "mesclar",
+          "quebrar linha",
+          "congelar",
+          "validação",
+          "validacao",
+          "formatação condicional",
+          "formatacao condicional",
+          "barras de dados",
+          "escala de cor",
+          "top n",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -283,19 +550,63 @@
         {
           "slot": "formula",
           "ask_pt": "Qual fórmula devo aplicar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Defina a fórmula =SOMA(A1:A10) em B1",
           "Aplique a fórmula =B2+B3 em C2",
-          "Escreva a fórmula =PROCV(A1,Plan2!A:B,2,FALSO) em D1"
+          "Escreva a fórmula =PROCV(A1,Plan2!A:B,2,FALSO) em D1",
+          "Em Planilha1!A1:A10, aplique fórmula single."
         ],
         "negative": [
           "Defina o valor para 100",
           "Formate como moeda"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.formula_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.formula.range",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "fórmula",
+          "equação"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.formula.range",
@@ -309,6 +620,38 @@
         "regex_any": [
           "\\bfórmula\\b.*\\b(?:ao longo|intervalo|preencher|aplicar (?:a|em|no|na))\\b",
           "\\bapliqu(?:e|ar)\\b.*\\bfórmula\\b.*\\b(?:em|no|na|ao)\\b.*:"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "mesclar",
+          "quebrar linha",
+          "congelar",
+          "validação",
+          "validacao",
+          "formatação condicional",
+          "formatacao condicional",
+          "barras de dados",
+          "escala de cor",
+          "top n",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -341,12 +684,61 @@
       "examples": {
         "positive": [
           "Aplique a fórmula =A1*2 ao longo de B1:B100",
-          "Defina a fórmula =SOMA(A1:A5) no intervalo C1:C20"
+          "Defina a fórmula =SOMA(A1:A5) no intervalo C1:C20",
+          "Em Planilha1!A1:A10, aplique fórmula range.",
+          "Aplique fórmula range no intervalo selecionado."
         ],
         "negative": [
-          "Aplique negrito no intervalo"
+          "Aplique negrito no intervalo",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.formula_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.formula.single",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "fórmula"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "formula",
+          "ask_en": "What formula should I apply?",
+          "ask_pt": "Qual fórmula devo aplicar?"
+        }
+      ]
     },
     {
       "id": "excel.fill_down",
@@ -365,6 +757,36 @@
           "\\bpreenche?r?\\s+(?:para\\s+)?baixo\\b",
           "\\bcopiar?\\s+(?:para\\s+)?baixo\\b",
           "\\barrastar?\\s+(?:para\\s+)?baixo\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -393,13 +815,55 @@
         "positive": [
           "Preencha para baixo de A1 até A100",
           "Copie a fórmula para baixo",
-          "Arraste para baixo B2:B50"
+          "Arraste para baixo B2:B50",
+          "Em Planilha1!A1:A10, aplique fill_down."
         ],
         "negative": [
           "Preencha para a direita",
           "Preencha com zeros"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.fill_direction",
+      "mutuallyExclusiveWith": [
+        "excel.fill_right",
+        "excel.fill_series"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "baixo",
+          "preencher",
+          "preencha"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.fill_right",
@@ -417,6 +881,36 @@
         "regex_any": [
           "\\bpreenche?r?\\s+(?:para\\s+)?(?:a\\s+)?direita\\b",
           "\\bcopiar?\\s+(?:para\\s+)?(?:a\\s+)?direita\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -444,13 +938,56 @@
       "examples": {
         "positive": [
           "Preencha para a direita de A1 até E1",
-          "Copie a fórmula para a direita"
+          "Copie a fórmula para a direita",
+          "Em Planilha1!A1:A10, aplique fill_right.",
+          "Aplique fill_right no intervalo selecionado."
         ],
         "negative": [
           "Preencha para baixo",
           "Alinhe à direita"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.fill_direction",
+      "mutuallyExclusiveWith": [
+        "excel.fill_down",
+        "excel.fill_series"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "direita",
+          "preencher",
+          "preencha"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.bold",
@@ -464,6 +1001,35 @@
         "regex_any": [
           "\\b(?:coloque|defina|aplique|deixe)\\b.*\\bnegrito\\b",
           "\\bnegrito\\b.*\\b(?:essa?|a|o|selecionad[oa]|intervalo|células?)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -493,12 +1059,53 @@
         "positive": [
           "Coloque A1:A10 em negrito",
           "Negrito nas células selecionadas",
-          "Aplique negrito na linha do cabeçalho"
+          "Aplique negrito na linha do cabeçalho",
+          "Em Planilha1!A1:A10, aplique formatar bold."
         ],
         "negative": [
-          "Defina o valor para texto em negrito"
+          "Defina o valor para texto em negrito",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "negrito"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.bold_toggle",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.italic",
@@ -512,6 +1119,35 @@
         "regex_any": [
           "\\b(?:coloque|defina|aplique|deixe)\\b.*\\bitálico\\b",
           "\\bitálico\\b.*\\b(?:essa?|a|o|selecionad[oa])\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -540,12 +1176,54 @@
       "examples": {
         "positive": [
           "Coloque A1:A10 em itálico",
-          "Aplique itálico na seleção"
+          "Aplique itálico na seleção",
+          "Em Planilha1!A1:A10, aplique formatar italic.",
+          "Aplique formatar italic no intervalo selecionado."
         ],
         "negative": [
-          "Escreva texto em itálico em A1"
+          "Escreva texto em itálico em A1",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "itálico"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.italic_toggle",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.underline",
@@ -560,6 +1238,35 @@
         "regex_any": [
           "\\b(?:coloque|defina|aplique|deixe)\\b.*\\bsublinh(?:ado|ar)\\b",
           "\\bsublinh(?:ado|ar)\\b.*\\b(?:essa?|a|o|selecionad[oa])\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -588,12 +1295,55 @@
       "examples": {
         "positive": [
           "Sublinhe A1:A10",
-          "Aplique sublinhado no cabeçalho"
+          "Aplique sublinhado no cabeçalho",
+          "Em Planilha1!A1:A10, aplique formatar underline.",
+          "Aplique formatar underline no intervalo selecionado."
         ],
         "negative": [
-          "Remova o sublinhado"
+          "Remova o sublinhado",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sublinhado",
+          "sublinhar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.underline_toggle",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.color",
@@ -607,6 +1357,35 @@
         "regex_any": [
           "\\b(?:coloque|defina|altere|aplique|mude)\\b.*\\b(?:cor|cor da fonte)\\b",
           "\\bcor\\b.*\\b(?:para|vermelho|azul|verde|preto|branco)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -641,18 +1420,57 @@
         {
           "slot": "color",
           "ask_pt": "Qual cor devo aplicar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Coloque o texto em vermelho em A1:A10",
           "Mude a cor para azul",
-          "Defina a cor da fonte como verde para a seleção"
+          "Defina a cor da fonte como verde para a seleção",
+          "Em Planilha1!A1:A10, aplique formatar color."
         ],
         "negative": [
-          "Escala de cores na formatação condicional"
+          "Escala de cores na formatação condicional",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "cor"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.format_color",
+      "requiresContext": {}
     },
     {
       "id": "excel.format.font",
@@ -666,6 +1484,35 @@
         "regex_any": [
           "\\b(?:altere|defina|aplique|use|mude)\\b.*\\bfonte\\b",
           "\\bfonte\\b.*\\b(?:para|família)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -705,12 +1552,53 @@
         "positive": [
           "Altere a fonte para Arial em A1:A10",
           "Defina a fonte como Calibri 14pt",
-          "Use Times New Roman no cabeçalho"
+          "Use Times New Roman no cabeçalho",
+          "Em Planilha1!A1:A10, aplique formatar font."
         ],
         "negative": [
-          "Defina a cor da fonte para vermelho"
+          "Defina a cor da fonte para vermelho",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "fonte"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.format_font",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "fontFamily",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.number_format",
@@ -731,6 +1619,35 @@
           "\\bformat(?:e|ar)\\b.*\\b(?:como|para)\\b.*\\b(?:moeda|percent(?:ual|agem)|data|número|contábil)\\b",
           "\\b(?:moeda|percent(?:ual|agem))\\b\\s*\\b(?:formato|formatação)\\b",
           "\\bapliqu(?:e|ar)\\b.*\\b(?:moeda|percent(?:ual|agem)|número)\\b.*\\bformat(?:o|ação)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
         ]
       },
       "slotExtractors": [
@@ -765,6 +1682,16 @@
         {
           "slot": "pattern",
           "ask_pt": "Qual formato numérico devo aplicar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
@@ -779,7 +1706,40 @@
           "Formate o texto como negrito",
           "Crie uma tabela"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.number_format",
+      "mutuallyExclusiveWith": [
+        "excel.format.custom_number_format",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formato",
+          "formatar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.format.custom_number_format",
@@ -792,6 +1752,43 @@
           "\\bformat(?:e|ar)\\b.*#,##",
           "\\bformat(?:e|ar)\\b.*0\\.0+%",
           "\\bformat(?:e|ar)\\b.*\\b(?:MM|DD|AAAA|HH)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "moeda",
+          "como",
+          "aaaa"
         ]
       },
       "slotExtractors": [
@@ -825,12 +1822,59 @@
         "positive": [
           "Aplique formato de moeda $#,##0.00 em D35:D48",
           "Formate como 0,00%",
-          "Use o formato DD/MM/AAAA"
+          "Use o formato DD/MM/AAAA",
+          "Em Planilha1!A1:A10, aplique formatar custom_number_formatar."
         ],
         "negative": [
-          "Formate o texto como negrito"
+          "Formate o texto como negrito",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.number_format",
+      "mutuallyExclusiveWith": [
+        "excel.format.number_format",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "pattern",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.sort.single_key",
@@ -847,6 +1891,36 @@
         "regex_any": [
           "\\bclassifi(?:que|car)\\b.*\\b(?:por|crescente|decrescente|asc|desc|a-z|z-a)\\b",
           "\\borden(?:e|ar)\\b.*\\bpor\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "gráfico",
+          "grafico",
+          "tabela",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "filtro",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -893,7 +1967,49 @@
           "Filtre as linhas",
           "Crie um gráfico"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sort_action",
+      "mutuallyExclusiveWith": [
+        "excel.filter.apply",
+        "excel.filter.clear"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "classifique",
+          "classificar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sortBy",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.filter.apply",
@@ -909,6 +2025,34 @@
         "regex_any": [
           "\\bfiltr(?:e|ar|o)\\b.*\\b(?:por|onde|linhas?|coluna)\\b",
           "\\bapliqu(?:e|ar)\\b.*\\bfiltro\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "ordenar",
+          "classificar"
         ]
       },
       "slotExtractors": [
@@ -942,13 +2086,56 @@
         "positive": [
           "Filtre linhas onde NOI > 100000",
           "Filtre pela coluna A igual a Vendas",
-          "Aplique filtro na tabela"
+          "Aplique filtro na tabela",
+          "Em Planilha1!A1:A10, aplique filtrar apply."
         ],
         "negative": [
           "Limpe o filtro",
           "Classifique em ordem crescente"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.filter_action",
+      "mutuallyExclusiveWith": [
+        "excel.filter.clear",
+        "excel.sort.single_key"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "filtre",
+          "filtrar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "filter",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.filter.clear",
@@ -963,6 +2150,35 @@
         "regex_any": [
           "\\blimp(?:e|ar)\\b.*\\bfiltro\\b",
           "\\b(?:remova|remover)\\b.*\\bfiltro\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "ordenar",
+          "classificar",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -991,13 +2207,56 @@
         "positive": [
           "Limpe os filtros",
           "Remova todos os filtros",
-          "Limpe o filtro da coluna A"
+          "Limpe o filtro da coluna A",
+          "Em Planilha1!A1:A10, aplique filtrar clear."
         ],
         "negative": [
           "Aplique filtro",
           "Filtre as linhas"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.filter_action",
+      "mutuallyExclusiveWith": [
+        "excel.filter.apply",
+        "excel.sort.single_key"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "limpe",
+          "filtro"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.table.create",
@@ -1011,6 +2270,34 @@
         "regex_any": [
           "\\b(?:crie|cri(?:e|ar)|faça|formate como|converta para)\\b.*\\btabela\\b",
           "\\btabela\\b.*\\b(?:crie|criar|a partir)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "grafico",
+          "gráfico",
+          "plot",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -1052,7 +2339,46 @@
           "Crie um gráfico",
           "Crie uma nova planilha"
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "tabela"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.table_create",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "hasHeaders",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.create",
@@ -1068,6 +2394,30 @@
         "regex_any": [
           "\\b(?:crie|faça|adicione|construa|gere)\\b.*\\bgráfico\\b",
           "\\bvisuali[sz](?:e|ar)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar",
+          "filtro"
         ]
       },
       "slotExtractors": [
@@ -1116,7 +2466,51 @@
           "Edite o título do gráfico",
           "Exclua o gráfico"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_create",
+      "mutuallyExclusiveWith": [
+        "excel.chart.create_specific",
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "gráfico",
+          "visualize"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartType",
+          "ask_en": "Which chart type should I use?",
+          "ask_pt": "Qual tipo de gráfico devo usar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.create_specific",
@@ -1126,6 +2520,39 @@
       "triggers": {
         "regex_any": [
           "\\b(?:barras?|colunas?|linhas?|pizza|dispersão|área|bolhas?|histograma|rosca|combo|radar|cascata|treemap|funil|empilhad[oa])\\b.*\\bgráfico\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar",
+          "filtro"
+        ],
+        "tokens_any": [
+          "grafico",
+          "gráfico",
+          "crie",
+          "barras",
+          "empilhadas",
+          "faca",
+          "pizza"
         ]
       },
       "slotExtractors": [
@@ -1165,12 +2592,58 @@
         "positive": [
           "Crie um gráfico de barras empilhadas",
           "Faça um gráfico de pizza de A1:B10",
-          "Gráfico de dispersão de X vs Y"
+          "Gráfico de dispersão de X vs Y",
+          "Em Planilha1!A1:A10, aplique gráfico create_specific."
         ],
         "negative": [
-          "Classifique pelos dados do gráfico"
+          "Classifique pelos dados do gráfico",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_create",
+      "mutuallyExclusiveWith": [
+        "excel.chart.create",
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "grafico",
+          "gráfico"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartType",
+          "ask_en": "Which chart type should I use?",
+          "ask_pt": "Qual tipo de gráfico devo usar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.update",
@@ -1181,6 +2654,39 @@
         "regex_any": [
           "\\b(?:altere|atualize|modifique|edite|mude)\\b.*\\bgráfico\\b",
           "\\bgráfico\\b.*\\b(?:título|legenda|eixo|série|tipo)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar",
+          "filtro"
+        ],
+        "tokens_any": [
+          "grafico",
+          "gráfico",
+          "altere",
+          "titulo",
+          "receita",
+          "atualize",
+          "tipo"
         ]
       },
       "slotExtractors": [
@@ -1210,13 +2716,58 @@
         "positive": [
           "Altere o título do gráfico para Receita",
           "Atualize o tipo do gráfico para linhas",
-          "Mova a legenda para baixo"
+          "Mova a legenda para baixo",
+          "Em Planilha1!A1:A10, aplique gráfico update."
         ],
         "negative": [
           "Crie um gráfico",
           "Exclua o gráfico"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "grafico",
+          "gráfico"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartId",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        },
+        {
+          "slot": "title",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.cond_format.color_scale",
@@ -1228,6 +2779,41 @@
           "\\bescala\\s*de\\s*cores?\\b",
           "\\bformatação\\s*condicional\\b.*\\bcor\\b",
           "\\bmapa\\s*de\\s*calor\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "cor",
+          "escala",
+          "cores",
+          "adicione",
+          "mapa",
+          "calor",
+          "intervalo"
         ]
       },
       "slotExtractors": [
@@ -1256,12 +2842,54 @@
         "positive": [
           "Aplique escala de cores em A1:A50",
           "Adicione um mapa de calor ao intervalo",
-          "Formatação condicional com escala de cores"
+          "Formatação condicional com escala de cores",
+          "Em Planilha1!A1:A10, aplique cond_formatar color_scale."
         ],
         "negative": [
-          "Mude a cor da fonte"
+          "Mude a cor da fonte",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.data_bars",
+        "excel.cond_format.top_n"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.cond_format",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.cond_format.data_bars",
@@ -1272,6 +2900,38 @@
         "regex_any": [
           "\\bbarras?\\s*de\\s*dados\\b",
           "\\bformatação\\s*condicional\\b.*\\bbarra\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "barras",
+          "dados",
+          "adicione",
+          "selecao"
         ]
       },
       "slotExtractors": [
@@ -1299,12 +2959,55 @@
       "examples": {
         "positive": [
           "Adicione barras de dados na seleção",
-          "Aplique barras de dados em A1:A50"
+          "Aplique barras de dados em A1:A50",
+          "Em Planilha1!A1:A10, aplique cond_formatar data_bars.",
+          "Aplique cond_formatar data_bars no intervalo selecionado."
         ],
         "negative": [
-          "Crie um gráfico de barras"
+          "Crie um gráfico de barras",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.color_scale",
+        "excel.cond_format.top_n"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.cond_format",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.cond_format.top_n",
@@ -1315,6 +3018,39 @@
         "regex_any": [
           "\\b(?:destaque|formate)\\b.*\\b(?:top|maiores|principais)\\s*\\d+\\b",
           "\\b(?:top|maiores|principais)\\s*\\d+\\b.*\\b(?:destaque|formate|cor)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "formate",
+          "formato",
+          "estilo",
+          "maiores",
+          "valores",
+          "destaque",
+          "verde",
+          "mostre"
         ]
       },
       "slotExtractors": [
@@ -1348,12 +3084,54 @@
         "positive": [
           "Destaque os 10 maiores valores",
           "Formate os top 5 em verde",
-          "Mostre os 3 maiores valores em negrito"
+          "Mostre os 3 maiores valores em negrito",
+          "Em Planilha1!A1:A10, aplique cond_formatar top_n."
         ],
         "negative": [
-          "Classifique em ordem decrescente"
+          "Classifique em ordem decrescente",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.color_scale",
+        "excel.cond_format.data_bars"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formate",
+          "formato"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.cond_format",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "topN",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.data_validation",
@@ -1365,6 +3143,38 @@
           "\\b(?:validação\\s*de\\s*)?dados\\b.*\\bvalidação\\b",
           "\\blista\\s*suspensa\\b",
           "\\b(?:adicione|crie)\\b.*\\b(?:dropdown|lista suspensa)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "validacao",
+          "validação",
+          "adicione",
+          "dados",
+          "crie",
+          "lista",
+          "suspensa"
         ]
       },
       "slotExtractors": [
@@ -1398,12 +3208,54 @@
         "positive": [
           "Adicione validação de dados em A1:A10",
           "Crie uma lista suspensa em B2",
-          "Adicione um dropdown com Sim, Não, Talvez"
+          "Adicione um dropdown com Sim, Não, Talvez",
+          "Em Planilha1!A1:A10, aplique data_validation."
         ],
         "negative": [
-          "Valide a fórmula"
+          "Valide a fórmula",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.color_scale",
+        "excel.cond_format.data_bars"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "validacao",
+          "validação"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_validation",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "validation",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.freeze_panes",
@@ -1418,6 +3270,34 @@
         "regex_any": [
           "\\bcongel(?:e|ar)\\b.*\\b(?:painel|painéis|linha|coluna|cabeçalho|topo)\\b",
           "\\bcongel(?:e|ar)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "grafico",
+          "gráfico",
+          "plot",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -1457,9 +3337,50 @@
           "Congele a linha do cabeçalho"
         ],
         "negative": [
-          "Descongele painéis"
+          "Descongele painéis",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "congele",
+          "congelar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.freeze_panes",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        },
+        {
+          "slot": "row",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.merge_cells",
@@ -1476,6 +3397,34 @@
         ],
         "regex_any": [
           "\\bmescl(?:e|ar)\\b.*\\bcélulas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "grafico",
+          "gráfico",
+          "plot",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -1503,12 +3452,56 @@
       "examples": {
         "positive": [
           "Mescle as células A1:D1",
-          "Mescle as células selecionadas"
+          "Mescle as células selecionadas",
+          "Em Planilha1!A1:A10, aplique merge_cells.",
+          "Aplique merge_cells no intervalo selecionado."
         ],
         "negative": [
-          "Mescle os parágrafos"
+          "Mescle os parágrafos",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "células",
+          "mescle",
+          "mesclar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.merge_cells",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.wrap_text",
@@ -1520,6 +3513,42 @@
           "\\bquebr(?:a|ar)\\s*(?:de\\s*)?texto\\b",
           "\\btexto\\s*quebr(?:a|ado)\\b",
           "\\bativ(?:e|ar)\\b.*\\bquebra\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza"
+        ],
+        "tokens_any": [
+          "quebrar",
+          "quebra",
+          "texto",
+          "ative",
+          "automatica"
         ]
       },
       "slotExtractors": [
@@ -1554,12 +3583,54 @@
         "positive": [
           "Quebra de texto em A1:A10",
           "Ative a quebra de texto",
-          "Ative a quebra automática de texto"
+          "Ative a quebra automática de texto",
+          "Em Planilha1!A1:A10, aplique wrap_text."
         ],
         "negative": [
-          "Desative a quebra de texto"
+          "Desative a quebra de texto",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "quebrar",
+          "quebra"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "gráfico",
+          "grafico",
+          "plot"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.wrap_text",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "enabled",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.auto_fit",
@@ -1571,6 +3642,43 @@
           "\\bajust(?:e|ar)\\s*autom(?:ático|aticamente)\\b",
           "\\bajustar?\\b.*\\bcolunas?\\b",
           "\\bredimension(?:e|ar)\\b.*\\bcolunas?\\b.*\\bajust(?:e|ar)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "grafico",
+          "gráfico",
+          "plot",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar"
+        ],
+        "tokens_any": [
+          "ajustar",
+          "colunas",
+          "ajuste",
+          "automatico",
+          "redimensione",
+          "caber",
+          "conteudo"
         ]
       },
       "slotExtractors": [
@@ -1599,12 +3707,54 @@
         "positive": [
           "Ajuste automático das colunas",
           "Redimensione as colunas para caber o conteúdo",
-          "Ajuste a largura das colunas automaticamente"
+          "Ajuste a largura das colunas automaticamente",
+          "Em Planilha1!A1:A10, aplique auto_fit."
         ],
         "negative": [
-          "Ajustar à página"
+          "Ajustar à página",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "ajustar",
+          "colunas"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.auto_fit",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.insert_rows",
@@ -1615,6 +3765,47 @@
         "regex_any": [
           "^(?!.*\\bgr[aá]fico\\b).*\\b(?:insira|inserir|adicione|adicionar)\\b.*\\blinhas?\\b",
           "\\blinhas?\\b.*\\b(?:insira|inserir|adicione|adicionar)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "italico",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "insira",
+          "adicione",
+          "linhas",
+          "linha",
+          "acima",
+          "apos"
         ]
       },
       "slotExtractors": [
@@ -1649,13 +3840,53 @@
         "positive": [
           "Insira 3 linhas acima da linha 5",
           "Adicione uma linha após o cabeçalho",
-          "Insira linhas em A10"
+          "Insira linhas em A10",
+          "Em Planilha1!A1:A10, aplique insert_rows."
         ],
         "negative": [
           "Exclua linhas",
           "Insira colunas"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_structural",
+      "mutuallyExclusiveWith": [
+        "excel.delete_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "insira",
+          "adicione"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "count",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.delete_rows",
@@ -1665,6 +3896,45 @@
       "triggers": {
         "regex_any": [
           "\\b(?:exclua|excluir|remova|remover)\\b.*\\blinhas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "italico",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "exclua",
+          "remova",
+          "linhas",
+          "selecionadas"
         ]
       },
       "slotExtractors": [
@@ -1692,13 +3962,54 @@
       "examples": {
         "positive": [
           "Exclua as linhas 5 a 10",
-          "Remova as linhas selecionadas"
+          "Remova as linhas selecionadas",
+          "Em Planilha1!A1:A10, aplique delete_rows.",
+          "Aplique delete_rows no intervalo selecionado."
         ],
         "negative": [
           "Insira linhas",
           "Exclua colunas"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_structural",
+      "mutuallyExclusiveWith": [
+        "excel.insert_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "exclua",
+          "remova"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.insert_columns",
@@ -1708,6 +4019,47 @@
       "triggers": {
         "regex_any": [
           "\\b(?:insira|inserir|adicione|adicionar)\\b.*\\bcolunas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "italico",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "insira",
+          "adicione",
+          "colunas",
+          "coluna",
+          "antes",
+          "depois"
         ]
       },
       "slotExtractors": [
@@ -1741,13 +4093,54 @@
       "examples": {
         "positive": [
           "Insira 2 colunas antes da coluna D",
-          "Adicione uma coluna depois de B"
+          "Adicione uma coluna depois de B",
+          "Em Planilha1!A1:A10, aplique insert_columns.",
+          "Aplique insert_columns no intervalo selecionado."
         ],
         "negative": [
           "Exclua colunas",
           "Insira linhas"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_structural",
+      "mutuallyExclusiveWith": [
+        "excel.delete_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "insira",
+          "adicione"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "count",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.delete_columns",
@@ -1757,6 +4150,45 @@
       "triggers": {
         "regex_any": [
           "\\b(?:exclua|excluir|remova|remover)\\b.*\\bcolunas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "italico",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "exclua",
+          "remova",
+          "colunas",
+          "coluna"
         ]
       },
       "slotExtractors": [
@@ -1784,12 +4216,54 @@
       "examples": {
         "positive": [
           "Exclua as colunas C a E",
-          "Remova a coluna D"
+          "Remova a coluna D",
+          "Em Planilha1!A1:A10, aplique delete_columns.",
+          "Aplique delete_columns no intervalo selecionado."
         ],
         "negative": [
-          "Exclua linhas"
+          "Exclua linhas",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_structural",
+      "mutuallyExclusiveWith": [
+        "excel.insert_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "exclua",
+          "remova"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.add_sheet",
@@ -1799,6 +4273,48 @@
       "triggers": {
         "regex_any": [
           "\\b(?:adicione|adicionar|crie|criar|insira|inserir|nova?)\\b.*\\b(?:planilha|aba)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "italico",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "planilha",
+          "aba",
+          "nova",
+          "adicione",
+          "chamada",
+          "resumo",
+          "crie"
         ]
       },
       "slotExtractors": [
@@ -1822,12 +4338,49 @@
         "positive": [
           "Adicione uma nova planilha chamada Resumo",
           "Crie uma nova planilha",
-          "Insira uma nova aba"
+          "Insira uma nova aba",
+          "Em Planilha1!A1:A10, aplique add_aba."
         ],
         "negative": [
-          "Renomeie a planilha"
+          "Renomeie a planilha",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sheet_structural",
+      "mutuallyExclusiveWith": [
+        "excel.rename_sheet",
+        "excel.delete_sheet"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "planilha",
+          "aba"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.rename_sheet",
@@ -1838,6 +4391,47 @@
         "regex_any": [
           "\\brenomei(?:e|ar)\\b.*\\b(?:planilha|aba)\\b",
           "\\b(?:planilha|aba)\\b.*\\brenomei(?:e|ar)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "italico",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "planilha",
+          "aba",
+          "renomeie",
+          "receita",
+          "plan1",
+          "dados"
         ]
       },
       "slotExtractors": [
@@ -1866,18 +4460,53 @@
         {
           "slot": "newName",
           "ask_pt": "Qual deve ser o novo nome?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Renomeie a planilha para Receita",
-          "Renomeie Plan1 para Dados"
+          "Renomeie Plan1 para Dados",
+          "Em Planilha1!A1:A10, aplique rename_aba.",
+          "Aplique rename_aba no intervalo selecionado."
         ],
         "negative": [
           "Exclua a planilha",
           "Adicione planilha"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sheet_structural",
+      "mutuallyExclusiveWith": [
+        "excel.add_sheet",
+        "excel.delete_sheet"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "planilha",
+          "aba"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.delete_sheet",
@@ -1887,6 +4516,47 @@
       "triggers": {
         "regex_any": [
           "\\b(?:exclua|excluir|remova|remover)\\b.*\\b(?:planilha|aba)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "italico",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "exclua",
+          "remova",
+          "planilha",
+          "aba",
+          "plan2",
+          "resumo"
         ]
       },
       "slotExtractors": [
@@ -1909,13 +4579,50 @@
       "examples": {
         "positive": [
           "Exclua a Plan2",
-          "Remova a aba Resumo"
+          "Remova a aba Resumo",
+          "Em Planilha1!A1:A10, aplique delete_aba.",
+          "Aplique delete_aba no intervalo selecionado."
         ],
         "negative": [
           "Adicione planilha",
           "Renomeie planilha"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sheet_structural",
+      "mutuallyExclusiveWith": [
+        "excel.add_sheet",
+        "excel.rename_sheet"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "exclua",
+          "remova"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "formato",
+          "formatar",
+          "negrito"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.hide_rows",
@@ -1925,6 +4632,41 @@
       "triggers": {
         "regex_any": [
           "\\bocult(?:e|ar)\\b.*\\blinhas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "negrito",
+          "italico",
+          "itálico",
+          "sublinhado",
+          "moeda",
+          "percentual",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "ocultar",
+          "linhas",
+          "oculte",
+          "selecionadas"
         ]
       },
       "slotExtractors": [
@@ -1953,13 +4695,54 @@
       "examples": {
         "positive": [
           "Oculte as linhas 5 a 10",
-          "Oculte as linhas selecionadas"
+          "Oculte as linhas selecionadas",
+          "Em Planilha1!A1:A10, aplique hide_rows.",
+          "Aplique hide_rows no intervalo selecionado."
         ],
         "negative": [
           "Mostre as linhas",
           "Oculte as colunas"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.show_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "ocultar",
+          "linhas"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.hide_columns",
@@ -1969,6 +4752,41 @@
       "triggers": {
         "regex_any": [
           "\\bocult(?:e|ar)\\b.*\\bcolunas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "negrito",
+          "italico",
+          "itálico",
+          "sublinhado",
+          "moeda",
+          "percentual",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "ocultar",
+          "colunas",
+          "oculte",
+          "coluna"
         ]
       },
       "slotExtractors": [
@@ -1997,12 +4815,54 @@
       "examples": {
         "positive": [
           "Oculte as colunas C a E",
-          "Oculte a coluna D"
+          "Oculte a coluna D",
+          "Em Planilha1!A1:A10, aplique hide_columns.",
+          "Aplique hide_columns no intervalo selecionado."
         ],
         "negative": [
-          "Mostre as colunas"
+          "Mostre as colunas",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.show_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "ocultar",
+          "colunas"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.show_rows",
@@ -2012,6 +4872,42 @@
       "triggers": {
         "regex_any": [
           "\\b(?:mostre|mostrar|reexiba|reexibir)\\b.*\\blinhas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "negrito",
+          "italico",
+          "itálico",
+          "sublinhado",
+          "moeda",
+          "percentual",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "mostrar",
+          "linhas",
+          "mostre",
+          "ocultas",
+          "reexiba"
         ]
       },
       "slotExtractors": [
@@ -2040,12 +4936,54 @@
       "examples": {
         "positive": [
           "Mostre as linhas ocultas",
-          "Reexiba as linhas 5 a 10"
+          "Reexiba as linhas 5 a 10",
+          "Em Planilha1!A1:A10, aplique show_rows.",
+          "Aplique show_rows no intervalo selecionado."
         ],
         "negative": [
-          "Oculte as linhas"
+          "Oculte as linhas",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.hide_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "mostrar",
+          "linhas"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.show_columns",
@@ -2055,6 +4993,43 @@
       "triggers": {
         "regex_any": [
           "\\b(?:mostre|mostrar|reexiba|reexibir)\\b.*\\bcolunas?\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "negrito",
+          "italico",
+          "itálico",
+          "sublinhado",
+          "moeda",
+          "percentual",
+          "validacao",
+          "validação"
+        ],
+        "tokens_any": [
+          "mostrar",
+          "colunas",
+          "mostre",
+          "ocultas",
+          "reexiba",
+          "coluna"
         ]
       },
       "slotExtractors": [
@@ -2083,12 +5058,54 @@
       "examples": {
         "positive": [
           "Mostre as colunas ocultas",
-          "Reexiba a coluna D"
+          "Reexiba a coluna D",
+          "Em Planilha1!A1:A10, aplique show_columns.",
+          "Aplique show_columns no intervalo selecionado."
         ],
         "negative": [
-          "Oculte as colunas"
+          "Oculte as colunas",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.hide_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "mostrar",
+          "colunas"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.sum",
@@ -2104,6 +5121,32 @@
         "regex_any": [
           "^(?!.*\\bf[óo]rmula\\b)(?!.*=).*\\b(?:soma|total|some)\\b.*\\b(?:de|da|do|em|para|coluna|intervalo)\\b",
           "^(?!.*\\bf[óo]rmula\\b)(?!.*=).*\\bcalcul(?:e|ar)\\b.*\\bsoma\\b"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -2138,13 +5181,56 @@
         "positive": [
           "Some a coluna A",
           "Calcule o total de B2:B50",
-          "Some os valores da seleção"
+          "Some os valores da seleção",
+          "Em Planilha1!A1:A10, aplique aggregation sum."
         ],
         "negative": [
           "Defina fórmula =SOMA",
           "Calcule a média do intervalo"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.average",
+        "excel.aggregation.count",
+        "excel.aggregation.max",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "soma",
+          "total"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.average",
@@ -2158,6 +5244,32 @@
         "regex_any": [
           "\\bmédia\\b.*\\b(?:de|da|do|em|para|coluna|intervalo)\\b",
           "\\bcalcul(?:e|ar)\\b.*\\bmédia\\b"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -2192,12 +5304,55 @@
         "positive": [
           "Média da coluna B",
           "Calcule a média de A1:A100",
-          "Qual é a média da seleção?"
+          "Qual é a média da seleção?",
+          "Em Planilha1!A1:A10, aplique aggregation average."
         ],
         "negative": [
-          "Some o intervalo"
+          "Some o intervalo",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.count",
+        "excel.aggregation.max",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "média"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.count",
@@ -2213,6 +5368,32 @@
         "regex_any": [
           "\\b(?:conte|contar|contagem)\\b\\s+(?:de|da|do|em|para|os|as|o|a)\\b.*\\b(?:coluna|intervalo|c[eé]lulas?|valores?|dados?)\\b",
           "\\bquant(?:os|as)\\b.*\\bc[eé]lulas?\\b.*\\bdados?\\b"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -2246,12 +5427,57 @@
       "examples": {
         "positive": [
           "Conte os valores em A1:A50",
-          "Quantas células têm dados?"
+          "Quantas células têm dados?",
+          "Em Planilha1!A1:A10, aplique aggregation count.",
+          "Aplique aggregation count no intervalo selecionado."
         ],
         "negative": [
-          "Some o intervalo"
+          "Some o intervalo",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.max",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "contagem",
+          "conte"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.max",
@@ -2266,6 +5492,32 @@
         ],
         "regex_any": [
           "\\b(?:máximo|máxima|maior)\\b.*\\b(?:de|da|do|em|para|valor)\\b"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -2300,12 +5552,56 @@
         "positive": [
           "Encontre o valor máximo na coluna B",
           "Qual é o maior valor?",
-          "Máximo da seleção"
+          "Máximo da seleção",
+          "Em Planilha1!A1:A10, aplique aggregation max."
         ],
         "negative": [
-          "Mínimo do intervalo"
+          "Mínimo do intervalo",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "máximo",
+          "máxima"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.min",
@@ -2321,6 +5617,32 @@
         ],
         "regex_any": [
           "\\b(?:mínimo|mínima|menor|menores)\\b.*\\b(?:de|da|do|em|para|valor)\\b"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "italico"
         ]
       },
       "slotExtractors": [
@@ -2355,12 +5677,56 @@
         "positive": [
           "Encontre o valor mínimo na coluna B",
           "Qual é o menor valor?",
-          "Mínimo do intervalo"
+          "Mínimo do intervalo",
+          "Em Planilha1!A1:A10, aplique aggregation min."
         ],
         "negative": [
-          "Máximo do intervalo"
+          "Máximo do intervalo",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count",
+        "excel.aggregation.max"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "mínimo",
+          "mínima"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "inserir linha"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.fill_blank_cells",
@@ -2372,6 +5738,55 @@
           "\\b(?:se|onde|quando)\\b.*\\b(?:vazio|em branco)\\b.*\\bpreencha\\b",
           "\\bpreencha\\b.*\\b(?:vazio|em branco)\\b",
           "\\b(?:vazio|em branco)\\b.*\\b(?:defina|preencha|substitua|coloque)\\b"
+        ],
+        "tokens_none": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico",
+          "grafico",
+          "plot",
+          "tabela",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar",
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "mesclar",
+          "quebrar linha",
+          "congelar",
+          "validação",
+          "validacao",
+          "formatação condicional",
+          "formatacao condicional",
+          "barras de dados",
+          "escala de cor",
+          "top n",
+          "italico"
+        ],
+        "tokens_any": [
+          "branco",
+          "preencha",
+          "celulas",
+          "alguma",
+          "celula",
+          "estiver"
         ]
       },
       "slotExtractors": [
@@ -2407,12 +5822,59 @@
         "positive": [
           "Se alguma célula estiver em branco em D35:D48, preencha com 0",
           "Preencha células vazias com N/A",
-          "Substitua células em branco por 0"
+          "Substitua células em branco por 0",
+          "Em Planilha1!A1:A10, aplique fill_blank_cells."
         ],
         "negative": [
-          "Exclua linhas em branco"
+          "Exclua linhas em branco",
+          "Reescreva este parágrafo de forma formal."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "branco",
+          "preencha"
+        ],
+        "penalizeIfTokensPresent": [
+          "formato",
+          "formatar",
+          "negrito",
+          "itálico",
+          "sublinhado",
+          "fonte",
+          "cor",
+          "moeda",
+          "percentual",
+          "porcentagem",
+          "decimal",
+          "gráfico"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "value",
+          "ask_en": "What value should I set?",
+          "ask_pt": "Qual valor devo definir?"
+        }
+      ]
     },
     {
       "id": "excel.fill_series",
@@ -2430,6 +5892,36 @@
           "\\bauto.?preencher\\b",
           "\\bsequência\\b.*\\b(?:de|a partir|começando)\\b",
           "\\b(?:gerar|criar)\\b.*\\bsérie\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "reescreva",
+          "resuma",
+          "traduza",
+          "ordenar",
+          "classificar",
+          "filtro",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -2465,7 +5957,49 @@
           "Preencher para baixo a fórmula",
           "Preencher células em branco"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.fill_direction",
+      "mutuallyExclusiveWith": [
+        "excel.fill_down",
+        "excel.fill_right"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "série",
+          "sequência"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.set_series",
@@ -2481,6 +6015,30 @@
           "\\bgráfico\\b.*\\b(?:série|séries|dados)\\b",
           "\\b(?:adicionar|alterar|atualizar|modificar)\\b.*\\bsérie\\b.*\\bgráfico\\b",
           "\\bsérie\\b.*\\b(?:intervalo|dados|fonte)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar",
+          "filtro"
         ]
       },
       "slotExtractors": [
@@ -2510,19 +6068,57 @@
           "slot": "chartId",
           "ask_en": "Which chart should I update?",
           "ask_pt": "Qual gráfico devo atualizar?"
+        },
+        {
+          "slot": "series",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Altere a série de dados do gráfico para B1:B50",
           "Atualize a série do gráfico da coluna C",
-          "Adicione série de D1:D20 ao gráfico"
+          "Adicione série de D1:D20 ao gráfico",
+          "Em Planilha1!A1:A10, aplique gráfico set_series."
         ],
         "negative": [
           "Crie um novo gráfico",
           "Exclua o gráfico"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "série",
+          "séries"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.chart.set_titles",
@@ -2537,6 +6133,30 @@
           "\\bgráfico\\b.*\\btítulo\\b",
           "\\b(?:definir|alterar|renomear|atualizar)\\b.*\\btítulo\\b.*\\bgráfico\\b",
           "\\btítulo\\s+do\\s+eixo\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar",
+          "filtro"
         ]
       },
       "slotExtractors": [
@@ -2566,19 +6186,56 @@
           "slot": "title",
           "ask_en": "What should the chart title be?",
           "ask_pt": "Qual deve ser o título do gráfico?"
+        },
+        {
+          "slot": "chartId",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Defina o título do gráfico como 'Receita 2026'",
           "Altere o título do eixo para 'Meses'",
-          "Renomeie o gráfico para 'Relatório de Vendas'"
+          "Renomeie o gráfico para 'Relatório de Vendas'",
+          "Em Planilha1!A1:A10, aplique gráfico set_titles."
         ],
         "negative": [
           "Crie um gráfico",
           "Exclua o título do gráfico"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_axes",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "título"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.chart.set_axes",
@@ -2590,6 +6247,39 @@
           "\\bgráfico\\b.*\\b(?:eixo|eixos)\\b",
           "\\b(?:definir|alterar|configurar|formatar|atualizar)\\b.*\\b(?:eixo\\s*x|eixo\\s*y|eixos)\\b",
           "\\beixo\\b.*\\b(?:escala|intervalo|mín|máx|rótulo)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar",
+          "filtro"
+        ],
+        "tokens_any": [
+          "grafico",
+          "gráfico",
+          "eixos",
+          "eixo",
+          "configure",
+          "escala",
+          "1000"
         ]
       },
       "slotExtractors": [
@@ -2620,7 +6310,46 @@
           "Crie um gráfico",
           "Defina o título do gráfico"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "grafico",
+          "gráfico"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartId",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.delete",
@@ -2637,6 +6366,30 @@
         "regex_any": [
           "\\b(?:excluir|remover|apagar|deletar)\\b.*\\bgráfico\\b",
           "\\bgráfico\\b.*\\b(?:excluir|remover|apagar|deletar)\\b"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar",
+          "filtro"
         ]
       },
       "slotExtractors": [
@@ -2667,13 +6420,570 @@
         "positive": [
           "Exclua o gráfico",
           "Remova o gráfico desta planilha",
-          "Delete o gráfico 'Vendas'"
+          "Delete o gráfico 'Vendas'",
+          "Em Planilha1!A1:A10, aplique gráfico delete."
         ],
         "negative": [
           "Exclua a linha 5",
           "Remova o filtro"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "excluir",
+          "remover"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.remove_duplicates",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "remover duplicatas",
+          "deduplicar",
+          "excluir duplicatas",
+          "linhas únicas",
+          "remover linhas duplicadas",
+          "eliminar duplicados"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "formato"
+        ],
+        "regex_any": [
+          "\\b(?:remover\\\\s+duplicatas|deduplicar|excluir\\\\s+duplicatas|linhas\\\\s+únicas|remover\\\\s+linhas\\\\s+duplicadas)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_REMOVE_DUPLICATES",
+          "rangeA1": "$rangeA1"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Remover duplicatas deste intervalo",
+          "Deduplicar os dados",
+          "Excluir linhas duplicadas",
+          "Em Planilha1!A1:A10, aplique remove_duplicates."
+        ],
+        "negative": [
+          "Remover o filtro",
+          "Excluir linha 5"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.trim_whitespace",
+        "excel.normalize_values"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "remover duplicatas",
+          "deduplicar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_cleaning",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
+    },
+    {
+      "id": "excel.trim_whitespace",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 70,
+      "triggers": {
+        "tokens_any": [
+          "limpar espaços",
+          "remover espaços",
+          "trim",
+          "espaços em branco",
+          "limpar espaços extras"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "formato"
+        ],
+        "regex_any": [
+          "\\b(?:limpar\\\\s+espaços|remover\\\\s+espaços|trim|espaços\\\\s+em\\\\s+branco|limpar\\\\s+espaços\\\\s+extras)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_TRIM_WHITESPACE",
+          "rangeA1": "$rangeA1"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Limpar espaços em branco destas células",
+          "Remover espaços extras",
+          "Trim das células selecionadas",
+          "Em Planilha1!A1:A10, aplique trim_whitespace."
+        ],
+        "negative": [
+          "Remover as primeiras 5 linhas",
+          "Excluir espaços entre palavras"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.remove_duplicates",
+        "excel.normalize_values"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "limpar espaços",
+          "remover espaços"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_cleaning",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
+    },
+    {
+      "id": "excel.normalize_values",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 70,
+      "triggers": {
+        "tokens_any": [
+          "normalizar",
+          "padronizar",
+          "normalizar valores",
+          "padronizar valores",
+          "normalizar datas",
+          "normalizar números",
+          "padronizar texto"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "formato"
+        ],
+        "regex_any": [
+          "\\b(?:normalizar|padronizar|normalizar\\\\s+valores|padronizar\\\\s+valores|normalizar\\\\s+datas)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        },
+        {
+          "type": "ENUM",
+          "out": "normalization",
+          "values": [
+            "dates",
+            "numbers",
+            "text_case"
+          ]
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_NORMALIZE_VALUES",
+          "rangeA1": "$rangeA1",
+          "normalization": "$normalization"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "normalization",
+          "ask_en": "What kind of normalization? (dates, numbers, or text_case)",
+          "ask_pt": "Que tipo de normalização? (datas, números ou maiúsculas/minúsculas)"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Normalizar datas nesta coluna",
+          "Padronizar o texto em maiúsculas",
+          "Normalizar números no intervalo A1:A50",
+          "Em Planilha1!A1:A10, aplique normalize_values."
+        ],
+        "negative": [
+          "Formatar como moeda",
+          "Alterar a fonte"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.remove_duplicates",
+        "excel.trim_whitespace"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "normalizar",
+          "padronizar"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_cleaning",
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.set_protection",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 65,
+      "triggers": {
+        "tokens_any": [
+          "proteger planilha",
+          "bloquear planilha",
+          "proteção da planilha",
+          "proteger com senha"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "formato"
+        ],
+        "regex_any": [
+          "\\b(?:proteger\\\\s+planilha|bloquear\\\\s+planilha|proteção\\\\s+da\\\\s+planilha|proteger\\\\s+com\\\\s+senha)\\b"
+        ]
+      },
+      "slotExtractors": [],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_PROTECTION"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Proteger esta planilha",
+          "Bloquear a planilha",
+          "Adicionar proteção à planilha",
+          "Em Planilha1!A1:A10, aplique set_protection."
+        ],
+        "negative": [
+          "Bloquear células A1:B5",
+          "Congelar a linha de cabeçalho"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.lock_cells"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "proteger planilha",
+          "bloquear planilha"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.protection",
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.lock_cells",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 65,
+      "triggers": {
+        "tokens_any": [
+          "bloquear células",
+          "desbloquear células",
+          "proteger células",
+          "proteção de células",
+          "bloquear intervalo",
+          "desbloquear intervalo"
+        ],
+        "tokens_none": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna",
+          "excluir coluna",
+          "adicionar aba",
+          "renomear aba",
+          "excluir aba",
+          "grafico",
+          "gráfico",
+          "plot",
+          "formato"
+        ],
+        "regex_any": [
+          "\\b(?:bloquear\\\\s+células|desbloquear\\\\s+células|proteger\\\\s+células|proteção\\\\s+de\\\\s+células|bloquear\\\\s+intervalo)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_LOCK_CELLS",
+          "rangeA1": "$rangeA1",
+          "locked": true
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Bloquear células A1:D10",
+          "Proteger estas células",
+          "Desbloquear a linha de cabeçalho",
+          "Em Planilha1!A1:A10, aplique lock_cells."
+        ],
+        "negative": [
+          "Proteger a planilha",
+          "Congelar painéis"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_protection"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "bloquear células",
+          "desbloquear células"
+        ],
+        "penalizeIfTokensPresent": [
+          "fórmula",
+          "formula",
+          "=soma(",
+          "=se(",
+          "=procv(",
+          "=procx(",
+          "=índice(",
+          "=indice(",
+          "=corresp(",
+          "inserir linha",
+          "excluir linha",
+          "inserir coluna"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.protection",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
     }
   ]
 }

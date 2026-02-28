@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "id": "di_travel_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for travel domain documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "maxBoostRules": 15,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "travel",
+  "sectionPriority": [
+    {
+      "section": "trip_summary",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "traveler_profile",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "schedule",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "ticket_and_fare",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "reservation_terms",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "insurance_details",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "visa_or_border",
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "payment_and_receipt",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "contact_support",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "footer_notices",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "travel_boost_001_core_fields",
+      "priority": 95,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query asks key dates, amounts, status, or identifiers",
+      "boostSections": [
+        "trip_summary",
+        "traveler_profile",
+        "schedule"
+      ]
+    },
+    {
+      "id": "travel_boost_002_reconciliation",
+      "priority": 91,
+      "weight": 2.5,
+      "operators": [
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "condition": "query asks totals tie-out, variance, or mismatch reasons",
+      "boostSections": [
+        "schedule",
+        "ticket_and_fare",
+        "reservation_terms",
+        "insurance_details",
+        "visa_or_border"
+      ]
+    },
+    {
+      "id": "travel_boost_003_terms",
+      "priority": 86,
+      "weight": 2,
+      "operators": [
+        "summarize",
+        "advise",
+        "evaluate"
+      ],
+      "condition": "query asks policy, terms, or constraints",
+      "boostSections": [
+        "terms_and_notes",
+        "visa_or_border",
+        "payment_and_receipt"
+      ]
+    },
+    {
+      "id": "travel_boost_004_identity",
+      "priority": 84,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks who/which account/which traveler/student/employee/property",
+      "boostSections": [
+        "issuer_profile",
+        "recipient_profile",
+        "trip_summary"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bstatement\\b",
+      "expansions": [
+        "document",
+        "record",
+        "extrato",
+        "relatorio"
+      ]
+    },
+    {
+      "trigger": "\\breceipt\\b",
+      "expansions": [
+        "proof of payment",
+        "comprovante",
+        "recibo"
+      ]
+    },
+    {
+      "trigger": "\\btotal\\b",
+      "expansions": [
+        "amount",
+        "sum",
+        "valor total"
+      ]
+    },
+    {
+      "trigger": "\\bdue\\b",
+      "expansions": [
+        "deadline",
+        "due date",
+        "vencimento"
+      ]
+    },
+    {
+      "trigger": "\\breference\\b",
+      "expansions": [
+        "id",
+        "number",
+        "codigo",
+        "referencia"
+      ]
+    },
+    {
+      "trigger": "\\bperiod\\b",
+      "expansions": [
+        "date range",
+        "cycle",
+        "competencia"
+      ]
+    }
+  ]
+}

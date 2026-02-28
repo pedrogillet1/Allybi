@@ -1,0 +1,306 @@
+{
+  "_meta": {
+    "id": "legal_sow_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for Statement of Work.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_sow"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "title",
+        "agreement date",
+        "version",
+        "Statement of Work Document Header",
+        "Declaracao de Trabalho Cabecalho do Documento"
+      ]
+    },
+    {
+      "id": "parties",
+      "name": {
+        "en": "Parties",
+        "pt": "Partes"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Parties",
+        "Partes",
+        "between",
+        "party",
+        "counterparty",
+        "Statement of Work Parties",
+        "Declaracao de Trabalho Partes"
+      ]
+    },
+    {
+      "id": "recitals_background",
+      "name": {
+        "en": "Recitals and Background",
+        "pt": "Considerandos e Contexto"
+      },
+      "required": false,
+      "order": 3,
+      "headingAnchors": [
+        "Recitals and Background",
+        "Considerandos e Contexto",
+        "whereas",
+        "background",
+        "purpose",
+        "Statement of Work Recitals and Background",
+        "Declaracao de Trabalho Considerandos e Contexto"
+      ]
+    },
+    {
+      "id": "definitions",
+      "name": {
+        "en": "Definitions",
+        "pt": "Definicoes"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Definitions",
+        "Definicoes",
+        "means",
+        "defined terms",
+        "definition",
+        "Statement of Work Definitions",
+        "Declaracao de Trabalho Definicoes"
+      ]
+    },
+    {
+      "id": "scope_of_services",
+      "name": {
+        "en": "Scope of Services / Subject Matter",
+        "pt": "Escopo de Servicos / Objeto"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "Scope of Services / Subject Matter",
+        "Escopo de Servicos / Objeto",
+        "scope",
+        "services",
+        "statement of work",
+        "Statement of Work Scope of Services / Subject Matter",
+        "Declaracao de Trabalho Escopo de Servicos / Objeto"
+      ]
+    },
+    {
+      "id": "fees_and_payment",
+      "name": {
+        "en": "Fees and Payment Terms",
+        "pt": "Remuneracao e Pagamento"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Fees and Payment Terms",
+        "Remuneracao e Pagamento",
+        "fees",
+        "payment",
+        "invoice",
+        "Statement of Work Fees and Payment Terms",
+        "Declaracao de Trabalho Remuneracao e Pagamento"
+      ]
+    },
+    {
+      "id": "term_and_renewal",
+      "name": {
+        "en": "Term and Renewal",
+        "pt": "Prazo e Renovacao"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Term and Renewal",
+        "Prazo e Renovacao",
+        "term",
+        "renewal",
+        "commencement",
+        "Statement of Work Term and Renewal",
+        "Declaracao de Trabalho Prazo e Renovacao"
+      ]
+    },
+    {
+      "id": "termination",
+      "name": {
+        "en": "Termination",
+        "pt": "Rescisao"
+      },
+      "required": true,
+      "order": 8,
+      "headingAnchors": [
+        "Termination",
+        "Rescisao",
+        "terminate",
+        "termination for cause",
+        "survival",
+        "Statement of Work Termination",
+        "Declaracao de Trabalho Rescisao"
+      ]
+    },
+    {
+      "id": "confidentiality_privacy",
+      "name": {
+        "en": "Confidentiality and Privacy",
+        "pt": "Confidencialidade e Privacidade"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Confidentiality and Privacy",
+        "Confidencialidade e Privacidade",
+        "confidential information",
+        "privacy",
+        "personal data",
+        "Statement of Work Confidentiality and Privacy",
+        "Declaracao de Trabalho Confidencialidade e Privacidade"
+      ]
+    },
+    {
+      "id": "security_compliance",
+      "name": {
+        "en": "Security and Compliance",
+        "pt": "Seguranca e Conformidade"
+      },
+      "required": false,
+      "order": 10,
+      "headingAnchors": [
+        "Security and Compliance",
+        "Seguranca e Conformidade",
+        "security measures",
+        "compliance",
+        "controls",
+        "Statement of Work Security and Compliance",
+        "Declaracao de Trabalho Seguranca e Conformidade"
+      ]
+    },
+    {
+      "id": "ip_and_license",
+      "name": {
+        "en": "IP and License",
+        "pt": "Propriedade Intelectual e Licenca"
+      },
+      "required": false,
+      "order": 11,
+      "headingAnchors": [
+        "IP and License",
+        "Propriedade Intelectual e Licenca",
+        "intellectual property",
+        "license grant",
+        "ownership",
+        "Statement of Work IP and License",
+        "Declaracao de Trabalho Propriedade Intelectual e Licenca"
+      ]
+    },
+    {
+      "id": "liability_and_indemnity",
+      "name": {
+        "en": "Liability and Indemnity",
+        "pt": "Responsabilidade e Indenizacao"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Liability and Indemnity",
+        "Responsabilidade e Indenizacao",
+        "liability",
+        "indemnify",
+        "damages",
+        "Statement of Work Liability and Indemnity",
+        "Declaracao de Trabalho Responsabilidade e Indenizacao"
+      ]
+    },
+    {
+      "id": "dispute_resolution",
+      "name": {
+        "en": "Dispute Resolution",
+        "pt": "Resolucao de Disputas"
+      },
+      "required": true,
+      "order": 13,
+      "headingAnchors": [
+        "Dispute Resolution",
+        "Resolucao de Disputas",
+        "governing law",
+        "jurisdiction",
+        "arbitration",
+        "Statement of Work Dispute Resolution",
+        "Declaracao de Trabalho Resolucao de Disputas"
+      ]
+    },
+    {
+      "id": "notices_misc",
+      "name": {
+        "en": "Notices and Miscellaneous",
+        "pt": "Notificacoes e Disposicoes Gerais"
+      },
+      "required": false,
+      "order": 14,
+      "headingAnchors": [
+        "Notices and Miscellaneous",
+        "Notificacoes e Disposicoes Gerais",
+        "notice",
+        "assignment",
+        "entire agreement",
+        "Statement of Work Notices and Miscellaneous",
+        "Declaracao de Trabalho Notificacoes e Disposicoes Gerais"
+      ]
+    },
+    {
+      "id": "signatures",
+      "name": {
+        "en": "Signatures",
+        "pt": "Assinaturas"
+      },
+      "required": true,
+      "order": 15,
+      "headingAnchors": [
+        "Signatures",
+        "Assinaturas",
+        "signature",
+        "executed",
+        "authorized signatory",
+        "Statement of Work Signatures",
+        "Declaracao de Trabalho Assinaturas"
+      ]
+    },
+    {
+      "id": "annexes_schedules",
+      "name": {
+        "en": "Annexes and Schedules",
+        "pt": "Anexos e Apensos"
+      },
+      "required": false,
+      "order": 16,
+      "headingAnchors": [
+        "Annexes and Schedules",
+        "Anexos e Apensos",
+        "schedule",
+        "annex",
+        "appendix",
+        "Statement of Work Annexes and Schedules",
+        "Declaracao de Trabalho Anexos e Apensos"
+      ]
+    }
+  ]
+}

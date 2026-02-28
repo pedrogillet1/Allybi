@@ -1,0 +1,133 @@
+{
+  "_meta": {
+    "id": "legal_answer_style_bank",
+    "version": "2.0.0",
+    "description": "Response style policy for legal domain outputs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "audienceProfiles": [
+    {
+      "id": "specialist",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "analyst",
+      "tone": "analytical",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "manager",
+      "tone": "explanatory",
+      "defaultDepth": "summary",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "operator",
+      "tone": "directive",
+      "defaultDepth": "summary",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "external",
+      "tone": "neutral",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "legal_style_001",
+      "rule": "State conclusions only after citing clause locations.",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_style_002",
+      "rule": "When language is ambiguous, explicitly mark uncertainty and ask a focused follow-up question.",
+      "applies": [
+        "summarize",
+        "advise",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_style_003",
+      "rule": "Separate binding obligations from operational recommendations.",
+      "applies": [
+        "advise",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "legal_style_004",
+      "rule": "Prefer bullet-point obligation matrices for multi-party agreements.",
+      "applies": [
+        "extract",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_style_005",
+      "rule": "Do not claim legal compliance; report evidence and gaps.",
+      "applies": [
+        "evaluate",
+        "validate",
+        "advise"
+      ]
+    },
+    {
+      "id": "legal_style_006",
+      "rule": "Preserve exact monetary figures and dates as in source.",
+      "applies": [
+        "extract",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_style_007",
+      "rule": "Differentiate policy statements from contractual commitments.",
+      "applies": [
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_style_008",
+      "rule": "Use concise risk labels: low/medium/high with rationale.",
+      "applies": [
+        "evaluate",
+        "advise",
+        "monitor"
+      ]
+    }
+  ]
+}

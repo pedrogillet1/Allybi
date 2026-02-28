@@ -1,0 +1,1893 @@
+{
+  "_meta": {
+    "id": "section_priority_legal",
+    "version": "1.0.0",
+    "description": "Section-priority rules for legal retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "mode": "deterministic_scan_order"
+  },
+  "domain": "legal",
+  "rules": [
+    {
+      "id": "legal_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law",
+        "dispute_resolution"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "termination",
+        "governing_law",
+        "dispute_resolution",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "fees_schedule",
+        "service_credits",
+        "payment_terms",
+        "late_fees",
+        "billing_table"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "payment_terms",
+        "late_fees",
+        "billing_table",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "fees_schedule",
+        "service_credits",
+        "payment_terms",
+        "late_fees"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "term",
+        "termination",
+        "liability",
+        "indemnity"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "termination",
+        "liability",
+        "indemnity",
+        "governing_law",
+        "payment_terms"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "term",
+        "termination",
+        "liability"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law",
+        "payment_terms"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "termination",
+        "governing_law",
+        "payment_terms",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "parties",
+        "definitions",
+        "payment_terms",
+        "termination",
+        "signature_block"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "payment_terms",
+        "termination",
+        "signature_block",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "parties",
+        "definitions",
+        "payment_terms",
+        "termination"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "definitions",
+        "clauses_index",
+        "schedule_index",
+        "annex_index"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "clauses_index",
+        "schedule_index",
+        "annex_index",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "definitions",
+        "clauses_index",
+        "schedule_index"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "obligations_calendar",
+        "notice_requirements",
+        "renewal_terms",
+        "service_levels",
+        "payment_terms"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "renewal_terms",
+        "service_levels",
+        "payment_terms",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "obligations_calendar",
+        "notice_requirements",
+        "renewal_terms",
+        "service_levels"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "schedule_index",
+        "annex_index",
+        "bookmarks",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "schedule_index",
+        "annex_index",
+        "bookmarks",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "recitals",
+        "scope_of_services",
+        "obligations",
+        "liability",
+        "termination"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "obligations",
+        "liability",
+        "termination",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "recitals",
+        "scope_of_services",
+        "obligations",
+        "liability"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "liability",
+        "indemnity",
+        "termination",
+        "notices"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "indemnity",
+        "termination",
+        "notices",
+        "payment_terms",
+        "definitions"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "liability",
+        "indemnity",
+        "termination"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_compare_contract_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "master_service_agreement",
+        "vendor_contract",
+        "statement_of_work"
+      ],
+      "sections": [
+        "definitions",
+        "term",
+        "termination",
+        "liability",
+        "indemnity",
+        "governing_law",
+        "payment_terms"
+      ]
+    },
+    {
+      "id": "legal_evaluate_clause_pack",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate",
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law",
+        "payment_terms"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "id": "legal_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law",
+        "dispute_resolution"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "termination",
+        "governing_law",
+        "dispute_resolution",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "fees_schedule",
+        "service_credits",
+        "payment_terms",
+        "late_fees",
+        "billing_table"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "payment_terms",
+        "late_fees",
+        "billing_table",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "fees_schedule",
+        "service_credits",
+        "payment_terms",
+        "late_fees"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "term",
+        "termination",
+        "liability",
+        "indemnity"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "termination",
+        "liability",
+        "indemnity",
+        "governing_law",
+        "payment_terms"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "term",
+        "termination",
+        "liability"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law",
+        "payment_terms"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "termination",
+        "governing_law",
+        "payment_terms",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "parties",
+        "definitions",
+        "payment_terms",
+        "termination",
+        "signature_block"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "payment_terms",
+        "termination",
+        "signature_block",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "parties",
+        "definitions",
+        "payment_terms",
+        "termination"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "definitions",
+        "clauses_index",
+        "schedule_index",
+        "annex_index"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "clauses_index",
+        "schedule_index",
+        "annex_index",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "definitions",
+        "clauses_index",
+        "schedule_index"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "obligations_calendar",
+        "notice_requirements",
+        "renewal_terms",
+        "service_levels",
+        "payment_terms"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "renewal_terms",
+        "service_levels",
+        "payment_terms",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "obligations_calendar",
+        "notice_requirements",
+        "renewal_terms",
+        "service_levels"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "schedule_index",
+        "annex_index",
+        "bookmarks",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "schedule_index",
+        "annex_index",
+        "bookmarks",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "clauses_index",
+        "schedule_index",
+        "annex_index"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "recitals",
+        "scope_of_services",
+        "obligations",
+        "liability",
+        "termination"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "obligations",
+        "liability",
+        "termination",
+        "definitions",
+        "term"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "recitals",
+        "scope_of_services",
+        "obligations",
+        "liability"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "liability",
+        "indemnity",
+        "termination",
+        "notices"
+      ],
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work",
+        "nda"
+      ]
+    },
+    {
+      "id": "legal_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "indemnity",
+        "termination",
+        "notices",
+        "payment_terms",
+        "definitions"
+      ],
+      "docTypes": [
+        "dpa",
+        "vendor_contract",
+        "employment_agreement"
+      ]
+    },
+    {
+      "id": "legal_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "definitions",
+        "liability",
+        "indemnity",
+        "termination"
+      ],
+      "docTypes": [
+        "lease_agreement",
+        "purchase_agreement",
+        "privacy_policy"
+      ]
+    },
+    {
+      "id": "legal_compare_contract_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "master_service_agreement",
+        "vendor_contract",
+        "statement_of_work"
+      ],
+      "sections": [
+        "definitions",
+        "term",
+        "termination",
+        "liability",
+        "indemnity",
+        "governing_law",
+        "payment_terms"
+      ]
+    },
+    {
+      "id": "legal_evaluate_clause_pack",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate",
+        "validate"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "sections": [
+        "liability",
+        "indemnity",
+        "termination",
+        "governing_law",
+        "payment_terms"
+      ]
+    }
+  ]
+}

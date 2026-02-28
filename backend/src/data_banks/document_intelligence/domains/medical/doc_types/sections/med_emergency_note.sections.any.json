@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "id": "medical_med_emergency_note_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for Emergency Note.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_emergency_note"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "document id",
+        "encounter",
+        "record number",
+        "Emergency Note Document Header",
+        "Nota de Emergencia Cabecalho do Documento"
+      ]
+    },
+    {
+      "id": "patient_identification",
+      "name": {
+        "en": "Patient Identification",
+        "pt": "Identificacao do Paciente"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Patient Identification",
+        "Identificacao do Paciente",
+        "patient name",
+        "mrn",
+        "dob",
+        "Emergency Note Patient Identification",
+        "Nota de Emergencia Identificacao do Paciente"
+      ]
+    },
+    {
+      "id": "encounter_context",
+      "name": {
+        "en": "Encounter Context",
+        "pt": "Contexto do Atendimento"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Encounter Context",
+        "Contexto do Atendimento",
+        "admission",
+        "visit date",
+        "service line",
+        "Emergency Note Encounter Context",
+        "Nota de Emergencia Contexto do Atendimento"
+      ]
+    },
+    {
+      "id": "chief_complaint_reason",
+      "name": {
+        "en": "Chief Complaint / Reason",
+        "pt": "Queixa Principal / Motivo"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Chief Complaint / Reason",
+        "Queixa Principal / Motivo",
+        "chief complaint",
+        "reason for visit",
+        "motivo",
+        "Emergency Note Chief Complaint / Reason",
+        "Nota de Emergencia Queixa Principal / Motivo"
+      ]
+    },
+    {
+      "id": "history_background",
+      "name": {
+        "en": "History and Background",
+        "pt": "Historia e Contexto"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "History and Background",
+        "Historia e Contexto",
+        "history of present illness",
+        "past medical history",
+        "Emergency Note History and Background",
+        "Nota de Emergencia Historia e Contexto"
+      ]
+    },
+    {
+      "id": "objective_findings",
+      "name": {
+        "en": "Objective Findings",
+        "pt": "Achados Objetivos"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Objective Findings",
+        "Achados Objetivos",
+        "exam",
+        "physical exam",
+        "objective",
+        "Emergency Note Objective Findings",
+        "Nota de Emergencia Achados Objetivos"
+      ]
+    },
+    {
+      "id": "vitals_and_measurements",
+      "name": {
+        "en": "Vitals and Measurements",
+        "pt": "Sinais Vitais e Medidas"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Vitals and Measurements",
+        "Sinais Vitais e Medidas",
+        "bp",
+        "heart rate",
+        "temperature",
+        "spo2",
+        "Emergency Note Vitals and Measurements",
+        "Nota de Emergencia Sinais Vitais e Medidas"
+      ]
+    },
+    {
+      "id": "labs_imaging",
+      "name": {
+        "en": "Laboratory and Imaging",
+        "pt": "Laboratorio e Imagem"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "Laboratory and Imaging",
+        "Laboratorio e Imagem",
+        "laboratory",
+        "impression",
+        "finding",
+        "Emergency Note Laboratory and Imaging",
+        "Nota de Emergencia Laboratorio e Imagem"
+      ]
+    },
+    {
+      "id": "assessment_documented",
+      "name": {
+        "en": "Documented Assessment",
+        "pt": "Avaliacao Documentada"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Documented Assessment",
+        "Avaliacao Documentada",
+        "assessment",
+        "clinical impression",
+        "diagnosis documented",
+        "Emergency Note Documented Assessment",
+        "Nota de Emergencia Avaliacao Documentada"
+      ]
+    },
+    {
+      "id": "plan_and_orders",
+      "name": {
+        "en": "Plan and Orders",
+        "pt": "Plano e Condutas"
+      },
+      "required": true,
+      "order": 10,
+      "headingAnchors": [
+        "Plan and Orders",
+        "Plano e Condutas",
+        "plan",
+        "orders",
+        "next steps",
+        "Emergency Note Plan and Orders",
+        "Nota de Emergencia Plano e Condutas"
+      ]
+    },
+    {
+      "id": "medications_allergies",
+      "name": {
+        "en": "Medications and Allergies",
+        "pt": "Medicacoes e Alergias"
+      },
+      "required": true,
+      "order": 11,
+      "headingAnchors": [
+        "Medications and Allergies",
+        "Medicacoes e Alergias",
+        "medications",
+        "allergies",
+        "contraindication",
+        "Emergency Note Medications and Allergies",
+        "Nota de Emergencia Medicacoes e Alergias"
+      ]
+    },
+    {
+      "id": "followup_and_disposition",
+      "name": {
+        "en": "Follow-up and Disposition",
+        "pt": "Acompanhamento e Desfecho"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Follow-up and Disposition",
+        "Acompanhamento e Desfecho",
+        "follow-up",
+        "discharge",
+        "referral",
+        "Emergency Note Follow-up and Disposition",
+        "Nota de Emergencia Acompanhamento e Desfecho"
+      ]
+    },
+    {
+      "id": "patient_instructions",
+      "name": {
+        "en": "Patient Instructions",
+        "pt": "Instrucoes ao Paciente"
+      },
+      "required": false,
+      "order": 13,
+      "headingAnchors": [
+        "Patient Instructions",
+        "Instrucoes ao Paciente",
+        "instructions",
+        "warning signs",
+        "return precautions",
+        "Emergency Note Patient Instructions",
+        "Nota de Emergencia Instrucoes ao Paciente"
+      ]
+    },
+    {
+      "id": "signoff_and_attestation",
+      "name": {
+        "en": "Signoff and Attestation",
+        "pt": "Assinatura e Atestacao"
+      },
+      "required": true,
+      "order": 14,
+      "headingAnchors": [
+        "Signoff and Attestation",
+        "Assinatura e Atestacao",
+        "signed by",
+        "clinician",
+        "timestamp",
+        "Emergency Note Signoff and Attestation",
+        "Nota de Emergencia Assinatura e Atestacao"
+      ]
+    },
+    {
+      "id": "annexes_tables",
+      "name": {
+        "en": "Annexes and Tables",
+        "pt": "Anexos e Tabelas"
+      },
+      "required": false,
+      "order": 15,
+      "headingAnchors": [
+        "Annexes and Tables",
+        "Anexos e Tabelas",
+        "table",
+        "appendix",
+        "annex",
+        "Emergency Note Annexes and Tables",
+        "Nota de Emergencia Anexos e Tabelas"
+      ]
+    }
+  ]
+}

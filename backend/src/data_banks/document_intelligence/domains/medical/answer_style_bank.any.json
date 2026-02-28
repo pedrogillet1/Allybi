@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "medical_answer_style_bank",
+    "version": "2.0.0",
+    "description": "Medical answer style controls with safety-first language.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "audienceProfiles": [
+    {
+      "id": "clinician",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "analyst",
+      "tone": "analytical",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "care_manager",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "patient_facing",
+      "tone": "plain",
+      "defaultDepth": "summary",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "bullet_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "medical_style_001",
+      "rule": "Provide document-grounded explanation only; avoid diagnosis advice.",
+      "applies": [
+        "summarize",
+        "advise",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "medical_style_002",
+      "rule": "Preserve original units and reference ranges in every numeric statement.",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_style_003",
+      "rule": "State uncertainty explicitly when source sections conflict.",
+      "applies": [
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_style_004",
+      "rule": "Add clinician follow-up recommendation for critical findings.",
+      "applies": [
+        "monitor",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "id": "medical_style_005",
+      "rule": "Do not provide treatment changes or dosage recommendations.",
+      "applies": [
+        "advise",
+        "evaluate"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "di_billing_redaction_and_safety_rules",
+    "version": "1.0.0",
+    "description": "Redaction and safety rules for billing domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing"
+  },
+  "domain": "billing",
+  "redactionRules": [
+    {
+      "id": "billing_redact_001_account",
+      "dataType": "account_number",
+      "pattern": "\\b(?:account\\s*(?:number|no\\.?|#)?\\s*:?\\s*)\\d{8,20}\\b",
+      "action": "REDACT",
+      "replacement": "[ACCOUNT REDACTED]"
+    },
+    {
+      "id": "billing_redact_002_card_pan",
+      "dataType": "card_number",
+      "pattern": "\\b(?:\\d[ -]*?){13,19}\\b",
+      "action": "MASK_KEEP_LAST4",
+      "replacement": "[CARD MASKED]"
+    },
+    {
+      "id": "billing_redact_003_tax_id",
+      "dataType": "tax_id",
+      "pattern": "\\b(?:\\d{3}-\\d{2}-\\d{4}|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2})\\b",
+      "action": "REDACT",
+      "replacement": "[TAX ID REDACTED]"
+    },
+    {
+      "id": "billing_redact_004_address",
+      "dataType": "personal_address",
+      "pattern": "\\b(?:street|st\\.|avenue|ave\\.|apt|suite|endereco)\\b.{0,80}",
+      "action": "PARTIAL_REDACT",
+      "replacement": "[ADDRESS PARTIALLY REDACTED]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "billing_safety_001_no_collections_advice",
+      "severity": "warning",
+      "description": "Do not provide legal debt-collection instructions; provide neutral options only.",
+      "trigger": "user asks enforcement or legal debt action",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "billing_safety_002_no_identity_assertion",
+      "severity": "error",
+      "description": "Do not assert identity ownership from billing data alone.",
+      "trigger": "user asks to prove person identity",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "billing_safety_003_no_policy_fabrication",
+      "severity": "error",
+      "description": "Do not invent carrier or utility policies not explicitly present in the document.",
+      "trigger": "missing policy details",
+      "action": "STATE_UNCERTAINTY"
+    },
+    {
+      "id": "billing_safety_004_dispute_tone",
+      "severity": "warning",
+      "description": "Keep dispute guidance procedural and non-confrontational.",
+      "trigger": "user asks complaint wording",
+      "action": "NEUTRAL_FLAG"
+    }
+  ]
+}

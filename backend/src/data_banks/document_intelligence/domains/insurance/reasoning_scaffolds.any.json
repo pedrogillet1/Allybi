@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "di_insurance_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for insurance domain analysis and extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance"
+  },
+  "domain": "insurance",
+  "scaffolds": [
+    {
+      "id": "ins_scaffold_001_policy_review",
+      "name": "Policy Document Review",
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize",
+        "validate"
+      ],
+      "steps": [
+        "Identify policy number, holder, issuer, and coverage period",
+        "Extract coverage limits, deductibles, and exclusions",
+        "Locate endorsements, riders, and waiting period clauses",
+        "Cite exact clause anchors for every coverage statement",
+        "Mark missing policy fields as unverified",
+        "Return neutral summary without legal/medical inference"
+      ]
+    },
+    {
+      "id": "ins_scaffold_002_eob_reconciliation",
+      "name": "EOB Reconciliation",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "steps": [
+        "Extract billed, allowed, paid, and member-responsibility values",
+        "Validate arithmetic consistency across line items",
+        "Identify denial/adjustment codes and reasons",
+        "Cross-check service dates and provider details",
+        "Flag unresolved differences and missing supporting evidence",
+        "Provide citation-rich summary per claim line"
+      ]
+    },
+    {
+      "id": "ins_scaffold_003_claim_submission_check",
+      "name": "Claim Submission Completeness Check",
+      "operators": [
+        "validate",
+        "extract",
+        "summarize"
+      ],
+      "steps": [
+        "Locate claim number, submission date, and claimant identity",
+        "Verify required supporting documents are attached",
+        "Extract incident/service details and claimed amount",
+        "Check timeline and policy eligibility alignment",
+        "Highlight missing critical fields without inference",
+        "Provide checklist of required follow-up evidence"
+      ]
+    },
+    {
+      "id": "ins_scaffold_004_premium_invoice_analysis",
+      "name": "Premium Invoice Analysis",
+      "operators": [
+        "extract",
+        "compare",
+        "monitor",
+        "validate"
+      ],
+      "steps": [
+        "Extract invoice number, period, premium amount, and due date",
+        "Break down taxes, fees, discounts, and prior balances",
+        "Validate billed total against line-item sum",
+        "Detect overdue or grace-period conditions",
+        "Cross-reference policy status and renewal timeline",
+        "Cite source cells/sections for every monetary claim"
+      ]
+    }
+  ]
+}

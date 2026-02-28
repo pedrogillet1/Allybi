@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "id": "query_rewrites_schema",
+    "version": "1.0.0",
+    "description": "JSON Schema contract for retrieval query_rewrites banks, including guardrails required for safe acronym and context-aware expansions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/query_rewrites_schema.any.json",
+    "title": "Query Rewrites Bank Schema",
+    "type": "object",
+    "required": [
+      "_meta",
+      "config",
+      "domain",
+      "rules"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "description",
+          "languages",
+          "lastUpdated"
+        ],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "domain"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "domain": {
+            "type": "string",
+            "minLength": 2
+          }
+        }
+      },
+      "domain": {
+        "type": "string",
+        "minLength": 2
+      },
+      "rules": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": [
+            "id",
+            "priority",
+            "enabled",
+            "patterns",
+            "negativePatterns",
+            "requireContextAny",
+            "requireContextAll",
+            "forbidContextAny",
+            "rewrites"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 3
+            },
+            "priority": {
+              "type": "number"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "patterns": {
+              "$ref": "#/$defs/stringArray"
+            },
+            "negativePatterns": {
+              "$ref": "#/$defs/stringArray"
+            },
+            "requireContextAny": {
+              "$ref": "#/$defs/stringArray"
+            },
+            "requireContextAll": {
+              "$ref": "#/$defs/stringArray"
+            },
+            "forbidContextAny": {
+              "$ref": "#/$defs/stringArray"
+            },
+            "rewrites": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "value"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "query": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "weight": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "conditions": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "requireDomainMatch": {
+                  "type": "boolean"
+                },
+                "intents": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "operators": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "domains": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "languages": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "negativePatterns": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "requireContextAny": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "requireContextAll": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "forbidContextAny": {
+                  "$ref": "#/$defs/stringArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "$defs": {
+      "stringArray": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

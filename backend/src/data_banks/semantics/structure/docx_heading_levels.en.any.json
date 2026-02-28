@@ -1,0 +1,316 @@
+{
+  "_meta": {
+    "id": "docx_heading_levels_en",
+    "version": "1.0.0",
+    "description": "English heading level conventions for DOCX structural parsing — maps style names, numbering patterns, and font heuristics to semantic levels.",
+    "languages": ["en"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": { "enabled": true },
+  "levels": [
+    {
+      "level": 1,
+      "styleNames": ["Heading 1", "heading 1", "Heading1", "Title", "TITLE"],
+      "xmlStyleIds": ["Heading1", "Title"],
+      "outlineLevel": 0,
+      "semanticRole": "document_title_or_major_section",
+      "typicalContent": ["Document title", "Major section heading"],
+      "expectedChildren": [2],
+      "tocDepthDefault": true
+    },
+    {
+      "level": 2,
+      "styleNames": ["Heading 2", "heading 2", "Heading2", "Subtitle", "SUBTITLE"],
+      "xmlStyleIds": ["Heading2", "Subtitle"],
+      "outlineLevel": 1,
+      "semanticRole": "section",
+      "typicalContent": ["Section heading", "Chapter heading"],
+      "expectedChildren": [3],
+      "tocDepthDefault": true
+    },
+    {
+      "level": 3,
+      "styleNames": ["Heading 3", "heading 3", "Heading3"],
+      "xmlStyleIds": ["Heading3"],
+      "outlineLevel": 2,
+      "semanticRole": "subsection",
+      "typicalContent": ["Subsection heading", "Topic heading"],
+      "expectedChildren": [4],
+      "tocDepthDefault": true
+    },
+    {
+      "level": 4,
+      "styleNames": ["Heading 4", "heading 4", "Heading4"],
+      "xmlStyleIds": ["Heading4"],
+      "outlineLevel": 3,
+      "semanticRole": "sub_subsection",
+      "typicalContent": ["Sub-subsection heading", "Detail heading"],
+      "expectedChildren": [5],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 5,
+      "styleNames": ["Heading 5", "heading 5", "Heading5"],
+      "xmlStyleIds": ["Heading5"],
+      "outlineLevel": 4,
+      "semanticRole": "paragraph_group",
+      "typicalContent": ["Paragraph group heading", "Minor heading"],
+      "expectedChildren": [6],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 6,
+      "styleNames": ["Heading 6", "heading 6", "Heading6"],
+      "xmlStyleIds": ["Heading6"],
+      "outlineLevel": 5,
+      "semanticRole": "minor_heading",
+      "typicalContent": ["Minor heading", "Run-in heading"],
+      "expectedChildren": [7],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 7,
+      "styleNames": ["Heading 7", "heading 7", "Heading7"],
+      "xmlStyleIds": ["Heading7"],
+      "outlineLevel": 6,
+      "semanticRole": "deep_heading",
+      "typicalContent": ["Deep nested heading", "Outline detail level"],
+      "expectedChildren": [8],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 8,
+      "styleNames": ["Heading 8", "heading 8", "Heading8"],
+      "xmlStyleIds": ["Heading8"],
+      "outlineLevel": 7,
+      "semanticRole": "deep_heading",
+      "typicalContent": ["Deep nested heading", "Technical sub-detail"],
+      "expectedChildren": [9],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 9,
+      "styleNames": ["Heading 9", "heading 9", "Heading9"],
+      "xmlStyleIds": ["Heading9"],
+      "outlineLevel": 8,
+      "semanticRole": "deepest_heading",
+      "typicalContent": ["Deepest heading level", "Fine-grained outline node"],
+      "expectedChildren": [],
+      "tocDepthDefault": false
+    }
+  ],
+  "numberingPatterns": [
+    {
+      "id": "np_en_001",
+      "pattern": "^\\d+\\.\\s",
+      "examples": ["1. Introduction", "2. Background"],
+      "inferredLevel": 1,
+      "notes": "Single number + period = top-level heading"
+    },
+    {
+      "id": "np_en_002",
+      "pattern": "^\\d+\\.\\d+\\.?\\s",
+      "examples": ["1.1 Scope", "2.3 Definitions"],
+      "inferredLevel": 2,
+      "notes": "Two-level decimal numbering"
+    },
+    {
+      "id": "np_en_003",
+      "pattern": "^\\d+\\.\\d+\\.\\d+\\.?\\s",
+      "examples": ["1.1.1 Overview", "3.2.4 Requirements"],
+      "inferredLevel": 3,
+      "notes": "Three-level decimal numbering"
+    },
+    {
+      "id": "np_en_004",
+      "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+\\.?\\s",
+      "examples": ["1.1.1.1 Detail", "2.3.4.5 Sub-item"],
+      "inferredLevel": 4,
+      "notes": "Four-level decimal numbering"
+    },
+    {
+      "id": "np_en_005",
+      "pattern": "^[A-Z]\\.\\s",
+      "examples": ["A. General Provisions", "B. Definitions"],
+      "inferredLevel": 1,
+      "notes": "Uppercase letter + period — common in legal outlines"
+    },
+    {
+      "id": "np_en_006",
+      "pattern": "^[a-z]\\.\\s",
+      "examples": ["a. First item", "b. Second item"],
+      "inferredLevel": 3,
+      "notes": "Lowercase letter + period — sub-items in legal/academic"
+    },
+    {
+      "id": "np_en_007",
+      "pattern": "^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\\.\\s",
+      "examples": ["I. Purpose", "IV. Methodology"],
+      "inferredLevel": 1,
+      "notes": "Uppercase Roman numeral — major division"
+    },
+    {
+      "id": "np_en_008",
+      "pattern": "^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)\\.\\s",
+      "examples": ["i. First point", "iv. Fourth point"],
+      "inferredLevel": 4,
+      "notes": "Lowercase Roman numeral — deep sub-item"
+    },
+    {
+      "id": "np_en_009",
+      "pattern": "^\\(\\d+\\)\\s",
+      "examples": ["(1) The following applies", "(3) Notwithstanding"],
+      "inferredLevel": 3,
+      "notes": "Parenthesized number — statutory/legal sub-section"
+    },
+    {
+      "id": "np_en_010",
+      "pattern": "^\\([a-z]\\)\\s",
+      "examples": ["(a) General rule", "(c) Exception"],
+      "inferredLevel": 4,
+      "notes": "Parenthesized lowercase letter — legal sub-sub-section"
+    },
+    {
+      "id": "np_en_011",
+      "pattern": "^\\((i|ii|iii|iv|v|vi|vii|viii|ix|x)\\)\\s",
+      "examples": ["(i) First condition", "(iv) Fourth condition"],
+      "inferredLevel": 5,
+      "notes": "Parenthesized Roman numeral — deep legal nesting"
+    },
+    {
+      "id": "np_en_012",
+      "pattern": "^ARTICLE\\s+[IVXLC]+",
+      "examples": ["ARTICLE I", "ARTICLE IV — Definitions"],
+      "inferredLevel": 1,
+      "notes": "ARTICLE + Roman numeral — top-level in contracts and bylaws"
+    },
+    {
+      "id": "np_en_013",
+      "pattern": "^Section\\s+\\d+",
+      "examples": ["Section 1", "Section 12 — Termination"],
+      "inferredLevel": 2,
+      "notes": "Section + number — within an Article"
+    },
+    {
+      "id": "np_en_014",
+      "pattern": "^Part\\s+\\d+",
+      "examples": ["Part 1", "Part 3 — Financial Statements"],
+      "inferredLevel": 1,
+      "notes": "Part + number — major division in regulations/reports"
+    },
+    {
+      "id": "np_en_015",
+      "pattern": "^Chapter\\s+\\d+",
+      "examples": ["Chapter 1", "Chapter 5 — Conclusion"],
+      "inferredLevel": 1,
+      "notes": "Chapter + number — book/report major division"
+    },
+    {
+      "id": "np_en_016",
+      "pattern": "^SCHEDULE\\s+[A-Z]",
+      "examples": ["SCHEDULE A", "SCHEDULE B — Pricing"],
+      "inferredLevel": 1,
+      "notes": "SCHEDULE + letter — contract appendix"
+    },
+    {
+      "id": "np_en_017",
+      "pattern": "^Exhibit\\s+[A-Z]",
+      "examples": ["Exhibit A", "Exhibit C — Maps"],
+      "inferredLevel": 1,
+      "notes": "Exhibit + letter — legal attachment"
+    },
+    {
+      "id": "np_en_018",
+      "pattern": "^Appendix\\s+[A-Z]",
+      "examples": ["Appendix A", "Appendix D — Glossary"],
+      "inferredLevel": 1,
+      "notes": "Appendix + letter — supplementary section"
+    },
+    {
+      "id": "np_en_019",
+      "pattern": "^Annex\\s+\\d+",
+      "examples": ["Annex 1", "Annex 3 — Technical Specifications"],
+      "inferredLevel": 1,
+      "notes": "Annex + number — common in EU/international documents"
+    },
+    {
+      "id": "np_en_020",
+      "pattern": "^Item\\s+\\d+",
+      "examples": ["Item 1", "Item 5 — Risk Factors"],
+      "inferredLevel": 2,
+      "notes": "Item + number — SEC filings and formal agendas"
+    }
+  ],
+  "fontHeuristics": [
+    {
+      "id": "fh_en_001",
+      "condition": "fontSize >= 18 AND bold == true AND allCaps == false",
+      "inferredLevel": 1,
+      "confidence": 0.85,
+      "notes": "Large bold text typically indicates top-level heading"
+    },
+    {
+      "id": "fh_en_002",
+      "condition": "fontSize >= 16 AND fontSize < 18 AND bold == true",
+      "inferredLevel": 1,
+      "confidence": 0.75,
+      "notes": "Medium-large bold — likely heading 1 in smaller-scale documents"
+    },
+    {
+      "id": "fh_en_003",
+      "condition": "fontSize >= 14 AND fontSize < 16 AND bold == true",
+      "inferredLevel": 2,
+      "confidence": 0.80,
+      "notes": "14-15pt bold — strong heading 2 signal"
+    },
+    {
+      "id": "fh_en_004",
+      "condition": "fontSize >= 12 AND fontSize < 14 AND bold == true AND allCaps == true",
+      "inferredLevel": 2,
+      "confidence": 0.75,
+      "notes": "Normal-size bold all-caps — heading 2 in legal/formal docs"
+    },
+    {
+      "id": "fh_en_005",
+      "condition": "fontSize >= 12 AND fontSize < 14 AND bold == true AND allCaps == false",
+      "inferredLevel": 3,
+      "confidence": 0.70,
+      "notes": "Normal-size bold — heading 3 when no larger headings use this size"
+    },
+    {
+      "id": "fh_en_006",
+      "condition": "fontSize >= 11 AND bold == true AND italic == true",
+      "inferredLevel": 4,
+      "confidence": 0.65,
+      "notes": "Bold italic combination — typically heading 4 or lower"
+    },
+    {
+      "id": "fh_en_007",
+      "condition": "fontSize >= 11 AND bold == false AND italic == true AND underline == true",
+      "inferredLevel": 5,
+      "confidence": 0.55,
+      "notes": "Italic + underline without bold — minor heading"
+    },
+    {
+      "id": "fh_en_008",
+      "condition": "allCaps == true AND bold == false AND fontSize >= 10",
+      "inferredLevel": 3,
+      "confidence": 0.50,
+      "notes": "All-caps without bold — sometimes used as sub-heading"
+    },
+    {
+      "id": "fh_en_009",
+      "condition": "underline == true AND bold == true AND fontSize >= 12",
+      "inferredLevel": 2,
+      "confidence": 0.70,
+      "notes": "Bold underline at normal+ size — heading 2 in older Word conventions"
+    },
+    {
+      "id": "fh_en_010",
+      "condition": "fontColor != 'auto' AND fontColor != '000000' AND bold == true AND fontSize >= 12",
+      "inferredLevel": 2,
+      "confidence": 0.65,
+      "notes": "Colored bold text — commonly used as heading in branded templates"
+    }
+  ]
+}

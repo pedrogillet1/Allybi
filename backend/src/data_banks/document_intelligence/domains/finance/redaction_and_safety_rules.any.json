@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "di_finance_redaction_and_safety_rules",
+    "version": "1.0.0",
+    "description": "Redaction and safety rules for finance domain — PII handling, MNPI guardrails, and sensitive data policies.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "redactionRules": [
+    {
+      "id": "fin_redact_001_ssn",
+      "dataType": "SSN",
+      "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+      "action": "REDACT",
+      "replacement": "[SSN REDACTED]"
+    },
+    {
+      "id": "fin_redact_002_bank_account",
+      "dataType": "bank_account_number",
+      "pattern": "\\b(?:account\\s*(?:no\\.?|number|#)\\s*:?\\s*)\\d{8,17}\\b",
+      "action": "REDACT",
+      "replacement": "[ACCOUNT REDACTED]"
+    },
+    {
+      "id": "fin_redact_003_routing",
+      "dataType": "routing_number",
+      "pattern": "\\b(?:routing\\s*(?:no\\.?|number|#)\\s*:?\\s*)\\d{9}\\b",
+      "action": "REDACT",
+      "replacement": "[ROUTING REDACTED]"
+    },
+    {
+      "id": "fin_redact_004_credit_card",
+      "dataType": "credit_card",
+      "pattern": "\\b(?:4\\d{3}|5[1-5]\\d{2}|3[47]\\d{2}|6011)[-\\s]?\\d{4}[-\\s]?\\d{4}[-\\s]?\\d{4}\\b",
+      "action": "REDACT",
+      "replacement": "[CARD REDACTED]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "fin_safety_001_no_investment_advice",
+      "severity": "error",
+      "description": "Never provide investment recommendations (buy/sell/hold). Analyze data only.",
+      "trigger": "query asks for investment recommendation",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "fin_safety_002_mnpi_guard",
+      "severity": "error",
+      "description": "Do not reproduce material non-public information (MNPI) verbatim if document is marked confidential/draft.",
+      "trigger": "document marked confidential or draft with forward-looking data",
+      "action": "WARN_AND_RESTRICT"
+    },
+    {
+      "id": "fin_safety_003_no_tax_advice",
+      "severity": "warning",
+      "description": "Do not provide specific tax advice. Summarize tax provisions from documents only.",
+      "trigger": "query asks for tax planning or advice",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "fin_safety_004_no_audit_opinion",
+      "severity": "error",
+      "description": "Never state or imply an audit opinion. Only summarize the auditor's stated opinion.",
+      "trigger": "query asks about audit outcome",
+      "action": "DISCLAIMER"
+    }
+  ]
+}

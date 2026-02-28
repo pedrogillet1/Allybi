@@ -1,0 +1,242 @@
+{
+  "_meta": {
+    "id": "legal_privacy_policy_entities",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for Privacy Policy.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "privacy_policy"
+  },
+  "entities": [
+    {
+      "id": "address",
+      "type": "string",
+      "required": true,
+      "description": "Extract Address for Privacy Policy.",
+      "section": "abstract"
+    },
+    {
+      "id": "article_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Article Number for Privacy Policy.",
+      "section": "action_items"
+    },
+    {
+      "id": "case_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Case Number for Privacy Policy.",
+      "section": "appendix"
+    },
+    {
+      "id": "city",
+      "type": "string",
+      "required": true,
+      "description": "Extract City for Privacy Policy.",
+      "section": "approvals"
+    },
+    {
+      "id": "clause_reference",
+      "type": "string",
+      "required": true,
+      "description": "Extract Clause Reference for Privacy Policy.",
+      "section": "assumptions"
+    },
+    {
+      "id": "company_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract Company Name for Privacy Policy.",
+      "section": "attachments"
+    },
+    {
+      "id": "counterparty",
+      "type": "string",
+      "required": true,
+      "description": "Extract Counterparty for Privacy Policy.",
+      "section": "audit_trail"
+    },
+    {
+      "id": "country",
+      "type": "string",
+      "required": true,
+      "description": "Extract Country for Privacy Policy.",
+      "section": "authorization"
+    },
+    {
+      "id": "court_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract Court Name for Privacy Policy.",
+      "section": "certifications"
+    },
+    {
+      "id": "currency_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Extract Currency Amount for Privacy Policy.",
+      "section": "compliance_section"
+    },
+    {
+      "id": "currency_code",
+      "type": "string",
+      "required": true,
+      "description": "Extract Currency Code for Privacy Policy.",
+      "section": "confidentiality_clause"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": true,
+      "description": "Extract Document Number for Privacy Policy.",
+      "section": "criteria"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Effective Date for Privacy Policy.",
+      "section": "data_tables"
+    },
+    {
+      "id": "execution_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Execution Date for Privacy Policy.",
+      "section": "definitions"
+    },
+    {
+      "id": "expiration_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Expiration Date for Privacy Policy.",
+      "section": "detailed_analysis"
+    },
+    {
+      "id": "filing_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract Filing Date for Privacy Policy.",
+      "section": "disclaimers"
+    },
+    {
+      "id": "interest_rate",
+      "type": "number",
+      "required": true,
+      "description": "Extract Interest Rate for Privacy Policy.",
+      "section": "discussion"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Extract Jurisdiction for Privacy Policy.",
+      "section": "dispute_resolution"
+    },
+    {
+      "id": "period_reference",
+      "type": "string",
+      "required": true,
+      "description": "Extract Period Reference for Privacy Policy.",
+      "section": "distribution_list"
+    },
+    {
+      "id": "person_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract Person Name for Privacy Policy.",
+      "section": "document_metadata"
+    },
+    {
+      "id": "person_role",
+      "type": "string",
+      "required": false,
+      "description": "Extract Person Role for Privacy Policy.",
+      "section": "executive_summary"
+    },
+    {
+      "id": "person_title",
+      "type": "string",
+      "required": false,
+      "description": "Extract Person Title for Privacy Policy.",
+      "section": "exhibits"
+    },
+    {
+      "id": "reference_code",
+      "type": "string",
+      "required": false,
+      "description": "Extract Reference Code for Privacy Policy.",
+      "section": "findings"
+    },
+    {
+      "id": "registration_number",
+      "type": "string",
+      "required": false,
+      "description": "Extract Registration Number for Privacy Policy.",
+      "section": "glossary"
+    },
+    {
+      "id": "regulatory_body",
+      "type": "string",
+      "required": false,
+      "description": "Extract Regulatory Body for Privacy Policy.",
+      "section": "governing_law"
+    },
+    {
+      "id": "signatory",
+      "type": "string",
+      "required": false,
+      "description": "Extract Signatory for Privacy Policy.",
+      "section": "header"
+    },
+    {
+      "id": "state_province",
+      "type": "string",
+      "required": false,
+      "description": "Extract State/Province for Privacy Policy.",
+      "section": "indemnification"
+    },
+    {
+      "id": "statute_citation",
+      "type": "string",
+      "required": false,
+      "description": "Extract Statute Citation for Privacy Policy.",
+      "section": "introduction"
+    },
+    {
+      "id": "subsidiary",
+      "type": "string",
+      "required": false,
+      "description": "Extract Subsidiary for Privacy Policy.",
+      "section": "limitations"
+    },
+    {
+      "id": "tax_id",
+      "type": "string",
+      "required": false,
+      "description": "Extract Tax ID for Privacy Policy.",
+      "section": "methodology"
+    },
+    {
+      "id": "tax_rate",
+      "type": "number",
+      "required": false,
+      "description": "Extract Tax Rate for Privacy Policy.",
+      "section": "procedures"
+    },
+    {
+      "id": "witness",
+      "type": "string",
+      "required": false,
+      "description": "Extract Witness for Privacy Policy.",
+      "section": "recitals"
+    }
+  ]
+}

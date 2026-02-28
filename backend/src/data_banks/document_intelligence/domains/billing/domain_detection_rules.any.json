@@ -1,0 +1,187 @@
+{
+  "_meta": {
+    "id": "di_billing_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting billing documents from headings, content, and table structure.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 30
+  },
+  "domain": "billing",
+  "rules": [
+    {
+      "id": "billing_detect_001_phone_bill",
+      "priority": 100,
+      "weight": 3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\b(?:mobile|wireless|cellular)\\s+bill\\b",
+        "\\b(?:imei|msisdn|data\\s+usage|voice\\s+minutes|sms)\\b",
+        "\\bconta\\s+de\\s+celular\\b"
+      ],
+      "description": "Mobile carrier billing markers"
+    },
+    {
+      "id": "billing_detect_002_internet_bill",
+      "priority": 95,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\b(?:internet|broadband|fiber)\\s+bill\\b",
+        "\\bdownload\\b",
+        "\\bupload\\b",
+        "\\bconta\\s+de\\s+internet\\b"
+      ],
+      "description": "Internet billing markers"
+    },
+    {
+      "id": "billing_detect_003_electricity_bill",
+      "priority": 95,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\belectricity\\s+bill\\b",
+        "\\bkwh\\b",
+        "\\bmeter\\s+reading\\b",
+        "\\bconta\\s+de\\s+energia\\b"
+      ],
+      "description": "Electricity utility bill markers"
+    },
+    {
+      "id": "billing_detect_004_water_sewer_bill",
+      "priority": 94,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bwater\\s+bill\\b",
+        "\\bsewer\\b",
+        "\\bm3\\b",
+        "\\bconta\\s+de\\s+agua\\b",
+        "\\besgoto\\b"
+      ],
+      "description": "Water and sewer utility markers"
+    },
+    {
+      "id": "billing_detect_005_retail_receipt",
+      "priority": 92,
+      "weight": 2.3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\b(?:retail|store|pos)\\s+receipt\\b",
+        "\\bcashier\\b",
+        "\\bsku\\b",
+        "\\bcupom\\s+fiscal\\b"
+      ],
+      "description": "Retail receipt markers"
+    },
+    {
+      "id": "billing_detect_006_business_invoice",
+      "priority": 93,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bbusiness\\s+invoice\\b",
+        "\\binvoice\\s*#\\b",
+        "\\bpurchase\\s+order\\b",
+        "\\bpayment\\s+terms\\b",
+        "\\bnota\\s+fiscal\\b"
+      ],
+      "description": "Business invoice markers"
+    },
+    {
+      "id": "billing_detect_007_due_and_balance",
+      "priority": 85,
+      "weight": 1.8,
+      "signal": "table_or_content",
+      "patterns": [
+        "\\bamount\\s+due\\b",
+        "\\bdue\\s+date\\b",
+        "\\bprevious\\s+balance\\b",
+        "\\bminimum\\s+payment\\b"
+      ],
+      "description": "Generic billing balance markers"
+    },
+    {
+      "id": "billing_detect_008_tax_and_fees",
+      "priority": 80,
+      "weight": 1.6,
+      "signal": "table_header",
+      "patterns": [
+        "\\b(?:tax|vat|icms|pis|cofins|service\\s+fee|late\\s+fee)\\b"
+      ],
+      "description": "Tax and fee lines typical of billing documents"
+    },
+    {
+      "id": "billing_detect_009_payment_channel",
+      "priority": 78,
+      "weight": 1.5,
+      "signal": "content",
+      "patterns": [
+        "\\bautopay\\b",
+        "\\bdebit\\s+automatico\\b",
+        "\\bbarcode\\b",
+        "\\blinea\\s+digitavel\\b",
+        "\\bnosso\\s+numero\\b"
+      ],
+      "description": "Payment channel and barcode markers"
+    },
+    {
+      "id": "billing_detect_010_negative_medical_lab_general",
+      "priority": 120,
+      "weight": -4,
+      "signal": "negative_heading_or_content",
+      "patterns": [
+        "\\blab\\s+report\\b",
+        "\\blaboratory\\s+result\\b",
+        "\\bhematology\\b",
+        "\\bcbc\\b",
+        "\\bspecimen\\b",
+        "\\breference\\s+range\\b",
+        "\\bpatient\\b",
+        "\\bphysician\\b",
+        "\\bdiagnosis\\b",
+        "\\bexam\\s+result\\b"
+      ],
+      "description": "Negative rule: laboratory report language should suppress billing classification"
+    },
+    {
+      "id": "billing_detect_011_negative_phone_bill_vs_lab_report",
+      "priority": 130,
+      "weight": -5,
+      "signal": "negative_doctype_disambiguation",
+      "positivePatterns": [
+        "\\b(?:mobile|wireless|imei|msisdn|data\\s+usage|sms|voice\\s+minutes)\\b"
+      ],
+      "negativePatterns": [
+        "\\b(?:lab\\s+report|specimen|hematology|urinalysis|reference\\s+range|patient\\s+id|medical\\s+record)\\b"
+      ],
+      "appliesToDocTypes": [
+        "billing_phone_bill_mobile"
+      ],
+      "description": "Explicit phone-bill vs lab-report disambiguation: reject phone-bill label when medical lab markers coexist"
+    },
+    {
+      "id": "billing_detect_012_negative_phone_bill_vs_lab_report_pt",
+      "priority": 129,
+      "weight": -5,
+      "signal": "negative_doctype_disambiguation",
+      "positivePatterns": [
+        "\\b(?:conta\\s+de\\s+celular|franquia\\s+de\\s+dados|consumo\\s+de\\s+dados|ligacoes|sms)\\b"
+      ],
+      "negativePatterns": [
+        "\\b(?:laudo\\s+laboratorial|hemograma|amostra|intervalo\\s+de\\s+referencia|paciente|resultado\\s+de\\s+exame)\\b"
+      ],
+      "appliesToDocTypes": [
+        "billing_phone_bill_mobile"
+      ],
+      "description": "Explicit phone-bill vs lab-report disambiguation in Portuguese"
+    }
+  ]
+}

@@ -1,0 +1,3583 @@
+{
+  "_meta": {
+    "id": "doc_aliases_tax",
+    "version": "1.0.0",
+    "description": "Tax document alias normalization bank.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true,
+    "minAliasConfidence": 0.6
+  },
+  "domain": "tax",
+  "aliases": [
+    {
+      "phrase": "annual personal tax filing",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual personal tax filing for the period",
+        "export annual personal tax filing for review"
+      ]
+    },
+    {
+      "phrase": "apuracao de icms",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar apuracao de icms do periodo",
+        "exportar apuracao de icms para revisao"
+      ]
+    },
+    {
+      "phrase": "apuracao de retencao folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar apuracao de retencao folha do periodo",
+        "exportar apuracao de retencao folha para revisao"
+      ]
+    },
+    {
+      "phrase": "arquivo de retencao folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar arquivo de retencao folha do periodo",
+        "exportar arquivo de retencao folha para revisao"
+      ]
+    },
+    {
+      "phrase": "arquivo imposto folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar arquivo imposto folha do periodo",
+        "exportar arquivo imposto folha para revisao"
+      ]
+    },
+    {
+      "phrase": "assessment letter",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show assessment letter for the period",
+        "export assessment letter for review"
+      ]
+    },
+    {
+      "phrase": "assessment letter tax",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show assessment letter tax for the period",
+        "export assessment letter tax for review"
+      ]
+    },
+    {
+      "phrase": "assessment msg tax",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show assessment msg tax for the period",
+        "export assessment msg tax for review"
+      ]
+    },
+    {
+      "phrase": "auto de infracao fiscal",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar auto de infracao fiscal do periodo",
+        "exportar auto de infracao fiscal para revisao"
+      ]
+    },
+    {
+      "phrase": "aviso de cobranca de imposto",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aviso de cobranca de imposto do periodo",
+        "exportar aviso de cobranca de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "aviso de reembolso de imposto",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aviso de reembolso de imposto do periodo",
+        "exportar aviso de reembolso de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "aviso de restitucao de imposto",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aviso de restitucao de imposto do periodo",
+        "exportar aviso de restitucao de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "biz return form",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show biz return form for the period",
+        "export biz return form for review"
+      ]
+    },
+    {
+      "phrase": "biz tax return",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show biz tax return for the period",
+        "export biz tax return for review"
+      ]
+    },
+    {
+      "phrase": "boleto de imposto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar boleto de imposto do periodo",
+        "exportar boleto de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "boleto de iptu",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar boleto de iptu do periodo",
+        "exportar boleto de iptu para revisao"
+      ]
+    },
+    {
+      "phrase": "business annual tax filing",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show business annual tax filing for the period",
+        "export business annual tax filing for review"
+      ]
+    },
+    {
+      "phrase": "business income tax return",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show business income tax return for the period",
+        "export business income tax return for review"
+      ]
+    },
+    {
+      "phrase": "cadastro de cnpj",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cadastro de cnpj do periodo",
+        "exportar cadastro de cnpj para revisao"
+      ]
+    },
+    {
+      "phrase": "cadastro de cpf",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cadastro de cpf do periodo",
+        "exportar cadastro de cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "cadastro no fisco",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cadastro no fisco do periodo",
+        "exportar cadastro no fisco para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de restitucao fiscal",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carta de restitucao fiscal do periodo",
+        "exportar carta de restitucao fiscal para revisao"
+      ]
+    },
+    {
+      "phrase": "cnpj registration",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cnpj registration for the period",
+        "export cnpj registration for review"
+      ]
+    },
+    {
+      "phrase": "company tax filing",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show company tax filing for the period",
+        "export company tax filing for review"
+      ]
+    },
+    {
+      "phrase": "company taxes",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show company taxes for the period",
+        "export company taxes for review"
+      ]
+    },
+    {
+      "phrase": "comprovante de pagamento de imposto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar comprovante de pagamento de imposto do periodo",
+        "exportar comprovante de pagamento de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "comunicado de restitucao",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar comunicado de restitucao do periodo",
+        "exportar comunicado de restitucao para revisao"
+      ]
+    },
+    {
+      "phrase": "consumption tax return",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show consumption tax return for the period",
+        "export consumption tax return for review"
+      ]
+    },
+    {
+      "phrase": "conta de imposto predial",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar conta de imposto predial do periodo",
+        "exportar conta de imposto predial para revisao"
+      ]
+    },
+    {
+      "phrase": "corp return",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show corp return for the period",
+        "export corp return for review"
+      ]
+    },
+    {
+      "phrase": "corporate tax return",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show corporate tax return for the period",
+        "export corporate tax return for review"
+      ]
+    },
+    {
+      "phrase": "cpf registration",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cpf registration do periodo",
+        "exportar cpf registration para revisao"
+      ]
+    },
+    {
+      "phrase": "darf",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar darf do periodo",
+        "exportar darf para revisao"
+      ]
+    },
+    {
+      "phrase": "darf pago",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show darf pago for the period",
+        "export darf pago for review"
+      ]
+    },
+    {
+      "phrase": "decla de imposto pf",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar decla de imposto pf do periodo",
+        "exportar decla de imposto pf para revisao"
+      ]
+    },
+    {
+      "phrase": "decla imposto pj",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar decla imposto pj do periodo",
+        "exportar decla imposto pj para revisao"
+      ]
+    },
+    {
+      "phrase": "decla iva",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show decla iva for the period",
+        "export decla iva for review"
+      ]
+    },
+    {
+      "phrase": "declaracao anual empresa",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao anual empresa do periodo",
+        "exportar declaracao anual empresa para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao anual pessoa fisica",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao anual pessoa fisica do periodo",
+        "exportar declaracao anual pessoa fisica para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de descontos de folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de descontos de folha do periodo",
+        "exportar declaracao de descontos de folha para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de gst",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de gst do periodo",
+        "exportar declaracao de gst para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de icms",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de icms do periodo",
+        "exportar declaracao de icms para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de imposto da empresa",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de imposto da empresa do periodo",
+        "exportar declaracao de imposto da empresa para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de imposto de renda pessoa fisica",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de imposto de renda pessoa fisica do periodo",
+        "exportar declaracao de imposto de renda pessoa fisica para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de imposto de renda pessoa juridica",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de imposto de renda pessoa juridica do periodo",
+        "exportar declaracao de imposto de renda pessoa juridica para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de imposto retido folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de imposto retido folha do periodo",
+        "exportar declaracao de imposto retido folha para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de imposto sobre valor agregado",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de imposto sobre valor agregado do periodo",
+        "exportar declaracao de imposto sobre valor agregado para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de ir pessoa fisica",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de ir pessoa fisica do periodo",
+        "exportar declaracao de ir pessoa fisica para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de iva",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de iva do periodo",
+        "exportar declaracao de iva para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao de retencao na folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de retencao na folha do periodo",
+        "exportar declaracao de retencao na folha para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao irpf",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao irpf do periodo",
+        "exportar declaracao irpf para revisao"
+      ]
+    },
+    {
+      "phrase": "declaracao irpj",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao irpj do periodo",
+        "exportar declaracao irpj para revisao"
+      ]
+    },
+    {
+      "phrase": "dirpf",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar dirpf do periodo",
+        "exportar dirpf para revisao"
+      ]
+    },
+    {
+      "phrase": "employment tax withholding return",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show employment tax withholding return for the period",
+        "export employment tax withholding return for review"
+      ]
+    },
+    {
+      "phrase": "empresa imposto renda",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar empresa imposto renda do periodo",
+        "exportar empresa imposto renda para revisao"
+      ]
+    },
+    {
+      "phrase": "entity income return",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show entity income return for the period",
+        "export entity income return for review"
+      ]
+    },
+    {
+      "phrase": "fiscal id registration",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show fiscal id registration for the period",
+        "export fiscal id registration for review"
+      ]
+    },
+    {
+      "phrase": "fiscal notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show fiscal notice for the period",
+        "export fiscal notice for review"
+      ]
+    },
+    {
+      "phrase": "fisco notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show fisco notice for the period",
+        "export fisco notice for review"
+      ]
+    },
+    {
+      "phrase": "folha retencao",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show folha retencao for the period",
+        "export folha retencao for review"
+      ]
+    },
+    {
+      "phrase": "form 1040",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show form 1040 for the period",
+        "export form 1040 for review"
+      ]
+    },
+    {
+      "phrase": "government tax payment slip",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show government tax payment slip for the period",
+        "export government tax payment slip for review"
+      ]
+    },
+    {
+      "phrase": "gst doc",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show gst doc for the period",
+        "export gst doc for review"
+      ]
+    },
+    {
+      "phrase": "gst filing",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show gst filing for the period",
+        "export gst filing for review"
+      ]
+    },
+    {
+      "phrase": "gst return",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show gst return for the period",
+        "export gst return for review"
+      ]
+    },
+    {
+      "phrase": "guia de iptu",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar guia de iptu do periodo",
+        "exportar guia de iptu para revisao"
+      ]
+    },
+    {
+      "phrase": "guia de pagamento de imposto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar guia de pagamento de imposto do periodo",
+        "exportar guia de pagamento de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "guia de recolhimento de imposto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar guia de recolhimento de imposto do periodo",
+        "exportar guia de recolhimento de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "guia fiscal de pagamento",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar guia fiscal de pagamento do periodo",
+        "exportar guia fiscal de pagamento para revisao"
+      ]
+    },
+    {
+      "phrase": "guia imposto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar guia imposto do periodo",
+        "exportar guia imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "holerite tax filing",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show holerite tax filing for the period",
+        "export holerite tax filing for review"
+      ]
+    },
+    {
+      "phrase": "house tax bill",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show house tax bill for the period",
+        "export house tax bill for review"
+      ]
+    },
+    {
+      "phrase": "house tax boleto",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show house tax boleto for the period",
+        "export house tax boleto for review"
+      ]
+    },
+    {
+      "phrase": "icms return",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show icms return for the period",
+        "export icms return for review"
+      ]
+    },
+    {
+      "phrase": "id fiscal cadastro",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show id fiscal cadastro for the period",
+        "export id fiscal cadastro for review"
+      ]
+    },
+    {
+      "phrase": "imposto boleto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar imposto boleto do periodo",
+        "exportar imposto boleto para revisao"
+      ]
+    },
+    {
+      "phrase": "imposto da casa",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar imposto da casa do periodo",
+        "exportar imposto da casa para revisao"
+      ]
+    },
+    {
+      "phrase": "imposto de renda pessoa fisica",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar imposto de renda pessoa fisica do periodo",
+        "exportar imposto de renda pessoa fisica para revisao"
+      ]
+    },
+    {
+      "phrase": "imposto de renda pessoa juridica",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar imposto de renda pessoa juridica do periodo",
+        "exportar imposto de renda pessoa juridica para revisao"
+      ]
+    },
+    {
+      "phrase": "imposto notificacao",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar imposto notificacao do periodo",
+        "exportar imposto notificacao para revisao"
+      ]
+    },
+    {
+      "phrase": "imposto predial e territorial",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar imposto predial e territorial do periodo",
+        "exportar imposto predial e territorial para revisao"
+      ]
+    },
+    {
+      "phrase": "imposto renda pf",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar imposto renda pf do periodo",
+        "exportar imposto renda pf para revisao"
+      ]
+    },
+    {
+      "phrase": "income return individual",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show income return individual for the period",
+        "export income return individual for review"
+      ]
+    },
+    {
+      "phrase": "income tax return business",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show income tax return business for the period",
+        "export income tax return business for review"
+      ]
+    },
+    {
+      "phrase": "individual income tax return",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show individual income tax return for the period",
+        "export individual income tax return for review"
+      ]
+    },
+    {
+      "phrase": "inscricao cnpj",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show inscricao cnpj for the period",
+        "export inscricao cnpj for review"
+      ]
+    },
+    {
+      "phrase": "inscricao cpf",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar inscricao cpf do periodo",
+        "exportar inscricao cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "inscricao fiscal",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar inscricao fiscal do periodo",
+        "exportar inscricao fiscal para revisao"
+      ]
+    },
+    {
+      "phrase": "iptu",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar iptu do periodo",
+        "exportar iptu para revisao"
+      ]
+    },
+    {
+      "phrase": "iptu bill",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show iptu bill for the period",
+        "export iptu bill for review"
+      ]
+    },
+    {
+      "phrase": "iptu guia",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show iptu guia for the period",
+        "export iptu guia for review"
+      ]
+    },
+    {
+      "phrase": "ir pessoa fisica",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show ir pessoa fisica for the period",
+        "export ir pessoa fisica for review"
+      ]
+    },
+    {
+      "phrase": "irpf",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show irpf for the period",
+        "export irpf for review"
+      ]
+    },
+    {
+      "phrase": "irpj",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show irpj for the period",
+        "export irpj for review"
+      ]
+    },
+    {
+      "phrase": "iva return",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show iva return for the period",
+        "export iva return for review"
+      ]
+    },
+    {
+      "phrase": "lancamento imposto",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar lancamento imposto do periodo",
+        "exportar lancamento imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "land tax bill",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show land tax bill for the period",
+        "export land tax bill for review"
+      ]
+    },
+    {
+      "phrase": "land tax boleto",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show land tax boleto for the period",
+        "export land tax boleto for review"
+      ]
+    },
+    {
+      "phrase": "letter restitucao",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show letter restitucao for the period",
+        "export letter restitucao for review"
+      ]
+    },
+    {
+      "phrase": "monthly vat doc",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show monthly vat doc for the period",
+        "export monthly vat doc for review"
+      ]
+    },
+    {
+      "phrase": "municipal house tax",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show municipal house tax for the period",
+        "export municipal house tax for review"
+      ]
+    },
+    {
+      "phrase": "municipal property tax bill",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show municipal property tax bill for the period",
+        "export municipal property tax bill for review"
+      ]
+    },
+    {
+      "phrase": "my return",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show my return for the period",
+        "export my return for review"
+      ]
+    },
+    {
+      "phrase": "my taxes",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show my taxes for the period",
+        "export my taxes for review"
+      ]
+    },
+    {
+      "phrase": "notice of tax assessment",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show notice of tax assessment for the period",
+        "export notice of tax assessment for review"
+      ]
+    },
+    {
+      "phrase": "notice of tax refund",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show notice of tax refund for the period",
+        "export notice of tax refund for review"
+      ]
+    },
+    {
+      "phrase": "notificacao da receita",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao da receita do periodo",
+        "exportar notificacao da receita para revisao"
+      ]
+    },
+    {
+      "phrase": "notificacao de avaliacao fiscal",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao de avaliacao fiscal do periodo",
+        "exportar notificacao de avaliacao fiscal para revisao"
+      ]
+    },
+    {
+      "phrase": "notificacao de devolucao de imposto",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao de devolucao de imposto do periodo",
+        "exportar notificacao de devolucao de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "notificacao de lancamento de imposto",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao de lancamento de imposto do periodo",
+        "exportar notificacao de lancamento de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "notificacao de restitucao de imposto",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao de restitucao de imposto do periodo",
+        "exportar notificacao de restitucao de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "notificacao de tributo devido",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao de tributo devido do periodo",
+        "exportar notificacao de tributo devido para revisao"
+      ]
+    },
+    {
+      "phrase": "pagar imposto guia",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar pagar imposto guia do periodo",
+        "exportar pagar imposto guia para revisao"
+      ]
+    },
+    {
+      "phrase": "payment guide tax",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show payment guide tax for the period",
+        "export payment guide tax for review"
+      ]
+    },
+    {
+      "phrase": "payroll tax filing",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payroll tax filing for the period",
+        "export payroll tax filing for review"
+      ]
+    },
+    {
+      "phrase": "payroll tax return",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show payroll tax return for the period",
+        "export payroll tax return for review"
+      ]
+    },
+    {
+      "phrase": "payroll withholding doc",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show payroll withholding doc for the period",
+        "export payroll withholding doc for review"
+      ]
+    },
+    {
+      "phrase": "payroll withholding filing",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payroll withholding filing for the period",
+        "export payroll withholding filing for review"
+      ]
+    },
+    {
+      "phrase": "personal income tax return",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show personal income tax return for the period",
+        "export personal income tax return for review"
+      ]
+    },
+    {
+      "phrase": "personal tax return form",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show personal tax return form for the period",
+        "export personal tax return form for review"
+      ]
+    },
+    {
+      "phrase": "pf tax return",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show pf tax return for the period",
+        "export pf tax return for review"
+      ]
+    },
+    {
+      "phrase": "pj tax return",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show pj tax return for the period",
+        "export pj tax return for review"
+      ]
+    },
+    {
+      "phrase": "property imposto",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar property imposto do periodo",
+        "exportar property imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "property levy bill",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show property levy bill for the period",
+        "export property levy bill for review"
+      ]
+    },
+    {
+      "phrase": "property tax bill",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show property tax bill for the period",
+        "export property tax bill for review"
+      ]
+    },
+    {
+      "phrase": "property tax notice",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show property tax notice for the period",
+        "export property tax notice for review"
+      ]
+    },
+    {
+      "phrase": "real estate tax bill",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show real estate tax bill for the period",
+        "export real estate tax bill for review"
+      ]
+    },
+    {
+      "phrase": "receita notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show receita notice for the period",
+        "export receita notice for review"
+      ]
+    },
+    {
+      "phrase": "reembolso imposto",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar reembolso imposto do periodo",
+        "exportar reembolso imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "refund advice tax authority",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show refund advice tax authority for the period",
+        "export refund advice tax authority for review"
+      ]
+    },
+    {
+      "phrase": "refund aviso",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show refund aviso for the period",
+        "export refund aviso for review"
+      ]
+    },
+    {
+      "phrase": "refund determination tax",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show refund determination tax for the period",
+        "export refund determination tax for review"
+      ]
+    },
+    {
+      "phrase": "refund msg receita",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show refund msg receita for the period",
+        "export refund msg receita for review"
+      ]
+    },
+    {
+      "phrase": "refund tax doc",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show refund tax doc for the period",
+        "export refund tax doc for review"
+      ]
+    },
+    {
+      "phrase": "refund tax letter",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show refund tax letter for the period",
+        "export refund tax letter for review"
+      ]
+    },
+    {
+      "phrase": "registration for tax id",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show registration for tax id for the period",
+        "export registration for tax id for review"
+      ]
+    },
+    {
+      "phrase": "registro de contribuinte",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro de contribuinte do periodo",
+        "exportar registro de contribuinte para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de identificacao fiscal",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro de identificacao fiscal do periodo",
+        "exportar registro de identificacao fiscal para revisao"
+      ]
+    },
+    {
+      "phrase": "registro tributario",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar registro tributario do periodo",
+        "exportar registro tributario para revisao"
+      ]
+    },
+    {
+      "phrase": "restituicao imposto",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar restituicao imposto do periodo",
+        "exportar restituicao imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "retencao de imposto na folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar retencao de imposto na folha do periodo",
+        "exportar retencao de imposto na folha para revisao"
+      ]
+    },
+    {
+      "phrase": "retencao folha",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show retencao folha for the period",
+        "export retencao folha for review"
+      ]
+    },
+    {
+      "phrase": "retencao salario",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show retencao salario for the period",
+        "export retencao salario for review"
+      ]
+    },
+    {
+      "phrase": "retorno de iva",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar retorno de iva do periodo",
+        "exportar retorno de iva para revisao"
+      ]
+    },
+    {
+      "phrase": "retorno fiscal empresarial",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar retorno fiscal empresarial do periodo",
+        "exportar retorno fiscal empresarial para revisao"
+      ]
+    },
+    {
+      "phrase": "returnzito pf",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show returnzito pf for the period",
+        "export returnzito pf for review"
+      ]
+    },
+    {
+      "phrase": "salary withholding filing",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show salary withholding filing for the period",
+        "export salary withholding filing for review"
+      ]
+    },
+    {
+      "phrase": "sales tax report",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show sales tax report for the period",
+        "export sales tax report for review"
+      ]
+    },
+    {
+      "phrase": "sales tax return vat",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show sales tax return vat for the period",
+        "export sales tax return vat for review"
+      ]
+    },
+    {
+      "phrase": "slip de imposto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar slip de imposto do periodo",
+        "exportar slip de imposto para revisao"
+      ]
+    },
+    {
+      "phrase": "tax account registration",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax account registration for the period",
+        "export tax account registration for review"
+      ]
+    },
+    {
+      "phrase": "tax assessment notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax assessment notice for the period",
+        "export tax assessment notice for review"
+      ]
+    },
+    {
+      "phrase": "tax authority assessment",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax authority assessment for the period",
+        "export tax authority assessment for review"
+      ]
+    },
+    {
+      "phrase": "tax authority letter",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax authority letter for the period",
+        "export tax authority letter for review"
+      ]
+    },
+    {
+      "phrase": "tax back notice",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax back notice for the period",
+        "export tax back notice for review"
+      ]
+    },
+    {
+      "phrase": "tax bill assessment notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax bill assessment notice for the period",
+        "export tax bill assessment notice for review"
+      ]
+    },
+    {
+      "phrase": "tax boleto",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax boleto for the period",
+        "export tax boleto for review"
+      ]
+    },
+    {
+      "phrase": "tax cashback notice",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax cashback notice for the period",
+        "export tax cashback notice for review"
+      ]
+    },
+    {
+      "phrase": "tax determination notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax determination notice for the period",
+        "export tax determination notice for review"
+      ]
+    },
+    {
+      "phrase": "tax due notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax due notice for the period",
+        "export tax due notice for review"
+      ]
+    },
+    {
+      "phrase": "tax due payment ticket",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax due payment ticket for the period",
+        "export tax due payment ticket for review"
+      ]
+    },
+    {
+      "phrase": "tax filing company",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax filing company for the period",
+        "export tax filing company for review"
+      ]
+    },
+    {
+      "phrase": "tax form for myself",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax form for myself for the period",
+        "export tax form for myself for review"
+      ]
+    },
+    {
+      "phrase": "tax id enrollment",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax id enrollment for the period",
+        "export tax id enrollment for review"
+      ]
+    },
+    {
+      "phrase": "tax id registration",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax id registration for the period",
+        "export tax id registration for review"
+      ]
+    },
+    {
+      "phrase": "tax id setup",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax id setup for the period",
+        "export tax id setup for review"
+      ]
+    },
+    {
+      "phrase": "tax id signup",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax id signup for the period",
+        "export tax id signup for review"
+      ]
+    },
+    {
+      "phrase": "tax notice",
+      "normalized": "tax assessment notice",
+      "docTypeIds": [
+        "tax_assessment_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax notice for the period",
+        "export tax notice for review"
+      ]
+    },
+    {
+      "phrase": "tax number registration",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax number registration for the period",
+        "export tax number registration for review"
+      ]
+    },
+    {
+      "phrase": "tax on house",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax on house for the period",
+        "export tax on house for review"
+      ]
+    },
+    {
+      "phrase": "tax payment receipt slip",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax payment receipt slip for the period",
+        "export tax payment receipt slip for review"
+      ]
+    },
+    {
+      "phrase": "tax payment slip",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax payment slip for the period",
+        "export tax payment slip for review"
+      ]
+    },
+    {
+      "phrase": "tax payment stub",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax payment stub for the period",
+        "export tax payment stub for review"
+      ]
+    },
+    {
+      "phrase": "tax payment voucher",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax payment voucher for the period",
+        "export tax payment voucher for review"
+      ]
+    },
+    {
+      "phrase": "tax rebate notice",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax rebate notice for the period",
+        "export tax rebate notice for review"
+      ]
+    },
+    {
+      "phrase": "tax refund letter",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax refund letter for the period",
+        "export tax refund letter for review"
+      ]
+    },
+    {
+      "phrase": "tax refund msg",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax refund msg for the period",
+        "export tax refund msg for review"
+      ]
+    },
+    {
+      "phrase": "tax refund notice",
+      "normalized": "tax refund notice",
+      "docTypeIds": [
+        "tax_refund_notice"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "notice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax refund notice for the period",
+        "export tax refund notice for review"
+      ]
+    },
+    {
+      "phrase": "tax remittance slip",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax remittance slip for the period",
+        "export tax remittance slip for review"
+      ]
+    },
+    {
+      "phrase": "tax return vat",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax return vat for the period",
+        "export tax return vat for review"
+      ]
+    },
+    {
+      "phrase": "tax slip",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax slip for the period",
+        "export tax slip for review"
+      ]
+    },
+    {
+      "phrase": "tax ticket",
+      "normalized": "tax payment slip",
+      "docTypeIds": [
+        "tax_payment_slip"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "payment_slip",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax ticket for the period",
+        "export tax ticket for review"
+      ]
+    },
+    {
+      "phrase": "tax withholding payroll",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax withholding payroll for the period",
+        "export tax withholding payroll for review"
+      ]
+    },
+    {
+      "phrase": "taxa predial",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show taxa predial for the period",
+        "export taxa predial for review"
+      ]
+    },
+    {
+      "phrase": "taxa sobre consumo",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show taxa sobre consumo for the period",
+        "export taxa sobre consumo for review"
+      ]
+    },
+    {
+      "phrase": "taxes file personal",
+      "normalized": "individual income return",
+      "docTypeIds": [
+        "tax_individual_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "individual",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show taxes file personal for the period",
+        "export taxes file personal for review"
+      ]
+    },
+    {
+      "phrase": "taxes for llc",
+      "normalized": "business income return",
+      "docTypeIds": [
+        "tax_business_income_return"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show taxes for llc for the period",
+        "export taxes for llc for review"
+      ]
+    },
+    {
+      "phrase": "taxpayer registration",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show taxpayer registration for the period",
+        "export taxpayer registration for review"
+      ]
+    },
+    {
+      "phrase": "taxpayer signup",
+      "normalized": "tax id registration",
+      "docTypeIds": [
+        "tax_tax_id_registration"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "registration",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show taxpayer signup for the period",
+        "export taxpayer signup for review"
+      ]
+    },
+    {
+      "phrase": "tributo imobiliario",
+      "normalized": "property tax bill",
+      "docTypeIds": [
+        "tax_property_tax_bill"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "property_owner",
+        "formatHint": "bill",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar tributo imobiliario do periodo",
+        "exportar tributo imobiliario para revisao"
+      ]
+    },
+    {
+      "phrase": "value added tax return",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show value added tax return for the period",
+        "export value added tax return for review"
+      ]
+    },
+    {
+      "phrase": "vat filing",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show vat filing for the period",
+        "export vat filing for review"
+      ]
+    },
+    {
+      "phrase": "vat gst filing",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show vat gst filing for the period",
+        "export vat gst filing for review"
+      ]
+    },
+    {
+      "phrase": "vat return",
+      "normalized": "vat gst return",
+      "docTypeIds": [
+        "tax_vat_gst_return"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "business",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show vat return for the period",
+        "export vat return for review"
+      ]
+    },
+    {
+      "phrase": "wage withholding doc",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show wage withholding doc for the period",
+        "export wage withholding doc for review"
+      ]
+    },
+    {
+      "phrase": "withholding declaration payroll",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show withholding declaration payroll for the period",
+        "export withholding declaration payroll for review"
+      ]
+    },
+    {
+      "phrase": "withholding report",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show withholding report for the period",
+        "export withholding report for review"
+      ]
+    },
+    {
+      "phrase": "withholding tax filing payroll",
+      "normalized": "payroll withholding filing",
+      "docTypeIds": [
+        "tax_payroll_withholding_filing"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "employer",
+        "formatHint": "filing",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show withholding tax filing payroll for the period",
+        "export withholding tax filing payroll for review"
+      ]
+    }
+  ]
+}

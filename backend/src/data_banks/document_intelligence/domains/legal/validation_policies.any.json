@@ -1,0 +1,130 @@
+{
+  "_meta": {
+    "id": "legal_validation_policies",
+    "version": "2.0.0",
+    "description": "Validation rules for legal bank outputs and extracted fields.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "policies": [
+    {
+      "id": "legal_validation_001",
+      "severity": "error",
+      "description": "Reject outputs without a recognizable document type from legal catalog.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "doc_type_detected",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "legal_validation_002",
+      "severity": "error",
+      "description": "Reject clause-level claims without citation location.",
+      "applies": [
+        "extract",
+        "compare",
+        "validate"
+      ],
+      "check": "citations_present",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "legal_validation_003",
+      "severity": "warning",
+      "description": "Warn when parties are incomplete or role assignment is missing.",
+      "applies": [
+        "extract",
+        "summarize"
+      ],
+      "check": "parties_complete",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "legal_validation_004",
+      "severity": "warning",
+      "description": "Warn when term dates conflict across sections and signature block.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "date_consistency",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "legal_validation_005",
+      "severity": "error",
+      "description": "Block legal advice wording that goes beyond source-grounded interpretation.",
+      "applies": [
+        "advise",
+        "evaluate"
+      ],
+      "check": "no_unauthorized_legal_advice",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "legal_validation_006",
+      "severity": "info",
+      "description": "Annotate unresolved cross-references for manual follow-up.",
+      "applies": [
+        "extract",
+        "compare",
+        "validate"
+      ],
+      "check": "cross_reference_resolution",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "legal_validation_007",
+      "severity": "warning",
+      "description": "Warn if financial terms are extracted without currency context.",
+      "applies": [
+        "extract",
+        "compare"
+      ],
+      "check": "currency_context",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "legal_validation_008",
+      "severity": "error",
+      "description": "Require governing law or explicit absence marker.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "governing_law_presence",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "legal_validation_009",
+      "severity": "warning",
+      "description": "Warn when security/privacy obligations are mentioned but control owner is missing.",
+      "applies": [
+        "extract",
+        "evaluate"
+      ],
+      "check": "control_owner_presence",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "legal_validation_010",
+      "severity": "info",
+      "description": "Annotate if document appears draft/redline and not final.",
+      "applies": [
+        "summarize",
+        "evaluate"
+      ],
+      "check": "draft_status_annotation",
+      "failureAction": "ANNOTATE"
+    }
+  ]
+}

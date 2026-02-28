@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_housing_abbreviations_en",
+    "version": "1.0.0",
+    "description": "EN abbreviations for housing domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "language": "en"
+  },
+  "domain": "housing",
+  "abbreviations": [
+    {
+      "abbr": "ACH",
+      "expansion": "Automated Clearing House"
+    },
+    {
+      "abbr": "APR",
+      "expansion": "Annual Percentage Rate"
+    },
+    {
+      "abbr": "ARM",
+      "expansion": "Adjustable Rate Mortgage"
+    },
+    {
+      "abbr": "Dep",
+      "expansion": "Deposit"
+    },
+    {
+      "abbr": "Esc",
+      "expansion": "Escrow"
+    },
+    {
+      "abbr": "HELOC",
+      "expansion": "Home Equity Line of Credit"
+    },
+    {
+      "abbr": "HOA",
+      "expansion": "Homeowners Association"
+    },
+    {
+      "abbr": "ID",
+      "expansion": "Identifier"
+    },
+    {
+      "abbr": "Int",
+      "expansion": "Interest"
+    },
+    {
+      "abbr": "LTV",
+      "expansion": "Loan To Value"
+    },
+    {
+      "abbr": "Maint",
+      "expansion": "Maintenance"
+    },
+    {
+      "abbr": "MLS",
+      "expansion": "Multiple Listing Service"
+    },
+    {
+      "abbr": "Mtg",
+      "expansion": "Mortgage"
+    },
+    {
+      "abbr": "PITI",
+      "expansion": "Principal Interest Taxes Insurance"
+    },
+    {
+      "abbr": "PMI",
+      "expansion": "Private Mortgage Insurance"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Power of Attorney"
+    },
+    {
+      "abbr": "Prin",
+      "expansion": "Principal"
+    },
+    {
+      "abbr": "Prop Tax",
+      "expansion": "Property Tax"
+    },
+    {
+      "abbr": "TIN",
+      "expansion": "Taxpayer Identification Number"
+    },
+    {
+      "abbr": "YTD",
+      "expansion": "Year To Date"
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_travel_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for travel domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "language": "pt"
+  },
+  "domain": "travel",
+  "terms": [
+    {
+      "id": "travel_lex_aeroporto",
+      "canonical": "aeroporto",
+      "synonyms": [
+        "terminal",
+        "portao"
+      ],
+      "display": "Aeroporto"
+    },
+    {
+      "id": "travel_lex_apolice",
+      "canonical": "apolice",
+      "synonyms": [
+        "numero da apolice",
+        "seguro"
+      ],
+      "display": "Apolice"
+    },
+    {
+      "id": "travel_lex_bagagem",
+      "canonical": "bagagem",
+      "synonyms": [
+        "franquia de bagagem",
+        "mala despachada"
+      ],
+      "display": "Bagagem"
+    },
+    {
+      "id": "travel_lex_cartao_de_embarque",
+      "canonical": "cartao de embarque",
+      "synonyms": [
+        "boarding pass",
+        "embarque"
+      ],
+      "display": "Cartao De Embarque"
+    },
+    {
+      "id": "travel_lex_check_in",
+      "canonical": "check-in",
+      "synonyms": [
+        "checkin",
+        "balcao"
+      ],
+      "display": "Check-in"
+    },
+    {
+      "id": "travel_lex_check_out",
+      "canonical": "check-out",
+      "synonyms": [
+        "saida do hotel",
+        "checkout"
+      ],
+      "display": "Check-out"
+    },
+    {
+      "id": "travel_lex_classe_tarifaria",
+      "canonical": "classe tarifaria",
+      "synonyms": [
+        "classe de reserva",
+        "tarifa"
+      ],
+      "display": "Classe Tarifaria"
+    },
+    {
+      "id": "travel_lex_conexao",
+      "canonical": "conexao",
+      "synonyms": [
+        "escala",
+        "stopover"
+      ],
+      "display": "Conexao"
+    },
+    {
+      "id": "travel_lex_data_de_chegada",
+      "canonical": "data de chegada",
+      "synonyms": [
+        "chegada",
+        "arrival"
+      ],
+      "display": "Data De Chegada"
+    },
+    {
+      "id": "travel_lex_data_de_partida",
+      "canonical": "data de partida",
+      "synonyms": [
+        "partida",
+        "departure"
+      ],
+      "display": "Data De Partida"
+    },
+    {
+      "id": "travel_lex_itinerario",
+      "canonical": "itinerario",
+      "synonyms": [
+        "roteiro",
+        "plano de viagem"
+      ],
+      "display": "Itinerario"
+    },
+    {
+      "id": "travel_lex_localizador",
+      "canonical": "localizador",
+      "synonyms": [
+        "pnr",
+        "codigo de reserva"
+      ],
+      "display": "Localizador"
+    },
+    {
+      "id": "travel_lex_numero_do_voo",
+      "canonical": "numero do voo",
+      "synonyms": [
+        "voo",
+        "flight number"
+      ],
+      "display": "Numero Do Voo"
+    },
+    {
+      "id": "travel_lex_passageiro",
+      "canonical": "passageiro",
+      "synonyms": [
+        "viajante",
+        "titular"
+      ],
+      "display": "Passageiro"
+    },
+    {
+      "id": "travel_lex_politica_de_cancelamento",
+      "canonical": "politica de cancelamento",
+      "synonyms": [
+        "reembolso",
+        "alteracao"
+      ],
+      "display": "Politica De Cancelamento"
+    },
+    {
+      "id": "travel_lex_portao",
+      "canonical": "portao",
+      "synonyms": [
+        "gate",
+        "portao de embarque"
+      ],
+      "display": "Portao"
+    },
+    {
+      "id": "travel_lex_reserva_de_hotel",
+      "canonical": "reserva de hotel",
+      "synonyms": [
+        "confirmacao de hotel",
+        "voucher"
+      ],
+      "display": "Reserva De Hotel"
+    },
+    {
+      "id": "travel_lex_seguro_viagem",
+      "canonical": "seguro viagem",
+      "synonyms": [
+        "apolice de viagem",
+        "cobertura de viagem"
+      ],
+      "display": "Seguro Viagem"
+    },
+    {
+      "id": "travel_lex_terminal",
+      "canonical": "terminal",
+      "synonyms": [
+        "terminal de embarque",
+        "terminal de saida"
+      ],
+      "display": "Terminal"
+    },
+    {
+      "id": "travel_lex_visto",
+      "canonical": "visto",
+      "synonyms": [
+        "solicitacao de visto",
+        "recibo consular"
+      ],
+      "display": "Visto"
+    }
+  ]
+}

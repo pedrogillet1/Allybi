@@ -1,0 +1,192 @@
+{
+  "_meta": {
+    "id": "legal_evidence_requirements",
+    "version": "2.0.0",
+    "description": "Evidence standards and citation policy for legal domain responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "legal",
+  "evidenceHierarchy": [
+    {
+      "id": "legal_evidence_hierarchy_001",
+      "rank": 1,
+      "type": "signed_contract_clause",
+      "label": {
+        "en": "Signed contract clause",
+        "pt": "Clausula contratual assinada"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "id": "legal_evidence_hierarchy_002",
+      "rank": 2,
+      "type": "executed_policy_text",
+      "label": {
+        "en": "Executed policy text",
+        "pt": "Texto de politica vigente"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "id": "legal_evidence_hierarchy_003",
+      "rank": 3,
+      "type": "board_or_court_order",
+      "label": {
+        "en": "Board/Court order",
+        "pt": "Ordem de conselho/justica"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "id": "legal_evidence_hierarchy_004",
+      "rank": 4,
+      "type": "schedule_or_annex",
+      "label": {
+        "en": "Schedule or annex",
+        "pt": "Anexo ou apenso"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "id": "legal_evidence_hierarchy_005",
+      "rank": 5,
+      "type": "draft_or_redline",
+      "label": {
+        "en": "Draft or redline",
+        "pt": "Rascunho ou redline"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "legal_evidence_exact_clause_for_obligations",
+      "description": "Obligations must cite exact clause text and location.",
+      "applies": [
+        "extract",
+        "compare",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_contract_clause"
+      ],
+      "requireStructuredCitation": true
+    },
+    {
+      "id": "legal_evidence_dual_source_for_dates",
+      "description": "Critical dates should be validated in body + signature/schedule where possible.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_contract_clause",
+        "schedule_or_annex"
+      ],
+      "requireDualSource": false
+    },
+    {
+      "id": "legal_evidence_no_inferred_parties",
+      "description": "Do not infer party identities or roles when ambiguous.",
+      "applies": [
+        "summarize",
+        "advise",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_contract_clause"
+      ],
+      "requireDualSource": false
+    },
+    {
+      "id": "legal_evidence_policy_version_control",
+      "description": "Policy interpretations must identify version/effective date evidence.",
+      "applies": [
+        "extract",
+        "summarize",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "executed_policy_text"
+      ],
+      "requireStructuredCitation": true
+    },
+    {
+      "id": "legal_evidence_dispute_deadline_priority",
+      "description": "Litigation memo outputs must cite deadlines and court/order authority.",
+      "applies": [
+        "extract",
+        "locate",
+        "monitor"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "board_or_court_order"
+      ],
+      "requireStructuredCitation": true
+    }
+  ],
+  "requirements": [
+    {
+      "id": "legal_requirement_parties",
+      "field": "party names and roles",
+      "minSources": 1,
+      "sourceTypes": [
+        "signed_contract_clause"
+      ],
+      "failureBehavior": "ask_clarifying_question"
+    },
+    {
+      "id": "legal_requirement_dates",
+      "field": "effective/execution/termination dates",
+      "minSources": 1,
+      "sourceTypes": [
+        "signed_contract_clause",
+        "schedule_or_annex"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "legal_requirement_money",
+      "field": "fees, penalties, credits",
+      "minSources": 1,
+      "sourceTypes": [
+        "signed_contract_clause",
+        "schedule_or_annex"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "legal_requirement_governing_law",
+      "field": "governing law and venue",
+      "minSources": 1,
+      "sourceTypes": [
+        "signed_contract_clause"
+      ],
+      "failureBehavior": "ask_clarifying_question"
+    },
+    {
+      "id": "legal_requirement_security_privacy",
+      "field": "security/privacy obligations",
+      "minSources": 1,
+      "sourceTypes": [
+        "signed_contract_clause",
+        "executed_policy_text"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    }
+  ]
+}

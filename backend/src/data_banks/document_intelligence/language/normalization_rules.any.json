@@ -1,0 +1,862 @@
+{
+  "_meta": {
+    "id": "di_normalization_rules",
+    "version": "1.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "dependsOn": [],
+    "usedBy": [
+      "di_abbreviation_global",
+      "di_entity_ontology"
+    ],
+    "tests": [
+      "SSOT_NORM_001"
+    ],
+    "lastUpdated": "2026-02-27",
+    "description": "di_normalization_rules (document_intelligence) configuration bank."
+  },
+  "config": {
+    "enabled": true,
+    "caseInsensitive": true,
+    "applyOrder": "sequential"
+  },
+  "rules": [
+    {
+      "id": "norm_001_expand_standard_abbreviations",
+      "category": "abbreviation",
+      "language": "any",
+      "description": "Expand commonly used standard abbreviations to full form",
+      "descriptionPt": "Expandir abreviaturas padrão comumente usadas para forma completa",
+      "pattern": "\\b(etc|approx|dept|govt|mgmt)\\b",
+      "replacement": "{{expand_abbreviation}}",
+      "examples": {
+        "input": [
+          "dept of finance",
+          "approx 500 items"
+        ],
+        "output": [
+          "department of finance",
+          "approximately 500 items"
+        ]
+      },
+      "priority": 80
+    },
+    {
+      "id": "norm_002_domain_abbreviation_handling",
+      "category": "abbreviation",
+      "language": "any",
+      "description": "Resolve domain-specific abbreviations using context from abbreviation bank",
+      "descriptionPt": "Resolver abreviaturas de dominio especifico usando contexto do banco de abreviaturas",
+      "pattern": "\\b[A-Z]{2,6}\\b",
+      "replacement": "{{resolve_domain_abbreviation}}",
+      "examples": {
+        "input": [
+          "EBITDA was positive",
+          "the NDA expires"
+        ],
+        "output": [
+          "earnings before interest taxes depreciation and amortization was positive",
+          "the non-disclosure agreement expires"
+        ]
+      },
+      "priority": 75
+    },
+    {
+      "id": "norm_003_strip_periods_in_abbreviations",
+      "category": "abbreviation",
+      "language": "any",
+      "description": "Remove periods from abbreviations to normalize matching",
+      "descriptionPt": "Remover pontos de abreviaturas para normalizar correspondencia",
+      "pattern": "(?:[A-Za-z]\\.){2,}",
+      "replacement": "{{strip_periods}}",
+      "examples": {
+        "input": [
+          "U.S.A.",
+          "e.g.",
+          "C.P.F."
+        ],
+        "output": [
+          "USA",
+          "eg",
+          "CPF"
+        ]
+      },
+      "priority": 70
+    },
+    {
+      "id": "norm_004_multi_word_abbreviation_recognition",
+      "category": "abbreviation",
+      "language": "any",
+      "description": "Recognize and tag multi-word abbreviation sequences for downstream expansion",
+      "descriptionPt": "Reconhecer e marcar sequencias de abreviaturas multi-palavra para expansao posterior",
+      "pattern": "\\b[A-Z][a-z]*\\.?\\s+[A-Z][a-z]*\\.?(?:\\s+[A-Z][a-z]*\\.?)*\\b",
+      "replacement": "{{tag_multi_word_abbreviation}}",
+      "examples": {
+        "input": [
+          "Bal. Sht.",
+          "Inc. Stmt."
+        ],
+        "output": [
+          "balance sheet",
+          "income statement"
+        ]
+      },
+      "priority": 65
+    },
+    {
+      "id": "norm_005_lowercase_doc_types",
+      "category": "case",
+      "language": "any",
+      "description": "Normalize document type references to lowercase",
+      "descriptionPt": "Normalizar referencias de tipo de documento para minusculas",
+      "pattern": "[A-Z][a-z]+ [A-Z][a-z]+",
+      "replacement": "{{lowercase}}",
+      "examples": {
+        "input": [
+          "Balance Sheet",
+          "Income Statement"
+        ],
+        "output": [
+          "balance sheet",
+          "income statement"
+        ]
+      },
+      "priority": 100
+    },
+    {
+      "id": "norm_006_case_insensitive_matching",
+      "category": "case",
+      "language": "any",
+      "description": "Enable case-insensitive matching for all document field references",
+      "descriptionPt": "Habilitar correspondencia sem distinção de maiusculas para todas as referencias de campo",
+      "pattern": "(?i)\\b(total|subtotal|amount|value|date|name)\\b",
+      "replacement": "{{lowercase}}",
+      "examples": {
+        "input": [
+          "TOTAL",
+          "Total",
+          "total"
+        ],
+        "output": [
+          "total",
+          "total",
+          "total"
+        ]
+      },
+      "priority": 95
+    },
+    {
+      "id": "norm_007_title_case_normalization",
+      "category": "case",
+      "language": "en",
+      "description": "Normalize title-cased headers and labels to sentence case",
+      "descriptionPt": "Normalizar cabecalhos em titulo para formato de frase",
+      "pattern": "(?:[A-Z][a-z]+\\s){2,}[A-Z][a-z]+",
+      "replacement": "{{sentence_case}}",
+      "examples": {
+        "input": [
+          "Quarterly Revenue Report Summary",
+          "Annual Profit Margin Analysis"
+        ],
+        "output": [
+          "Quarterly revenue report summary",
+          "Annual profit margin analysis"
+        ]
+      },
+      "priority": 85
+    },
+    {
+      "id": "norm_008_acronym_preservation",
+      "category": "case",
+      "language": "any",
+      "description": "Preserve all-caps acronyms during case normalization",
+      "descriptionPt": "Preservar siglas em maiusculas durante normalizacao de caixa",
+      "pattern": "\\b[A-Z]{2,6}\\b",
+      "replacement": "{{preserve}}",
+      "examples": {
+        "input": [
+          "EBITDA margin",
+          "ROI analysis"
+        ],
+        "output": [
+          "EBITDA margin",
+          "ROI analysis"
+        ]
+      },
+      "priority": 98
+    },
+    {
+      "id": "norm_009_mixed_case_handling",
+      "category": "case",
+      "language": "any",
+      "description": "Normalize mixed-case tokens that are not acronyms or proper nouns",
+      "descriptionPt": "Normalizar tokens de caixa mista que nao sao siglas ou nomes proprios",
+      "pattern": "[a-z]+[A-Z][a-z]+",
+      "replacement": "{{split_and_lowercase}}",
+      "examples": {
+        "input": [
+          "cashFlow",
+          "netIncome",
+          "grossProfit"
+        ],
+        "output": [
+          "cash flow",
+          "net income",
+          "gross profit"
+        ]
+      },
+      "priority": 80
+    },
+    {
+      "id": "norm_010_br_real_prefix",
+      "category": "currency_format",
+      "language": "pt",
+      "description": "Normalize R$ prefix with optional spaces to standard form",
+      "descriptionPt": "Normalizar prefixo R$ com espacos opcionais para forma padrao",
+      "pattern": "R\\s*\\$\\s*",
+      "replacement": "R$ ",
+      "examples": {
+        "input": [
+          "R $1.000",
+          "R$1.000",
+          "R  $ 1.000"
+        ],
+        "output": [
+          "R$ 1.000",
+          "R$ 1.000",
+          "R$ 1.000"
+        ]
+      },
+      "priority": 90
+    },
+    {
+      "id": "norm_011_dollar_sign_disambiguation",
+      "category": "currency_format",
+      "language": "any",
+      "description": "Disambiguate bare $ sign based on document language context",
+      "descriptionPt": "Desambiguar sinal $ isolado com base no contexto de idioma do documento",
+      "pattern": "(?<!R)\\$\\s*[\\d.,]+",
+      "replacement": "{{disambiguate_currency}}",
+      "examples": {
+        "input": [
+          "$1,000.00",
+          "$ 500"
+        ],
+        "output": [
+          "USD 1,000.00",
+          "USD 500"
+        ]
+      },
+      "priority": 88
+    },
+    {
+      "id": "norm_012_currency_code_vs_symbol",
+      "category": "currency_format",
+      "language": "any",
+      "description": "Normalize currency symbols to ISO 4217 codes for consistent matching",
+      "descriptionPt": "Normalizar simbolos de moeda para codigos ISO 4217 para correspondencia consistente",
+      "pattern": "(\\$|\\u00a3|\\u20ac|R\\$|\\u00a5)",
+      "replacement": "{{iso_currency_code}}",
+      "examples": {
+        "input": [
+          "$100",
+          "£200",
+          "€300",
+          "R$400"
+        ],
+        "output": [
+          "USD 100",
+          "GBP 200",
+          "EUR 300",
+          "BRL 400"
+        ]
+      },
+      "priority": 85
+    },
+    {
+      "id": "norm_013_thousand_separator_in_currency",
+      "category": "currency_format",
+      "language": "any",
+      "description": "Normalize thousand separators within currency values to locale-appropriate form",
+      "descriptionPt": "Normalizar separadores de milhar em valores monetarios para formato local",
+      "pattern": "(?<=\\d)[.,](?=\\d{3}(?:[.,]|\\b))",
+      "replacement": "{{locale_thousand_sep}}",
+      "examples": {
+        "input": [
+          "R$ 1.000.000",
+          "$1,000,000"
+        ],
+        "output": [
+          "R$ 1.000.000",
+          "USD 1,000,000"
+        ]
+      },
+      "priority": 82
+    },
+    {
+      "id": "norm_014_currency_decimal_places",
+      "category": "currency_format",
+      "language": "any",
+      "description": "Normalize decimal places in currency to exactly 2 digits",
+      "descriptionPt": "Normalizar casas decimais em moeda para exatamente 2 digitos",
+      "pattern": "([.,])(\\d{1,4})(?=\\s|$)",
+      "replacement": "{{normalize_decimal_places_2}}",
+      "examples": {
+        "input": [
+          "R$ 1.000,5",
+          "$1,000.5000"
+        ],
+        "output": [
+          "R$ 1.000,50",
+          "USD 1,000.50"
+        ]
+      },
+      "priority": 78
+    },
+    {
+      "id": "norm_015_date_format_locale",
+      "category": "date_format",
+      "language": "any",
+      "description": "Normalize DD/MM/YYYY (BR) and MM/DD/YYYY (US) date formats to ISO 8601 based on document locale",
+      "descriptionPt": "Normalizar formatos de data DD/MM/AAAA (BR) e MM/DD/AAAA (US) para ISO 8601 com base no locale do documento",
+      "pattern": "(\\d{1,2})/(\\d{1,2})/(\\d{4})",
+      "replacement": "{{iso_date_from_locale}}",
+      "examples": {
+        "input": [
+          "15/03/2026",
+          "03/15/2026",
+          "01/12/2025",
+          "12/01/2025"
+        ],
+        "output": [
+          "2026-03-15",
+          "2026-03-15",
+          "2025-12-01",
+          "2025-12-01"
+        ]
+      },
+      "priority": 90
+    },
+    {
+      "id": "norm_017_month_name_normalization",
+      "category": "date_format",
+      "language": "any",
+      "description": "Normalize written month names to numeric month in both EN and PT",
+      "descriptionPt": "Normalizar nomes de meses escritos para mes numerico em EN e PT",
+      "pattern": "\\b(January|February|March|April|May|June|July|August|September|October|November|December|Janeiro|Fevereiro|Marco|Abril|Maio|Junho|Julho|Agosto|Setembro|Outubro|Novembro|Dezembro)\\b",
+      "replacement": "{{month_to_number}}",
+      "examples": {
+        "input": [
+          "March 15, 2026",
+          "15 de Marco de 2026"
+        ],
+        "output": [
+          "03/15/2026",
+          "15/03/2026"
+        ]
+      },
+      "priority": 85
+    },
+    {
+      "id": "norm_018_date_range_normalization",
+      "category": "date_format",
+      "language": "any",
+      "description": "Normalize date ranges to consistent start-end ISO format",
+      "descriptionPt": "Normalizar intervalos de datas para formato ISO inicio-fim consistente",
+      "pattern": "(\\d{1,2}[/\\-.]\\d{1,2}[/\\-.]\\d{4})\\s*(?:to|a|\\-|\\u2013|\\u2014)\\s*(\\d{1,2}[/\\-.]\\d{1,2}[/\\-.]\\d{4})",
+      "replacement": "{{iso_date_range}}",
+      "examples": {
+        "input": [
+          "01/01/2026 to 03/31/2026",
+          "01/01/2026 a 31/03/2026"
+        ],
+        "output": [
+          "2026-01-01/2026-03-31",
+          "2026-01-01/2026-03-31"
+        ]
+      },
+      "priority": 80
+    },
+    {
+      "id": "norm_019_fiscal_year_reference",
+      "category": "date_format",
+      "language": "any",
+      "description": "Normalize fiscal year references to standard FY notation",
+      "descriptionPt": "Normalizar referencias de ano fiscal para notacao padrao AF",
+      "pattern": "(?:fiscal\\s+year|ano\\s+fiscal|FY\\s*'?)\\s*(\\d{2,4})",
+      "replacement": "FY{{four_digit_year}}",
+      "examples": {
+        "input": [
+          "fiscal year 2026",
+          "FY'26",
+          "ano fiscal 2026"
+        ],
+        "output": [
+          "FY2026",
+          "FY2026",
+          "FY2026"
+        ]
+      },
+      "priority": 75
+    },
+    {
+      "id": "norm_020_relative_date_terms",
+      "category": "date_format",
+      "language": "any",
+      "description": "Normalize relative date terms to standardized tokens",
+      "descriptionPt": "Normalizar termos de data relativa para tokens padronizados",
+      "pattern": "\\b(last\\s+quarter|previous\\s+month|year-to-date|trimestre\\s+anterior|mes\\s+anterior|acumulado\\s+no\\s+ano)\\b",
+      "replacement": "{{relative_date_token}}",
+      "examples": {
+        "input": [
+          "last quarter revenue",
+          "receita do trimestre anterior"
+        ],
+        "output": [
+          "[REL:Q-1] revenue",
+          "receita [REL:Q-1]"
+        ]
+      },
+      "priority": 70
+    },
+    {
+      "id": "norm_021_preserve_pt_diacritics",
+      "category": "diacritics",
+      "language": "pt",
+      "description": "Preserve Portuguese diacritics in normalized output for display",
+      "descriptionPt": "Preservar acentos portugueses na saida normalizada para exibicao",
+      "pattern": "[\\u00e0-\\u00ff\\u00c0-\\u00df]",
+      "replacement": "{{preserve}}",
+      "examples": {
+        "input": [
+          "balanço",
+          "demonstração",
+          "ações"
+        ],
+        "output": [
+          "balanço",
+          "demonstração",
+          "ações"
+        ]
+      },
+      "priority": 95
+    },
+    {
+      "id": "norm_022_strip_diacritics_for_matching",
+      "category": "diacritics",
+      "language": "any",
+      "description": "Strip diacritics from text to produce an ASCII matching key",
+      "descriptionPt": "Remover acentos do texto para produzir chave de correspondencia ASCII",
+      "pattern": "[\\u0300-\\u036f]",
+      "replacement": "",
+      "examples": {
+        "input": [
+          "balanço",
+          "crédito",
+          "ação"
+        ],
+        "output": [
+          "balanco",
+          "credito",
+          "acao"
+        ]
+      },
+      "priority": 60
+    },
+    {
+      "id": "norm_023_accent_insensitive_comparison",
+      "category": "diacritics",
+      "language": "any",
+      "description": "Generate accent-insensitive comparison key alongside original text",
+      "descriptionPt": "Gerar chave de comparacao insensivel a acentos junto com texto original",
+      "pattern": "\\b\\w*[\\u00e0-\\u00ff\\u00c0-\\u00df]\\w*\\b",
+      "replacement": "{{dual_key_accent_insensitive}}",
+      "examples": {
+        "input": [
+          "Demonstração de Resultado"
+        ],
+        "output": [
+          "demonstracao de resultado"
+        ]
+      },
+      "priority": 55
+    },
+    {
+      "id": "norm_024_thousand_separator_locale",
+      "category": "number_format",
+      "language": "any",
+      "description": "Normalize thousand separators: BR dot and US comma stripped for numeric comparison",
+      "descriptionPt": "Normalizar separadores de milhar: ponto BR e virgula US removidos para comparacao numerica",
+      "pattern": "(?<=\\d)[.,](?=\\d{3}(?:[,.]|\\b))",
+      "replacement": "{{strip_thousand_sep}}",
+      "examples": {
+        "input": [
+          "1.000.000",
+          "1,000,000",
+          "25.500",
+          "25,500"
+        ],
+        "output": [
+          "1000000",
+          "1000000",
+          "25500",
+          "25500"
+        ]
+      },
+      "priority": 90
+    },
+    {
+      "id": "norm_026_br_decimal_separator",
+      "category": "number_format",
+      "language": "pt",
+      "description": "Normalize BR decimal separator (comma) to standard period",
+      "descriptionPt": "Normalizar separador decimal BR (virgula) para ponto padrao",
+      "pattern": "(?<=\\d),(?=\\d{1,2}(?:\\s|$|\\b))",
+      "replacement": ".",
+      "examples": {
+        "input": [
+          "1.000,50",
+          "99,9"
+        ],
+        "output": [
+          "1000.50",
+          "99.9"
+        ]
+      },
+      "priority": 88
+    },
+    {
+      "id": "norm_027_negative_number_formats",
+      "category": "number_format",
+      "language": "any",
+      "description": "Normalize parenthesized negative numbers to minus-sign format",
+      "descriptionPt": "Normalizar numeros negativos entre parenteses para formato com sinal de menos",
+      "pattern": "\\(([\\d.,]+)\\)",
+      "replacement": "-{{stripped_number}}",
+      "examples": {
+        "input": [
+          "(1,000.00)",
+          "(500,50)"
+        ],
+        "output": [
+          "-1000.00",
+          "-500.50"
+        ]
+      },
+      "priority": 85
+    },
+    {
+      "id": "norm_028_magnitude_abbreviations",
+      "category": "number_format",
+      "language": "any",
+      "description": "Expand thousand/million/billion abbreviations to full numeric value",
+      "descriptionPt": "Expandir abreviaturas mil/milhao/bilhao para valor numerico completo",
+      "pattern": "([\\d.,]+)\\s*(K|k|M|MM|B|bn|mil|mi|bi|tri)\\b",
+      "replacement": "{{expand_magnitude}}",
+      "examples": {
+        "input": [
+          "5.2M",
+          "1.5B",
+          "100K",
+          "2,5 mi"
+        ],
+        "output": [
+          "5200000",
+          "1500000000",
+          "100000",
+          "2500000"
+        ]
+      },
+      "priority": 82
+    },
+    {
+      "id": "norm_029_scientific_notation",
+      "category": "number_format",
+      "language": "any",
+      "description": "Convert scientific notation to standard decimal form",
+      "descriptionPt": "Converter notacao cientifica para forma decimal padrao",
+      "pattern": "([\\d.,]+)\\s*[xX\\u00d7]\\s*10\\^?(-?\\d+)",
+      "replacement": "{{expand_scientific}}",
+      "examples": {
+        "input": [
+          "1.5 x 10^6",
+          "3.2X10^-3"
+        ],
+        "output": [
+          "1500000",
+          "0.0032"
+        ]
+      },
+      "priority": 75
+    },
+    {
+      "id": "norm_030_ordinal_numbers",
+      "category": "number_format",
+      "language": "any",
+      "description": "Normalize ordinal number suffixes across EN and PT",
+      "descriptionPt": "Normalizar sufixos de numeros ordinais em EN e PT",
+      "pattern": "(\\d+)\\s*(?:st|nd|rd|th|\\u00ba|\\u00aa|\\u00b0)",
+      "replacement": "{{ordinal_normalized}}",
+      "examples": {
+        "input": [
+          "1st quarter",
+          "3rd section",
+          "2º trimestre",
+          "1ª parcela"
+        ],
+        "output": [
+          "1st quarter",
+          "3rd section",
+          "2o trimestre",
+          "1a parcela"
+        ]
+      },
+      "priority": 70
+    },
+    {
+      "id": "norm_031_normalize_smart_quotes",
+      "category": "punctuation",
+      "language": "any",
+      "description": "Convert smart/curly quotes to straight ASCII quotes",
+      "descriptionPt": "Converter aspas tipograficas para aspas retas ASCII",
+      "pattern": "[\\u2018\\u2019\\u201A\\u201B\\u2032]",
+      "replacement": "'",
+      "examples": {
+        "input": [
+          "‘value’",
+          "“term”"
+        ],
+        "output": [
+          "'value'",
+          "\"term\""
+        ]
+      },
+      "priority": 90
+    },
+    {
+      "id": "norm_032_normalize_dashes",
+      "category": "punctuation",
+      "language": "any",
+      "description": "Normalize em dashes and en dashes to standard hyphen for matching",
+      "descriptionPt": "Normalizar travessoes para hifen padrao para correspondencia",
+      "pattern": "[\\u2013\\u2014\\u2015]",
+      "replacement": "-",
+      "examples": {
+        "input": [
+          "2025–2026",
+          "cash—flow"
+        ],
+        "output": [
+          "2025-2026",
+          "cash-flow"
+        ]
+      },
+      "priority": 88
+    },
+    {
+      "id": "norm_033_normalize_ellipsis",
+      "category": "punctuation",
+      "language": "any",
+      "description": "Normalize Unicode ellipsis and multi-dot sequences to standard three-dot form",
+      "descriptionPt": "Normalizar reticencias Unicode e sequencias de pontos para forma padrao de tres pontos",
+      "pattern": "[\\u2026]|\\.{2,}",
+      "replacement": "...",
+      "examples": {
+        "input": [
+          "see below…",
+          "continued....."
+        ],
+        "output": [
+          "see below...",
+          "continued..."
+        ]
+      },
+      "priority": 85
+    },
+    {
+      "id": "norm_034_strip_invisible_chars",
+      "category": "punctuation",
+      "language": "any",
+      "description": "Strip zero-width spaces, byte order marks, and other invisible Unicode characters",
+      "descriptionPt": "Remover espacos de largura zero, marcas de ordem de byte e outros caracteres Unicode invisiveis",
+      "pattern": "[\\u200B\\u200C\\u200D\\uFEFF\\u00AD\\u2060]",
+      "replacement": "",
+      "examples": {
+        "input": [
+          "total​value",
+          "﻿header"
+        ],
+        "output": [
+          "totalvalue",
+          "header"
+        ]
+      },
+      "priority": 99
+    },
+    {
+      "id": "norm_035_en_pt_doc_type_synonyms",
+      "category": "synonym",
+      "language": "any",
+      "description": "Map EN and PT document type synonyms to canonical form",
+      "descriptionPt": "Mapear sinonimos de tipo de documento EN e PT para forma canonica",
+      "pattern": "\\b(spreadsheet|planilha|worksheet|folha|invoice|fatura|nota fiscal|contract|contrato|report|relatorio|agreement|acordo)\\b",
+      "replacement": "{{canonical_doc_type}}",
+      "examples": {
+        "input": [
+          "open the spreadsheet",
+          "abrir a planilha"
+        ],
+        "output": [
+          "open the [DOC:spreadsheet]",
+          "abrir a [DOC:spreadsheet]"
+        ]
+      },
+      "priority": 85
+    },
+    {
+      "id": "norm_036_common_misspelling_correction",
+      "category": "synonym",
+      "language": "any",
+      "description": "Correct common misspellings of financial and document terms",
+      "descriptionPt": "Corrigir erros ortograficos comuns de termos financeiros e documentais",
+      "pattern": "\\b(reciept|recieve|seperate|occured|accomodation|balan[cs]o|demonstra[cs]ao|receb[iy]vel)\\b",
+      "replacement": "{{correct_spelling}}",
+      "examples": {
+        "input": [
+          "reciept total",
+          "seperate sheet",
+          "balanco geral"
+        ],
+        "output": [
+          "receipt total",
+          "separate sheet",
+          "balanco geral"
+        ]
+      },
+      "priority": 60
+    },
+    {
+      "id": "norm_037_informal_to_formal_terms",
+      "category": "synonym",
+      "language": "any",
+      "description": "Map informal or colloquial terms to formal equivalents",
+      "descriptionPt": "Mapear termos informais ou coloquiais para equivalentes formais",
+      "pattern": "\\b(bottom line|top line|burn rate|queima de caixa|nota|boleto|grana)\\b",
+      "replacement": "{{formal_equivalent}}",
+      "examples": {
+        "input": [
+          "check the bottom line",
+          "verificar a queima de caixa"
+        ],
+        "output": [
+          "check the net income",
+          "verificar a taxa de consumo de caixa"
+        ]
+      },
+      "priority": 55
+    },
+    {
+      "id": "norm_038_plural_to_singular",
+      "category": "synonym",
+      "language": "any",
+      "description": "Normalize plural document and entity nouns to singular for consistent matching",
+      "descriptionPt": "Normalizar substantivos de documento e entidade no plural para singular para correspondencia consistente",
+      "pattern": "\\b(invoices|contracts|reports|statements|planilhas|faturas|contratos|relatorios|demonstracoes)\\b",
+      "replacement": "{{singularize}}",
+      "examples": {
+        "input": [
+          "list all invoices",
+          "listar todas as faturas"
+        ],
+        "output": [
+          "list all invoice",
+          "listar todas as fatura"
+        ]
+      },
+      "priority": 50
+    },
+    {
+      "id": "norm_039_collapse_multiple_spaces",
+      "category": "whitespace",
+      "language": "any",
+      "description": "Collapse multiple consecutive spaces into a single space",
+      "descriptionPt": "Colapsar multiplos espacos consecutivos em um unico espaco",
+      "pattern": " {2,}",
+      "replacement": " ",
+      "examples": {
+        "input": [
+          "total   amount",
+          "net    income"
+        ],
+        "output": [
+          "total amount",
+          "net income"
+        ]
+      },
+      "priority": 95
+    },
+    {
+      "id": "norm_040_trim_leading_trailing",
+      "category": "whitespace",
+      "language": "any",
+      "description": "Trim leading and trailing whitespace from cell values and field content",
+      "descriptionPt": "Remover espacos iniciais e finais de valores de celula e conteudo de campo",
+      "pattern": "^\\s+|\\s+$",
+      "replacement": "",
+      "examples": {
+        "input": [
+          "  total amount  ",
+          "\ttax rate\t"
+        ],
+        "output": [
+          "total amount",
+          "tax rate"
+        ]
+      },
+      "priority": 98
+    },
+    {
+      "id": "norm_041_normalize_tabs_to_spaces",
+      "category": "whitespace",
+      "language": "any",
+      "description": "Convert tab characters to single spaces for uniform tokenization",
+      "descriptionPt": "Converter caracteres de tabulacao para espacos unicos para tokenizacao uniforme",
+      "pattern": "\\t+",
+      "replacement": " ",
+      "examples": {
+        "input": [
+          "column1\tcolumn2",
+          "field\t\tvalue"
+        ],
+        "output": [
+          "column1 column2",
+          "field value"
+        ]
+      },
+      "priority": 92
+    },
+    {
+      "id": "norm_042_normalize_line_breaks",
+      "category": "whitespace",
+      "language": "any",
+      "description": "Normalize CRLF and CR line breaks to LF for consistent processing",
+      "descriptionPt": "Normalizar quebras de linha CRLF e CR para LF para processamento consistente",
+      "pattern": "\\r\\n?",
+      "replacement": "\\n",
+      "examples": {
+        "input": [
+          "line1\\r\\nline2",
+          "line1\\rline2"
+        ],
+        "output": [
+          "line1\\nline2",
+          "line1\\nline2"
+        ]
+      },
+      "priority": 99
+    }
+  ]
+}

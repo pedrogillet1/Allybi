@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "id": "di_accounting_extraction_acct_je_support",
+    "description": "Extraction hints for journal entry support.",
+    "version": "1.0.0",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_je_support"
+  },
+  "hints": [
+    {
+      "id": "hint_je_number",
+      "entity": "je_number",
+      "anchors": [
+        "JE Number",
+        "Journal Entry #",
+        "Lancamento No"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_je_date",
+      "entity": "je_date",
+      "anchors": [
+        "Entry Date",
+        "Posting Date",
+        "Data do Lancamento"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_total_debits",
+      "entity": "total_debits",
+      "anchors": [
+        "total debits",
+        "debit total"
+      ],
+      "location": "je_lines_table",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_total_credits",
+      "entity": "total_credits",
+      "anchors": [
+        "total credits",
+        "credit total"
+      ],
+      "location": "je_lines_table",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_prepared_by",
+      "entity": "prepared_by",
+      "anchors": [
+        "prepared by",
+        "prepared"
+      ],
+      "location": "approval_workflow",
+      "extractionMethod": "role_lookup"
+    }
+  ]
+}

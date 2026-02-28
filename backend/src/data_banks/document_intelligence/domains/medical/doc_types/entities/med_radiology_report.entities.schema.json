@@ -1,0 +1,1146 @@
+{
+  "_meta": {
+    "id": "medical_med_radiology_report_entities",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for Radiology Report with explicit units/reference ranges.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_radiology_report"
+  },
+  "schemaVersion": "2026-02-28",
+  "entities": [
+    {
+      "id": "patient_identifier_masked",
+      "type": "string",
+      "required": true,
+      "description": "Extract patient identifier masked from Radiology Report.",
+      "section": "patient_identification",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "patient identifier masked",
+          "patient identification",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "patient_age",
+      "type": "number",
+      "required": true,
+      "description": "Extract patient age from Radiology Report.",
+      "section": "patient_identification",
+      "unit": "year",
+      "referenceRange": "0-120",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "patient age",
+          "patient identification",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 249
+    },
+    {
+      "id": "patient_sex_documented",
+      "type": "string",
+      "required": false,
+      "description": "Extract patient sex documented from Radiology Report.",
+      "section": "patient_identification",
+      "unit": "unitless",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "patient sex documented",
+          "patient identification",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 248
+    },
+    {
+      "id": "encounter_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract encounter date from Radiology Report.",
+      "section": "encounter_context",
+      "unit": "unitless",
+      "referenceRange": "valid_date",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "encounter date",
+          "encounter context",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "valid_date_format"
+      ],
+      "extractionPriority": 247
+    },
+    {
+      "id": "encounter_time",
+      "type": "string",
+      "required": false,
+      "description": "Extract encounter time from Radiology Report.",
+      "section": "encounter_context",
+      "unit": "hour",
+      "referenceRange": "00:00-23:59",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "encounter time",
+          "encounter context",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 246
+    },
+    {
+      "id": "chief_complaint_text",
+      "type": "string",
+      "required": true,
+      "description": "Extract chief complaint text from Radiology Report.",
+      "section": "chief_complaint_reason",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "chief complaint text",
+          "chief complaint reason",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 245
+    },
+    {
+      "id": "history_duration",
+      "type": "string",
+      "required": false,
+      "description": "Extract history duration from Radiology Report.",
+      "section": "history_background",
+      "unit": "day",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "history duration",
+          "history background",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 244
+    },
+    {
+      "id": "blood_pressure_systolic",
+      "type": "number",
+      "required": true,
+      "description": "Extract blood pressure systolic from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "mmHg",
+      "referenceRange": "70-220",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "blood pressure systolic",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 243
+    },
+    {
+      "id": "blood_pressure_diastolic",
+      "type": "number",
+      "required": true,
+      "description": "Extract blood pressure diastolic from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "mmHg",
+      "referenceRange": "40-140",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "blood pressure diastolic",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 242
+    },
+    {
+      "id": "heart_rate",
+      "type": "number",
+      "required": true,
+      "description": "Extract heart rate from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "bpm",
+      "referenceRange": "30-220",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "heart rate",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 241
+    },
+    {
+      "id": "respiratory_rate",
+      "type": "number",
+      "required": true,
+      "description": "Extract respiratory rate from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "breaths_per_minute",
+      "referenceRange": "6-50",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "respiratory rate",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 240
+    },
+    {
+      "id": "temperature",
+      "type": "number",
+      "required": true,
+      "description": "Extract temperature from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "celsius",
+      "referenceRange": "34-42",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "temperature",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 239
+    },
+    {
+      "id": "oxygen_saturation",
+      "type": "number",
+      "required": true,
+      "description": "Extract oxygen saturation from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "percent",
+      "referenceRange": "50-100",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "oxygen saturation",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 238
+    },
+    {
+      "id": "weight",
+      "type": "number",
+      "required": false,
+      "description": "Extract weight from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "kg",
+      "referenceRange": "0-400",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "weight",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 237
+    },
+    {
+      "id": "height",
+      "type": "number",
+      "required": false,
+      "description": "Extract height from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "cm",
+      "referenceRange": "30-250",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "height",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 236
+    },
+    {
+      "id": "body_mass_index",
+      "type": "number",
+      "required": false,
+      "description": "Extract body mass index from Radiology Report.",
+      "section": "vitals_and_measurements",
+      "unit": "kg_per_m2",
+      "referenceRange": "10-80",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "body mass index",
+          "vitals and measurements",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 235
+    },
+    {
+      "id": "pain_score",
+      "type": "number",
+      "required": false,
+      "description": "Extract pain score from Radiology Report.",
+      "section": "objective_findings",
+      "unit": "point",
+      "referenceRange": "0-10",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "pain score",
+          "objective findings",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 234
+    },
+    {
+      "id": "glucose_value",
+      "type": "number",
+      "required": false,
+      "description": "Extract glucose value from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "mg/dL",
+      "referenceRange": "70-199",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "glucose value",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 233
+    },
+    {
+      "id": "hemoglobin_value",
+      "type": "number",
+      "required": false,
+      "description": "Extract hemoglobin value from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "g/dL",
+      "referenceRange": "6-20",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "hemoglobin value",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 232
+    },
+    {
+      "id": "white_cell_count",
+      "type": "number",
+      "required": false,
+      "description": "Extract white cell count from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "10^3/uL",
+      "referenceRange": "2-30",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "white cell count",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 231
+    },
+    {
+      "id": "creatinine_value",
+      "type": "number",
+      "required": false,
+      "description": "Extract creatinine value from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "mg/dL",
+      "referenceRange": "0.2-20",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "creatinine value",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 230
+    },
+    {
+      "id": "sodium_value",
+      "type": "number",
+      "required": false,
+      "description": "Extract sodium value from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "mmol/L",
+      "referenceRange": "110-170",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "sodium value",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 229
+    },
+    {
+      "id": "potassium_value",
+      "type": "number",
+      "required": false,
+      "description": "Extract potassium value from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "mmol/L",
+      "referenceRange": "2-8",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "potassium value",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 228
+    },
+    {
+      "id": "radiology_modality",
+      "type": "string",
+      "required": false,
+      "description": "Extract radiology modality from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "unitless",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "radiology modality",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 227
+    },
+    {
+      "id": "radiology_impression_text",
+      "type": "string",
+      "required": false,
+      "description": "Extract radiology impression text from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "radiology impression text",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 226
+    },
+    {
+      "id": "pathology_specimen_type",
+      "type": "string",
+      "required": false,
+      "description": "Extract pathology specimen type from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "unitless",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "pathology specimen type",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 225
+    },
+    {
+      "id": "ecg_rate",
+      "type": "number",
+      "required": false,
+      "description": "Extract ecg rate from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "bpm",
+      "referenceRange": "30-220",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "ecg rate",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 224
+    },
+    {
+      "id": "ecg_qtc",
+      "type": "number",
+      "required": false,
+      "description": "Extract ecg qtc from Radiology Report.",
+      "section": "labs_imaging",
+      "unit": "ms",
+      "referenceRange": "300-550",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "ecg qtc",
+          "labs imaging",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 223
+    },
+    {
+      "id": "documented_assessment_text",
+      "type": "string",
+      "required": true,
+      "description": "Extract documented assessment text from Radiology Report.",
+      "section": "assessment_documented",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "documented assessment text",
+          "assessment documented",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 222
+    },
+    {
+      "id": "ordered_intervention_text",
+      "type": "string",
+      "required": true,
+      "description": "Extract ordered intervention text from Radiology Report.",
+      "section": "plan_and_orders",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "ordered intervention text",
+          "plan and orders",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 221
+    },
+    {
+      "id": "medication_name",
+      "type": "string",
+      "required": false,
+      "description": "Extract medication name from Radiology Report.",
+      "section": "medications_allergies",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "medication name",
+          "medications allergies",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 220
+    },
+    {
+      "id": "medication_dose",
+      "type": "string",
+      "required": false,
+      "description": "Extract medication dose from Radiology Report.",
+      "section": "medications_allergies",
+      "unit": "mg",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "medication dose",
+          "medications allergies",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 219
+    },
+    {
+      "id": "medication_route",
+      "type": "string",
+      "required": false,
+      "description": "Extract medication route from Radiology Report.",
+      "section": "medications_allergies",
+      "unit": "unitless",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "medication route",
+          "medications allergies",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 218
+    },
+    {
+      "id": "medication_frequency",
+      "type": "string",
+      "required": false,
+      "description": "Extract medication frequency from Radiology Report.",
+      "section": "medications_allergies",
+      "unit": "per_day",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "medication frequency",
+          "medications allergies",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 217
+    },
+    {
+      "id": "allergy_substance",
+      "type": "string",
+      "required": false,
+      "description": "Extract allergy substance from Radiology Report.",
+      "section": "medications_allergies",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "allergy substance",
+          "medications allergies",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 216
+    },
+    {
+      "id": "allergy_reaction",
+      "type": "string",
+      "required": false,
+      "description": "Extract allergy reaction from Radiology Report.",
+      "section": "medications_allergies",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "allergy reaction",
+          "medications allergies",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 215
+    },
+    {
+      "id": "followup_window",
+      "type": "string",
+      "required": false,
+      "description": "Extract followup window from Radiology Report.",
+      "section": "followup_and_disposition",
+      "unit": "day",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "followup window",
+          "followup and disposition",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 214
+    },
+    {
+      "id": "referral_target",
+      "type": "string",
+      "required": false,
+      "description": "Extract referral target from Radiology Report.",
+      "section": "followup_and_disposition",
+      "unit": "unitless",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "referral target",
+          "followup and disposition",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 213
+    },
+    {
+      "id": "disposition_status",
+      "type": "string",
+      "required": false,
+      "description": "Extract disposition status from Radiology Report.",
+      "section": "followup_and_disposition",
+      "unit": "unitless",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "disposition status",
+          "followup and disposition",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 212
+    },
+    {
+      "id": "author_clinician_role",
+      "type": "string",
+      "required": true,
+      "description": "Extract author clinician role from Radiology Report.",
+      "section": "signoff_and_attestation",
+      "unit": "unitless",
+      "referenceRange": "document_value_only",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "author clinician role",
+          "signoff and attestation",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 211
+    },
+    {
+      "id": "attestation_timestamp",
+      "type": "string",
+      "required": false,
+      "description": "Extract attestation timestamp from Radiology Report.",
+      "section": "signoff_and_attestation",
+      "unit": "iso_datetime",
+      "referenceRange": "valid_datetime",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "attestation timestamp",
+          "signoff and attestation",
+          "radiology report"
+        ],
+        "preferredSources": [
+          "objective_findings",
+          "vitals_and_measurements",
+          "labs_imaging",
+          "plan_and_orders"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 210
+    }
+  ]
+}

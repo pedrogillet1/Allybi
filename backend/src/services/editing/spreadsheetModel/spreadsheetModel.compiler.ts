@@ -169,7 +169,9 @@ export async function compileSpreadsheetModelToXlsx(
       : [];
     if (typeof (ws as any).addConditionalFormatting === "function") {
       for (const item of conditionalFormats) {
-        const ruleType = String(item.rule?.type || "NUMBER_GREATER").toUpperCase();
+        const ruleType = String(
+          item.rule?.type || "NUMBER_GREATER",
+        ).toUpperCase();
         try {
           const parsed = parseA1Range(item.range, sheet.name);
           const ref = `${ws.getCell(parsed.start.row, parsed.start.col).address}:${ws.getCell(parsed.end.row, parsed.end.col).address}`;
@@ -197,12 +199,16 @@ export async function compileSpreadsheetModelToXlsx(
                   type: "colorScale",
                   cfvo: [
                     { type: "min" },
-                    ...(item.rule?.midColor ? [{ type: "percentile", value: 50 }] : []),
+                    ...(item.rule?.midColor
+                      ? [{ type: "percentile", value: 50 }]
+                      : []),
                     { type: "max" },
                   ],
                   color: [
                     { argb: toArgb(item.rule?.minColor) || "FFFF0000" },
-                    ...(item.rule?.midColor ? [{ argb: toArgb(item.rule.midColor) || "FFFFFF00" }] : []),
+                    ...(item.rule?.midColor
+                      ? [{ argb: toArgb(item.rule.midColor) || "FFFFFF00" }]
+                      : []),
                     { argb: toArgb(item.rule?.maxColor) || "FF00FF00" },
                   ],
                 },

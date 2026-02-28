@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "di_accounting_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "Portuguese abbreviations for accounting domain.",
+    "languages": ["pt"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "language": "pt"
+  },
+  "domain": "accounting",
+  "abbreviations": [
+    { "abbr": "BV", "expansion": "Balancete de Verificação" },
+    { "abbr": "CMV", "expansion": "Custo das Mercadorias Vendidas" },
+    { "abbr": "CP", "expansion": "Contas a Pagar" },
+    { "abbr": "CR", "expansion": "Contas a Receber" },
+    { "abbr": "CVM", "expansion": "Comissão de Valores Mobiliários" },
+    { "abbr": "DFC", "expansion": "Demonstração de Fluxo de Caixa" },
+    { "abbr": "DRE", "expansion": "Demonstração de Resultado do Exercício" },
+    { "abbr": "ECD", "expansion": "Escrituração Contábil Digital" },
+    { "abbr": "ECF", "expansion": "Escrituração Contábil Fiscal" },
+    { "abbr": "LALUR", "expansion": "Livro de Apuração do Lucro Real" },
+    { "abbr": "NBC", "expansion": "Normas Brasileiras de Contabilidade" },
+    { "abbr": "PDD", "expansion": "Provisão para Devedores Duvidosos" },
+    { "abbr": "PEPS", "expansion": "Primeiro que Entra, Primeiro que Sai (FIFO)" },
+    { "abbr": "PL", "expansion": "Patrimônio Líquido" },
+    { "abbr": "SPED", "expansion": "Sistema Público de Escrituração Digital" },
+    { "abbr": "UEPS", "expansion": "Último que Entra, Primeiro que Sai (LIFO)" }
+  ]
+}

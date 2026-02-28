@@ -1,0 +1,299 @@
+{
+  "_meta": {
+    "id": "di_banking_entities_banking_loan_statement",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for  documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "docType": "banking_loan_statement"
+  },
+  "entities": [
+    {
+      "id": "docType",
+      "type": "string",
+      "required": true,
+      "description": "Detected document type identifier"
+    },
+    {
+      "id": "issuerName",
+      "type": "string",
+      "required": true,
+      "description": "Issuing organization name"
+    },
+    {
+      "id": "issuerTaxId",
+      "type": "string",
+      "required": false,
+      "description": "Issuer tax identifier"
+    },
+    {
+      "id": "issuerAddress",
+      "type": "string",
+      "required": false,
+      "description": "Issuer address"
+    },
+    {
+      "id": "issuerPhone",
+      "type": "string",
+      "required": false,
+      "description": "Issuer contact phone"
+    },
+    {
+      "id": "issuerWebsite",
+      "type": "string",
+      "required": false,
+      "description": "Issuer website URL"
+    },
+    {
+      "id": "customerName",
+      "type": "string",
+      "required": true,
+      "description": "Customer or account holder name"
+    },
+    {
+      "id": "customerId",
+      "type": "string",
+      "required": false,
+      "description": "Customer identifier in issuer system"
+    },
+    {
+      "id": "accountNumber",
+      "type": "string",
+      "required": true,
+      "description": "Account number as presented"
+    },
+    {
+      "id": "maskedAccountNumber",
+      "type": "string",
+      "required": false,
+      "description": "Masked account number"
+    },
+    {
+      "id": "serviceAddress",
+      "type": "string",
+      "required": false,
+      "description": "Service or billing address"
+    },
+    {
+      "id": "statementNumber",
+      "type": "string",
+      "required": false,
+      "description": "Statement number"
+    },
+    {
+      "id": "invoiceNumber",
+      "type": "string",
+      "required": false,
+      "description": "Invoice number"
+    },
+    {
+      "id": "receiptNumber",
+      "type": "string",
+      "required": false,
+      "description": "Receipt number"
+    },
+    {
+      "id": "referenceNumber",
+      "type": "string",
+      "required": false,
+      "description": "Reference number or barcode payload"
+    },
+    {
+      "id": "issueDate",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "statementDate",
+      "type": "date",
+      "required": false,
+      "description": "Statement generation date"
+    },
+    {
+      "id": "billingPeriodStart",
+      "type": "date",
+      "required": false,
+      "description": "Billing or statement period start"
+    },
+    {
+      "id": "billingPeriodEnd",
+      "type": "date",
+      "required": false,
+      "description": "Billing or statement period end"
+    },
+    {
+      "id": "dueDate",
+      "type": "date",
+      "required": false,
+      "description": "Payment due date"
+    },
+    {
+      "id": "paymentDate",
+      "type": "date",
+      "required": false,
+      "description": "Recorded payment date"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Currency code"
+    },
+    {
+      "id": "subtotalAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Subtotal before taxes and fees"
+    },
+    {
+      "id": "taxAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Total tax amount"
+    },
+    {
+      "id": "feeAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Total fees"
+    },
+    {
+      "id": "discountAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Discounts or rebates"
+    },
+    {
+      "id": "adjustmentAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Manual or system adjustments"
+    },
+    {
+      "id": "previousBalance",
+      "type": "currency",
+      "required": false,
+      "description": "Previous cycle balance"
+    },
+    {
+      "id": "paymentsCredits",
+      "type": "currency",
+      "required": false,
+      "description": "Total payments and credits applied"
+    },
+    {
+      "id": "amountDue",
+      "type": "currency",
+      "required": true,
+      "description": "Amount currently due"
+    },
+    {
+      "id": "minimumPaymentDue",
+      "type": "currency",
+      "required": false,
+      "description": "Minimum amount to pay"
+    },
+    {
+      "id": "amountPaid",
+      "type": "currency",
+      "required": false,
+      "description": "Amount paid on receipt or statement"
+    },
+    {
+      "id": "endingBalance",
+      "type": "currency",
+      "required": false,
+      "description": "Ending balance"
+    },
+    {
+      "id": "lateFeeAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Late fee amount"
+    },
+    {
+      "id": "interestAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Interest charged"
+    },
+    {
+      "id": "usageQuantity",
+      "type": "number",
+      "required": false,
+      "description": "Usage/consumption quantity"
+    },
+    {
+      "id": "usageUnit",
+      "type": "string",
+      "required": false,
+      "description": "Usage unit, e.g. kWh, GB, m3"
+    },
+    {
+      "id": "transactionCount",
+      "type": "number",
+      "required": false,
+      "description": "Count of transactions or line items"
+    },
+    {
+      "id": "servicePlan",
+      "type": "string",
+      "required": false,
+      "description": "Service plan or product tier"
+    },
+    {
+      "id": "paymentMethod",
+      "type": "string",
+      "required": false,
+      "description": "Payment method"
+    },
+    {
+      "id": "autopayStatus",
+      "type": "enum",
+      "required": false,
+      "description": "Autopay enrollment status",
+      "values": [
+        "enrolled",
+        "not_enrolled",
+        "unknown"
+      ]
+    },
+    {
+      "id": "riskFlags",
+      "type": "array_string",
+      "required": false,
+      "description": "Validation or anomaly flags"
+    },
+    {
+      "id": "languageDetected",
+      "type": "enum",
+      "required": true,
+      "description": "Detected language",
+      "values": [
+        "en",
+        "pt",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "documentPages",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidenceScore",
+      "type": "number",
+      "required": false,
+      "description": "Overall extraction confidence"
+    }
+  ]
+}

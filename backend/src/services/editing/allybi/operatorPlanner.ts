@@ -443,6 +443,194 @@ function mapRenderType(
   return defaultDocx;
 }
 
+// ---------------------------------------------------------------------------
+// Routing guardrails (bank-driven)
+// ---------------------------------------------------------------------------
+
+export interface RoutingGuardrailResult {
+  id: string;
+  action: "block" | "require_confirmation" | "noop" | "pass";
+  code?: string;
+  message?: string;
+}
+
+function loadGuardrails(): any[] {
+  const banks = loadAllybiBanks();
+  const routing = banks.editingRouting;
+  if (!routing || !Array.isArray(routing.guardrails)) return [];
+  return routing.guardrails;
+}
+
+function matchesOperatorPattern(operator: string, patterns: string[]): boolean {
+  const op = String(operator || "").toUpperCase();
+  return patterns.some((p) => op.includes(p.toUpperCase()));
+}
+
+function userSaysEntireDocument(message: string): boolean {
+  const low = String(message || "").toLowerCase();
+  return /\b(entire document|whole document|documento inteiro|todo o documento)\b/.test(
+    low,
+  );
+}
+
+/**
+ * Apply pre-phase guardrails before operator selection.
+ * Returns a blocked plan if a pre-phase rule fires, else null.
+ */
+function applyPreGuardrails(input: {
+  domain: EditDomain;
+  message: string;
+  scope: AllybiScopeResolution;
+  language: "en" | "pt";
+  candidateOperator: string | null;
+}): RoutingGuardrailResult | null {
+  const guardrails = loadGuardrails();
+  for (const rule of guardrails) {
+    if (rule.phase !== "pre" || !rule.condition) continue;
+
+    // no_bulk_override_selection
+    if (rule.id === "no_bulk_override_selection") {
+      const hasSelection =
+        input.scope.source === "frozen_selection" ||
+        input.scope.source === "live_selection";
+      const isBulkScope = [
+        "document",
+        "all_headings",
+        "all_paragraphs",
+      ].includes(input.scope.scopeKind);
+      if (
+        hasSelection &&
+        isBulkScope &&
+        !userSaysEntireDocument(input.message)
+      ) {
+        const msg =
+          rule.blockMessage?.[input.language] ||
+          rule.blockMessage?.en ||
+          "Bulk operation blocked while selection is active.";
+        return {
+          id: rule.id,
+          action: "block",
+          code: rule.blockCode || "ROUTING_BULK_OVERRIDE_BLOCKED",
+          message: msg,
+        };
+      }
+    }
+
+    // engine_capability_gate
+    if (rule.id === "engine_capability_gate" && input.candidateOperator) {
+      const capMap =
+        rule.capabilityMap && typeof rule.capabilityMap === "object"
+          ? (rule.capabilityMap as Record<string, any>)
+          : {};
+      const entry = capMap[input.candidateOperator];
+      if (entry) {
+        const requiredDomain = String(entry.requiresDomain || "");
+        if (requiredDomain && requiredDomain !== input.domain) {
+          const msg =
+            rule.blockMessage?.[input.language] ||
+            rule.blockMessage?.en ||
+            "Operation not supported by this document engine.";
+          return {
+            id: rule.id,
+            action: "block",
+            code: rule.blockCode || "ROUTING_ENGINE_UNSUPPORTED",
+            message: msg,
+          };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Apply post-phase guardrails after operator selection.
+ * Returns a guardrail result if a rule fires, else null.
+ */
+export function applyPostGuardrails(input: {
+  plan: AllybiOperatorPlan;
+  language: "en" | "pt";
+  isFormattingIntent: boolean;
+  operatorClass: AllybiOperatorClass;
+}): RoutingGuardrailResult | null {
+  const guardrails = loadGuardrails();
+  for (const rule of guardrails) {
+    if (rule.phase !== "post" || !rule.condition) continue;
+
+    // formatting_never_rewrite
+    if (rule.id === "formatting_never_rewrite") {
+      if (
+        input.isFormattingIntent &&
+        rule.condition.operatorMatches &&
+        matchesOperatorPattern(
+          input.plan.canonicalOperator,
+          rule.condition.operatorMatches,
+        )
+      ) {
+        const msg =
+          rule.blockMessage?.[input.language] ||
+          rule.blockMessage?.en ||
+          "Formatting cannot use rewrite operator.";
+        return {
+          id: rule.id,
+          action: "block",
+          code: rule.blockCode || "ROUTING_FORMATTING_REWRITE_BLOCKED",
+          message: msg,
+        };
+      }
+    }
+
+    // structural_never_paragraph_rewrite
+    if (rule.id === "structural_never_paragraph_rewrite") {
+      const classesMatch =
+        Array.isArray(rule.condition.operatorClassIn) &&
+        rule.condition.operatorClassIn.includes(input.operatorClass);
+      if (
+        classesMatch &&
+        rule.condition.operatorMatches &&
+        matchesOperatorPattern(
+          input.plan.canonicalOperator,
+          rule.condition.operatorMatches,
+        )
+      ) {
+        const msg =
+          rule.blockMessage?.[input.language] ||
+          rule.blockMessage?.en ||
+          "Structural ops cannot fall back to paragraph rewrite.";
+        return {
+          id: rule.id,
+          action: "block",
+          code: rule.blockCode || "ROUTING_STRUCTURAL_REWRITE_BLOCKED",
+          message: msg,
+        };
+      }
+    }
+
+    // destructive_ops_confirm
+    if (rule.id === "destructive_ops_confirm") {
+      if (
+        Array.isArray(rule.condition.operatorMatchesAny) &&
+        matchesOperatorPattern(
+          input.plan.canonicalOperator,
+          rule.condition.operatorMatchesAny,
+        )
+      ) {
+        const msg =
+          rule.confirmMessage?.[input.language] ||
+          rule.confirmMessage?.en ||
+          "Destructive operation requires confirmation.";
+        return {
+          id: rule.id,
+          action: "require_confirmation",
+          code: rule.confirmCode || "ROUTING_DESTRUCTIVE_CONFIRM",
+          message: msg,
+        };
+      }
+    }
+  }
+  return null;
+}
+
 export function planAllybiOperator(input: {
   domain: EditDomain;
   message: string;
@@ -484,6 +672,29 @@ export function planAllybiOperator(input: {
     : classMismatch
       ? classSpecificFallback || candidateRaw
       : candidateRaw;
+
+  // --- Pre-phase routing guardrails (bank-driven) ---
+  const preGuard = applyPreGuardrails({
+    domain: input.domain,
+    message: input.message,
+    scope: input.scope,
+    language,
+    candidateOperator: candidate,
+  });
+  if (preGuard && preGuard.action === "block") {
+    return buildBlockedPlan({
+      domain: input.domain,
+      canonicalOperator: candidate || preferredFormattingOp,
+      scope: input.scope,
+      language,
+      formattingOnly,
+      blockedRewrite,
+      fontFamily: input.classifiedIntent?.fontFamily,
+      operatorClass: expectedOperatorClass,
+      reasonCode: preGuard.code || "ROUTING_PRE_GUARD",
+      reasonMessage: preGuard.message || "Pre-guard blocked this operation.",
+    });
+  }
 
   if (input.classifiedIntent?.clarificationRequired) {
     const clarificationOperator =
@@ -556,7 +767,7 @@ export function planAllybiOperator(input: {
         reasonMessage: `No runtime operator mapping found for ${candidate}.`,
       });
     }
-    return {
+    const candidatePlan: AllybiOperatorPlan = {
       canonicalOperator: candidate,
       runtimeOperator,
       planStatus: "ok",
@@ -584,6 +795,34 @@ export function planAllybiOperator(input: {
       fontFamily: input.classifiedIntent?.fontFamily,
       language,
     };
+    // --- Post-phase routing guardrails ---
+    const postGuard = applyPostGuardrails({
+      plan: candidatePlan,
+      language,
+      isFormattingIntent: formattingOnly,
+      operatorClass: expectedOperatorClass,
+    });
+    if (postGuard) {
+      if (postGuard.action === "block") {
+        return buildBlockedPlan({
+          domain: input.domain,
+          canonicalOperator: candidate,
+          scope: input.scope,
+          language,
+          formattingOnly,
+          blockedRewrite,
+          fontFamily: input.classifiedIntent?.fontFamily,
+          operatorClass: expectedOperatorClass,
+          reasonCode: postGuard.code || "ROUTING_POST_GUARD",
+          reasonMessage:
+            postGuard.message || "Post-guard blocked this operation.",
+        });
+      }
+      if (postGuard.action === "require_confirmation") {
+        candidatePlan.requiresConfirmation = true;
+      }
+    }
+    return candidatePlan;
   }
 
   const canonicalFallback = classSpecificFallback
@@ -627,7 +866,7 @@ export function planAllybiOperator(input: {
     });
   }
 
-  return {
+  const fallbackPlan: AllybiOperatorPlan = {
     canonicalOperator: canonicalFallback,
     runtimeOperator: runtimeFallback,
     planStatus: "ok",
@@ -646,6 +885,34 @@ export function planAllybiOperator(input: {
     fontFamily: input.classifiedIntent?.fontFamily,
     language,
   };
+  // --- Post-phase routing guardrails ---
+  const postGuardFallback = applyPostGuardrails({
+    plan: fallbackPlan,
+    language,
+    isFormattingIntent: formattingOnly,
+    operatorClass: expectedOperatorClass,
+  });
+  if (postGuardFallback) {
+    if (postGuardFallback.action === "block") {
+      return buildBlockedPlan({
+        domain: input.domain,
+        canonicalOperator: canonicalFallback,
+        scope: input.scope,
+        language,
+        formattingOnly,
+        blockedRewrite,
+        fontFamily: input.classifiedIntent?.fontFamily,
+        operatorClass: expectedOperatorClass,
+        reasonCode: postGuardFallback.code || "ROUTING_POST_GUARD",
+        reasonMessage:
+          postGuardFallback.message || "Post-guard blocked this operation.",
+      });
+    }
+    if (postGuardFallback.action === "require_confirmation") {
+      fallbackPlan.requiresConfirmation = true;
+    }
+  }
+  return fallbackPlan;
 }
 
 export function planAllybiOperatorSteps(input: {

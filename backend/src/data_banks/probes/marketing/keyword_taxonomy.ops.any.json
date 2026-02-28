@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,5206 @@
     "telemetryOnly": true
   },
   "domain": "ops",
-  "clusters": []
+  "clusters": [
+    {
+      "id": "ops_cluster_automate_capacity_planning",
+      "label": "capacity planning accuracy - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "automation intent",
+        "intenção de automação",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "automation intent capacity planning accuracy",
+        "intenção de automação acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_change_control",
+      "label": "change control quality - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "automation intent",
+        "intenção de automação",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "automation intent change control quality",
+        "intenção de automação qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_compliance",
+      "label": "operational compliance assurance - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "automation intent",
+        "intenção de automação",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "automation intent operational compliance assurance",
+        "intenção de automação garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_incident_response",
+      "label": "incident response performance - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "automation intent",
+        "intenção de automação",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "automation intent incident response performance",
+        "intenção de automação desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_onboarding",
+      "label": "onboarding process efficiency - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "automation intent",
+        "intenção de automação",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "automation intent onboarding process efficiency",
+        "intenção de automação eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_procurement",
+      "label": "procurement cycle optimization - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "automation intent",
+        "intenção de automação",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "automation intent procurement cycle optimization",
+        "intenção de automação otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_risk_register",
+      "label": "risk register quality - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "automation intent",
+        "intenção de automação",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "automation intent risk register quality",
+        "intenção de automação qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_runbook_quality",
+      "label": "runbook effectiveness - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "automation intent",
+        "intenção de automação",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "automation intent runbook effectiveness",
+        "intenção de automação efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_sla_health",
+      "label": "SLA attainment - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "automation intent",
+        "intenção de automação",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "automation intent SLA attainment",
+        "intenção de automação atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_automate_vendor_performance",
+      "label": "vendor performance governance - automation intent",
+      "intent": "automate",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "automation intent",
+        "intenção de automação",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "automation intent vendor performance governance",
+        "intenção de automação governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_capacity_planning",
+      "label": "capacity planning accuracy - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "benchmark intent",
+        "intenção de benchmark",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "benchmark intent capacity planning accuracy",
+        "intenção de benchmark acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_change_control",
+      "label": "change control quality - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "benchmark intent",
+        "intenção de benchmark",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "benchmark intent change control quality",
+        "intenção de benchmark qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_compliance",
+      "label": "operational compliance assurance - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "benchmark intent",
+        "intenção de benchmark",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "benchmark intent operational compliance assurance",
+        "intenção de benchmark garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_incident_response",
+      "label": "incident response performance - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "benchmark intent",
+        "intenção de benchmark",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "benchmark intent incident response performance",
+        "intenção de benchmark desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_onboarding",
+      "label": "onboarding process efficiency - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "benchmark intent",
+        "intenção de benchmark",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "benchmark intent onboarding process efficiency",
+        "intenção de benchmark eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_procurement",
+      "label": "procurement cycle optimization - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "benchmark intent",
+        "intenção de benchmark",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "benchmark intent procurement cycle optimization",
+        "intenção de benchmark otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_risk_register",
+      "label": "risk register quality - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "benchmark intent",
+        "intenção de benchmark",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "benchmark intent risk register quality",
+        "intenção de benchmark qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_runbook_quality",
+      "label": "runbook effectiveness - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "benchmark intent",
+        "intenção de benchmark",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "benchmark intent runbook effectiveness",
+        "intenção de benchmark efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_sla_health",
+      "label": "SLA attainment - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "benchmark intent",
+        "intenção de benchmark",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "benchmark intent SLA attainment",
+        "intenção de benchmark atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_benchmark_vendor_performance",
+      "label": "vendor performance governance - benchmark intent",
+      "intent": "benchmark",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "benchmark intent",
+        "intenção de benchmark",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "benchmark intent vendor performance governance",
+        "intenção de benchmark governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_capacity_planning",
+      "label": "capacity planning accuracy - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "comparison intent",
+        "intenção de comparação",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "comparison intent capacity planning accuracy",
+        "intenção de comparação acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_change_control",
+      "label": "change control quality - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "comparison intent",
+        "intenção de comparação",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "comparison intent change control quality",
+        "intenção de comparação qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_compliance",
+      "label": "operational compliance assurance - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "comparison intent",
+        "intenção de comparação",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "comparison intent operational compliance assurance",
+        "intenção de comparação garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_incident_response",
+      "label": "incident response performance - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "comparison intent",
+        "intenção de comparação",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "comparison intent incident response performance",
+        "intenção de comparação desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_onboarding",
+      "label": "onboarding process efficiency - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "comparison intent",
+        "intenção de comparação",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "comparison intent onboarding process efficiency",
+        "intenção de comparação eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_procurement",
+      "label": "procurement cycle optimization - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "comparison intent",
+        "intenção de comparação",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "comparison intent procurement cycle optimization",
+        "intenção de comparação otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_risk_register",
+      "label": "risk register quality - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "comparison intent",
+        "intenção de comparação",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "comparison intent risk register quality",
+        "intenção de comparação qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_runbook_quality",
+      "label": "runbook effectiveness - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "comparison intent",
+        "intenção de comparação",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "comparison intent runbook effectiveness",
+        "intenção de comparação efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_sla_health",
+      "label": "SLA attainment - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "comparison intent",
+        "intenção de comparação",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "comparison intent SLA attainment",
+        "intenção de comparação atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_compare_vendor_performance",
+      "label": "vendor performance governance - comparison intent",
+      "intent": "compare",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "comparison intent",
+        "intenção de comparação",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "comparison intent vendor performance governance",
+        "intenção de comparação governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_capacity_planning",
+      "label": "capacity planning accuracy - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "diagnostic intent capacity planning accuracy",
+        "intenção de diagnóstico acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_change_control",
+      "label": "change control quality - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "diagnostic intent change control quality",
+        "intenção de diagnóstico qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_compliance",
+      "label": "operational compliance assurance - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "diagnostic intent operational compliance assurance",
+        "intenção de diagnóstico garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_incident_response",
+      "label": "incident response performance - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "diagnostic intent incident response performance",
+        "intenção de diagnóstico desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_onboarding",
+      "label": "onboarding process efficiency - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "diagnostic intent onboarding process efficiency",
+        "intenção de diagnóstico eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_procurement",
+      "label": "procurement cycle optimization - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "diagnostic intent procurement cycle optimization",
+        "intenção de diagnóstico otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_risk_register",
+      "label": "risk register quality - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "diagnostic intent risk register quality",
+        "intenção de diagnóstico qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_runbook_quality",
+      "label": "runbook effectiveness - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "diagnostic intent runbook effectiveness",
+        "intenção de diagnóstico efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_sla_health",
+      "label": "SLA attainment - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "diagnostic intent SLA attainment",
+        "intenção de diagnóstico atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_diagnose_vendor_performance",
+      "label": "vendor performance governance - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "diagnostic intent vendor performance governance",
+        "intenção de diagnóstico governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_capacity_planning",
+      "label": "capacity planning accuracy - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "discovery intent",
+        "intenção de descoberta",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "discovery intent capacity planning accuracy",
+        "intenção de descoberta acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_change_control",
+      "label": "change control quality - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "discovery intent",
+        "intenção de descoberta",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "discovery intent change control quality",
+        "intenção de descoberta qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_compliance",
+      "label": "operational compliance assurance - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "discovery intent",
+        "intenção de descoberta",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "discovery intent operational compliance assurance",
+        "intenção de descoberta garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_incident_response",
+      "label": "incident response performance - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "discovery intent",
+        "intenção de descoberta",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "discovery intent incident response performance",
+        "intenção de descoberta desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_onboarding",
+      "label": "onboarding process efficiency - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "discovery intent",
+        "intenção de descoberta",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "discovery intent onboarding process efficiency",
+        "intenção de descoberta eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_procurement",
+      "label": "procurement cycle optimization - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "discovery intent",
+        "intenção de descoberta",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "discovery intent procurement cycle optimization",
+        "intenção de descoberta otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_risk_register",
+      "label": "risk register quality - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "discovery intent",
+        "intenção de descoberta",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "discovery intent risk register quality",
+        "intenção de descoberta qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_runbook_quality",
+      "label": "runbook effectiveness - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "discovery intent",
+        "intenção de descoberta",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "discovery intent runbook effectiveness",
+        "intenção de descoberta efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_sla_health",
+      "label": "SLA attainment - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "discovery intent",
+        "intenção de descoberta",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "discovery intent SLA attainment",
+        "intenção de descoberta atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_discover_vendor_performance",
+      "label": "vendor performance governance - discovery intent",
+      "intent": "discover",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "discovery intent",
+        "intenção de descoberta",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "discovery intent vendor performance governance",
+        "intenção de descoberta governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_capacity_planning",
+      "label": "capacity planning accuracy - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "forecast intent",
+        "intenção de previsão",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "forecast intent capacity planning accuracy",
+        "intenção de previsão acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_change_control",
+      "label": "change control quality - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "forecast intent",
+        "intenção de previsão",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "forecast intent change control quality",
+        "intenção de previsão qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_compliance",
+      "label": "operational compliance assurance - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "forecast intent",
+        "intenção de previsão",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "forecast intent operational compliance assurance",
+        "intenção de previsão garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_incident_response",
+      "label": "incident response performance - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "forecast intent",
+        "intenção de previsão",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "forecast intent incident response performance",
+        "intenção de previsão desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_onboarding",
+      "label": "onboarding process efficiency - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "forecast intent",
+        "intenção de previsão",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "forecast intent onboarding process efficiency",
+        "intenção de previsão eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_procurement",
+      "label": "procurement cycle optimization - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "forecast intent",
+        "intenção de previsão",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "forecast intent procurement cycle optimization",
+        "intenção de previsão otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_risk_register",
+      "label": "risk register quality - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "forecast intent",
+        "intenção de previsão",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "forecast intent risk register quality",
+        "intenção de previsão qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_runbook_quality",
+      "label": "runbook effectiveness - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "forecast intent",
+        "intenção de previsão",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "forecast intent runbook effectiveness",
+        "intenção de previsão efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_sla_health",
+      "label": "SLA attainment - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "forecast intent",
+        "intenção de previsão",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "forecast intent SLA attainment",
+        "intenção de previsão atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_forecast_vendor_performance",
+      "label": "vendor performance governance - forecast intent",
+      "intent": "forecast",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "forecast intent",
+        "intenção de previsão",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "forecast intent vendor performance governance",
+        "intenção de previsão governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_capacity_planning",
+      "label": "capacity planning accuracy - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "optimization intent",
+        "intenção de otimização",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "optimization intent capacity planning accuracy",
+        "intenção de otimização acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_change_control",
+      "label": "change control quality - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "optimization intent",
+        "intenção de otimização",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "optimization intent change control quality",
+        "intenção de otimização qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_compliance",
+      "label": "operational compliance assurance - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "optimization intent",
+        "intenção de otimização",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "optimization intent operational compliance assurance",
+        "intenção de otimização garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_incident_response",
+      "label": "incident response performance - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "optimization intent",
+        "intenção de otimização",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "optimization intent incident response performance",
+        "intenção de otimização desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_onboarding",
+      "label": "onboarding process efficiency - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "optimization intent",
+        "intenção de otimização",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "optimization intent onboarding process efficiency",
+        "intenção de otimização eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_procurement",
+      "label": "procurement cycle optimization - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "optimization intent",
+        "intenção de otimização",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "optimization intent procurement cycle optimization",
+        "intenção de otimização otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_risk_register",
+      "label": "risk register quality - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "optimization intent",
+        "intenção de otimização",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "optimization intent risk register quality",
+        "intenção de otimização qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_runbook_quality",
+      "label": "runbook effectiveness - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "optimization intent",
+        "intenção de otimização",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "optimization intent runbook effectiveness",
+        "intenção de otimização efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_sla_health",
+      "label": "SLA attainment - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "optimization intent",
+        "intenção de otimização",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "optimization intent SLA attainment",
+        "intenção de otimização atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_optimize_vendor_performance",
+      "label": "vendor performance governance - optimization intent",
+      "intent": "optimize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "optimization intent",
+        "intenção de otimização",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "optimization intent vendor performance governance",
+        "intenção de otimização governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_capacity_planning",
+      "label": "capacity planning accuracy - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "prioritization intent",
+        "intenção de priorização",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "prioritization intent capacity planning accuracy",
+        "intenção de priorização acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_change_control",
+      "label": "change control quality - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "prioritization intent",
+        "intenção de priorização",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "prioritization intent change control quality",
+        "intenção de priorização qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_compliance",
+      "label": "operational compliance assurance - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "prioritization intent",
+        "intenção de priorização",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "prioritization intent operational compliance assurance",
+        "intenção de priorização garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_incident_response",
+      "label": "incident response performance - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "prioritization intent",
+        "intenção de priorização",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "prioritization intent incident response performance",
+        "intenção de priorização desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_onboarding",
+      "label": "onboarding process efficiency - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "prioritization intent",
+        "intenção de priorização",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "prioritization intent onboarding process efficiency",
+        "intenção de priorização eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_procurement",
+      "label": "procurement cycle optimization - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "prioritization intent",
+        "intenção de priorização",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "prioritization intent procurement cycle optimization",
+        "intenção de priorização otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_risk_register",
+      "label": "risk register quality - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "prioritization intent",
+        "intenção de priorização",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "prioritization intent risk register quality",
+        "intenção de priorização qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_runbook_quality",
+      "label": "runbook effectiveness - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "prioritization intent",
+        "intenção de priorização",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "prioritization intent runbook effectiveness",
+        "intenção de priorização efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_sla_health",
+      "label": "SLA attainment - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "prioritization intent",
+        "intenção de priorização",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "prioritization intent SLA attainment",
+        "intenção de priorização atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_prioritize_vendor_performance",
+      "label": "vendor performance governance - prioritization intent",
+      "intent": "prioritize",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "prioritization intent",
+        "intenção de priorização",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "prioritization intent vendor performance governance",
+        "intenção de priorização governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_capacity_planning",
+      "label": "capacity planning accuracy - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "reporting intent",
+        "intenção de reporte",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "reporting intent capacity planning accuracy",
+        "intenção de reporte acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_change_control",
+      "label": "change control quality - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "reporting intent",
+        "intenção de reporte",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "reporting intent change control quality",
+        "intenção de reporte qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_compliance",
+      "label": "operational compliance assurance - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "reporting intent",
+        "intenção de reporte",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "reporting intent operational compliance assurance",
+        "intenção de reporte garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_incident_response",
+      "label": "incident response performance - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "reporting intent",
+        "intenção de reporte",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "reporting intent incident response performance",
+        "intenção de reporte desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_onboarding",
+      "label": "onboarding process efficiency - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "reporting intent",
+        "intenção de reporte",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "reporting intent onboarding process efficiency",
+        "intenção de reporte eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_procurement",
+      "label": "procurement cycle optimization - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "reporting intent",
+        "intenção de reporte",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "reporting intent procurement cycle optimization",
+        "intenção de reporte otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_risk_register",
+      "label": "risk register quality - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "reporting intent",
+        "intenção de reporte",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "reporting intent risk register quality",
+        "intenção de reporte qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_runbook_quality",
+      "label": "runbook effectiveness - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "reporting intent",
+        "intenção de reporte",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "reporting intent runbook effectiveness",
+        "intenção de reporte efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_sla_health",
+      "label": "SLA attainment - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "reporting intent",
+        "intenção de reporte",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "reporting intent SLA attainment",
+        "intenção de reporte atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_report_vendor_performance",
+      "label": "vendor performance governance - reporting intent",
+      "intent": "report",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "reporting intent",
+        "intenção de reporte",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "reporting intent vendor performance governance",
+        "intenção de reporte governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_capacity_planning",
+      "label": "capacity planning accuracy - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "capacity_planning",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "capacity_plan",
+        "project_status_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "capacity planning accuracy",
+        "acurácia de planejamento de capacidade",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "capacity planning accuracy analytics",
+        "acurácia de planejamento de capacidade analytics",
+        "capacity planning accuracy dashboard",
+        "acurácia de planejamento de capacidade dashboard",
+        "risk monitoring intent capacity planning accuracy",
+        "intenção de monitoramento de risco acurácia de planejamento de capacidade",
+        "ops capacity_planning"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated capacity_planning"
+      ],
+      "examples": [
+        "How can we improve capacity planning accuracy?",
+        "Como melhorar acurácia de planejamento de capacidade?",
+        "Show capacity planning accuracy insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_change_control",
+      "label": "change control quality - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "change_control",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "change_request",
+        "release_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "change control quality",
+        "qualidade de controle de mudanças",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "change control quality analytics",
+        "qualidade de controle de mudanças analytics",
+        "change control quality dashboard",
+        "qualidade de controle de mudanças dashboard",
+        "risk monitoring intent change control quality",
+        "intenção de monitoramento de risco qualidade de controle de mudanças",
+        "ops change_control"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated change_control"
+      ],
+      "examples": [
+        "How can we improve change control quality?",
+        "Como melhorar qualidade de controle de mudanças?",
+        "Show change control quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_compliance",
+      "label": "operational compliance assurance - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "compliance",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "policy_manual",
+        "quality_assurance_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "operational compliance assurance",
+        "garantia de compliance operacional",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "operational compliance assurance analytics",
+        "garantia de compliance operacional analytics",
+        "operational compliance assurance dashboard",
+        "garantia de compliance operacional dashboard",
+        "risk monitoring intent operational compliance assurance",
+        "intenção de monitoramento de risco garantia de compliance operacional",
+        "ops compliance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated compliance"
+      ],
+      "examples": [
+        "How can we improve operational compliance assurance?",
+        "Como melhorar garantia de compliance operacional?",
+        "Show operational compliance assurance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_incident_response",
+      "label": "incident response performance - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "incident_response",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "incident response performance",
+        "desempenho de resposta a incidentes",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "incident response performance analytics",
+        "desempenho de resposta a incidentes analytics",
+        "incident response performance dashboard",
+        "desempenho de resposta a incidentes dashboard",
+        "risk monitoring intent incident response performance",
+        "intenção de monitoramento de risco desempenho de resposta a incidentes",
+        "ops incident_response"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated incident_response"
+      ],
+      "examples": [
+        "How can we improve incident response performance?",
+        "Como melhorar desempenho de resposta a incidentes?",
+        "Show incident response performance insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_onboarding",
+      "label": "onboarding process efficiency - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "onboarding",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "onboarding_checklist",
+        "training_manual"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "onboarding process efficiency",
+        "eficiência do processo de onboarding",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "onboarding process efficiency analytics",
+        "eficiência do processo de onboarding analytics",
+        "onboarding process efficiency dashboard",
+        "eficiência do processo de onboarding dashboard",
+        "risk monitoring intent onboarding process efficiency",
+        "intenção de monitoramento de risco eficiência do processo de onboarding",
+        "ops onboarding"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated onboarding"
+      ],
+      "examples": [
+        "How can we improve onboarding process efficiency?",
+        "Como melhorar eficiência do processo de onboarding?",
+        "Show onboarding process efficiency insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_procurement",
+      "label": "procurement cycle optimization - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "procurement",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "procurement_request",
+        "inventory_report"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "procurement cycle optimization",
+        "otimização do ciclo de compras",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "procurement cycle optimization analytics",
+        "otimização do ciclo de compras analytics",
+        "procurement cycle optimization dashboard",
+        "otimização do ciclo de compras dashboard",
+        "risk monitoring intent procurement cycle optimization",
+        "intenção de monitoramento de risco otimização do ciclo de compras",
+        "ops procurement"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated procurement"
+      ],
+      "examples": [
+        "How can we improve procurement cycle optimization?",
+        "Como melhorar otimização do ciclo de compras?",
+        "Show procurement cycle optimization insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_risk_register",
+      "label": "risk register quality - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "risk_register",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "risk_register",
+        "audit_checklist"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "risk register quality",
+        "qualidade do registro de riscos",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "risk register quality analytics",
+        "qualidade do registro de riscos analytics",
+        "risk register quality dashboard",
+        "qualidade do registro de riscos dashboard",
+        "risk monitoring intent risk register quality",
+        "intenção de monitoramento de risco qualidade do registro de riscos",
+        "ops risk_register"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated risk_register"
+      ],
+      "examples": [
+        "How can we improve risk register quality?",
+        "Como melhorar qualidade do registro de riscos?",
+        "Show risk register quality insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_runbook_quality",
+      "label": "runbook effectiveness - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "runbook_quality",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "runbook",
+        "compliance_runbook"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "runbook effectiveness",
+        "efetividade de runbook",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "runbook effectiveness analytics",
+        "efetividade de runbook analytics",
+        "runbook effectiveness dashboard",
+        "efetividade de runbook dashboard",
+        "risk monitoring intent runbook effectiveness",
+        "intenção de monitoramento de risco efetividade de runbook",
+        "ops runbook_quality"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated runbook_quality"
+      ],
+      "examples": [
+        "How can we improve runbook effectiveness?",
+        "Como melhorar efetividade de runbook?",
+        "Show runbook effectiveness insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_sla_health",
+      "label": "SLA attainment - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "sla_health",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "service_level_agreement",
+        "kpi_dashboard"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "SLA attainment",
+        "atingimento de SLA",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "SLA attainment analytics",
+        "atingimento de SLA analytics",
+        "SLA attainment dashboard",
+        "atingimento de SLA dashboard",
+        "risk monitoring intent SLA attainment",
+        "intenção de monitoramento de risco atingimento de SLA",
+        "ops sla_health"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated sla_health"
+      ],
+      "examples": [
+        "How can we improve SLA attainment?",
+        "Como melhorar atingimento de SLA?",
+        "Show SLA attainment insights by period."
+      ]
+    },
+    {
+      "id": "ops_cluster_risk_vendor_performance",
+      "label": "vendor performance governance - risk monitoring intent",
+      "intent": "risk",
+      "domain": "ops",
+      "tags": [
+        "ops",
+        "vendor_performance",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_performance_review",
+        "service_catalog"
+      ],
+      "keywords": [
+        "ops analytics",
+        "operations intelligence",
+        "operações analytics",
+        "service reliability insights",
+        "vendor performance governance",
+        "governança de desempenho de fornecedor",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "vendor performance governance analytics",
+        "governança de desempenho de fornecedor analytics",
+        "vendor performance governance dashboard",
+        "governança de desempenho de fornecedor dashboard",
+        "risk monitoring intent vendor performance governance",
+        "intenção de monitoramento de risco governança de desempenho de fornecedor",
+        "ops vendor_performance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor_performance"
+      ],
+      "examples": [
+        "How can we improve vendor performance governance?",
+        "Como melhorar governança de desempenho de fornecedor?",
+        "Show vendor performance governance insights by period."
+      ]
+    }
+  ]
 }

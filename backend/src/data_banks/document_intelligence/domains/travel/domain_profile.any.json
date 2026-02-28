@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "di_travel_domain_profile",
+    "version": "1.0.0",
+    "description": "Travel domain profile with scope, detection signals, and supported operators.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel"
+  },
+  "domain": "travel",
+  "displayName": {
+    "en": "Travel",
+    "pt": "Viagem"
+  },
+  "scope": "Travel booking and transport documents including itinerary, boarding pass, reservations, insurance, rentals, and visa receipts.",
+  "coreConcepts": [
+    "arrival_date",
+    "baggage",
+    "booking_reference",
+    "cancellation_terms",
+    "carrier",
+    "check_in",
+    "check_out",
+    "departure_date",
+    "fare",
+    "flight_number",
+    "gate",
+    "passport_number",
+    "pnr",
+    "policy_number",
+    "seat",
+    "terminal",
+    "ticket_number",
+    "traveler_name",
+    "trip_duration",
+    "visa_reference"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "arrival_date",
+      "booking_reference",
+      "check_in",
+      "check_out",
+      "departure_date",
+      "flight_number",
+      "gate",
+      "pnr",
+      "seat",
+      "ticket_number"
+    ],
+    "mediumConfidence": [
+      "baggage",
+      "cancellation_terms",
+      "carrier",
+      "fare",
+      "passport_number",
+      "policy_number",
+      "terminal",
+      "traveler_name",
+      "trip_duration",
+      "visa_reference"
+    ]
+  },
+  "relatedDomains": [
+    "billing",
+    "identity",
+    "insurance"
+  ],
+  "ontologyPrefix": "travel"
+}

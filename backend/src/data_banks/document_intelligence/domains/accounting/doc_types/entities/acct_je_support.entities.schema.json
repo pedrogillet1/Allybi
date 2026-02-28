@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_je_support",
+    "description": "Entity extraction schema for journal entry support.",
+    "version": "1.0.0",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_je_support"
+  },
+  "entities": [
+    {
+      "id": "je_number",
+      "type": "string",
+      "required": true,
+      "description": "Journal entry number"
+    },
+    {
+      "id": "je_date",
+      "type": "date",
+      "required": true,
+      "description": "Journal entry date"
+    },
+    {
+      "id": "posting_period",
+      "type": "string",
+      "required": true,
+      "description": "Posting period"
+    },
+    {
+      "id": "total_debits",
+      "type": "currency",
+      "required": true,
+      "description": "Total debits"
+    },
+    {
+      "id": "total_credits",
+      "type": "currency",
+      "required": true,
+      "description": "Total credits"
+    },
+    {
+      "id": "line_count",
+      "type": "number",
+      "required": false,
+      "description": "Number of JE lines"
+    },
+    {
+      "id": "prepared_by",
+      "type": "string",
+      "required": true,
+      "description": "Preparer name"
+    },
+    {
+      "id": "reviewed_by",
+      "type": "string",
+      "required": false,
+      "description": "Reviewer name"
+    },
+    {
+      "id": "approved_by",
+      "type": "string",
+      "required": false,
+      "description": "Approver name"
+    },
+    {
+      "id": "supporting_reference",
+      "type": "string",
+      "required": false,
+      "description": "Reference to supporting schedule or ticket"
+    }
+  ]
+}

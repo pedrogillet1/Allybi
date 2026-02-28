@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -15,11 +15,1652 @@
   "domain": "finance",
   "archetypes": [
     {
-      "id": "finance_default_archetype",
-      "label": "finance default archetype",
-      "expectedSections": [],
-      "fieldFamilies": [],
-      "redFlags": []
+      "id": "finance_accounts_payable_aging",
+      "label": "Accounts Payable Aging",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_accounts_receivable_aging",
+      "label": "Accounts Receivable Aging",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_annual_report",
+      "label": "Annual Report",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo",
+        "KPI trend table",
+        "Tabela de tendência de KPI"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura",
+        "Metric definitions",
+        "Definições de métricas"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte",
+        "Undocumented metric source",
+        "Fonte da métrica não documentada"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?",
+        "Do metrics reconcile with the source records?",
+        "As métricas reconciliam com os registros de origem?"
+      ]
+    },
+    {
+      "id": "finance_audit_adjustment_schedule",
+      "label": "Audit Adjustment Schedule",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_balance_sheet",
+      "label": "Balance Sheet",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_bank_reconciliation",
+      "label": "Bank Reconciliation",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_board_pack",
+      "label": "Board Pack",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_budget",
+      "label": "Budget",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_budget_variance",
+      "label": "Budget Variance",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_capex_request",
+      "label": "Capex Request",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_cash_flow_statement",
+      "label": "Cash Flow Statement",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_cash_position_report",
+      "label": "Cash Position Report",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo",
+        "KPI trend table",
+        "Tabela de tendência de KPI"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura",
+        "Metric definitions",
+        "Definições de métricas"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte",
+        "Undocumented metric source",
+        "Fonte da métrica não documentada"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?",
+        "Do metrics reconcile with the source records?",
+        "As métricas reconciliam com os registros de origem?"
+      ]
+    },
+    {
+      "id": "finance_chart_of_accounts",
+      "label": "Chart OF Accounts",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_cost_center_report",
+      "label": "Cost Center Report",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo",
+        "KPI trend table",
+        "Tabela de tendência de KPI"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura",
+        "Metric definitions",
+        "Definições de métricas"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte",
+        "Undocumented metric source",
+        "Fonte da métrica não documentada"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?",
+        "Do metrics reconcile with the source records?",
+        "As métricas reconciliam com os registros de origem?"
+      ]
+    },
+    {
+      "id": "finance_covenant_report",
+      "label": "Covenant Report",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo",
+        "KPI trend table",
+        "Tabela de tendência de KPI"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura",
+        "Metric definitions",
+        "Definições de métricas"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte",
+        "Undocumented metric source",
+        "Fonte da métrica não documentada"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?",
+        "Do metrics reconcile with the source records?",
+        "As métricas reconciliam com os registros de origem?"
+      ]
+    },
+    {
+      "id": "finance_credit_memo",
+      "label": "Credit Memo",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_debt_schedule",
+      "label": "Debt Schedule",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_expense_policy",
+      "label": "Expense Policy",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Terms and Conditions",
+        "Termos e Condições",
+        "Obligations",
+        "Obrigações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Terms and Conditions",
+        "Termos e Condições",
+        "Obligations",
+        "Obrigações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo",
+        "Clause reference matrix",
+        "Matriz de referência de cláusulas"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura",
+        "Party obligations",
+        "Obrigações das partes"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte",
+        "Conflicting clause language",
+        "Linguagem conflitante entre cláusulas"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?",
+        "Are obligations and remedies clearly defined?",
+        "As obrigações e remédios estão claramente definidos?"
+      ]
+    },
+    {
+      "id": "finance_expense_report",
+      "label": "Expense Report",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Findings",
+        "Achados",
+        "Conclusions",
+        "Conclusões"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo",
+        "KPI trend table",
+        "Tabela de tendência de KPI"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura",
+        "Metric definitions",
+        "Definições de métricas"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte",
+        "Undocumented metric source",
+        "Fonte da métrica não documentada"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?",
+        "Do metrics reconcile with the source records?",
+        "As métricas reconciliam com os registros de origem?"
+      ]
+    },
+    {
+      "id": "finance_financial_forecast",
+      "label": "Financial Forecast",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_fixed_asset_register",
+      "label": "Fixed Asset Register",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_general_ledger_extract",
+      "label": "General Ledger Extract",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_income_statement",
+      "label": "Income Statement",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?"
+      ]
+    },
+    {
+      "id": "finance_invoice",
+      "label": "Invoice",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Line Item Detail",
+        "Detalhe por item",
+        "Validation Rules",
+        "Regras de validação"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Executive Summary",
+        "Resumo Executivo",
+        "Methodology",
+        "Metodologia",
+        "Detailed Analysis",
+        "Análise Detalhada",
+        "Approvals",
+        "Aprovações",
+        "Line Item Detail",
+        "Detalhe por item",
+        "Validation Rules",
+        "Regras de validação"
+      ],
+      "expectedTableFamilies": [
+        "Line items by period",
+        "Itens por período",
+        "Variance bridge",
+        "Ponte de variação",
+        "Entity and cost center matrix",
+        "Matriz de entidade e centro de custo",
+        "Line item table",
+        "Tabela de itens"
+      ],
+      "fieldFamilies": [
+        "Document identifiers",
+        "Identificadores do documento",
+        "Amounts and currencies",
+        "Valores e moedas",
+        "Dates and periods",
+        "Datas e períodos",
+        "Approvals and sign-off",
+        "Aprovações e assinatura",
+        "Reference number",
+        "Número de referência"
+      ],
+      "redFlags": [
+        "Unreconciled balances",
+        "Saldos não reconciliados",
+        "Missing approval trail",
+        "Trilha de aprovação ausente",
+        "Outlier transactions",
+        "Transações fora do padrão",
+        "Unsupported adjustments",
+        "Ajustes sem suporte",
+        "Missing source reference",
+        "Referência de origem ausente"
+      ],
+      "missingQuestions": [
+        "Which entity and period does this document cover?",
+        "Qual entidade e período este documento cobre?",
+        "Are all balances reconciled to source systems?",
+        "Todos os saldos estão reconciliados com os sistemas de origem?",
+        "Who approved the final version?",
+        "Quem aprovou a versão final?",
+        "Are all line items traceable to source evidence?",
+        "Todos os itens são rastreáveis até a evidência de origem?"
+      ]
     }
   ]
 }

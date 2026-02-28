@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "id": "di_accounting_lexicon_en",
+    "version": "1.0.0",
+    "description": "English lexicon for accounting domain — canonical terms, synonyms, and display forms.",
+    "languages": ["en"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "language": "en"
+  },
+  "domain": "accounting",
+  "terms": [
+    { "id": "acct_lex_accrual", "canonical": "accrual", "synonyms": ["accrued expense", "accrued liability"], "display": "Accrual" },
+    { "id": "acct_lex_adjusting_entry", "canonical": "adjusting entry", "synonyms": ["adjustment", "AJE"], "display": "Adjusting Entry" },
+    { "id": "acct_lex_aging_report", "canonical": "aging report", "synonyms": ["aging schedule", "aging summary", "aged trial balance"], "display": "Aging Report" },
+    { "id": "acct_lex_allowance", "canonical": "allowance for doubtful accounts", "synonyms": ["bad debt reserve", "provision for doubtful accounts", "AFDA"], "display": "Allowance for Doubtful Accounts" },
+    { "id": "acct_lex_bank_rec", "canonical": "bank reconciliation", "synonyms": ["bank rec", "cash reconciliation"], "display": "Bank Reconciliation" },
+    { "id": "acct_lex_chart_of_accounts", "canonical": "chart of accounts", "synonyms": ["COA", "account listing"], "display": "Chart of Accounts" },
+    { "id": "acct_lex_closing_entry", "canonical": "closing entry", "synonyms": ["closing JE", "period-end entry"], "display": "Closing Entry" },
+    { "id": "acct_lex_control_account", "canonical": "control account", "synonyms": ["controlling account", "GL control"], "display": "Control Account" },
+    { "id": "acct_lex_credit", "canonical": "credit", "synonyms": ["CR", "Cr."], "display": "Credit" },
+    { "id": "acct_lex_debit", "canonical": "debit", "synonyms": ["DR", "Dr."], "display": "Debit" },
+    { "id": "acct_lex_depreciation", "canonical": "depreciation", "synonyms": ["depreciation expense", "accumulated depreciation"], "display": "Depreciation" },
+    { "id": "acct_lex_general_ledger", "canonical": "general ledger", "synonyms": ["GL", "ledger", "nominal ledger"], "display": "General Ledger" },
+    { "id": "acct_lex_journal_entry", "canonical": "journal entry", "synonyms": ["JE", "journal voucher", "posting"], "display": "Journal Entry" },
+    { "id": "acct_lex_materiality", "canonical": "materiality", "synonyms": ["material amount", "materiality threshold"], "display": "Materiality" },
+    { "id": "acct_lex_prepaid", "canonical": "prepaid expense", "synonyms": ["prepaid", "deferred expense"], "display": "Prepaid Expense" },
+    { "id": "acct_lex_reconciling_item", "canonical": "reconciling item", "synonyms": ["recon item", "adjustment item"], "display": "Reconciling Item" },
+    { "id": "acct_lex_reversing_entry", "canonical": "reversing entry", "synonyms": ["reversal", "auto-reverse"], "display": "Reversing Entry" },
+    { "id": "acct_lex_subsidiary_ledger", "canonical": "subsidiary ledger", "synonyms": ["subledger", "sub-ledger", "auxiliary ledger"], "display": "Subsidiary Ledger" },
+    { "id": "acct_lex_trial_balance", "canonical": "trial balance", "synonyms": ["TB", "unadjusted trial balance", "adjusted trial balance"], "display": "Trial Balance" },
+    { "id": "acct_lex_workpaper", "canonical": "workpaper", "synonyms": ["working paper", "work paper", "audit schedule"], "display": "Workpaper" }
+  ]
+}

@@ -285,10 +285,14 @@ export class EditHandlerService {
     const contract = this.supportContract.evaluatePreApply({
       instruction: planned.plan.normalizedInstruction,
       domain: planned.plan.domain,
+      language: (input.context.language ||
+        planned.plan.constraints.outputLanguage) as "en" | "pt",
       runtimeOperator: planned.plan.operator,
       canonicalOperator: planned.plan.canonicalOperator || null,
       intentSource: planned.plan.intentSource,
       resolvedTargetId: resolvedTarget.id,
+      isAmbiguousTarget: resolvedTarget.isAmbiguous,
+      resolvedTargetCandidateCount: resolvedTarget.candidates.length,
       viewerContext: buildSupportViewerContext(planned.plan, resolvedTarget),
     });
 
@@ -327,6 +331,15 @@ export class EditHandlerService {
       };
     }
 
+    // Merge slot context from intent runtime onto plan for template hydration
+    const slotContext = (contract.details?.slotContext || {}) as Record<
+      string,
+      unknown
+    >;
+    if (Object.keys(slotContext).length > 0) {
+      Object.assign(planned.plan, { metadata: slotContext });
+    }
+
     if (
       resolvedTarget.isAmbiguous &&
       input.mode === "apply" &&
@@ -359,7 +372,10 @@ export class EditHandlerService {
       return {
         ok: preview.ok,
         mode: "preview",
-        result: preview,
+        result: {
+          ...preview,
+          requestId: input.context?.clientMessageId,
+        },
         receipt: preview.receipt,
         requiresUserChoice: resolvedTarget.isAmbiguous,
         error: preview.ok ? undefined : preview.error,
@@ -390,10 +406,33 @@ export class EditHandlerService {
         safetyDecision.decision === "block"
           ? "SAFETY_GATE_BLOCKED"
           : "SAFETY_GATE_CONFIRMATION_REQUIRED";
+      const safetyValidations = [
+        {
+          id: "safety_gate",
+          pass: false,
+          detail: `${safetyDecision.decision}: ${safetyDecision.reasons.join("; ")}`,
+        },
+        ...(safetyDecision.injectionDetected
+          ? [
+              {
+                id: "injection_check",
+                pass: false,
+                detail: "Prompt injection suspected",
+              },
+            ]
+          : [{ id: "injection_check", pass: true }]),
+        {
+          id: "risk_score",
+          pass: safetyDecision.riskScore < 0.7,
+          detail: `score=${safetyDecision.riskScore}`,
+        },
+      ];
       const blocked: EditApplyResult = {
         ok: true,
         applied: false,
         outcomeType: "blocked",
+        requestId: input.context?.clientMessageId,
+        validations: safetyValidations,
         safetyGate: safetyDecision,
         blockedReason: {
           code,
@@ -430,11 +469,29 @@ export class EditHandlerService {
       expectedDocumentFileHash: input.expectedDocumentFileHash,
       userConfirmed: input.userConfirmed === true,
     });
+    const applyValidations = [
+      {
+        id: "safety_gate",
+        pass: true,
+        detail: `allowed (risk=${safetyDecision.riskScore})`,
+      },
+      ...(safetyDecision.injectionDetected
+        ? [
+            {
+              id: "injection_check",
+              pass: false,
+              detail: "Prompt injection suspected",
+            },
+          ]
+        : [{ id: "injection_check", pass: true }]),
+    ];
     return {
       ok: applied.ok,
       mode: "apply",
       result: {
         ...applied,
+        requestId: input.context?.clientMessageId,
+        validations: [...applyValidations, ...(applied.validations || [])],
         safetyGate: applied.safetyGate || safetyDecision,
       },
       receipt: applied.receipt,

@@ -1,7 +1,9 @@
-import { createHmac, randomUUID } from "crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "crypto";
 import { URLSearchParams } from "url";
 
 import type { ConnectorProvider } from "../connectorsRegistry";
+import ConnectorIdentityMapService from "../connectorIdentityMap.service";
+import { markOAuthStateNonceUsed } from "../oauthStateNonceStore.service";
 import { TokenVaultService } from "../tokenVault.service";
 
 const PROVIDER: ConnectorProvider = "slack";
@@ -70,28 +72,20 @@ function asString(value: unknown): string | null {
     : null;
 }
 
-function parseExtStateUserId(extState: string): string | null {
-  try {
-    const decoded = Buffer.from(extState, "base64url").toString("utf8");
-    const parts = decoded.split(":");
-    if (parts.length >= 2 && parts[0] === "slack" && parts[1].trim()) {
-      return parts[1].trim();
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
 function nowSec(): number {
   return Math.floor(Date.now() / 1000);
 }
 
 export class SlackOAuthService {
   private readonly tokenVault: TokenVaultService;
+  private readonly identityMap: ConnectorIdentityMapService;
 
-  constructor(opts?: { tokenVault?: TokenVaultService }) {
+  constructor(opts?: {
+    tokenVault?: TokenVaultService;
+    identityMap?: ConnectorIdentityMapService;
+  }) {
     this.tokenVault = opts?.tokenVault ?? new TokenVaultService();
+    this.identityMap = opts?.identityMap ?? new ConnectorIdentityMapService();
   }
 
   getAuthorizationUrl(input: SlackStartConnectInput): string {
@@ -140,11 +134,12 @@ export class SlackOAuthService {
   ): Promise<Record<string, unknown>> {
     const code = asString(input.code);
     if (!code) throw new Error("Slack callback is missing code.");
-
-    const verified = this.verifyState(asString(input.state) || "");
-    const userId = verified?.userId || this.deriveUserIdFromQuery(input.query);
-    if (!userId)
-      throw new Error("Unable to resolve userId from Slack OAuth state.");
+    const state = asString(input.state) || "";
+    const verified = this.verifyState(state);
+    if (!verified?.userId) {
+      throw new Error("Invalid or expired Slack OAuth state.");
+    }
+    const userId = verified.userId;
 
     const token = await this.exchangeCode({
       code,
@@ -195,13 +190,26 @@ export class SlackOAuthService {
       expiresAt,
     );
 
+    const teamId = asString(authTest?.team_id) || asString(token.team?.id);
+    if (teamId) {
+      await this.identityMap.upsertSlackWorkspaceLink({
+        userId,
+        teamId,
+        externalUserId:
+          asString(authTest?.user_id) ||
+          asString(token.authed_user?.id) ||
+          asString(token.bot_user_id),
+        externalAccountEmail: null,
+      });
+    }
+
     return {
       provider: PROVIDER,
       connected: true,
       userId,
       expiresAt: expiresAt.toISOString(),
       scopes: Array.from(new Set(scopes)),
-      teamId: asString(authTest?.team_id) || asString(token.team?.id) || null,
+      teamId: teamId || null,
       teamName: asString(authTest?.team) || asString(token.team?.name) || null,
       extState: verified?.extState ?? null,
     };
@@ -298,25 +306,9 @@ export class SlackOAuthService {
     return json;
   }
 
-  private deriveUserIdFromQuery(
-    query?: Record<string, unknown>,
-  ): string | null {
-    if (!query) return null;
-
-    const state = asString(query.state);
-    if (state) {
-      const parsed = this.verifyState(state);
-      if (parsed?.userId) return parsed.userId;
-      const fallback = parseExtStateUserId(state);
-      if (fallback) return fallback;
-    }
-
-    return asString(query.userId) || asString(query.uid) || null;
-  }
-
   private resolveRedirectUriFromCallback(state?: string | null): string | null {
     // Prefer the redirectUri we used when creating the auth URL (embedded in signed state).
-    const parsed = state ? this.verifyState(state) : null;
+    const parsed = state ? this.decodeSignedState(state) : null;
     const candidate = asString(parsed?.redirectUri);
     if (candidate && this.isAllowedRedirectOverride(candidate))
       return candidate;
@@ -398,17 +390,18 @@ export class SlackOAuthService {
   }
 
   private verifyState(state: string): SignedStatePayload | null {
-    if (!state.includes(".")) {
-      const fallbackUserId = parseExtStateUserId(state);
-      if (!fallbackUserId) return null;
-      return {
-        v: 1,
-        provider: PROVIDER,
-        userId: fallbackUserId,
-        nonce: "external",
-        iat: nowSec(),
-      };
+    const parsed = this.decodeSignedState(state);
+    if (
+      !parsed ||
+      !markOAuthStateNonceUsed(PROVIDER, parsed.nonce, parsed.iat)
+    ) {
+      return null;
     }
+    return parsed;
+  }
+
+  private decodeSignedState(state: string): SignedStatePayload | null {
+    if (!state.includes(".")) return null;
 
     const [encoded, signature] = state.split(".", 2);
     if (!encoded || !signature) return null;
@@ -420,17 +413,55 @@ export class SlackOAuthService {
     const expected = createHmac("sha256", secret as string)
       .update(encoded)
       .digest("base64url");
-    if (expected !== signature) return null;
+    const expectedBuf = Buffer.from(expected, "utf8");
+    const providedBuf = Buffer.from(signature, "utf8");
+    if (
+      expectedBuf.length !== providedBuf.length ||
+      !timingSafeEqual(expectedBuf, providedBuf)
+    ) {
+      return null;
+    }
 
     try {
       const parsed = JSON.parse(
         Buffer.from(encoded, "base64url").toString("utf8"),
       ) as SignedStatePayload;
-      if (parsed.provider !== PROVIDER || !asString(parsed.userId)) return null;
+      if (
+        parsed.provider !== PROVIDER ||
+        !asString(parsed.userId) ||
+        !asString(parsed.nonce)
+      ) {
+        return null;
+      }
       if (Math.abs(nowSec() - parsed.iat) > 15 * 60) return null;
       return parsed;
     } catch {
       return null;
+    }
+  }
+
+  async revokeAccess(userId: string): Promise<boolean> {
+    const payload = await this.tokenVault
+      .getDecryptedPayload(userId, PROVIDER)
+      .catch(() => null);
+    const accessToken = asString(payload?.accessToken);
+    if (!accessToken) return false;
+
+    try {
+      const body = new URLSearchParams({ token: accessToken });
+      const response = await fetch("https://slack.com/api/auth.revoke", {
+        method: "POST",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded",
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: body.toString(),
+      });
+      if (!response.ok) return false;
+      const json = (await response.json()) as Record<string, unknown>;
+      return json.ok === true;
+    } catch {
+      return false;
     }
   }
 }

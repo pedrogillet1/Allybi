@@ -1,0 +1,104 @@
+{
+  "_meta": {
+    "id": "di_education_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting education documents from headings, content, and table structure.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 32
+  },
+  "domain": "education",
+  "rules": [
+    {
+      "id": "edu_detect_001_transcript",
+      "priority": 100,
+      "weight": 3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\btranscript\\b",
+        "\\bacademic record\\b",
+        "\\bhistorico escolar\\b"
+      ],
+      "description": "Transcript markers"
+    },
+    {
+      "id": "edu_detect_002_diploma",
+      "priority": 98,
+      "weight": 2.8,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bdiploma\\b",
+        "\\bcertificate of graduation\\b",
+        "\\bcertificado de diploma\\b"
+      ],
+      "description": "Diploma markers"
+    },
+    {
+      "id": "edu_detect_003_enrollment",
+      "priority": 96,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\benrollment letter\\b",
+        "\\bproof of enrollment\\b",
+        "\\bcarta de matricula\\b"
+      ],
+      "description": "Enrollment markers"
+    },
+    {
+      "id": "edu_detect_004_schedule",
+      "priority": 95,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bstudent schedule\\b",
+        "\\bclass schedule\\b",
+        "\\bgrade horaria\\b"
+      ],
+      "description": "Schedule markers"
+    },
+    {
+      "id": "edu_detect_005_syllabus",
+      "priority": 94,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bsyllabus\\b",
+        "\\bcourse outline\\b",
+        "\\bplano de ensino\\b"
+      ],
+      "description": "Syllabus markers"
+    },
+    {
+      "id": "edu_detect_006_financial_aid",
+      "priority": 93,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bfinancial aid award\\b",
+        "\\bgrant award\\b",
+        "\\bbolsa\\b"
+      ],
+      "description": "Aid award markers"
+    },
+    {
+      "id": "education_detect_999_scope_lock",
+      "priority": 70,
+      "weight": 1.4,
+      "signal": "content",
+      "patterns": [
+        "\\bdocument\\s+number\\b",
+        "\\breference\\b",
+        "\\bpage\\s+\\d+\\b"
+      ],
+      "description": "Generic structural markers for scoped document extraction"
+    }
+  ]
+}

@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,2766 @@
     "telemetryOnly": true
   },
   "domain": "ops",
-  "signals": []
+  "signals": [
+    {
+      "id": "ops_signal_abandonment_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "abandonment_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_abandonment_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.15,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "abandonment_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_abandonment_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "abandonment_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_abandonment_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "abandonment_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_abandonment_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "abandonment_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_actionability_gap_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "actionability_gap_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "actionability_gap_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce actionability_gap_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir actionability_gap_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_actionability_gap_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "actionability_gap_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "actionability_gap_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce actionability_gap_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir actionability_gap_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_actionability_gap_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "actionability_gap_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "actionability_gap_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce actionability_gap_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir actionability_gap_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_actionability_gap_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "actionability_gap_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "actionability_gap_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce actionability_gap_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir actionability_gap_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_actionability_gap_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "actionability_gap_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "actionability_gap_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce actionability_gap_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir actionability_gap_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_control_evidence_gap_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "control_evidence_gap_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "control_evidence_gap_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce control_evidence_gap_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir control_evidence_gap_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_control_evidence_gap_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "control_evidence_gap_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "control_evidence_gap_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce control_evidence_gap_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir control_evidence_gap_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_control_evidence_gap_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "control_evidence_gap_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.15,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "control_evidence_gap_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce control_evidence_gap_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir control_evidence_gap_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_control_evidence_gap_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "control_evidence_gap_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "control_evidence_gap_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce control_evidence_gap_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir control_evidence_gap_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_control_evidence_gap_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "control_evidence_gap_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "control_evidence_gap_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce control_evidence_gap_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir control_evidence_gap_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_fallback_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "fallback_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_fallback_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "fallback_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_fallback_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "fallback_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_fallback_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "fallback_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_fallback_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "fallback_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_followup_turns_p95_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "followup_turns_p95",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_followup_turns_p95_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4.03,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "followup_turns_p95",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_followup_turns_p95_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4.02,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "followup_turns_p95",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_followup_turns_p95_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4.04,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "followup_turns_p95",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_followup_turns_p95_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4.01,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "followup_turns_p95",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_latency_p95_ms_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4235,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "latency_p95_ms",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_latency_p95_ms_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4229,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "latency_p95_ms",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_latency_p95_ms_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4226,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "latency_p95_ms",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_latency_p95_ms_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4232,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "latency_p95_ms",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_latency_p95_ms_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4223,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "latency_p95_ms",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_negative_feedback_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.08,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "negative_feedback_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_negative_feedback_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "negative_feedback_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_negative_feedback_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "negative_feedback_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_negative_feedback_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "negative_feedback_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_negative_feedback_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.09,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "negative_feedback_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_owner_assignment_gap_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "owner_assignment_gap_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "owner_assignment_gap_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce owner_assignment_gap_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir owner_assignment_gap_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_owner_assignment_gap_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "owner_assignment_gap_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "owner_assignment_gap_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce owner_assignment_gap_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir owner_assignment_gap_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_owner_assignment_gap_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "owner_assignment_gap_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "owner_assignment_gap_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce owner_assignment_gap_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir owner_assignment_gap_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_owner_assignment_gap_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "owner_assignment_gap_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "owner_assignment_gap_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce owner_assignment_gap_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir owner_assignment_gap_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_owner_assignment_gap_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "owner_assignment_gap_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "owner_assignment_gap_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce owner_assignment_gap_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir owner_assignment_gap_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_reask_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "reask_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_reask_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.26,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "reask_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_reask_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.25,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "reask_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_reask_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.27,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "reask_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_reask_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "reask_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_sla_misread_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "sla_misread_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "sla_misread_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce sla_misread_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir sla_misread_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_sla_misread_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "sla_misread_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "sla_misread_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce sla_misread_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir sla_misread_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_sla_misread_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "sla_misread_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "sla_misread_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce sla_misread_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir sla_misread_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_sla_misread_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "sla_misread_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "sla_misread_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce sla_misread_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir sla_misread_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_sla_misread_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "sla_misread_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.15,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "sla_misread_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce sla_misread_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir sla_misread_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_weak_evidence_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "weak_evidence_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_weak_evidence_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "weak_evidence_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_weak_evidence_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "weak_evidence_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_weak_evidence_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "weak_evidence_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_weak_evidence_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "weak_evidence_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_workflow_step_missing_rate_change_risk_visibility_gap",
+      "domain": "ops",
+      "symptomEn": "Change risk visibility is low",
+      "symptomPt": "Visibilidade de risco de mudança está baixa",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "workflow_step_missing_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify change risk visibility gap.",
+        "Usuários fazem perguntas adicionais para esclarecer change risk visibility gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "workflow_step_missing_rate",
+        "change_risk_visibility_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce workflow_step_missing_rate for change risk visibility gap.",
+        "productPt": "Priorizar experimento para reduzir workflow_step_missing_rate em change risk visibility gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_workflow_step_missing_rate_evidence_trace_gap",
+      "domain": "ops",
+      "symptomEn": "Operational evidence links are missing",
+      "symptomPt": "Links de evidência operacional estão ausentes",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "workflow_step_missing_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify evidence trace gap.",
+        "Usuários fazem perguntas adicionais para esclarecer evidence trace gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "workflow_step_missing_rate",
+        "evidence_trace_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce workflow_step_missing_rate for evidence trace gap.",
+        "productPt": "Priorizar experimento para reduzir workflow_step_missing_rate em evidence trace gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_workflow_step_missing_rate_ownership_gap",
+      "domain": "ops",
+      "symptomEn": "Ownership and accountability are unclear",
+      "symptomPt": "Responsabilidade e accountability estão pouco claras",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "workflow_step_missing_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify ownership gap.",
+        "Usuários fazem perguntas adicionais para esclarecer ownership gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "workflow_step_missing_rate",
+        "ownership_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce workflow_step_missing_rate for ownership gap.",
+        "productPt": "Priorizar experimento para reduzir workflow_step_missing_rate em ownership gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_workflow_step_missing_rate_sla_context_loss",
+      "domain": "ops",
+      "symptomEn": "SLA context is incomplete",
+      "symptomPt": "Contexto de SLA está incompleto",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "workflow_step_missing_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify sla context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer sla context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "workflow_step_missing_rate",
+        "sla_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce workflow_step_missing_rate for sla context loss.",
+        "productPt": "Priorizar experimento para reduzir workflow_step_missing_rate em sla context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "ops_signal_workflow_step_missing_rate_workflow_ambiguity",
+      "domain": "ops",
+      "symptomEn": "Workflow steps are ambiguous",
+      "symptomPt": "Etapas do fluxo estão ambíguas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "workflow_step_missing_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify workflow ambiguity.",
+        "Usuários fazem perguntas adicionais para esclarecer workflow ambiguity."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "calculate",
+        "advise"
+      ],
+      "tags": [
+        "ops",
+        "workflow_step_missing_rate",
+        "workflow_ambiguity",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce workflow_step_missing_rate for workflow ambiguity.",
+        "productPt": "Priorizar experimento para reduzir workflow_step_missing_rate em workflow ambiguity.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    }
+  ]
 }

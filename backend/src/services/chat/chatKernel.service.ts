@@ -6,6 +6,7 @@ import type { TurnExecutor } from "./handlers/types";
 import type { ChatRequest, ChatResult, TurnRouteDecision } from "./chat.types";
 import { TurnContextBuilder } from "./turnContext.builder";
 import { TurnRouterService } from "./turnRouter.service";
+import type { IntentDecisionOutput } from "../config/intentConfig.service";
 import { normalizeTurnError, normalizeTurnSuccess } from "./responseEnvelope";
 import { ConnectorTurnHandler } from "./handlers/connectorTurn.handler";
 import { KnowledgeTurnHandler } from "./handlers/knowledgeTurn.handler";
@@ -26,10 +27,51 @@ export class ChatKernelService {
     this.generalHandler = new GeneralTurnHandler(executor);
   }
 
+  private asRecord(value: unknown): Record<string, unknown> {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    return value as Record<string, unknown>;
+  }
+
+  private withIntentMetadata(
+    req: ChatRequest,
+    intentDecision: IntentDecisionOutput | null,
+  ): ChatRequest {
+    if (!intentDecision) return req;
+
+    const meta = this.asRecord(req.meta);
+    const context = this.asRecord(req.context);
+    const intentState = this.asRecord((context as any).intentState);
+
+    return {
+      ...req,
+      meta: {
+        ...meta,
+        intentFamily: intentDecision.intentFamily,
+        operator: intentDecision.operatorId,
+        domain: intentDecision.domainId,
+        domainId: intentDecision.domainId,
+      },
+      context: {
+        ...context,
+        intentState: {
+          ...intentState,
+          lastRoutingDecision: intentDecision.persistable,
+          activeDomain: intentDecision.domainId,
+        },
+      },
+    };
+  }
+
   async handleTurn(req: ChatRequest): Promise<ChatResult> {
     const ctx = this.contextBuilder.build(req);
-    const route = this.router.decide(ctx);
-    return this.dispatch(route, { ctx });
+    const resolved = this.router.decideWithIntent(ctx);
+    const nextReq = this.withIntentMetadata(
+      ctx.request,
+      resolved.intentDecision,
+    );
+    const nextCtx =
+      nextReq === ctx.request ? ctx : { ...ctx, request: nextReq };
+    return this.dispatch(resolved.route, { ctx: nextCtx });
   }
 
   async streamTurn(params: {
@@ -38,9 +80,15 @@ export class ChatKernelService {
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
     const ctx = this.contextBuilder.build(params.req);
-    const route = this.router.decide(ctx);
-    return this.dispatch(route, {
-      ctx,
+    const resolved = this.router.decideWithIntent(ctx);
+    const nextReq = this.withIntentMetadata(
+      ctx.request,
+      resolved.intentDecision,
+    );
+    const nextCtx =
+      nextReq === ctx.request ? ctx : { ...ctx, request: nextReq };
+    return this.dispatch(resolved.route, {
+      ctx: nextCtx,
       sink: params.sink,
       streamingConfig: params.streamingConfig,
     });

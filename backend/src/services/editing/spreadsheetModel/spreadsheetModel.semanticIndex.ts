@@ -322,7 +322,9 @@ export function inferColumnType(
 
   // --- Rule 5: Categorical ---
   if (sampleSize >= 10) {
-    const uniqueValues = new Set(samples.map((s) => toText(s.raw).toLowerCase()));
+    const uniqueValues = new Set(
+      samples.map((s) => toText(s.raw).toLowerCase()),
+    );
     if (uniqueValues.size < 20) {
       return {
         kind: "categorical",
@@ -436,7 +438,16 @@ export function detectMultiHeaders(
 const SYNONYM_GROUPS: string[][] = [
   ["revenue", "sales", "faturamento", "receita", "income", "vendas"],
   ["cost", "expense", "custo", "despesa", "cogs", "gastos"],
-  ["date", "data", "period", "per\u00EDodo", "month", "m\u00EAs", "ano", "year"],
+  [
+    "date",
+    "data",
+    "period",
+    "per\u00EDodo",
+    "month",
+    "m\u00EAs",
+    "ano",
+    "year",
+  ],
   ["name", "nome", "full name", "nome completo"],
   ["email", "e-mail", "email address", "endere\u00E7o de email"],
   ["quantity", "qty", "quantidade", "qtd", "units", "unidades"],
@@ -539,11 +550,7 @@ export function buildEnhancedSemanticIndex(
     if (headerRow != null) {
       for (const colStr of Object.keys(idx.columns)) {
         const colIdx = Number(colStr);
-        columnTypeInference[colIdx] = inferColumnType(
-          sheet,
-          colIdx,
-          headerRow,
-        );
+        columnTypeInference[colIdx] = inferColumnType(sheet, colIdx, headerRow);
       }
     }
 
@@ -567,9 +574,8 @@ export function buildEnhancedSemanticIndex(
     out[sheet.name] = {
       ...idx,
       tableBounds,
-      multiHeaders: multiHeaders && multiHeaders.length > 0
-        ? multiHeaders
-        : undefined,
+      multiHeaders:
+        multiHeaders && multiHeaders.length > 0 ? multiHeaders : undefined,
       columnSynonyms,
       formulaSummaries,
       columnTypeInference,

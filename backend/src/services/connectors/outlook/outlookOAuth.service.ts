@@ -1,7 +1,8 @@
-import { createHmac, randomUUID } from "crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "crypto";
 import { URLSearchParams } from "url";
 
 import type { ConnectorProvider } from "../connectorsRegistry";
+import { markOAuthStateNonceUsed } from "../oauthStateNonceStore.service";
 import { TokenVaultService } from "../tokenVault.service";
 
 const PROVIDER: ConnectorProvider = "outlook";
@@ -55,20 +56,6 @@ function asString(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0
     ? value.trim()
     : null;
-}
-
-function parseExtStateUserId(extState: string): string | null {
-  try {
-    const decoded = Buffer.from(extState, "base64url").toString("utf8");
-    const parts = decoded.split(":");
-    // Format from connectorHandler: provider:userId:conversationId:clientMessageId:correlationId:timestamp
-    if (parts.length >= 2 && parts[0] === "outlook" && parts[1].trim()) {
-      return parts[1].trim();
-    }
-  } catch {
-    return null;
-  }
-  return null;
 }
 
 function safeNowSec(): number {
@@ -145,12 +132,12 @@ export class OutlookOAuthService {
   ): Promise<Record<string, unknown>> {
     const code = asString(input.code);
     if (!code) throw new Error("OAuth callback is missing code.");
-
-    const verified = this.verifyState(asString(input.state) || "");
-    const userId = verified?.userId || this.deriveUserIdFromQuery(input.query);
-    if (!userId) {
-      throw new Error("Unable to resolve userId from OAuth state.");
+    const state = asString(input.state) || "";
+    const verified = this.verifyState(state);
+    if (!verified?.userId) {
+      throw new Error("Invalid or expired OAuth state.");
     }
+    const userId = verified.userId;
 
     const token = await this.exchangeCode({
       code,
@@ -340,23 +327,6 @@ export class OutlookOAuthService {
     return (await response.json()) as Record<string, unknown>;
   }
 
-  private deriveUserIdFromQuery(
-    query?: Record<string, unknown>,
-  ): string | null {
-    if (!query) return null;
-
-    const state = asString(query.state);
-    if (state) {
-      const parsed = this.verifyState(state);
-      if (parsed?.userId) return parsed.userId;
-      const ext = parseExtStateUserId(state);
-      if (ext) return ext;
-    }
-
-    const directUserId = asString(query.userId) || asString(query.uid);
-    return directUserId || null;
-  }
-
   private signState(payload: SignedStatePayload): string {
     const secret =
       process.env.CONNECTOR_OAUTH_STATE_SECRET || process.env.ENCRYPTION_KEY;
@@ -378,18 +348,7 @@ export class OutlookOAuthService {
   private verifyState(
     state: string,
   ): (SignedStatePayload & { extState?: string }) | null {
-    if (!state.includes(".")) {
-      const fallbackUserId = parseExtStateUserId(state);
-      if (!fallbackUserId) return null;
-      return {
-        v: 1,
-        provider: PROVIDER,
-        userId: fallbackUserId,
-        nonce: "external",
-        iat: safeNowSec(),
-        extState: state,
-      };
-    }
+    if (!state.includes(".")) return null;
 
     const [encoded, signature] = state.split(".", 2);
     if (!encoded || !signature) return null;
@@ -401,20 +360,57 @@ export class OutlookOAuthService {
     const expected = createHmac("sha256", secret as string)
       .update(encoded)
       .digest("base64url");
-    if (expected !== signature) return null;
+    const expectedBuf = Buffer.from(expected, "utf8");
+    const providedBuf = Buffer.from(signature, "utf8");
+    if (
+      expectedBuf.length !== providedBuf.length ||
+      !timingSafeEqual(expectedBuf, providedBuf)
+    ) {
+      return null;
+    }
 
     try {
       const parsed = JSON.parse(
         Buffer.from(encoded, "base64url").toString("utf8"),
       ) as SignedStatePayload;
-      if (parsed.provider !== PROVIDER || !asString(parsed.userId)) return null;
+      if (
+        parsed.provider !== PROVIDER ||
+        !asString(parsed.userId) ||
+        !asString(parsed.nonce)
+      ) {
+        return null;
+      }
 
       // soft TTL: 15 minutes
       if (Math.abs(safeNowSec() - parsed.iat) > 15 * 60) return null;
+      if (!markOAuthStateNonceUsed(PROVIDER, parsed.nonce, parsed.iat)) {
+        return null;
+      }
 
       return parsed;
     } catch {
       return null;
+    }
+  }
+
+  async revokeAccess(userId: string): Promise<boolean> {
+    const payload = await this.tokenVault
+      .getDecryptedPayload(userId, PROVIDER)
+      .catch(() => null);
+    const accessToken = asString(payload?.accessToken);
+    if (!accessToken) return false;
+
+    try {
+      const response = await fetch(`${GRAPH_BASE}/me/revokeSignInSessions`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          accept: "application/json",
+        },
+      });
+      return response.ok;
+    } catch {
+      return false;
     }
   }
 }

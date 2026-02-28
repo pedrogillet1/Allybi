@@ -34,6 +34,19 @@ function tokenize(value: string): Set<string> {
   );
 }
 
+function containsTokenOrPhrase(
+  normText: string,
+  textTokens: Set<string>,
+  rawToken: string,
+): boolean {
+  const token = normalize(rawToken);
+  if (!token) return false;
+  if (token.includes(" ")) {
+    return normText.includes(token);
+  }
+  return textTokens.has(token);
+}
+
 // ---------------------------------------------------------------------------
 // A1 range detection
 // ---------------------------------------------------------------------------
@@ -43,6 +56,19 @@ const A1_RANGE_RE =
 
 function hasExplicitA1Range(text: string): boolean {
   return A1_RANGE_RE.test(text);
+}
+
+const SHEET_HINT_RE =
+  /(?:'[^']+'\s*!|[A-Za-z0-9_][A-Za-z0-9_ ]*!|\b(?:sheet|worksheet|tab|planilha|aba)\b)/i;
+const SELECTION_HINT_RE =
+  /\b(?:selected|selection|this cell|these cells|célula selecionada|sele[cç][aã]o|c[ée]lulas selecionadas)\b/i;
+
+function hasSheetReference(text: string): boolean {
+  return SHEET_HINT_RE.test(text);
+}
+
+function hasSelectionHint(text: string): boolean {
+  return SELECTION_HINT_RE.test(text);
 }
 
 // ---------------------------------------------------------------------------
@@ -55,6 +81,8 @@ const POINTS = {
   TOKEN_ALL_BONUS: 20,
   A1_RANGE_BONUS: 25,
   NEGATIVE_PENALTY: 15,
+  ADJUSTMENT_BOOST_DEFAULT: 12,
+  ADJUSTMENT_PENALTY_DEFAULT: 12,
 };
 
 type PatternScore = {
@@ -72,6 +100,17 @@ function scorePattern(pattern: IntentPattern, text: string): PatternScore {
   const textTokens = tokenize(text);
   let score = 0;
   const matchedTriggers: string[] = [];
+
+  const requiresContext = pattern.requiresContext || {};
+  if (requiresContext.explicitRange && !hasExplicitA1Range(text)) {
+    return { score: 0, matchedTriggers: [] };
+  }
+  if (requiresContext.sheetReference && !hasSheetReference(text)) {
+    return { score: 0, matchedTriggers: [] };
+  }
+  if (requiresContext.selectionHint && !hasSelectionHint(text)) {
+    return { score: 0, matchedTriggers: [] };
+  }
 
   // regex_any: +30 per match
   if (pattern.triggers.regex_any) {
@@ -94,8 +133,7 @@ function scorePattern(pattern: IntentPattern, text: string): PatternScore {
   // tokens_any: +10 per matched token
   if (pattern.triggers.tokens_any) {
     for (const tok of pattern.triggers.tokens_any) {
-      const normTok = normalize(tok);
-      if (textTokens.has(normTok) || normText.includes(normTok)) {
+      if (containsTokenOrPhrase(normText, textTokens, tok)) {
         score += POINTS.TOKEN_ANY_MATCH;
         matchedTriggers.push(`token_any:${tok}`);
       }
@@ -104,10 +142,9 @@ function scorePattern(pattern: IntentPattern, text: string): PatternScore {
 
   // tokens_all: +20 bonus if ALL tokens found
   if (pattern.triggers.tokens_all && pattern.triggers.tokens_all.length > 0) {
-    const allFound = pattern.triggers.tokens_all.every((tok) => {
-      const normTok = normalize(tok);
-      return textTokens.has(normTok) || normText.includes(normTok);
-    });
+    const allFound = pattern.triggers.tokens_all.every((tok) =>
+      containsTokenOrPhrase(normText, textTokens, tok),
+    );
     if (allFound) {
       score += POINTS.TOKEN_ALL_BONUS;
       matchedTriggers.push("tokens_all:matched");
@@ -118,9 +155,36 @@ function scorePattern(pattern: IntentPattern, text: string): PatternScore {
   // Used to prevent collisions like "format as currency" matching a value-set pattern.
   if (pattern.triggers.tokens_none && pattern.triggers.tokens_none.length > 0) {
     for (const tok of pattern.triggers.tokens_none) {
-      const normTok = normalize(tok);
-      if (textTokens.has(normTok) || normText.includes(normTok)) {
+      if (containsTokenOrPhrase(normText, textTokens, tok)) {
         return { score: 0, matchedTriggers: [] };
+      }
+    }
+  }
+
+  const scoreAdjustments = pattern.scoreAdjustments;
+  if (scoreAdjustments) {
+    const boostPoints =
+      scoreAdjustments.boostPoints ?? POINTS.ADJUSTMENT_BOOST_DEFAULT;
+    const penaltyPoints =
+      scoreAdjustments.penaltyPoints ?? POINTS.ADJUSTMENT_PENALTY_DEFAULT;
+
+    if (scoreAdjustments.boostIfTokensPresent?.length) {
+      const hasBoost = scoreAdjustments.boostIfTokensPresent.some((tok) =>
+        containsTokenOrPhrase(normText, textTokens, tok),
+      );
+      if (hasBoost) {
+        score += boostPoints;
+        matchedTriggers.push("score_adjustment:boost");
+      }
+    }
+
+    if (scoreAdjustments.penalizeIfTokensPresent?.length) {
+      const hasPenalty = scoreAdjustments.penalizeIfTokensPresent.some((tok) =>
+        containsTokenOrPhrase(normText, textTokens, tok),
+      );
+      if (hasPenalty) {
+        score -= penaltyPoints;
+        matchedTriggers.push("score_adjustment:penalty");
       }
     }
   }
@@ -156,6 +220,55 @@ function jaccardScore(a: string, b: string): number {
   return union > 0 ? inter / union : 0;
 }
 
+function scoreCmp(a: MatchCandidate, b: MatchCandidate): number {
+  if (b.score !== a.score) return b.score - a.score;
+  if (b.pattern.priority !== a.pattern.priority) {
+    return b.pattern.priority - a.pattern.priority;
+  }
+  return a.pattern.id.localeCompare(b.pattern.id);
+}
+
+function keepTopPerDisambiguationGroup(
+  candidates: MatchCandidate[],
+): MatchCandidate[] {
+  const byGroup = new Map<string, MatchCandidate>();
+  const passthrough: MatchCandidate[] = [];
+
+  for (const candidate of candidates) {
+    const group = String(candidate.pattern.disambiguationGroup || "").trim();
+    if (!group) {
+      passthrough.push(candidate);
+      continue;
+    }
+    const existing = byGroup.get(group);
+    if (!existing || scoreCmp(candidate, existing) < 0) {
+      byGroup.set(group, candidate);
+    }
+  }
+
+  return [...passthrough, ...Array.from(byGroup.values())];
+}
+
+function pruneMutuallyExclusive(
+  candidates: MatchCandidate[],
+): MatchCandidate[] {
+  const selected: MatchCandidate[] = [];
+
+  for (const candidate of candidates) {
+    const excludes = new Set(candidate.pattern.mutuallyExclusiveWith || []);
+    const conflicts = selected.some((picked) => {
+      if (excludes.has(picked.pattern.id)) return true;
+      return (picked.pattern.mutuallyExclusiveWith || []).includes(
+        candidate.pattern.id,
+      );
+    });
+    if (conflicts) continue;
+    selected.push(candidate);
+  }
+
+  return selected;
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -183,9 +296,10 @@ export function matchSegment(
     });
   }
 
-  // Sort by score descending, take top 3
-  candidates.sort((a, b) => b.score - a.score);
-  const top3 = candidates.slice(0, 3);
+  candidates.sort(scoreCmp);
+  const grouped = keepTopPerDisambiguationGroup(candidates).sort(scoreCmp);
+  const pruned = pruneMutuallyExclusive(grouped).sort(scoreCmp);
+  const top3 = pruned.slice(0, 3);
 
   return {
     segment,

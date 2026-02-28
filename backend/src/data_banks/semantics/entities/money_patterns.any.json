@@ -1,21 +1,1561 @@
 {
   "_meta": {
     "id": "money_patterns",
-    "version": "1.0.0",
-    "description": "Monetary extraction patterns including symbols, units, and accounting negatives.",
+    "version": "1.1.0",
+    "description": "Cross-domain money extraction patterns for everyday documents with normalization guidance.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true
   },
   "rules": [
     {
-      "id": "money_patterns_rule_001",
-      "pattern": "",
-      "notes": "Populate domain-specific extraction patterns."
+      "id": "money_001",
+      "name": "abbreviated_billions_symbol",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]\\s?[\\d.]+[Bb]",
+      "examples": [
+        "$3.5B",
+        "€1.2b",
+        "R$5B"
+      ],
+      "normalization": "expand_billions",
+      "currency": "auto_detect",
+      "notes": "Abbreviated billions with currency symbol"
+    },
+    {
+      "id": "money_002",
+      "name": "abbreviated_brl_bi",
+      "pattern": "R\\$\\s?[\\d.,]+\\s?(?:bi|bilhao|bilhoes)",
+      "examples": [
+        "R$ 1,5 bi",
+        "R$ 2 bilhoes",
+        "R$3,5 bilhao"
+      ],
+      "normalization": "expand_brl_billions",
+      "currency": "BRL",
+      "notes": "Brazilian abbreviated billions"
+    },
+    {
+      "id": "money_003",
+      "name": "abbreviated_brl_mi",
+      "pattern": "R\\$\\s?[\\d.,]+\\s?(?:mi|milhao|milhoes)",
+      "examples": [
+        "R$ 1,5 mi",
+        "R$ 2 milhoes",
+        "R$3,5 milhao"
+      ],
+      "normalization": "expand_brl_millions",
+      "currency": "BRL",
+      "notes": "Brazilian abbreviated millions"
+    },
+    {
+      "id": "money_004",
+      "name": "abbreviated_brl_mil",
+      "pattern": "R\\$\\s?[\\d.]+\\s?mil",
+      "examples": [
+        "R$ 1.500 mil",
+        "R$ 500 mil",
+        "R$100 mil"
+      ],
+      "normalization": "expand_brl_mil",
+      "currency": "BRL",
+      "notes": "Brazilian abbreviated thousands with 'mil'"
+    },
+    {
+      "id": "money_005",
+      "name": "abbreviated_millions_symbol",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]\\s?[\\d.]+[Mm]",
+      "examples": [
+        "$1.2M",
+        "€3.5m",
+        "R$2.1M"
+      ],
+      "normalization": "expand_millions",
+      "currency": "auto_detect",
+      "notes": "Abbreviated millions with currency symbol"
+    },
+    {
+      "id": "money_006",
+      "name": "abbreviated_thousands_k",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]\\s?[\\d.]+[Kk]",
+      "examples": [
+        "$2.1k",
+        "€500K",
+        "R$100k"
+      ],
+      "normalization": "expand_thousands",
+      "currency": "auto_detect",
+      "notes": "Abbreviated thousands with K suffix"
+    },
+    {
+      "id": "money_007",
+      "name": "accounting_negative_cr",
+      "pattern": "[\\d,]+\\.?\\d{0,2}\\s?(?:CR|cr|Cr)",
+      "examples": [
+        "1,234.56 CR",
+        "100cr",
+        "50.00 Cr"
+      ],
+      "normalization": "negate_strip_cr_suffix",
+      "currency": "auto_detect",
+      "notes": "Credit/negative indicated by CR suffix"
+    },
+    {
+      "id": "money_008",
+      "name": "accounting_negative_dash",
+      "pattern": "-\\s?[\\$\\u20ac\\u00a3]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "- €100",
+        "-$1,234.56",
+        "-1234.56"
+      ],
+      "normalization": "negate_strip_dash",
+      "currency": "auto_detect",
+      "notes": "Negative amount with leading dash"
+    },
+    {
+      "id": "money_009",
+      "name": "accounting_negative_parens",
+      "pattern": "\\(\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}\\s?\\)",
+      "examples": [
+        "($1,234.56)",
+        "(€100.00)",
+        "(1,234.56)"
+      ],
+      "normalization": "negate_strip_parens",
+      "currency": "auto_detect",
+      "notes": "Accounting-style negative with parentheses"
+    },
+    {
+      "id": "money_010",
+      "name": "accounting_negative_trailing",
+      "pattern": "[\\$\\u20ac\\u00a3]?\\s?[\\d,]+\\.?\\d{0,2}\\s?-",
+      "examples": [
+        "$1,234.56-",
+        "1234.56-"
+      ],
+      "normalization": "negate_strip_trailing_dash",
+      "currency": "auto_detect",
+      "notes": "Negative amount with trailing dash"
+    },
+    {
+      "id": "money_011",
+      "name": "aed_code_prefix",
+      "pattern": "AED\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "AED 1,234.56",
+        "AED1000"
+      ],
+      "normalization": "strip_code_and_commas",
+      "currency": "AED",
+      "notes": "UAE dirham with ISO code"
+    },
+    {
+      "name": "amount_due_label",
+      "pattern": "(?:amount\\sdue|valor\\sa\\spagar)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Amount due: $199.99"
+      ],
+      "normalization": "extract_amount_due",
+      "currency": "auto_detect",
+      "notes": "Amount due label extraction",
+      "id": "money_012"
+    },
+    {
+      "name": "amount_followed_by_ex_tax_tag",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?(?:ex\\.?\\stax|sem\\simposto)",
+      "examples": [
+        "$120.00 ex tax",
+        "R$ 300,00 sem imposto"
+      ],
+      "normalization": "extract_amount_mark_tax_excluded",
+      "currency": "auto_detect",
+      "notes": "Amount tagged as tax excluded",
+      "id": "money_013"
+    },
+    {
+      "name": "amount_followed_by_tax_tag",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?(?:inc\\.?\\stax|incl\\.?\\stax|com\\simposto)",
+      "examples": [
+        "$120.00 inc tax",
+        "R$ 300,00 com imposto"
+      ],
+      "normalization": "extract_amount_mark_tax_included",
+      "currency": "auto_detect",
+      "notes": "Amount tagged as tax included",
+      "id": "money_014"
+    },
+    {
+      "name": "amount_per_day",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?day",
+      "examples": [
+        "$45/day"
+      ],
+      "normalization": "parse_unit_price_day",
+      "currency": "auto_detect",
+      "notes": "Per-day pricing",
+      "id": "money_015"
+    },
+    {
+      "name": "amount_per_gb",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?GB",
+      "examples": [
+        "$1.50/GB",
+        "R$ 2,30/GB"
+      ],
+      "normalization": "parse_unit_price_gb",
+      "currency": "auto_detect",
+      "notes": "Telecom price per GB",
+      "id": "money_016"
+    },
+    {
+      "name": "amount_per_kwh",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?kWh",
+      "examples": [
+        "$0.18/kWh",
+        "R$ 0,92 / kWh"
+      ],
+      "normalization": "parse_unit_price_kwh",
+      "currency": "auto_detect",
+      "notes": "Utility price per kWh",
+      "id": "money_017"
+    },
+    {
+      "name": "amount_per_minute",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?(?:min|minute|minuto)",
+      "examples": [
+        "$0.20/min",
+        "R$ 0,35/minuto"
+      ],
+      "normalization": "parse_unit_price_minute",
+      "currency": "auto_detect",
+      "notes": "Voice call per-minute pricing",
+      "id": "money_018"
+    },
+    {
+      "name": "amount_per_month",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?(?:month|mes)",
+      "examples": [
+        "$35/month",
+        "R$ 89/mes"
+      ],
+      "normalization": "parse_unit_price_month",
+      "currency": "auto_detect",
+      "notes": "Monthly recurring pricing",
+      "id": "money_019"
+    },
+    {
+      "name": "amount_per_night",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?night",
+      "examples": [
+        "$120/night"
+      ],
+      "normalization": "parse_unit_price_night",
+      "currency": "auto_detect",
+      "notes": "Travel nightly rate",
+      "id": "money_020"
+    },
+    {
+      "name": "amount_received_label",
+      "pattern": "(?:amount\\sreceived|valor\\srecebido)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Amount received: $345.12"
+      ],
+      "normalization": "extract_amount_received",
+      "currency": "auto_detect",
+      "notes": "Amount received label",
+      "id": "money_021"
+    },
+    {
+      "name": "amount_with_approx_sign",
+      "pattern": "[~≈]\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "~$120",
+        "≈ R$ 300,00"
+      ],
+      "normalization": "mark_approximate_amount",
+      "currency": "auto_detect",
+      "notes": "Approximate amount with symbol",
+      "id": "money_022"
+    },
+    {
+      "name": "amount_with_ceiling_phrase",
+      "pattern": "(?:up\\sto|ate\\sno\\smaximo)\\s[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "ate no maximo R$ 500",
+        "up to $2,000"
+      ],
+      "normalization": "mark_maximum_amount",
+      "currency": "auto_detect",
+      "notes": "Maximum threshold amount",
+      "id": "money_023"
+    },
+    {
+      "name": "amount_with_floor_phrase",
+      "pattern": "(?:at\\sleast|no\\sminimo)\\s[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "at least $500",
+        "no minimo R$ 100"
+      ],
+      "normalization": "mark_minimum_amount",
+      "currency": "auto_detect",
+      "notes": "Minimum threshold amount",
+      "id": "money_024"
+    },
+    {
+      "id": "money_025",
+      "name": "approx_amount",
+      "pattern": "(?:approx|approximately|circa|~|cerca de|aproximadamente)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "~$100",
+        "approx €500",
+        "cerca de R$1.000"
+      ],
+      "normalization": "flag_approximate",
+      "currency": "auto_detect",
+      "notes": "Approximate monetary amounts"
+    },
+    {
+      "id": "money_026",
+      "name": "at_least_amount",
+      "pattern": "(?:at least|no minimo|pelo menos)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "at least $1,000",
+        "no minimo R$500",
+        "pelo menos €100"
+      ],
+      "normalization": "flag_minimum",
+      "currency": "auto_detect",
+      "notes": "Minimum/floor amounts"
+    },
+    {
+      "id": "money_027",
+      "name": "aud_symbol_prefix",
+      "pattern": "A\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "A$ 100",
+        "A$1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "AUD",
+      "notes": "Australian dollar with A$ prefix"
+    },
+    {
+      "name": "baggage_fee_label",
+      "pattern": "(?:baggage\\sfee|taxa\\sde\\sbagagem)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Baggage fee: $60.00"
+      ],
+      "normalization": "extract_fee_amount",
+      "currency": "auto_detect",
+      "notes": "Travel baggage fee amount",
+      "id": "money_028"
+    },
+    {
+      "name": "bank_balance_label",
+      "pattern": "(?:opening\\sbalance|closing\\sbalance|saldo\\sinicial|saldo\\sfinal)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Opening balance: $1,200.00"
+      ],
+      "normalization": "extract_balance_labeled_amount",
+      "currency": "auto_detect",
+      "notes": "Balance amount labels",
+      "id": "money_029"
+    },
+    {
+      "name": "banking_debit_credit_columns",
+      "pattern": "(?:debit|credit|debito|credito)\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Credito R$ 99,90",
+        "Debit $125.40"
+      ],
+      "normalization": "capture_amount_with_polarity",
+      "currency": "auto_detect",
+      "notes": "Debit/credit-labeled monetary amount",
+      "id": "money_030"
+    },
+    {
+      "id": "money_031",
+      "name": "brl_code_prefix",
+      "pattern": "BRL\\s?[\\d.]+,?\\d{0,2}",
+      "examples": [
+        "BRL 1.234,56",
+        "BRL100"
+      ],
+      "normalization": "strip_code_brazilian_format",
+      "currency": "BRL",
+      "notes": "Brazilian real with ISO code"
+    },
+    {
+      "id": "money_032",
+      "name": "brl_code_suffix",
+      "pattern": "[\\d.]+,?\\d{0,2}\\s?BRL",
+      "examples": [
+        "1.234,56 BRL",
+        "100 BRL"
+      ],
+      "normalization": "strip_code_brazilian_format",
+      "currency": "BRL",
+      "notes": "Brazilian real with ISO code suffix"
+    },
+    {
+      "name": "brl_parenthesis_negative",
+      "pattern": "\\(R\\$\\s?[\\d.]+,\\d{2}\\)",
+      "examples": [
+        "(R$ 125,45)"
+      ],
+      "normalization": "negate_strip_parenthesis_brl",
+      "currency": "BRL",
+      "notes": "Accounting negative BRL in parentheses",
+      "id": "money_033"
+    },
+    {
+      "id": "money_034",
+      "name": "brl_symbol_prefix",
+      "pattern": "R\\$\\s?[\\d.]+,?\\d{0,2}",
+      "examples": [
+        "R$ 100,00",
+        "R$0,99",
+        "R$1.234,56"
+      ],
+      "normalization": "strip_symbol_brazilian_format",
+      "currency": "BRL",
+      "notes": "Brazilian real with R$ prefix, period grouping, comma decimal"
+    },
+    {
+      "id": "money_035",
+      "name": "cad_symbol_prefix",
+      "pattern": "C\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "C$ 100",
+        "C$1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "CAD",
+      "notes": "Canadian dollar with C$ prefix"
+    },
+    {
+      "id": "money_036",
+      "name": "cents_only",
+      "pattern": "\\d{1,2}\\s?(?:cents|centavos|\\u00a2|c)",
+      "examples": [
+        "50 centavos",
+        "50c",
+        "99 cents",
+        "99¢"
+      ],
+      "normalization": "convert_cents_to_decimal",
+      "currency": "auto_detect",
+      "notes": "Cent/centavo amounts"
+    },
+    {
+      "id": "money_037",
+      "name": "chf_code_prefix",
+      "pattern": "CHF\\s?[\\d',]+\\.?\\d{0,2}",
+      "examples": [
+        "CHF 1'234.56",
+        "CHF1,234.56"
+      ],
+      "normalization": "strip_code_swiss_format",
+      "currency": "CHF",
+      "notes": "Swiss franc with apostrophe or comma grouping"
+    },
+    {
+      "id": "money_038",
+      "name": "cny_symbol_prefix",
+      "pattern": "\\u00a5\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "¥ 100",
+        "¥1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "CNY",
+      "notes": "Chinese yuan with ¥ prefix (same symbol as JPY, disambiguate by context)"
+    },
+    {
+      "name": "commission_percentage_amount",
+      "pattern": "\\d{1,2}(?:\\.\\d{1,2})?%\\s(?:commission|comissao)\\s(?:of|de)\\s[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "10% commission of $300.00"
+      ],
+      "normalization": "extract_percentage_and_base",
+      "currency": "auto_detect",
+      "notes": "Commission amount from percentage of base",
+      "id": "money_039"
+    },
+    {
+      "name": "copay_label",
+      "pattern": "(?:copay|coparticipacao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Copay: $35.00"
+      ],
+      "normalization": "extract_copay",
+      "currency": "auto_detect",
+      "notes": "Insurance copay amount",
+      "id": "money_040"
+    },
+    {
+      "name": "currency_after_parenthesis",
+      "pattern": "\\(\\s?[\\d.,]+\\s?\\)\\s?[A-Z]{3}",
+      "examples": [
+        "(1,230.44) USD"
+      ],
+      "normalization": "negate_strip_parenthesis_code_suffix",
+      "currency": "auto_detect",
+      "notes": "Parenthesized amount followed by currency code",
+      "id": "money_041"
+    },
+    {
+      "name": "currency_code_before_parenthesis",
+      "pattern": "[A-Z]{3}\\s?\\(\\s?[\\d.,]+\\s?\\)",
+      "examples": [
+        "BRL(120,00)",
+        "USD (1,230.44)"
+      ],
+      "normalization": "strip_code_parenthesis_parse",
+      "currency": "auto_detect",
+      "notes": "Currency code with parenthesized number",
+      "id": "money_042"
+    },
+    {
+      "id": "money_043",
+      "name": "dash_placeholder",
+      "pattern": "[\\$\\u20ac\\u00a3]\\s?[-\\u2013]+|R\\$\\s?[-\\u2013]+",
+      "examples": [
+        "$---",
+        "€-",
+        "R$---"
+      ],
+      "normalization": "null_amount",
+      "currency": "auto_detect",
+      "notes": "Dash placeholder indicating no value"
+    },
+    {
+      "name": "deductible_label",
+      "pattern": "(?:deductible|franquia)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Deductible: $500.00"
+      ],
+      "normalization": "extract_deductible",
+      "currency": "auto_detect",
+      "notes": "Insurance deductible amount",
+      "id": "money_044"
+    },
+    {
+      "id": "money_045",
+      "name": "dkk_suffix",
+      "pattern": "[\\d.]+,?\\d{0,2}\\s?(?:kr|DKK)",
+      "examples": [
+        "1.234,56 kr",
+        "100 DKK"
+      ],
+      "normalization": "strip_suffix_european_format",
+      "currency": "DKK",
+      "notes": "Danish krone with kr/DKK suffix"
+    },
+    {
+      "name": "due_in_installments_label",
+      "pattern": "(?:\\d+\\sx\\sde|\\d+\\sinstallments\\sof)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "10 x de R$ 59,99",
+        "12 installments of $89.90"
+      ],
+      "normalization": "extract_installment_count_and_amount",
+      "currency": "auto_detect",
+      "notes": "Installment count and installment amount",
+      "id": "money_046"
+    },
+    {
+      "id": "money_047",
+      "name": "eur_code_prefix",
+      "pattern": "EUR\\s?[\\d.,]+",
+      "examples": [
+        "EUR 1.234,56",
+        "EUR1000"
+      ],
+      "normalization": "strip_code_european_format",
+      "currency": "EUR",
+      "notes": "Euro with ISO code prefix"
+    },
+    {
+      "id": "money_048",
+      "name": "eur_code_suffix",
+      "pattern": "[\\d.,]+\\s?EUR",
+      "examples": [
+        "1.234,56 EUR",
+        "100 EUR"
+      ],
+      "normalization": "strip_code_european_format",
+      "currency": "EUR",
+      "notes": "Euro with ISO code suffix"
+    },
+    {
+      "name": "eur_space_grouping",
+      "pattern": "\\u20ac\\s?\\d{1,3}(?:\\s\\d{3})+,\\d{2}",
+      "examples": [
+        "€ 1 234 567,89"
+      ],
+      "normalization": "strip_symbol_space_grouping",
+      "currency": "EUR",
+      "notes": "EUR using space thousand separator",
+      "id": "money_049"
+    },
+    {
+      "id": "money_050",
+      "name": "eur_symbol_prefix",
+      "pattern": "\\u20ac\\s?[\\d.,]+",
+      "examples": [
+        "€ 100",
+        "€1.234,56",
+        "€50.00"
+      ],
+      "normalization": "strip_symbol_european_format",
+      "currency": "EUR",
+      "notes": "Euro with € prefix, supports both decimal conventions"
+    },
+    {
+      "name": "fixed_fee_label",
+      "pattern": "(?:fixed\\sfee|taxa\\sfixa)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Fixed fee: $12.00"
+      ],
+      "normalization": "extract_fixed_fee",
+      "currency": "auto_detect",
+      "notes": "Fixed fee label",
+      "id": "money_051"
+    },
+    {
+      "name": "fuel_surcharge_label",
+      "pattern": "(?:fuel\\ssurcharge|taxa\\sde\\scombustivel)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Fuel surcharge: $45.00"
+      ],
+      "normalization": "extract_surcharge",
+      "currency": "auto_detect",
+      "notes": "Travel fuel surcharge amount",
+      "id": "money_052"
+    },
+    {
+      "id": "money_053",
+      "name": "gbp_code_prefix",
+      "pattern": "GBP\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "GBP 1,234.56",
+        "GBP1000"
+      ],
+      "normalization": "strip_code_and_commas",
+      "currency": "GBP",
+      "notes": "British pound with ISO code"
+    },
+    {
+      "name": "gbp_space_grouping",
+      "pattern": "\\u00a3\\s?\\d{1,3}(?:\\s\\d{3})+\\.?\\d{2}",
+      "examples": [
+        "£ 1 234 567.89"
+      ],
+      "normalization": "strip_symbol_space_grouping",
+      "currency": "GBP",
+      "notes": "GBP using space thousand separator",
+      "id": "money_054"
+    },
+    {
+      "id": "money_055",
+      "name": "gbp_symbol_prefix",
+      "pattern": "\\u00a3\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "£ 100",
+        "£1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "GBP",
+      "notes": "British pound with £ prefix"
+    },
+    {
+      "id": "money_056",
+      "name": "generic_iso_code_prefix",
+      "pattern": "[A-Z]{3}\\s[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "CLP 1,234",
+        "COP 1,234.56",
+        "PEN 100.00"
+      ],
+      "normalization": "strip_code_and_commas",
+      "currency": "auto_detect",
+      "notes": "Generic ISO currency code prefix for less common currencies"
+    },
+    {
+      "id": "money_057",
+      "name": "generic_iso_code_suffix",
+      "pattern": "[\\d,]+\\.?\\d{0,2}\\s[A-Z]{3}",
+      "examples": [
+        "1,234.56 ARS",
+        "100 HUF",
+        "50.00 CZK"
+      ],
+      "normalization": "strip_code_and_commas",
+      "currency": "auto_detect",
+      "notes": "Generic ISO currency code suffix"
+    },
+    {
+      "id": "money_058",
+      "name": "hkd_symbol_prefix",
+      "pattern": "HK\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "HK$ 100",
+        "HK$1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "HKD",
+      "notes": "Hong Kong dollar with HK$ prefix"
+    },
+    {
+      "id": "money_059",
+      "name": "idr_prefix",
+      "pattern": "Rp\\s?[\\d.]+,?\\d{0,2}",
+      "examples": [
+        "Rp 100.000",
+        "Rp1.234.567"
+      ],
+      "normalization": "strip_prefix_indonesian_format",
+      "currency": "IDR",
+      "notes": "Indonesian rupiah with Rp prefix"
+    },
+    {
+      "id": "money_060",
+      "name": "ils_symbol_prefix",
+      "pattern": "\\u20aa\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "₪ 100",
+        "₪1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "ILS",
+      "notes": "Israeli new shekel with ₪ prefix"
+    },
+    {
+      "id": "money_061",
+      "name": "inr_code_prefix",
+      "pattern": "INR\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "INR 1,23,456.78",
+        "INR1000"
+      ],
+      "normalization": "strip_code_indian_format",
+      "currency": "INR",
+      "notes": "Indian rupee with ISO code"
+    },
+    {
+      "id": "money_062",
+      "name": "inr_symbol_prefix",
+      "pattern": "\\u20b9\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "₹ 100",
+        "₹1,23,456.78"
+      ],
+      "normalization": "strip_symbol_indian_format",
+      "currency": "INR",
+      "notes": "Indian rupee with ₹ prefix, lakh/crore grouping"
+    },
+    {
+      "name": "installment_fraction_amount",
+      "pattern": "\\d{1,2}\\/\\d{1,2}\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "03/10 R$ 500,00",
+        "1/12 $1200.00"
+      ],
+      "normalization": "extract_installment_marker_and_amount",
+      "currency": "auto_detect",
+      "notes": "Installment fraction plus amount",
+      "id": "money_063"
+    },
+    {
+      "name": "insurance_premium_label",
+      "pattern": "(?:premium|premio)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Premio: R$ 200,00",
+        "Premium: $80.00"
+      ],
+      "normalization": "extract_premium",
+      "currency": "auto_detect",
+      "notes": "Insurance premium amount",
+      "id": "money_064"
+    },
+    {
+      "name": "interest_charge_label",
+      "pattern": "(?:interest\\scharge|juros)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Interest charge: $12.44"
+      ],
+      "normalization": "extract_interest_amount",
+      "currency": "auto_detect",
+      "notes": "Interest charge extraction",
+      "id": "money_065"
+    },
+    {
+      "name": "iso_code_with_apostrophe_grouping",
+      "pattern": "[A-Z]{3}s?d{1,3}(?:'d{3})+(?:.d{2})?",
+      "examples": [
+        "CHF 1'234'567.89"
+      ],
+      "normalization": "strip_code_apostrophe_grouping",
+      "currency": "auto_detect",
+      "notes": "ISO code with apostrophe thousand separators",
+      "id": "money_066"
+    },
+    {
+      "id": "money_067",
+      "name": "jpy_code_prefix",
+      "pattern": "JPY\\s?[\\d,]+",
+      "examples": [
+        "JPY 1,234",
+        "JPY100000"
+      ],
+      "normalization": "strip_code_and_commas_no_decimal",
+      "currency": "JPY",
+      "notes": "Japanese yen with ISO code"
+    },
+    {
+      "id": "money_068",
+      "name": "jpy_symbol_prefix",
+      "pattern": "\\u00a5\\s?[\\d,]+",
+      "examples": [
+        "¥ 100000",
+        "¥1,234"
+      ],
+      "normalization": "strip_symbol_and_commas_no_decimal",
+      "currency": "JPY",
+      "notes": "Japanese yen with ¥ prefix, no decimal places"
+    },
+    {
+      "id": "money_069",
+      "name": "krw_symbol_prefix",
+      "pattern": "\\u20a9\\s?[\\d,]+",
+      "examples": [
+        "₩ 100000",
+        "₩1,234"
+      ],
+      "normalization": "strip_symbol_and_commas_no_decimal",
+      "currency": "KRW",
+      "notes": "Korean won with ₩ prefix, no decimals"
+    },
+    {
+      "name": "large_grouped_amount",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?\\d{1,3}(?:[.,\\s]\\d{3}){2,}(?:[.,]\\d{2})?",
+      "examples": [
+        "$1,234,567,890.99",
+        "R$ 1.234.567.890,99"
+      ],
+      "normalization": "normalize_multi_group_separator",
+      "currency": "auto_detect",
+      "notes": "Very large grouped amount",
+      "id": "money_070"
+    },
+    {
+      "name": "late_fee_label",
+      "pattern": "(?:late\\sfee|multa\\sde\\satraso)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Late fee: $25.00"
+      ],
+      "normalization": "extract_late_fee",
+      "currency": "auto_detect",
+      "notes": "Late fee extraction",
+      "id": "money_071"
+    },
+    {
+      "name": "loan_interest_label",
+      "pattern": "(?:interest)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Interest: $430.50"
+      ],
+      "normalization": "extract_interest_amount",
+      "currency": "auto_detect",
+      "notes": "Loan interest amount label",
+      "id": "money_072"
+    },
+    {
+      "name": "loan_principal_label",
+      "pattern": "(?:principal)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Principal: $85,000.00"
+      ],
+      "normalization": "extract_principal_amount",
+      "currency": "auto_detect",
+      "notes": "Loan principal amount label",
+      "id": "money_073"
+    },
+    {
+      "name": "minimum_payment_label",
+      "pattern": "(?:minimum\\spayment|minimo\\sa\\spagar)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Minimum payment: $45.00"
+      ],
+      "normalization": "extract_minimum_payment",
+      "currency": "auto_detect",
+      "notes": "Minimum payment amount",
+      "id": "money_074"
+    },
+    {
+      "id": "money_075",
+      "name": "mixed_currency_indicator",
+      "pattern": "(?:USD|EUR|GBP|BRL|JPY|CAD|AUD|CHF|CNY|INR|MXN)\\s?[\\d.,]+\\s?(?:million|billion|thousand|mil|milhao|bilhao)",
+      "examples": [
+        "BRL 500 mil",
+        "EUR 2.3 billion",
+        "USD 1.5 million"
+      ],
+      "normalization": "expand_with_code",
+      "currency": "auto_detect",
+      "notes": "ISO code with abbreviated magnitude"
+    },
+    {
+      "name": "mortgage_payment_label",
+      "pattern": "(?:mortgage\\spayment|parcela\\sda\\shipoteca)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Mortgage payment: $2,050.00"
+      ],
+      "normalization": "extract_mortgage_payment",
+      "currency": "auto_detect",
+      "notes": "Mortgage installment amount",
+      "id": "money_076"
+    },
+    {
+      "id": "money_077",
+      "name": "mxn_symbol_prefix",
+      "pattern": "MX\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "MX$ 100",
+        "MX$1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "MXN",
+      "notes": "Mexican peso with MX$ prefix"
+    },
+    {
+      "id": "money_078",
+      "name": "myr_prefix",
+      "pattern": "RM\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "RM 100",
+        "RM1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "MYR",
+      "notes": "Malaysian ringgit with RM prefix"
+    },
+    {
+      "id": "money_079",
+      "name": "nok_suffix",
+      "pattern": "[\\d\\s]+,?\\d{0,2}\\s?(?:kr|NOK)",
+      "examples": [
+        "1 234,56 kr",
+        "100 NOK"
+      ],
+      "normalization": "strip_suffix_nordic_format",
+      "currency": "NOK",
+      "notes": "Norwegian krone with kr/NOK suffix"
+    },
+    {
+      "id": "money_080",
+      "name": "nzd_symbol_prefix",
+      "pattern": "NZ\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "NZ$ 100",
+        "NZ$1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "NZD",
+      "notes": "New Zealand dollar with NZ$ prefix"
+    },
+    {
+      "id": "money_081",
+      "name": "per_unit_brl",
+      "pattern": "R\\$[\\d.,]+\\s?/\\s?(?:unidade|hora|dia|mes|ano|kg|peca)",
+      "examples": [
+        "R$100/mes",
+        "R$5/unidade",
+        "R$50/hora"
+      ],
+      "normalization": "parse_per_unit_brl",
+      "currency": "BRL",
+      "notes": "BRL per-unit pricing in Portuguese"
+    },
+    {
+      "id": "money_082",
+      "name": "per_unit_eur",
+      "pattern": "\\u20ac[\\d.,]+\\s?/\\s?(?:unit|hr|hour|day|month|year|piece|kg)",
+      "examples": [
+        "€1.200/month",
+        "€10/hr",
+        "€50/day"
+      ],
+      "normalization": "parse_per_unit",
+      "currency": "EUR",
+      "notes": "EUR per-unit pricing"
+    },
+    {
+      "id": "money_083",
+      "name": "per_unit_usd",
+      "pattern": "\\$[\\d,]+\\.?\\d{0,2}\\s?/\\s?(?:unit|hr|hour|day|month|year|item|piece|kg|lb)",
+      "examples": [
+        "$1,200/month",
+        "$10/hr",
+        "$100/day",
+        "$5/unit"
+      ],
+      "normalization": "parse_per_unit",
+      "currency": "USD",
+      "notes": "USD per-unit pricing"
+    },
+    {
+      "id": "money_084",
+      "name": "percentage_of_amount",
+      "pattern": "\\d+\\.?\\d*%\\s?(?:of|de|do)\\s?[\\$\\u20ac\\u00a3R\\$][\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "10% de R$500.000",
+        "2.5% of €1,000",
+        "5% of $1,000,000"
+      ],
+      "normalization": "compute_percentage",
+      "currency": "auto_detect",
+      "notes": "Percentage of a monetary amount"
+    },
+    {
+      "id": "money_085",
+      "name": "php_symbol_prefix",
+      "pattern": "\\u20b1\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "₱ 100",
+        "₱1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "PHP",
+      "notes": "Philippine peso with ₱ prefix"
+    },
+    {
+      "id": "money_086",
+      "name": "pln_suffix",
+      "pattern": "[\\d\\s]+,?\\d{0,2}\\s?(?:zl|PLN)",
+      "examples": [
+        "1 234,56 zl",
+        "100 PLN"
+      ],
+      "normalization": "strip_suffix_european_format",
+      "currency": "PLN",
+      "notes": "Polish zloty with zl/PLN suffix"
+    },
+    {
+      "name": "property_tax_label",
+      "pattern": "(?:property\\stax|iptu)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "IPTU: R$ 980,00",
+        "Property tax: $720.00"
+      ],
+      "normalization": "extract_property_tax",
+      "currency": "auto_detect",
+      "notes": "Property tax amount",
+      "id": "money_087"
+    },
+    {
+      "id": "money_088",
+      "name": "range_brl_between",
+      "pattern": "(?:between|entre)\\s?R\\$[\\d.,]+\\s?(?:and|e)\\s?R\\$[\\d.,]+",
+      "examples": [
+        "between R$1.000 and R$2.000",
+        "entre R$500 e R$1.000"
+      ],
+      "normalization": "parse_range_brl",
+      "currency": "BRL",
+      "notes": "BRL range with between/entre"
+    },
+    {
+      "id": "money_089",
+      "name": "range_eur_to",
+      "pattern": "\\u20ac[\\d.,]+\\s?(?:to|a|ate)\\s?\\u20ac[\\d.,]+",
+      "examples": [
+        "€1.000 a €2.000",
+        "€50 to €100"
+      ],
+      "normalization": "parse_range_eur",
+      "currency": "EUR",
+      "notes": "EUR range with to/a"
+    },
+    {
+      "id": "money_090",
+      "name": "range_generic",
+      "pattern": "[\\d,]+\\.?\\d{0,2}\\s?[-\\u2013]\\s?[\\d,]+\\.?\\d{0,2}\\s?[A-Z]{3}",
+      "examples": [
+        "1,000–2,000 EUR",
+        "100-200 USD"
+      ],
+      "normalization": "parse_range_generic",
+      "currency": "auto_detect",
+      "notes": "Generic currency range with ISO code suffix"
+    },
+    {
+      "id": "money_091",
+      "name": "range_usd_dash",
+      "pattern": "\\$[\\d,]+\\.?\\d{0,2}\\s?[-\\u2013]\\s?\\$[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "$1,000 - $2,000",
+        "$100-$200",
+        "$50–$100"
+      ],
+      "normalization": "parse_range_usd",
+      "currency": "USD",
+      "notes": "USD range with dash/en-dash"
+    },
+    {
+      "name": "range_with_to_word_and_code",
+      "pattern": "[\\d.,]+\\s?(?:to|a|ate)\\s?[\\d.,]+\\s?[A-Z]{3}",
+      "examples": [
+        "100 to 200 USD",
+        "120 a 240 BRL"
+      ],
+      "normalization": "parse_numeric_range_with_code",
+      "currency": "auto_detect",
+      "notes": "Numeric range with ISO code suffix",
+      "id": "money_092"
+    },
+    {
+      "name": "reimbursement_label",
+      "pattern": "(?:reimbursement|reembolso)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Reimbursement: $220.00"
+      ],
+      "normalization": "extract_reimbursement_amount",
+      "currency": "auto_detect",
+      "notes": "Reimbursement amount",
+      "id": "money_093"
+    },
+    {
+      "name": "rent_amount_label",
+      "pattern": "(?:rent|aluguel)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Aluguel: R$ 2.500,00",
+        "Rent: $1,650.00"
+      ],
+      "normalization": "extract_rent_amount",
+      "currency": "auto_detect",
+      "notes": "Housing rent amount",
+      "id": "money_094"
+    },
+    {
+      "name": "salary_gross_label",
+      "pattern": "(?:gross\\ssalary|salario\\sbruto)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Gross salary: $4,200.00"
+      ],
+      "normalization": "extract_gross_salary",
+      "currency": "auto_detect",
+      "notes": "Gross salary amount",
+      "id": "money_095"
+    },
+    {
+      "name": "salary_net_label",
+      "pattern": "(?:net\\spay|salario\\sliquido)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Net pay: $3,100.00"
+      ],
+      "normalization": "extract_net_salary",
+      "currency": "auto_detect",
+      "notes": "Net salary amount",
+      "id": "money_096"
+    },
+    {
+      "id": "money_097",
+      "name": "sar_code_prefix",
+      "pattern": "SAR\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "SAR 1,234.56",
+        "SAR1000"
+      ],
+      "normalization": "strip_code_and_commas",
+      "currency": "SAR",
+      "notes": "Saudi riyal with ISO code"
+    },
+    {
+      "name": "security_deposit_label",
+      "pattern": "(?:security\\sdeposit|caucao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Security deposit: $1,000.00"
+      ],
+      "normalization": "extract_security_deposit",
+      "currency": "auto_detect",
+      "notes": "Security deposit amount",
+      "id": "money_098"
+    },
+    {
+      "id": "money_099",
+      "name": "sek_suffix",
+      "pattern": "[\\d\\s]+,?\\d{0,2}\\s?(?:kr|SEK)",
+      "examples": [
+        "1 234,56 kr",
+        "100 SEK"
+      ],
+      "normalization": "strip_suffix_nordic_format",
+      "currency": "SEK",
+      "notes": "Swedish krona with kr/SEK suffix, space grouping"
+    },
+    {
+      "id": "money_100",
+      "name": "sgd_symbol_prefix",
+      "pattern": "S\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "S$ 100",
+        "S$1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "SGD",
+      "notes": "Singapore dollar with S$ prefix"
+    },
+    {
+      "name": "short_notation_mn_code",
+      "pattern": "[A-Z]{3}\\s?[\\d.]+\\s?(?:mn|bn|k)",
+      "examples": [
+        "BRL 500 k",
+        "EUR 4.0 bn",
+        "USD 1.2 mn"
+      ],
+      "normalization": "expand_short_magnitude_suffix",
+      "currency": "auto_detect",
+      "notes": "Short magnitude notation mn/bn/k",
+      "id": "money_101"
+    },
+    {
+      "name": "signed_amount_with_dr_cr",
+      "pattern": "[+-]?\\s?[\\d,]+\\.?\\d{0,2}\\s?(?:DR|CR|dr|cr)",
+      "examples": [
+        "-500.00 CR",
+        "+1,200.00 DR"
+      ],
+      "normalization": "parse_signed_and_polarity_suffix",
+      "currency": "auto_detect",
+      "notes": "Signed amount with DR/CR suffix",
+      "id": "money_102"
+    },
+    {
+      "name": "signed_parenthesis_with_code",
+      "pattern": "[A-Z]{3}\\s?\\(\\s?[\\d.,]+\\s?\\)\\s?(?:DR|CR)?",
+      "examples": [
+        "USD (1,220.00) CR"
+      ],
+      "normalization": "parse_parenthesis_signed_with_code",
+      "currency": "auto_detect",
+      "notes": "Signed parenthesis with currency code and optional DR/CR",
+      "id": "money_103"
+    },
+    {
+      "name": "small_decimal_amount",
+      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?0[.,]\\d{1,4}",
+      "examples": [
+        "$0.0099",
+        "R$ 0,0025"
+      ],
+      "normalization": "preserve_small_decimal_scale",
+      "currency": "auto_detect",
+      "notes": "Small fractional amount",
+      "id": "money_104"
+    },
+    {
+      "name": "tax_due_label",
+      "pattern": "(?:tax\\sdue|imposto\\sdevido)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Tax due: $920.00"
+      ],
+      "normalization": "extract_tax_due",
+      "currency": "auto_detect",
+      "notes": "Tax due amount",
+      "id": "money_105"
+    },
+    {
+      "name": "tax_refund_label",
+      "pattern": "(?:tax\\srefund|restituicao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Restituicao: R$ 300,00",
+        "Tax refund: $240.00"
+      ],
+      "normalization": "extract_tax_refund",
+      "currency": "auto_detect",
+      "notes": "Tax refund amount",
+      "id": "money_106"
+    },
+    {
+      "id": "money_107",
+      "name": "thb_symbol_prefix",
+      "pattern": "\\u0e3f\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "฿ 100",
+        "฿1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "THB",
+      "notes": "Thai baht with ฿ prefix"
+    },
+    {
+      "id": "money_108",
+      "name": "thousands_separator_space",
+      "pattern": "[\\$\\u20ac\\u00a3]\\s?\\d{1,3}(?:\\s\\d{3})+\\.?\\d{0,2}",
+      "examples": [
+        "$ 1 234.56",
+        "£ 1 234 567.89",
+        "€ 10 000"
+      ],
+      "normalization": "strip_space_grouped",
+      "currency": "auto_detect",
+      "notes": "Space as thousands separator (common in French, some European)"
+    },
+    {
+      "name": "total_after_tax_label",
+      "pattern": "(?:after\\stax|apos\\simposto)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "After tax: $236.00"
+      ],
+      "normalization": "extract_post_tax_total",
+      "currency": "auto_detect",
+      "notes": "Amount after tax",
+      "id": "money_109"
+    },
+    {
+      "name": "total_before_tax_label",
+      "pattern": "(?:before\\stax|antes\\sde\\simposto)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Before tax: $200.00"
+      ],
+      "normalization": "extract_pre_tax_total",
+      "currency": "auto_detect",
+      "notes": "Amount before tax",
+      "id": "money_110"
+    },
+    {
+      "name": "total_paid_label",
+      "pattern": "(?:total\\spaid|total\\spago)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Total paid: $345.12"
+      ],
+      "normalization": "extract_total_paid",
+      "currency": "auto_detect",
+      "notes": "Total paid amount label",
+      "id": "money_111"
+    },
+    {
+      "id": "money_112",
+      "name": "try_symbol_prefix",
+      "pattern": "\\u20ba\\s?[\\d.]+,?\\d{0,2}",
+      "examples": [
+        "₺ 100",
+        "₺1.234,56"
+      ],
+      "normalization": "strip_symbol_european_format",
+      "currency": "TRY",
+      "notes": "Turkish lira with ₺ prefix"
+    },
+    {
+      "name": "tuition_fee_label",
+      "pattern": "(?:tuition|mensalidade)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Tuition: $3,500.00"
+      ],
+      "normalization": "extract_tuition_amount",
+      "currency": "auto_detect",
+      "notes": "Education tuition amount",
+      "id": "money_113"
+    },
+    {
+      "id": "money_114",
+      "name": "twd_prefix",
+      "pattern": "NT\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "NT$ 100",
+        "NT$1,234"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "TWD",
+      "notes": "Taiwan dollar with NT$ prefix"
+    },
+    {
+      "id": "money_115",
+      "name": "up_to_amount",
+      "pattern": "(?:up to|ate|no maximo)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "ate R$5.000",
+        "no maximo €500",
+        "up to $10,000"
+      ],
+      "normalization": "flag_maximum",
+      "currency": "auto_detect",
+      "notes": "Maximum/ceiling amounts"
+    },
+    {
+      "id": "money_116",
+      "name": "usd_code_prefix",
+      "pattern": "USD\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "USD 1,234.56",
+        "USD1000"
+      ],
+      "normalization": "strip_code_and_commas",
+      "currency": "USD",
+      "notes": "US dollar with ISO code prefix"
+    },
+    {
+      "id": "money_117",
+      "name": "usd_code_suffix",
+      "pattern": "[\\d,]+\\.?\\d{0,2}\\s?USD",
+      "examples": [
+        "1,234.56 USD",
+        "100USD"
+      ],
+      "normalization": "strip_code_and_commas",
+      "currency": "USD",
+      "notes": "US dollar with ISO code suffix"
+    },
+    {
+      "name": "usd_parenthesis_negative",
+      "pattern": "\\(\\$\\s?[\\d,]+\\.?\\d{0,2}\\)",
+      "examples": [
+        "($125.45)"
+      ],
+      "normalization": "negate_strip_parenthesis",
+      "currency": "USD",
+      "notes": "Accounting negative USD in parentheses",
+      "id": "money_118"
+    },
+    {
+      "id": "money_119",
+      "name": "usd_symbol_prefix",
+      "pattern": "\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "examples": [
+        "$ 100",
+        "$0.99",
+        "$1,234.56"
+      ],
+      "normalization": "strip_symbol_and_commas",
+      "currency": "USD",
+      "notes": "US dollar with $ prefix, optional space, comma grouping"
+    },
+    {
+      "name": "value_in_words_en_currency",
+      "pattern": "(?:one|two|three|four|five|six|seven|eight|nine|ten)\\s(?:hundred|thousand|million)?\\s(?:dollars|euros|pounds)",
+      "examples": [
+        "two thousand dollars"
+      ],
+      "normalization": "parse_written_amount_words_en",
+      "currency": "auto_detect",
+      "notes": "Written amount in English words",
+      "id": "money_120"
+    },
+    {
+      "name": "value_in_words_pt_currency",
+      "pattern": "(?:um|dois|tres|quatro|cinco|seis|sete|oito|nove|dez)\\s(?:mil|milhao|milhoes)?\\s(?:reais|dolares|euros)",
+      "examples": [
+        "dois mil reais"
+      ],
+      "normalization": "parse_written_amount_words_pt",
+      "currency": "auto_detect",
+      "notes": "Written amount in Portuguese words",
+      "id": "money_121"
+    },
+    {
+      "name": "variable_fee_label",
+      "pattern": "(?:variable\\sfee|taxa\\svariavel)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Variable fee: $4.56"
+      ],
+      "normalization": "extract_variable_fee",
+      "currency": "auto_detect",
+      "notes": "Variable fee label",
+      "id": "money_122"
+    },
+    {
+      "name": "with_currency_word_en",
+      "pattern": "[\\d.,]+\\s(?:US\\sdollars|euros|pounds)",
+      "examples": [
+        "1200 US dollars",
+        "300 euros"
+      ],
+      "normalization": "extract_amount_currency_word",
+      "currency": "auto_detect",
+      "notes": "Amount with English currency word",
+      "id": "money_123"
+    },
+    {
+      "name": "with_currency_word_pt",
+      "pattern": "[\\d.,]+\\s(?:reais|dolares|euros)",
+      "examples": [
+        "1200 reais",
+        "300 dolares"
+      ],
+      "normalization": "extract_amount_currency_word",
+      "currency": "auto_detect",
+      "notes": "Amount with Portuguese currency word",
+      "id": "money_124"
+    },
+    {
+      "name": "withholding_label",
+      "pattern": "(?:withholding|retencao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Retencao: R$ 80,00",
+        "Withholding: $120.00"
+      ],
+      "normalization": "extract_withholding_amount",
+      "currency": "auto_detect",
+      "notes": "Tax withholding amount",
+      "id": "money_125"
+    },
+    {
+      "id": "money_126",
+      "name": "written_amount_en_thousands",
+      "pattern": "(?:\\w+\\s)?(?:thousand|million|billion|trillion)\\s(?:dollars|euros|pounds|reais)",
+      "examples": [
+        "five thousand dollars",
+        "one million euros",
+        "two billion pounds"
+      ],
+      "normalization": "parse_written_en",
+      "currency": "auto_detect",
+      "notes": "Written English amounts with currency name"
+    },
+    {
+      "id": "money_127",
+      "name": "written_amount_pt",
+      "pattern": "(?:\\w+\\s)?(?:mil|milhao|milhoes|bilhao|bilhoes|trilhao)\\s(?:reais|dolares|euros)",
+      "examples": [
+        "cinco mil reais",
+        "dois bilhoes de euros",
+        "um milhao de dolares"
+      ],
+      "normalization": "parse_written_pt",
+      "currency": "auto_detect",
+      "notes": "Written Portuguese amounts with currency name"
+    },
+    {
+      "id": "money_128",
+      "name": "zar_symbol_prefix",
+      "pattern": "R\\s?[\\d\\s]+\\.?\\d{0,2}",
+      "examples": [
+        "R 1 234.56",
+        "R100"
+      ],
+      "normalization": "strip_symbol_space_grouped",
+      "currency": "ZAR",
+      "notes": "South African rand with R prefix"
+    },
+    {
+      "id": "money_129",
+      "name": "zero_amount",
+      "pattern": "[\\$\\u20ac\\u00a3]\\s?0\\.?0{0,2}|R\\$\\s?0,?0{0,2}|0\\.00\\s?[A-Z]{3}",
+      "examples": [
+        "$0.00",
+        "€0",
+        "0.00 USD",
+        "R$0,00"
+      ],
+      "normalization": "zero",
+      "currency": "auto_detect",
+      "notes": "Zero monetary amounts"
     }
   ]
 }

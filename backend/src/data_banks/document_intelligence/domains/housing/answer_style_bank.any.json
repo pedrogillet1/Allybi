@@ -1,0 +1,100 @@
+{
+  "_meta": {
+    "id": "di_housing_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer style rules for housing domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing"
+  },
+  "domain": "housing",
+  "audienceProfiles": [
+    {
+      "id": "consumer",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "low"
+    },
+    {
+      "id": "operations",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "analyst",
+      "tone": "analytical",
+      "defaultDepth": "decision_memo",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "housing_style_001_scope",
+      "rule": "Answer only from attached document evidence and mark unknowns explicitly.",
+      "applies": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "housing_style_002_dates",
+      "rule": "Use ISO date format (YYYY-MM-DD) for extracted dates.",
+      "applies": [
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "id": "housing_style_003_currency",
+      "rule": "Always include currency code/symbol for monetary values.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "id": "housing_style_004_totals",
+      "rule": "When totals are requested, show components before final total when available.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize"
+      ]
+    },
+    {
+      "id": "housing_style_005_confidence",
+      "rule": "State uncertainty and missing evidence instead of inferring absent fields.",
+      "applies": [
+        "evaluate",
+        "validate",
+        "summarize"
+      ]
+    }
+  ]
+}

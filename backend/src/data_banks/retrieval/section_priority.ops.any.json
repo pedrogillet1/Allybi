@@ -1,0 +1,1889 @@
+{
+  "_meta": {
+    "id": "section_priority_ops",
+    "version": "1.0.0",
+    "description": "Section-priority rules for ops retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "mode": "deterministic_scan_order"
+  },
+  "domain": "ops",
+  "rules": [
+    {
+      "id": "ops_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "risk_register",
+        "playbook_improvements",
+        "resourcing",
+        "next_actions"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "playbook_improvements",
+        "resourcing",
+        "next_actions",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "risk_register",
+        "playbook_improvements",
+        "resourcing"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "uptime_table",
+        "response_time_table",
+        "capacity_table",
+        "error_budget"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "response_time_table",
+        "capacity_table",
+        "error_budget",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "uptime_table",
+        "response_time_table",
+        "capacity_table"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "sla_metrics",
+        "incident_trends",
+        "change_history",
+        "root_cause"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "change_history",
+        "root_cause",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "sla_metrics",
+        "incident_trends",
+        "change_history"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "root_cause",
+        "risk_register",
+        "control_gaps",
+        "capacity",
+        "operational_readiness"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "control_gaps",
+        "capacity",
+        "operational_readiness",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "root_cause",
+        "risk_register",
+        "control_gaps",
+        "capacity"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_log",
+        "sla_metrics",
+        "action_items",
+        "owners",
+        "due_dates"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "action_items",
+        "owners",
+        "due_dates",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_log",
+        "sla_metrics",
+        "action_items",
+        "owners"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index",
+        "checklist_index"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "runbook_index",
+        "incident_index",
+        "checklist_index",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "breach_log",
+        "incident_trends",
+        "alert_stream",
+        "checklist_status"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "alert_stream",
+        "checklist_status",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "breach_log",
+        "incident_trends",
+        "alert_stream"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index",
+        "checklist_index"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "runbook_index",
+        "incident_index",
+        "checklist_index",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index",
+        "checklist_index"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "runbook_index",
+        "incident_index",
+        "checklist_index",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "incident_summary",
+        "major_risks",
+        "actions",
+        "next_review"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "major_risks",
+        "actions",
+        "next_review",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "incident_summary",
+        "major_risks",
+        "actions"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "checklist_status",
+        "runbook_steps",
+        "sla_metrics",
+        "alerts",
+        "ownership_matrix"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "alerts",
+        "ownership_matrix",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "checklist_status",
+        "runbook_steps",
+        "sla_metrics",
+        "alerts"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_monitor_core_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "checklist"
+      ],
+      "sections": [
+        "sla_metrics",
+        "breach_log",
+        "incident_trends",
+        "checklist_status",
+        "action_items"
+      ]
+    },
+    {
+      "id": "ops_advise_core_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "incident_report",
+        "postmortem",
+        "runbook"
+      ],
+      "sections": [
+        "incident_trends",
+        "root_cause",
+        "playbook_improvements",
+        "checklist_status",
+        "next_actions"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "id": "ops_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "risk_register",
+        "playbook_improvements",
+        "resourcing",
+        "next_actions"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "playbook_improvements",
+        "resourcing",
+        "next_actions",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "risk_register",
+        "playbook_improvements",
+        "resourcing"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "uptime_table",
+        "response_time_table",
+        "capacity_table",
+        "error_budget"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "response_time_table",
+        "capacity_table",
+        "error_budget",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "uptime_table",
+        "response_time_table",
+        "capacity_table"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "sla_metrics",
+        "incident_trends",
+        "change_history",
+        "root_cause"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "change_history",
+        "root_cause",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "sla_metrics",
+        "incident_trends",
+        "change_history"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "root_cause",
+        "risk_register",
+        "control_gaps",
+        "capacity",
+        "operational_readiness"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "control_gaps",
+        "capacity",
+        "operational_readiness",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "root_cause",
+        "risk_register",
+        "control_gaps",
+        "capacity"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_log",
+        "sla_metrics",
+        "action_items",
+        "owners",
+        "due_dates"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "action_items",
+        "owners",
+        "due_dates",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_log",
+        "sla_metrics",
+        "action_items",
+        "owners"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index",
+        "checklist_index"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "runbook_index",
+        "incident_index",
+        "checklist_index",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "breach_log",
+        "incident_trends",
+        "alert_stream",
+        "checklist_status"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "incident_trends",
+        "alert_stream",
+        "checklist_status",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "breach_log",
+        "incident_trends",
+        "alert_stream"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index",
+        "checklist_index"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "runbook_index",
+        "incident_index",
+        "checklist_index",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index",
+        "checklist_index"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "runbook_index",
+        "incident_index",
+        "checklist_index",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "service_index",
+        "runbook_index",
+        "incident_index"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "incident_summary",
+        "major_risks",
+        "actions",
+        "next_review"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "major_risks",
+        "actions",
+        "next_review",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_summary",
+        "incident_summary",
+        "major_risks",
+        "actions"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "checklist_status",
+        "runbook_steps",
+        "sla_metrics",
+        "alerts",
+        "ownership_matrix"
+      ],
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "runbook"
+      ]
+    },
+    {
+      "id": "ops_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sla_metrics",
+        "alerts",
+        "ownership_matrix",
+        "service_summary",
+        "sla_metrics"
+      ],
+      "docTypes": [
+        "oncall_log",
+        "postmortem",
+        "service_dashboard"
+      ]
+    },
+    {
+      "id": "ops_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "checklist_status",
+        "runbook_steps",
+        "sla_metrics",
+        "alerts"
+      ],
+      "docTypes": [
+        "change_log",
+        "capacity_plan",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ops_monitor_core_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "sla_report",
+        "incident_report",
+        "checklist"
+      ],
+      "sections": [
+        "sla_metrics",
+        "breach_log",
+        "incident_trends",
+        "checklist_status",
+        "action_items"
+      ]
+    },
+    {
+      "id": "ops_advise_core_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "incident_report",
+        "postmortem",
+        "runbook"
+      ],
+      "sections": [
+        "incident_trends",
+        "root_cause",
+        "playbook_improvements",
+        "checklist_status",
+        "next_actions"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1889 @@
+{
+  "_meta": {
+    "id": "section_priority_medical",
+    "version": "1.0.0",
+    "description": "Section-priority rules for medical retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "mode": "deterministic_scan_order"
+  },
+  "domain": "medical",
+  "rules": [
+    {
+      "id": "medical_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "plan",
+        "safety_alerts",
+        "red_flags",
+        "follow_up"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "safety_alerts",
+        "red_flags",
+        "follow_up",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "plan",
+        "safety_alerts",
+        "red_flags"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "trend_table",
+        "dose_table",
+        "vitals_table",
+        "reference_range"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "dose_table",
+        "vitals_table",
+        "reference_range",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "trend_table",
+        "dose_table",
+        "vitals_table"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "trend_table",
+        "assessment",
+        "plan"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "trend_table",
+        "assessment",
+        "plan",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "trend_table",
+        "assessment"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "red_flags",
+        "safety_alerts",
+        "medication_list",
+        "plan"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "safety_alerts",
+        "medication_list",
+        "plan",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "red_flags",
+        "safety_alerts",
+        "medication_list"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "medication_list",
+        "allergies",
+        "diagnoses",
+        "procedures"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "allergies",
+        "diagnoses",
+        "procedures",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "medication_list",
+        "allergies",
+        "diagnoses"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "medication_section",
+        "assessment",
+        "plan"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "medication_section",
+        "assessment",
+        "plan",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "medication_section",
+        "assessment"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "vital_trends",
+        "critical_values",
+        "alerts",
+        "medication_changes",
+        "follow_up_tasks"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "alerts",
+        "medication_changes",
+        "follow_up_tasks",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "vital_trends",
+        "critical_values",
+        "alerts",
+        "medication_changes"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index",
+        "timeline_index"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "section_index",
+        "timeline_index",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index",
+        "timeline_index"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "section_index",
+        "timeline_index",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "impression",
+        "assessment",
+        "plan",
+        "key_results",
+        "follow_up"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "plan",
+        "key_results",
+        "follow_up",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "impression",
+        "assessment",
+        "plan",
+        "key_results"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "units",
+        "sample_info",
+        "critical_values"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "units",
+        "sample_info",
+        "critical_values",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "units",
+        "sample_info"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_advise_safety_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise",
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "lab_report",
+        "discharge_summary",
+        "consult_note"
+      ],
+      "sections": [
+        "results",
+        "reference_range",
+        "red_flags",
+        "safety_alerts",
+        "plan"
+      ]
+    },
+    {
+      "id": "medical_validate_ranges_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "cbc_panel",
+        "metabolic_panel"
+      ],
+      "sections": [
+        "results",
+        "units",
+        "reference_range",
+        "critical_values",
+        "assessment"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "id": "medical_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "plan",
+        "safety_alerts",
+        "red_flags",
+        "follow_up"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "safety_alerts",
+        "red_flags",
+        "follow_up",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "plan",
+        "safety_alerts",
+        "red_flags"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "trend_table",
+        "dose_table",
+        "vitals_table",
+        "reference_range"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "dose_table",
+        "vitals_table",
+        "reference_range",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "trend_table",
+        "dose_table",
+        "vitals_table"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "trend_table",
+        "assessment",
+        "plan"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "trend_table",
+        "assessment",
+        "plan",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "trend_table",
+        "assessment"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "red_flags",
+        "safety_alerts",
+        "medication_list",
+        "plan"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "safety_alerts",
+        "medication_list",
+        "plan",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "assessment",
+        "red_flags",
+        "safety_alerts",
+        "medication_list"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "medication_list",
+        "allergies",
+        "diagnoses",
+        "procedures"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "allergies",
+        "diagnoses",
+        "procedures",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "medication_list",
+        "allergies",
+        "diagnoses"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "medication_section",
+        "assessment",
+        "plan"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "medication_section",
+        "assessment",
+        "plan",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "medication_section",
+        "assessment"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "vital_trends",
+        "critical_values",
+        "alerts",
+        "medication_changes",
+        "follow_up_tasks"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "alerts",
+        "medication_changes",
+        "follow_up_tasks",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "vital_trends",
+        "critical_values",
+        "alerts",
+        "medication_changes"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index",
+        "timeline_index"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "section_index",
+        "timeline_index",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index",
+        "timeline_index"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "section_index",
+        "timeline_index",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "results_index",
+        "bookmarks",
+        "section_index"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "impression",
+        "assessment",
+        "plan",
+        "key_results",
+        "follow_up"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "plan",
+        "key_results",
+        "follow_up",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "impression",
+        "assessment",
+        "plan",
+        "key_results"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "units",
+        "sample_info",
+        "critical_values"
+      ],
+      "docTypes": [
+        "lab_report",
+        "cbc_panel",
+        "metabolic_panel"
+      ]
+    },
+    {
+      "id": "medical_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "units",
+        "sample_info",
+        "critical_values",
+        "impression",
+        "assessment"
+      ],
+      "docTypes": [
+        "imaging_report",
+        "discharge_summary",
+        "progress_note"
+      ]
+    },
+    {
+      "id": "medical_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "results",
+        "reference_range",
+        "units",
+        "sample_info"
+      ],
+      "docTypes": [
+        "medication_list",
+        "vital_signs_chart",
+        "care_plan"
+      ]
+    },
+    {
+      "id": "medical_advise_safety_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise",
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "lab_report",
+        "discharge_summary",
+        "consult_note"
+      ],
+      "sections": [
+        "results",
+        "reference_range",
+        "red_flags",
+        "safety_alerts",
+        "plan"
+      ]
+    },
+    {
+      "id": "medical_validate_ranges_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "cbc_panel",
+        "metabolic_panel"
+      ],
+      "sections": [
+        "results",
+        "units",
+        "reference_range",
+        "critical_values",
+        "assessment"
+      ]
+    }
+  ]
+}

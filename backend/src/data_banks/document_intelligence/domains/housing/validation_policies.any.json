@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "di_housing_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for housing extraction and reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing"
+  },
+  "domain": "housing",
+  "policies": [
+    {
+      "id": "housing_val_001_mortgage_reconciliation",
+      "severity": "error",
+      "description": "Principal + interest + escrow + fees - credits should reconcile to amount due.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "housing_total_reconciliation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "housing_val_002_rent_receipt_reconciliation",
+      "severity": "error",
+      "description": "Rent base amount plus fees minus discounts should match paid/total amount.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "housing_rent_total_reconciliation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "housing_val_003_tax_bill_reconciliation",
+      "severity": "warning",
+      "description": "Property tax components should reconcile to billed tax total.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "housing_tax_reconciliation",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "housing_val_004_date_order",
+      "severity": "warning",
+      "description": "Lease start date should not be later than lease end date; due date must fall within billing cycle when present.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "housing_date_order",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "housing_val_005_scope_lock",
+      "severity": "error",
+      "description": "Do not blend charges from different properties or statements.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "single_document_scope_lock",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

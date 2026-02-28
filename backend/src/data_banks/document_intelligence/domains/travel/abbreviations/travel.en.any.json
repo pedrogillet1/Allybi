@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_travel_abbreviations_en",
+    "version": "1.0.0",
+    "description": "EN abbreviations for travel domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "language": "en"
+  },
+  "domain": "travel",
+  "abbreviations": [
+    {
+      "abbr": "API",
+      "expansion": "Advance Passenger Information"
+    },
+    {
+      "abbr": "BAG",
+      "expansion": "Baggage"
+    },
+    {
+      "abbr": "BKG",
+      "expansion": "Booking"
+    },
+    {
+      "abbr": "COI",
+      "expansion": "Certificate of Insurance"
+    },
+    {
+      "abbr": "DOB",
+      "expansion": "Date of Birth"
+    },
+    {
+      "abbr": "E-TKT",
+      "expansion": "Electronic Ticket"
+    },
+    {
+      "abbr": "EMD",
+      "expansion": "Electronic Miscellaneous Document"
+    },
+    {
+      "abbr": "ETA",
+      "expansion": "Estimated Time of Arrival"
+    },
+    {
+      "abbr": "ETD",
+      "expansion": "Estimated Time of Departure"
+    },
+    {
+      "abbr": "GDS",
+      "expansion": "Global Distribution System"
+    },
+    {
+      "abbr": "IATA",
+      "expansion": "International Air Transport Association"
+    },
+    {
+      "abbr": "ICAO",
+      "expansion": "International Civil Aviation Organization"
+    },
+    {
+      "abbr": "NDC",
+      "expansion": "New Distribution Capability"
+    },
+    {
+      "abbr": "PAX",
+      "expansion": "Passenger"
+    },
+    {
+      "abbr": "PNR",
+      "expansion": "Passenger Name Record"
+    },
+    {
+      "abbr": "RLOC",
+      "expansion": "Record Locator"
+    },
+    {
+      "abbr": "SSR",
+      "expansion": "Special Service Request"
+    },
+    {
+      "abbr": "STA",
+      "expansion": "Scheduled Time of Arrival"
+    },
+    {
+      "abbr": "STD",
+      "expansion": "Scheduled Time of Departure"
+    },
+    {
+      "abbr": "VISA",
+      "expansion": "Travel Visa"
+    }
+  ]
+}

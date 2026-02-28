@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "id": "di_accounting_validation_policies",
+    "version": "1.1.0",
+    "description": "Validation policies for accounting domain — correctness checks, consistency guards, and quality gates.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting"
+  },
+  "domain": "accounting",
+  "policies": [
+    {
+      "id": "acct_val_001_debit_credit_balance",
+      "severity": "error",
+      "description": "Total debits must equal total credits in any journal entry or trial balance.",
+      "applies": ["extract", "validate", "calculate"],
+      "check": "debit_credit_equality",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_002_normal_balance",
+      "severity": "warning",
+      "description": "Flag accounts with balances opposite to their normal balance (e.g., credit balance in an asset account).",
+      "applies": ["extract", "validate"],
+      "check": "normal_balance_sign",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "acct_val_003_reconciliation_agreement",
+      "severity": "error",
+      "description": "Adjusted book balance must equal adjusted bank balance after all reconciling items.",
+      "applies": ["validate", "compare"],
+      "check": "reconciliation_tie_out",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_004_period_integrity",
+      "severity": "error",
+      "description": "Transactions must be posted within the correct accounting period. Flag out-of-period postings.",
+      "applies": ["validate", "extract"],
+      "check": "period_cutoff",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "acct_val_005_account_code_valid",
+      "severity": "warning",
+      "description": "Referenced account codes should exist in the chart of accounts.",
+      "applies": ["extract", "locate"],
+      "check": "account_code_existence",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "acct_val_006_subledger_tie",
+      "severity": "warning",
+      "description": "Subledger totals (AR, AP) must agree with the corresponding GL control account.",
+      "applies": ["validate", "compare"],
+      "check": "subledger_gl_agreement",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "acct_val_007_aging_total",
+      "severity": "error",
+      "description": "Sum of aging buckets must equal the total balance reported.",
+      "applies": ["extract", "validate"],
+      "check": "aging_bucket_sum",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_008_je_authorization",
+      "severity": "warning",
+      "description": "Manual or adjusting journal entries above materiality threshold should show authorization evidence.",
+      "applies": ["validate", "evaluate"],
+      "check": "je_authorization",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "acct_val_009_debit_credit_sign_convention",
+      "severity": "error",
+      "description": "Debit and credit sign convention must be explicit and consistent: either (a) debit and credit columns are unsigned positive values, or (b) a single signed amount column uses debit as positive and credit as negative with indicator support.",
+      "applies": ["extract", "validate", "calculate"],
+      "check": "debit_credit_sign_convention",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_010_balance_rollforward_signs",
+      "severity": "warning",
+      "description": "Rollforward schedules must apply sign direction consistently (increases/decreases) so opening plus net movement equals closing under the stated convention.",
+      "applies": ["extract", "validate", "compare"],
+      "check": "rollforward_sign_consistency",
+      "failureAction": "WARN_AND_EXPLAIN"
+    }
+  ]
+}

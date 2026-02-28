@@ -1,0 +1,879 @@
+{
+  "_meta": {
+    "id": "di_unit_and_measurement_ontology",
+    "version": "1.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "di_domain_ontology"
+    ],
+    "usedBy": [
+      "di_metric_ontology"
+    ],
+    "tests": [
+      "SSOT_UNIT_001"
+    ],
+    "lastUpdated": "2026-02-27",
+    "description": "di_unit_and_measurement_ontology (document_intelligence) configuration bank."
+  },
+  "config": {
+    "enabled": true
+  },
+  "unitFamilies": [
+    {
+      "id": "count",
+      "label": "Count",
+      "labelPt": "Contagem",
+      "baseUnit": "unit"
+    },
+    {
+      "id": "currency",
+      "label": "Currency",
+      "labelPt": "Moeda",
+      "baseUnit": "usd"
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "labelPt": "Comprimento",
+      "baseUnit": "meter"
+    },
+    {
+      "id": "mass",
+      "label": "Mass",
+      "labelPt": "Massa",
+      "baseUnit": "kilogram"
+    },
+    {
+      "id": "percentage",
+      "label": "Percentage",
+      "labelPt": "Percentual",
+      "baseUnit": "percent"
+    },
+    {
+      "id": "temperature_unit",
+      "label": "Temperature",
+      "labelPt": "Temperatura",
+      "baseUnit": "celsius"
+    },
+    {
+      "id": "time",
+      "label": "Time",
+      "labelPt": "Tempo",
+      "baseUnit": "second"
+    },
+    {
+      "id": "volume",
+      "label": "Volume",
+      "labelPt": "Volume",
+      "baseUnit": "liter"
+    }
+  ],
+  "units": [
+    {
+      "id": "billion",
+      "familyId": "count",
+      "label": "Billion",
+      "labelPt": "Bilhão",
+      "symbol": "B",
+      "conversionToBase": 1000000000,
+      "patterns": {
+        "en": [
+          "billion",
+          "B",
+          "bn",
+          "billions"
+        ],
+        "pt": [
+          "bilhão",
+          "bilhões",
+          "bi"
+        ]
+      }
+    },
+    {
+      "id": "dozen",
+      "familyId": "count",
+      "label": "Dozen",
+      "labelPt": "Dúzia",
+      "symbol": "dz",
+      "conversionToBase": 12,
+      "patterns": {
+        "en": [
+          "dozen",
+          "dz",
+          "dozens"
+        ],
+        "pt": [
+          "dúzia",
+          "dúzias",
+          "dz"
+        ]
+      }
+    },
+    {
+      "id": "million",
+      "familyId": "count",
+      "label": "Million",
+      "labelPt": "Milhão",
+      "symbol": "M",
+      "conversionToBase": 1000000,
+      "patterns": {
+        "en": [
+          "million",
+          "M",
+          "mm",
+          "millions"
+        ],
+        "pt": [
+          "milhão",
+          "milhões",
+          "mi"
+        ]
+      }
+    },
+    {
+      "id": "thousand",
+      "familyId": "count",
+      "label": "Thousand",
+      "labelPt": "Milhar",
+      "symbol": "K",
+      "conversionToBase": 1000,
+      "patterns": {
+        "en": [
+          "thousand",
+          "K",
+          "thousands"
+        ],
+        "pt": [
+          "milhar",
+          "milhares",
+          "mil"
+        ]
+      }
+    },
+    {
+      "id": "unit",
+      "familyId": "count",
+      "label": "Unit",
+      "labelPt": "Unidade",
+      "symbol": "u",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "unit",
+          "units",
+          "ea",
+          "each"
+        ],
+        "pt": [
+          "unidade",
+          "unidades",
+          "un"
+        ]
+      }
+    },
+    {
+      "id": "aud",
+      "familyId": "currency",
+      "label": "Australian Dollar",
+      "labelPt": "Dólar Australiano",
+      "symbol": "A$",
+      "isoCode": "AUD",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "A$",
+          "AUD",
+          "Australian dollars",
+          "AU dollars"
+        ],
+        "pt": [
+          "AUD",
+          "dólares australianos",
+          "dólar australiano"
+        ]
+      }
+    },
+    {
+      "id": "brl",
+      "familyId": "currency",
+      "label": "Brazilian Real",
+      "labelPt": "Real Brasileiro",
+      "symbol": "R$",
+      "isoCode": "BRL",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "R$",
+          "BRL",
+          "Brazilian reais",
+          "reais"
+        ],
+        "pt": [
+          "R$",
+          "BRL",
+          "reais",
+          "real"
+        ]
+      }
+    },
+    {
+      "id": "cad",
+      "familyId": "currency",
+      "label": "Canadian Dollar",
+      "labelPt": "Dólar Canadense",
+      "symbol": "C$",
+      "isoCode": "CAD",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "C$",
+          "CAD",
+          "Canadian dollars",
+          "CA dollars"
+        ],
+        "pt": [
+          "CAD",
+          "dólares canadenses",
+          "dólar canadense"
+        ]
+      }
+    },
+    {
+      "id": "chf",
+      "familyId": "currency",
+      "label": "Swiss Franc",
+      "labelPt": "Franco Suíço",
+      "symbol": "CHF",
+      "isoCode": "CHF",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "CHF",
+          "Swiss francs",
+          "francs",
+          "Swiss franc"
+        ],
+        "pt": [
+          "CHF",
+          "francos suíços",
+          "franco suíço"
+        ]
+      }
+    },
+    {
+      "id": "eur",
+      "familyId": "currency",
+      "label": "Euro",
+      "labelPt": "Euro",
+      "symbol": "€",
+      "isoCode": "EUR",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "€",
+          "EUR",
+          "euros",
+          "euro"
+        ],
+        "pt": [
+          "€",
+          "EUR",
+          "euros",
+          "euro"
+        ]
+      }
+    },
+    {
+      "id": "gbp",
+      "familyId": "currency",
+      "label": "British Pound",
+      "labelPt": "Libra Esterlina",
+      "symbol": "£",
+      "isoCode": "GBP",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "£",
+          "GBP",
+          "pounds",
+          "British pounds"
+        ],
+        "pt": [
+          "£",
+          "GBP",
+          "libras esterlinas",
+          "libra"
+        ]
+      }
+    },
+    {
+      "id": "jpy",
+      "familyId": "currency",
+      "label": "Japanese Yen",
+      "labelPt": "Iene Japonês",
+      "symbol": "¥",
+      "isoCode": "JPY",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "¥",
+          "JPY",
+          "yen",
+          "Japanese yen"
+        ],
+        "pt": [
+          "¥",
+          "JPY",
+          "ienes",
+          "iene"
+        ]
+      }
+    },
+    {
+      "id": "usd",
+      "familyId": "currency",
+      "label": "US Dollar",
+      "labelPt": "Dólar Americano",
+      "symbol": "$",
+      "isoCode": "USD",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "$",
+          "USD",
+          "US dollars",
+          "dollars"
+        ],
+        "pt": [
+          "USD",
+          "dólares americanos",
+          "dólar",
+          "dólares"
+        ]
+      }
+    },
+    {
+      "id": "centimeter",
+      "familyId": "length",
+      "label": "Centimeter",
+      "labelPt": "Centímetro",
+      "symbol": "cm",
+      "conversionToBase": 0.01,
+      "patterns": {
+        "en": [
+          "cm",
+          "centimeter",
+          "centimeters",
+          "centimetre"
+        ],
+        "pt": [
+          "cm",
+          "centímetro",
+          "centímetros"
+        ]
+      }
+    },
+    {
+      "id": "inch",
+      "familyId": "length",
+      "label": "Inch",
+      "labelPt": "Polegada",
+      "symbol": "in",
+      "conversionToBase": 0.0254,
+      "patterns": {
+        "en": [
+          "in",
+          "inch",
+          "inches",
+          "\""
+        ],
+        "pt": [
+          "pol",
+          "polegada",
+          "polegadas"
+        ]
+      }
+    },
+    {
+      "id": "meter",
+      "familyId": "length",
+      "label": "Meter",
+      "labelPt": "Metro",
+      "symbol": "m",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "m",
+          "meter",
+          "meters",
+          "metre"
+        ],
+        "pt": [
+          "m",
+          "metro",
+          "metros"
+        ]
+      }
+    },
+    {
+      "id": "millimeter",
+      "familyId": "length",
+      "label": "Millimeter",
+      "labelPt": "Milímetro",
+      "symbol": "mm",
+      "conversionToBase": 0.001,
+      "patterns": {
+        "en": [
+          "mm",
+          "millimeter",
+          "millimeters",
+          "millimetre"
+        ],
+        "pt": [
+          "mm",
+          "milímetro",
+          "milímetros"
+        ]
+      }
+    },
+    {
+      "id": "gram",
+      "familyId": "mass",
+      "label": "Gram",
+      "labelPt": "Grama",
+      "symbol": "g",
+      "conversionToBase": 0.001,
+      "patterns": {
+        "en": [
+          "g",
+          "gram",
+          "grams",
+          "gramme"
+        ],
+        "pt": [
+          "g",
+          "grama",
+          "gramas"
+        ]
+      }
+    },
+    {
+      "id": "kilogram",
+      "familyId": "mass",
+      "label": "Kilogram",
+      "labelPt": "Quilograma",
+      "symbol": "kg",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "kg",
+          "kilogram",
+          "kilograms",
+          "kilo"
+        ],
+        "pt": [
+          "kg",
+          "quilograma",
+          "quilogramas",
+          "quilo"
+        ]
+      }
+    },
+    {
+      "id": "milligram",
+      "familyId": "mass",
+      "label": "Milligram",
+      "labelPt": "Miligrama",
+      "symbol": "mg",
+      "conversionToBase": 0.000001,
+      "patterns": {
+        "en": [
+          "mg",
+          "milligram",
+          "milligrams"
+        ],
+        "pt": [
+          "mg",
+          "miligrama",
+          "miligramas"
+        ]
+      }
+    },
+    {
+      "id": "pound",
+      "familyId": "mass",
+      "label": "Pound",
+      "labelPt": "Libra",
+      "symbol": "lb",
+      "conversionToBase": 0.453592,
+      "patterns": {
+        "en": [
+          "lb",
+          "pound",
+          "pounds",
+          "lbs"
+        ],
+        "pt": [
+          "lb",
+          "libra",
+          "libras"
+        ]
+      }
+    },
+    {
+      "id": "basis_point",
+      "familyId": "percentage",
+      "label": "Basis Point",
+      "labelPt": "Ponto Base",
+      "symbol": "bp",
+      "conversionToBase": 0.01,
+      "patterns": {
+        "en": [
+          "bp",
+          "bps",
+          "basis point",
+          "basis points"
+        ],
+        "pt": [
+          "pb",
+          "ponto base",
+          "pontos base"
+        ]
+      }
+    },
+    {
+      "id": "percent",
+      "familyId": "percentage",
+      "label": "Percent",
+      "labelPt": "Porcento",
+      "symbol": "%",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "%",
+          "percent",
+          "percentage",
+          "pct"
+        ],
+        "pt": [
+          "%",
+          "porcento",
+          "por cento",
+          "percentual"
+        ]
+      }
+    },
+    {
+      "id": "percentage_point",
+      "familyId": "percentage",
+      "label": "Percentage Point",
+      "labelPt": "Ponto Percentual",
+      "symbol": "pp",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "pp",
+          "percentage point",
+          "percentage points",
+          "p.p."
+        ],
+        "pt": [
+          "pp",
+          "ponto percentual",
+          "pontos percentuais",
+          "p.p."
+        ]
+      }
+    },
+    {
+      "id": "celsius",
+      "familyId": "temperature_unit",
+      "label": "Celsius",
+      "labelPt": "Celsius",
+      "symbol": "°C",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "°C",
+          "Celsius",
+          "degrees Celsius",
+          "C"
+        ],
+        "pt": [
+          "°C",
+          "Celsius",
+          "graus Celsius"
+        ]
+      }
+    },
+    {
+      "id": "fahrenheit",
+      "familyId": "temperature_unit",
+      "label": "Fahrenheit",
+      "labelPt": "Fahrenheit",
+      "symbol": "°F",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "°F",
+          "Fahrenheit",
+          "degrees Fahrenheit",
+          "F"
+        ],
+        "pt": [
+          "°F",
+          "Fahrenheit",
+          "graus Fahrenheit"
+        ]
+      }
+    },
+    {
+      "id": "kelvin",
+      "familyId": "temperature_unit",
+      "label": "Kelvin",
+      "labelPt": "Kelvin",
+      "symbol": "K",
+      "conversionToBase": null,
+      "patterns": {
+        "en": [
+          "K",
+          "Kelvin",
+          "kelvins"
+        ],
+        "pt": [
+          "K",
+          "Kelvin",
+          "kelvins"
+        ]
+      }
+    },
+    {
+      "id": "day",
+      "familyId": "time",
+      "label": "Day",
+      "labelPt": "Dia",
+      "symbol": "d",
+      "conversionToBase": 86400,
+      "patterns": {
+        "en": [
+          "d",
+          "day",
+          "days"
+        ],
+        "pt": [
+          "d",
+          "dia",
+          "dias"
+        ]
+      }
+    },
+    {
+      "id": "hour",
+      "familyId": "time",
+      "label": "Hour",
+      "labelPt": "Hora",
+      "symbol": "h",
+      "conversionToBase": 3600,
+      "patterns": {
+        "en": [
+          "h",
+          "hour",
+          "hours",
+          "hr"
+        ],
+        "pt": [
+          "h",
+          "hora",
+          "horas"
+        ]
+      }
+    },
+    {
+      "id": "minute",
+      "familyId": "time",
+      "label": "Minute",
+      "labelPt": "Minuto",
+      "symbol": "min",
+      "conversionToBase": 60,
+      "patterns": {
+        "en": [
+          "min",
+          "minute",
+          "minutes"
+        ],
+        "pt": [
+          "min",
+          "minuto",
+          "minutos"
+        ]
+      }
+    },
+    {
+      "id": "month",
+      "familyId": "time",
+      "label": "Month",
+      "labelPt": "Mês",
+      "symbol": "mo",
+      "conversionToBase": 2592000,
+      "patterns": {
+        "en": [
+          "mo",
+          "month",
+          "months"
+        ],
+        "pt": [
+          "mês",
+          "meses"
+        ]
+      }
+    },
+    {
+      "id": "second",
+      "familyId": "time",
+      "label": "Second",
+      "labelPt": "Segundo",
+      "symbol": "s",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "s",
+          "second",
+          "seconds",
+          "sec"
+        ],
+        "pt": [
+          "s",
+          "segundo",
+          "segundos"
+        ]
+      }
+    },
+    {
+      "id": "week",
+      "familyId": "time",
+      "label": "Week",
+      "labelPt": "Semana",
+      "symbol": "wk",
+      "conversionToBase": 604800,
+      "patterns": {
+        "en": [
+          "wk",
+          "week",
+          "weeks"
+        ],
+        "pt": [
+          "sem",
+          "semana",
+          "semanas"
+        ]
+      }
+    },
+    {
+      "id": "year",
+      "familyId": "time",
+      "label": "Year",
+      "labelPt": "Ano",
+      "symbol": "yr",
+      "conversionToBase": 31536000,
+      "patterns": {
+        "en": [
+          "yr",
+          "year",
+          "years",
+          "annum"
+        ],
+        "pt": [
+          "ano",
+          "anos"
+        ]
+      }
+    },
+    {
+      "id": "fluid_ounce",
+      "familyId": "volume",
+      "label": "Fluid Ounce",
+      "labelPt": "Onça Fluida",
+      "symbol": "fl oz",
+      "conversionToBase": 0.0295735,
+      "patterns": {
+        "en": [
+          "fl oz",
+          "fluid ounce",
+          "fluid ounces"
+        ],
+        "pt": [
+          "fl oz",
+          "onça fluida",
+          "onças fluidas"
+        ]
+      }
+    },
+    {
+      "id": "gallon",
+      "familyId": "volume",
+      "label": "Gallon",
+      "labelPt": "Galão",
+      "symbol": "gal",
+      "conversionToBase": 3.78541,
+      "patterns": {
+        "en": [
+          "gal",
+          "gallon",
+          "gallons"
+        ],
+        "pt": [
+          "gal",
+          "galão",
+          "galões"
+        ]
+      }
+    },
+    {
+      "id": "liter",
+      "familyId": "volume",
+      "label": "Liter",
+      "labelPt": "Litro",
+      "symbol": "L",
+      "conversionToBase": 1,
+      "patterns": {
+        "en": [
+          "L",
+          "liter",
+          "liters",
+          "litre"
+        ],
+        "pt": [
+          "L",
+          "litro",
+          "litros"
+        ]
+      }
+    },
+    {
+      "id": "milliliter",
+      "familyId": "volume",
+      "label": "Milliliter",
+      "labelPt": "Mililitro",
+      "symbol": "mL",
+      "conversionToBase": 0.001,
+      "patterns": {
+        "en": [
+          "mL",
+          "milliliter",
+          "milliliters",
+          "ml"
+        ],
+        "pt": [
+          "mL",
+          "mililitro",
+          "mililitros"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "id": "di_accounting_extraction_acct_management_rep_letter",
+    "version": "1.1.0",
+    "description": "Extraction hints for management representation letter documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_management_rep_letter"
+  },
+  "hints": [
+    {
+      "id": "hint_period",
+      "entity": "period",
+      "anchors": [
+        "period",
+        "reporting period",
+        "competencia",
+        "periodo"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_entity",
+      "entity": "entity",
+      "anchors": [
+        "entity",
+        "company",
+        "legal entity",
+        "empresa"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_currency",
+      "entity": "currency",
+      "anchors": [
+        "currency",
+        "moeda",
+        "curr",
+        "reporting currency"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_basis",
+      "entity": "basis",
+      "anchors": [
+        "basis",
+        "accounting basis",
+        "base contabil",
+        "regime"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_source_system",
+      "entity": "sourceSystem",
+      "anchors": [
+        "source system",
+        "erp",
+        "sistema origem",
+        "origem"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_letterDate",
+      "entity": "letterDate",
+      "anchors": [
+        "letter date",
+        "letter Date",
+        "letterDate"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_signingOfficer",
+      "entity": "signingOfficer",
+      "anchors": [
+        "signing officer",
+        "signing Officer",
+        "signingOfficer"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_reportingFramework",
+      "entity": "reportingFramework",
+      "anchors": [
+        "reporting framework",
+        "reporting Framework",
+        "reportingFramework"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_representationCount",
+      "entity": "representationCount",
+      "anchors": [
+        "representation count",
+        "representation Count",
+        "representationCount"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "di_education_domain_profile",
+    "version": "1.0.0",
+    "description": "Education domain profile with scope, detection signals, and supported operators.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education"
+  },
+  "domain": "education",
+  "displayName": {
+    "en": "Education",
+    "pt": "Educacao"
+  },
+  "scope": "Academic records and school administration documents used to verify enrollment, performance, schedules, and aid awards.",
+  "coreConcepts": [
+    "academic_standing",
+    "advisor",
+    "aid_award",
+    "aid_type",
+    "attendance",
+    "campus",
+    "course_code",
+    "credential_type",
+    "credits",
+    "disbursement_date",
+    "enrollment_status",
+    "gpa",
+    "grade",
+    "graduation_date",
+    "institution",
+    "program",
+    "schedule_slot",
+    "student_id",
+    "term",
+    "tuition"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "attendance",
+      "credits",
+      "enrollment_status",
+      "gpa",
+      "grade",
+      "institution",
+      "program",
+      "student_id",
+      "term",
+      "tuition"
+    ],
+    "mediumConfidence": [
+      "academic_standing",
+      "advisor",
+      "aid_award",
+      "aid_type",
+      "campus",
+      "course_code",
+      "credential_type",
+      "disbursement_date",
+      "graduation_date",
+      "schedule_slot"
+    ]
+  },
+  "relatedDomains": [
+    "finance",
+    "hr_payroll",
+    "identity"
+  ],
+  "ontologyPrefix": "education"
+}

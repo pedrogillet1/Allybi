@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "id": "di_accounting_lexicon_pt",
+    "version": "1.0.0",
+    "description": "Portuguese lexicon for accounting domain — canonical terms, synonyms, and display forms.",
+    "languages": ["pt"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "language": "pt"
+  },
+  "domain": "accounting",
+  "terms": [
+    { "id": "acct_lex_pt_accrual", "canonical": "provisão", "synonyms": ["competência", "despesa provisionada"], "display": "Provisão", "enRef": "acct_lex_accrual" },
+    { "id": "acct_lex_pt_adjusting_entry", "canonical": "lançamento de ajuste", "synonyms": ["ajuste contábil"], "display": "Lançamento de Ajuste", "enRef": "acct_lex_adjusting_entry" },
+    { "id": "acct_lex_pt_aging_report", "canonical": "relatório de vencimento", "synonyms": ["aging", "relatório de inadimplência"], "display": "Relatório de Vencimento", "enRef": "acct_lex_aging_report" },
+    { "id": "acct_lex_pt_allowance", "canonical": "provisão para devedores duvidosos", "synonyms": ["PDD", "PCLD"], "display": "Provisão para Devedores Duvidosos", "enRef": "acct_lex_allowance" },
+    { "id": "acct_lex_pt_bank_rec", "canonical": "conciliação bancária", "synonyms": ["reconciliação bancária"], "display": "Conciliação Bancária", "enRef": "acct_lex_bank_rec" },
+    { "id": "acct_lex_pt_chart_of_accounts", "canonical": "plano de contas", "synonyms": ["elenco de contas"], "display": "Plano de Contas", "enRef": "acct_lex_chart_of_accounts" },
+    { "id": "acct_lex_pt_closing_entry", "canonical": "lançamento de encerramento", "synonyms": ["fechamento"], "display": "Lançamento de Encerramento", "enRef": "acct_lex_closing_entry" },
+    { "id": "acct_lex_pt_control_account", "canonical": "conta controle", "synonyms": ["conta sintética"], "display": "Conta Controle", "enRef": "acct_lex_control_account" },
+    { "id": "acct_lex_pt_credit", "canonical": "crédito", "synonyms": ["C", "Cr"], "display": "Crédito", "enRef": "acct_lex_credit" },
+    { "id": "acct_lex_pt_debit", "canonical": "débito", "synonyms": ["D", "Db"], "display": "Débito", "enRef": "acct_lex_debit" },
+    { "id": "acct_lex_pt_depreciation", "canonical": "depreciação", "synonyms": ["despesa de depreciação", "depreciação acumulada"], "display": "Depreciação", "enRef": "acct_lex_depreciation" },
+    { "id": "acct_lex_pt_general_ledger", "canonical": "razão geral", "synonyms": ["livro razão", "razão contábil"], "display": "Razão Geral", "enRef": "acct_lex_general_ledger" },
+    { "id": "acct_lex_pt_journal_entry", "canonical": "lançamento contábil", "synonyms": ["partida contábil", "registro contábil"], "display": "Lançamento Contábil", "enRef": "acct_lex_journal_entry" },
+    { "id": "acct_lex_pt_materiality", "canonical": "materialidade", "synonyms": ["relevância"], "display": "Materialidade", "enRef": "acct_lex_materiality" },
+    { "id": "acct_lex_pt_prepaid", "canonical": "despesa antecipada", "synonyms": ["adiantamento", "ativo diferido"], "display": "Despesa Antecipada", "enRef": "acct_lex_prepaid" },
+    { "id": "acct_lex_pt_reconciling_item", "canonical": "item de conciliação", "synonyms": ["pendência de conciliação"], "display": "Item de Conciliação", "enRef": "acct_lex_reconciling_item" },
+    { "id": "acct_lex_pt_reversing_entry", "canonical": "estorno", "synonyms": ["lançamento de reversão"], "display": "Estorno", "enRef": "acct_lex_reversing_entry" },
+    { "id": "acct_lex_pt_subsidiary_ledger", "canonical": "razão auxiliar", "synonyms": ["livro auxiliar"], "display": "Razão Auxiliar", "enRef": "acct_lex_subsidiary_ledger" },
+    { "id": "acct_lex_pt_trial_balance", "canonical": "balancete de verificação", "synonyms": ["balancete", "BV"], "display": "Balancete de Verificação", "enRef": "acct_lex_trial_balance" },
+    { "id": "acct_lex_pt_workpaper", "canonical": "papel de trabalho", "synonyms": ["folha de trabalho"], "display": "Papel de Trabalho", "enRef": "acct_lex_workpaper" }
+  ]
+}

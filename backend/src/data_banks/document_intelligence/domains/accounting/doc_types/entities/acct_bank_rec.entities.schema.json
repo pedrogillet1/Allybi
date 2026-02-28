@@ -1,0 +1,17 @@
+{
+  "_meta": { "id": "di_accounting_entities_acct_bank_rec", "version": "1.0.0", "description": "Entity extraction schema for bank reconciliation documents.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "accounting", "docType": "acct_bank_rec" },
+  "entities": [
+    { "id": "entity_name", "type": "string", "required": true, "description": "Company name" },
+    { "id": "bank_name", "type": "string", "required": false, "description": "Bank name" },
+    { "id": "account_number_masked", "type": "string", "required": false, "description": "Bank account (last 4 digits)" },
+    { "id": "reconciliation_date", "type": "date", "required": true, "description": "Reconciliation as-of date" },
+    { "id": "book_balance", "type": "currency", "required": true, "description": "Balance per books (GL)" },
+    { "id": "bank_balance", "type": "currency", "required": true, "description": "Balance per bank statement" },
+    { "id": "outstanding_checks_total", "type": "currency", "required": true, "description": "Total outstanding checks" },
+    { "id": "deposits_in_transit_total", "type": "currency", "required": true, "description": "Total deposits in transit" },
+    { "id": "adjusted_book_balance", "type": "currency", "required": true, "description": "Adjusted balance per books" },
+    { "id": "adjusted_bank_balance", "type": "currency", "required": true, "description": "Adjusted balance per bank" },
+    { "id": "reconciling_difference", "type": "currency", "required": true, "description": "Remaining difference (should be zero)" }
+  ]
+}

@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,5206 @@
     "telemetryOnly": true
   },
   "domain": "legal",
-  "clusters": []
+  "clusters": [
+    {
+      "id": "legal_cluster_automate_employment",
+      "label": "employment clause consistency - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "automation intent",
+        "intenção de automação",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "automation intent employment clause consistency",
+        "intenção de automação consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_governance",
+      "label": "governance resolution tracking - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "automation intent",
+        "intenção de automação",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "automation intent governance resolution tracking",
+        "intenção de automação acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_ip",
+      "label": "intellectual property assignment checks - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "automation intent",
+        "intenção de automação",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "automation intent intellectual property assignment checks",
+        "intenção de automação checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_liability",
+      "label": "liability exposure analysis - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "automation intent",
+        "intenção de automação",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "automation intent liability exposure analysis",
+        "intenção de automação análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_litigation",
+      "label": "litigation risk screening - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "automation intent",
+        "intenção de automação",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "automation intent litigation risk screening",
+        "intenção de automação triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_negotiation",
+      "label": "negotiation friction analysis - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "automation intent",
+        "intenção de automação",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "automation intent negotiation friction analysis",
+        "intenção de automação análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_obligations",
+      "label": "obligation tracking - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "automation intent",
+        "intenção de automação",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "automation intent obligation tracking",
+        "intenção de automação acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_privacy",
+      "label": "privacy compliance mapping - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "automation intent",
+        "intenção de automação",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "automation intent privacy compliance mapping",
+        "intenção de automação mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_termination",
+      "label": "termination clause review - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "automation intent",
+        "intenção de automação",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "automation intent termination clause review",
+        "intenção de automação revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_automate_vendor",
+      "label": "vendor contract hygiene - automation intent",
+      "intent": "automate",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "automation intent",
+        "intenção de automação",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "automation intent vendor contract hygiene",
+        "intenção de automação higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_employment",
+      "label": "employment clause consistency - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "benchmark intent",
+        "intenção de benchmark",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "benchmark intent employment clause consistency",
+        "intenção de benchmark consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_governance",
+      "label": "governance resolution tracking - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "benchmark intent",
+        "intenção de benchmark",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "benchmark intent governance resolution tracking",
+        "intenção de benchmark acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_ip",
+      "label": "intellectual property assignment checks - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "benchmark intent",
+        "intenção de benchmark",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "benchmark intent intellectual property assignment checks",
+        "intenção de benchmark checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_liability",
+      "label": "liability exposure analysis - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "benchmark intent",
+        "intenção de benchmark",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "benchmark intent liability exposure analysis",
+        "intenção de benchmark análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_litigation",
+      "label": "litigation risk screening - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "benchmark intent",
+        "intenção de benchmark",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "benchmark intent litigation risk screening",
+        "intenção de benchmark triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_negotiation",
+      "label": "negotiation friction analysis - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "benchmark intent",
+        "intenção de benchmark",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "benchmark intent negotiation friction analysis",
+        "intenção de benchmark análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_obligations",
+      "label": "obligation tracking - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "benchmark intent",
+        "intenção de benchmark",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "benchmark intent obligation tracking",
+        "intenção de benchmark acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_privacy",
+      "label": "privacy compliance mapping - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "benchmark intent",
+        "intenção de benchmark",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "benchmark intent privacy compliance mapping",
+        "intenção de benchmark mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_termination",
+      "label": "termination clause review - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "benchmark intent",
+        "intenção de benchmark",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "benchmark intent termination clause review",
+        "intenção de benchmark revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_benchmark_vendor",
+      "label": "vendor contract hygiene - benchmark intent",
+      "intent": "benchmark",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "benchmark intent",
+        "intenção de benchmark",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "benchmark intent vendor contract hygiene",
+        "intenção de benchmark higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_employment",
+      "label": "employment clause consistency - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "comparison intent",
+        "intenção de comparação",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "comparison intent employment clause consistency",
+        "intenção de comparação consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_governance",
+      "label": "governance resolution tracking - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "comparison intent",
+        "intenção de comparação",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "comparison intent governance resolution tracking",
+        "intenção de comparação acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_ip",
+      "label": "intellectual property assignment checks - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "comparison intent",
+        "intenção de comparação",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "comparison intent intellectual property assignment checks",
+        "intenção de comparação checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_liability",
+      "label": "liability exposure analysis - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "comparison intent",
+        "intenção de comparação",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "comparison intent liability exposure analysis",
+        "intenção de comparação análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_litigation",
+      "label": "litigation risk screening - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "comparison intent",
+        "intenção de comparação",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "comparison intent litigation risk screening",
+        "intenção de comparação triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_negotiation",
+      "label": "negotiation friction analysis - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "comparison intent",
+        "intenção de comparação",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "comparison intent negotiation friction analysis",
+        "intenção de comparação análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_obligations",
+      "label": "obligation tracking - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "comparison intent",
+        "intenção de comparação",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "comparison intent obligation tracking",
+        "intenção de comparação acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_privacy",
+      "label": "privacy compliance mapping - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "comparison intent",
+        "intenção de comparação",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "comparison intent privacy compliance mapping",
+        "intenção de comparação mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_termination",
+      "label": "termination clause review - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "comparison intent",
+        "intenção de comparação",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "comparison intent termination clause review",
+        "intenção de comparação revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_compare_vendor",
+      "label": "vendor contract hygiene - comparison intent",
+      "intent": "compare",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "comparison intent",
+        "intenção de comparação",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "comparison intent vendor contract hygiene",
+        "intenção de comparação higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_employment",
+      "label": "employment clause consistency - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "diagnostic intent employment clause consistency",
+        "intenção de diagnóstico consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_governance",
+      "label": "governance resolution tracking - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "diagnostic intent governance resolution tracking",
+        "intenção de diagnóstico acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_ip",
+      "label": "intellectual property assignment checks - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "diagnostic intent intellectual property assignment checks",
+        "intenção de diagnóstico checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_liability",
+      "label": "liability exposure analysis - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "diagnostic intent liability exposure analysis",
+        "intenção de diagnóstico análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_litigation",
+      "label": "litigation risk screening - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "diagnostic intent litigation risk screening",
+        "intenção de diagnóstico triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_negotiation",
+      "label": "negotiation friction analysis - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "diagnostic intent negotiation friction analysis",
+        "intenção de diagnóstico análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_obligations",
+      "label": "obligation tracking - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "diagnostic intent obligation tracking",
+        "intenção de diagnóstico acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_privacy",
+      "label": "privacy compliance mapping - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "diagnostic intent privacy compliance mapping",
+        "intenção de diagnóstico mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_termination",
+      "label": "termination clause review - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "diagnostic intent termination clause review",
+        "intenção de diagnóstico revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_diagnose_vendor",
+      "label": "vendor contract hygiene - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "diagnostic intent vendor contract hygiene",
+        "intenção de diagnóstico higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_employment",
+      "label": "employment clause consistency - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "discovery intent",
+        "intenção de descoberta",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "discovery intent employment clause consistency",
+        "intenção de descoberta consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_governance",
+      "label": "governance resolution tracking - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "discovery intent",
+        "intenção de descoberta",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "discovery intent governance resolution tracking",
+        "intenção de descoberta acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_ip",
+      "label": "intellectual property assignment checks - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "discovery intent",
+        "intenção de descoberta",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "discovery intent intellectual property assignment checks",
+        "intenção de descoberta checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_liability",
+      "label": "liability exposure analysis - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "discovery intent",
+        "intenção de descoberta",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "discovery intent liability exposure analysis",
+        "intenção de descoberta análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_litigation",
+      "label": "litigation risk screening - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "discovery intent",
+        "intenção de descoberta",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "discovery intent litigation risk screening",
+        "intenção de descoberta triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_negotiation",
+      "label": "negotiation friction analysis - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "discovery intent",
+        "intenção de descoberta",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "discovery intent negotiation friction analysis",
+        "intenção de descoberta análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_obligations",
+      "label": "obligation tracking - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "discovery intent",
+        "intenção de descoberta",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "discovery intent obligation tracking",
+        "intenção de descoberta acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_privacy",
+      "label": "privacy compliance mapping - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "discovery intent",
+        "intenção de descoberta",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "discovery intent privacy compliance mapping",
+        "intenção de descoberta mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_termination",
+      "label": "termination clause review - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "discovery intent",
+        "intenção de descoberta",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "discovery intent termination clause review",
+        "intenção de descoberta revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_discover_vendor",
+      "label": "vendor contract hygiene - discovery intent",
+      "intent": "discover",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "discovery intent",
+        "intenção de descoberta",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "discovery intent vendor contract hygiene",
+        "intenção de descoberta higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_employment",
+      "label": "employment clause consistency - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "forecast intent",
+        "intenção de previsão",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "forecast intent employment clause consistency",
+        "intenção de previsão consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_governance",
+      "label": "governance resolution tracking - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "forecast intent",
+        "intenção de previsão",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "forecast intent governance resolution tracking",
+        "intenção de previsão acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_ip",
+      "label": "intellectual property assignment checks - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "forecast intent",
+        "intenção de previsão",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "forecast intent intellectual property assignment checks",
+        "intenção de previsão checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_liability",
+      "label": "liability exposure analysis - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "forecast intent",
+        "intenção de previsão",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "forecast intent liability exposure analysis",
+        "intenção de previsão análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_litigation",
+      "label": "litigation risk screening - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "forecast intent",
+        "intenção de previsão",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "forecast intent litigation risk screening",
+        "intenção de previsão triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_negotiation",
+      "label": "negotiation friction analysis - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "forecast intent",
+        "intenção de previsão",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "forecast intent negotiation friction analysis",
+        "intenção de previsão análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_obligations",
+      "label": "obligation tracking - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "forecast intent",
+        "intenção de previsão",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "forecast intent obligation tracking",
+        "intenção de previsão acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_privacy",
+      "label": "privacy compliance mapping - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "forecast intent",
+        "intenção de previsão",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "forecast intent privacy compliance mapping",
+        "intenção de previsão mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_termination",
+      "label": "termination clause review - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "forecast intent",
+        "intenção de previsão",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "forecast intent termination clause review",
+        "intenção de previsão revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_forecast_vendor",
+      "label": "vendor contract hygiene - forecast intent",
+      "intent": "forecast",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "forecast intent",
+        "intenção de previsão",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "forecast intent vendor contract hygiene",
+        "intenção de previsão higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_employment",
+      "label": "employment clause consistency - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "optimization intent",
+        "intenção de otimização",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "optimization intent employment clause consistency",
+        "intenção de otimização consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_governance",
+      "label": "governance resolution tracking - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "optimization intent",
+        "intenção de otimização",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "optimization intent governance resolution tracking",
+        "intenção de otimização acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_ip",
+      "label": "intellectual property assignment checks - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "optimization intent",
+        "intenção de otimização",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "optimization intent intellectual property assignment checks",
+        "intenção de otimização checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_liability",
+      "label": "liability exposure analysis - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "optimization intent",
+        "intenção de otimização",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "optimization intent liability exposure analysis",
+        "intenção de otimização análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_litigation",
+      "label": "litigation risk screening - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "optimization intent",
+        "intenção de otimização",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "optimization intent litigation risk screening",
+        "intenção de otimização triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_negotiation",
+      "label": "negotiation friction analysis - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "optimization intent",
+        "intenção de otimização",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "optimization intent negotiation friction analysis",
+        "intenção de otimização análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_obligations",
+      "label": "obligation tracking - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "optimization intent",
+        "intenção de otimização",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "optimization intent obligation tracking",
+        "intenção de otimização acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_privacy",
+      "label": "privacy compliance mapping - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "optimization intent",
+        "intenção de otimização",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "optimization intent privacy compliance mapping",
+        "intenção de otimização mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_termination",
+      "label": "termination clause review - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "optimization intent",
+        "intenção de otimização",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "optimization intent termination clause review",
+        "intenção de otimização revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_optimize_vendor",
+      "label": "vendor contract hygiene - optimization intent",
+      "intent": "optimize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "optimization intent",
+        "intenção de otimização",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "optimization intent vendor contract hygiene",
+        "intenção de otimização higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_employment",
+      "label": "employment clause consistency - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "prioritization intent",
+        "intenção de priorização",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "prioritization intent employment clause consistency",
+        "intenção de priorização consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_governance",
+      "label": "governance resolution tracking - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "prioritization intent",
+        "intenção de priorização",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "prioritization intent governance resolution tracking",
+        "intenção de priorização acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_ip",
+      "label": "intellectual property assignment checks - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "prioritization intent",
+        "intenção de priorização",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "prioritization intent intellectual property assignment checks",
+        "intenção de priorização checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_liability",
+      "label": "liability exposure analysis - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "prioritization intent",
+        "intenção de priorização",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "prioritization intent liability exposure analysis",
+        "intenção de priorização análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_litigation",
+      "label": "litigation risk screening - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "prioritization intent",
+        "intenção de priorização",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "prioritization intent litigation risk screening",
+        "intenção de priorização triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_negotiation",
+      "label": "negotiation friction analysis - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "prioritization intent",
+        "intenção de priorização",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "prioritization intent negotiation friction analysis",
+        "intenção de priorização análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_obligations",
+      "label": "obligation tracking - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "prioritization intent",
+        "intenção de priorização",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "prioritization intent obligation tracking",
+        "intenção de priorização acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_privacy",
+      "label": "privacy compliance mapping - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "prioritization intent",
+        "intenção de priorização",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "prioritization intent privacy compliance mapping",
+        "intenção de priorização mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_termination",
+      "label": "termination clause review - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "prioritization intent",
+        "intenção de priorização",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "prioritization intent termination clause review",
+        "intenção de priorização revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_prioritize_vendor",
+      "label": "vendor contract hygiene - prioritization intent",
+      "intent": "prioritize",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "prioritization intent",
+        "intenção de priorização",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "prioritization intent vendor contract hygiene",
+        "intenção de priorização higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_employment",
+      "label": "employment clause consistency - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "reporting intent",
+        "intenção de reporte",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "reporting intent employment clause consistency",
+        "intenção de reporte consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_governance",
+      "label": "governance resolution tracking - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "reporting intent",
+        "intenção de reporte",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "reporting intent governance resolution tracking",
+        "intenção de reporte acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_ip",
+      "label": "intellectual property assignment checks - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "reporting intent",
+        "intenção de reporte",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "reporting intent intellectual property assignment checks",
+        "intenção de reporte checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_liability",
+      "label": "liability exposure analysis - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "reporting intent",
+        "intenção de reporte",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "reporting intent liability exposure analysis",
+        "intenção de reporte análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_litigation",
+      "label": "litigation risk screening - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "reporting intent",
+        "intenção de reporte",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "reporting intent litigation risk screening",
+        "intenção de reporte triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_negotiation",
+      "label": "negotiation friction analysis - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "reporting intent",
+        "intenção de reporte",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "reporting intent negotiation friction analysis",
+        "intenção de reporte análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_obligations",
+      "label": "obligation tracking - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "reporting intent",
+        "intenção de reporte",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "reporting intent obligation tracking",
+        "intenção de reporte acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_privacy",
+      "label": "privacy compliance mapping - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "reporting intent",
+        "intenção de reporte",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "reporting intent privacy compliance mapping",
+        "intenção de reporte mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_termination",
+      "label": "termination clause review - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "reporting intent",
+        "intenção de reporte",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "reporting intent termination clause review",
+        "intenção de reporte revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_report_vendor",
+      "label": "vendor contract hygiene - reporting intent",
+      "intent": "report",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "reporting intent",
+        "intenção de reporte",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "reporting intent vendor contract hygiene",
+        "intenção de reporte higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_employment",
+      "label": "employment clause consistency - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "employment",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "consulting_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "employment clause consistency",
+        "consistência de cláusulas trabalhistas",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "employment clause consistency analytics",
+        "consistência de cláusulas trabalhistas analytics",
+        "employment clause consistency dashboard",
+        "consistência de cláusulas trabalhistas dashboard",
+        "risk monitoring intent employment clause consistency",
+        "intenção de monitoramento de risco consistência de cláusulas trabalhistas",
+        "legal employment"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated employment"
+      ],
+      "examples": [
+        "How can we improve employment clause consistency?",
+        "Como melhorar consistência de cláusulas trabalhistas?",
+        "Show employment clause consistency insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_governance",
+      "label": "governance resolution tracking - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "governance",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_resolution",
+        "power_of_attorney"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "governance resolution tracking",
+        "acompanhamento de resoluções de governança",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "governance resolution tracking analytics",
+        "acompanhamento de resoluções de governança analytics",
+        "governance resolution tracking dashboard",
+        "acompanhamento de resoluções de governança dashboard",
+        "risk monitoring intent governance resolution tracking",
+        "intenção de monitoramento de risco acompanhamento de resoluções de governança",
+        "legal governance"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated governance"
+      ],
+      "examples": [
+        "How can we improve governance resolution tracking?",
+        "Como melhorar acompanhamento de resoluções de governança?",
+        "Show governance resolution tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_ip",
+      "label": "intellectual property assignment checks - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "ip",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "ip_assignment",
+        "confidentiality_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "intellectual property assignment checks",
+        "checagens de cessão de propriedade intelectual",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "intellectual property assignment checks analytics",
+        "checagens de cessão de propriedade intelectual analytics",
+        "intellectual property assignment checks dashboard",
+        "checagens de cessão de propriedade intelectual dashboard",
+        "risk monitoring intent intellectual property assignment checks",
+        "intenção de monitoramento de risco checagens de cessão de propriedade intelectual",
+        "legal ip"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated ip"
+      ],
+      "examples": [
+        "How can we improve intellectual property assignment checks?",
+        "Como melhorar checagens de cessão de propriedade intelectual?",
+        "Show intellectual property assignment checks insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_liability",
+      "label": "liability exposure analysis - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "liability",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "indemnity_agreement",
+        "settlement_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "liability exposure analysis",
+        "análise de exposição de responsabilidade",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "liability exposure analysis analytics",
+        "análise de exposição de responsabilidade analytics",
+        "liability exposure analysis dashboard",
+        "análise de exposição de responsabilidade dashboard",
+        "risk monitoring intent liability exposure analysis",
+        "intenção de monitoramento de risco análise de exposição de responsabilidade",
+        "legal liability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated liability"
+      ],
+      "examples": [
+        "How can we improve liability exposure analysis?",
+        "Como melhorar análise de exposição de responsabilidade?",
+        "Show liability exposure analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_litigation",
+      "label": "litigation risk screening - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "litigation",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "complaint",
+        "litigation_hold_notice"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "litigation risk screening",
+        "triagem de risco de litígio",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "litigation risk screening analytics",
+        "triagem de risco de litígio analytics",
+        "litigation risk screening dashboard",
+        "triagem de risco de litígio dashboard",
+        "risk monitoring intent litigation risk screening",
+        "intenção de monitoramento de risco triagem de risco de litígio",
+        "legal litigation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated litigation"
+      ],
+      "examples": [
+        "How can we improve litigation risk screening?",
+        "Como melhorar triagem de risco de litígio?",
+        "Show litigation risk screening insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_negotiation",
+      "label": "negotiation friction analysis - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "negotiation",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "amendment",
+        "contract_addendum"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "negotiation friction analysis",
+        "análise de fricção de negociação",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "negotiation friction analysis analytics",
+        "análise de fricção de negociação analytics",
+        "negotiation friction analysis dashboard",
+        "análise de fricção de negociação dashboard",
+        "risk monitoring intent negotiation friction analysis",
+        "intenção de monitoramento de risco análise de fricção de negociação",
+        "legal negotiation"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated negotiation"
+      ],
+      "examples": [
+        "How can we improve negotiation friction analysis?",
+        "Como melhorar análise de fricção de negociação?",
+        "Show negotiation friction analysis insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_obligations",
+      "label": "obligation tracking - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "obligations",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "master_service_agreement",
+        "terms_and_conditions"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "obligation tracking",
+        "acompanhamento de obrigações",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "obligation tracking analytics",
+        "acompanhamento de obrigações analytics",
+        "obligation tracking dashboard",
+        "acompanhamento de obrigações dashboard",
+        "risk monitoring intent obligation tracking",
+        "intenção de monitoramento de risco acompanhamento de obrigações",
+        "legal obligations"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated obligations"
+      ],
+      "examples": [
+        "How can we improve obligation tracking?",
+        "Como melhorar acompanhamento de obrigações?",
+        "Show obligation tracking insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_privacy",
+      "label": "privacy compliance mapping - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "privacy",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "privacy_policy",
+        "data_processing_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "privacy compliance mapping",
+        "mapeamento de compliance de privacidade",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "privacy compliance mapping analytics",
+        "mapeamento de compliance de privacidade analytics",
+        "privacy compliance mapping dashboard",
+        "mapeamento de compliance de privacidade dashboard",
+        "risk monitoring intent privacy compliance mapping",
+        "intenção de monitoramento de risco mapeamento de compliance de privacidade",
+        "legal privacy"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated privacy"
+      ],
+      "examples": [
+        "How can we improve privacy compliance mapping?",
+        "Como melhorar mapeamento de compliance de privacidade?",
+        "Show privacy compliance mapping insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_termination",
+      "label": "termination clause review - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "termination",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "employment_agreement",
+        "vendor_contract"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "termination clause review",
+        "revisão de cláusulas de rescisão",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "termination clause review analytics",
+        "revisão de cláusulas de rescisão analytics",
+        "termination clause review dashboard",
+        "revisão de cláusulas de rescisão dashboard",
+        "risk monitoring intent termination clause review",
+        "intenção de monitoramento de risco revisão de cláusulas de rescisão",
+        "legal termination"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated termination"
+      ],
+      "examples": [
+        "How can we improve termination clause review?",
+        "Como melhorar revisão de cláusulas de rescisão?",
+        "Show termination clause review insights by period."
+      ]
+    },
+    {
+      "id": "legal_cluster_risk_vendor",
+      "label": "vendor contract hygiene - risk monitoring intent",
+      "intent": "risk",
+      "domain": "legal",
+      "tags": [
+        "legal",
+        "vendor",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "vendor_contract",
+        "master_service_agreement"
+      ],
+      "keywords": [
+        "legal analytics",
+        "contract intelligence",
+        "jurídico analytics",
+        "compliance legal",
+        "vendor contract hygiene",
+        "higiene de contratos de fornecedores",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "vendor contract hygiene analytics",
+        "higiene de contratos de fornecedores analytics",
+        "vendor contract hygiene dashboard",
+        "higiene de contratos de fornecedores dashboard",
+        "risk monitoring intent vendor contract hygiene",
+        "intenção de monitoramento de risco higiene de contratos de fornecedores",
+        "legal vendor"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated vendor"
+      ],
+      "examples": [
+        "How can we improve vendor contract hygiene?",
+        "Como melhorar higiene de contratos de fornecedores?",
+        "Show vendor contract hygiene insights by period."
+      ]
+    }
+  ]
 }

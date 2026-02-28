@@ -369,7 +369,53 @@ export class EditingTextGenerationService {
         },
       });
 
-      const proposedText = postProcessTaskOutput(task.taskId, out.text);
+      let proposedText = postProcessTaskOutput(task.taskId, out.text);
+
+      // Repair retry: if first attempt returns empty/invalid, retry once with
+      // an explicit repair instruction appended.  Max 1 retry to cap latency.
+      if (!proposedText) {
+        logger.warn(
+          "[EditingTextGeneration] empty_proposal, attempting repair retry",
+          {
+            operator: input.plan.operator,
+            taskId: task.taskId,
+          },
+        );
+        try {
+          const repairOut = await gateway.generate({
+            traceId: input.context.correlationId || randomUUID(),
+            userId: input.context.userId,
+            conversationId: input.context.conversationId,
+            messages: [
+              {
+                role: "user",
+                content: input.plan.normalizedInstruction,
+              },
+              {
+                role: "assistant",
+                content: "(empty response)",
+              },
+              {
+                role: "user",
+                content:
+                  "Your previous response was empty. Please try again and provide the edited text. Return ONLY the edited text, no explanations.",
+              },
+            ],
+            meta: {
+              promptTask: task.taskId,
+              promptTaskArgs: task.args,
+              operator: task.taskId,
+              operatorFamily: "file_actions",
+              preferredLanguage:
+                input.context.language || input.plan.constraints.outputLanguage,
+            },
+          });
+          proposedText = postProcessTaskOutput(task.taskId, repairOut.text);
+        } catch {
+          // Repair retry failed — fall through to the empty proposal error below.
+        }
+      }
+
       if (!proposedText) {
         return {
           ok: false,

@@ -1,0 +1,10 @@
+{
+  "_meta": { "id": "di_finance_extraction_fin_variance", "version": "1.0.0", "description": "Extraction hints for variance analysis reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "finance", "docType": "fin_variance" },
+  "hints": [
+    { "id": "hint_actual_revenue", "entity": "actual_revenue", "anchors": ["actual", "revenue"], "location": "variance_summary", "extractionMethod": "table_cell_match" },
+    { "id": "hint_budget_revenue", "entity": "budget_revenue", "anchors": ["budget", "plan", "revenue"], "location": "variance_summary", "extractionMethod": "table_cell_match" },
+    { "id": "hint_period", "entity": "period", "anchors": ["Period", "Month", "Quarter", "YTD"], "location": "executive_summary", "extractionMethod": "heading_proximity" },
+    { "id": "hint_variance_pct", "entity": "revenue_variance_pct", "anchors": ["variance %", "var %", "% variance"], "location": "variance_summary", "extractionMethod": "table_cell_match" }
+  ]
+}

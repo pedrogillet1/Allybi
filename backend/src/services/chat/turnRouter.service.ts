@@ -1,11 +1,20 @@
 import type { TurnContext, TurnRouteDecision } from "./chat.types";
 import { TurnRoutePolicyService } from "./turnRoutePolicy.service";
+import {
+  getDocumentIntelligenceBanksInstance,
+  type DocumentIntelligenceBanksService,
+} from "../core/banks/documentIntelligenceBanks.service";
 import type {
   IntentDecisionOutput,
   IntentSignals,
   RouterCandidate,
 } from "../config/intentConfig.service";
 import { IntentConfigService } from "../config/intentConfig.service";
+
+export interface RoutedTurnDecision {
+  route: TurnRouteDecision;
+  intentDecision: IntentDecisionOutput | null;
+}
 
 function resolveEnv(): "production" | "staging" | "dev" | "local" {
   const raw = String(process.env.NODE_ENV || "").toLowerCase();
@@ -22,6 +31,27 @@ function isStrictIntentConfigEnv(): boolean {
 
 function low(value: string): string {
   return String(value || "").toLowerCase();
+}
+
+function normalizeForMatching(
+  value: string,
+  opts?: {
+    caseInsensitive?: boolean;
+    stripDiacritics?: boolean;
+    collapseWhitespace?: boolean;
+  },
+): string {
+  let out = String(value || "");
+  if (opts?.stripDiacritics) {
+    out = out.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  if (opts?.collapseWhitespace) {
+    out = out.replace(/\s+/g, " ");
+  }
+  if (opts?.caseInsensitive !== false) {
+    out = out.toLowerCase();
+  }
+  return out.trim();
 }
 
 function hasDocRefSignal(message: string): boolean {
@@ -66,6 +96,10 @@ function mapIntentFamilyToRoute(
 }
 
 export class TurnRouterService {
+  private readonly fileActionBankProvider:
+    | Pick<DocumentIntelligenceBanksService, "getFileActionOperators">
+    | ((bankId: string) => any | null);
+
   constructor(
     private readonly routePolicy: Pick<
       TurnRoutePolicyService,
@@ -75,7 +109,157 @@ export class TurnRouterService {
       IntentConfigService,
       "decide"
     > = new IntentConfigService(),
-  ) {}
+    fileActionBankProvider:
+      | Pick<DocumentIntelligenceBanksService, "getFileActionOperators">
+      | ((
+          bankId: string,
+        ) => any | null) = getDocumentIntelligenceBanksInstance(),
+  ) {
+    this.fileActionBankProvider = fileActionBankProvider;
+  }
+
+  private getFileActionBank(): any | null {
+    try {
+      if (typeof this.fileActionBankProvider === "function") {
+        return this.fileActionBankProvider("file_action_operators");
+      }
+      return this.fileActionBankProvider.getFileActionOperators();
+    } catch {
+      return null;
+    }
+  }
+
+  private getPatterns(value: unknown): string[] {
+    if (!value || typeof value !== "object") return [];
+    const obj = value as Record<string, unknown>;
+    return [
+      ...(Array.isArray(obj.en) ? obj.en : []),
+      ...(Array.isArray(obj.pt) ? obj.pt : []),
+      ...(Array.isArray(obj.any) ? obj.any : []),
+    ]
+      .map((item) => String(item || "").trim())
+      .filter(Boolean);
+  }
+
+  private detectFileAction(query: string): {
+    operatorId: string;
+    confidence: number;
+  } | null {
+    const bank = this.getFileActionBank();
+    const detection = bank?.config?.operatorDetection;
+    if (!bank || !detection?.enabled) return null;
+
+    const normalized = normalizeForMatching(query, {
+      caseInsensitive: detection.caseInsensitive !== false,
+      stripDiacritics: detection.stripDiacritics !== false,
+      collapseWhitespace: detection.collapseWhitespace !== false,
+    });
+    if (!normalized) return null;
+
+    const mustNotContain = this.getPatterns(
+      detection?.guards?.mustNotContain || {},
+    );
+    for (const pattern of mustNotContain) {
+      try {
+        if (new RegExp(pattern, "i").test(normalized)) return null;
+      } catch {
+        continue;
+      }
+    }
+
+    const mustNotMatchWholeMessage = this.getPatterns(
+      detection?.guards?.mustNotMatchWholeMessage || {},
+    );
+    for (const pattern of mustNotMatchWholeMessage) {
+      try {
+        if (new RegExp(pattern, "i").test(normalized)) return null;
+      } catch {
+        continue;
+      }
+    }
+
+    const minConfidence = Number(detection.minConfidence || 0.55);
+    const maxCandidates = Math.max(
+      1,
+      Number(detection.maxCandidatesPerMessage || 3),
+    );
+    const rules = Array.isArray(bank?.detectionRules)
+      ? bank.detectionRules
+      : [];
+    const matches: Array<{
+      operator: string;
+      confidence: number;
+      priority: number;
+    }> = [];
+
+    for (const rule of rules) {
+      const operator = String(rule?.operator || "")
+        .trim()
+        .toLowerCase();
+      if (!operator) continue;
+
+      const patterns = this.getPatterns(rule?.patterns || {});
+      if (patterns.length === 0) continue;
+
+      let matched = false;
+      for (const pattern of patterns) {
+        try {
+          if (new RegExp(pattern, "i").test(normalized)) {
+            matched = true;
+            break;
+          }
+        } catch {
+          continue;
+        }
+      }
+      if (!matched) continue;
+
+      const ruleMustContain = this.getPatterns(rule?.mustContain || {});
+      if (ruleMustContain.length > 0) {
+        const hasRequired = ruleMustContain.some((pattern) => {
+          try {
+            return new RegExp(pattern, "i").test(normalized);
+          } catch {
+            return false;
+          }
+        });
+        if (!hasRequired) continue;
+      }
+
+      const ruleMustNotContain = this.getPatterns(rule?.mustNotContain || {});
+      const hasForbidden = ruleMustNotContain.some((pattern) => {
+        try {
+          return new RegExp(pattern, "i").test(normalized);
+        } catch {
+          return false;
+        }
+      });
+      if (hasForbidden) continue;
+
+      const confidence = Math.max(
+        minConfidence,
+        Number(rule?.confidence || minConfidence),
+      );
+      const priority = Number(rule?.priority || 0);
+
+      matches.push({ operator, confidence, priority });
+    }
+
+    if (matches.length === 0) return null;
+
+    matches.sort((a, b) => {
+      if (b.confidence !== a.confidence) return b.confidence - a.confidence;
+      if (b.priority !== a.priority) return b.priority - a.priority;
+      return a.operator.localeCompare(b.operator);
+    });
+
+    const top = matches.slice(0, maxCandidates)[0];
+    if (!top || top.confidence < minConfidence) return null;
+    return {
+      operatorId: top.operator,
+      confidence: top.confidence,
+    };
+  }
 
   private buildCandidates(
     ctx: TurnContext,
@@ -84,6 +268,7 @@ export class TurnRouterService {
     const query = String(ctx.messageText || "");
     const nav = isNavQuery(query);
     const discovery = isDiscoveryQuery(query);
+    const fileAction = this.detectFileAction(query);
 
     const candidates: RouterCandidate[] = [];
     if (docsAvailable || discovery || hasDocRefSignal(query)) {
@@ -95,7 +280,15 @@ export class TurnRouterService {
         score: docsAvailable ? 0.88 : 0.74,
       });
     }
-    if (nav) {
+    if (fileAction) {
+      candidates.push({
+        intentId: "file_actions",
+        operatorId: fileAction.operatorId,
+        intentFamily: "file_actions",
+        domainId: "general",
+        score: Math.max(0.9, fileAction.confidence),
+      });
+    } else if (nav) {
       candidates.push({
         intentId: "file_actions",
         operatorId: "open",
@@ -167,25 +360,48 @@ export class TurnRouterService {
     }
   }
 
-  decide(ctx: TurnContext): TurnRouteDecision {
+  decideWithIntent(ctx: TurnContext): RoutedTurnDecision {
     const connectorIntent = this.routePolicy.isConnectorTurn(
       ctx.messageText || "",
       ctx.locale,
     );
 
     if (ctx.viewer?.mode) {
-      if (connectorIntent) return "CONNECTOR";
-      return "KNOWLEDGE";
+      if (connectorIntent) {
+        return {
+          route: "CONNECTOR",
+          intentDecision: null,
+        };
+      }
+      return {
+        route: "KNOWLEDGE",
+        intentDecision: null,
+      };
     }
 
-    if (connectorIntent) return "CONNECTOR";
+    if (connectorIntent) {
+      return {
+        route: "CONNECTOR",
+        intentDecision: null,
+      };
+    }
     const docsAvailable = Boolean(
       ctx.attachedDocuments.length > 0 || ctx.activeDocument,
     );
     const decision = this.resolveIntentDecision(ctx, docsAvailable);
     if (decision) {
-      return mapIntentFamilyToRoute(decision.intentFamily, docsAvailable);
+      return {
+        route: mapIntentFamilyToRoute(decision.intentFamily, docsAvailable),
+        intentDecision: decision,
+      };
     }
-    return docsAvailable ? "KNOWLEDGE" : "GENERAL";
+    return {
+      route: docsAvailable ? "KNOWLEDGE" : "GENERAL",
+      intentDecision: null,
+    };
+  }
+
+  decide(ctx: TurnContext): TurnRouteDecision {
+    return this.decideWithIntent(ctx).route;
   }
 }

@@ -1,0 +1,668 @@
+{
+  "_meta": {
+    "id": "legal_eula_extraction_hints",
+    "version": "2.0.0",
+    "description": "Extraction hints and pitfalls for End User License Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_eula"
+  },
+  "hints": [
+    {
+      "id": "legal_eula_hint_001",
+      "entity": "document_title",
+      "anchors": [
+        "document title",
+        "end user license agreement document title",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document title in legal_eula",
+        "document_header document title"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_002",
+      "entity": "document_version",
+      "anchors": [
+        "document version",
+        "end user license agreement document version",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document version in legal_eula",
+        "parties document version"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_003",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "end user license agreement effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "effective date in legal_eula",
+        "recitals_background effective date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_004",
+      "entity": "execution_date",
+      "anchors": [
+        "execution date",
+        "end user license agreement execution date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "execution date in legal_eula",
+        "definitions execution date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_005",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "end user license agreement expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "expiration date in legal_eula",
+        "scope_of_services expiration date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_006",
+      "entity": "renewal_term_days",
+      "anchors": [
+        "renewal term days",
+        "end user license agreement renewal term days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "renewal term days in legal_eula",
+        "fees_and_payment renewal term days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_007",
+      "entity": "notice_period_days",
+      "anchors": [
+        "notice period days",
+        "end user license agreement notice period days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "notice period days in legal_eula",
+        "term_and_renewal notice period days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_008",
+      "entity": "governing_law",
+      "anchors": [
+        "governing law",
+        "end user license agreement governing law",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "governing law in legal_eula",
+        "termination governing law"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_009",
+      "entity": "jurisdiction_venue",
+      "anchors": [
+        "jurisdiction venue",
+        "end user license agreement jurisdiction venue",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "jurisdiction venue in legal_eula",
+        "confidentiality_privacy jurisdiction venue"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_010",
+      "entity": "arbitration_forum",
+      "anchors": [
+        "arbitration forum",
+        "end user license agreement arbitration forum",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "arbitration forum in legal_eula",
+        "security_compliance arbitration forum"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_011",
+      "entity": "party_one_name",
+      "anchors": [
+        "party one name",
+        "end user license agreement party one name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "ip_and_license",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one name in legal_eula",
+        "ip_and_license party one name"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_012",
+      "entity": "party_one_role",
+      "anchors": [
+        "party one role",
+        "end user license agreement party one role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "liability_and_indemnity",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one role in legal_eula",
+        "liability_and_indemnity party one role"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_eula_hint_013",
+      "entity": "party_one_address",
+      "anchors": [
+        "party one address",
+        "end user license agreement party one address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "dispute_resolution",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one address in legal_eula",
+        "dispute_resolution party one address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_014",
+      "entity": "party_two_name",
+      "anchors": [
+        "party two name",
+        "end user license agreement party two name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "notices_misc",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two name in legal_eula",
+        "notices_misc party two name"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_015",
+      "entity": "party_two_role",
+      "anchors": [
+        "party two role",
+        "end user license agreement party two role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "signatures",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two role in legal_eula",
+        "signatures party two role"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_016",
+      "entity": "party_two_address",
+      "anchors": [
+        "party two address",
+        "end user license agreement party two address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "annexes_schedules",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two address in legal_eula",
+        "annexes_schedules party two address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_017",
+      "entity": "affiliate_definition",
+      "anchors": [
+        "affiliate definition",
+        "end user license agreement affiliate definition",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "affiliate definition in legal_eula",
+        "document_header affiliate definition"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_018",
+      "entity": "services_description",
+      "anchors": [
+        "services description",
+        "end user license agreement services description",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "services description in legal_eula",
+        "parties services description"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_019",
+      "entity": "deliverables_summary",
+      "anchors": [
+        "deliverables summary",
+        "end user license agreement deliverables summary",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "deliverables summary in legal_eula",
+        "recitals_background deliverables summary"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_020",
+      "entity": "service_level_target",
+      "anchors": [
+        "service level target",
+        "end user license agreement service level target",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "service level target in legal_eula",
+        "definitions service level target"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_eula_hint_021",
+      "entity": "fee_amount",
+      "anchors": [
+        "fee amount",
+        "end user license agreement fee amount",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee amount in legal_eula",
+        "scope_of_services fee amount"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_eula_hint_022",
+      "entity": "fee_currency",
+      "anchors": [
+        "fee currency",
+        "end user license agreement fee currency",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee currency in legal_eula",
+        "fees_and_payment fee currency"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_eula_hint_023",
+      "entity": "payment_terms_days",
+      "anchors": [
+        "payment terms days",
+        "end user license agreement payment terms days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "payment terms days in legal_eula",
+        "term_and_renewal payment terms days"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_eula_hint_024",
+      "entity": "late_fee_rate",
+      "anchors": [
+        "late fee rate",
+        "end user license agreement late fee rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "late fee rate in legal_eula",
+        "termination late fee rate"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_eula_hint_025",
+      "entity": "liability_cap_text",
+      "anchors": [
+        "liability cap text",
+        "end user license agreement liability cap text",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "liability cap text in legal_eula",
+        "confidentiality_privacy liability cap text"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_eula_hint_026",
+      "entity": "indemnity_scope",
+      "anchors": [
+        "indemnity scope",
+        "end user license agreement indemnity scope",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "indemnity scope in legal_eula",
+        "security_compliance indemnity scope"
+      ],
+      "confidenceBias": "low"
+    }
+  ]
+}

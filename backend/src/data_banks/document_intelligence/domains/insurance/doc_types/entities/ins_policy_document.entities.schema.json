@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "id": "di_insurance_entities_ins_policy_document",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for ins_policy_document.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_policy_document"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Document issuer or authority"
+    },
+    {
+      "id": "subject_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary subject referenced by the document"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": false,
+      "description": "Official document number"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": false,
+      "description": "Document effective date"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Jurisdiction or governing authority"
+    },
+    {
+      "id": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current processing or legal status"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code when monetary values are present"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total document amount when applicable"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date for payment or action"
+    },
+    {
+      "id": "reference_id",
+      "type": "string",
+      "required": false,
+      "description": "External reference id"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "policy_number",
+      "type": "string",
+      "required": true,
+      "description": "Policy number"
+    },
+    {
+      "id": "policy_holder",
+      "type": "string",
+      "required": true,
+      "description": "Policy holder name"
+    },
+    {
+      "id": "insured_party",
+      "type": "string",
+      "required": false,
+      "description": "Insured party or beneficiary"
+    },
+    {
+      "id": "coverage_start",
+      "type": "date",
+      "required": true,
+      "description": "Coverage start date"
+    },
+    {
+      "id": "coverage_end",
+      "type": "date",
+      "required": true,
+      "description": "Coverage end date"
+    },
+    {
+      "id": "sum_insured",
+      "type": "currency",
+      "required": true,
+      "description": "Total sum insured"
+    },
+    {
+      "id": "deductible",
+      "type": "currency",
+      "required": false,
+      "description": "Deductible amount"
+    },
+    {
+      "id": "coverage_limit",
+      "type": "currency",
+      "required": false,
+      "description": "Coverage limit per event/period"
+    },
+    {
+      "id": "renewal_terms",
+      "type": "string",
+      "required": false,
+      "description": "Renewal terms"
+    },
+    {
+      "id": "exclusions_summary",
+      "type": "string",
+      "required": false,
+      "description": "Major exclusions summary"
+    },
+    {
+      "id": "endorsement_reference",
+      "type": "string",
+      "required": false,
+      "description": "Endorsement/rider reference"
+    },
+    {
+      "id": "insurance_doc_type",
+      "type": "string",
+      "required": true,
+      "description": "Resolved doc type: ins_policy_document"
+    }
+  ]
+}

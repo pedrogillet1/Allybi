@@ -1,0 +1,225 @@
+{
+  "_meta": {
+    "id": "di_tax_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for tax domain including section weighting and query expansion.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "maxBoostRules": 16,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "tax",
+  "sectionPriority": [
+    {
+      "section": "document_identification",
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ]
+    },
+    {
+      "section": "party_identification",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ]
+    },
+    {
+      "section": "period_and_jurisdiction",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "section": "status_and_summary",
+      "weight": 2.4,
+      "operators": [
+        "summarize",
+        "evaluate",
+        "monitor"
+      ]
+    },
+    {
+      "section": "line_items",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "section": "calculation_basis",
+      "weight": 2.5,
+      "operators": [
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "section": "critical_dates",
+      "weight": 2.7,
+      "operators": [
+        "locate",
+        "monitor",
+        "validate"
+      ]
+    },
+    {
+      "section": "obligations_and_conditions",
+      "weight": 2.2,
+      "operators": [
+        "evaluate",
+        "validate"
+      ]
+    },
+    {
+      "section": "annexes_exhibits",
+      "weight": 2,
+      "operators": [
+        "locate",
+        "extract"
+      ]
+    },
+    {
+      "section": "footnotes",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "tax_boost_numeric_amounts",
+      "priority": 96,
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "calculate"
+      ],
+      "condition": "query references amount due, tax base, penalty, or refund",
+      "boostSections": [
+        "line_items",
+        "calculation_basis",
+        "status_and_summary"
+      ]
+    },
+    {
+      "id": "tax_boost_deadlines",
+      "priority": 94,
+      "weight": 2.5,
+      "operators": [
+        "locate",
+        "monitor",
+        "validate"
+      ],
+      "condition": "query references filing or payment deadlines",
+      "boostSections": [
+        "critical_dates",
+        "status_and_summary",
+        "footnotes"
+      ]
+    },
+    {
+      "id": "tax_boost_identity_scope",
+      "priority": 92,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query references taxpayer id, filing status, or jurisdiction",
+      "boostSections": [
+        "party_identification",
+        "period_and_jurisdiction",
+        "document_identification"
+      ]
+    },
+    {
+      "id": "tax_boost_dispute_context",
+      "priority": 90,
+      "weight": 2,
+      "operators": [
+        "evaluate",
+        "summarize"
+      ],
+      "condition": "query references assessment dispute or objection",
+      "boostSections": [
+        "obligations_and_conditions",
+        "annexes_exhibits",
+        "footnotes"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\brefund\\b",
+      "expansions": [
+        "tax refund",
+        "credit balance",
+        "restituicao",
+        "valor a restituir"
+      ]
+    },
+    {
+      "trigger": "\\bpenalty\\b",
+      "expansions": [
+        "late fee",
+        "interest",
+        "multa",
+        "juros de mora"
+      ]
+    },
+    {
+      "trigger": "\\bwithholding\\b",
+      "expansions": [
+        "tax withheld",
+        "source withholding",
+        "retencao",
+        "retido na fonte"
+      ]
+    },
+    {
+      "trigger": "\\bproperty\\s+tax\\b",
+      "expansions": [
+        "property tax bill",
+        "municipal tax",
+        "iptu",
+        "imposto predial"
+      ]
+    },
+    {
+      "trigger": "\\bassessment\\b",
+      "expansions": [
+        "assessment notice",
+        "notice of assessment",
+        "lancamento",
+        "notificacao"
+      ]
+    },
+    {
+      "trigger": "\\bpayment\\b",
+      "expansions": [
+        "payment slip",
+        "payment reference",
+        "guia de pagamento",
+        "darf"
+      ]
+    }
+  ]
+}

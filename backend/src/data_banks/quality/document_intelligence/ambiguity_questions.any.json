@@ -11,11 +11,474 @@
   "config": {
     "enabled": true
   },
-  "rules": [],
+  "rules": [
+    {
+      "id": "AMB_001_multiple_entities_same_name",
+      "trigger": "query references an entity name that matches 2+ distinct entities in the corpus",
+      "check": "context.matchedEntities.count > 1 AND context.matchedEntities.allShareName == true",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["Which John Smith?", "There are 3 accounts named 'Alpha Corp'."]
+    },
+    {
+      "id": "AMB_002_ambiguous_date_range",
+      "trigger": "query mentions a date or period that could map to multiple fiscal/calendar ranges",
+      "check": "context.dateRef.ambiguous == true AND context.dateRef.candidateRanges.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["Q3 could be calendar Q3 or fiscal Q3.", "Which year's March report?"]
+    },
+    {
+      "id": "AMB_003_ambiguous_metric_name",
+      "trigger": "query uses a metric name that appears under 2+ different definitions in the corpus",
+      "check": "context.metricRef.definitionCount > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["'Revenue' appears as gross and net in different tables.", "'Margin' has 3 definitions."]
+    },
+    {
+      "id": "AMB_004_pronoun_without_antecedent",
+      "trigger": "query uses a pronoun (it, that, this) without a clear antecedent in conversation history",
+      "check": "context.pronounRef.resolved == false AND context.conversationHistory.lastDocRef == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["What does 'it' refer to?", "'That clause' — which clause?"]
+    },
+    {
+      "id": "AMB_005_version_conflict",
+      "trigger": "corpus contains multiple versions of the same document and query does not specify which",
+      "check": "context.docVersions.count > 1 AND context.explicitVersionRef == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["Contract v1 and v2 both exist.", "Draft vs final version?"]
+    },
+    {
+      "id": "AMB_006_currency_ambiguity",
+      "trigger": "query references a monetary value without specifying currency and corpus contains multiple currencies",
+      "check": "context.currencies.count > 1 AND context.queryCurrencyRef == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["Document has USD and BRL values.", "Is this in euros or dollars?"]
+    },
+    {
+      "id": "AMB_007_scope_too_broad",
+      "trigger": "query is broad enough to match 5+ documents with no narrowing signal",
+      "check": "context.matchedDocs.count >= 5 AND context.narrowingSignals.count == 0",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Show me the report' matches 12 docs.", "'Find the contract' — which one?"]
+    },
+    {
+      "id": "AMB_008_conflicting_data_points",
+      "trigger": "two source passages provide contradictory answers to the same question",
+      "check": "context.retrievedPassages.conflictDetected == true",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["Page 3 says $500k, page 7 says $450k.", "Clause 4.1 contradicts clause 6.2."]
+    },
+    {
+      "id": "AMB_009_partial_name_match",
+      "trigger": "query uses a partial name that could match multiple full names in the corpus",
+      "check": "context.nameRef.partialMatch == true AND context.nameRef.candidates.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'The Silva contract' — Maria Silva or João Silva?", "'Report from ABC' — ABC Ltd or ABC Inc?"]
+    },
+    {
+      "id": "AMB_010_time_period_missing",
+      "trigger": "query asks for a time-sensitive value but does not specify period",
+      "check": "context.timeSensitiveQuery == true AND context.periodRef == null AND context.availablePeriods.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["What's the revenue? (2024 or 2025?)", "Which quarter's expenses?"]
+    },
+    {
+      "id": "AMB_011_abbreviation_collision",
+      "trigger": "query uses an abbreviation that maps to 2+ expansions in the corpus",
+      "check": "context.abbreviationRef.expansions.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'ROI' — Return on Investment or Region of Interest?", "'PM' — Project Manager or Post Meridiem?"]
+    },
+    {
+      "id": "AMB_012_section_number_reuse",
+      "trigger": "query references a section number that exists in multiple documents",
+      "check": "context.sectionRef.present == true AND context.sectionRef.docsContaining.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["Section 3.2 exists in both the lease and the amendment.", "Article 5 in which document?"]
+    },
+    {
+      "id": "AMB_013_implicit_comparison_target",
+      "trigger": "query asks for a comparison but only specifies one side",
+      "check": "context.comparisonIntent == true AND context.comparisonTargets.count < 2",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'How does this compare?' — compare to what?", "'Is it higher?' — higher than which baseline?"]
+    },
+    {
+      "id": "AMB_014_threshold_undefined",
+      "trigger": "query uses subjective qualifiers (high, low, significant) without defining a threshold",
+      "check": "context.subjectiveQualifier.present == true AND context.thresholdDefined == false",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Show high-value transactions' — above what amount?", "'Significant variance' — what percentage?"]
+    },
+    {
+      "id": "AMB_015_table_column_ambiguity",
+      "trigger": "query references a column name that appears in multiple tables across the corpus",
+      "check": "context.columnRef.tablesContaining.count > 1 AND context.tableRef == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Total' column exists in 4 tables.", "'Amount' — from which sheet?"]
+    },
+    {
+      "id": "AMB_016_language_mismatch",
+      "trigger": "query language differs from document language and could cause translation ambiguity",
+      "check": "context.queryLang != context.docLang AND context.translationAmbiguity == true",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["EN query on PT doc: 'revenue' could be 'receita' or 'faturamento'.", "Technical term differs across languages."]
+    },
+    {
+      "id": "AMB_017_conditional_clause_uncertain",
+      "trigger": "answer depends on a condition in the document whose status is unknown from context",
+      "check": "context.conditionalClause.present == true AND context.conditionStatus == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["'If the contract is renewed' — has it been renewed?", "'Subject to board approval' — was it approved?"]
+    },
+    {
+      "id": "AMB_018_aggregation_level_unclear",
+      "trigger": "query could be answered at individual or aggregate level",
+      "check": "context.aggregationAmbiguity == true AND context.aggregationLevel == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Total sales' — per product or overall?", "'Average cost' — per unit or per batch?"]
+    },
+    {
+      "id": "AMB_019_document_type_ambiguity",
+      "trigger": "query references a document type (report, contract) that matches multiple docs of same type",
+      "check": "context.docTypeRef.matchCount > 1 AND context.disambiguators.count == 0",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'The report' — 5 reports are uploaded.", "'The spreadsheet' — which one?"]
+    },
+    {
+      "id": "AMB_020_page_number_cross_doc",
+      "trigger": "query references a page number and multiple documents have content on that page",
+      "check": "context.pageRef.present == true AND context.pageRef.docsWithPage.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["Page 5 exists in all 3 uploaded PDFs.", "Which document's page 12?"]
+    },
+    {
+      "id": "AMB_021_formula_reference_ambiguity",
+      "trigger": "query references a calculation or formula name that is defined differently in multiple sheets",
+      "check": "context.formulaRef.definitions.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["'Net profit' formula differs between Sheet1 and Sheet2.", "'CAGR' computed with different base years."]
+    },
+    {
+      "id": "AMB_022_boolean_question_needs_context",
+      "trigger": "yes/no question requires additional context that is not available in the corpus",
+      "check": "context.booleanQuestion == true AND context.requiredContextMissing == true",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Is this compliant?' — compliant with which regulation?", "'Was it approved?' — by which authority?"]
+    },
+    {
+      "id": "AMB_023_relative_reference_no_anchor",
+      "trigger": "query uses relative terms (next, previous, above, below) without a clear anchor point",
+      "check": "context.relativeRef.present == true AND context.relativeRef.anchor == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'The next section' — next after what?", "'Below that value' — which value?"]
+    },
+    {
+      "id": "AMB_024_multi_answer_single_question",
+      "trigger": "query can be legitimately answered with multiple different correct values from the corpus",
+      "check": "context.validAnswerCount > 1 AND context.disambiguationNeeded == true",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["3 different effective dates found.", "Multiple payment terms apply."]
+    },
+    {
+      "id": "AMB_025_unit_ambiguity",
+      "trigger": "query references a numeric value whose unit is ambiguous (kg vs lb, km vs mi, etc.)",
+      "check": "context.unitAmbiguity == true AND context.unitRef == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Weight is 50' — kg or lb?", "'Distance of 100' — miles or kilometers?"]
+    },
+    {
+      "id": "AMB_026_party_role_ambiguity",
+      "trigger": "query references a party role (buyer, seller, client) that maps to multiple entities",
+      "check": "context.partyRoleRef.entities.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "error",
+      "examples": ["'The buyer' — contract has 2 co-buyers.", "'The client' — which subsidiary?"]
+    },
+    {
+      "id": "AMB_027_status_field_multiple_values",
+      "trigger": "query asks about status but entity has multiple status fields or status history",
+      "check": "context.statusRef.fieldCount > 1 OR context.statusRef.historyEntries > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["Current or historical status?", "'Status' — approval status or payment status?"]
+    },
+    {
+      "id": "AMB_028_mixed_granularity_data",
+      "trigger": "corpus contains data at mixed granularity (daily, monthly, yearly) and query doesn't specify",
+      "check": "context.dataGranularity.types.count > 1 AND context.requestedGranularity == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["Data available daily and monthly — which?", "Quarterly or annual figures?"]
+    },
+    {
+      "id": "AMB_029_negation_scope_unclear",
+      "trigger": "query contains negation whose scope is syntactically ambiguous",
+      "check": "context.negation.present == true AND context.negation.scopeAmbiguous == true",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Not all employees received bonuses' — who didn't?", "'Exclude non-compliant items' — which are non-compliant?"]
+    },
+    {
+      "id": "AMB_030_chart_vs_table_source",
+      "trigger": "query could be answered from a chart or a table and values may differ due to rounding",
+      "check": "context.chartSource.present == true AND context.tableSource.present == true AND context.valuesConflict == true",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["Chart shows ~$5M, table shows $4,982,341.", "Should I use the chart or table value?"]
+    },
+    {
+      "id": "AMB_031_implicit_filter_missing",
+      "trigger": "query implies a filter (active, current) but does not state it explicitly",
+      "check": "context.implicitFilter.detected == true AND context.explicitFilter == null",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'List employees' — all or only active?", "'Show contracts' — including expired ones?"]
+    },
+    {
+      "id": "AMB_032_geographic_ambiguity",
+      "trigger": "query references a location name that maps to multiple places in the corpus",
+      "check": "context.geoRef.candidates.count > 1",
+      "failureAction": "ASK_CLARIFY_ONE",
+      "severity": "warning",
+      "examples": ["'Springfield office' — IL or MO?", "'São Paulo' — city or state?"]
+    }
+  ],
+  "questions": [
+    {
+      "id": "AMB_Q_001_numeric_lookup_period",
+      "queryFamily": "numeric_lookup",
+      "domain": "finance",
+      "question": "Which period should I use for this value?",
+      "when": "period missing and multiple period candidates"
+    },
+    {
+      "id": "AMB_Q_002_numeric_lookup_currency",
+      "queryFamily": "numeric_lookup",
+      "domain": "finance",
+      "question": "Which currency should I report this in?",
+      "when": "multiple currencies detected"
+    },
+    {
+      "id": "AMB_Q_003_compare_docs_pair",
+      "queryFamily": "compare_docs",
+      "domain": "any",
+      "question": "Which two documents should I compare?",
+      "when": "compare intent and fewer than two explicit docs"
+    },
+    {
+      "id": "AMB_Q_004_compare_docs_baseline",
+      "queryFamily": "compare_docs",
+      "domain": "finance",
+      "question": "What should I use as the baseline document?",
+      "when": "comparison target missing"
+    },
+    {
+      "id": "AMB_Q_005_extract_entities_party",
+      "queryFamily": "extract_entities",
+      "domain": "legal",
+      "question": "Which party should I extract obligations for?",
+      "when": "multiple party candidates"
+    },
+    {
+      "id": "AMB_Q_006_extract_entities_scope",
+      "queryFamily": "extract_entities",
+      "domain": "ops",
+      "question": "Should I extract from all matching records or only active ones?",
+      "when": "implicit filter missing"
+    },
+    {
+      "id": "AMB_Q_007_summarize_doc_version",
+      "queryFamily": "summarize_doc",
+      "domain": "any",
+      "question": "Which document version should I summarize?",
+      "when": "multiple versions exist"
+    },
+    {
+      "id": "AMB_Q_008_summarize_doc_scope",
+      "queryFamily": "summarize_doc",
+      "domain": "legal",
+      "question": "Do you want only the amendment or the full agreement set?",
+      "when": "base agreement and amendment both match"
+    },
+    {
+      "id": "AMB_Q_009_timeline_anchor",
+      "queryFamily": "timeline",
+      "domain": "any",
+      "question": "Which start date should anchor the timeline?",
+      "when": "multiple candidate anchors"
+    },
+    {
+      "id": "AMB_Q_010_timeline_calendar",
+      "queryFamily": "timeline",
+      "domain": "accounting",
+      "question": "Should I use fiscal dates or calendar dates?",
+      "when": "fiscal/calendar ambiguity"
+    },
+    {
+      "id": "AMB_Q_011_compliance_framework",
+      "queryFamily": "compliance_check",
+      "domain": "legal",
+      "question": "Which compliance framework should I validate against?",
+      "when": "framework not specified"
+    },
+    {
+      "id": "AMB_Q_012_compliance_jurisdiction",
+      "queryFamily": "compliance_check",
+      "domain": "legal",
+      "question": "Which jurisdiction should I apply for this compliance check?",
+      "when": "jurisdiction missing"
+    },
+    {
+      "id": "AMB_Q_013_medical_result_encounter",
+      "queryFamily": "numeric_lookup",
+      "domain": "medical",
+      "question": "Which encounter date should I use for this result?",
+      "when": "multiple encounter dates present"
+    },
+    {
+      "id": "AMB_Q_014_medical_unit",
+      "queryFamily": "numeric_lookup",
+      "domain": "medical",
+      "question": "Should I keep the original lab unit or convert it?",
+      "when": "unit conversion ambiguity"
+    },
+    {
+      "id": "AMB_Q_015_legal_clause_version",
+      "queryFamily": "definition_lookup",
+      "domain": "legal",
+      "question": "Should I use the clause text from the original contract or the amendment?",
+      "when": "same clause id in multiple docs"
+    },
+    {
+      "id": "AMB_Q_016_finance_metric_definition",
+      "queryFamily": "definition_lookup",
+      "domain": "finance",
+      "question": "Which definition of this metric should I apply?",
+      "when": "metric has multiple definitions"
+    },
+    {
+      "id": "AMB_Q_017_ops_kpi_granularity",
+      "queryFamily": "risks_and_controls",
+      "domain": "ops",
+      "question": "Do you want KPI risk at team level or company level?",
+      "when": "aggregation level ambiguous"
+    },
+    {
+      "id": "AMB_Q_018_accounting_cutoff",
+      "queryFamily": "numeric_lookup",
+      "domain": "accounting",
+      "question": "Which period cutoff should I apply for this accounting value?",
+      "when": "close period ambiguity"
+    },
+    {
+      "id": "AMB_Q_019_accounting_basis",
+      "queryFamily": "compliance_check",
+      "domain": "accounting",
+      "question": "Should I evaluate this on accrual basis or cash basis?",
+      "when": "accounting basis not specified"
+    },
+    {
+      "id": "AMB_Q_020_crossdoc_conflict_resolution",
+      "queryFamily": "compare_docs",
+      "domain": "any",
+      "question": "Two sources conflict; which source should be treated as authoritative?",
+      "when": "retrieved evidence conflict detected"
+    },
+    {
+      "id": "AMB_Q_021_doc_alias_disambiguation",
+      "queryFamily": "scope_resolution",
+      "domain": "any",
+      "question": "Which document do you mean by that name?",
+      "when": "alias maps to multiple docs"
+    },
+    {
+      "id": "AMB_Q_022_table_column_disambiguation",
+      "queryFamily": "extract_entities",
+      "domain": "finance",
+      "question": "Which table should I use for that column?",
+      "when": "column name appears in multiple tables"
+    },
+    {
+      "id": "AMB_Q_023_medical_abbreviation",
+      "queryFamily": "definition_lookup",
+      "domain": "medical",
+      "question": "Which expansion of this abbreviation should I use?",
+      "when": "abbreviation collision detected"
+    },
+    {
+      "id": "AMB_Q_024_ops_status_type",
+      "queryFamily": "extract_entities",
+      "domain": "ops",
+      "question": "Which status type do you want: operational, approval, or payment?",
+      "when": "status field ambiguity"
+    }
+  ],
   "templates": {
-    "finance": [],
-    "legal": [],
-    "medical": [],
-    "ops": []
+    "finance": [
+      "Which fiscal period are you referring to — {{candidatePeriods}}?",
+      "The term '{{metricName}}' has {{definitionCount}} definitions in this document. Which do you mean: {{definitionList}}?",
+      "I found {{currencyCount}} currencies ({{currencyList}}). Which currency should I use?",
+      "There are {{entityCount}} entities named '{{entityName}}'. Which one: {{entityList}}?",
+      "Revenue figures differ between {{sourceA}} and {{sourceB}}. Which source should I use?",
+      "Should I report at the consolidated or subsidiary level?",
+      "This value appears as both gross and net. Which do you need?",
+      "Multiple cost centers match '{{ref}}'. Please specify: {{candidateList}}."
+    ],
+    "legal": [
+      "Section {{sectionNum}} appears in {{docCount}} documents. Which document: {{docList}}?",
+      "The term '{{partyRole}}' maps to {{partyCount}} parties. Which party: {{partyList}}?",
+      "I found {{versionCount}} versions of this contract. Which version: {{versionList}}?",
+      "This clause has a condition ('{{condition}}'). Has that condition been met?",
+      "The term '{{legalTerm}}' is defined differently in {{defCount}} clauses. Which definition applies?",
+      "Multiple effective dates found: {{dateList}}. Which applies to your question?",
+      "Amendment or original contract terms?",
+      "Which jurisdiction's interpretation should I apply?"
+    ],
+    "medical": [
+      "The abbreviation '{{abbrev}}' could mean {{expansionList}}. Which one?",
+      "Patient data exists for {{periodCount}} time periods. Which period: {{periodList}}?",
+      "Dosage is recorded in {{unitList}}. Which unit should I report?",
+      "I found results from {{labCount}} different lab panels. Which lab panel?",
+      "Multiple diagnoses use code {{code}}. Which condition specifically?",
+      "Current or historical reading for {{measurement}}?",
+      "Should I include readings from all visits or the most recent only?",
+      "The protocol has {{versionCount}} versions. Which version applies?"
+    ],
+    "ops": [
+      "There are {{matchCount}} items matching '{{itemRef}}'. Please specify: {{itemList}}.",
+      "Data is available at {{granularityList}} granularity. Which level?",
+      "Multiple departments match '{{deptRef}}': {{deptList}}. Which one?",
+      "This metric is tracked in {{systemCount}} systems with different values. Which system?",
+      "Should I include archived records or only active ones?",
+      "Status could refer to {{statusTypes}}. Which status type?",
+      "Report from {{dateOptions}}. Which date range?",
+      "Threshold not specified — what value defines '{{qualifier}}'?"
+    ]
   }
 }

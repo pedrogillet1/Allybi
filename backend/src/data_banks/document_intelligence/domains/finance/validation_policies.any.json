@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "id": "di_finance_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for finance domain — correctness checks, consistency guards, and quality gates.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "policies": [
+    {
+      "id": "fin_val_001_balance_check",
+      "severity": "error",
+      "description": "Assets must equal Liabilities + Equity on any balance sheet extraction.",
+      "applies": ["extract", "calculate", "validate"],
+      "check": "balance_sheet_equation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_002_sign_consistency",
+      "severity": "error",
+      "description": "Revenue should be positive; expenses/losses should follow sign convention consistently.",
+      "applies": ["extract", "calculate"],
+      "check": "sign_convention",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_003_period_alignment",
+      "severity": "error",
+      "description": "Numerator and denominator in ratios must come from the same fiscal period.",
+      "applies": ["calculate"],
+      "check": "period_match",
+      "failureAction": "BLOCK_AND_REGEN"
+    },
+    {
+      "id": "fin_val_004_currency_consistency",
+      "severity": "error",
+      "description": "All values in a comparison must use the same currency. Flag if mixed currencies detected.",
+      "applies": ["compare", "calculate"],
+      "check": "currency_match",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_005_materiality_gate",
+      "severity": "warning",
+      "description": "Variance below 1% of total may be immaterial — flag as 'not material' rather than analyzing.",
+      "applies": ["compare", "evaluate"],
+      "check": "materiality_threshold",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_006_stale_data",
+      "severity": "warning",
+      "description": "Financial data older than 18 months should be flagged as potentially stale.",
+      "applies": ["extract", "compare", "monitor"],
+      "check": "data_freshness",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_007_gaap_vs_nongaap",
+      "severity": "warning",
+      "description": "Do not mix GAAP and non-GAAP figures in the same comparison without disclosure.",
+      "applies": ["compare", "calculate"],
+      "check": "accounting_basis_match",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_008_cross_statement_consistency",
+      "severity": "warning",
+      "description": "Net income on income statement must match net income on cash flow statement.",
+      "applies": ["validate"],
+      "check": "cross_statement_tie",
+      "failureAction": "WARN_AND_EXPLAIN"
+    }
+  ]
+}

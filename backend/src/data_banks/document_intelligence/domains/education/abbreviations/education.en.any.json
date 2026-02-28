@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_education_abbreviations_en",
+    "version": "1.0.0",
+    "description": "EN abbreviations for education domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education",
+    "language": "en"
+  },
+  "domain": "education",
+  "abbreviations": [
+    {
+      "abbr": "ACT",
+      "expansion": "American College Testing"
+    },
+    {
+      "abbr": "CGPA",
+      "expansion": "Cumulative Grade Point Average"
+    },
+    {
+      "abbr": "CRN",
+      "expansion": "Course Reference Number"
+    },
+    {
+      "abbr": "Dean",
+      "expansion": "Academic Dean"
+    },
+    {
+      "abbr": "DOB",
+      "expansion": "Date of Birth"
+    },
+    {
+      "abbr": "FAFSA",
+      "expansion": "Free Application for Federal Student Aid"
+    },
+    {
+      "abbr": "FERPA",
+      "expansion": "Family Educational Rights and Privacy Act"
+    },
+    {
+      "abbr": "GPA",
+      "expansion": "Grade Point Average"
+    },
+    {
+      "abbr": "ID",
+      "expansion": "Identifier"
+    },
+    {
+      "abbr": "IELTS",
+      "expansion": "International English Language Testing System"
+    },
+    {
+      "abbr": "IP",
+      "expansion": "In Progress"
+    },
+    {
+      "abbr": "P/F",
+      "expansion": "Pass Fail"
+    },
+    {
+      "abbr": "PG",
+      "expansion": "Postgraduate"
+    },
+    {
+      "abbr": "RA",
+      "expansion": "Research Assistant"
+    },
+    {
+      "abbr": "Reg",
+      "expansion": "Registrar"
+    },
+    {
+      "abbr": "SAT",
+      "expansion": "Scholastic Assessment Test"
+    },
+    {
+      "abbr": "TA",
+      "expansion": "Teaching Assistant"
+    },
+    {
+      "abbr": "TOEFL",
+      "expansion": "Test of English as a Foreign Language"
+    },
+    {
+      "abbr": "UG",
+      "expansion": "Undergraduate"
+    },
+    {
+      "abbr": "W",
+      "expansion": "Withdrawn"
+    }
+  ]
+}

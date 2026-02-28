@@ -1,0 +1,496 @@
+{
+  "_meta": {
+    "id": "di_identity_lexicon_en",
+    "version": "1.0.0",
+    "description": "English lexicon for identity domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "language": "en"
+  },
+  "domain": "identity",
+  "terms": [
+    {
+      "id": "identity_lex_address_line",
+      "canonical": "address line",
+      "synonyms": [
+        "street line",
+        "residential address"
+      ],
+      "display": "Address Line"
+    },
+    {
+      "id": "identity_lex_barcode",
+      "canonical": "barcode",
+      "synonyms": [
+        "2d barcode",
+        "pdf417"
+      ],
+      "display": "Barcode"
+    },
+    {
+      "id": "identity_lex_birth_date",
+      "canonical": "date of birth",
+      "synonyms": [
+        "dob",
+        "birth date"
+      ],
+      "display": "Date of Birth"
+    },
+    {
+      "id": "identity_lex_birth_place",
+      "canonical": "place of birth",
+      "synonyms": [
+        "birth place",
+        "city of birth"
+      ],
+      "display": "Place of Birth"
+    },
+    {
+      "id": "identity_lex_business_id",
+      "canonical": "business registration id",
+      "synonyms": [
+        "registration number",
+        "company id"
+      ],
+      "display": "Business Registration ID"
+    },
+    {
+      "id": "identity_lex_business_name",
+      "canonical": "registered business name",
+      "synonyms": [
+        "legal business name",
+        "company name"
+      ],
+      "display": "Business Name"
+    },
+    {
+      "id": "identity_lex_citizenship",
+      "canonical": "citizenship",
+      "synonyms": [
+        "nationality",
+        "country of citizenship"
+      ],
+      "display": "Citizenship"
+    },
+    {
+      "id": "identity_lex_company_type",
+      "canonical": "company type",
+      "synonyms": [
+        "legal entity type",
+        "entity class"
+      ],
+      "display": "Company Type"
+    },
+    {
+      "id": "identity_lex_country_code",
+      "canonical": "country code",
+      "synonyms": [
+        "issuing country",
+        "country abbreviation"
+      ],
+      "display": "Country Code"
+    },
+    {
+      "id": "identity_lex_document_class",
+      "canonical": "document class",
+      "synonyms": [
+        "document type",
+        "class"
+      ],
+      "display": "Document Class"
+    },
+    {
+      "id": "identity_lex_document_expiry",
+      "canonical": "document expiry date",
+      "synonyms": [
+        "expiration date",
+        "valid thru"
+      ],
+      "display": "Document Expiry"
+    },
+    {
+      "id": "identity_lex_document_issue_date",
+      "canonical": "document issue date",
+      "synonyms": [
+        "issued date",
+        "date of issue"
+      ],
+      "display": "Document Issue Date"
+    },
+    {
+      "id": "identity_lex_document_number",
+      "canonical": "document number",
+      "synonyms": [
+        "id number",
+        "license number"
+      ],
+      "display": "Document Number"
+    },
+    {
+      "id": "identity_lex_document_series",
+      "canonical": "document series",
+      "synonyms": [
+        "series",
+        "batch code"
+      ],
+      "display": "Document Series"
+    },
+    {
+      "id": "identity_lex_document_side",
+      "canonical": "document side",
+      "synonyms": [
+        "front side",
+        "back side"
+      ],
+      "display": "Document Side"
+    },
+    {
+      "id": "identity_lex_document_template",
+      "canonical": "document template",
+      "synonyms": [
+        "template version",
+        "layout version"
+      ],
+      "display": "Document Template"
+    },
+    {
+      "id": "identity_lex_driver_license",
+      "canonical": "driver license",
+      "synonyms": [
+        "driving license",
+        "dl"
+      ],
+      "display": "Driver License"
+    },
+    {
+      "id": "identity_lex_endorsement",
+      "canonical": "license endorsement",
+      "synonyms": [
+        "class endorsement",
+        "restriction code"
+      ],
+      "display": "License Endorsement"
+    },
+    {
+      "id": "identity_lex_full_name",
+      "canonical": "full legal name",
+      "synonyms": [
+        "legal name",
+        "name"
+      ],
+      "display": "Full Legal Name"
+    },
+    {
+      "id": "identity_lex_gender",
+      "canonical": "gender",
+      "synonyms": [
+        "sex",
+        "gender marker"
+      ],
+      "display": "Gender"
+    },
+    {
+      "id": "identity_lex_holder_signature",
+      "canonical": "holder signature",
+      "synonyms": [
+        "signature",
+        "bearer signature"
+      ],
+      "display": "Holder Signature"
+    },
+    {
+      "id": "identity_lex_id_card",
+      "canonical": "identity card",
+      "synonyms": [
+        "id",
+        "photo id"
+      ],
+      "display": "Identity Card"
+    },
+    {
+      "id": "identity_lex_identifier_hash",
+      "canonical": "identifier hash",
+      "synonyms": [
+        "masked id",
+        "tokenized id"
+      ],
+      "display": "Identifier Hash"
+    },
+    {
+      "id": "identity_lex_incorporation_number",
+      "canonical": "incorporation number",
+      "synonyms": [
+        "company incorporation id",
+        "formation number"
+      ],
+      "display": "Incorporation Number"
+    },
+    {
+      "id": "identity_lex_issuing_authority",
+      "canonical": "issuing authority",
+      "synonyms": [
+        "issuing office",
+        "authority"
+      ],
+      "display": "Issuing Authority"
+    },
+    {
+      "id": "identity_lex_issuing_country",
+      "canonical": "issuing country",
+      "synonyms": [
+        "country of issue",
+        "issuer country"
+      ],
+      "display": "Issuing Country"
+    },
+    {
+      "id": "identity_lex_issuing_jurisdiction",
+      "canonical": "issuing jurisdiction",
+      "synonyms": [
+        "issuing authority area",
+        "jurisdiction"
+      ],
+      "display": "Issuing Jurisdiction"
+    },
+    {
+      "id": "identity_lex_issuing_state",
+      "canonical": "issuing state",
+      "synonyms": [
+        "state of issue",
+        "issuing region"
+      ],
+      "display": "Issuing State"
+    },
+    {
+      "id": "identity_lex_machine_readable_zone",
+      "canonical": "machine readable zone",
+      "synonyms": [
+        "mrz",
+        "readable zone"
+      ],
+      "display": "Machine Readable Zone"
+    },
+    {
+      "id": "identity_lex_name_variants",
+      "canonical": "name variants",
+      "synonyms": [
+        "alias names",
+        "alternate names"
+      ],
+      "display": "Name Variants"
+    },
+    {
+      "id": "identity_lex_national_id",
+      "canonical": "national id",
+      "synonyms": [
+        "government id",
+        "citizen id"
+      ],
+      "display": "National ID"
+    },
+    {
+      "id": "identity_lex_passport",
+      "canonical": "passport",
+      "synonyms": [
+        "travel passport",
+        "passport document"
+      ],
+      "display": "Passport"
+    },
+    {
+      "id": "identity_lex_passport_number",
+      "canonical": "passport number",
+      "synonyms": [
+        "travel document number",
+        "passport id"
+      ],
+      "display": "Passport Number"
+    },
+    {
+      "id": "identity_lex_photo_match",
+      "canonical": "photo match",
+      "synonyms": [
+        "face match",
+        "portrait match"
+      ],
+      "display": "Photo Match"
+    },
+    {
+      "id": "identity_lex_place_of_issue",
+      "canonical": "place of issue",
+      "synonyms": [
+        "issuing location",
+        "office location"
+      ],
+      "display": "Place of Issue"
+    },
+    {
+      "id": "identity_lex_proof_of_address",
+      "canonical": "proof of address",
+      "synonyms": [
+        "address proof",
+        "residency proof"
+      ],
+      "display": "Proof of Address"
+    },
+    {
+      "id": "identity_lex_public_registry",
+      "canonical": "public registry",
+      "synonyms": [
+        "commercial registry",
+        "business registry"
+      ],
+      "display": "Public Registry"
+    },
+    {
+      "id": "identity_lex_qr_code",
+      "canonical": "qr code",
+      "synonyms": [
+        "validation qr",
+        "scan code"
+      ],
+      "display": "QR Code"
+    },
+    {
+      "id": "identity_lex_registered_address",
+      "canonical": "registered address",
+      "synonyms": [
+        "business address",
+        "legal address"
+      ],
+      "display": "Registered Address"
+    },
+    {
+      "id": "identity_lex_registration_date",
+      "canonical": "registration date",
+      "synonyms": [
+        "filing date",
+        "incorporation date"
+      ],
+      "display": "Registration Date"
+    },
+    {
+      "id": "identity_lex_registration_office",
+      "canonical": "registration office",
+      "synonyms": [
+        "registry office",
+        "issuing office"
+      ],
+      "display": "Registration Office"
+    },
+    {
+      "id": "identity_lex_registration_status",
+      "canonical": "registration status",
+      "synonyms": [
+        "company status",
+        "active status"
+      ],
+      "display": "Registration Status"
+    },
+    {
+      "id": "identity_lex_residency_document",
+      "canonical": "residency document",
+      "synonyms": [
+        "residence permit",
+        "residency card"
+      ],
+      "display": "Residency Document"
+    },
+    {
+      "id": "identity_lex_residential_address",
+      "canonical": "residential address",
+      "synonyms": [
+        "home address",
+        "mailing address"
+      ],
+      "display": "Residential Address"
+    },
+    {
+      "id": "identity_lex_security_features",
+      "canonical": "security features",
+      "synonyms": [
+        "anti-fraud features",
+        "security controls"
+      ],
+      "display": "Security Features"
+    },
+    {
+      "id": "identity_lex_serial_number",
+      "canonical": "serial number",
+      "synonyms": [
+        "serial",
+        "document serial"
+      ],
+      "display": "Serial Number"
+    },
+    {
+      "id": "identity_lex_state_registration",
+      "canonical": "state registration",
+      "synonyms": [
+        "state registry",
+        "regional registration"
+      ],
+      "display": "State Registration"
+    },
+    {
+      "id": "identity_lex_supporting_bill",
+      "canonical": "supporting utility bill",
+      "synonyms": [
+        "utility statement",
+        "service bill"
+      ],
+      "display": "Supporting Utility Bill"
+    },
+    {
+      "id": "identity_lex_tax_id",
+      "canonical": "tax identifier",
+      "synonyms": [
+        "tin",
+        "tax id"
+      ],
+      "display": "Tax Identifier"
+    },
+    {
+      "id": "identity_lex_validity_period",
+      "canonical": "validity period",
+      "synonyms": [
+        "document validity",
+        "validity term"
+      ],
+      "display": "Validity Period"
+    },
+    {
+      "id": "identity_lex_verification_code",
+      "canonical": "verification code",
+      "synonyms": [
+        "check code",
+        "validation code"
+      ],
+      "display": "Verification Code"
+    },
+    {
+      "id": "identity_lex_visa",
+      "canonical": "visa",
+      "synonyms": [
+        "entry visa",
+        "residency visa"
+      ],
+      "display": "Visa"
+    },
+    {
+      "id": "identity_lex_watermark",
+      "canonical": "security watermark",
+      "synonyms": [
+        "watermark",
+        "security mark"
+      ],
+      "display": "Security Watermark"
+    }
+  ]
+}

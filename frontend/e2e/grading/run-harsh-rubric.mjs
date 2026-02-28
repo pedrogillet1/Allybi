@@ -65,8 +65,23 @@ function isLikelyPortuguese(text) {
   return ptCount >= enCount;
 }
 
+function isLikelyEnglish(text) {
+  const v = String(text || '').toLowerCase();
+  const enWords = [' the ', ' with ', ' this ', ' that ', ' for ', ' and ', ' from ', ' are '];
+  const ptWords = [' de ', ' para ', ' com ', ' não ', ' que ', ' uma ', ' os ', ' as '];
+  const enCount = enWords.reduce((acc, w) => acc + (v.includes(w) ? 1 : 0), 0);
+  const ptCount = ptWords.reduce((acc, w) => acc + (v.includes(w) ? 1 : 0), 0);
+  return enCount >= ptCount;
+}
+
 function looksLikeTruncated(result) {
-  const flag = result.truncated === true || result.truncation === true || (result.truncation && result.truncation !== null);
+  const truncationValue = result.truncation;
+  const truncationOccurred =
+    truncationValue === true ||
+    (truncationValue &&
+      typeof truncationValue === 'object' &&
+      truncationValue.occurred === true);
+  const flag = result.truncated === true || truncationOccurred;
   const text = String(result.responseText || '');
   const marker = text.includes('[truncated]') || text.includes('(Response was truncated)');
   return Boolean(flag || marker);
@@ -152,6 +167,7 @@ function normalizeResults(dataset) {
       return {
         index: Number(row.queryNum || row.index || idx + 1),
         query,
+        expectedLanguage: String(row.expectedLanguage || row.language || '').trim() || null,
         responseText,
         rawSources,
         sourceDocIds,
@@ -172,11 +188,11 @@ function isOutOfScope(row, allowedDocIds, allowedDocNames) {
     return row.sourceDocIds.some((id) => !allowedDocIds.has(id));
   }
 
-  const normalizedAllowed = new Set(
-    [...allowedDocNames].map((name) => normalizeText(name)).filter(Boolean),
-  );
-  for (const pattern of DEFAULT_ALLOWED_DOC_NAME_PATTERNS) {
-    normalizedAllowed.add(normalizeText(pattern));
+  const normalizedAllowed = new Set([...allowedDocNames].map((name) => normalizeText(name)).filter(Boolean));
+  if (normalizedAllowed.size === 0) {
+    for (const pattern of DEFAULT_ALLOWED_DOC_NAME_PATTERNS) {
+      normalizedAllowed.add(normalizeText(pattern));
+    }
   }
 
   if (row.sourceNames.length === 0) return false;
@@ -202,9 +218,13 @@ function evaluateQuery(row, context) {
 
   const text = row.responseText;
   const lower = text.toLowerCase();
-  const languageMismatch =
-    context.expectedLanguage.startsWith('pt') &&
-    (!isLikelyPortuguese(text) || lower.includes('based on limited information'));
+  const expectedLanguage =
+    String(row.expectedLanguage || context.expectedLanguage || 'pt').trim().toLowerCase();
+  const languageMismatch = expectedLanguage.startsWith('pt')
+    ? (!isLikelyPortuguese(text) || lower.includes('based on limited information'))
+    : expectedLanguage.startsWith('en')
+      ? !isLikelyEnglish(text)
+      : false;
 
   const fallbackNoSource =
     hasDocsAttached &&
@@ -235,8 +255,8 @@ function evaluateQuery(row, context) {
 
   const retrieval = {
     docsetLock: outOfScope ? 0 : 15,
-    evidenceRelevance: hasSources ? 8 : 0,
-    traceability: hasSources ? (sourceCount >= 1 ? 7 : 0) : 0,
+    evidenceRelevance: hasSources ? 10 : 0,
+    traceability: hasSources ? (sourceCount >= 1 ? 10 : 0) : 0,
     multiDocCoverage: multiDocQuery ? (sourceCount >= 2 ? 5 : 2) : 5,
   };
 
@@ -317,10 +337,6 @@ function evaluateQuery(row, context) {
     rawScore -= 5;
   }
 
-  if (issues.length === 0 && deductions.length === 0 && hasSources) {
-    rawScore = Math.max(rawScore, 95);
-  }
-
   if (hardFail) {
     return {
       ...row,
@@ -350,7 +366,7 @@ function evaluateQuery(row, context) {
   };
 
   const finalScore = Math.max(0, Math.min(100, Math.round(rawScore)));
-  const status = finalScore >= 90 ? 'PASS' : finalScore >= 70 ? 'PARTIAL' : 'FAIL';
+  const status = finalScore >= 95 ? 'PASS' : finalScore >= 80 ? 'PARTIAL' : 'FAIL';
 
   return {
     ...row,
@@ -498,6 +514,20 @@ function main() {
 
   const dataset = JSON.parse(fs.readFileSync(inputFile, 'utf8'));
   const normalized = normalizeResults(dataset);
+  const requiresAttachedDocset = ['40', '50', '100'].includes(String(opts.pack));
+  if (
+    requiresAttachedDocset &&
+    normalized.allowedDocIds.size === 0 &&
+    normalized.allowedDocNames.size === 0
+  ) {
+    console.error(
+      `[harsh-rubric] strict mode requires attached document metadata for pack ${opts.pack}.`,
+    );
+    console.error(
+      '[harsh-rubric] expected JSON shape: { "meta": { "documentsAttached": [{ "id": "...", "name": "..." }] }, "results": [...] }',
+    );
+    process.exit(1);
+  }
 
   const scoredRows = normalized.rows.map((row) =>
     evaluateQuery(row, {
@@ -537,7 +567,7 @@ function main() {
     console.error('[harsh-rubric] hard gates failed');
     process.exit(1);
   }
-  if (summary.finalScore < 90) {
+  if (summary.finalScore < 95) {
     console.error(`[harsh-rubric] score below readiness threshold: ${summary.finalScore}`);
     process.exit(1);
   }

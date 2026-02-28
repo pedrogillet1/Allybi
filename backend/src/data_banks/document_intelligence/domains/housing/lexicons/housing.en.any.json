@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_housing_lexicon_en",
+    "version": "1.0.0",
+    "description": "EN lexicon for housing domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "language": "en"
+  },
+  "domain": "housing",
+  "terms": [
+    {
+      "id": "housing_lex_assessment",
+      "canonical": "assessment",
+      "synonyms": [
+        "property assessment",
+        "assessed value"
+      ],
+      "display": "Assessment"
+    },
+    {
+      "id": "housing_lex_due_date",
+      "canonical": "due date",
+      "synonyms": [
+        "payment due date",
+        "deadline"
+      ],
+      "display": "Due Date"
+    },
+    {
+      "id": "housing_lex_escrow",
+      "canonical": "escrow",
+      "synonyms": [
+        "escrow account",
+        "impound account"
+      ],
+      "display": "Escrow"
+    },
+    {
+      "id": "housing_lex_hoa_fee",
+      "canonical": "hoa fee",
+      "synonyms": [
+        "association fee",
+        "condo fee"
+      ],
+      "display": "Hoa Fee"
+    },
+    {
+      "id": "housing_lex_inspection_report",
+      "canonical": "inspection report",
+      "synonyms": [
+        "home inspection",
+        "property inspection"
+      ],
+      "display": "Inspection Report"
+    },
+    {
+      "id": "housing_lex_interest",
+      "canonical": "interest",
+      "synonyms": [
+        "interest charge",
+        "finance charge"
+      ],
+      "display": "Interest"
+    },
+    {
+      "id": "housing_lex_landlord",
+      "canonical": "landlord",
+      "synonyms": [
+        "lessor",
+        "property owner"
+      ],
+      "display": "Landlord"
+    },
+    {
+      "id": "housing_lex_lease_term",
+      "canonical": "lease term",
+      "synonyms": [
+        "rental term",
+        "tenancy term"
+      ],
+      "display": "Lease Term"
+    },
+    {
+      "id": "housing_lex_maintenance_fee",
+      "canonical": "maintenance fee",
+      "synonyms": [
+        "service fee",
+        "upkeep fee"
+      ],
+      "display": "Maintenance Fee"
+    },
+    {
+      "id": "housing_lex_mortgage_statement",
+      "canonical": "mortgage statement",
+      "synonyms": [
+        "loan statement",
+        "home loan statement"
+      ],
+      "display": "Mortgage Statement"
+    },
+    {
+      "id": "housing_lex_payment_history",
+      "canonical": "payment history",
+      "synonyms": [
+        "transaction history",
+        "payment log"
+      ],
+      "display": "Payment History"
+    },
+    {
+      "id": "housing_lex_principal",
+      "canonical": "principal",
+      "synonyms": [
+        "principal balance",
+        "loan principal"
+      ],
+      "display": "Principal"
+    },
+    {
+      "id": "housing_lex_property_address",
+      "canonical": "property address",
+      "synonyms": [
+        "site address",
+        "premises address"
+      ],
+      "display": "Property Address"
+    },
+    {
+      "id": "housing_lex_property_tax",
+      "canonical": "property tax",
+      "synonyms": [
+        "real estate tax",
+        "tax bill"
+      ],
+      "display": "Property Tax"
+    },
+    {
+      "id": "housing_lex_rent_receipt",
+      "canonical": "rent receipt",
+      "synonyms": [
+        "rental receipt",
+        "proof of rent payment"
+      ],
+      "display": "Rent Receipt"
+    },
+    {
+      "id": "housing_lex_security_deposit",
+      "canonical": "security deposit",
+      "synonyms": [
+        "deposit",
+        "rental deposit"
+      ],
+      "display": "Security Deposit"
+    },
+    {
+      "id": "housing_lex_tenant",
+      "canonical": "tenant",
+      "synonyms": [
+        "lessee",
+        "occupant"
+      ],
+      "display": "Tenant"
+    },
+    {
+      "id": "housing_lex_unit_number",
+      "canonical": "unit number",
+      "synonyms": [
+        "apartment number",
+        "suite number"
+      ],
+      "display": "Unit Number"
+    },
+    {
+      "id": "housing_lex_utilities",
+      "canonical": "utilities",
+      "synonyms": [
+        "service charges",
+        "utility fees"
+      ],
+      "display": "Utilities"
+    },
+    {
+      "id": "housing_lex_valuation",
+      "canonical": "valuation",
+      "synonyms": [
+        "appraised value",
+        "valuation amount"
+      ],
+      "display": "Valuation"
+    }
+  ]
+}

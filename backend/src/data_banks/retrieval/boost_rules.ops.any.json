@@ -1,0 +1,1988 @@
+{
+  "_meta": {
+    "id": "boost_rules_ops",
+    "version": "1.0.0",
+    "description": "Domain boost rules for ops retrieval ranking by intent, operator, doc type, and section anchors.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "maxMatchedRules": 6,
+    "maxDocumentIntelligenceBoost": 0.45,
+    "coefficientRange": "0..3"
+  },
+  "domain": "ops",
+  "rules": [
+    {
+      "id": "ops_advise_general_unlock",
+      "priority": 90,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "incident_trends",
+          "weight": 2.5
+        },
+        {
+          "section": "risk_register",
+          "weight": 2.3
+        },
+        {
+          "section": "playbook_improvements",
+          "weight": 2.1
+        },
+        {
+          "section": "resourcing",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_advise_doc_lock",
+      "priority": 89,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "incident_trends",
+          "weight": 1.9
+        },
+        {
+          "section": "risk_register",
+          "weight": 1.75
+        },
+        {
+          "section": "playbook_improvements",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_advise_explicit_doc_type",
+      "priority": 88,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "risk_register",
+          "weight": 2.2
+        },
+        {
+          "section": "playbook_improvements",
+          "weight": 2.02
+        },
+        {
+          "section": "resourcing",
+          "weight": 1.84
+        },
+        {
+          "section": "next_actions",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_calculate_general_unlock",
+      "priority": 87,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 2.5
+        },
+        {
+          "section": "uptime_table",
+          "weight": 2.3
+        },
+        {
+          "section": "response_time_table",
+          "weight": 2.1
+        },
+        {
+          "section": "capacity_table",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_calculate_doc_lock",
+      "priority": 86,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 1.9
+        },
+        {
+          "section": "uptime_table",
+          "weight": 1.75
+        },
+        {
+          "section": "response_time_table",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_calculate_explicit_doc_type",
+      "priority": 85,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "uptime_table",
+          "weight": 2.2
+        },
+        {
+          "section": "response_time_table",
+          "weight": 2.02
+        },
+        {
+          "section": "capacity_table",
+          "weight": 1.84
+        },
+        {
+          "section": "error_budget",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_compare_general_unlock",
+      "priority": 84,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_summary",
+          "weight": 2.5
+        },
+        {
+          "section": "sla_metrics",
+          "weight": 2.3
+        },
+        {
+          "section": "incident_trends",
+          "weight": 2.1
+        },
+        {
+          "section": "change_history",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_compare_doc_lock",
+      "priority": 83,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_summary",
+          "weight": 1.9
+        },
+        {
+          "section": "sla_metrics",
+          "weight": 1.75
+        },
+        {
+          "section": "incident_trends",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_compare_explicit_doc_type",
+      "priority": 82,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 2.2
+        },
+        {
+          "section": "incident_trends",
+          "weight": 2.02
+        },
+        {
+          "section": "change_history",
+          "weight": 1.84
+        },
+        {
+          "section": "root_cause",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_evaluate_general_unlock",
+      "priority": 81,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "root_cause",
+          "weight": 2.5
+        },
+        {
+          "section": "risk_register",
+          "weight": 2.3
+        },
+        {
+          "section": "control_gaps",
+          "weight": 2.1
+        },
+        {
+          "section": "capacity",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_evaluate_doc_lock",
+      "priority": 80,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "root_cause",
+          "weight": 1.9
+        },
+        {
+          "section": "risk_register",
+          "weight": 1.75
+        },
+        {
+          "section": "control_gaps",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_evaluate_explicit_doc_type",
+      "priority": 79,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "risk_register",
+          "weight": 2.2
+        },
+        {
+          "section": "control_gaps",
+          "weight": 2.02
+        },
+        {
+          "section": "capacity",
+          "weight": 1.84
+        },
+        {
+          "section": "operational_readiness",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_extract_general_unlock",
+      "priority": 78,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "incident_log",
+          "weight": 2.5
+        },
+        {
+          "section": "sla_metrics",
+          "weight": 2.3
+        },
+        {
+          "section": "action_items",
+          "weight": 2.1
+        },
+        {
+          "section": "owners",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_extract_doc_lock",
+      "priority": 77,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "incident_log",
+          "weight": 1.9
+        },
+        {
+          "section": "sla_metrics",
+          "weight": 1.75
+        },
+        {
+          "section": "action_items",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_extract_explicit_doc_type",
+      "priority": 76,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 2.2
+        },
+        {
+          "section": "action_items",
+          "weight": 2.02
+        },
+        {
+          "section": "owners",
+          "weight": 1.84
+        },
+        {
+          "section": "due_dates",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_locate_general_unlock",
+      "priority": 75,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "service_index",
+          "weight": 2.3
+        },
+        {
+          "section": "runbook_index",
+          "weight": 2.1
+        },
+        {
+          "section": "incident_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_locate_doc_lock",
+      "priority": 74,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "service_index",
+          "weight": 1.75
+        },
+        {
+          "section": "runbook_index",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_locate_explicit_doc_type",
+      "priority": 73,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_index",
+          "weight": 2.2
+        },
+        {
+          "section": "runbook_index",
+          "weight": 2.02
+        },
+        {
+          "section": "incident_index",
+          "weight": 1.84
+        },
+        {
+          "section": "checklist_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_monitor_general_unlock",
+      "priority": 72,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 2.5
+        },
+        {
+          "section": "breach_log",
+          "weight": 2.3
+        },
+        {
+          "section": "incident_trends",
+          "weight": 2.1
+        },
+        {
+          "section": "alert_stream",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_monitor_doc_lock",
+      "priority": 71,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 1.9
+        },
+        {
+          "section": "breach_log",
+          "weight": 1.75
+        },
+        {
+          "section": "incident_trends",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_monitor_explicit_doc_type",
+      "priority": 70,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "breach_log",
+          "weight": 2.2
+        },
+        {
+          "section": "incident_trends",
+          "weight": 2.02
+        },
+        {
+          "section": "alert_stream",
+          "weight": 1.84
+        },
+        {
+          "section": "checklist_status",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_navigate_general_unlock",
+      "priority": 69,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "service_index",
+          "weight": 2.3
+        },
+        {
+          "section": "runbook_index",
+          "weight": 2.1
+        },
+        {
+          "section": "incident_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_navigate_doc_lock",
+      "priority": 68,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "service_index",
+          "weight": 1.75
+        },
+        {
+          "section": "runbook_index",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_navigate_explicit_doc_type",
+      "priority": 67,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_index",
+          "weight": 2.2
+        },
+        {
+          "section": "runbook_index",
+          "weight": 2.02
+        },
+        {
+          "section": "incident_index",
+          "weight": 1.84
+        },
+        {
+          "section": "checklist_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_open_general_unlock",
+      "priority": 66,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "service_index",
+          "weight": 2.3
+        },
+        {
+          "section": "runbook_index",
+          "weight": 2.1
+        },
+        {
+          "section": "incident_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_open_doc_lock",
+      "priority": 65,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "service_index",
+          "weight": 1.75
+        },
+        {
+          "section": "runbook_index",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_open_explicit_doc_type",
+      "priority": 64,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_index",
+          "weight": 2.2
+        },
+        {
+          "section": "runbook_index",
+          "weight": 2.02
+        },
+        {
+          "section": "incident_index",
+          "weight": 1.84
+        },
+        {
+          "section": "checklist_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_summarize_general_unlock",
+      "priority": 63,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_summary",
+          "weight": 2.5
+        },
+        {
+          "section": "incident_summary",
+          "weight": 2.3
+        },
+        {
+          "section": "major_risks",
+          "weight": 2.1
+        },
+        {
+          "section": "actions",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_summarize_doc_lock",
+      "priority": 62,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_summary",
+          "weight": 1.9
+        },
+        {
+          "section": "incident_summary",
+          "weight": 1.75
+        },
+        {
+          "section": "major_risks",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_summarize_explicit_doc_type",
+      "priority": 61,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "incident_summary",
+          "weight": 2.2
+        },
+        {
+          "section": "major_risks",
+          "weight": 2.02
+        },
+        {
+          "section": "actions",
+          "weight": 1.84
+        },
+        {
+          "section": "next_review",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_validate_general_unlock",
+      "priority": 60,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.35
+        },
+        {
+          "docType": "runbook",
+          "weight": 2.1
+        },
+        {
+          "docType": "oncall_log",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "checklist_status",
+          "weight": 2.5
+        },
+        {
+          "section": "runbook_steps",
+          "weight": 2.3
+        },
+        {
+          "section": "sla_metrics",
+          "weight": 2.1
+        },
+        {
+          "section": "alerts",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_validate_doc_lock",
+      "priority": 59,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 1.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "checklist_status",
+          "weight": 1.9
+        },
+        {
+          "section": "runbook_steps",
+          "weight": 1.75
+        },
+        {
+          "section": "sla_metrics",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_validate_explicit_doc_type",
+      "priority": 58,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "explicitDocTypes": [
+        "sla_report",
+        "incident_report"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "explicitDocTypes": [
+          "sla_report",
+          "incident_report"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.4
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "runbook_steps",
+          "weight": 2.2
+        },
+        {
+          "section": "sla_metrics",
+          "weight": 2.02
+        },
+        {
+          "section": "alerts",
+          "weight": 1.84
+        },
+        {
+          "section": "ownership_matrix",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "ops_monitor_core_bundle",
+      "priority": 68,
+      "weight": 1.9,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "sla_report",
+          "weight": 2.8
+        },
+        {
+          "docType": "incident_report",
+          "weight": 2.7
+        },
+        {
+          "docType": "checklist",
+          "weight": 2.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 2.9
+        },
+        {
+          "section": "breach_log",
+          "weight": 2.8
+        },
+        {
+          "section": "incident_trends",
+          "weight": 2.8
+        },
+        {
+          "section": "checklist_status",
+          "weight": 2.7
+        }
+      ],
+      "guardrails": {
+        "includeSlaBreachTrendChecklist": true
+      }
+    },
+    {
+      "id": "ops_advise_core_bundle",
+      "priority": 67,
+      "weight": 1.8,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "incident_report",
+          "weight": 2.7
+        },
+        {
+          "docType": "postmortem",
+          "weight": 2.6
+        },
+        {
+          "docType": "checklist",
+          "weight": 2.5
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "incident_trends",
+          "weight": 2.8
+        },
+        {
+          "section": "root_cause",
+          "weight": 2.7
+        },
+        {
+          "section": "checklist_status",
+          "weight": 2.7
+        },
+        {
+          "section": "next_actions",
+          "weight": 2.6
+        }
+      ],
+      "guardrails": {
+        "includeSlaBreachTrendChecklist": true
+      }
+    },
+    {
+      "id": "ops_compare_service_periods",
+      "priority": 66,
+      "weight": 1.7,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ],
+        "docLock": false,
+        "minExplicitResolvedDocs": 2
+      },
+      "boostDocTypes": [
+        {
+          "docType": "service_dashboard",
+          "weight": 2.7
+        },
+        {
+          "docType": "sla_report",
+          "weight": 2.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "sla_metrics",
+          "weight": 2.8
+        },
+        {
+          "section": "incident_trends",
+          "weight": 2.8
+        },
+        {
+          "section": "change_history",
+          "weight": 2.5
+        }
+      ],
+      "guardrails": {
+        "compareNeedsResolvedDocs": true
+      }
+    }
+  ]
+}

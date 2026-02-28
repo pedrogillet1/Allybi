@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,5206 @@
     "telemetryOnly": true
   },
   "domain": "finance",
-  "clusters": []
+  "clusters": [
+    {
+      "id": "finance_cluster_automate_audit",
+      "label": "audit readiness - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "automation intent",
+        "intenção de automação",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "automation intent audit readiness",
+        "intenção de automação preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_board",
+      "label": "board reporting - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "automation intent",
+        "intenção de automação",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "automation intent board reporting",
+        "intenção de automação relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_budgeting",
+      "label": "budget planning - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "automation intent",
+        "intenção de automação",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "automation intent budget planning",
+        "intenção de automação planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_cashflow",
+      "label": "cash flow management - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "automation intent",
+        "intenção de automação",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "automation intent cash flow management",
+        "intenção de automação gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_covenants",
+      "label": "debt covenant tracking - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "automation intent",
+        "intenção de automação",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "automation intent debt covenant tracking",
+        "intenção de automação acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_payables",
+      "label": "accounts payable control - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "automation intent",
+        "intenção de automação",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "automation intent accounts payable control",
+        "intenção de automação controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_profitability",
+      "label": "profitability analysis - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "automation intent",
+        "intenção de automação",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "automation intent profitability analysis",
+        "intenção de automação análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_receivables",
+      "label": "accounts receivable control - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "automation intent",
+        "intenção de automação",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "automation intent accounts receivable control",
+        "intenção de automação controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_tax",
+      "label": "tax compliance tracking - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "automation intent",
+        "intenção de automação",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "automation intent tax compliance tracking",
+        "intenção de automação acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_automate_working_capital",
+      "label": "working capital optimization - automation intent",
+      "intent": "automate",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "automate",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "automation intent",
+        "intenção de automação",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "automation intent working capital optimization",
+        "intenção de automação otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_audit",
+      "label": "audit readiness - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "benchmark intent",
+        "intenção de benchmark",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "benchmark intent audit readiness",
+        "intenção de benchmark preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_board",
+      "label": "board reporting - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "benchmark intent",
+        "intenção de benchmark",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "benchmark intent board reporting",
+        "intenção de benchmark relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_budgeting",
+      "label": "budget planning - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "benchmark intent",
+        "intenção de benchmark",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "benchmark intent budget planning",
+        "intenção de benchmark planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_cashflow",
+      "label": "cash flow management - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "benchmark intent",
+        "intenção de benchmark",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "benchmark intent cash flow management",
+        "intenção de benchmark gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_covenants",
+      "label": "debt covenant tracking - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "benchmark intent",
+        "intenção de benchmark",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "benchmark intent debt covenant tracking",
+        "intenção de benchmark acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_payables",
+      "label": "accounts payable control - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "benchmark intent",
+        "intenção de benchmark",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "benchmark intent accounts payable control",
+        "intenção de benchmark controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_profitability",
+      "label": "profitability analysis - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "benchmark intent",
+        "intenção de benchmark",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "benchmark intent profitability analysis",
+        "intenção de benchmark análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_receivables",
+      "label": "accounts receivable control - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "benchmark intent",
+        "intenção de benchmark",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "benchmark intent accounts receivable control",
+        "intenção de benchmark controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_tax",
+      "label": "tax compliance tracking - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "benchmark intent",
+        "intenção de benchmark",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "benchmark intent tax compliance tracking",
+        "intenção de benchmark acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_benchmark_working_capital",
+      "label": "working capital optimization - benchmark intent",
+      "intent": "benchmark",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "benchmark",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "benchmark intent",
+        "intenção de benchmark",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "benchmark intent working capital optimization",
+        "intenção de benchmark otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_audit",
+      "label": "audit readiness - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "comparison intent",
+        "intenção de comparação",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "comparison intent audit readiness",
+        "intenção de comparação preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_board",
+      "label": "board reporting - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "comparison intent",
+        "intenção de comparação",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "comparison intent board reporting",
+        "intenção de comparação relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_budgeting",
+      "label": "budget planning - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "comparison intent",
+        "intenção de comparação",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "comparison intent budget planning",
+        "intenção de comparação planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_cashflow",
+      "label": "cash flow management - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "comparison intent",
+        "intenção de comparação",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "comparison intent cash flow management",
+        "intenção de comparação gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_covenants",
+      "label": "debt covenant tracking - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "comparison intent",
+        "intenção de comparação",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "comparison intent debt covenant tracking",
+        "intenção de comparação acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_payables",
+      "label": "accounts payable control - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "comparison intent",
+        "intenção de comparação",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "comparison intent accounts payable control",
+        "intenção de comparação controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_profitability",
+      "label": "profitability analysis - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "comparison intent",
+        "intenção de comparação",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "comparison intent profitability analysis",
+        "intenção de comparação análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_receivables",
+      "label": "accounts receivable control - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "comparison intent",
+        "intenção de comparação",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "comparison intent accounts receivable control",
+        "intenção de comparação controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_tax",
+      "label": "tax compliance tracking - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "comparison intent",
+        "intenção de comparação",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "comparison intent tax compliance tracking",
+        "intenção de comparação acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_compare_working_capital",
+      "label": "working capital optimization - comparison intent",
+      "intent": "compare",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "compare",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "comparison intent",
+        "intenção de comparação",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "comparison intent working capital optimization",
+        "intenção de comparação otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_audit",
+      "label": "audit readiness - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "diagnostic intent audit readiness",
+        "intenção de diagnóstico preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_board",
+      "label": "board reporting - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "diagnostic intent board reporting",
+        "intenção de diagnóstico relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_budgeting",
+      "label": "budget planning - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "diagnostic intent budget planning",
+        "intenção de diagnóstico planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_cashflow",
+      "label": "cash flow management - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "diagnostic intent cash flow management",
+        "intenção de diagnóstico gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_covenants",
+      "label": "debt covenant tracking - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "diagnostic intent debt covenant tracking",
+        "intenção de diagnóstico acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_payables",
+      "label": "accounts payable control - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "diagnostic intent accounts payable control",
+        "intenção de diagnóstico controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_profitability",
+      "label": "profitability analysis - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "diagnostic intent profitability analysis",
+        "intenção de diagnóstico análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_receivables",
+      "label": "accounts receivable control - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "diagnostic intent accounts receivable control",
+        "intenção de diagnóstico controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_tax",
+      "label": "tax compliance tracking - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "diagnostic intent tax compliance tracking",
+        "intenção de diagnóstico acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_diagnose_working_capital",
+      "label": "working capital optimization - diagnostic intent",
+      "intent": "diagnose",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "diagnose",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "diagnostic intent",
+        "intenção de diagnóstico",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "diagnostic intent working capital optimization",
+        "intenção de diagnóstico otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_audit",
+      "label": "audit readiness - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "discovery intent",
+        "intenção de descoberta",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "discovery intent audit readiness",
+        "intenção de descoberta preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_board",
+      "label": "board reporting - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "discovery intent",
+        "intenção de descoberta",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "discovery intent board reporting",
+        "intenção de descoberta relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_budgeting",
+      "label": "budget planning - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "discovery intent",
+        "intenção de descoberta",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "discovery intent budget planning",
+        "intenção de descoberta planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_cashflow",
+      "label": "cash flow management - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "discovery intent",
+        "intenção de descoberta",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "discovery intent cash flow management",
+        "intenção de descoberta gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_covenants",
+      "label": "debt covenant tracking - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "discovery intent",
+        "intenção de descoberta",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "discovery intent debt covenant tracking",
+        "intenção de descoberta acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_payables",
+      "label": "accounts payable control - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "discovery intent",
+        "intenção de descoberta",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "discovery intent accounts payable control",
+        "intenção de descoberta controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_profitability",
+      "label": "profitability analysis - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "discovery intent",
+        "intenção de descoberta",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "discovery intent profitability analysis",
+        "intenção de descoberta análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_receivables",
+      "label": "accounts receivable control - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "discovery intent",
+        "intenção de descoberta",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "discovery intent accounts receivable control",
+        "intenção de descoberta controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_tax",
+      "label": "tax compliance tracking - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "discovery intent",
+        "intenção de descoberta",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "discovery intent tax compliance tracking",
+        "intenção de descoberta acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_discover_working_capital",
+      "label": "working capital optimization - discovery intent",
+      "intent": "discover",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "discover",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "discovery intent",
+        "intenção de descoberta",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "discovery intent working capital optimization",
+        "intenção de descoberta otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_audit",
+      "label": "audit readiness - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "forecast intent",
+        "intenção de previsão",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "forecast intent audit readiness",
+        "intenção de previsão preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_board",
+      "label": "board reporting - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "forecast intent",
+        "intenção de previsão",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "forecast intent board reporting",
+        "intenção de previsão relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_budgeting",
+      "label": "budget planning - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "forecast intent",
+        "intenção de previsão",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "forecast intent budget planning",
+        "intenção de previsão planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_cashflow",
+      "label": "cash flow management - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "forecast intent",
+        "intenção de previsão",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "forecast intent cash flow management",
+        "intenção de previsão gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_covenants",
+      "label": "debt covenant tracking - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "forecast intent",
+        "intenção de previsão",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "forecast intent debt covenant tracking",
+        "intenção de previsão acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_payables",
+      "label": "accounts payable control - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "forecast intent",
+        "intenção de previsão",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "forecast intent accounts payable control",
+        "intenção de previsão controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_profitability",
+      "label": "profitability analysis - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "forecast intent",
+        "intenção de previsão",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "forecast intent profitability analysis",
+        "intenção de previsão análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_receivables",
+      "label": "accounts receivable control - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "forecast intent",
+        "intenção de previsão",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "forecast intent accounts receivable control",
+        "intenção de previsão controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_tax",
+      "label": "tax compliance tracking - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "forecast intent",
+        "intenção de previsão",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "forecast intent tax compliance tracking",
+        "intenção de previsão acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_forecast_working_capital",
+      "label": "working capital optimization - forecast intent",
+      "intent": "forecast",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "forecast",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "forecast intent",
+        "intenção de previsão",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "forecast intent working capital optimization",
+        "intenção de previsão otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_audit",
+      "label": "audit readiness - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "optimization intent",
+        "intenção de otimização",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "optimization intent audit readiness",
+        "intenção de otimização preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_board",
+      "label": "board reporting - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "optimization intent",
+        "intenção de otimização",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "optimization intent board reporting",
+        "intenção de otimização relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_budgeting",
+      "label": "budget planning - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "optimization intent",
+        "intenção de otimização",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "optimization intent budget planning",
+        "intenção de otimização planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_cashflow",
+      "label": "cash flow management - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "optimization intent",
+        "intenção de otimização",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "optimization intent cash flow management",
+        "intenção de otimização gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_covenants",
+      "label": "debt covenant tracking - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "optimization intent",
+        "intenção de otimização",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "optimization intent debt covenant tracking",
+        "intenção de otimização acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_payables",
+      "label": "accounts payable control - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "optimization intent",
+        "intenção de otimização",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "optimization intent accounts payable control",
+        "intenção de otimização controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_profitability",
+      "label": "profitability analysis - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "optimization intent",
+        "intenção de otimização",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "optimization intent profitability analysis",
+        "intenção de otimização análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_receivables",
+      "label": "accounts receivable control - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "optimization intent",
+        "intenção de otimização",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "optimization intent accounts receivable control",
+        "intenção de otimização controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_tax",
+      "label": "tax compliance tracking - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "optimization intent",
+        "intenção de otimização",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "optimization intent tax compliance tracking",
+        "intenção de otimização acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_optimize_working_capital",
+      "label": "working capital optimization - optimization intent",
+      "intent": "optimize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "optimize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "optimization intent",
+        "intenção de otimização",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "optimization intent working capital optimization",
+        "intenção de otimização otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_audit",
+      "label": "audit readiness - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "prioritization intent",
+        "intenção de priorização",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "prioritization intent audit readiness",
+        "intenção de priorização preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_board",
+      "label": "board reporting - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "prioritization intent",
+        "intenção de priorização",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "prioritization intent board reporting",
+        "intenção de priorização relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_budgeting",
+      "label": "budget planning - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "prioritization intent",
+        "intenção de priorização",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "prioritization intent budget planning",
+        "intenção de priorização planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_cashflow",
+      "label": "cash flow management - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "prioritization intent",
+        "intenção de priorização",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "prioritization intent cash flow management",
+        "intenção de priorização gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_covenants",
+      "label": "debt covenant tracking - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "prioritization intent",
+        "intenção de priorização",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "prioritization intent debt covenant tracking",
+        "intenção de priorização acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_payables",
+      "label": "accounts payable control - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "prioritization intent",
+        "intenção de priorização",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "prioritization intent accounts payable control",
+        "intenção de priorização controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_profitability",
+      "label": "profitability analysis - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "prioritization intent",
+        "intenção de priorização",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "prioritization intent profitability analysis",
+        "intenção de priorização análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_receivables",
+      "label": "accounts receivable control - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "prioritization intent",
+        "intenção de priorização",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "prioritization intent accounts receivable control",
+        "intenção de priorização controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_tax",
+      "label": "tax compliance tracking - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "prioritization intent",
+        "intenção de priorização",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "prioritization intent tax compliance tracking",
+        "intenção de priorização acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_prioritize_working_capital",
+      "label": "working capital optimization - prioritization intent",
+      "intent": "prioritize",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "prioritize",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "prioritization intent",
+        "intenção de priorização",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "prioritization intent working capital optimization",
+        "intenção de priorização otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_audit",
+      "label": "audit readiness - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "reporting intent",
+        "intenção de reporte",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "reporting intent audit readiness",
+        "intenção de reporte preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_board",
+      "label": "board reporting - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "reporting intent",
+        "intenção de reporte",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "reporting intent board reporting",
+        "intenção de reporte relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_budgeting",
+      "label": "budget planning - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "reporting intent",
+        "intenção de reporte",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "reporting intent budget planning",
+        "intenção de reporte planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_cashflow",
+      "label": "cash flow management - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "reporting intent",
+        "intenção de reporte",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "reporting intent cash flow management",
+        "intenção de reporte gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_covenants",
+      "label": "debt covenant tracking - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "reporting intent",
+        "intenção de reporte",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "reporting intent debt covenant tracking",
+        "intenção de reporte acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_payables",
+      "label": "accounts payable control - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "reporting intent",
+        "intenção de reporte",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "reporting intent accounts payable control",
+        "intenção de reporte controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_profitability",
+      "label": "profitability analysis - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "reporting intent",
+        "intenção de reporte",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "reporting intent profitability analysis",
+        "intenção de reporte análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_receivables",
+      "label": "accounts receivable control - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "reporting intent",
+        "intenção de reporte",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "reporting intent accounts receivable control",
+        "intenção de reporte controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_tax",
+      "label": "tax compliance tracking - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "reporting intent",
+        "intenção de reporte",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "reporting intent tax compliance tracking",
+        "intenção de reporte acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_report_working_capital",
+      "label": "working capital optimization - reporting intent",
+      "intent": "report",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "report",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "reporting intent",
+        "intenção de reporte",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "reporting intent working capital optimization",
+        "intenção de reporte otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_audit",
+      "label": "audit readiness - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "audit",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "audit_adjustment_schedule",
+        "general_ledger_extract"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "audit readiness",
+        "preparação para auditoria",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "audit readiness analytics",
+        "preparação para auditoria analytics",
+        "audit readiness dashboard",
+        "preparação para auditoria dashboard",
+        "risk monitoring intent audit readiness",
+        "intenção de monitoramento de risco preparação para auditoria",
+        "finance audit"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated audit"
+      ],
+      "examples": [
+        "How can we improve audit readiness?",
+        "Como melhorar preparação para auditoria?",
+        "Show audit readiness insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_board",
+      "label": "board reporting - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "board",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "board_pack",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "board reporting",
+        "relatórios para conselho",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "board reporting analytics",
+        "relatórios para conselho analytics",
+        "board reporting dashboard",
+        "relatórios para conselho dashboard",
+        "risk monitoring intent board reporting",
+        "intenção de monitoramento de risco relatórios para conselho",
+        "finance board"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated board"
+      ],
+      "examples": [
+        "How can we improve board reporting?",
+        "Como melhorar relatórios para conselho?",
+        "Show board reporting insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_budgeting",
+      "label": "budget planning - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "budgeting",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "budget",
+        "forecast"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "budget planning",
+        "planejamento orçamentário",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "budget planning analytics",
+        "planejamento orçamentário analytics",
+        "budget planning dashboard",
+        "planejamento orçamentário dashboard",
+        "risk monitoring intent budget planning",
+        "intenção de monitoramento de risco planejamento orçamentário",
+        "finance budgeting"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated budgeting"
+      ],
+      "examples": [
+        "How can we improve budget planning?",
+        "Como melhorar planejamento orçamentário?",
+        "Show budget planning insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_cashflow",
+      "label": "cash flow management - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "cashflow",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "cash_flow_statement",
+        "treasury_position"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "cash flow management",
+        "gestão de fluxo de caixa",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "cash flow management analytics",
+        "gestão de fluxo de caixa analytics",
+        "cash flow management dashboard",
+        "gestão de fluxo de caixa dashboard",
+        "risk monitoring intent cash flow management",
+        "intenção de monitoramento de risco gestão de fluxo de caixa",
+        "finance cashflow"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated cashflow"
+      ],
+      "examples": [
+        "How can we improve cash flow management?",
+        "Como melhorar gestão de fluxo de caixa?",
+        "Show cash flow management insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_covenants",
+      "label": "debt covenant tracking - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "covenants",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "covenant_report",
+        "loan_agreement"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "debt covenant tracking",
+        "acompanhamento de covenant",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "debt covenant tracking analytics",
+        "acompanhamento de covenant analytics",
+        "debt covenant tracking dashboard",
+        "acompanhamento de covenant dashboard",
+        "risk monitoring intent debt covenant tracking",
+        "intenção de monitoramento de risco acompanhamento de covenant",
+        "finance covenants"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated covenants"
+      ],
+      "examples": [
+        "How can we improve debt covenant tracking?",
+        "Como melhorar acompanhamento de covenant?",
+        "Show debt covenant tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_payables",
+      "label": "accounts payable control - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "payables",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_payable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts payable control",
+        "controle de contas a pagar",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "accounts payable control analytics",
+        "controle de contas a pagar analytics",
+        "accounts payable control dashboard",
+        "controle de contas a pagar dashboard",
+        "risk monitoring intent accounts payable control",
+        "intenção de monitoramento de risco controle de contas a pagar",
+        "finance payables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated payables"
+      ],
+      "examples": [
+        "How can we improve accounts payable control?",
+        "Como melhorar controle de contas a pagar?",
+        "Show accounts payable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_profitability",
+      "label": "profitability analysis - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "profitability",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "income_statement",
+        "management_accounts"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "profitability analysis",
+        "análise de rentabilidade",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "profitability analysis analytics",
+        "análise de rentabilidade analytics",
+        "profitability analysis dashboard",
+        "análise de rentabilidade dashboard",
+        "risk monitoring intent profitability analysis",
+        "intenção de monitoramento de risco análise de rentabilidade",
+        "finance profitability"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated profitability"
+      ],
+      "examples": [
+        "How can we improve profitability analysis?",
+        "Como melhorar análise de rentabilidade?",
+        "Show profitability analysis insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_receivables",
+      "label": "accounts receivable control - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "receivables",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "accounts_receivable_aging",
+        "invoice"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "accounts receivable control",
+        "controle de contas a receber",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "accounts receivable control analytics",
+        "controle de contas a receber analytics",
+        "accounts receivable control dashboard",
+        "controle de contas a receber dashboard",
+        "risk monitoring intent accounts receivable control",
+        "intenção de monitoramento de risco controle de contas a receber",
+        "finance receivables"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated receivables"
+      ],
+      "examples": [
+        "How can we improve accounts receivable control?",
+        "Como melhorar controle de contas a receber?",
+        "Show accounts receivable control insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_tax",
+      "label": "tax compliance tracking - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "tax",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "tax_return",
+        "audit_adjustment_schedule"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "tax compliance tracking",
+        "acompanhamento de compliance tributário",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "tax compliance tracking analytics",
+        "acompanhamento de compliance tributário analytics",
+        "tax compliance tracking dashboard",
+        "acompanhamento de compliance tributário dashboard",
+        "risk monitoring intent tax compliance tracking",
+        "intenção de monitoramento de risco acompanhamento de compliance tributário",
+        "finance tax"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated tax"
+      ],
+      "examples": [
+        "How can we improve tax compliance tracking?",
+        "Como melhorar acompanhamento de compliance tributário?",
+        "Show tax compliance tracking insights by period."
+      ]
+    },
+    {
+      "id": "finance_cluster_risk_working_capital",
+      "label": "working capital optimization - risk monitoring intent",
+      "intent": "risk",
+      "domain": "finance",
+      "tags": [
+        "finance",
+        "working_capital",
+        "risk",
+        "marketing_probe",
+        "keyword_cluster"
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "relatedDocTypes": [
+        "working_capital_report",
+        "balance_sheet"
+      ],
+      "keywords": [
+        "finance analytics",
+        "fp&a insights",
+        "financial intelligence",
+        "tesouraria analytics",
+        "working capital optimization",
+        "otimização do capital de giro",
+        "risk monitoring intent",
+        "intenção de monitoramento de risco",
+        "working capital optimization analytics",
+        "otimização do capital de giro analytics",
+        "working capital optimization dashboard",
+        "otimização do capital de giro dashboard",
+        "risk monitoring intent working capital optimization",
+        "intenção de monitoramento de risco otimização do capital de giro",
+        "finance working_capital"
+      ],
+      "negativeKeywords": [
+        "out of scope",
+        "fora do escopo",
+        "unrelated working_capital"
+      ],
+      "examples": [
+        "How can we improve working capital optimization?",
+        "Como melhorar otimização do capital de giro?",
+        "Show working capital optimization insights by period."
+      ]
+    }
+  ]
 }

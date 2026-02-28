@@ -1,0 +1,231 @@
+{
+  "_meta": {
+    "id": "di_billing_sections_billing_electricity_bill",
+    "version": "1.0.0",
+    "description": "Section map for  documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "docType": "billing_electricity_bill"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "electricity",
+        "power",
+        "kwh",
+        "meter",
+        "tariff"
+      ]
+    },
+    {
+      "id": "issuer_and_customer",
+      "name": {
+        "en": "Issuer and Customer",
+        "pt": "Emissor e Cliente"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id"
+      ]
+    },
+    {
+      "id": "period",
+      "name": {
+        "en": "Period",
+        "pt": "Periodo"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "billing period",
+        "statement period",
+        "from",
+        "to",
+        "cycle",
+        "competence"
+      ]
+    },
+    {
+      "id": "summary",
+      "name": {
+        "en": "Summary",
+        "pt": "Resumo"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "summary",
+        "overview",
+        "totals",
+        "amount due",
+        "balance"
+      ]
+    },
+    {
+      "id": "charges_and_fees",
+      "name": {
+        "en": "Charges and Fees",
+        "pt": "Cobrancas e Taxas"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "charges",
+        "fees",
+        "tariff",
+        "service fee",
+        "encargos"
+      ]
+    },
+    {
+      "id": "usage_or_activity",
+      "name": {
+        "en": "Usage or Activity",
+        "pt": "Uso ou Atividade"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "usage",
+        "consumption",
+        "transactions",
+        "activity",
+        "detalhes"
+      ]
+    },
+    {
+      "id": "taxes",
+      "name": {
+        "en": "Taxes",
+        "pt": "Impostos"
+      },
+      "required": false,
+      "order": 7,
+      "headingAnchors": [
+        "tax",
+        "vat",
+        "icms",
+        "pis",
+        "cofins"
+      ]
+    },
+    {
+      "id": "payments_and_credits",
+      "name": {
+        "en": "Payments and Credits",
+        "pt": "Pagamentos e Creditos"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "payment",
+        "credit",
+        "receipt",
+        "paid",
+        "credit adjustment"
+      ]
+    },
+    {
+      "id": "balance_and_due",
+      "name": {
+        "en": "Balance and Due",
+        "pt": "Saldo e Vencimento"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "balance",
+        "amount due",
+        "minimum payment",
+        "due date",
+        "past due"
+      ]
+    },
+    {
+      "id": "line_items",
+      "name": {
+        "en": "Line Items",
+        "pt": "Itens"
+      },
+      "required": false,
+      "order": 10,
+      "headingAnchors": [
+        "item",
+        "description",
+        "qty",
+        "amount",
+        "detail"
+      ]
+    },
+    {
+      "id": "adjustments_and_disputes",
+      "name": {
+        "en": "Adjustments and Disputes",
+        "pt": "Ajustes e Contestacoes"
+      },
+      "required": false,
+      "order": 11,
+      "headingAnchors": [
+        "adjustment",
+        "dispute",
+        "reversal",
+        "credit note"
+      ]
+    },
+    {
+      "id": "notices_and_terms",
+      "name": {
+        "en": "Notices and Terms",
+        "pt": "Avisos e Termos"
+      },
+      "required": false,
+      "order": 12,
+      "headingAnchors": [
+        "notice",
+        "terms",
+        "conditions",
+        "policy",
+        "late fee"
+      ]
+    },
+    {
+      "id": "footer_metadata",
+      "name": {
+        "en": "Footer Metadata",
+        "pt": "Rodape e Metadados"
+      },
+      "required": false,
+      "order": 13,
+      "headingAnchors": [
+        "page",
+        "generated",
+        "barcode",
+        "reference",
+        "document id"
+      ]
+    }
+  ]
+}

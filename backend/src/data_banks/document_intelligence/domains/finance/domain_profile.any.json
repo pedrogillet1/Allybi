@@ -1,0 +1,64 @@
+{
+  "_meta": {
+    "id": "di_finance_domain_profile",
+    "version": "2.0.0",
+    "description": "Finance domain profile for deep financial document interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "displayName": {
+    "en": "Finance",
+    "pt": "Financas"
+  },
+  "scope": "Corporate finance, FP&A, treasury, investor reporting, covenant monitoring, recurring revenue analytics, and board-level finance reporting.",
+  "supportedDocTypes": [
+    "fin_10k",
+    "fin_10q",
+    "fin_8k",
+    "fin_arr_mrr_report",
+    "fin_bank_statement",
+    "fin_board_deck_finance",
+    "fin_budget",
+    "fin_cap_table",
+    "fin_cash_forecast",
+    "fin_cohort_analysis",
+    "fin_covenant_compliance_certificate",
+    "fin_debt_schedule",
+    "fin_earnings_release",
+    "fin_esg_report",
+    "fin_forecast",
+    "fin_investor_presentation",
+    "fin_kpi_dashboard",
+    "fin_monthly_close_pack",
+    "fin_pipeline_report",
+    "fin_rolling_forecast",
+    "fin_statements_pack",
+    "fin_unit_economics_model",
+    "fin_variance_report"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "negativeBoundaries": [
+    "Do not classify accounting-close operational ledgers as finance when no planning/reporting signals are present.",
+    "Do not infer legal obligations from finance documents without explicit legal clauses."
+  ],
+  "ontologyPrefix": "fin"
+}

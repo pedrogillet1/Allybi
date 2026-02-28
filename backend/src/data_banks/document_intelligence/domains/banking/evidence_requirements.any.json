@@ -1,0 +1,138 @@
+{
+  "_meta": {
+    "id": "di_banking_evidence_requirements",
+    "version": "1.0.0",
+    "description": "Evidence requirements and citation policy for banking documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "banking",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "bank_statement_header",
+      "label": {
+        "en": "Bank statement header",
+        "pt": "Cabecalho bancario"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "transaction_row",
+      "label": {
+        "en": "Transaction row",
+        "pt": "Linha de transacao"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "balance_row",
+      "label": {
+        "en": "Balance row",
+        "pt": "Linha de saldo"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 4,
+      "type": "payment_reference",
+      "label": {
+        "en": "Payment reference",
+        "pt": "Referencia de pagamento"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "fee_interest_row",
+      "label": {
+        "en": "Fee/interest row",
+        "pt": "Linha de tarifa/juros"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 6,
+      "type": "footnote",
+      "label": {
+        "en": "Footnote or disclosure",
+        "pt": "Rodape ou divulgacao"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "banking_ev_001_balance_claim",
+      "description": "Balance claims must include date context and corresponding balance row citation.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "balance_row"
+      ]
+    },
+    {
+      "id": "banking_ev_002_transaction_claim",
+      "description": "Transaction claims must include date, description, and amount from a transaction row.",
+      "applies": [
+        "extract",
+        "locate",
+        "compare"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "transaction_row"
+      ]
+    },
+    {
+      "id": "banking_ev_003_payment_confirmation",
+      "description": "Payment confirmation requires authorization/reference code or equivalent transaction id.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "payment_reference",
+        "transaction_row"
+      ]
+    },
+    {
+      "id": "banking_ev_004_interest_fee",
+      "description": "Interest and fee explanations must cite fee/interest rows and their calculation context.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "fee_interest_row"
+      ]
+    },
+    {
+      "id": "banking_ev_005_disclaimer_scope",
+      "description": "Any recommendation must acknowledge that output is informational and not financial advice.",
+      "applies": [
+        "advise"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "footnote"
+      ]
+    }
+  ]
+}

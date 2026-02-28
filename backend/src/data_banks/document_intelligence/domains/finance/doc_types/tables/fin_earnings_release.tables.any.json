@@ -1,0 +1,312 @@
+{
+  "_meta": {
+    "id": "di_finance_tables_fin_earnings_release",
+    "version": "2.0.0",
+    "description": "Table patterns for fin_earnings_release with header mappings and units rules.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_earnings_release"
+  },
+  "tables": [
+    {
+      "id": "summary_table",
+      "name": {
+        "en": "Summary Financial Table",
+        "pt": "Tabela Financeira Resumo"
+      },
+      "section": "tables_primary",
+      "expectedColumns": [
+        "metric",
+        "period",
+        "value",
+        "unit"
+      ],
+      "keyRows": [
+        "revenue",
+        "ebitda",
+        "net_income",
+        "cash"
+      ]
+    },
+    {
+      "id": "detail_table",
+      "name": {
+        "en": "Detailed Breakdown",
+        "pt": "Detalhamento"
+      },
+      "section": "tables_primary",
+      "expectedColumns": [
+        "line_item",
+        "period",
+        "actual",
+        "plan",
+        "variance"
+      ],
+      "keyRows": [
+        "gross_profit",
+        "opex",
+        "capex"
+      ]
+    },
+    {
+      "id": "trend_table",
+      "name": {
+        "en": "Trend Table",
+        "pt": "Tabela de Tendencia"
+      },
+      "section": "variance_and_drivers",
+      "expectedColumns": [
+        "metric",
+        "current_period",
+        "prior_period",
+        "yoy_change"
+      ],
+      "keyRows": [
+        "revenue",
+        "ebitda",
+        "cash"
+      ]
+    },
+    {
+      "id": "support_table",
+      "name": {
+        "en": "Supporting Schedule",
+        "pt": "Cronograma de Suporte"
+      },
+      "section": "appendix",
+      "expectedColumns": [
+        "item",
+        "date",
+        "amount",
+        "note_ref"
+      ],
+      "keyRows": [
+        "total"
+      ]
+    }
+  ],
+  "tableHeaderMappings": [
+    {
+      "canonicalHeader": "period",
+      "synonyms": [
+        "period",
+        "fiscal period",
+        "mes",
+        "trimestre",
+        "periodo"
+      ]
+    },
+    {
+      "canonicalHeader": "revenue",
+      "synonyms": [
+        "revenue",
+        "sales",
+        "receita",
+        "faturamento"
+      ]
+    },
+    {
+      "canonicalHeader": "gross_profit",
+      "synonyms": [
+        "gross profit",
+        "gross margin value",
+        "lucro bruto"
+      ]
+    },
+    {
+      "canonicalHeader": "ebitda",
+      "synonyms": [
+        "ebitda",
+        "lajida"
+      ]
+    },
+    {
+      "canonicalHeader": "operating_income",
+      "synonyms": [
+        "operating income",
+        "resultado operacional"
+      ]
+    },
+    {
+      "canonicalHeader": "net_income",
+      "synonyms": [
+        "net income",
+        "profit after tax",
+        "lucro liquido"
+      ]
+    },
+    {
+      "canonicalHeader": "cash",
+      "synonyms": [
+        "cash",
+        "cash position",
+        "caixa"
+      ]
+    },
+    {
+      "canonicalHeader": "capex",
+      "synonyms": [
+        "capex",
+        "capital expenditure",
+        "investimento"
+      ]
+    },
+    {
+      "canonicalHeader": "opex",
+      "synonyms": [
+        "opex",
+        "operating expense",
+        "despesa operacional"
+      ]
+    },
+    {
+      "canonicalHeader": "currency",
+      "synonyms": [
+        "currency",
+        "moeda"
+      ]
+    },
+    {
+      "canonicalHeader": "unit_scale",
+      "synonyms": [
+        "in thousands",
+        "in millions",
+        "em milhares",
+        "em milhoes"
+      ]
+    },
+    {
+      "canonicalHeader": "variance",
+      "synonyms": [
+        "variance",
+        "delta",
+        "variacao"
+      ]
+    },
+    {
+      "canonicalHeader": "variance_percent",
+      "synonyms": [
+        "variance %",
+        "delta %",
+        "variacao %"
+      ]
+    },
+    {
+      "canonicalHeader": "yoy_change",
+      "synonyms": [
+        "yoy",
+        "year over year",
+        "ano contra ano"
+      ]
+    },
+    {
+      "canonicalHeader": "qoq_change",
+      "synonyms": [
+        "qoq",
+        "quarter over quarter",
+        "trimestre contra trimestre"
+      ]
+    }
+  ],
+  "unitsRules": [
+    {
+      "id": "unit_rule_currency_required",
+      "appliesToHeaders": [
+        "revenue",
+        "gross_profit",
+        "ebitda",
+        "operating_income",
+        "net_income",
+        "cash",
+        "capex",
+        "opex"
+      ],
+      "rule": "currency_must_be_explicit_or_inherited_from_header_context"
+    },
+    {
+      "id": "unit_rule_scale_normalization",
+      "appliesToHeaders": [
+        "revenue",
+        "ebitda",
+        "net_income",
+        "cash"
+      ],
+      "rule": "normalize_k_m_b_thousands_millions_billions_and_record_scale"
+    },
+    {
+      "id": "unit_rule_percent_fields",
+      "appliesToHeaders": [
+        "variance_percent",
+        "yoy_change",
+        "qoq_change"
+      ],
+      "rule": "percent_fields_must_use_percent_unit_not_currency"
+    },
+    {
+      "id": "unit_rule_negative_style",
+      "appliesToHeaders": [
+        "revenue",
+        "ebitda",
+        "net_income",
+        "cash",
+        "capex",
+        "opex"
+      ],
+      "rule": "support_parentheses_and_minus_as_negative"
+    },
+    {
+      "id": "unit_rule_rounding",
+      "appliesToHeaders": [
+        "revenue",
+        "ebitda",
+        "net_income"
+      ],
+      "rule": "round_only_for_display_keep_raw_precision"
+    },
+    {
+      "id": "unit_rule_header_context",
+      "appliesToHeaders": [
+        "all"
+      ],
+      "rule": "table_cell_value_requires_header_and_row_context_before_use"
+    },
+    {
+      "id": "unit_rule_period_alignment",
+      "appliesToHeaders": [
+        "all"
+      ],
+      "rule": "comparisons_require_same_period_granularity"
+    },
+    {
+      "id": "unit_rule_mixed_currency_guard",
+      "appliesToHeaders": [
+        "all"
+      ],
+      "rule": "block_calculation_when_mixed_currencies_without_conversion_rate"
+    }
+  ],
+  "headerContextRules": [
+    {
+      "id": "ctx_row_header_required",
+      "check": "row_and_column_headers_required_for_numeric_extraction"
+    },
+    {
+      "id": "ctx_period_header_required",
+      "check": "period_header_required_for_time_series_claims"
+    },
+    {
+      "id": "ctx_total_reconcile",
+      "check": "line_items_should_reconcile_to_total_when_total_row_present"
+    },
+    {
+      "id": "ctx_unit_header_required",
+      "check": "unit_or_scale_header_required_for_currency_values"
+    }
+  ]
+}

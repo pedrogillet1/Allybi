@@ -1,0 +1,8 @@
+/*
+ * V2 bridge styles.
+ * Keep this lightweight: most current visuals are still sourced from legacy chat styles.
+ */
+
+[data-chat-container="true"] {
+  --chat-v2-enabled: 1;
+}

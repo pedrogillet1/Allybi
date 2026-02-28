@@ -1,0 +1,219 @@
+{
+  "_meta": {
+    "id": "medical_abbreviations_en",
+    "version": "2.0.0",
+    "description": "English abbreviations for medical extraction.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "language": "en"
+  },
+  "domain": "medical",
+  "abbreviations": [
+    {
+      "abbr": "A1C",
+      "expansion": "Hemoglobin A1C"
+    },
+    {
+      "abbr": "BID",
+      "expansion": "Twice Daily"
+    },
+    {
+      "abbr": "BMI",
+      "expansion": "Body Mass Index"
+    },
+    {
+      "abbr": "BMP",
+      "expansion": "Basic Metabolic Panel"
+    },
+    {
+      "abbr": "BP",
+      "expansion": "Blood Pressure"
+    },
+    {
+      "abbr": "BUN",
+      "expansion": "Blood Urea Nitrogen"
+    },
+    {
+      "abbr": "CBC",
+      "expansion": "Complete Blood Count"
+    },
+    {
+      "abbr": "CHF",
+      "expansion": "Congestive Heart Failure"
+    },
+    {
+      "abbr": "CMP",
+      "expansion": "Comprehensive Metabolic Panel"
+    },
+    {
+      "abbr": "COPD",
+      "expansion": "Chronic Obstructive Pulmonary Disease"
+    },
+    {
+      "abbr": "Cr",
+      "expansion": "Creatinine"
+    },
+    {
+      "abbr": "CT",
+      "expansion": "Computed Tomography"
+    },
+    {
+      "abbr": "CXR",
+      "expansion": "Chest X-Ray"
+    },
+    {
+      "abbr": "DNR",
+      "expansion": "Do Not Resuscitate"
+    },
+    {
+      "abbr": "DOB",
+      "expansion": "Date of Birth"
+    },
+    {
+      "abbr": "Dx",
+      "expansion": "Diagnosis Documented"
+    },
+    {
+      "abbr": "ECG",
+      "expansion": "Electrocardiogram"
+    },
+    {
+      "abbr": "ED",
+      "expansion": "Emergency Department"
+    },
+    {
+      "abbr": "EKG",
+      "expansion": "Electrocardiogram"
+    },
+    {
+      "abbr": "Hgb",
+      "expansion": "Hemoglobin"
+    },
+    {
+      "abbr": "HPI",
+      "expansion": "History of Present Illness"
+    },
+    {
+      "abbr": "HR",
+      "expansion": "Heart Rate"
+    },
+    {
+      "abbr": "ICU",
+      "expansion": "Intensive Care Unit"
+    },
+    {
+      "abbr": "IM",
+      "expansion": "Intramuscular"
+    },
+    {
+      "abbr": "IV",
+      "expansion": "Intravenous"
+    },
+    {
+      "abbr": "K",
+      "expansion": "Potassium"
+    },
+    {
+      "abbr": "LFT",
+      "expansion": "Liver Function Test"
+    },
+    {
+      "abbr": "MRI",
+      "expansion": "Magnetic Resonance Imaging"
+    },
+    {
+      "abbr": "MRN",
+      "expansion": "Medical Record Number"
+    },
+    {
+      "abbr": "Na",
+      "expansion": "Sodium"
+    },
+    {
+      "abbr": "NPO",
+      "expansion": "Nothing By Mouth"
+    },
+    {
+      "abbr": "PE",
+      "expansion": "Physical Examination"
+    },
+    {
+      "abbr": "PLT",
+      "expansion": "Platelet Count"
+    },
+    {
+      "abbr": "PMH",
+      "expansion": "Past Medical History"
+    },
+    {
+      "abbr": "PO",
+      "expansion": "By Mouth"
+    },
+    {
+      "abbr": "PRN",
+      "expansion": "As Needed"
+    },
+    {
+      "abbr": "QID",
+      "expansion": "Four Times Daily"
+    },
+    {
+      "abbr": "ROS",
+      "expansion": "Review of Systems"
+    },
+    {
+      "abbr": "RR",
+      "expansion": "Respiratory Rate"
+    },
+    {
+      "abbr": "Rx",
+      "expansion": "Prescription"
+    },
+    {
+      "abbr": "SC",
+      "expansion": "Subcutaneous"
+    },
+    {
+      "abbr": "SOAP",
+      "expansion": "Subjective Objective Assessment Plan"
+    },
+    {
+      "abbr": "SOB",
+      "expansion": "Shortness of Breath"
+    },
+    {
+      "abbr": "SpO2",
+      "expansion": "Peripheral Oxygen Saturation"
+    },
+    {
+      "abbr": "Temp",
+      "expansion": "Temperature"
+    },
+    {
+      "abbr": "TID",
+      "expansion": "Three Times Daily"
+    },
+    {
+      "abbr": "URI",
+      "expansion": "Upper Respiratory Infection"
+    },
+    {
+      "abbr": "US",
+      "expansion": "Ultrasound"
+    },
+    {
+      "abbr": "UTI",
+      "expansion": "Urinary Tract Infection"
+    },
+    {
+      "abbr": "WBC",
+      "expansion": "White Blood Cell Count"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "medical_validation_policies",
+    "version": "2.0.0",
+    "description": "Validation policies for medical document outputs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "policies": [
+    {
+      "id": "medical_validation_001",
+      "severity": "error",
+      "description": "Block outputs that omit units on numeric findings.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "check": "units_present_for_numeric",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "medical_validation_002",
+      "severity": "warning",
+      "description": "Warn when reference range is present in source but missing in output.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "reference_range_preserved",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "medical_validation_003",
+      "severity": "error",
+      "description": "Block diagnosis advice or treatment recommendation text.",
+      "applies": [
+        "advise",
+        "evaluate",
+        "summarize"
+      ],
+      "check": "no_diagnosis_or_treatment_advice",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "medical_validation_004",
+      "severity": "warning",
+      "description": "Warn when patient identifier appears unredacted in response.",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare"
+      ],
+      "check": "patient_identifier_redacted",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "medical_validation_005",
+      "severity": "info",
+      "description": "Annotate unresolved contradictions across sections.",
+      "applies": [
+        "compare",
+        "validate"
+      ],
+      "check": "cross_section_consistency",
+      "failureAction": "ANNOTATE"
+    }
+  ]
+}

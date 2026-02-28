@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,2766 @@
     "telemetryOnly": true
   },
   "domain": "legal",
-  "signals": []
+  "signals": [
+    {
+      "id": "legal_signal_abandonment_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "abandonment_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_abandonment_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "abandonment_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_abandonment_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "abandonment_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_abandonment_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "abandonment_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_abandonment_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "abandonment_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_ambiguity_question_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "ambiguity_question_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "ambiguity_question_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce ambiguity_question_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir ambiguity_question_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_ambiguity_question_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "ambiguity_question_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "ambiguity_question_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce ambiguity_question_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir ambiguity_question_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_ambiguity_question_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "ambiguity_question_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "ambiguity_question_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce ambiguity_question_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir ambiguity_question_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_ambiguity_question_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "ambiguity_question_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.25,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "ambiguity_question_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce ambiguity_question_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir ambiguity_question_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_ambiguity_question_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "ambiguity_question_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.26,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "ambiguity_question_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce ambiguity_question_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir ambiguity_question_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_citation_mismatch_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "citation_mismatch_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "citation_mismatch_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce citation_mismatch_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir citation_mismatch_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_citation_mismatch_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "citation_mismatch_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.09,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "citation_mismatch_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce citation_mismatch_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir citation_mismatch_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_citation_mismatch_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "citation_mismatch_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "citation_mismatch_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce citation_mismatch_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir citation_mismatch_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_citation_mismatch_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "citation_mismatch_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "citation_mismatch_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce citation_mismatch_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir citation_mismatch_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_citation_mismatch_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "citation_mismatch_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "citation_mismatch_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce citation_mismatch_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir citation_mismatch_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_cross_doc_confusion_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "cross_doc_confusion_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "cross_doc_confusion_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce cross_doc_confusion_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir cross_doc_confusion_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_cross_doc_confusion_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "cross_doc_confusion_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "cross_doc_confusion_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce cross_doc_confusion_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir cross_doc_confusion_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_cross_doc_confusion_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "cross_doc_confusion_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "cross_doc_confusion_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce cross_doc_confusion_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir cross_doc_confusion_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_cross_doc_confusion_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "cross_doc_confusion_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "cross_doc_confusion_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce cross_doc_confusion_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir cross_doc_confusion_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_cross_doc_confusion_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "cross_doc_confusion_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "cross_doc_confusion_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce cross_doc_confusion_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir cross_doc_confusion_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_fallback_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "fallback_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_fallback_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "fallback_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_fallback_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "fallback_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_fallback_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "fallback_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_fallback_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "fallback_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_followup_turns_p95_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 5.01,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "followup_turns_p95",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_followup_turns_p95_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 5,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "followup_turns_p95",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_followup_turns_p95_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 5.02,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "followup_turns_p95",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_followup_turns_p95_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 5.03,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "followup_turns_p95",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_followup_turns_p95_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 5.04,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "followup_turns_p95",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_latency_p95_ms_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4723,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "latency_p95_ms",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_latency_p95_ms_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4735,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "latency_p95_ms",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_latency_p95_ms_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4726,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "latency_p95_ms",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_latency_p95_ms_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4729,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "latency_p95_ms",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_latency_p95_ms_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4732,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "latency_p95_ms",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_missing_clause_reference_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "missing_clause_reference_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.29,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "missing_clause_reference_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_clause_reference_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir missing_clause_reference_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_missing_clause_reference_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "missing_clause_reference_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.28,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "missing_clause_reference_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_clause_reference_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir missing_clause_reference_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_missing_clause_reference_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "missing_clause_reference_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.3,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "missing_clause_reference_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_clause_reference_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir missing_clause_reference_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_missing_clause_reference_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "missing_clause_reference_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.31,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "missing_clause_reference_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_clause_reference_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir missing_clause_reference_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_missing_clause_reference_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "missing_clause_reference_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.32,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "missing_clause_reference_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_clause_reference_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir missing_clause_reference_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_negative_feedback_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "negative_feedback_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_negative_feedback_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "negative_feedback_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_negative_feedback_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "negative_feedback_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_negative_feedback_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "negative_feedback_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_negative_feedback_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "negative_feedback_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_no_quote_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.35,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "no_quote_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_no_quote_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.34,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "no_quote_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_no_quote_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.36,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "no_quote_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_no_quote_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.37,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "no_quote_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_no_quote_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.38,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "no_quote_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_reask_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.27,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "reask_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_reask_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.26,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "reask_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_reask_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.28,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "reask_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_reask_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.29,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "reask_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_reask_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.3,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "reask_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_weak_evidence_rate_clause_discovery_gap",
+      "domain": "legal",
+      "symptomEn": "Users cannot quickly find controlling clauses",
+      "symptomPt": "Usuários não encontram rapidamente cláusulas de controle",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.25,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify clause discovery gap.",
+        "Usuários fazem perguntas adicionais para esclarecer clause discovery gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "weak_evidence_rate",
+        "clause_discovery_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for clause discovery gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em clause discovery gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_weak_evidence_rate_deadline_tracking_gap",
+      "domain": "legal",
+      "symptomEn": "Deadline extraction is incomplete",
+      "symptomPt": "Extração de prazos está incompleta",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify deadline tracking gap.",
+        "Usuários fazem perguntas adicionais para esclarecer deadline tracking gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "weak_evidence_rate",
+        "deadline_tracking_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for deadline tracking gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em deadline tracking gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_weak_evidence_rate_jurisdiction_confusion",
+      "domain": "legal",
+      "symptomEn": "Jurisdiction scope is unclear",
+      "symptomPt": "Escopo de jurisdição está confuso",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.26,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify jurisdiction confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer jurisdiction confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "weak_evidence_rate",
+        "jurisdiction_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for jurisdiction confusion.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em jurisdiction confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_weak_evidence_rate_obligation_owner_missing",
+      "domain": "legal",
+      "symptomEn": "Obligation owners are not explicit",
+      "symptomPt": "Responsáveis por obrigações não estão explícitos",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.27,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify obligation owner missing.",
+        "Usuários fazem perguntas adicionais para esclarecer obligation owner missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "weak_evidence_rate",
+        "obligation_owner_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for obligation owner missing.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em obligation owner missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "legal_signal_weak_evidence_rate_quote_fidelity_concern",
+      "domain": "legal",
+      "symptomEn": "Quotes are perceived as imprecise",
+      "symptomPt": "Citações são percebidas como imprecisas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.28,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify quote fidelity concern.",
+        "Usuários fazem perguntas adicionais para esclarecer quote fidelity concern."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "locate",
+        "quote",
+        "advise"
+      ],
+      "tags": [
+        "legal",
+        "weak_evidence_rate",
+        "quote_fidelity_concern",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for quote fidelity concern.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em quote fidelity concern.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    }
+  ]
 }

@@ -1,0 +1,534 @@
+{
+  "_meta": {
+    "id": "di_identity_tables_id_driver_license",
+    "version": "2.0.0",
+    "description": "Table patterns for id_driver_license with header mappings and unit rules.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "docType": "id_driver_license"
+  },
+  "tables": [
+    {
+      "id": "summary_table",
+      "name": {
+        "en": "Summary Table",
+        "pt": "Tabela Resumo"
+      },
+      "section": "status_and_summary",
+      "expectedColumns": [
+        "field",
+        "value",
+        "unit",
+        "source"
+      ],
+      "keyRows": [
+        "document_number",
+        "holder_name",
+        "issue_date",
+        "expiry_date"
+      ]
+    },
+    {
+      "id": "line_item_table",
+      "name": {
+        "en": "Line Item Table",
+        "pt": "Tabela de Itens"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "line_item",
+        "description",
+        "amount",
+        "status",
+        "reference"
+      ],
+      "keyRows": [
+        "license_class",
+        "restrictions",
+        "endorsements",
+        "issuer"
+      ]
+    },
+    {
+      "id": "date_milestone_table",
+      "name": {
+        "en": "Date and Milestone Table",
+        "pt": "Tabela de Datas e Marcos"
+      },
+      "section": "critical_dates",
+      "expectedColumns": [
+        "event",
+        "date",
+        "deadline",
+        "status"
+      ],
+      "keyRows": [
+        "issue_date",
+        "effective_date",
+        "due_date",
+        "submission_deadline"
+      ]
+    },
+    {
+      "id": "party_table",
+      "name": {
+        "en": "Party and Identifier Table",
+        "pt": "Tabela de Partes e Identificadores"
+      },
+      "section": "party_identification",
+      "expectedColumns": [
+        "party",
+        "identifier",
+        "role",
+        "jurisdiction"
+      ],
+      "keyRows": [
+        "issuer",
+        "subject",
+        "counterparty",
+        "agent"
+      ]
+    },
+    {
+      "id": "amount_breakdown_table",
+      "name": {
+        "en": "Amount Breakdown Table",
+        "pt": "Tabela de Detalhamento de Valores"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "component",
+        "base_amount",
+        "adjustment",
+        "total"
+      ],
+      "keyRows": [
+        "principal",
+        "fees",
+        "interest",
+        "net_total"
+      ]
+    },
+    {
+      "id": "status_history_table",
+      "name": {
+        "en": "Status History Table",
+        "pt": "Tabela de Historico de Status"
+      },
+      "section": "status_and_summary",
+      "expectedColumns": [
+        "status",
+        "date",
+        "actor",
+        "note"
+      ],
+      "keyRows": [
+        "created",
+        "submitted",
+        "approved",
+        "closed"
+      ]
+    },
+    {
+      "id": "compliance_rule_table",
+      "name": {
+        "en": "Compliance Rule Table",
+        "pt": "Tabela de Regras de Conformidade"
+      },
+      "section": "obligations_and_conditions",
+      "expectedColumns": [
+        "rule",
+        "condition",
+        "threshold",
+        "result"
+      ],
+      "keyRows": [
+        "identity_match",
+        "document_validity",
+        "deadline_met",
+        "amount_consistency"
+      ]
+    },
+    {
+      "id": "supporting_doc_table",
+      "name": {
+        "en": "Supporting Document Table",
+        "pt": "Tabela de Documentos de Suporte"
+      },
+      "section": "supporting_documents",
+      "expectedColumns": [
+        "document_name",
+        "doc_id",
+        "date",
+        "status"
+      ],
+      "keyRows": [
+        "annex",
+        "exhibit",
+        "attachment",
+        "receipt"
+      ]
+    },
+    {
+      "id": "annex_reference_table",
+      "name": {
+        "en": "Annex Reference Table",
+        "pt": "Tabela de Referencia de Anexos"
+      },
+      "section": "annexes_exhibits",
+      "expectedColumns": [
+        "annex_id",
+        "title",
+        "page",
+        "topic"
+      ],
+      "keyRows": [
+        "annex_a",
+        "annex_b",
+        "appendix_1",
+        "schedule_1"
+      ]
+    },
+    {
+      "id": "footnote_trace_table",
+      "name": {
+        "en": "Footnote Trace Table",
+        "pt": "Tabela de Rastreio de Notas"
+      },
+      "section": "footnotes",
+      "expectedColumns": [
+        "note_id",
+        "anchor",
+        "text",
+        "impact"
+      ],
+      "keyRows": [
+        "note_1",
+        "note_2",
+        "asterisk",
+        "superscript"
+      ]
+    }
+  ],
+  "tableHeaderMappings": [
+    {
+      "canonicalHeader": "amount",
+      "synonyms": [
+        "amount",
+        "value",
+        "valor",
+        "montante",
+        "importe"
+      ]
+    },
+    {
+      "canonicalHeader": "base_amount",
+      "synonyms": [
+        "base amount",
+        "valor base",
+        "taxable base",
+        "base de calculo"
+      ]
+    },
+    {
+      "canonicalHeader": "birth_date",
+      "synonyms": [
+        "date of birth",
+        "dob",
+        "data de nascimento"
+      ]
+    },
+    {
+      "canonicalHeader": "component",
+      "synonyms": [
+        "component",
+        "item",
+        "componente",
+        "rubrica"
+      ]
+    },
+    {
+      "canonicalHeader": "condition",
+      "synonyms": [
+        "condition",
+        "criteria",
+        "condicao",
+        "criterio"
+      ]
+    },
+    {
+      "canonicalHeader": "currency",
+      "synonyms": [
+        "currency",
+        "moeda"
+      ]
+    },
+    {
+      "canonicalHeader": "date",
+      "synonyms": [
+        "date",
+        "data",
+        "issued on",
+        "emitido em"
+      ]
+    },
+    {
+      "canonicalHeader": "deadline",
+      "synonyms": [
+        "deadline",
+        "due date",
+        "prazo",
+        "vencimento"
+      ]
+    },
+    {
+      "canonicalHeader": "description",
+      "synonyms": [
+        "description",
+        "details",
+        "descricao",
+        "detalhes"
+      ]
+    },
+    {
+      "canonicalHeader": "document_expiry",
+      "synonyms": [
+        "expiry",
+        "valid thru",
+        "validade"
+      ]
+    },
+    {
+      "canonicalHeader": "document_number",
+      "synonyms": [
+        "document no",
+        "document number",
+        "numero do documento"
+      ]
+    },
+    {
+      "canonicalHeader": "field",
+      "synonyms": [
+        "field",
+        "attribute",
+        "campo",
+        "atributo"
+      ]
+    },
+    {
+      "canonicalHeader": "identifier",
+      "synonyms": [
+        "identifier",
+        "id",
+        "identificador",
+        "numero"
+      ]
+    },
+    {
+      "canonicalHeader": "issuing_authority",
+      "synonyms": [
+        "issuing authority",
+        "orgao emissor",
+        "authority"
+      ]
+    },
+    {
+      "canonicalHeader": "jurisdiction",
+      "synonyms": [
+        "jurisdiction",
+        "state",
+        "uf",
+        "jurisdicao"
+      ]
+    },
+    {
+      "canonicalHeader": "line_item",
+      "synonyms": [
+        "line item",
+        "item",
+        "linha",
+        "rubrica"
+      ]
+    },
+    {
+      "canonicalHeader": "mrz",
+      "synonyms": [
+        "mrz",
+        "machine readable zone",
+        "zona de leitura mecanica"
+      ]
+    },
+    {
+      "canonicalHeader": "note",
+      "synonyms": [
+        "note",
+        "remarks",
+        "observacao",
+        "nota"
+      ]
+    },
+    {
+      "canonicalHeader": "period",
+      "synonyms": [
+        "period",
+        "tax year",
+        "competencia",
+        "periodo"
+      ]
+    },
+    {
+      "canonicalHeader": "reference",
+      "synonyms": [
+        "reference",
+        "ref",
+        "referencia",
+        "protocolo"
+      ]
+    },
+    {
+      "canonicalHeader": "status",
+      "synonyms": [
+        "status",
+        "situation",
+        "situacao"
+      ]
+    },
+    {
+      "canonicalHeader": "subject",
+      "synonyms": [
+        "subject",
+        "holder",
+        "titular",
+        "contribuinte"
+      ]
+    },
+    {
+      "canonicalHeader": "threshold",
+      "synonyms": [
+        "threshold",
+        "limit",
+        "limite",
+        "faixa"
+      ]
+    },
+    {
+      "canonicalHeader": "unit",
+      "synonyms": [
+        "unit",
+        "scale",
+        "unidade",
+        "escala"
+      ]
+    },
+    {
+      "canonicalHeader": "value",
+      "synonyms": [
+        "value",
+        "valor",
+        "resultado"
+      ]
+    }
+  ],
+  "unitsRules": [
+    {
+      "id": "unit_rule_currency_required",
+      "appliesToHeaders": [
+        "amount",
+        "base_amount",
+        "value"
+      ],
+      "rule": "currency_must_be_explicit_or_inherited_from_header_context"
+    },
+    {
+      "id": "unit_rule_header_context",
+      "appliesToHeaders": [
+        "all"
+      ],
+      "rule": "table_cell_value_requires_header_and_row_context_before_use"
+    },
+    {
+      "id": "unit_rule_identity_date_formats",
+      "appliesToHeaders": [
+        "birth_date",
+        "document_expiry",
+        "date"
+      ],
+      "rule": "accept_multiple_date_formats_but_return_iso_normalized_date"
+    },
+    {
+      "id": "unit_rule_mixed_currency_guard",
+      "appliesToHeaders": [
+        "all"
+      ],
+      "rule": "block_calculation_when_mixed_currencies_without_conversion_rate"
+    },
+    {
+      "id": "unit_rule_negative_style",
+      "appliesToHeaders": [
+        "amount",
+        "base_amount",
+        "value"
+      ],
+      "rule": "support_parentheses_and_minus_as_negative"
+    },
+    {
+      "id": "unit_rule_percent_fields",
+      "appliesToHeaders": [
+        "threshold"
+      ],
+      "rule": "percent_fields_must_use_percent_unit_not_currency"
+    },
+    {
+      "id": "unit_rule_period_alignment",
+      "appliesToHeaders": [
+        "all"
+      ],
+      "rule": "comparisons_require_same_period_granularity"
+    },
+    {
+      "id": "unit_rule_rounding",
+      "appliesToHeaders": [
+        "amount",
+        "value"
+      ],
+      "rule": "round_only_for_display_keep_raw_precision"
+    },
+    {
+      "id": "unit_rule_scale_normalization",
+      "appliesToHeaders": [
+        "amount",
+        "base_amount",
+        "value"
+      ],
+      "rule": "normalize_k_m_b_thousands_millions_billions_and_record_scale"
+    }
+  ],
+  "headerContextRules": [
+    {
+      "id": "ctx_annex_anchor_required",
+      "check": "annex_or_footnote_values_require_reference_anchor"
+    },
+    {
+      "id": "ctx_period_header_required",
+      "check": "period_header_required_for_time_series_claims"
+    },
+    {
+      "id": "ctx_row_header_required",
+      "check": "row_and_column_headers_required_for_numeric_extraction"
+    },
+    {
+      "id": "ctx_total_reconcile",
+      "check": "line_items_should_reconcile_to_total_when_total_row_present"
+    },
+    {
+      "id": "ctx_unit_header_required",
+      "check": "unit_or_scale_header_required_for_currency_values"
+    }
+  ]
+}

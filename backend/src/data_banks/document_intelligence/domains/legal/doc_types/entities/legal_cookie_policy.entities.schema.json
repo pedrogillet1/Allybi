@@ -1,0 +1,1204 @@
+{
+  "_meta": {
+    "id": "legal_cookie_policy_entities",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for Cookie Policy.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_cookie_policy"
+  },
+  "schemaVersion": "2026-02-28",
+  "entities": [
+    {
+      "id": "document_title",
+      "type": "string",
+      "required": true,
+      "description": "Extract document title from Cookie Policy.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "document title",
+          "document header",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 200
+    },
+    {
+      "id": "document_version",
+      "type": "string",
+      "required": false,
+      "description": "Extract document version from Cookie Policy.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "document version",
+          "document header",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 199
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract effective date from Cookie Policy.",
+      "section": "term_and_renewal",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "effective date",
+          "term and renewal",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "valid_date_format"
+      ],
+      "extractionPriority": 198
+    },
+    {
+      "id": "execution_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract execution date from Cookie Policy.",
+      "section": "signatures",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "execution date",
+          "signatures",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "valid_date_format"
+      ],
+      "extractionPriority": 197
+    },
+    {
+      "id": "expiration_date",
+      "type": "date",
+      "required": false,
+      "description": "Extract expiration date from Cookie Policy.",
+      "section": "term_and_renewal",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "expiration date",
+          "term and renewal",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "valid_date_format"
+      ],
+      "extractionPriority": 196
+    },
+    {
+      "id": "renewal_term_days",
+      "type": "number",
+      "required": false,
+      "description": "Extract renewal term days from Cookie Policy.",
+      "section": "term_and_renewal",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "renewal term days",
+          "term and renewal",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 195
+    },
+    {
+      "id": "notice_period_days",
+      "type": "number",
+      "required": false,
+      "description": "Extract notice period days from Cookie Policy.",
+      "section": "notices_misc",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "notice period days",
+          "notices misc",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 194
+    },
+    {
+      "id": "governing_law",
+      "type": "string",
+      "required": true,
+      "description": "Extract governing law from Cookie Policy.",
+      "section": "dispute_resolution",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "governing law",
+          "dispute resolution",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 193
+    },
+    {
+      "id": "jurisdiction_venue",
+      "type": "string",
+      "required": true,
+      "description": "Extract jurisdiction venue from Cookie Policy.",
+      "section": "dispute_resolution",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "jurisdiction venue",
+          "dispute resolution",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 192
+    },
+    {
+      "id": "arbitration_forum",
+      "type": "string",
+      "required": false,
+      "description": "Extract arbitration forum from Cookie Policy.",
+      "section": "dispute_resolution",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "arbitration forum",
+          "dispute resolution",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 191
+    },
+    {
+      "id": "party_one_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract party one name from Cookie Policy.",
+      "section": "parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "party one name",
+          "parties",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 190
+    },
+    {
+      "id": "party_one_role",
+      "type": "string",
+      "required": true,
+      "description": "Extract party one role from Cookie Policy.",
+      "section": "parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "party one role",
+          "parties",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 189
+    },
+    {
+      "id": "party_one_address",
+      "type": "string",
+      "required": false,
+      "description": "Extract party one address from Cookie Policy.",
+      "section": "parties",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "party one address",
+          "parties",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 188
+    },
+    {
+      "id": "party_two_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract party two name from Cookie Policy.",
+      "section": "parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "party two name",
+          "parties",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 187
+    },
+    {
+      "id": "party_two_role",
+      "type": "string",
+      "required": true,
+      "description": "Extract party two role from Cookie Policy.",
+      "section": "parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "party two role",
+          "parties",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 186
+    },
+    {
+      "id": "party_two_address",
+      "type": "string",
+      "required": false,
+      "description": "Extract party two address from Cookie Policy.",
+      "section": "parties",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "party two address",
+          "parties",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 185
+    },
+    {
+      "id": "affiliate_definition",
+      "type": "string",
+      "required": false,
+      "description": "Extract affiliate definition from Cookie Policy.",
+      "section": "definitions",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "affiliate definition",
+          "definitions",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 184
+    },
+    {
+      "id": "services_description",
+      "type": "string",
+      "required": true,
+      "description": "Extract services description from Cookie Policy.",
+      "section": "scope_of_services",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "services description",
+          "scope of services",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 183
+    },
+    {
+      "id": "deliverables_summary",
+      "type": "string",
+      "required": false,
+      "description": "Extract deliverables summary from Cookie Policy.",
+      "section": "scope_of_services",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "deliverables summary",
+          "scope of services",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 182
+    },
+    {
+      "id": "service_level_target",
+      "type": "string",
+      "required": false,
+      "description": "Extract service level target from Cookie Policy.",
+      "section": "security_compliance",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "service level target",
+          "security compliance",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 181
+    },
+    {
+      "id": "fee_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Extract fee amount from Cookie Policy.",
+      "section": "fees_and_payment",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "fee amount",
+          "fees and payment",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "currency_or_amount_context"
+      ],
+      "extractionPriority": 180
+    },
+    {
+      "id": "fee_currency",
+      "type": "string",
+      "required": false,
+      "description": "Extract fee currency from Cookie Policy.",
+      "section": "fees_and_payment",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "fee currency",
+          "fees and payment",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 179
+    },
+    {
+      "id": "payment_terms_days",
+      "type": "number",
+      "required": true,
+      "description": "Extract payment terms days from Cookie Policy.",
+      "section": "fees_and_payment",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "payment terms days",
+          "fees and payment",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 178
+    },
+    {
+      "id": "late_fee_rate",
+      "type": "number",
+      "required": false,
+      "description": "Extract late fee rate from Cookie Policy.",
+      "section": "fees_and_payment",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "late fee rate",
+          "fees and payment",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "lower"
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 177
+    },
+    {
+      "id": "liability_cap_text",
+      "type": "string",
+      "required": true,
+      "description": "Extract liability cap text from Cookie Policy.",
+      "section": "liability_and_indemnity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "liability cap text",
+          "liability and indemnity",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 176
+    },
+    {
+      "id": "indemnity_scope",
+      "type": "string",
+      "required": true,
+      "description": "Extract indemnity scope from Cookie Policy.",
+      "section": "liability_and_indemnity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "indemnity scope",
+          "liability and indemnity",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 175
+    },
+    {
+      "id": "confidential_information_definition",
+      "type": "string",
+      "required": true,
+      "description": "Extract confidential information definition from Cookie Policy.",
+      "section": "confidentiality_privacy",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "confidential information definition",
+          "confidentiality privacy",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 174
+    },
+    {
+      "id": "data_processing_role",
+      "type": "string",
+      "required": false,
+      "description": "Extract data processing role from Cookie Policy.",
+      "section": "confidentiality_privacy",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "data processing role",
+          "confidentiality privacy",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 173
+    },
+    {
+      "id": "subprocessor_requirements",
+      "type": "string",
+      "required": false,
+      "description": "Extract subprocessor requirements from Cookie Policy.",
+      "section": "security_compliance",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "subprocessor requirements",
+          "security compliance",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 172
+    },
+    {
+      "id": "security_incident_notice_window",
+      "type": "string",
+      "required": false,
+      "description": "Extract security incident notice window from Cookie Policy.",
+      "section": "security_compliance",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "security incident notice window",
+          "security compliance",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 171
+    },
+    {
+      "id": "ip_ownership_clause",
+      "type": "string",
+      "required": false,
+      "description": "Extract ip ownership clause from Cookie Policy.",
+      "section": "ip_and_license",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "ip ownership clause",
+          "ip and license",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 170
+    },
+    {
+      "id": "license_grant_scope",
+      "type": "string",
+      "required": false,
+      "description": "Extract license grant scope from Cookie Policy.",
+      "section": "ip_and_license",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "license grant scope",
+          "ip and license",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 169
+    },
+    {
+      "id": "assignment_restrictions",
+      "type": "string",
+      "required": false,
+      "description": "Extract assignment restrictions from Cookie Policy.",
+      "section": "notices_misc",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "assignment restrictions",
+          "notices misc",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 168
+    },
+    {
+      "id": "termination_for_cause_clause",
+      "type": "string",
+      "required": true,
+      "description": "Extract termination for cause clause from Cookie Policy.",
+      "section": "termination",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "termination for cause clause",
+          "termination",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 167
+    },
+    {
+      "id": "termination_for_convenience_clause",
+      "type": "string",
+      "required": false,
+      "description": "Extract termination for convenience clause from Cookie Policy.",
+      "section": "termination",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "termination for convenience clause",
+          "termination",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 166
+    },
+    {
+      "id": "survival_clauses",
+      "type": "string",
+      "required": false,
+      "description": "Extract survival clauses from Cookie Policy.",
+      "section": "termination",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "survival clauses",
+          "termination",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 165
+    },
+    {
+      "id": "signature_party_one_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract signature party one name from Cookie Policy.",
+      "section": "signatures",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "signature party one name",
+          "signatures",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 164
+    },
+    {
+      "id": "signature_party_two_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract signature party two name from Cookie Policy.",
+      "section": "signatures",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "signature party two name",
+          "signatures",
+          "cookie policy"
+        ],
+        "disallowInference": true,
+        "preferredSources": [
+          "main_clause_text",
+          "definitions",
+          "signature_block"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 163
+    },
+    {
+      "id": "signature_dates",
+      "type": "string",
+      "required": false,
+      "description": "Extract signature dates from Cookie Policy.",
+      "section": "signatures",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "signature dates",
+          "signatures",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 162
+    },
+    {
+      "id": "amendment_history",
+      "type": "string",
+      "required": false,
+      "description": "Extract amendment history from Cookie Policy.",
+      "section": "annexes_schedules",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": [
+          "amendment history",
+          "annexes schedules",
+          "cookie policy"
+        ],
+        "disallowInference": false,
+        "preferredSources": [
+          "main_clause_text",
+          "annexes_schedules"
+        ]
+      },
+      "normalization": {
+        "trimWhitespace": true,
+        "normalizeUnicode": true,
+        "case": "preserve"
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 161
+    }
+  ]
+}

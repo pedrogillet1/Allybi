@@ -86,6 +86,19 @@ type AdminTelemetryAppService = {
   }) => Promise<any>;
   apiMetrics: (params: { range: string }) => Promise<any>;
   externalProviders: (params: { range: string }) => Promise<any>;
+  retrievalRewriteRulesTop: (params: {
+    range: string;
+    limit: number;
+  }) => Promise<any>;
+  retrievalBoostRulesTop: (params: {
+    range: string;
+    limit: number;
+  }) => Promise<any>;
+  retrievalWorstRules: (params: {
+    range: string;
+    limit: number;
+    minHits?: number;
+  }) => Promise<any>;
 };
 
 type AdminTelemetryServices = {
@@ -253,6 +266,59 @@ export async function adminTelemetryQueries(
     const domain = parseOptionalString(req.query.domain);
     const intent = parseOptionalString(req.query.intent);
     const data = await svc.queries({ range, limit, cursor, domain, intent });
+    res.json({ ok: true, range, ...data });
+  } catch (e) {
+    next(e);
+  }
+}
+
+// ============================================================================
+// RETRIEVAL RULE EFFECTIVENESS
+// ============================================================================
+
+export async function adminTelemetryRetrievalTopRewriteRules(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const svc = getSvc(req);
+    const range = parseRange(req.query.range, "7d");
+    const limit = parseLimit(req.query.limit, 20);
+    const data = await svc.retrievalRewriteRulesTop({ range, limit });
+    res.json({ ok: true, range, ...data });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function adminTelemetryRetrievalTopBoostRules(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const svc = getSvc(req);
+    const range = parseRange(req.query.range, "7d");
+    const limit = parseLimit(req.query.limit, 20);
+    const data = await svc.retrievalBoostRulesTop({ range, limit });
+    res.json({ ok: true, range, ...data });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function adminTelemetryRetrievalWorstRules(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const svc = getSvc(req);
+    const range = parseRange(req.query.range, "7d");
+    const limit = parseLimit(req.query.limit, 20);
+    const minHits = parseLimit(req.query.minHits, 3);
+    const data = await svc.retrievalWorstRules({ range, limit, minHits });
     res.json({ ok: true, range, ...data });
   } catch (e) {
     next(e);

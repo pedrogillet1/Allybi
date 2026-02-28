@@ -2487,4 +2487,98 @@ export class DocxEditorService {
 
     return outputBuffer;
   }
+
+  /**
+   * Insert a page break before or after a target paragraph.
+   * Creates a new paragraph containing `<w:r><w:br w:type="page"/></w:r>`.
+   */
+  async insertPageBreak(
+    buffer: Buffer,
+    paragraphId: string,
+    position: "before" | "after" = "before",
+  ): Promise<Buffer> {
+    if (!paragraphId.trim()) throw new Error("paragraphId is required");
+
+    const anchors = await this.anchorsService.extractParagraphNodes(buffer);
+    const targetAnchor = anchors.find((a) => a.paragraphId === paragraphId);
+    if (!targetAnchor)
+      throw new Error(`Paragraph target not found: ${paragraphId}`);
+
+    const zip = new AdmZip(buffer);
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
+
+    const documentXml = documentEntry.getData().toString("utf8");
+    const parsed = await parseDocumentXml(documentXml);
+
+    const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
+    if (xmlIndex < 0)
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
+
+    const pageBreakParagraph: XmlNode = {
+      "w:r": [
+        {
+          "w:br": [{ $: { "w:type": "page" } }],
+        },
+      ],
+    };
+
+    const insertAt = position === "before" ? xmlIndex : xmlIndex + 1;
+    parsed.paragraphs.splice(insertAt, 0, pageBreakParagraph);
+    parsed.body["w:p"] = parsed.paragraphs;
+
+    return this.rebuildZip(zip, parsed);
+  }
+
+  /**
+   * Insert a section break before a target paragraph.
+   * Adds `<w:pPr><w:sectPr><w:type w:val="{breakType}"/></w:sectPr></w:pPr>`
+   * to a new empty paragraph.
+   */
+  async insertSectionBreak(
+    buffer: Buffer,
+    paragraphId: string,
+    breakType: "nextPage" | "continuous" = "nextPage",
+  ): Promise<Buffer> {
+    if (!paragraphId.trim()) throw new Error("paragraphId is required");
+
+    const anchors = await this.anchorsService.extractParagraphNodes(buffer);
+    const targetAnchor = anchors.find((a) => a.paragraphId === paragraphId);
+    if (!targetAnchor)
+      throw new Error(`Paragraph target not found: ${paragraphId}`);
+
+    const zip = new AdmZip(buffer);
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
+
+    const documentXml = documentEntry.getData().toString("utf8");
+    const parsed = await parseDocumentXml(documentXml);
+
+    const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
+    if (xmlIndex < 0)
+      throw new Error(
+        `Unable to map paragraphId to XML paragraph: ${paragraphId}`,
+      );
+
+    const sectionBreakParagraph: XmlNode = {
+      "w:pPr": [
+        {
+          "w:sectPr": [
+            {
+              "w:type": [{ $: { "w:val": breakType } }],
+            },
+          ],
+        },
+      ],
+    };
+
+    parsed.paragraphs.splice(xmlIndex, 0, sectionBreakParagraph);
+    parsed.body["w:p"] = parsed.paragraphs;
+
+    return this.rebuildZip(zip, parsed);
+  }
 }

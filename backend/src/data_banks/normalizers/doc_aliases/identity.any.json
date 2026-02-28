@@ -1,0 +1,3943 @@
+{
+  "_meta": {
+    "id": "doc_aliases_identity",
+    "version": "1.0.0",
+    "description": "Identity document alias normalization bank.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true,
+    "minAliasConfidence": 0.6
+  },
+  "domain": "identity",
+  "aliases": [
+    {
+      "phrase": "address confirmation letter",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show address confirmation letter for the period",
+        "export address confirmation letter for review"
+      ]
+    },
+    {
+      "phrase": "address doc",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show address doc for the period",
+        "export address doc for review"
+      ]
+    },
+    {
+      "phrase": "address proof bill",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show address proof bill for the period",
+        "export address proof bill for review"
+      ]
+    },
+    {
+      "phrase": "address verification bill",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show address verification bill for the period",
+        "export address verification bill for review"
+      ]
+    },
+    {
+      "phrase": "address verification document",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show address verification document for the period",
+        "export address verification document for review"
+      ]
+    },
+    {
+      "phrase": "assento de casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar assento de casamento do periodo",
+        "exportar assento de casamento para revisao"
+      ]
+    },
+    {
+      "phrase": "assento de nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar assento de nascimento do periodo",
+        "exportar assento de nascimento para revisao"
+      ]
+    },
+    {
+      "phrase": "auto registration",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show auto registration for the period",
+        "export auto registration for review"
+      ]
+    },
+    {
+      "phrase": "automobile registration card",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show automobile registration card for the period",
+        "export automobile registration card for review"
+      ]
+    },
+    {
+      "phrase": "bank statement proof address",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show bank statement proof address for the period",
+        "export bank statement proof address for review"
+      ]
+    },
+    {
+      "phrase": "biometric passport",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show biometric passport for the period",
+        "export biometric passport for review"
+      ]
+    },
+    {
+      "phrase": "birth cert",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show birth cert for the period",
+        "export birth cert for review"
+      ]
+    },
+    {
+      "phrase": "birth certificate",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show birth certificate for the period",
+        "export birth certificate for review"
+      ]
+    },
+    {
+      "phrase": "birth doc",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show birth doc for the period",
+        "export birth doc for review"
+      ]
+    },
+    {
+      "phrase": "birth paper",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show birth paper for the period",
+        "export birth paper for review"
+      ]
+    },
+    {
+      "phrase": "birth record",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show birth record for the period",
+        "export birth record for review"
+      ]
+    },
+    {
+      "phrase": "birth registration certificate",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show birth registration certificate for the period",
+        "export birth registration certificate for review"
+      ]
+    },
+    {
+      "phrase": "biz reg cert",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show biz reg cert for the period",
+        "export biz reg cert for review"
+      ]
+    },
+    {
+      "phrase": "booklet pass",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show booklet pass for the period",
+        "export booklet pass for review"
+      ]
+    },
+    {
+      "phrase": "business incorporation certificate",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show business incorporation certificate for the period",
+        "export business incorporation certificate for review"
+      ]
+    },
+    {
+      "phrase": "business registration certificate",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show business registration certificate for the period",
+        "export business registration certificate for review"
+      ]
+    },
+    {
+      "phrase": "business registry paper",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show business registry paper for the period",
+        "export business registry paper for review"
+      ]
+    },
+    {
+      "phrase": "car reg",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show car reg for the period",
+        "export car reg for review"
+      ]
+    },
+    {
+      "phrase": "car registration card",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show car registration card for the period",
+        "export car registration card for review"
+      ]
+    },
+    {
+      "phrase": "car registration document",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show car registration document for the period",
+        "export car registration document for review"
+      ]
+    },
+    {
+      "phrase": "card cpf",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar card cpf do periodo",
+        "exportar card cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "cartao cpf",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cartao cpf do periodo",
+        "exportar cartao cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "cartao de identificacao fiscal",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cartao de identificacao fiscal do periodo",
+        "exportar cartao de identificacao fiscal para revisao"
+      ]
+    },
+    {
+      "phrase": "carteira de identidade",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carteira de identidade do periodo",
+        "exportar carteira de identidade para revisao"
+      ]
+    },
+    {
+      "phrase": "carteira de motorista",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carteira de motorista do periodo",
+        "exportar carteira de motorista para revisao"
+      ]
+    },
+    {
+      "phrase": "carteira id",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show carteira id for the period",
+        "export carteira id for review"
+      ]
+    },
+    {
+      "phrase": "carteira nacional de habilitacao",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carteira nacional de habilitacao do periodo",
+        "exportar carteira nacional de habilitacao para revisao"
+      ]
+    },
+    {
+      "phrase": "casamento certidao",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show casamento certidao for the period",
+        "export casamento certidao for review"
+      ]
+    },
+    {
+      "phrase": "casamento doc",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show casamento doc for the period",
+        "export casamento doc for review"
+      ]
+    },
+    {
+      "phrase": "cert casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cert casamento for the period",
+        "export cert casamento for review"
+      ]
+    },
+    {
+      "phrase": "cert nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cert nascimento for the period",
+        "export cert nascimento for review"
+      ]
+    },
+    {
+      "phrase": "cert of birth",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cert of birth for the period",
+        "export cert of birth for review"
+      ]
+    },
+    {
+      "phrase": "cert of marriage",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cert of marriage for the period",
+        "export cert of marriage for review"
+      ]
+    },
+    {
+      "phrase": "certidao casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show certidao casamento for the period",
+        "export certidao casamento for review"
+      ]
+    },
+    {
+      "phrase": "certidao de casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certidao de casamento do periodo",
+        "exportar certidao de casamento para revisao"
+      ]
+    },
+    {
+      "phrase": "certidao de nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certidao de nascimento do periodo",
+        "exportar certidao de nascimento para revisao"
+      ]
+    },
+    {
+      "phrase": "certidao de registro da empresa",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certidao de registro da empresa do periodo",
+        "exportar certidao de registro da empresa para revisao"
+      ]
+    },
+    {
+      "phrase": "certidao empresa",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show certidao empresa for the period",
+        "export certidao empresa for review"
+      ]
+    },
+    {
+      "phrase": "certidao nasc",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show certidao nasc for the period",
+        "export certidao nasc for review"
+      ]
+    },
+    {
+      "phrase": "certificado de casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de casamento do periodo",
+        "exportar certificado de casamento para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado de incorporacao",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de incorporacao do periodo",
+        "exportar certificado de incorporacao para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado de nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de nascimento do periodo",
+        "exportar certificado de nascimento para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado de registro do veiculo",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de registro do veiculo do periodo",
+        "exportar certificado de registro do veiculo para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado de registro empresarial",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de registro empresarial do periodo",
+        "exportar certificado de registro empresarial para revisao"
+      ]
+    },
+    {
+      "phrase": "certificate company setup",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show certificate company setup for the period",
+        "export certificate company setup for review"
+      ]
+    },
+    {
+      "phrase": "certificate of birth",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show certificate of birth for the period",
+        "export certificate of birth for review"
+      ]
+    },
+    {
+      "phrase": "certificate of incorporation",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show certificate of incorporation for the period",
+        "export certificate of incorporation for review"
+      ]
+    },
+    {
+      "phrase": "certificate of marriage",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show certificate of marriage for the period",
+        "export certificate of marriage for review"
+      ]
+    },
+    {
+      "phrase": "citizen id card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show citizen id card for the period",
+        "export citizen id card for review"
+      ]
+    },
+    {
+      "phrase": "civil marriage certificate",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show civil marriage certificate for the period",
+        "export civil marriage certificate for review"
+      ]
+    },
+    {
+      "phrase": "civil union cert",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show civil union cert for the period",
+        "export civil union cert for review"
+      ]
+    },
+    {
+      "phrase": "cnh",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cnh do periodo",
+        "exportar cnh para revisao"
+      ]
+    },
+    {
+      "phrase": "cnh digital",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cnh digital do periodo",
+        "exportar cnh digital para revisao"
+      ]
+    },
+    {
+      "phrase": "cnh doc",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cnh doc do periodo",
+        "exportar cnh doc para revisao"
+      ]
+    },
+    {
+      "phrase": "cnpj registration cert",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cnpj registration cert for the period",
+        "export cnpj registration cert for review"
+      ]
+    },
+    {
+      "phrase": "company reg cert",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show company reg cert for the period",
+        "export company reg cert for review"
+      ]
+    },
+    {
+      "phrase": "company registration certificate",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show company registration certificate for the period",
+        "export company registration certificate for review"
+      ]
+    },
+    {
+      "phrase": "company registry certificate",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show company registry certificate for the period",
+        "export company registry certificate for review"
+      ]
+    },
+    {
+      "phrase": "company setup certificate",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show company setup certificate for the period",
+        "export company setup certificate for review"
+      ]
+    },
+    {
+      "phrase": "comprovante de endereco",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar comprovante de endereco do periodo",
+        "exportar comprovante de endereco para revisao"
+      ]
+    },
+    {
+      "phrase": "comprovante de registro da empresa",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar comprovante de registro da empresa do periodo",
+        "exportar comprovante de registro da empresa para revisao"
+      ]
+    },
+    {
+      "phrase": "comprovante de residencia",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar comprovante de residencia do periodo",
+        "exportar comprovante de residencia para revisao"
+      ]
+    },
+    {
+      "phrase": "comprovante residencia",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar comprovante residencia do periodo",
+        "exportar comprovante residencia para revisao"
+      ]
+    },
+    {
+      "phrase": "confirmacao de endereco",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar confirmacao de endereco do periodo",
+        "exportar confirmacao de endereco para revisao"
+      ]
+    },
+    {
+      "phrase": "conta de agua comprovante",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar conta de agua comprovante do periodo",
+        "exportar conta de agua comprovante para revisao"
+      ]
+    },
+    {
+      "phrase": "conta de luz comprovante",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar conta de luz comprovante do periodo",
+        "exportar conta de luz comprovante para revisao"
+      ]
+    },
+    {
+      "phrase": "copia do passaporte",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar copia do passaporte do periodo",
+        "exportar copia do passaporte para revisao"
+      ]
+    },
+    {
+      "phrase": "corporate registration certificate",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show corporate registration certificate for the period",
+        "export corporate registration certificate for review"
+      ]
+    },
+    {
+      "phrase": "cpf",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cpf do periodo",
+        "exportar cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "cpf card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cpf card do periodo",
+        "exportar cpf card para revisao"
+      ]
+    },
+    {
+      "phrase": "cpf doc",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cpf doc do periodo",
+        "exportar cpf doc para revisao"
+      ]
+    },
+    {
+      "phrase": "crlv",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar crlv do periodo",
+        "exportar crlv para revisao"
+      ]
+    },
+    {
+      "phrase": "crlv digital",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show crlv digital for the period",
+        "export crlv digital for review"
+      ]
+    },
+    {
+      "phrase": "declaracao de residencia",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar declaracao de residencia do periodo",
+        "exportar declaracao de residencia para revisao"
+      ]
+    },
+    {
+      "phrase": "dl",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show dl for the period",
+        "export dl for review"
+      ]
+    },
+    {
+      "phrase": "doc casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show doc casamento for the period",
+        "export doc casamento for review"
+      ]
+    },
+    {
+      "phrase": "doc cpf",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar doc cpf do periodo",
+        "exportar doc cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "doc de endereco",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar doc de endereco do periodo",
+        "exportar doc de endereco para revisao"
+      ]
+    },
+    {
+      "phrase": "doc do carro",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar doc do carro do periodo",
+        "exportar doc do carro para revisao"
+      ]
+    },
+    {
+      "phrase": "doc identidade",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show doc identidade for the period",
+        "export doc identidade for review"
+      ]
+    },
+    {
+      "phrase": "doc nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show doc nascimento for the period",
+        "export doc nascimento for review"
+      ]
+    },
+    {
+      "phrase": "doc passaporte",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show doc passaporte for the period",
+        "export doc passaporte for review"
+      ]
+    },
+    {
+      "phrase": "doc registro empresarial",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar doc registro empresarial do periodo",
+        "exportar doc registro empresarial para revisao"
+      ]
+    },
+    {
+      "phrase": "documento cpf",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento cpf do periodo",
+        "exportar documento cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de casamento civil",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento de casamento civil do periodo",
+        "exportar documento de casamento civil para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de constituicao da empresa",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento de constituicao da empresa do periodo",
+        "exportar documento de constituicao da empresa para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de endereco",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento de endereco do periodo",
+        "exportar documento de endereco para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de habilitacao",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento de habilitacao do periodo",
+        "exportar documento de habilitacao para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de identidade",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento de identidade do periodo",
+        "exportar documento de identidade para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento de nascimento do periodo",
+        "exportar documento de nascimento para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de passaporte",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento de passaporte do periodo",
+        "exportar documento de passaporte para revisao"
+      ]
+    },
+    {
+      "phrase": "documento do veiculo",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento do veiculo do periodo",
+        "exportar documento do veiculo para revisao"
+      ]
+    },
+    {
+      "phrase": "drive license",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show drive license for the period",
+        "export drive license for review"
+      ]
+    },
+    {
+      "phrase": "driver id card",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show driver id card for the period",
+        "export driver id card for review"
+      ]
+    },
+    {
+      "phrase": "driver lic",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show driver lic for the period",
+        "export driver lic for review"
+      ]
+    },
+    {
+      "phrase": "driver license",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show driver license for the period",
+        "export driver license for review"
+      ]
+    },
+    {
+      "phrase": "driver permit card",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show driver permit card for the period",
+        "export driver permit card for review"
+      ]
+    },
+    {
+      "phrase": "drivers lic",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show drivers lic for the period",
+        "export drivers lic for review"
+      ]
+    },
+    {
+      "phrase": "drivers license card",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show drivers license card for the period",
+        "export drivers license card for review"
+      ]
+    },
+    {
+      "phrase": "driving license",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show driving license for the period",
+        "export driving license for review"
+      ]
+    },
+    {
+      "phrase": "enterprise registration doc",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show enterprise registration doc for the period",
+        "export enterprise registration doc for review"
+      ]
+    },
+    {
+      "phrase": "fiscal card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show fiscal card for the period",
+        "export fiscal card for review"
+      ]
+    },
+    {
+      "phrase": "fiscal id card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show fiscal id card for the period",
+        "export fiscal id card for review"
+      ]
+    },
+    {
+      "phrase": "gov id",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show gov id for the period",
+        "export gov id for review"
+      ]
+    },
+    {
+      "phrase": "government id card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show government id card for the period",
+        "export government id card for review"
+      ]
+    },
+    {
+      "phrase": "habilitacao",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar habilitacao do periodo",
+        "exportar habilitacao para revisao"
+      ]
+    },
+    {
+      "phrase": "id card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show id card for the period",
+        "export id card for review"
+      ]
+    },
+    {
+      "phrase": "id fiscal",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar id fiscal do periodo",
+        "exportar id fiscal para revisao"
+      ]
+    },
+    {
+      "phrase": "id nacional",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar id nacional do periodo",
+        "exportar id nacional para revisao"
+      ]
+    },
+    {
+      "phrase": "id nacional card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show id nacional card for the period",
+        "export id nacional card for review"
+      ]
+    },
+    {
+      "phrase": "id tributario",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show id tributario for the period",
+        "export id tributario for review"
+      ]
+    },
+    {
+      "phrase": "identidade",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show identidade for the period",
+        "export identidade for review"
+      ]
+    },
+    {
+      "phrase": "identidade civil",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar identidade civil do periodo",
+        "exportar identidade civil para revisao"
+      ]
+    },
+    {
+      "phrase": "identity card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show identity card for the period",
+        "export identity card for review"
+      ]
+    },
+    {
+      "phrase": "incorporation cert",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show incorporation cert for the period",
+        "export incorporation cert for review"
+      ]
+    },
+    {
+      "phrase": "international passport",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show international passport for the period",
+        "export international passport for review"
+      ]
+    },
+    {
+      "phrase": "internet bill address proof",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show internet bill address proof for the period",
+        "export internet bill address proof for review"
+      ]
+    },
+    {
+      "phrase": "licenca de motorista",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar licenca de motorista do periodo",
+        "exportar licenca de motorista para revisao"
+      ]
+    },
+    {
+      "phrase": "licenca dirigir",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show licenca dirigir for the period",
+        "export licenca dirigir for review"
+      ]
+    },
+    {
+      "phrase": "licenciamento do veiculo",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar licenciamento do veiculo do periodo",
+        "exportar licenciamento do veiculo para revisao"
+      ]
+    },
+    {
+      "phrase": "license card",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show license card for the period",
+        "export license card for review"
+      ]
+    },
+    {
+      "phrase": "license to drive",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show license to drive for the period",
+        "export license to drive for review"
+      ]
+    },
+    {
+      "phrase": "marital cert",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show marital cert for the period",
+        "export marital cert for review"
+      ]
+    },
+    {
+      "phrase": "marital status certificate",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show marital status certificate for the period",
+        "export marital status certificate for review"
+      ]
+    },
+    {
+      "phrase": "marriage cert",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show marriage cert for the period",
+        "export marriage cert for review"
+      ]
+    },
+    {
+      "phrase": "marriage certificate",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show marriage certificate for the period",
+        "export marriage certificate for review"
+      ]
+    },
+    {
+      "phrase": "marriage paper",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show marriage paper for the period",
+        "export marriage paper for review"
+      ]
+    },
+    {
+      "phrase": "marriage registration certificate",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show marriage registration certificate for the period",
+        "export marriage registration certificate for review"
+      ]
+    },
+    {
+      "phrase": "motor reg",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show motor reg for the period",
+        "export motor reg for review"
+      ]
+    },
+    {
+      "phrase": "motor vehicle license",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show motor vehicle license for the period",
+        "export motor vehicle license for review"
+      ]
+    },
+    {
+      "phrase": "motor vehicle registration",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show motor vehicle registration for the period",
+        "export motor vehicle registration for review"
+      ]
+    },
+    {
+      "phrase": "motorista id",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show motorista id for the period",
+        "export motorista id for review"
+      ]
+    },
+    {
+      "phrase": "my cnh",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar my cnh do periodo",
+        "exportar my cnh para revisao"
+      ]
+    },
+    {
+      "phrase": "my cpf",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar my cpf do periodo",
+        "exportar my cpf para revisao"
+      ]
+    },
+    {
+      "phrase": "my id",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show my id for the period",
+        "export my id for review"
+      ]
+    },
+    {
+      "phrase": "my passport",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show my passport for the period",
+        "export my passport for review"
+      ]
+    },
+    {
+      "phrase": "nascimento certidao",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show nascimento certidao for the period",
+        "export nascimento certidao for review"
+      ]
+    },
+    {
+      "phrase": "national id",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show national id for the period",
+        "export national id for review"
+      ]
+    },
+    {
+      "phrase": "national id card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show national id card for the period",
+        "export national id card for review"
+      ]
+    },
+    {
+      "phrase": "national identity card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show national identity card for the period",
+        "export national identity card for review"
+      ]
+    },
+    {
+      "phrase": "newborn birth certificate",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show newborn birth certificate for the period",
+        "export newborn birth certificate for review"
+      ]
+    },
+    {
+      "phrase": "newborn cert",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show newborn cert for the period",
+        "export newborn cert for review"
+      ]
+    },
+    {
+      "phrase": "numero de contribuinte",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar numero de contribuinte do periodo",
+        "exportar numero de contribuinte para revisao"
+      ]
+    },
+    {
+      "phrase": "official birth record",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show official birth record for the period",
+        "export official birth record for review"
+      ]
+    },
+    {
+      "phrase": "official id",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show official id for the period",
+        "export official id for review"
+      ]
+    },
+    {
+      "phrase": "official identity card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show official identity card for the period",
+        "export official identity card for review"
+      ]
+    },
+    {
+      "phrase": "pagina de identificacao do passaporte",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar pagina de identificacao do passaporte do periodo",
+        "exportar pagina de identificacao do passaporte para revisao"
+      ]
+    },
+    {
+      "phrase": "pass",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show pass for the period",
+        "export pass for review"
+      ]
+    },
+    {
+      "phrase": "pass id",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show pass id for the period",
+        "export pass id for review"
+      ]
+    },
+    {
+      "phrase": "passaporte",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar passaporte do periodo",
+        "exportar passaporte para revisao"
+      ]
+    },
+    {
+      "phrase": "passaporte biometrico",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar passaporte biometrico do periodo",
+        "exportar passaporte biometrico para revisao"
+      ]
+    },
+    {
+      "phrase": "passaporte copy",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show passaporte copy for the period",
+        "export passaporte copy for review"
+      ]
+    },
+    {
+      "phrase": "passaporte internacional",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar passaporte internacional do periodo",
+        "exportar passaporte internacional para revisao"
+      ]
+    },
+    {
+      "phrase": "passaporte pdf",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show passaporte pdf for the period",
+        "export passaporte pdf for review"
+      ]
+    },
+    {
+      "phrase": "passport",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show passport for the period",
+        "export passport for review"
+      ]
+    },
+    {
+      "phrase": "passport booklet",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show passport booklet for the period",
+        "export passport booklet for review"
+      ]
+    },
+    {
+      "phrase": "passport copy",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show passport copy for the period",
+        "export passport copy for review"
+      ]
+    },
+    {
+      "phrase": "passport doc",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show passport doc for the period",
+        "export passport doc for review"
+      ]
+    },
+    {
+      "phrase": "passport id page",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show passport id page for the period",
+        "export passport id page for review"
+      ]
+    },
+    {
+      "phrase": "passport page",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show passport page for the period",
+        "export passport page for review"
+      ]
+    },
+    {
+      "phrase": "passport scan",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show passport scan for the period",
+        "export passport scan for review"
+      ]
+    },
+    {
+      "phrase": "permissao dirigir",
+      "normalized": "driver license",
+      "docTypeIds": [
+        "id_driver_license"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show permissao dirigir for the period",
+        "export permissao dirigir for review"
+      ]
+    },
+    {
+      "phrase": "proof addy",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show proof addy for the period",
+        "export proof addy for review"
+      ]
+    },
+    {
+      "phrase": "proof of address",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show proof of address for the period",
+        "export proof of address for review"
+      ]
+    },
+    {
+      "phrase": "proof of addy",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show proof of addy for the period",
+        "export proof of addy for review"
+      ]
+    },
+    {
+      "phrase": "proof of residence",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show proof of residence for the period",
+        "export proof of residence for review"
+      ]
+    },
+    {
+      "phrase": "proof residency",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show proof residency for the period",
+        "export proof residency for review"
+      ]
+    },
+    {
+      "phrase": "prova de endereco",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar prova de endereco do periodo",
+        "exportar prova de endereco para revisao"
+      ]
+    },
+    {
+      "phrase": "registration cert business",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show registration cert business for the period",
+        "export registration cert business for review"
+      ]
+    },
+    {
+      "phrase": "registration certificate vehicle",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show registration certificate vehicle for the period",
+        "export registration certificate vehicle for review"
+      ]
+    },
+    {
+      "phrase": "registration paper car",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show registration paper car for the period",
+        "export registration paper car for review"
+      ]
+    },
+    {
+      "phrase": "registro automotivo",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro automotivo do periodo",
+        "exportar registro automotivo para revisao"
+      ]
+    },
+    {
+      "phrase": "registro carro",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar registro carro do periodo",
+        "exportar registro carro para revisao"
+      ]
+    },
+    {
+      "phrase": "registro casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar registro casamento do periodo",
+        "exportar registro casamento para revisao"
+      ]
+    },
+    {
+      "phrase": "registro comercial da empresa",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro comercial da empresa do periodo",
+        "exportar registro comercial da empresa para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de automovel",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar registro de automovel do periodo",
+        "exportar registro de automovel para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro de casamento do periodo",
+        "exportar registro de casamento para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro de nascimento do periodo",
+        "exportar registro de nascimento para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de veiculo",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro de veiculo do periodo",
+        "exportar registro de veiculo para revisao"
+      ]
+    },
+    {
+      "phrase": "registro empresa",
+      "normalized": "business registration certificate",
+      "docTypeIds": [
+        "id_business_registration_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business",
+        "formatHint": "registration_certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar registro empresa do periodo",
+        "exportar registro empresa para revisao"
+      ]
+    },
+    {
+      "phrase": "registro geral",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro geral do periodo",
+        "exportar registro geral para revisao"
+      ]
+    },
+    {
+      "phrase": "registro nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar registro nascimento do periodo",
+        "exportar registro nascimento para revisao"
+      ]
+    },
+    {
+      "phrase": "residence proof doc",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show residence proof doc for the period",
+        "export residence proof doc for review"
+      ]
+    },
+    {
+      "phrase": "residence verification document",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show residence verification document for the period",
+        "export residence verification document for review"
+      ]
+    },
+    {
+      "phrase": "residency proof",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show residency proof for the period",
+        "export residency proof for review"
+      ]
+    },
+    {
+      "phrase": "rg",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar rg do periodo",
+        "exportar rg para revisao"
+      ]
+    },
+    {
+      "phrase": "rg card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar rg card do periodo",
+        "exportar rg card para revisao"
+      ]
+    },
+    {
+      "phrase": "segunda via certidao de casamento",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar segunda via certidao de casamento do periodo",
+        "exportar segunda via certidao de casamento para revisao"
+      ]
+    },
+    {
+      "phrase": "segunda via certidao de nascimento",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar segunda via certidao de nascimento do periodo",
+        "exportar segunda via certidao de nascimento para revisao"
+      ]
+    },
+    {
+      "phrase": "state id",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show state id for the period",
+        "export state id for review"
+      ]
+    },
+    {
+      "phrase": "state id card",
+      "normalized": "national id card",
+      "docTypeIds": [
+        "id_national_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show state id card for the period",
+        "export state id card for review"
+      ]
+    },
+    {
+      "phrase": "tax card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax card for the period",
+        "export tax card for review"
+      ]
+    },
+    {
+      "phrase": "tax id",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax id for the period",
+        "export tax id for review"
+      ]
+    },
+    {
+      "phrase": "tax id card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax id card for the period",
+        "export tax id card for review"
+      ]
+    },
+    {
+      "phrase": "tax identifier card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax identifier card for the period",
+        "export tax identifier card for review"
+      ]
+    },
+    {
+      "phrase": "tax number card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax number card for the period",
+        "export tax number card for review"
+      ]
+    },
+    {
+      "phrase": "tax number id",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tax number id for the period",
+        "export tax number id for review"
+      ]
+    },
+    {
+      "phrase": "tax registration card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show tax registration card for the period",
+        "export tax registration card for review"
+      ]
+    },
+    {
+      "phrase": "taxpayer id",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show taxpayer id for the period",
+        "export taxpayer id for review"
+      ]
+    },
+    {
+      "phrase": "taxpayer id card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show taxpayer id card for the period",
+        "export taxpayer id card for review"
+      ]
+    },
+    {
+      "phrase": "tin card",
+      "normalized": "tax id card",
+      "docTypeIds": [
+        "id_tax_id_card"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "taxpayer",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show tin card for the period",
+        "export tin card for review"
+      ]
+    },
+    {
+      "phrase": "travel pass doc",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show travel pass doc for the period",
+        "export travel pass doc for review"
+      ]
+    },
+    {
+      "phrase": "travel passport document",
+      "normalized": "passport",
+      "docTypeIds": [
+        "id_passport"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show travel passport document for the period",
+        "export travel passport document for review"
+      ]
+    },
+    {
+      "phrase": "utility bill as proof",
+      "normalized": "proof of address",
+      "docTypeIds": [
+        "id_proof_of_address"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "resident",
+        "formatHint": "proof_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show utility bill as proof for the period",
+        "export utility bill as proof for review"
+      ]
+    },
+    {
+      "phrase": "vehicle license registration",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show vehicle license registration for the period",
+        "export vehicle license registration for review"
+      ]
+    },
+    {
+      "phrase": "vehicle reg",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show vehicle reg for the period",
+        "export vehicle reg for review"
+      ]
+    },
+    {
+      "phrase": "vehicle registration",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show vehicle registration for the period",
+        "export vehicle registration for review"
+      ]
+    },
+    {
+      "phrase": "vehicle title registration",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show vehicle title registration for the period",
+        "export vehicle title registration for review"
+      ]
+    },
+    {
+      "phrase": "veiculo documento",
+      "normalized": "vehicle registration",
+      "docTypeIds": [
+        "id_vehicle_registration"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "vehicle_owner",
+        "formatHint": "registration_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show veiculo documento for the period",
+        "export veiculo documento for review"
+      ]
+    },
+    {
+      "phrase": "vital birth record",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show vital birth record for the period",
+        "export vital birth record for review"
+      ]
+    },
+    {
+      "phrase": "vital record birth",
+      "normalized": "birth certificate",
+      "docTypeIds": [
+        "id_birth_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show vital record birth for the period",
+        "export vital record birth for review"
+      ]
+    },
+    {
+      "phrase": "wedding cert",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show wedding cert for the period",
+        "export wedding cert for review"
+      ]
+    },
+    {
+      "phrase": "wedding registration certificate",
+      "normalized": "marriage certificate",
+      "docTypeIds": [
+        "id_marriage_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "person",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show wedding registration certificate for the period",
+        "export wedding registration certificate for review"
+      ]
+    }
+  ]
+}

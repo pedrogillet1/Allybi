@@ -113,7 +113,7 @@
     "disconnect_gmail": {
       "operatorId": "disconnect_gmail",
       "category": "connectors",
-      "availability": "planned",
+      "availability": "implemented",
       "runtime": { "provider": "gmail", "action": "disconnect" },
       "supportedLocales": ["en", "pt"],
       "requiredEntities": ["provider"],
@@ -338,7 +338,7 @@
     "summarize_email_thread": {
       "operatorId": "summarize_email_thread",
       "category": "connectors",
-      "availability": "planned",
+      "availability": "implemented",
       "runtime": { "provider": "gmail", "action": "summarize" },
       "supportedLocales": ["en", "pt"],
       "requiredEntities": ["provider", "threadRef"],
@@ -488,7 +488,7 @@
     "disconnect_outlook": {
       "operatorId": "disconnect_outlook",
       "category": "connectors",
-      "availability": "planned",
+      "availability": "implemented",
       "runtime": { "provider": "outlook", "action": "disconnect" },
       "supportedLocales": ["en", "pt"],
       "requiredEntities": ["provider"],
@@ -713,7 +713,7 @@
     "summarize_outlook_thread": {
       "operatorId": "summarize_outlook_thread",
       "category": "connectors",
-      "availability": "planned",
+      "availability": "implemented",
       "runtime": { "provider": "outlook", "action": "summarize" },
       "supportedLocales": ["en", "pt"],
       "requiredEntities": ["provider", "threadRef"],
@@ -863,7 +863,7 @@
     "disconnect_slack": {
       "operatorId": "disconnect_slack",
       "category": "connectors",
-      "availability": "planned",
+      "availability": "implemented",
       "runtime": { "provider": "slack", "action": "disconnect" },
       "supportedLocales": ["en", "pt"],
       "requiredEntities": ["provider"],

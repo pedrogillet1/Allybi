@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,2766 @@
     "telemetryOnly": true
   },
   "domain": "medical",
-  "signals": []
+  "signals": [
+    {
+      "id": "medical_signal_abandonment_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "abandonment_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_abandonment_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "abandonment_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_abandonment_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "abandonment_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_abandonment_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "abandonment_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_abandonment_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.15,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "abandonment_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_clinical_uncertainty_omission_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "clinical_uncertainty_omission_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "clinical_uncertainty_omission_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce clinical_uncertainty_omission_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir clinical_uncertainty_omission_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_clinical_uncertainty_omission_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "clinical_uncertainty_omission_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "clinical_uncertainty_omission_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce clinical_uncertainty_omission_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir clinical_uncertainty_omission_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_clinical_uncertainty_omission_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "clinical_uncertainty_omission_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.15,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "clinical_uncertainty_omission_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce clinical_uncertainty_omission_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir clinical_uncertainty_omission_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_clinical_uncertainty_omission_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "clinical_uncertainty_omission_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "clinical_uncertainty_omission_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce clinical_uncertainty_omission_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir clinical_uncertainty_omission_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_clinical_uncertainty_omission_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "clinical_uncertainty_omission_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "clinical_uncertainty_omission_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce clinical_uncertainty_omission_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir clinical_uncertainty_omission_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_fallback_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "fallback_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_fallback_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "fallback_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_fallback_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "fallback_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_fallback_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "fallback_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_fallback_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "fallback_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_followup_turns_p95_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4.04,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "followup_turns_p95",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_followup_turns_p95_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4.03,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "followup_turns_p95",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_followup_turns_p95_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "followup_turns_p95",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_followup_turns_p95_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4.01,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "followup_turns_p95",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_followup_turns_p95_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4.02,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "followup_turns_p95",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_latency_p95_ms_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4432,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "latency_p95_ms",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_latency_p95_ms_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4429,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "latency_p95_ms",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_latency_p95_ms_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4435,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "latency_p95_ms",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_latency_p95_ms_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4423,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "latency_p95_ms",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_latency_p95_ms_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4426,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "latency_p95_ms",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_medication_field_missing_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "medication_field_missing_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "medication_field_missing_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce medication_field_missing_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir medication_field_missing_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_medication_field_missing_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "medication_field_missing_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "medication_field_missing_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce medication_field_missing_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir medication_field_missing_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_medication_field_missing_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "medication_field_missing_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "medication_field_missing_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce medication_field_missing_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir medication_field_missing_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_medication_field_missing_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "medication_field_missing_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "medication_field_missing_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce medication_field_missing_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir medication_field_missing_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_medication_field_missing_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "medication_field_missing_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "medication_field_missing_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce medication_field_missing_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir medication_field_missing_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_missing_reference_range_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "missing_reference_range_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "missing_reference_range_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_reference_range_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir missing_reference_range_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_missing_reference_range_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "missing_reference_range_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "missing_reference_range_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_reference_range_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir missing_reference_range_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_missing_reference_range_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "missing_reference_range_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "missing_reference_range_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_reference_range_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir missing_reference_range_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_missing_reference_range_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "missing_reference_range_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "missing_reference_range_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_reference_range_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir missing_reference_range_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_missing_reference_range_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "missing_reference_range_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "missing_reference_range_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce missing_reference_range_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir missing_reference_range_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_negative_feedback_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "negative_feedback_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_negative_feedback_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "negative_feedback_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_negative_feedback_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.09,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "negative_feedback_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_negative_feedback_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "negative_feedback_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_negative_feedback_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "negative_feedback_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_non_diagnostic_guardrail_violation_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "non_diagnostic_guardrail_violation_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.06,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "non_diagnostic_guardrail_violation_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce non_diagnostic_guardrail_violation_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir non_diagnostic_guardrail_violation_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_non_diagnostic_guardrail_violation_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "non_diagnostic_guardrail_violation_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.05,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "non_diagnostic_guardrail_violation_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce non_diagnostic_guardrail_violation_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir non_diagnostic_guardrail_violation_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_non_diagnostic_guardrail_violation_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "non_diagnostic_guardrail_violation_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.02,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "non_diagnostic_guardrail_violation_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce non_diagnostic_guardrail_violation_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir non_diagnostic_guardrail_violation_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_non_diagnostic_guardrail_violation_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "non_diagnostic_guardrail_violation_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.03,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "non_diagnostic_guardrail_violation_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce non_diagnostic_guardrail_violation_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir non_diagnostic_guardrail_violation_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_non_diagnostic_guardrail_violation_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "non_diagnostic_guardrail_violation_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.04,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "non_diagnostic_guardrail_violation_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce non_diagnostic_guardrail_violation_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir non_diagnostic_guardrail_violation_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_reask_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.29,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "reask_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_reask_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.28,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "reask_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_reask_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.25,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "reask_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_reask_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.26,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "reask_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_reask_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.27,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "reask_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_safety_escalation_miss_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "safety_escalation_miss_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "safety_escalation_miss_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce safety_escalation_miss_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir safety_escalation_miss_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_safety_escalation_miss_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "safety_escalation_miss_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "safety_escalation_miss_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce safety_escalation_miss_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir safety_escalation_miss_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_safety_escalation_miss_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "safety_escalation_miss_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.07,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "safety_escalation_miss_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce safety_escalation_miss_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir safety_escalation_miss_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_safety_escalation_miss_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "safety_escalation_miss_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.08,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "safety_escalation_miss_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce safety_escalation_miss_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir safety_escalation_miss_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_safety_escalation_miss_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "safety_escalation_miss_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.09,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "safety_escalation_miss_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce safety_escalation_miss_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir safety_escalation_miss_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_weak_evidence_rate_care_continuity_gap",
+      "domain": "medical",
+      "symptomEn": "Follow-up actions are not explicit",
+      "symptomPt": "Ações de acompanhamento não estão explícitas",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.25,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify care continuity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer care continuity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "weak_evidence_rate",
+        "care_continuity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for care continuity gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em care continuity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_weak_evidence_rate_escalation_uncertainty",
+      "domain": "medical",
+      "symptomEn": "Urgency escalation is inconsistent",
+      "symptomPt": "Escalonamento de urgência está inconsistente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify escalation uncertainty.",
+        "Usuários fazem perguntas adicionais para esclarecer escalation uncertainty."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "weak_evidence_rate",
+        "escalation_uncertainty",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for escalation uncertainty.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em escalation uncertainty.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_weak_evidence_rate_medication_context_loss",
+      "domain": "medical",
+      "symptomEn": "Medication context is incomplete",
+      "symptomPt": "Contexto medicamentoso está incompleto",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify medication context loss.",
+        "Usuários fazem perguntas adicionais para esclarecer medication context loss."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "weak_evidence_rate",
+        "medication_context_loss",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for medication context loss.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em medication context loss.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_weak_evidence_rate_range_framing_gap",
+      "domain": "medical",
+      "symptomEn": "Reference range framing is missing or unclear",
+      "symptomPt": "Enquadramento de faixa de referência está ausente ou pouco claro",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify range framing gap.",
+        "Usuários fazem perguntas adicionais para esclarecer range framing gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "weak_evidence_rate",
+        "range_framing_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for range framing gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em range framing gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "medical_signal_weak_evidence_rate_safety_language_risk",
+      "domain": "medical",
+      "symptomEn": "Language sounds overly diagnostic",
+      "symptomPt": "Linguagem parece excessivamente diagnóstica",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify safety language risk.",
+        "Usuários fazem perguntas adicionais para esclarecer safety language risk."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "advise",
+        "locate"
+      ],
+      "tags": [
+        "medical",
+        "weak_evidence_rate",
+        "safety_language_risk",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for safety language risk.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em safety language risk.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    }
+  ]
 }

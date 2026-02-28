@@ -1,0 +1,980 @@
+{
+  "_meta": {
+    "id": "di_abbreviation_global",
+    "version": "1.0.0",
+    "description": "Global abbreviation dictionary used by document intelligence normalization and entity extraction.",
+    "owner": "document_intelligence",
+    "languages": ["en", "pt"],
+    "dependsOn": ["di_domain_ontology"],
+    "usedBy": ["di_normalization_rules", "di_entity_ontology"],
+    "tests": ["SSOT_ABBREV_001"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "caseInsensitive": true,
+    "matchWholeWord": true
+  },
+  "abbreviations": [
+    {
+      "id": "abbr_ap",
+      "abbreviation": "AP",
+      "expansions": {
+        "en": "Accounts Payable",
+        "pt": "Contas a Pagar"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": true,
+      "disambiguationHint": "In finance context means Accounts Payable; in education context may mean Advanced Placement"
+    },
+    {
+      "id": "abbr_ar",
+      "abbreviation": "AR",
+      "expansions": {
+        "en": "Accounts Receivable",
+        "pt": "Contas a Receber"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_bs",
+      "abbreviation": "BS",
+      "expansions": {
+        "en": "Balance Sheet",
+        "pt": "Balanco Patrimonial"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": true,
+      "disambiguationHint": "In finance context means Balance Sheet; in education context may mean Bachelor of Science"
+    },
+    {
+      "id": "abbr_capex",
+      "abbreviation": "CAPEX",
+      "expansions": {
+        "en": "Capital Expenditure",
+        "pt": "Despesas de Capital"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cogs",
+      "abbreviation": "COGS",
+      "expansions": {
+        "en": "Cost of Goods Sold",
+        "pt": "Custo das Mercadorias Vendidas"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cpa",
+      "abbreviation": "CPA",
+      "expansions": {
+        "en": "Certified Public Accountant",
+        "pt": "Contador Publico Certificado"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_dcf",
+      "abbreviation": "DCF",
+      "expansions": {
+        "en": "Discounted Cash Flow",
+        "pt": "Fluxo de Caixa Descontado"
+      },
+      "domain": "finance",
+      "category": "banking",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ebitda",
+      "abbreviation": "EBITDA",
+      "expansions": {
+        "en": "Earnings Before Interest, Taxes, Depreciation, and Amortization",
+        "pt": "Lucros Antes de Juros, Impostos, Depreciacao e Amortizacao"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_eps",
+      "abbreviation": "EPS",
+      "expansions": {
+        "en": "Earnings Per Share",
+        "pt": "Lucro por Acao"
+      },
+      "domain": "finance",
+      "category": "banking",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_fx",
+      "abbreviation": "FX",
+      "expansions": {
+        "en": "Foreign Exchange",
+        "pt": "Cambio"
+      },
+      "domain": "finance",
+      "category": "banking",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_gaap",
+      "abbreviation": "GAAP",
+      "expansions": {
+        "en": "Generally Accepted Accounting Principles",
+        "pt": "Principios Contabeis Geralmente Aceitos"
+      },
+      "domain": "finance",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_gl",
+      "abbreviation": "GL",
+      "expansions": {
+        "en": "General Ledger",
+        "pt": "Razao Geral"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_gp",
+      "abbreviation": "GP",
+      "expansions": {
+        "en": "Gross Profit",
+        "pt": "Lucro Bruto"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_irr",
+      "abbreviation": "IRR",
+      "expansions": {
+        "en": "Internal Rate of Return",
+        "pt": "Taxa Interna de Retorno"
+      },
+      "domain": "finance",
+      "category": "banking",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_kpi",
+      "abbreviation": "KPI",
+      "expansions": {
+        "en": "Key Performance Indicator",
+        "pt": "Indicador-Chave de Desempenho"
+      },
+      "domain": "finance",
+      "category": "general",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_npv",
+      "abbreviation": "NPV",
+      "expansions": {
+        "en": "Net Present Value",
+        "pt": "Valor Presente Liquido"
+      },
+      "domain": "finance",
+      "category": "banking",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_opex",
+      "abbreviation": "OPEX",
+      "expansions": {
+        "en": "Operating Expenditure",
+        "pt": "Despesas Operacionais"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_pnl",
+      "abbreviation": "P&L",
+      "expansions": {
+        "en": "Profit and Loss",
+        "pt": "Lucros e Perdas"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_roi",
+      "abbreviation": "ROI",
+      "expansions": {
+        "en": "Return on Investment",
+        "pt": "Retorno sobre Investimento"
+      },
+      "domain": "finance",
+      "category": "banking",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ytd",
+      "abbreviation": "YTD",
+      "expansions": {
+        "en": "Year to Date",
+        "pt": "Acumulado no Ano"
+      },
+      "domain": "finance",
+      "category": "accounting",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_adr",
+      "abbreviation": "ADR",
+      "expansions": {
+        "en": "Alternative Dispute Resolution",
+        "pt": "Resolucao Alternativa de Disputas"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_aml",
+      "abbreviation": "AML",
+      "expansions": {
+        "en": "Anti-Money Laundering",
+        "pt": "Prevencao a Lavagem de Dinheiro"
+      },
+      "domain": "legal",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ccpa",
+      "abbreviation": "CCPA",
+      "expansions": {
+        "en": "California Consumer Privacy Act",
+        "pt": "Lei de Privacidade do Consumidor da California"
+      },
+      "domain": "legal",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cnpj",
+      "abbreviation": "CNPJ",
+      "expansions": {
+        "en": "National Registry of Legal Entities",
+        "pt": "Cadastro Nacional da Pessoa Juridica"
+      },
+      "domain": "legal",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cpf",
+      "abbreviation": "CPF",
+      "expansions": {
+        "en": "Individual Taxpayer Registry",
+        "pt": "Cadastro de Pessoas Fisicas"
+      },
+      "domain": "legal",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_dpa",
+      "abbreviation": "DPA",
+      "expansions": {
+        "en": "Data Processing Agreement",
+        "pt": "Acordo de Processamento de Dados"
+      },
+      "domain": "legal",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_eula",
+      "abbreviation": "EULA",
+      "expansions": {
+        "en": "End User License Agreement",
+        "pt": "Acordo de Licenca de Usuario Final"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_gdpr",
+      "abbreviation": "GDPR",
+      "expansions": {
+        "en": "General Data Protection Regulation",
+        "pt": "Regulamento Geral sobre a Protecao de Dados"
+      },
+      "domain": "legal",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ip",
+      "abbreviation": "IP",
+      "expansions": {
+        "en": "Intellectual Property",
+        "pt": "Propriedade Intelectual"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": true,
+      "disambiguationHint": "In legal context means Intellectual Property; in technology context may mean Internet Protocol"
+    },
+    {
+      "id": "abbr_kyc",
+      "abbreviation": "KYC",
+      "expansions": {
+        "en": "Know Your Customer",
+        "pt": "Conheca Seu Cliente"
+      },
+      "domain": "legal",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_llc",
+      "abbreviation": "LLC",
+      "expansions": {
+        "en": "Limited Liability Company",
+        "pt": "Sociedade de Responsabilidade Limitada"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_msa",
+      "abbreviation": "MSA",
+      "expansions": {
+        "en": "Master Service Agreement",
+        "pt": "Acordo Mestre de Servicos"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_nda",
+      "abbreviation": "NDA",
+      "expansions": {
+        "en": "Non-Disclosure Agreement",
+        "pt": "Acordo de Confidencialidade"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_poa",
+      "abbreviation": "POA",
+      "expansions": {
+        "en": "Power of Attorney",
+        "pt": "Procuracao"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_spa",
+      "abbreviation": "SPA",
+      "expansions": {
+        "en": "Share Purchase Agreement",
+        "pt": "Contrato de Compra e Venda de Acoes"
+      },
+      "domain": "legal",
+      "category": "legal",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_bmi",
+      "abbreviation": "BMI",
+      "expansions": {
+        "en": "Body Mass Index",
+        "pt": "Indice de Massa Corporal"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_bmp",
+      "abbreviation": "BMP",
+      "expansions": {
+        "en": "Basic Metabolic Panel",
+        "pt": "Painel Metabolico Basico"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_bp",
+      "abbreviation": "BP",
+      "expansions": {
+        "en": "Blood Pressure",
+        "pt": "Pressao Arterial"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cbc",
+      "abbreviation": "CBC",
+      "expansions": {
+        "en": "Complete Blood Count",
+        "pt": "Hemograma Completo"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cpr",
+      "abbreviation": "CPR",
+      "expansions": {
+        "en": "Cardiopulmonary Resuscitation",
+        "pt": "Ressuscitacao Cardiopulmonar"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ct",
+      "abbreviation": "CT",
+      "expansions": {
+        "en": "Computed Tomography",
+        "pt": "Tomografia Computadorizada"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": true,
+      "disambiguationHint": "In medical context means Computed Tomography; in geographic context may mean Connecticut (US state)"
+    },
+    {
+      "id": "abbr_cta",
+      "abbreviation": "CTA",
+      "expansions": {
+        "en": "CT Angiography",
+        "pt": "Angiotomografia"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ecg",
+      "abbreviation": "ECG",
+      "expansions": {
+        "en": "Electrocardiogram",
+        "pt": "Eletrocardiograma"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ehr",
+      "abbreviation": "EHR",
+      "expansions": {
+        "en": "Electronic Health Record",
+        "pt": "Registro Eletronico de Saude"
+      },
+      "domain": "medical",
+      "category": "technology",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_emr",
+      "abbreviation": "EMR",
+      "expansions": {
+        "en": "Electronic Medical Record",
+        "pt": "Prontuario Eletronico"
+      },
+      "domain": "medical",
+      "category": "technology",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_er",
+      "abbreviation": "ER",
+      "expansions": {
+        "en": "Emergency Room",
+        "pt": "Pronto-Socorro"
+      },
+      "domain": "medical",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_hdl",
+      "abbreviation": "HDL",
+      "expansions": {
+        "en": "High-Density Lipoprotein",
+        "pt": "Lipoproteina de Alta Densidade"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_hpi",
+      "abbreviation": "HPI",
+      "expansions": {
+        "en": "History of Present Illness",
+        "pt": "Historia da Doenca Atual"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_icu",
+      "abbreviation": "ICU",
+      "expansions": {
+        "en": "Intensive Care Unit",
+        "pt": "Unidade de Terapia Intensiva"
+      },
+      "domain": "medical",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_iv",
+      "abbreviation": "IV",
+      "expansions": {
+        "en": "Intravenous",
+        "pt": "Intravenoso"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ldl",
+      "abbreviation": "LDL",
+      "expansions": {
+        "en": "Low-Density Lipoprotein",
+        "pt": "Lipoproteina de Baixa Densidade"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_mri",
+      "abbreviation": "MRI",
+      "expansions": {
+        "en": "Magnetic Resonance Imaging",
+        "pt": "Ressonancia Magnetica"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_otc",
+      "abbreviation": "OTC",
+      "expansions": {
+        "en": "Over the Counter",
+        "pt": "Sem Receita Medica"
+      },
+      "domain": "medical",
+      "category": "general",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_pt",
+      "abbreviation": "PT",
+      "expansions": {
+        "en": "Physical Therapy",
+        "pt": "Fisioterapia"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": true,
+      "disambiguationHint": "In medical context means Physical Therapy; may also mean Patient, Prothrombin Time, or the Portuguese language code"
+    },
+    {
+      "id": "abbr_rbc",
+      "abbreviation": "RBC",
+      "expansions": {
+        "en": "Red Blood Cell",
+        "pt": "Globulo Vermelho"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ros",
+      "abbreviation": "ROS",
+      "expansions": {
+        "en": "Review of Systems",
+        "pt": "Revisao de Sistemas"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_rx",
+      "abbreviation": "RX",
+      "expansions": {
+        "en": "Prescription",
+        "pt": "Prescricao"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": true,
+      "disambiguationHint": "In medical context means Prescription; in technology context may mean Receiver"
+    },
+    {
+      "id": "abbr_spo2",
+      "abbreviation": "SpO2",
+      "expansions": {
+        "en": "Peripheral Oxygen Saturation",
+        "pt": "Saturacao Periferica de Oxigenio"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_wbc",
+      "abbreviation": "WBC",
+      "expansions": {
+        "en": "White Blood Cell",
+        "pt": "Globulo Branco"
+      },
+      "domain": "medical",
+      "category": "clinical",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_who",
+      "abbreviation": "WHO",
+      "expansions": {
+        "en": "World Health Organization",
+        "pt": "Organizacao Mundial da Saude"
+      },
+      "domain": "medical",
+      "category": "regulatory",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_bcp",
+      "abbreviation": "BCP",
+      "expansions": {
+        "en": "Business Continuity Plan",
+        "pt": "Plano de Continuidade de Negocios"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cicd",
+      "abbreviation": "CI/CD",
+      "expansions": {
+        "en": "Continuous Integration / Continuous Delivery",
+        "pt": "Integracao Continua / Entrega Continua"
+      },
+      "domain": "operations",
+      "category": "technology",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_cmdb",
+      "abbreviation": "CMDB",
+      "expansions": {
+        "en": "Configuration Management Database",
+        "pt": "Banco de Dados de Gerenciamento de Configuracao"
+      },
+      "domain": "operations",
+      "category": "technology",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_dr",
+      "abbreviation": "DR",
+      "expansions": {
+        "en": "Disaster Recovery",
+        "pt": "Recuperacao de Desastres"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": true,
+      "disambiguationHint": "In operations context means Disaster Recovery; in medical context may mean Doctor"
+    },
+    {
+      "id": "abbr_drp",
+      "abbreviation": "DRP",
+      "expansions": {
+        "en": "Disaster Recovery Plan",
+        "pt": "Plano de Recuperacao de Desastres"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_eta",
+      "abbreviation": "ETA",
+      "expansions": {
+        "en": "Estimated Time of Arrival",
+        "pt": "Tempo Estimado de Chegada"
+      },
+      "domain": "operations",
+      "category": "general",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_itil",
+      "abbreviation": "ITIL",
+      "expansions": {
+        "en": "Information Technology Infrastructure Library",
+        "pt": "Biblioteca de Infraestrutura de Tecnologia da Informacao"
+      },
+      "domain": "operations",
+      "category": "technology",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_mtbf",
+      "abbreviation": "MTBF",
+      "expansions": {
+        "en": "Mean Time Between Failures",
+        "pt": "Tempo Medio Entre Falhas"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_mttr",
+      "abbreviation": "MTTR",
+      "expansions": {
+        "en": "Mean Time to Repair",
+        "pt": "Tempo Medio de Reparo"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_okr",
+      "abbreviation": "OKR",
+      "expansions": {
+        "en": "Objectives and Key Results",
+        "pt": "Objetivos e Resultados-Chave"
+      },
+      "domain": "operations",
+      "category": "general",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_ola",
+      "abbreviation": "OLA",
+      "expansions": {
+        "en": "Operational Level Agreement",
+        "pt": "Acordo de Nivel Operacional"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_pm",
+      "abbreviation": "PM",
+      "expansions": {
+        "en": "Project Manager",
+        "pt": "Gerente de Projeto"
+      },
+      "domain": "operations",
+      "category": "general",
+      "ambiguous": true,
+      "disambiguationHint": "In operations context means Project Manager; in time context may mean Post Meridiem (afternoon)"
+    },
+    {
+      "id": "abbr_qa",
+      "abbreviation": "QA",
+      "expansions": {
+        "en": "Quality Assurance",
+        "pt": "Garantia de Qualidade"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_rca",
+      "abbreviation": "RCA",
+      "expansions": {
+        "en": "Root Cause Analysis",
+        "pt": "Analise de Causa Raiz"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_rfc",
+      "abbreviation": "RFC",
+      "expansions": {
+        "en": "Request for Change",
+        "pt": "Solicitacao de Mudanca"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_sla",
+      "abbreviation": "SLA",
+      "expansions": {
+        "en": "Service Level Agreement",
+        "pt": "Acordo de Nivel de Servico"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_slo",
+      "abbreviation": "SLO",
+      "expansions": {
+        "en": "Service Level Objective",
+        "pt": "Objetivo de Nivel de Servico"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_sop",
+      "abbreviation": "SOP",
+      "expansions": {
+        "en": "Standard Operating Procedure",
+        "pt": "Procedimento Operacional Padrao"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_uat",
+      "abbreviation": "UAT",
+      "expansions": {
+        "en": "User Acceptance Testing",
+        "pt": "Teste de Aceitacao do Usuario"
+      },
+      "domain": "operations",
+      "category": "technology",
+      "ambiguous": false,
+      "disambiguationHint": null
+    },
+    {
+      "id": "abbr_wbs",
+      "abbreviation": "WBS",
+      "expansions": {
+        "en": "Work Breakdown Structure",
+        "pt": "Estrutura Analitica do Projeto"
+      },
+      "domain": "operations",
+      "category": "operational",
+      "ambiguous": false,
+      "disambiguationHint": null
+    }
+  ]
+}

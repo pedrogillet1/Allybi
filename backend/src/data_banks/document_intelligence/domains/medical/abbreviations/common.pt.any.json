@@ -1,0 +1,307 @@
+{
+  "_meta": {
+    "id": "medical_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "Portuguese abbreviations for medical domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "language": "pt"
+  },
+  "domain": "medical",
+  "abbreviations": [
+    {
+      "abbr": "ABG",
+      "expansion": "Gasometria Arterial"
+    },
+    {
+      "abbr": "ALP",
+      "expansion": "Fosfatase Alcalina"
+    },
+    {
+      "abbr": "ALT",
+      "expansion": "Alanina Aminotransferase"
+    },
+    {
+      "abbr": "aPTT",
+      "expansion": "Tempo de Tromboplastina Parcial Ativada"
+    },
+    {
+      "abbr": "AST",
+      "expansion": "Aspartato Aminotransferase"
+    },
+    {
+      "abbr": "BID",
+      "expansion": "Duas Vezes ao Dia"
+    },
+    {
+      "abbr": "BMI",
+      "expansion": "Indice de Massa Corporal"
+    },
+    {
+      "abbr": "BMP",
+      "expansion": "Painel Metabolico Basico"
+    },
+    {
+      "abbr": "BP",
+      "expansion": "Pressao Arterial"
+    },
+    {
+      "abbr": "BUN",
+      "expansion": "Nitrogenio Ureico no Sangue"
+    },
+    {
+      "abbr": "CBC",
+      "expansion": "Hemograma Completo"
+    },
+    {
+      "abbr": "CHF",
+      "expansion": "Insuficiencia Cardiaca Congestiva"
+    },
+    {
+      "abbr": "CMP",
+      "expansion": "Painel Metabolico Completo"
+    },
+    {
+      "abbr": "COPD",
+      "expansion": "Doenca Pulmonar Obstrutiva Cronica"
+    },
+    {
+      "abbr": "CPR",
+      "expansion": "Ressuscitacao Cardiopulmonar"
+    },
+    {
+      "abbr": "Cr",
+      "expansion": "Creatinina"
+    },
+    {
+      "abbr": "CRP",
+      "expansion": "Proteina C Reativa"
+    },
+    {
+      "abbr": "CT",
+      "expansion": "Tomografia Computadorizada"
+    },
+    {
+      "abbr": "CXR",
+      "expansion": "Raio X de Torax"
+    },
+    {
+      "abbr": "DM",
+      "expansion": "Diabetes Mellitus"
+    },
+    {
+      "abbr": "DNR",
+      "expansion": "Nao Reanimar"
+    },
+    {
+      "abbr": "DOB",
+      "expansion": "Data de Nascimento"
+    },
+    {
+      "abbr": "Dx",
+      "expansion": "Diagnostico"
+    },
+    {
+      "abbr": "ECG",
+      "expansion": "Eletrocardiograma"
+    },
+    {
+      "abbr": "ED",
+      "expansion": "Departamento de Emergencia"
+    },
+    {
+      "abbr": "EKG",
+      "expansion": "Eletrocardiograma"
+    },
+    {
+      "abbr": "ESR",
+      "expansion": "Velocidade de Hemossedimentacao"
+    },
+    {
+      "abbr": "Fx",
+      "expansion": "Fratura"
+    },
+    {
+      "abbr": "Hb",
+      "expansion": "Hemoglobina"
+    },
+    {
+      "abbr": "Hct",
+      "expansion": "Hematocrito"
+    },
+    {
+      "abbr": "HPI",
+      "expansion": "Historia da Doenca Atual"
+    },
+    {
+      "abbr": "HR",
+      "expansion": "Frequencia Cardiaca"
+    },
+    {
+      "abbr": "HTN",
+      "expansion": "Hipertensao"
+    },
+    {
+      "abbr": "Hx",
+      "expansion": "Historico"
+    },
+    {
+      "abbr": "ICU",
+      "expansion": "Unidade de Terapia Intensiva"
+    },
+    {
+      "abbr": "IM",
+      "expansion": "Intramuscular"
+    },
+    {
+      "abbr": "INR",
+      "expansion": "Razao Normalizada Internacional"
+    },
+    {
+      "abbr": "IV",
+      "expansion": "Intravenoso"
+    },
+    {
+      "abbr": "K",
+      "expansion": "Potassio"
+    },
+    {
+      "abbr": "LFT",
+      "expansion": "Teste de Funcao Hepatica"
+    },
+    {
+      "abbr": "LOS",
+      "expansion": "Tempo de Internacao"
+    },
+    {
+      "abbr": "MRI",
+      "expansion": "Ressonancia Magnetica"
+    },
+    {
+      "abbr": "MRN",
+      "expansion": "Numero do Prontuario"
+    },
+    {
+      "abbr": "N/V",
+      "expansion": "Nausea e Vomito"
+    },
+    {
+      "abbr": "Na",
+      "expansion": "Sodio"
+    },
+    {
+      "abbr": "NPO",
+      "expansion": "Nada por Via Oral"
+    },
+    {
+      "abbr": "OPD",
+      "expansion": "Ambulatorio"
+    },
+    {
+      "abbr": "PE",
+      "expansion": "Exame Fisico"
+    },
+    {
+      "abbr": "PLT",
+      "expansion": "Contagem de Plaquetas"
+    },
+    {
+      "abbr": "PMH",
+      "expansion": "Historico Medico Pregresso"
+    },
+    {
+      "abbr": "PO",
+      "expansion": "Via Oral"
+    },
+    {
+      "abbr": "PRN",
+      "expansion": "Se Necessario"
+    },
+    {
+      "abbr": "PT",
+      "expansion": "Tempo de Protrombina"
+    },
+    {
+      "abbr": "QD",
+      "expansion": "Uma Vez ao Dia"
+    },
+    {
+      "abbr": "qHS",
+      "expansion": "Todas as Noites ao Deitar"
+    },
+    {
+      "abbr": "QID",
+      "expansion": "Quatro Vezes ao Dia"
+    },
+    {
+      "abbr": "RBC",
+      "expansion": "Hemacias"
+    },
+    {
+      "abbr": "RFT",
+      "expansion": "Teste de Funcao Renal"
+    },
+    {
+      "abbr": "ROS",
+      "expansion": "Revisao de Sistemas"
+    },
+    {
+      "abbr": "RR",
+      "expansion": "Frequencia Respiratoria"
+    },
+    {
+      "abbr": "Rx",
+      "expansion": "Prescricao"
+    },
+    {
+      "abbr": "SC",
+      "expansion": "Subcutaneo"
+    },
+    {
+      "abbr": "SOAP",
+      "expansion": "Subjetivo Objetivo Avaliacao Plano"
+    },
+    {
+      "abbr": "SOB",
+      "expansion": "Falta de Ar"
+    },
+    {
+      "abbr": "SpO2",
+      "expansion": "Saturacao Periferica de Oxigenio"
+    },
+    {
+      "abbr": "STAT",
+      "expansion": "Imediatamente"
+    },
+    {
+      "abbr": "TID",
+      "expansion": "Tres Vezes ao Dia"
+    },
+    {
+      "abbr": "Tx",
+      "expansion": "Tratamento"
+    },
+    {
+      "abbr": "URI",
+      "expansion": "Infeccao de Vias Aereas Superiores"
+    },
+    {
+      "abbr": "US",
+      "expansion": "Ultrassom"
+    },
+    {
+      "abbr": "UTI",
+      "expansion": "Infeccao do Trato Urinario"
+    },
+    {
+      "abbr": "WBC",
+      "expansion": "Leucocitos"
+    }
+  ]
+}

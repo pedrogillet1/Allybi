@@ -1,18 +1,5319 @@
 {
   "_meta": {
     "id": "accounting_rules",
-    "version": "1.0.0",
-    "description": "Accounting interpretation policy: accrual/cash handling, recurring/non-recurring classification, and period logic.",
+    "version": "1.1.0",
+    "description": "Accounting interpretation policy with accrual/cash handling, classification logic, and deterministic validation rules.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
     "domain": "finance"
   },
   "domain": "finance",
-  "definitions": [],
-  "rules": []
+  "definitions": [
+    {
+      "id": "acct_accrual_basis",
+      "canonicalName": "Accrual Basis",
+      "definition": {
+        "en": "Recognize income/expenses when earned/incurred, not when cash moves.",
+        "pt": "Recognize income/expenses when earned/incurred, not when cash moves."
+      },
+      "synonyms": {
+        "en": [
+          "accrual accounting",
+          "accrual basis"
+        ],
+        "pt": [
+          "accrual basis",
+          "regime de competência"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 1
+    },
+    {
+      "id": "acct_allowance_for_doubtful_accounts",
+      "canonicalName": "Allowance for Doubtful Accounts",
+      "definition": {
+        "en": "Estimate expected credit losses on receivables.",
+        "pt": "Estimate expected credit losses on receivables."
+      },
+      "synonyms": {
+        "en": [
+          "allowance for doubtful accounts",
+          "bad debt reserve",
+          "ecl"
+        ],
+        "pt": [
+          "allowance for doubtful accounts",
+          "provisão para devedores duvidosos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 32
+    },
+    {
+      "id": "acct_amortization",
+      "canonicalName": "Amortization",
+      "definition": {
+        "en": "Systematic allocation of intangible asset cost over useful life.",
+        "pt": "Systematic allocation of intangible asset cost over useful life."
+      },
+      "synonyms": {
+        "en": [
+          "amortization",
+          "intangible amortization"
+        ],
+        "pt": [
+          "amortização",
+          "amortization"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 14
+    },
+    {
+      "id": "acct_borrowing_costs",
+      "canonicalName": "Borrowing Costs",
+      "definition": {
+        "en": "Capitalize borrowing costs directly attributable to qualifying assets.",
+        "pt": "Capitalize borrowing costs directly attributable to qualifying assets."
+      },
+      "synonyms": {
+        "en": [
+          "borrowing costs",
+          "interest capitalization"
+        ],
+        "pt": [
+          "borrowing costs",
+          "capitalização de encargos financeiros"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 40
+    },
+    {
+      "id": "acct_capitalization_vs_expense",
+      "canonicalName": "Capitalization vs Expense",
+      "definition": {
+        "en": "Decide whether spend creates future benefit or period cost.",
+        "pt": "Decide whether spend creates future benefit or period cost."
+      },
+      "synonyms": {
+        "en": [
+          "capex vs opex",
+          "capitalization vs expense"
+        ],
+        "pt": [
+          "capitalizar vs despesar",
+          "capitalization vs expense"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 23
+    },
+    {
+      "id": "acct_cash_basis",
+      "canonicalName": "Cash Basis",
+      "definition": {
+        "en": "Recognize income/expenses when cash is received/paid.",
+        "pt": "Recognize income/expenses when cash is received/paid."
+      },
+      "synonyms": {
+        "en": [
+          "cash accounting",
+          "cash basis"
+        ],
+        "pt": [
+          "cash basis",
+          "regime de caixa"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 2
+    },
+    {
+      "id": "acct_classification_current_noncurrent",
+      "canonicalName": "Current vs Non-current Classification",
+      "definition": {
+        "en": "Classify assets/liabilities by operating cycle or 12-month horizon.",
+        "pt": "Classify assets/liabilities by operating cycle or 12-month horizon."
+      },
+      "synonyms": {
+        "en": [
+          "classification current noncurrent",
+          "current classification"
+        ],
+        "pt": [
+          "classificação circulante e não circulante",
+          "classification current noncurrent"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 31
+    },
+    {
+      "id": "acct_consistency",
+      "canonicalName": "Consistency",
+      "definition": {
+        "en": "Apply accounting methods consistently across comparable periods.",
+        "pt": "Apply accounting methods consistently across comparable periods."
+      },
+      "synonyms": {
+        "en": [
+          "consistency",
+          "method consistency"
+        ],
+        "pt": [
+          "consistência contábil",
+          "consistency"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 6
+    },
+    {
+      "id": "acct_consolidation",
+      "canonicalName": "Consolidation",
+      "definition": {
+        "en": "Combine parent and controlled entities removing intercompany effects.",
+        "pt": "Combine parent and controlled entities removing intercompany effects."
+      },
+      "synonyms": {
+        "en": [
+          "consolidation",
+          "group consolidation"
+        ],
+        "pt": [
+          "consolidação",
+          "consolidation"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 27
+    },
+    {
+      "id": "acct_contingent_asset",
+      "canonicalName": "Contingent Asset",
+      "definition": {
+        "en": "Possible asset from uncertain future events; disclose cautiously.",
+        "pt": "Possible asset from uncertain future events; disclose cautiously."
+      },
+      "synonyms": {
+        "en": [
+          "contingency asset",
+          "contingent asset"
+        ],
+        "pt": [
+          "ativo contingente",
+          "contingent asset"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 17
+    },
+    {
+      "id": "acct_contingent_liability",
+      "canonicalName": "Contingent Liability",
+      "definition": {
+        "en": "Possible obligation depending on uncertain future events.",
+        "pt": "Possible obligation depending on uncertain future events."
+      },
+      "synonyms": {
+        "en": [
+          "contingency",
+          "contingent liability"
+        ],
+        "pt": [
+          "contingent liability",
+          "passivo contingente"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 16
+    },
+    {
+      "id": "acct_cost_of_sales_definition",
+      "canonicalName": "Cost of Sales Definition",
+      "definition": {
+        "en": "Define which costs belong in COGS versus operating expenses.",
+        "pt": "Define which costs belong in COGS versus operating expenses."
+      },
+      "synonyms": {
+        "en": [
+          "cost classification",
+          "cost of sales definition"
+        ],
+        "pt": [
+          "cost of sales definition",
+          "definição de custo de vendas"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 33
+    },
+    {
+      "id": "acct_cutoff",
+      "canonicalName": "Cutoff",
+      "definition": {
+        "en": "Record transactions in the correct accounting period.",
+        "pt": "Record transactions in the correct accounting period."
+      },
+      "synonyms": {
+        "en": [
+          "cutoff",
+          "period cutoff"
+        ],
+        "pt": [
+          "corte contábil",
+          "cutoff"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 34
+    },
+    {
+      "id": "acct_deferred_revenue",
+      "canonicalName": "Deferred Revenue",
+      "definition": {
+        "en": "Cash received before revenue is earned.",
+        "pt": "Cash received before revenue is earned."
+      },
+      "synonyms": {
+        "en": [
+          "contract liability",
+          "deferred revenue"
+        ],
+        "pt": [
+          "deferred revenue",
+          "receita diferida"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 18
+    },
+    {
+      "id": "acct_deferred_tax",
+      "canonicalName": "Deferred Tax",
+      "definition": {
+        "en": "Future tax effects from temporary differences.",
+        "pt": "Future tax effects from temporary differences."
+      },
+      "synonyms": {
+        "en": [
+          "deferred tax",
+          "dta",
+          "dtl"
+        ],
+        "pt": [
+          "deferred tax",
+          "imposto diferido"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 20
+    },
+    {
+      "id": "acct_depreciation",
+      "canonicalName": "Depreciation",
+      "definition": {
+        "en": "Systematic allocation of depreciable asset cost over useful life.",
+        "pt": "Systematic allocation of depreciable asset cost over useful life."
+      },
+      "synonyms": {
+        "en": [
+          "depreciation",
+          "fixed asset depreciation"
+        ],
+        "pt": [
+          "depreciação",
+          "depreciation"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 13
+    },
+    {
+      "id": "acct_disclosure_completeness",
+      "canonicalName": "Disclosure Completeness",
+      "definition": {
+        "en": "Ensure notes disclose assumptions, judgments, and uncertainties.",
+        "pt": "Ensure notes disclose assumptions, judgments, and uncertainties."
+      },
+      "synonyms": {
+        "en": [
+          "disclosure completeness",
+          "note disclosure"
+        ],
+        "pt": [
+          "completude de divulgações",
+          "disclosure completeness"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 44
+    },
+    {
+      "id": "acct_earnings_quality",
+      "canonicalName": "Earnings Quality",
+      "definition": {
+        "en": "Assess sustainability and cash conversion of earnings.",
+        "pt": "Assess sustainability and cash conversion of earnings."
+      },
+      "synonyms": {
+        "en": [
+          "earnings quality",
+          "quality of earnings"
+        ],
+        "pt": [
+          "earnings quality",
+          "qualidade dos resultados"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 36
+    },
+    {
+      "id": "acct_extraordinary_item_policy",
+      "canonicalName": "Extraordinary Item Policy",
+      "definition": {
+        "en": "Classify unusual/infrequent items according to framework constraints.",
+        "pt": "Classify unusual/infrequent items according to framework constraints."
+      },
+      "synonyms": {
+        "en": [
+          "extraordinary",
+          "extraordinary item policy"
+        ],
+        "pt": [
+          "extraordinary item policy",
+          "item extraordinário"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 30
+    },
+    {
+      "id": "acct_fair_value",
+      "canonicalName": "Fair Value",
+      "definition": {
+        "en": "Measurement based on orderly transaction exit price.",
+        "pt": "Measurement based on orderly transaction exit price."
+      },
+      "synonyms": {
+        "en": [
+          "fair value",
+          "mark to market"
+        ],
+        "pt": [
+          "fair value",
+          "valor justo"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 11
+    },
+    {
+      "id": "acct_foreign_currency_translation",
+      "canonicalName": "Foreign Currency Translation",
+      "definition": {
+        "en": "Translate balances using functional/reporting currency policy.",
+        "pt": "Translate balances using functional/reporting currency policy."
+      },
+      "synonyms": {
+        "en": [
+          "foreign currency translation",
+          "fx translation"
+        ],
+        "pt": [
+          "conversão cambial",
+          "foreign currency translation"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 26
+    },
+    {
+      "id": "acct_going_concern",
+      "canonicalName": "Going Concern",
+      "definition": {
+        "en": "Assume entity continues operating unless evidence says otherwise.",
+        "pt": "Assume entity continues operating unless evidence says otherwise."
+      },
+      "synonyms": {
+        "en": [
+          "continuity assumption",
+          "going concern"
+        ],
+        "pt": [
+          "continuidade operacional",
+          "going concern"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 9
+    },
+    {
+      "id": "acct_goodwill_testing",
+      "canonicalName": "Goodwill Testing",
+      "definition": {
+        "en": "Test goodwill for impairment at least annually.",
+        "pt": "Test goodwill for impairment at least annually."
+      },
+      "synonyms": {
+        "en": [
+          "goodwill impairment",
+          "goodwill testing"
+        ],
+        "pt": [
+          "goodwill testing",
+          "teste de impairment de goodwill"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 42
+    },
+    {
+      "id": "acct_government_grants",
+      "canonicalName": "Government Grants",
+      "definition": {
+        "en": "Recognize grants by matching to related costs/conditions.",
+        "pt": "Recognize grants by matching to related costs/conditions."
+      },
+      "synonyms": {
+        "en": [
+          "government grants",
+          "grant accounting"
+        ],
+        "pt": [
+          "government grants",
+          "subvenções governamentais"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 38
+    },
+    {
+      "id": "acct_hedge_accounting",
+      "canonicalName": "Hedge Accounting",
+      "definition": {
+        "en": "Apply hedge relationships with effectiveness documentation.",
+        "pt": "Apply hedge relationships with effectiveness documentation."
+      },
+      "synonyms": {
+        "en": [
+          "hedge accounting",
+          "hedge designation"
+        ],
+        "pt": [
+          "contabilidade de hedge",
+          "hedge accounting"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 37
+    },
+    {
+      "id": "acct_historical_cost",
+      "canonicalName": "Historical Cost",
+      "definition": {
+        "en": "Assets/liabilities recognized initially at transaction cost when applicable.",
+        "pt": "Assets/liabilities recognized initially at transaction cost when applicable."
+      },
+      "synonyms": {
+        "en": [
+          "cost model",
+          "historical cost"
+        ],
+        "pt": [
+          "custo histórico",
+          "historical cost"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 10
+    },
+    {
+      "id": "acct_impairment",
+      "canonicalName": "Impairment",
+      "definition": {
+        "en": "Recognize losses when carrying amount exceeds recoverable amount.",
+        "pt": "Recognize losses when carrying amount exceeds recoverable amount."
+      },
+      "synonyms": {
+        "en": [
+          "asset impairment",
+          "impairment"
+        ],
+        "pt": [
+          "impairment",
+          "perda por desvalorização"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 12
+    },
+    {
+      "id": "acct_intangibles_recognition",
+      "canonicalName": "Intangibles Recognition",
+      "definition": {
+        "en": "Recognize identifiable non-monetary assets without physical substance.",
+        "pt": "Recognize identifiable non-monetary assets without physical substance."
+      },
+      "synonyms": {
+        "en": [
+          "intangible assets",
+          "intangibles recognition"
+        ],
+        "pt": [
+          "intangibles recognition",
+          "reconhecimento de intangíveis"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 41
+    },
+    {
+      "id": "acct_intercompany_elimination",
+      "canonicalName": "Intercompany Elimination",
+      "definition": {
+        "en": "Remove intra-group balances and transactions.",
+        "pt": "Remove intra-group balances and transactions."
+      },
+      "synonyms": {
+        "en": [
+          "elimination entries",
+          "intercompany elimination"
+        ],
+        "pt": [
+          "eliminação intercompany",
+          "intercompany elimination"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 28
+    },
+    {
+      "id": "acct_inventory_valuation",
+      "canonicalName": "Inventory Valuation",
+      "definition": {
+        "en": "Inventory measurement under approved valuation method.",
+        "pt": "Inventory measurement under approved valuation method."
+      },
+      "synonyms": {
+        "en": [
+          "fifo",
+          "inventory valuation",
+          "weighted average"
+        ],
+        "pt": [
+          "avaliação de estoque",
+          "inventory valuation"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 21
+    },
+    {
+      "id": "acct_leases_capitalization",
+      "canonicalName": "Lease Capitalization",
+      "definition": {
+        "en": "Recognition of right-of-use asset and lease liability.",
+        "pt": "Recognition of right-of-use asset and lease liability."
+      },
+      "synonyms": {
+        "en": [
+          "asc842",
+          "ifrs16",
+          "leases capitalization"
+        ],
+        "pt": [
+          "capitalização de arrendamento",
+          "leases capitalization"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 22
+    },
+    {
+      "id": "acct_matching_principle",
+      "canonicalName": "Matching Principle",
+      "definition": {
+        "en": "Match expenses to the revenues they help generate.",
+        "pt": "Match expenses to the revenues they help generate."
+      },
+      "synonyms": {
+        "en": [
+          "expense matching",
+          "matching principle"
+        ],
+        "pt": [
+          "matching principle",
+          "princípio da confrontação"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 4
+    },
+    {
+      "id": "acct_materiality",
+      "canonicalName": "Materiality",
+      "definition": {
+        "en": "Items are material if omission/misstatement can influence decisions.",
+        "pt": "Items are material if omission/misstatement can influence decisions."
+      },
+      "synonyms": {
+        "en": [
+          "material threshold",
+          "materiality"
+        ],
+        "pt": [
+          "materialidade",
+          "materiality"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 5
+    },
+    {
+      "id": "acct_non_recurring_item",
+      "canonicalName": "Non-Recurring Item",
+      "definition": {
+        "en": "Item not expected to repeat as ordinary operations.",
+        "pt": "Item not expected to repeat as ordinary operations."
+      },
+      "synonyms": {
+        "en": [
+          "non recurring item",
+          "one-off item"
+        ],
+        "pt": [
+          "item não recorrente",
+          "non recurring item"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 29
+    },
+    {
+      "id": "acct_provision",
+      "canonicalName": "Provision",
+      "definition": {
+        "en": "Liability of uncertain timing or amount with probable outflow.",
+        "pt": "Liability of uncertain timing or amount with probable outflow."
+      },
+      "synonyms": {
+        "en": [
+          "estimated liability",
+          "provision"
+        ],
+        "pt": [
+          "provisão",
+          "provision"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 15
+    },
+    {
+      "id": "acct_prudence",
+      "canonicalName": "Prudence",
+      "definition": {
+        "en": "Avoid overstating assets/revenue or understating liabilities/expenses.",
+        "pt": "Avoid overstating assets/revenue or understating liabilities/expenses."
+      },
+      "synonyms": {
+        "en": [
+          "conservatism",
+          "prudence"
+        ],
+        "pt": [
+          "prudence",
+          "prudência"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 7
+    },
+    {
+      "id": "acct_related_party",
+      "canonicalName": "Related Party",
+      "definition": {
+        "en": "Transactions with related parties require explicit disclosure.",
+        "pt": "Transactions with related parties require explicit disclosure."
+      },
+      "synonyms": {
+        "en": [
+          "related party",
+          "related party disclosure"
+        ],
+        "pt": [
+          "parte relacionada",
+          "related party"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 24
+    },
+    {
+      "id": "acct_research_development_treatment",
+      "canonicalName": "Research and Development Treatment",
+      "definition": {
+        "en": "Expense research, capitalize development when criteria met.",
+        "pt": "Expense research, capitalize development when criteria met."
+      },
+      "synonyms": {
+        "en": [
+          "r&d accounting",
+          "research development treatment"
+        ],
+        "pt": [
+          "research development treatment",
+          "tratamento de p&d"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 39
+    },
+    {
+      "id": "acct_reserves_equity_movements",
+      "canonicalName": "Reserves and Equity Movements",
+      "definition": {
+        "en": "Track legal/statutory and discretionary reserves with clear movements.",
+        "pt": "Track legal/statutory and discretionary reserves with clear movements."
+      },
+      "synonyms": {
+        "en": [
+          "equity bridge",
+          "reserves equity movements"
+        ],
+        "pt": [
+          "movimentação de reservas",
+          "reserves equity movements"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 43
+    },
+    {
+      "id": "acct_restatement_policy",
+      "canonicalName": "Restatement Policy",
+      "definition": {
+        "en": "Correct prior-period errors with retrospective adjustment when required.",
+        "pt": "Correct prior-period errors with retrospective adjustment when required."
+      },
+      "synonyms": {
+        "en": [
+          "prior period adjustment",
+          "restatement policy"
+        ],
+        "pt": [
+          "política de reapresentação",
+          "restatement policy"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 46
+    },
+    {
+      "id": "acct_revenue_recognition",
+      "canonicalName": "Revenue Recognition",
+      "definition": {
+        "en": "Recognize revenue when performance obligations are satisfied.",
+        "pt": "Recognize revenue when performance obligations are satisfied."
+      },
+      "synonyms": {
+        "en": [
+          "asc 606",
+          "ifrs 15",
+          "revenue recognition"
+        ],
+        "pt": [
+          "reconhecimento de receita",
+          "revenue recognition"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 3
+    },
+    {
+      "id": "acct_segment_reporting",
+      "canonicalName": "Segment Reporting",
+      "definition": {
+        "en": "Disclose financial information by operating segment.",
+        "pt": "Disclose financial information by operating segment."
+      },
+      "synonyms": {
+        "en": [
+          "segment note",
+          "segment reporting"
+        ],
+        "pt": [
+          "informação por segmento",
+          "segment reporting"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 25
+    },
+    {
+      "id": "acct_subsequent_events",
+      "canonicalName": "Subsequent Events",
+      "definition": {
+        "en": "Assess events after reporting date for adjustment/disclosure.",
+        "pt": "Assess events after reporting date for adjustment/disclosure."
+      },
+      "synonyms": {
+        "en": [
+          "post-balance-sheet events",
+          "subsequent events"
+        ],
+        "pt": [
+          "eventos subsequentes",
+          "subsequent events"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 35
+    },
+    {
+      "id": "acct_substance_over_form",
+      "canonicalName": "Substance over Form",
+      "definition": {
+        "en": "Accounting reflects economic reality over legal form.",
+        "pt": "Accounting reflects economic reality over legal form."
+      },
+      "synonyms": {
+        "en": [
+          "economic substance",
+          "substance over form"
+        ],
+        "pt": [
+          "essência sobre a forma",
+          "substance over form"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 8
+    },
+    {
+      "id": "acct_tax_rate_reconciliation",
+      "canonicalName": "Tax Rate Reconciliation",
+      "definition": {
+        "en": "Reconcile effective tax rate against statutory rate.",
+        "pt": "Reconcile effective tax rate against statutory rate."
+      },
+      "synonyms": {
+        "en": [
+          "etr bridge",
+          "tax rate reconciliation"
+        ],
+        "pt": [
+          "reconciliação da taxa efetiva de imposto",
+          "tax rate reconciliation"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 45
+    },
+    {
+      "id": "acct_unearned_revenue",
+      "canonicalName": "Unearned Revenue",
+      "definition": {
+        "en": "Obligation to deliver goods/services for received consideration.",
+        "pt": "Obligation to deliver goods/services for received consideration."
+      },
+      "synonyms": {
+        "en": [
+          "customer advances",
+          "unearned revenue"
+        ],
+        "pt": [
+          "receita não realizada",
+          "unearned revenue"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 19
+    },
+    {
+      "id": "acct_deferred_tax_asset",
+      "canonicalName": "Deferred Tax Asset",
+      "definition": {
+        "en": "Tax benefit recoverable in future periods from deductible temporary differences or carryforwards.",
+        "pt": "Benefício fiscal recuperável em períodos futuros decorrente de diferenças temporárias dedutíveis ou prejuízos a compensar."
+      },
+      "synonyms": {
+        "en": [
+          "deferred tax asset",
+          "dta",
+          "future tax benefit"
+        ],
+        "pt": [
+          "ativo fiscal diferido",
+          "crédito tributário diferido"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 47
+    },
+    {
+      "id": "acct_deferred_tax_liability",
+      "canonicalName": "Deferred Tax Liability",
+      "definition": {
+        "en": "Tax obligation arising from taxable temporary differences payable in future periods.",
+        "pt": "Obrigação fiscal decorrente de diferenças temporárias tributáveis a pagar em períodos futuros."
+      },
+      "synonyms": {
+        "en": [
+          "deferred tax liability",
+          "dtl",
+          "future tax obligation"
+        ],
+        "pt": [
+          "passivo fiscal diferido",
+          "obrigação tributária diferida"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 48
+    },
+    {
+      "id": "acct_tax_loss_carryforward",
+      "canonicalName": "Tax Loss Carryforward",
+      "definition": {
+        "en": "Accumulated tax losses available to offset future taxable income subject to expiry and limitation rules.",
+        "pt": "Prejuízos fiscais acumulados disponíveis para compensar lucro tributável futuro, sujeitos a regras de prescrição e limitação."
+      },
+      "synonyms": {
+        "en": [
+          "tax loss carryforward",
+          "nol carryforward",
+          "loss carryover"
+        ],
+        "pt": [
+          "prejuízo fiscal a compensar",
+          "compensação de prejuízos fiscais"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 49
+    },
+    {
+      "id": "acct_operating_lease_ifrs16",
+      "canonicalName": "Operating Lease (IFRS 16)",
+      "definition": {
+        "en": "Lease recognized on-balance-sheet as right-of-use asset and lease liability under IFRS 16, formerly off-balance-sheet.",
+        "pt": "Arrendamento reconhecido no balanço como ativo de direito de uso e passivo de arrendamento conforme IFRS 16, anteriormente fora do balanço."
+      },
+      "synonyms": {
+        "en": [
+          "operating lease",
+          "ifrs 16 lease",
+          "on-balance-sheet lease"
+        ],
+        "pt": [
+          "arrendamento operacional",
+          "leasing operacional ifrs 16"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 50
+    },
+    {
+      "id": "acct_finance_lease",
+      "canonicalName": "Finance Lease",
+      "definition": {
+        "en": "Lease that transfers substantially all risks and rewards of ownership to the lessee.",
+        "pt": "Arrendamento que transfere substancialmente todos os riscos e benefícios da propriedade ao arrendatário."
+      },
+      "synonyms": {
+        "en": [
+          "finance lease",
+          "capital lease",
+          "financing lease"
+        ],
+        "pt": [
+          "arrendamento financeiro",
+          "leasing financeiro"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 51
+    },
+    {
+      "id": "acct_right_of_use_asset",
+      "canonicalName": "Right-of-Use Asset",
+      "definition": {
+        "en": "Asset representing lessee right to use underlying asset for the lease term.",
+        "pt": "Ativo representando o direito do arrendatário de usar o ativo subjacente durante o prazo do arrendamento."
+      },
+      "synonyms": {
+        "en": [
+          "right-of-use asset",
+          "rou asset",
+          "lease asset"
+        ],
+        "pt": [
+          "ativo de direito de uso",
+          "ativo rou"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 52
+    },
+    {
+      "id": "acct_lease_liability",
+      "canonicalName": "Lease Liability",
+      "definition": {
+        "en": "Obligation to make lease payments measured at present value of future payments.",
+        "pt": "Obrigação de efetuar pagamentos de arrendamento mensurada ao valor presente dos pagamentos futuros."
+      },
+      "synonyms": {
+        "en": [
+          "lease liability",
+          "lease obligation",
+          "lease payable"
+        ],
+        "pt": [
+          "passivo de arrendamento",
+          "obrigação de leasing"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 53
+    },
+    {
+      "id": "acct_share_based_compensation",
+      "canonicalName": "Share-Based Compensation",
+      "definition": {
+        "en": "Compensation arrangement where entity grants equity instruments or cash settled based on share price.",
+        "pt": "Acordo de remuneração em que a entidade concede instrumentos de patrimônio ou liquidação em caixa com base no preço da ação."
+      },
+      "synonyms": {
+        "en": [
+          "share-based compensation",
+          "stock-based compensation",
+          "equity compensation"
+        ],
+        "pt": [
+          "remuneração baseada em ações",
+          "pagamento baseado em ações"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 54
+    },
+    {
+      "id": "acct_stock_options",
+      "canonicalName": "Stock Options",
+      "definition": {
+        "en": "Right granted to employees to purchase shares at a predetermined exercise price over a vesting period.",
+        "pt": "Direito concedido a funcionários de adquirir ações a um preço de exercício predeterminado ao longo de um período de aquisição."
+      },
+      "synonyms": {
+        "en": [
+          "stock options",
+          "employee stock options",
+          "eso"
+        ],
+        "pt": [
+          "opções de ações",
+          "opções de compra de ações"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 55
+    },
+    {
+      "id": "acct_restricted_stock_units",
+      "canonicalName": "Restricted Stock Units",
+      "definition": {
+        "en": "Shares promised to employees subject to vesting conditions, settled in equity or cash.",
+        "pt": "Ações prometidas a funcionários sujeitas a condições de aquisição, liquidadas em patrimônio ou caixa."
+      },
+      "synonyms": {
+        "en": [
+          "restricted stock units",
+          "rsu",
+          "restricted shares"
+        ],
+        "pt": [
+          "unidades de ações restritas",
+          "ações restritas"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 56
+    },
+    {
+      "id": "acct_treasury_stock",
+      "canonicalName": "Treasury Stock",
+      "definition": {
+        "en": "Entity own shares reacquired and held, reducing total equity.",
+        "pt": "Ações próprias readquiridas e mantidas pela entidade, reduzindo o patrimônio líquido total."
+      },
+      "synonyms": {
+        "en": [
+          "treasury stock",
+          "treasury shares",
+          "own shares"
+        ],
+        "pt": [
+          "ações em tesouraria",
+          "ações próprias"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 57
+    },
+    {
+      "id": "acct_comprehensive_income",
+      "canonicalName": "Comprehensive Income",
+      "definition": {
+        "en": "Total change in equity from non-owner sources including net income and other comprehensive income.",
+        "pt": "Variação total do patrimônio líquido de fontes não proprietárias, incluindo lucro líquido e outros resultados abrangentes."
+      },
+      "synonyms": {
+        "en": [
+          "comprehensive income",
+          "total comprehensive income",
+          "ci"
+        ],
+        "pt": [
+          "resultado abrangente",
+          "lucro abrangente total"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 58
+    },
+    {
+      "id": "acct_other_comprehensive_income",
+      "canonicalName": "Other Comprehensive Income",
+      "definition": {
+        "en": "Income and expenses not recognized in profit or loss as required by IFRS/GAAP standards.",
+        "pt": "Receitas e despesas não reconhecidas no resultado do período conforme exigido pelas normas IFRS/GAAP."
+      },
+      "synonyms": {
+        "en": [
+          "other comprehensive income",
+          "oci",
+          "accumulated oci"
+        ],
+        "pt": [
+          "outros resultados abrangentes",
+          "oci acumulado"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 59
+    },
+    {
+      "id": "acct_foreign_currency_translation_adjustment",
+      "canonicalName": "Foreign Currency Translation Adjustment",
+      "definition": {
+        "en": "OCI component arising from translating foreign subsidiary financial statements into reporting currency.",
+        "pt": "Componente de OCI decorrente da conversão de demonstrações financeiras de subsidiárias estrangeiras para a moeda de apresentação."
+      },
+      "synonyms": {
+        "en": [
+          "foreign currency translation adjustment",
+          "cta",
+          "cumulative translation adjustment"
+        ],
+        "pt": [
+          "ajuste de conversão cambial",
+          "ajuste acumulado de conversão"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 60
+    },
+    {
+      "id": "acct_hedging_reserve",
+      "canonicalName": "Hedging Reserve",
+      "definition": {
+        "en": "Equity reserve accumulating effective portion of gains and losses on hedging instruments.",
+        "pt": "Reserva de patrimônio acumulando a parcela efetiva de ganhos e perdas em instrumentos de hedge."
+      },
+      "synonyms": {
+        "en": [
+          "hedging reserve",
+          "hedge reserve",
+          "cash flow hedge reserve"
+        ],
+        "pt": [
+          "reserva de hedge",
+          "reserva de proteção cambial"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 61
+    },
+    {
+      "id": "acct_cash_flow_hedge",
+      "canonicalName": "Cash Flow Hedge",
+      "definition": {
+        "en": "Hedge of exposure to variability in cash flows attributable to a recognized asset/liability or forecast transaction.",
+        "pt": "Hedge da exposição à variabilidade nos fluxos de caixa atribuível a um ativo/passivo reconhecido ou transação prevista."
+      },
+      "synonyms": {
+        "en": [
+          "cash flow hedge",
+          "cfh",
+          "forecast transaction hedge"
+        ],
+        "pt": [
+          "hedge de fluxo de caixa",
+          "proteção de fluxo de caixa"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 62
+    },
+    {
+      "id": "acct_fair_value_hedge",
+      "canonicalName": "Fair Value Hedge",
+      "definition": {
+        "en": "Hedge of exposure to changes in fair value of a recognized asset/liability or firm commitment.",
+        "pt": "Hedge da exposição a mudanças no valor justo de um ativo/passivo reconhecido ou compromisso firme."
+      },
+      "synonyms": {
+        "en": [
+          "fair value hedge",
+          "fvh",
+          "firm commitment hedge"
+        ],
+        "pt": [
+          "hedge de valor justo",
+          "proteção de valor justo"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 63
+    },
+    {
+      "id": "acct_fair_value_level_1",
+      "canonicalName": "Level 1 Fair Value",
+      "definition": {
+        "en": "Fair value measured using quoted prices in active markets for identical assets or liabilities.",
+        "pt": "Valor justo mensurado com base em preços cotados em mercados ativos para ativos ou passivos idênticos."
+      },
+      "synonyms": {
+        "en": [
+          "level 1 fair value",
+          "quoted market price",
+          "active market price"
+        ],
+        "pt": [
+          "valor justo nível 1",
+          "preço cotado em mercado ativo"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 64
+    },
+    {
+      "id": "acct_fair_value_level_2",
+      "canonicalName": "Level 2 Fair Value",
+      "definition": {
+        "en": "Fair value measured using observable inputs other than quoted prices for identical assets, including similar assets or yield curves.",
+        "pt": "Valor justo mensurado com base em dados observáveis além de preços cotados para ativos idênticos, incluindo ativos similares ou curvas de juros."
+      },
+      "synonyms": {
+        "en": [
+          "level 2 fair value",
+          "observable inputs",
+          "comparable market data"
+        ],
+        "pt": [
+          "valor justo nível 2",
+          "dados observáveis de mercado"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 65
+    },
+    {
+      "id": "acct_fair_value_level_3",
+      "canonicalName": "Level 3 Fair Value",
+      "definition": {
+        "en": "Fair value measured using unobservable inputs reflecting entity own assumptions about market participant pricing.",
+        "pt": "Valor justo mensurado com base em dados não observáveis que refletem as premissas da própria entidade sobre precificação de participantes do mercado."
+      },
+      "synonyms": {
+        "en": [
+          "level 3 fair value",
+          "unobservable inputs",
+          "model-based valuation"
+        ],
+        "pt": [
+          "valor justo nível 3",
+          "dados não observáveis"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 66
+    },
+    {
+      "id": "acct_biological_assets",
+      "canonicalName": "Biological Assets",
+      "definition": {
+        "en": "Living animals or plants managed for agricultural activity measured at fair value less costs to sell.",
+        "pt": "Animais ou plantas vivos gerenciados para atividade agrícola mensurados ao valor justo menos custos de venda."
+      },
+      "synonyms": {
+        "en": [
+          "biological assets",
+          "living assets",
+          "ias 41 assets"
+        ],
+        "pt": [
+          "ativos biológicos",
+          "ativos vivos"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 67
+    },
+    {
+      "id": "acct_investment_property",
+      "canonicalName": "Investment Property",
+      "definition": {
+        "en": "Property held to earn rentals or capital appreciation rather than for use in production or administration.",
+        "pt": "Propriedade mantida para auferir aluguéis ou valorização de capital, e não para uso em produção ou administração."
+      },
+      "synonyms": {
+        "en": [
+          "investment property",
+          "rental property",
+          "ias 40 property"
+        ],
+        "pt": [
+          "propriedade para investimento",
+          "imóvel para investimento"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 68
+    },
+    {
+      "id": "acct_held_for_sale",
+      "canonicalName": "Held-for-Sale Classification",
+      "definition": {
+        "en": "Non-current asset classified as held for sale when carrying amount will be recovered through sale rather than use.",
+        "pt": "Ativo não circulante classificado como mantido para venda quando o valor contábil será recuperado por meio de venda e não pelo uso."
+      },
+      "synonyms": {
+        "en": [
+          "held-for-sale",
+          "asset held for sale",
+          "ifrs 5 classification"
+        ],
+        "pt": [
+          "mantido para venda",
+          "ativo mantido para venda"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 69
+    },
+    {
+      "id": "acct_discontinued_operations",
+      "canonicalName": "Discontinued Operations",
+      "definition": {
+        "en": "Component of entity disposed of or classified as held for sale representing a separate major line of business.",
+        "pt": "Componente da entidade alienado ou classificado como mantido para venda que representa uma linha de negócio principal separada."
+      },
+      "synonyms": {
+        "en": [
+          "discontinued operations",
+          "discontinued business",
+          "ifrs 5 discontinued"
+        ],
+        "pt": [
+          "operações descontinuadas",
+          "atividades descontinuadas"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 70
+    },
+    {
+      "id": "acct_segment_reporting_ifrs8",
+      "canonicalName": "Segment Reporting (IFRS 8)",
+      "definition": {
+        "en": "Disaggregated financial information by operating segment based on internal management reporting.",
+        "pt": "Informação financeira desagregada por segmento operacional com base em relatórios gerenciais internos."
+      },
+      "synonyms": {
+        "en": [
+          "segment reporting ifrs 8",
+          "operating segments",
+          "reportable segments"
+        ],
+        "pt": [
+          "relatório por segmento ifrs 8",
+          "segmentos operacionais"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 71
+    },
+    {
+      "id": "acct_intercompany_elimination_adj",
+      "canonicalName": "Intercompany Elimination Adjustment",
+      "definition": {
+        "en": "Adjustments to remove intra-group revenues, expenses, receivables, payables, and unrealized profits.",
+        "pt": "Ajustes para eliminar receitas, despesas, contas a receber, contas a pagar e lucros não realizados intragrupo."
+      },
+      "synonyms": {
+        "en": [
+          "intercompany elimination adjustment",
+          "ic elimination",
+          "intra-group elimination"
+        ],
+        "pt": [
+          "ajuste de eliminação intercompany",
+          "eliminação intragrupo"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 72
+    },
+    {
+      "id": "acct_consolidation_adjustment",
+      "canonicalName": "Consolidation Adjustment",
+      "definition": {
+        "en": "Adjusting entries required to produce consolidated financial statements from individual entity statements.",
+        "pt": "Lançamentos de ajuste necessários para produzir demonstrações financeiras consolidadas a partir de demonstrações individuais."
+      },
+      "synonyms": {
+        "en": [
+          "consolidation adjustment",
+          "consolidation entry",
+          "group adjustment"
+        ],
+        "pt": [
+          "ajuste de consolidação",
+          "lançamento de consolidação"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 73
+    },
+    {
+      "id": "acct_non_controlling_interest",
+      "canonicalName": "Non-controlling Interest",
+      "definition": {
+        "en": "Equity in a subsidiary not attributable directly or indirectly to the parent entity.",
+        "pt": "Patrimônio em uma subsidiária não atribuível direta ou indiretamente à entidade controladora."
+      },
+      "synonyms": {
+        "en": [
+          "non-controlling interest",
+          "minority interest",
+          "nci"
+        ],
+        "pt": [
+          "participação de não controladores",
+          "interesse minoritário"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 74
+    },
+    {
+      "id": "acct_equity_method_investment",
+      "canonicalName": "Equity Method Investment",
+      "definition": {
+        "en": "Investment in associate or joint venture recognized initially at cost and adjusted for post-acquisition share of profit.",
+        "pt": "Investimento em coligada ou empreendimento conjunto reconhecido inicialmente ao custo e ajustado pela participação pós-aquisição no resultado."
+      },
+      "synonyms": {
+        "en": [
+          "equity method investment",
+          "equity method",
+          "associate investment"
+        ],
+        "pt": [
+          "investimento pelo método de equivalência patrimonial",
+          "equivalência patrimonial"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 75
+    },
+    {
+      "id": "acct_purchase_price_allocation",
+      "canonicalName": "Purchase Price Allocation",
+      "definition": {
+        "en": "Process of allocating acquisition cost to identifiable assets acquired, liabilities assumed, and goodwill.",
+        "pt": "Processo de alocação do custo de aquisição a ativos identificáveis adquiridos, passivos assumidos e ágio."
+      },
+      "synonyms": {
+        "en": [
+          "purchase price allocation",
+          "ppa",
+          "acquisition accounting"
+        ],
+        "pt": [
+          "alocação do preço de compra",
+          "alocação do preço de aquisição"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 76
+    },
+    {
+      "id": "acct_contingent_consideration",
+      "canonicalName": "Contingent Consideration",
+      "definition": {
+        "en": "Additional consideration in a business combination contingent on future events or performance targets.",
+        "pt": "Contraprestação adicional em uma combinação de negócios contingente a eventos futuros ou metas de desempenho."
+      },
+      "synonyms": {
+        "en": [
+          "contingent consideration",
+          "conditional payment",
+          "milestone payment"
+        ],
+        "pt": [
+          "contraprestação contingente",
+          "pagamento condicional"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 77
+    },
+    {
+      "id": "acct_earnout_liability",
+      "canonicalName": "Earn-out Liability",
+      "definition": {
+        "en": "Financial liability representing future payments to sellers contingent on acquired business performance.",
+        "pt": "Passivo financeiro representando pagamentos futuros a vendedores contingentes ao desempenho do negócio adquirido."
+      },
+      "synonyms": {
+        "en": [
+          "earn-out liability",
+          "earnout",
+          "performance-based consideration"
+        ],
+        "pt": [
+          "passivo de earn-out",
+          "contraprestação baseada em desempenho"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 78
+    },
+    {
+      "id": "acct_restructuring_provision",
+      "canonicalName": "Restructuring Provision",
+      "definition": {
+        "en": "Provision for costs of a program planned and controlled by management that materially changes scope or manner of business.",
+        "pt": "Provisão para custos de um programa planejado e controlado pela administração que altera materialmente o escopo ou forma de condução do negócio."
+      },
+      "synonyms": {
+        "en": [
+          "restructuring provision",
+          "restructuring reserve",
+          "reorganization provision"
+        ],
+        "pt": [
+          "provisão para reestruturação",
+          "reserva de reestruturação"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 79
+    },
+    {
+      "id": "acct_onerous_contract_provision",
+      "canonicalName": "Onerous Contract Provision",
+      "definition": {
+        "en": "Provision recognized when unavoidable costs of meeting contract obligations exceed expected economic benefits.",
+        "pt": "Provisão reconhecida quando os custos inevitáveis de cumprir as obrigações contratuais excedem os benefícios econômicos esperados."
+      },
+      "synonyms": {
+        "en": [
+          "onerous contract provision",
+          "loss-making contract",
+          "onerous lease"
+        ],
+        "pt": [
+          "provisão para contrato oneroso",
+          "contrato deficitário"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 80
+    },
+    {
+      "id": "acct_environmental_liability",
+      "canonicalName": "Environmental Liability",
+      "definition": {
+        "en": "Obligation arising from environmental remediation, decommissioning, or asset retirement activities.",
+        "pt": "Obrigação decorrente de remediação ambiental, descomissionamento ou atividades de desativação de ativos."
+      },
+      "synonyms": {
+        "en": [
+          "environmental liability",
+          "remediation liability",
+          "asset retirement obligation"
+        ],
+        "pt": [
+          "passivo ambiental",
+          "obrigação de remediação ambiental"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 81
+    },
+    {
+      "id": "acct_warranty_provision",
+      "canonicalName": "Warranty Provision",
+      "definition": {
+        "en": "Provision for estimated costs of fulfilling warranty obligations on products sold.",
+        "pt": "Provisão para custos estimados de cumprimento de obrigações de garantia sobre produtos vendidos."
+      },
+      "synonyms": {
+        "en": [
+          "warranty provision",
+          "warranty reserve",
+          "product warranty"
+        ],
+        "pt": [
+          "provisão para garantia",
+          "reserva de garantia"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 82
+    },
+    {
+      "id": "acct_product_recall_reserve",
+      "canonicalName": "Product Recall Reserve",
+      "definition": {
+        "en": "Provision for costs associated with recalling defective products from the market.",
+        "pt": "Provisão para custos associados ao recall de produtos defeituosos do mercado."
+      },
+      "synonyms": {
+        "en": [
+          "product recall reserve",
+          "recall provision",
+          "defective product reserve"
+        ],
+        "pt": [
+          "reserva para recall de produtos",
+          "provisão para recall"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 83
+    },
+    {
+      "id": "acct_expected_credit_loss",
+      "canonicalName": "Expected Credit Loss (IFRS 9)",
+      "definition": {
+        "en": "Impairment model based on forward-looking expected credit losses rather than incurred losses.",
+        "pt": "Modelo de provisão baseado em perdas de crédito esperadas prospectivas em vez de perdas incorridas."
+      },
+      "synonyms": {
+        "en": [
+          "expected credit loss",
+          "ecl ifrs 9",
+          "forward-looking impairment"
+        ],
+        "pt": [
+          "perda de crédito esperada",
+          "ecl ifrs 9"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 84
+    },
+    {
+      "id": "acct_simplified_approach_ecl",
+      "canonicalName": "Simplified Approach (Trade Receivables)",
+      "definition": {
+        "en": "ECL approach for trade receivables using lifetime expected losses without tracking credit deterioration stages.",
+        "pt": "Abordagem simplificada de ECL para contas a receber comerciais usando perdas esperadas vitalícias sem rastrear estágios de deterioração de crédito."
+      },
+      "synonyms": {
+        "en": [
+          "simplified approach",
+          "trade receivables ecl",
+          "provision matrix"
+        ],
+        "pt": [
+          "abordagem simplificada",
+          "matriz de provisão"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 85
+    },
+    {
+      "id": "acct_general_approach_ecl",
+      "canonicalName": "General Approach (Financial Assets)",
+      "definition": {
+        "en": "ECL approach requiring three-stage credit deterioration model with 12-month and lifetime loss measurement.",
+        "pt": "Abordagem geral de ECL exigindo modelo de deterioração de crédito em três estágios com mensuração de perda de 12 meses e vitalícia."
+      },
+      "synonyms": {
+        "en": [
+          "general approach",
+          "three-stage ecl",
+          "staging model"
+        ],
+        "pt": [
+          "abordagem geral",
+          "modelo de três estágios"
+        ]
+      },
+      "interpretationBoundary": {
+        "policyDependent": true,
+        "requiresDisclosureOfAssumptions": true,
+        "deterministicClassificationRequired": true
+      },
+      "priority": 86
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule_accounting_accrual_cash_mixed",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "accrual",
+            "cash basis"
+          ],
+          "pt": [
+            "caixa",
+            "competência"
+          ]
+        }
+      },
+      "check": {
+        "type": "accrual_and_cash_basis_mixed_in_same_metric",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_BASIS_MIXED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I convert this analysis to accrual basis or cash basis?",
+          "pt": "Devo converter esta análise para regime de competência ou caixa?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_currency_translation_policy",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "functional currency",
+            "translation"
+          ],
+          "pt": [
+            "conversão",
+            "moeda funcional"
+          ]
+        }
+      },
+      "check": {
+        "type": "functional_versus_presentation_currency_policy_required",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_TRANSLATION_POLICY_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which FX translation policy should I use for this report?",
+          "pt": "Qual política de conversão cambial devo usar neste relatório?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_disclosure_support",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "disclosure",
+            "note"
+          ],
+          "pt": [
+            "divulgação",
+            "nota"
+          ]
+        }
+      },
+      "check": {
+        "type": "material_conclusions_require_note_disclosure_evidence",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_DISCLOSURE_EVIDENCE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which note section should I use as evidence for this conclusion?",
+          "pt": "Qual seção de notas devo usar como evidência para esta conclusão?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_estimate_change_guard",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "error correction",
+            "estimate change"
+          ],
+          "pt": [
+            "correção de erro",
+            "mudança de estimativa"
+          ]
+        }
+      },
+      "check": {
+        "type": "changes_in_estimates_must_be_distinguished_from_errors",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_ESTIMATE_VS_ERROR_UNCLEAR",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should this be treated as change in estimate or prior-period error?",
+          "pt": "Isto deve ser tratado como mudança de estimativa ou erro de período anterior?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_intercompany_elimination_required",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "consolidated",
+            "intercompany"
+          ],
+          "pt": [
+            "consolidado",
+            "intercompany"
+          ]
+        }
+      },
+      "check": {
+        "type": "intercompany_elimination_before_consolidation",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_INTERCOMPANY_NOT_ELIMINATED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I eliminate intercompany balances before presenting consolidated figures?",
+          "pt": "Devo eliminar saldos intercompany antes de apresentar números consolidados?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_materiality_threshold_guard",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "material",
+            "threshold"
+          ],
+          "pt": [
+            "limite",
+            "material"
+          ]
+        }
+      },
+      "check": {
+        "type": "materiality_threshold_must_be_explicit",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_MATERIALITY_THRESHOLD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What materiality threshold should I apply for this review?",
+          "pt": "Qual limite de materialidade devo aplicar nesta revisão?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_non_recurring_tag_required",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "non recurring",
+            "one-off"
+          ],
+          "pt": [
+            "não recorrente",
+            "pontual"
+          ]
+        }
+      },
+      "check": {
+        "type": "non-recurring_tags",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_NON_RECURRING_UNTAGGED",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I classify this item as recurring or non-recurring?",
+          "pt": "Devo classificar este item como recorrente ou não recorrente?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_period_cutoff_required",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "closing",
+            "cutoff",
+            "period end"
+          ],
+          "pt": [
+            "corte",
+            "fechamento",
+            "fim do período"
+          ]
+        }
+      },
+      "check": {
+        "type": "cutoff_integrity",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_CUTOFF_UNCLEAR",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which posting date cutoff should I apply?",
+          "pt": "Qual data de corte contábil devo aplicar?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_accrual_basis",
+      "appliesTo": [
+        "acct_accrual_basis"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "accrual accounting",
+            "accrual basis",
+            "Accrual Basis"
+          ],
+          "pt": [
+            "accrual basis",
+            "Accrual Basis",
+            "regime de competência"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_ACCRUAL_BASIS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Accrual Basis?",
+          "pt": "Qual política contábil devo aplicar para Accrual Basis?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_allowance_for_doubtful_accounts",
+      "appliesTo": [
+        "acct_allowance_for_doubtful_accounts"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "allowance for doubtful accounts",
+            "Allowance for Doubtful Accounts",
+            "ecl"
+          ],
+          "pt": [
+            "allowance for doubtful accounts",
+            "Allowance for Doubtful Accounts",
+            "provisão para devedores duvidosos"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_ALLOWANCE_FOR_DOUBTFUL_ACCOUNTS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Allowance for Doubtful Accounts?",
+          "pt": "Qual política contábil devo aplicar para Allowance for Doubtful Accounts?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_amortization",
+      "appliesTo": [
+        "acct_amortization"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "amortization",
+            "Amortization",
+            "intangible amortization"
+          ],
+          "pt": [
+            "amortização",
+            "amortization",
+            "Amortization"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_AMORTIZATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Amortization?",
+          "pt": "Qual política contábil devo aplicar para Amortization?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_borrowing_costs",
+      "appliesTo": [
+        "acct_borrowing_costs"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "borrowing costs",
+            "Borrowing Costs",
+            "interest capitalization"
+          ],
+          "pt": [
+            "borrowing costs",
+            "Borrowing Costs",
+            "capitalização de encargos financeiros"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_BORROWING_COSTS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Borrowing Costs?",
+          "pt": "Qual política contábil devo aplicar para Borrowing Costs?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_capitalization_vs_expense",
+      "appliesTo": [
+        "acct_capitalization_vs_expense"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "capex vs opex",
+            "capitalization vs expense",
+            "Capitalization vs Expense"
+          ],
+          "pt": [
+            "capitalizar vs despesar",
+            "capitalization vs expense",
+            "Capitalization vs Expense"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CAPITALIZATION_VS_EXPENSE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Capitalization vs Expense?",
+          "pt": "Qual política contábil devo aplicar para Capitalization vs Expense?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_cash_basis",
+      "appliesTo": [
+        "acct_cash_basis"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cash accounting",
+            "cash basis",
+            "Cash Basis"
+          ],
+          "pt": [
+            "cash basis",
+            "Cash Basis",
+            "regime de caixa"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CASH_BASIS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Cash Basis?",
+          "pt": "Qual política contábil devo aplicar para Cash Basis?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_classification_current_noncurrent",
+      "appliesTo": [
+        "acct_classification_current_noncurrent"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "classification current noncurrent",
+            "current classification",
+            "Current vs Non-current Classification"
+          ],
+          "pt": [
+            "classificação circulante e não circulante",
+            "classification current noncurrent",
+            "Current vs Non-current Classification"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CLASSIFICATION_CURRENT_NONCURRENT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Current vs Non-current Classification?",
+          "pt": "Qual política contábil devo aplicar para Current vs Non-current Classification?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_consistency",
+      "appliesTo": [
+        "acct_consistency"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "consistency",
+            "Consistency",
+            "method consistency"
+          ],
+          "pt": [
+            "consistência contábil",
+            "consistency",
+            "Consistency"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CONSISTENCY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Consistency?",
+          "pt": "Qual política contábil devo aplicar para Consistency?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_consolidation",
+      "appliesTo": [
+        "acct_consolidation"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "consolidation",
+            "Consolidation",
+            "group consolidation"
+          ],
+          "pt": [
+            "consolidação",
+            "consolidation",
+            "Consolidation"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CONSOLIDATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Consolidation?",
+          "pt": "Qual política contábil devo aplicar para Consolidation?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_contingent_asset",
+      "appliesTo": [
+        "acct_contingent_asset"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "contingency asset",
+            "contingent asset",
+            "Contingent Asset"
+          ],
+          "pt": [
+            "ativo contingente",
+            "contingent asset",
+            "Contingent Asset"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CONTINGENT_ASSET",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Contingent Asset?",
+          "pt": "Qual política contábil devo aplicar para Contingent Asset?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_contingent_liability",
+      "appliesTo": [
+        "acct_contingent_liability"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "contingency",
+            "contingent liability",
+            "Contingent Liability"
+          ],
+          "pt": [
+            "contingent liability",
+            "Contingent Liability",
+            "passivo contingente"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CONTINGENT_LIABILITY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Contingent Liability?",
+          "pt": "Qual política contábil devo aplicar para Contingent Liability?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_cost_of_sales_definition",
+      "appliesTo": [
+        "acct_cost_of_sales_definition"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cost classification",
+            "cost of sales definition",
+            "Cost of Sales Definition"
+          ],
+          "pt": [
+            "cost of sales definition",
+            "Cost of Sales Definition",
+            "definição de custo de vendas"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_COST_OF_SALES_DEFINITION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Cost of Sales Definition?",
+          "pt": "Qual política contábil devo aplicar para Cost of Sales Definition?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_cutoff",
+      "appliesTo": [
+        "acct_cutoff"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cutoff",
+            "Cutoff",
+            "period cutoff"
+          ],
+          "pt": [
+            "corte contábil",
+            "cutoff",
+            "Cutoff"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_CUTOFF",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Cutoff?",
+          "pt": "Qual política contábil devo aplicar para Cutoff?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_deferred_revenue",
+      "appliesTo": [
+        "acct_deferred_revenue"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "contract liability",
+            "deferred revenue",
+            "Deferred Revenue"
+          ],
+          "pt": [
+            "deferred revenue",
+            "Deferred Revenue",
+            "receita diferida"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_DEFERRED_REVENUE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Deferred Revenue?",
+          "pt": "Qual política contábil devo aplicar para Deferred Revenue?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_deferred_tax",
+      "appliesTo": [
+        "acct_deferred_tax"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "deferred tax",
+            "Deferred Tax",
+            "dtl"
+          ],
+          "pt": [
+            "deferred tax",
+            "Deferred Tax",
+            "imposto diferido"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_DEFERRED_TAX",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Deferred Tax?",
+          "pt": "Qual política contábil devo aplicar para Deferred Tax?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_depreciation",
+      "appliesTo": [
+        "acct_depreciation"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "depreciation",
+            "Depreciation",
+            "fixed asset depreciation"
+          ],
+          "pt": [
+            "depreciação",
+            "depreciation",
+            "Depreciation"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_DEPRECIATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Depreciation?",
+          "pt": "Qual política contábil devo aplicar para Depreciation?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_disclosure_completeness",
+      "appliesTo": [
+        "acct_disclosure_completeness"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "disclosure completeness",
+            "Disclosure Completeness",
+            "note disclosure"
+          ],
+          "pt": [
+            "completude de divulgações",
+            "disclosure completeness",
+            "Disclosure Completeness"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_DISCLOSURE_COMPLETENESS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Disclosure Completeness?",
+          "pt": "Qual política contábil devo aplicar para Disclosure Completeness?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_earnings_quality",
+      "appliesTo": [
+        "acct_earnings_quality"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "earnings quality",
+            "Earnings Quality",
+            "quality of earnings"
+          ],
+          "pt": [
+            "earnings quality",
+            "Earnings Quality",
+            "qualidade dos resultados"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_EARNINGS_QUALITY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Earnings Quality?",
+          "pt": "Qual política contábil devo aplicar para Earnings Quality?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_extraordinary_item_policy",
+      "appliesTo": [
+        "acct_extraordinary_item_policy"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "extraordinary",
+            "extraordinary item policy",
+            "Extraordinary Item Policy"
+          ],
+          "pt": [
+            "extraordinary item policy",
+            "Extraordinary Item Policy",
+            "item extraordinário"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_EXTRAORDINARY_ITEM_POLICY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Extraordinary Item Policy?",
+          "pt": "Qual política contábil devo aplicar para Extraordinary Item Policy?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_fair_value",
+      "appliesTo": [
+        "acct_fair_value"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "fair value",
+            "Fair Value",
+            "mark to market"
+          ],
+          "pt": [
+            "fair value",
+            "Fair Value",
+            "valor justo"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_FAIR_VALUE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Fair Value?",
+          "pt": "Qual política contábil devo aplicar para Fair Value?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_foreign_currency_translation",
+      "appliesTo": [
+        "acct_foreign_currency_translation"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "foreign currency translation",
+            "Foreign Currency Translation",
+            "fx translation"
+          ],
+          "pt": [
+            "conversão cambial",
+            "foreign currency translation",
+            "Foreign Currency Translation"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_FOREIGN_CURRENCY_TRANSLATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Foreign Currency Translation?",
+          "pt": "Qual política contábil devo aplicar para Foreign Currency Translation?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_going_concern",
+      "appliesTo": [
+        "acct_going_concern"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "continuity assumption",
+            "going concern",
+            "Going Concern"
+          ],
+          "pt": [
+            "continuidade operacional",
+            "going concern",
+            "Going Concern"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_GOING_CONCERN",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Going Concern?",
+          "pt": "Qual política contábil devo aplicar para Going Concern?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_goodwill_testing",
+      "appliesTo": [
+        "acct_goodwill_testing"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "goodwill impairment",
+            "goodwill testing",
+            "Goodwill Testing"
+          ],
+          "pt": [
+            "goodwill testing",
+            "Goodwill Testing",
+            "teste de impairment de goodwill"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_GOODWILL_TESTING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Goodwill Testing?",
+          "pt": "Qual política contábil devo aplicar para Goodwill Testing?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_government_grants",
+      "appliesTo": [
+        "acct_government_grants"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "government grants",
+            "Government Grants",
+            "grant accounting"
+          ],
+          "pt": [
+            "government grants",
+            "Government Grants",
+            "subvenções governamentais"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_GOVERNMENT_GRANTS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Government Grants?",
+          "pt": "Qual política contábil devo aplicar para Government Grants?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_hedge_accounting",
+      "appliesTo": [
+        "acct_hedge_accounting"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "hedge accounting",
+            "Hedge Accounting",
+            "hedge designation"
+          ],
+          "pt": [
+            "contabilidade de hedge",
+            "hedge accounting",
+            "Hedge Accounting"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_HEDGE_ACCOUNTING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Hedge Accounting?",
+          "pt": "Qual política contábil devo aplicar para Hedge Accounting?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_historical_cost",
+      "appliesTo": [
+        "acct_historical_cost"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "cost model",
+            "historical cost",
+            "Historical Cost"
+          ],
+          "pt": [
+            "custo histórico",
+            "historical cost",
+            "Historical Cost"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_HISTORICAL_COST",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Historical Cost?",
+          "pt": "Qual política contábil devo aplicar para Historical Cost?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_impairment",
+      "appliesTo": [
+        "acct_impairment"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "asset impairment",
+            "impairment",
+            "Impairment"
+          ],
+          "pt": [
+            "impairment",
+            "Impairment"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_IMPAIRMENT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Impairment?",
+          "pt": "Qual política contábil devo aplicar para Impairment?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_intangibles_recognition",
+      "appliesTo": [
+        "acct_intangibles_recognition"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "intangible assets",
+            "intangibles recognition",
+            "Intangibles Recognition"
+          ],
+          "pt": [
+            "intangibles recognition",
+            "Intangibles Recognition",
+            "reconhecimento de intangíveis"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_INTANGIBLES_RECOGNITION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Intangibles Recognition?",
+          "pt": "Qual política contábil devo aplicar para Intangibles Recognition?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_intercompany_elimination",
+      "appliesTo": [
+        "acct_intercompany_elimination"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "elimination entries",
+            "intercompany elimination",
+            "Intercompany Elimination"
+          ],
+          "pt": [
+            "eliminação intercompany",
+            "intercompany elimination",
+            "Intercompany Elimination"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_INTERCOMPANY_ELIMINATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Intercompany Elimination?",
+          "pt": "Qual política contábil devo aplicar para Intercompany Elimination?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_inventory_valuation",
+      "appliesTo": [
+        "acct_inventory_valuation"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "fifo",
+            "inventory valuation",
+            "Inventory Valuation"
+          ],
+          "pt": [
+            "avaliação de estoque",
+            "inventory valuation",
+            "Inventory Valuation"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_INVENTORY_VALUATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Inventory Valuation?",
+          "pt": "Qual política contábil devo aplicar para Inventory Valuation?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_leases_capitalization",
+      "appliesTo": [
+        "acct_leases_capitalization"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "ifrs16",
+            "Lease Capitalization",
+            "leases capitalization"
+          ],
+          "pt": [
+            "capitalização de arrendamento",
+            "Lease Capitalization",
+            "leases capitalization"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_LEASES_CAPITALIZATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Lease Capitalization?",
+          "pt": "Qual política contábil devo aplicar para Lease Capitalization?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_matching_principle",
+      "appliesTo": [
+        "acct_matching_principle"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "expense matching",
+            "matching principle",
+            "Matching Principle"
+          ],
+          "pt": [
+            "matching principle",
+            "Matching Principle",
+            "princípio da confrontação"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_MATCHING_PRINCIPLE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Matching Principle?",
+          "pt": "Qual política contábil devo aplicar para Matching Principle?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_materiality",
+      "appliesTo": [
+        "acct_materiality"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "material threshold",
+            "materiality",
+            "Materiality"
+          ],
+          "pt": [
+            "materialidade",
+            "materiality",
+            "Materiality"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_MATERIALITY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Materiality?",
+          "pt": "Qual política contábil devo aplicar para Materiality?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_non_recurring_item",
+      "appliesTo": [
+        "acct_non_recurring_item"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "non recurring item",
+            "Non-Recurring Item",
+            "one-off item"
+          ],
+          "pt": [
+            "item não recorrente",
+            "non recurring item",
+            "Non-Recurring Item"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_NON_RECURRING_ITEM",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Non-Recurring Item?",
+          "pt": "Qual política contábil devo aplicar para Non-Recurring Item?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_provision",
+      "appliesTo": [
+        "acct_provision"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "estimated liability",
+            "provision",
+            "Provision"
+          ],
+          "pt": [
+            "provisão",
+            "provision",
+            "Provision"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_PROVISION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Provision?",
+          "pt": "Qual política contábil devo aplicar para Provision?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_prudence",
+      "appliesTo": [
+        "acct_prudence"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "conservatism",
+            "prudence",
+            "Prudence"
+          ],
+          "pt": [
+            "prudence",
+            "Prudence",
+            "prudência"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_PRUDENCE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Prudence?",
+          "pt": "Qual política contábil devo aplicar para Prudence?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_related_party",
+      "appliesTo": [
+        "acct_related_party"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "related party",
+            "Related Party",
+            "related party disclosure"
+          ],
+          "pt": [
+            "parte relacionada",
+            "related party",
+            "Related Party"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_RELATED_PARTY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Related Party?",
+          "pt": "Qual política contábil devo aplicar para Related Party?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_research_development_treatment",
+      "appliesTo": [
+        "acct_research_development_treatment"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "r&d accounting",
+            "Research and Development Treatment",
+            "research development treatment"
+          ],
+          "pt": [
+            "Research and Development Treatment",
+            "research development treatment",
+            "tratamento de p&d"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_RESEARCH_DEVELOPMENT_TREATMENT",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Research and Development Treatment?",
+          "pt": "Qual política contábil devo aplicar para Research and Development Treatment?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_reserves_equity_movements",
+      "appliesTo": [
+        "acct_reserves_equity_movements"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "equity bridge",
+            "Reserves and Equity Movements",
+            "reserves equity movements"
+          ],
+          "pt": [
+            "movimentação de reservas",
+            "Reserves and Equity Movements",
+            "reserves equity movements"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_RESERVES_EQUITY_MOVEMENTS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Reserves and Equity Movements?",
+          "pt": "Qual política contábil devo aplicar para Reserves and Equity Movements?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_restatement_policy",
+      "appliesTo": [
+        "acct_restatement_policy"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "prior period adjustment",
+            "restatement policy",
+            "Restatement Policy"
+          ],
+          "pt": [
+            "política de reapresentação",
+            "restatement policy",
+            "Restatement Policy"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_RESTATEMENT_POLICY",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Restatement Policy?",
+          "pt": "Qual política contábil devo aplicar para Restatement Policy?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_revenue_recognition",
+      "appliesTo": [
+        "acct_revenue_recognition"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "asc 606",
+            "revenue recognition",
+            "Revenue Recognition"
+          ],
+          "pt": [
+            "reconhecimento de receita",
+            "revenue recognition",
+            "Revenue Recognition"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_REVENUE_RECOGNITION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Revenue Recognition?",
+          "pt": "Qual política contábil devo aplicar para Revenue Recognition?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_segment_reporting",
+      "appliesTo": [
+        "acct_segment_reporting"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "segment note",
+            "segment reporting",
+            "Segment Reporting"
+          ],
+          "pt": [
+            "informação por segmento",
+            "segment reporting",
+            "Segment Reporting"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_SEGMENT_REPORTING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Segment Reporting?",
+          "pt": "Qual política contábil devo aplicar para Segment Reporting?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_subsequent_events",
+      "appliesTo": [
+        "acct_subsequent_events"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "post-balance-sheet events",
+            "subsequent events",
+            "Subsequent Events"
+          ],
+          "pt": [
+            "eventos subsequentes",
+            "subsequent events",
+            "Subsequent Events"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_SUBSEQUENT_EVENTS",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Subsequent Events?",
+          "pt": "Qual política contábil devo aplicar para Subsequent Events?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_substance_over_form",
+      "appliesTo": [
+        "acct_substance_over_form"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "economic substance",
+            "substance over form",
+            "Substance over Form"
+          ],
+          "pt": [
+            "essência sobre a forma",
+            "substance over form",
+            "Substance over Form"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_SUBSTANCE_OVER_FORM",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Substance over Form?",
+          "pt": "Qual política contábil devo aplicar para Substance over Form?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_tax_rate_reconciliation",
+      "appliesTo": [
+        "acct_tax_rate_reconciliation"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "etr bridge",
+            "tax rate reconciliation",
+            "Tax Rate Reconciliation"
+          ],
+          "pt": [
+            "reconciliação da taxa efetiva de imposto",
+            "tax rate reconciliation",
+            "Tax Rate Reconciliation"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_TAX_RATE_RECONCILIATION",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Tax Rate Reconciliation?",
+          "pt": "Qual política contábil devo aplicar para Tax Rate Reconciliation?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_policy_acct_unearned_revenue",
+      "appliesTo": [
+        "acct_unearned_revenue"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "compare"
+        ],
+        "keywords": {
+          "en": [
+            "customer advances",
+            "unearned revenue",
+            "Unearned Revenue"
+          ],
+          "pt": [
+            "receita não realizada",
+            "unearned revenue",
+            "Unearned Revenue"
+          ]
+        }
+      },
+      "check": {
+        "type": "policy_alignment",
+        "requiresNamedPolicy": true,
+        "requiresPeriodConsistency": true,
+        "requiresEntityScope": true
+      },
+      "failureAction": {
+        "code": "ACCT_POLICY_UNCLEAR_ACCT_UNEARNED_REVENUE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which accounting policy should I apply for Unearned Revenue?",
+          "pt": "Qual política contábil devo aplicar para Unearned Revenue?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_restatement_scope_guard",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "restate",
+            "restatement"
+          ],
+          "pt": [
+            "reapresentação",
+            "republicação"
+          ]
+        }
+      },
+      "check": {
+        "type": "restatement_requires_affected_periods_list",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_RESTATEMENT_SCOPE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which periods are affected by the restatement?",
+          "pt": "Quais períodos são afetados pela reapresentação?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_tax_reconciliation_guard",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "effective tax",
+            "statutory"
+          ],
+          "pt": [
+            "taxa efetiva",
+            "taxa nominal"
+          ]
+        }
+      },
+      "check": {
+        "type": "effective_tax_rate_needs_statutory_bridge",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_TAX_BRIDGE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I build a statutory-to-effective tax bridge before concluding?",
+          "pt": "Devo montar uma ponte da taxa nominal para efetiva antes de concluir?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_lease_classification_framework",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "lease classification",
+            "operating lease",
+            "finance lease"
+          ],
+          "pt": [
+            "classificação de arrendamento",
+            "leasing operacional",
+            "leasing financeiro"
+          ]
+        }
+      },
+      "check": {
+        "type": "lease_classification_ifrs16_vs_asc842_must_be_specified",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_LEASE_FRAMEWORK_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I classify this lease under IFRS 16 or US GAAP ASC 842?",
+          "pt": "Devo classificar este arrendamento conforme IFRS 16 ou US GAAP ASC 842?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_rou_discount_rate",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "calculate"
+        ],
+        "keywords": {
+          "en": [
+            "right-of-use",
+            "discount rate",
+            "lease liability"
+          ],
+          "pt": [
+            "direito de uso",
+            "taxa de desconto",
+            "passivo de arrendamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "rou_discount_rate_incremental_borrowing_vs_implicit",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_LEASE_DISCOUNT_RATE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I use the incremental borrowing rate or the implicit rate in the lease for discounting?",
+          "pt": "Devo usar a taxa incremental de empréstimo ou a taxa implícita no arrendamento para desconto?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_sbc_pricing_model",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "calculate"
+        ],
+        "keywords": {
+          "en": [
+            "share-based compensation",
+            "option pricing",
+            "stock options"
+          ],
+          "pt": [
+            "remuneração baseada em ações",
+            "precificação de opções",
+            "opções de ações"
+          ]
+        }
+      },
+      "check": {
+        "type": "sbc_requires_option_pricing_model_identification",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_SBC_MODEL_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which option pricing model should I use: Black-Scholes or Monte Carlo simulation?",
+          "pt": "Qual modelo de precificação de opções devo usar: Black-Scholes ou simulação de Monte Carlo?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_stock_option_vesting",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "calculate"
+        ],
+        "keywords": {
+          "en": [
+            "vesting schedule",
+            "stock option expense",
+            "graded vesting"
+          ],
+          "pt": [
+            "cronograma de aquisição",
+            "despesa de opção de ações",
+            "aquisição gradual"
+          ]
+        }
+      },
+      "check": {
+        "type": "stock_option_expense_requires_vesting_schedule_alignment",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_VESTING_SCHEDULE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should I apply straight-line or graded vesting for the stock option expense recognition?",
+          "pt": "Devo aplicar aquisição linear ou gradual para o reconhecimento da despesa de opções de ações?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_oci_reclassification",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "other comprehensive income",
+            "oci",
+            "reclassification"
+          ],
+          "pt": [
+            "outros resultados abrangentes",
+            "oci",
+            "reclassificação"
+          ]
+        }
+      },
+      "check": {
+        "type": "oci_items_must_classify_reclassifiable_vs_non_reclassifiable",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_OCI_CLASSIFICATION_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should this OCI item be classified as reclassifiable or non-reclassifiable to profit or loss?",
+          "pt": "Este item de OCI deve ser classificado como reclassificável ou não reclassificável para o resultado?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_functional_currency",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "functional currency",
+            "foreign currency",
+            "translation adjustment"
+          ],
+          "pt": [
+            "moeda funcional",
+            "moeda estrangeira",
+            "ajuste de conversão"
+          ]
+        }
+      },
+      "check": {
+        "type": "foreign_currency_translation_needs_functional_currency_id",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_FUNCTIONAL_CURRENCY_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the functional currency of this entity for translation purposes?",
+          "pt": "Qual é a moeda funcional desta entidade para fins de conversão?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_hedge_effectiveness",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "hedge effectiveness",
+            "hedge testing",
+            "hedge documentation"
+          ],
+          "pt": [
+            "efetividade do hedge",
+            "teste de hedge",
+            "documentação de hedge"
+          ]
+        }
+      },
+      "check": {
+        "type": "hedge_effectiveness_testing_method_must_be_disclosed",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_HEDGE_METHOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which hedge effectiveness testing method was used (dollar-offset, regression, or critical terms match)?",
+          "pt": "Qual método de teste de efetividade do hedge foi utilizado (dollar-offset, regressão ou correspondência de termos críticos)?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_fair_value_hierarchy",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "fair value",
+            "hierarchy",
+            "level 1",
+            "level 2",
+            "level 3"
+          ],
+          "pt": [
+            "valor justo",
+            "hierarquia",
+            "nível 1",
+            "nível 2",
+            "nível 3"
+          ]
+        }
+      },
+      "check": {
+        "type": "fair_value_hierarchy_level_must_be_stated",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_FAIR_VALUE_LEVEL_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "At which fair value hierarchy level (1, 2, or 3) is this measurement classified?",
+          "pt": "Em qual nível da hierarquia de valor justo (1, 2 ou 3) esta mensuração está classificada?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_discontinued_ops_date",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "discontinued operations",
+            "disposal group",
+            "held for sale"
+          ],
+          "pt": [
+            "operações descontinuadas",
+            "grupo de alienação",
+            "mantido para venda"
+          ]
+        }
+      },
+      "check": {
+        "type": "discontinued_operations_require_classification_date",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_DISCONTINUED_DATE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What is the date of classification as discontinued operations?",
+          "pt": "Qual é a data de classificação como operações descontinuadas?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_intercompany_bidirectional",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "intercompany",
+            "elimination",
+            "intra-group"
+          ],
+          "pt": [
+            "intercompany",
+            "eliminação",
+            "intragrupo"
+          ]
+        }
+      },
+      "check": {
+        "type": "intercompany_elimination_must_be_complete_and_bidirectional",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_IC_ELIMINATION_INCOMPLETE",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Have all intercompany balances been eliminated bidirectionally (both seller and buyer sides)?",
+          "pt": "Todos os saldos intercompany foram eliminados bidirecionalmente (lado do vendedor e do comprador)?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_nci_measurement",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "non-controlling interest",
+            "minority interest",
+            "nci"
+          ],
+          "pt": [
+            "participação de não controladores",
+            "interesse minoritário",
+            "nci"
+          ]
+        }
+      },
+      "check": {
+        "type": "nci_must_use_acquisition_date_fair_value_or_proportionate_share",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_NCI_METHOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Should NCI be measured at acquisition-date fair value (full goodwill) or proportionate share of net assets?",
+          "pt": "O NCI deve ser mensurado ao valor justo na data de aquisição (goodwill total) ou pela participação proporcional nos ativos líquidos?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_ppa_valuation",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "purchase price allocation",
+            "ppa",
+            "intangible valuation"
+          ],
+          "pt": [
+            "alocação do preço de compra",
+            "ppa",
+            "avaliação de intangível"
+          ]
+        }
+      },
+      "check": {
+        "type": "ppa_needs_valuation_methodology_for_each_intangible",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_PPA_METHODOLOGY_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which valuation methodology was used for each identified intangible (MEEM, relief-from-royalty, with/without)?",
+          "pt": "Qual metodologia de avaliação foi usada para cada intangível identificado (MEEM, alívio de royalty, com/sem)?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_contingent_consideration_remeasurement",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "contingent consideration",
+            "earnout",
+            "remeasurement"
+          ],
+          "pt": [
+            "contraprestação contingente",
+            "earn-out",
+            "remensuração"
+          ]
+        }
+      },
+      "check": {
+        "type": "contingent_consideration_must_be_remeasured_each_reporting_date",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_CONTINGENT_REMEASURE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Has the contingent consideration been remeasured at fair value as of this reporting date?",
+          "pt": "A contraprestação contingente foi remensurada ao valor justo nesta data de reporte?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_restructuring_evidence",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "restructuring",
+            "provision",
+            "reorganization"
+          ],
+          "pt": [
+            "reestruturação",
+            "provisão",
+            "reorganização"
+          ]
+        }
+      },
+      "check": {
+        "type": "restructuring_provisions_need_detailed_plan_and_communication",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_RESTRUCTURING_PLAN_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Is there a detailed restructuring plan with evidence of communication to affected parties?",
+          "pt": "Existe um plano detalhado de reestruturação com evidência de comunicação às partes afetadas?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_ecl_staging",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "expected credit loss",
+            "ecl staging",
+            "credit deterioration"
+          ],
+          "pt": [
+            "perda de crédito esperada",
+            "estágio ecl",
+            "deterioração de crédito"
+          ]
+        }
+      },
+      "check": {
+        "type": "ecl_needs_staging_12month_vs_lifetime_disclosure",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_ECL_STAGING_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Are the expected credit losses measured on a 12-month or lifetime basis, and what stage applies?",
+          "pt": "As perdas de crédito esperadas são mensuradas em base de 12 meses ou vitalícia, e qual estágio se aplica?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_asc842_lease_criteria",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "asc 842",
+            "operating vs finance",
+            "lease criteria"
+          ],
+          "pt": [
+            "asc 842",
+            "operacional vs financeiro",
+            "critérios de arrendamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "operating_vs_finance_lease_asc842_needs_criteria_reference",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_ASC842_CRITERIA_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Which specific ASC 842 criteria were applied to distinguish operating from finance lease?",
+          "pt": "Quais critérios específicos do ASC 842 foram aplicados para distinguir arrendamento operacional de financeiro?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_biological_asset_market_data",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "biological asset",
+            "fair value less costs to sell",
+            "agricultural"
+          ],
+          "pt": [
+            "ativo biológico",
+            "valor justo menos custos de venda",
+            "agrícola"
+          ]
+        }
+      },
+      "check": {
+        "type": "biological_assets_fair_value_needs_market_data_source",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_BIO_MARKET_DATA_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What market data source was used for the biological asset fair value less costs to sell?",
+          "pt": "Qual fonte de dados de mercado foi usada para o valor justo menos custos de venda do ativo biológico?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_investment_property_model",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "investment property",
+            "cost model",
+            "fair value model"
+          ],
+          "pt": [
+            "propriedade para investimento",
+            "modelo de custo",
+            "modelo de valor justo"
+          ]
+        }
+      },
+      "check": {
+        "type": "investment_property_model_must_be_consistently_applied",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_INVESTMENT_PROP_MODEL_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Is the investment property measured using the cost model or the fair value model, and is it consistently applied?",
+          "pt": "A propriedade para investimento é mensurada pelo modelo de custo ou de valor justo, e é aplicado de forma consistente?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_held_for_sale_evidence",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "held for sale",
+            "available for immediate sale",
+            "ifrs 5"
+          ],
+          "pt": [
+            "mantido para venda",
+            "disponível para venda imediata",
+            "ifrs 5"
+          ]
+        }
+      },
+      "check": {
+        "type": "held_for_sale_needs_available_for_immediate_sale_evidence",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_HELD_FOR_SALE_EVIDENCE_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Is there evidence that the asset is available for immediate sale in its present condition?",
+          "pt": "Há evidência de que o ativo está disponível para venda imediata em suas condições atuais?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_going_concern_horizon",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "going concern",
+            "continuity",
+            "viability"
+          ],
+          "pt": [
+            "continuidade operacional",
+            "viabilidade",
+            "empresa em funcionamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "going_concern_needs_specific_time_horizon_12months",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_GOING_CONCERN_HORIZON_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Has the going concern assessment covered at least 12 months from the date of financial statement issuance?",
+          "pt": "A avaliação de continuidade operacional cobriu pelo menos 12 meses a partir da data de emissão das demonstrações financeiras?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_segment_aggregation",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "segment aggregation",
+            "reportable segment",
+            "quantitative threshold"
+          ],
+          "pt": [
+            "agregação de segmentos",
+            "segmento reportável",
+            "limite quantitativo"
+          ]
+        }
+      },
+      "check": {
+        "type": "segment_aggregation_needs_quantitative_threshold_disclosure",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_SEGMENT_THRESHOLD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Do the reported segments meet the quantitative thresholds (10% revenue, profit, or assets test)?",
+          "pt": "Os segmentos reportados atendem aos limites quantitativos (teste de 10% de receita, resultado ou ativos)?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_treasury_stock_method",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "treasury stock",
+            "own shares",
+            "share buyback"
+          ],
+          "pt": [
+            "ações em tesouraria",
+            "ações próprias",
+            "recompra de ações"
+          ]
+        }
+      },
+      "check": {
+        "type": "treasury_stock_requires_cost_vs_par_value_method",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_TREASURY_METHOD_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Is treasury stock accounted for using the cost method or the par value method?",
+          "pt": "As ações em tesouraria são contabilizadas pelo método do custo ou pelo método do valor nominal?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_comprehensive_income_presentation",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "comprehensive income",
+            "statement presentation",
+            "single statement"
+          ],
+          "pt": [
+            "resultado abrangente",
+            "apresentação da demonstração",
+            "demonstração única"
+          ]
+        }
+      },
+      "check": {
+        "type": "comprehensive_income_presentation_format_must_be_identified",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_CI_PRESENTATION_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Is comprehensive income presented in a single continuous statement or in two separate statements?",
+          "pt": "O resultado abrangente é apresentado em uma demonstração contínua única ou em duas demonstrações separadas?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_earnout_scenarios",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "calculate"
+        ],
+        "keywords": {
+          "en": [
+            "earn-out",
+            "earnout",
+            "probability-weighted"
+          ],
+          "pt": [
+            "earn-out",
+            "ponderação por probabilidade",
+            "cenários de earn-out"
+          ]
+        }
+      },
+      "check": {
+        "type": "earnout_liabilities_need_probability_weighted_scenario_disclosure",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_EARNOUT_SCENARIOS_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "Have the earn-out scenarios been probability-weighted with disclosed assumptions?",
+          "pt": "Os cenários de earn-out foram ponderados por probabilidade com premissas divulgadas?"
+        }
+      }
+    },
+    {
+      "id": "rule_accounting_environmental_liability_timing",
+      "appliesTo": [
+        "all_accounting_interpretations"
+      ],
+      "trigger": {
+        "operators": [
+          "evaluate",
+          "validate",
+          "summarize"
+        ],
+        "keywords": {
+          "en": [
+            "environmental liability",
+            "remediation",
+            "decommissioning"
+          ],
+          "pt": [
+            "passivo ambiental",
+            "remediação",
+            "descomissionamento"
+          ]
+        }
+      },
+      "check": {
+        "type": "environmental_liabilities_require_discount_rate_and_timing",
+        "deterministic": true,
+        "requiresSinglePolicyChoice": true
+      },
+      "failureAction": {
+        "code": "ACCT_ENV_LIABILITY_TIMING_MISSING",
+        "severity": "ask",
+        "action": "ask_one_question",
+        "questionTemplate": {
+          "en": "What discount rate and expected settlement timing were used for the environmental liability?",
+          "pt": "Qual taxa de desconto e prazo esperado de liquidação foram usados para o passivo ambiental?"
+        }
+      }
+    }
+  ]
 }

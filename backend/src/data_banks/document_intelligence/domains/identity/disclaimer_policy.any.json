@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "id": "di_identity_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer templates for identity domain responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity"
+  },
+  "domain": "identity",
+  "disclaimers": [
+    {
+      "id": "id_disc_001_not_identity_auth_decision",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This output summarizes observed identity document evidence and is not a final authentication decision.",
+        "pt": "Esta resposta resume evidencias observadas em documentos de identidade e nao constitui decisao final de autenticacao."
+      }
+    },
+    {
+      "id": "id_disc_002_scope_lock",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Only attached documents were analyzed. External registries were not queried.",
+        "pt": "Somente os documentos anexados foram analisados. Registros externos nao foram consultados."
+      }
+    },
+    {
+      "id": "id_disc_003_unverified_fields",
+      "trigger": "contains_unverified_fields",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Some identity fields are unverified due to missing or unreadable evidence.",
+        "pt": "Alguns campos de identidade estao nao verificados por falta de evidencia legivel ou completa."
+      }
+    },
+    {
+      "id": "id_disc_004_redaction_notice",
+      "trigger": "pii_redacted",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Sensitive identifiers were redacted by default for security.",
+        "pt": "Identificadores sensiveis foram ocultados por padrao por seguranca."
+      }
+    },
+    {
+      "id": "id_disc_005_expiry_warning",
+      "trigger": "contains_expiry_context",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Document validity should be confirmed against issuing authority requirements.",
+        "pt": "A validade do documento deve ser confirmada conforme os requisitos da autoridade emissora."
+      }
+    }
+  ]
+}

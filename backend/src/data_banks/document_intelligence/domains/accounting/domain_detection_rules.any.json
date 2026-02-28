@@ -1,0 +1,98 @@
+{
+  "_meta": {
+    "id": "di_accounting_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting accounting domain from document content, metadata, and structure.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 20
+  },
+  "domain": "accounting",
+  "rules": [
+    {
+      "id": "acct_detect_001_trial_balance",
+      "priority": 99,
+      "weight": 3.0,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:trial\\s+balance|balan(?:ç|c)ete\\s+de\\s+verifica(?:ç|c)[ãa]o)\\b"],
+      "description": "Trial balance heading or content"
+    },
+    {
+      "id": "acct_detect_002_general_ledger",
+      "priority": 98,
+      "weight": 3.0,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:general\\s+ledger|GL\\s+(?:export|detail|summary)|raz[ãa]o\\s+geral|livro\\s+raz[ãa]o)\\b"],
+      "description": "General ledger identifiers"
+    },
+    {
+      "id": "acct_detect_003_journal_entry",
+      "priority": 95,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:journal\\s+entr(?:y|ies)|JE\\s+\\d|adjusting\\s+entr(?:y|ies)|lan(?:ç|c)amento(?:s)?\\s+cont[áa]bei(?:s|l))\\b"],
+      "description": "Journal entry identifiers"
+    },
+    {
+      "id": "acct_detect_004_debit_credit",
+      "priority": 85,
+      "weight": 2.0,
+      "signal": "table_header",
+      "patterns": ["\\b(?:debit|credit|d[ée]bito|cr[ée]dito)\\b.*\\b(?:debit|credit|d[ée]bito|cr[ée]dito)\\b"],
+      "description": "Debit/credit column pair in table headers"
+    },
+    {
+      "id": "acct_detect_005_bank_rec",
+      "priority": 95,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:bank\\s+reconciliation|reconcilia(?:ç|c)[ãa]o\\s+banc[áa]ria|reconciling\\s+items)\\b"],
+      "description": "Bank reconciliation identifiers"
+    },
+    {
+      "id": "acct_detect_006_aging",
+      "priority": 90,
+      "weight": 2.0,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:(?:AR|AP|accounts\\s+(?:receivable|payable))\\s+aging|aging\\s+(?:report|schedule|summary))\\b"],
+      "description": "Aging report identifiers"
+    },
+    {
+      "id": "acct_detect_007_audit_workpaper",
+      "priority": 95,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:audit\\s+workpaper|working\\s+paper|PBC\\s+list|prepared\\s+by\\s+client|papel\\s+de\\s+trabalho)\\b"],
+      "description": "Audit workpaper identifiers"
+    },
+    {
+      "id": "acct_detect_008_coa",
+      "priority": 90,
+      "weight": 2.0,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:chart\\s+of\\s+accounts|plano\\s+de\\s+contas|account\\s+(?:code|number)\\s*:\\s*\\d{4,})\\b"],
+      "description": "Chart of accounts references"
+    },
+    {
+      "id": "acct_detect_009_controls",
+      "priority": 80,
+      "weight": 1.5,
+      "signal": "heading_or_content",
+      "patterns": ["\\b(?:internal\\s+controls?|controls?\\s+narrative|segregation\\s+of\\s+duties|controles?\\s+internos?)\\b"],
+      "description": "Internal controls terminology"
+    },
+    {
+      "id": "acct_detect_010_closing",
+      "priority": 75,
+      "weight": 1.2,
+      "signal": "content",
+      "patterns": ["\\b(?:closing\\s+entr(?:y|ies)|period[- ]end\\s+close|month[- ]end\\s+close|fechamento\\s+(?:mensal|cont[áa]bil))\\b"],
+      "description": "Period close terminology"
+    }
+  ]
+}

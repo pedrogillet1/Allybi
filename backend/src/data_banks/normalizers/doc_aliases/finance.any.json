@@ -1,27 +1,3206 @@
 {
   "_meta": {
     "id": "doc_aliases_finance",
-    "version": "1.0.0",
-    "description": "User alias mapping for finance documents.",
+    "version": "2.0.0",
+    "description": "User alias mapping for finance documents with PT-heavy coverage and doc-type disambiguation.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "caseInsensitive": true
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.74
   },
   "domain": "finance",
   "aliases": [
     {
-      "alias": "finance document",
-      "docTypes": [],
+      "phrase": "10-k",
+      "normalized": "10-k",
+      "docTypeIds": [
+        "fin_10k"
+      ],
       "hints": {
-        "period": "unknown",
-        "owner": "unknown"
-      }
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show 10-k for 2025",
+        "compare 10-k by quarter"
+      ]
+    },
+    {
+      "phrase": "10-q",
+      "normalized": "10-q",
+      "docTypeIds": [
+        "fin_10q"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show 10-q for 2025",
+        "compare 10-q by quarter"
+      ]
+    },
+    {
+      "phrase": "10k anual",
+      "normalized": "10k anual",
+      "docTypeIds": [
+        "fin_10k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show 10k anual for 2025",
+        "compare 10k anual by quarter"
+      ]
+    },
+    {
+      "phrase": "10q trimestral",
+      "normalized": "10q trimestral",
+      "docTypeIds": [
+        "fin_10q"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show 10q trimestral for 2025",
+        "compare 10q trimestral by quarter"
+      ]
+    },
+    {
+      "phrase": "8-k",
+      "normalized": "8-k",
+      "docTypeIds": [
+        "fin_8k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show 8-k for 2025",
+        "compare 8-k by quarter"
+      ]
+    },
+    {
+      "phrase": "agenda de divida",
+      "normalized": "agenda de divida",
+      "docTypeIds": [
+        "fin_debt_schedule"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre agenda de divida de 2025",
+        "compare agenda de divida por trimestre"
+      ]
+    },
+    {
+      "phrase": "analise de coorte",
+      "normalized": "analise de coorte",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre analise de coorte de 2025",
+        "compare analise de coorte por trimestre"
+      ]
+    },
+    {
+      "phrase": "analise de coorte de receita",
+      "normalized": "analise de coorte de receita",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre analise de coorte de receita de 2025",
+        "onde estao os dados de analise de coorte de receita"
+      ]
+    },
+    {
+      "phrase": "analise de variacao",
+      "normalized": "analise de variacao",
+      "docTypeIds": [
+        "fin_variance_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre analise de variacao de 2025",
+        "compare analise de variacao por trimestre"
+      ]
+    },
+    {
+      "phrase": "annual budget",
+      "normalized": "annual budget",
+      "docTypeIds": [
+        "fin_budget"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual budget for 2025",
+        "compare annual budget by quarter"
+      ]
+    },
+    {
+      "phrase": "annual sec filing",
+      "normalized": "annual sec filing",
+      "docTypeIds": [
+        "fin_10k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual sec filing for 2025",
+        "compare annual sec filing by quarter"
+      ]
+    },
+    {
+      "phrase": "apresentacao conselho financeiro",
+      "normalized": "apresentacao conselho financeiro",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre apresentacao conselho financeiro de 2025",
+        "compare apresentacao conselho financeiro por trimestre"
+      ]
+    },
+    {
+      "phrase": "apresentacao de investidores",
+      "normalized": "apresentacao de investidores",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre apresentacao de investidores de 2025",
+        "onde estao os dados de apresentacao de investidores"
+      ]
+    },
+    {
+      "phrase": "apresentacao investidores",
+      "normalized": "apresentacao investidores",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre apresentacao investidores de 2025",
+        "compare apresentacao investidores por trimestre"
+      ]
+    },
+    {
+      "phrase": "apresentacao ri",
+      "normalized": "apresentacao ri",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre apresentacao ri de 2025",
+        "compare apresentacao ri por trimestre"
+      ]
+    },
+    {
+      "phrase": "arquivo 10-k",
+      "normalized": "arquivo 10-k",
+      "docTypeIds": [
+        "fin_10k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show arquivo 10-k for 2025",
+        "compare arquivo 10-k by quarter"
+      ]
+    },
+    {
+      "phrase": "arquivo 10-q",
+      "normalized": "arquivo 10-q",
+      "docTypeIds": [
+        "fin_10q"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show arquivo 10-q for 2025",
+        "compare arquivo 10-q by quarter"
+      ]
+    },
+    {
+      "phrase": "arquivo 8-k",
+      "normalized": "arquivo 8-k",
+      "docTypeIds": [
+        "fin_8k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show arquivo 8-k for 2025",
+        "compare arquivo 8-k by quarter"
+      ]
+    },
+    {
+      "phrase": "arr mrr report",
+      "normalized": "arr mrr report",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show arr mrr report for 2025",
+        "compare arr mrr report by quarter"
+      ]
+    },
+    {
+      "phrase": "arr nrr churn",
+      "normalized": "arr nrr churn",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show arr nrr churn for 2025",
+        "compare arr nrr churn by quarter"
+      ]
+    },
+    {
+      "phrase": "arr report",
+      "normalized": "arr report",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show arr report for 2025",
+        "compare arr report by quarter"
+      ]
+    },
+    {
+      "phrase": "balanco dre fluxo",
+      "normalized": "balanco dre fluxo",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "statements",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre balanco dre fluxo de 2025",
+        "compare balanco dre fluxo por trimestre"
+      ]
+    },
+    {
+      "phrase": "balanco patrimonial",
+      "normalized": "balanco patrimonial",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre balanco patrimonial de 2025",
+        "onde estao os dados de balanco patrimonial"
+      ]
+    },
+    {
+      "phrase": "bank extract",
+      "normalized": "bank extract",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show bank extract for 2025",
+        "compare bank extract by quarter"
+      ]
+    },
+    {
+      "phrase": "bank statement",
+      "normalized": "bank statement",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show bank statement for 2025",
+        "compare bank statement by quarter"
+      ]
+    },
+    {
+      "phrase": "board deck finance",
+      "normalized": "board deck finance",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show board deck finance for 2025",
+        "compare board deck finance by quarter"
+      ]
+    },
+    {
+      "phrase": "board finance deck",
+      "normalized": "board finance deck",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show board finance deck for 2025",
+        "compare board finance deck by quarter"
+      ]
+    },
+    {
+      "phrase": "budget",
+      "normalized": "budget",
+      "docTypeIds": [
+        "fin_budget"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show budget for 2025",
+        "compare budget by quarter"
+      ]
+    },
+    {
+      "phrase": "budget plan",
+      "normalized": "budget plan",
+      "docTypeIds": [
+        "fin_budget"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show budget plan for 2025",
+        "compare budget plan by quarter"
+      ]
+    },
+    {
+      "phrase": "budget vs actual",
+      "normalized": "budget vs actual",
+      "docTypeIds": [
+        "fin_variance_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show budget vs actual for 2025",
+        "compare budget vs actual by quarter"
+      ]
+    },
+    {
+      "phrase": "cap table",
+      "normalized": "cap table",
+      "docTypeIds": [
+        "fin_cap_table"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "equity_holder",
+        "formatHint": "capital",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cap table for 2025",
+        "compare cap table by quarter"
+      ]
+    },
+    {
+      "phrase": "cap table diluida",
+      "normalized": "cap table diluida",
+      "docTypeIds": [
+        "fin_cap_table"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "equity_holder",
+        "formatHint": "capital",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cap table diluida for 2025",
+        "compare cap table diluida by quarter"
+      ]
+    },
+    {
+      "phrase": "capitalization table",
+      "normalized": "capitalization table",
+      "docTypeIds": [
+        "fin_cap_table"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "equity_holder",
+        "formatHint": "capital",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show capitalization table for 2025",
+        "compare capitalization table by quarter"
+      ]
+    },
+    {
+      "phrase": "carta de compliance da divida",
+      "normalized": "carta de compliance da divida",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre carta de compliance da divida de 2025",
+        "compare carta de compliance da divida por trimestre"
+      ]
+    },
+    {
+      "phrase": "cash forecast",
+      "normalized": "cash forecast",
+      "docTypeIds": [
+        "fin_cash_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cash forecast for 2025",
+        "compare cash forecast by quarter"
+      ]
+    },
+    {
+      "phrase": "cash planning",
+      "normalized": "cash planning",
+      "docTypeIds": [
+        "fin_cash_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cash planning for 2025",
+        "compare cash planning by quarter"
+      ]
+    },
+    {
+      "phrase": "cash projection",
+      "normalized": "cash projection",
+      "docTypeIds": [
+        "fin_cash_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cash projection for 2025",
+        "compare cash projection by quarter"
+      ]
+    },
+    {
+      "phrase": "certificado compliance covenant",
+      "normalized": "certificado compliance covenant",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre certificado compliance covenant de 2025",
+        "compare certificado compliance covenant por trimestre"
+      ]
+    },
+    {
+      "phrase": "certificado covenant",
+      "normalized": "certificado covenant",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre certificado covenant de 2025",
+        "compare certificado covenant por trimestre"
+      ]
+    },
+    {
+      "phrase": "certificado de covenant",
+      "normalized": "certificado de covenant",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre certificado de covenant de 2025",
+        "onde estao os dados de certificado de covenant"
+      ]
+    },
+    {
+      "phrase": "closing pack mensal",
+      "normalized": "closing pack mensal",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "close",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show closing pack mensal for 2025",
+        "compare closing pack mensal by quarter"
+      ]
+    },
+    {
+      "phrase": "cobertura pipeline",
+      "normalized": "cobertura pipeline",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cobertura pipeline for 2025",
+        "compare cobertura pipeline by quarter"
+      ]
+    },
+    {
+      "phrase": "cockpit financeiro",
+      "normalized": "cockpit financeiro",
+      "docTypeIds": [
+        "fin_kpi_dashboard"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cockpit financeiro for 2025",
+        "compare cockpit financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "cohort analysis",
+      "normalized": "cohort analysis",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cohort analysis for 2025",
+        "compare cohort analysis by quarter"
+      ]
+    },
+    {
+      "phrase": "cohort report",
+      "normalized": "cohort report",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cohort report for 2025",
+        "compare cohort report by quarter"
+      ]
+    },
+    {
+      "phrase": "cohort retention",
+      "normalized": "cohort retention",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show cohort retention for 2025",
+        "compare cohort retention by quarter"
+      ]
+    },
+    {
+      "phrase": "compliance de covenant",
+      "normalized": "compliance de covenant",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre compliance de covenant de 2025",
+        "compare compliance de covenant por trimestre"
+      ]
+    },
+    {
+      "phrase": "comunicado de resultados",
+      "normalized": "comunicado de resultados",
+      "docTypeIds": [
+        "fin_earnings_release"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show comunicado de resultados for 2025",
+        "compare comunicado de resultados by quarter"
+      ]
+    },
+    {
+      "phrase": "coorte de clientes",
+      "normalized": "coorte de clientes",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre coorte de clientes de 2025",
+        "compare coorte de clientes por trimestre"
+      ]
+    },
+    {
+      "phrase": "covenant certificate",
+      "normalized": "covenant certificate",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre covenant certificate de 2025",
+        "compare covenant certificate por trimestre"
+      ]
+    },
+    {
+      "phrase": "covenant compliance",
+      "normalized": "covenant compliance",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre covenant compliance de 2025",
+        "compare covenant compliance por trimestre"
+      ]
+    },
+    {
+      "phrase": "cronograma de divida",
+      "normalized": "cronograma de divida",
+      "docTypeIds": [
+        "fin_debt_schedule"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre cronograma de divida de 2025",
+        "compare cronograma de divida por trimestre"
+      ]
+    },
+    {
+      "phrase": "dash kpi",
+      "normalized": "dash kpi",
+      "docTypeIds": [
+        "fin_kpi_dashboard"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show dash kpi for 2025",
+        "compare dash kpi by quarter"
+      ]
+    },
+    {
+      "phrase": "dashboard financeiro",
+      "normalized": "dashboard financeiro",
+      "docTypeIds": [
+        "fin_kpi_dashboard"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show dashboard financeiro for 2025",
+        "compare dashboard financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "debt schedule",
+      "normalized": "debt schedule",
+      "docTypeIds": [
+        "fin_debt_schedule"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt schedule for 2025",
+        "compare debt schedule by quarter"
+      ]
+    },
+    {
+      "phrase": "deck board financeiro",
+      "normalized": "deck board financeiro",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show deck board financeiro for 2025",
+        "compare deck board financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "deck comite financeiro",
+      "normalized": "deck comite financeiro",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show deck comite financeiro for 2025",
+        "compare deck comite financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "deck conselho financeiro",
+      "normalized": "deck conselho financeiro",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre deck conselho financeiro de 2025",
+        "compare deck conselho financeiro por trimestre"
+      ]
+    },
+    {
+      "phrase": "deck financeiro do conselho",
+      "normalized": "deck financeiro do conselho",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre deck financeiro do conselho de 2025",
+        "onde estao os dados de deck financeiro do conselho"
+      ]
+    },
+    {
+      "phrase": "deck para investidores",
+      "normalized": "deck para investidores",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show deck para investidores for 2025",
+        "compare deck para investidores by quarter"
+      ]
+    },
+    {
+      "phrase": "deck ri",
+      "normalized": "deck ri",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show deck ri for 2025",
+        "compare deck ri by quarter"
+      ]
+    },
+    {
+      "phrase": "demonstracao de resultado",
+      "normalized": "demonstracao de resultado",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre demonstracao de resultado de 2025",
+        "onde estao os dados de demonstracao de resultado"
+      ]
+    },
+    {
+      "phrase": "demonstracoes financeiras",
+      "normalized": "demonstracoes financeiras",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "statements",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre demonstracoes financeiras de 2025",
+        "compare demonstracoes financeiras por trimestre"
+      ]
+    },
+    {
+      "phrase": "desvio orcamentario",
+      "normalized": "desvio orcamentario",
+      "docTypeIds": [
+        "fin_variance_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show desvio orcamentario for 2025",
+        "compare desvio orcamentario by quarter"
+      ]
+    },
+    {
+      "phrase": "dfc",
+      "normalized": "dfc",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre dfc de 2025",
+        "onde estao os dados de dfc"
+      ]
+    },
+    {
+      "phrase": "divulgacao de resultados",
+      "normalized": "divulgacao de resultados",
+      "docTypeIds": [
+        "fin_earnings_release"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show divulgacao de resultados for 2025",
+        "compare divulgacao de resultados by quarter"
+      ]
+    },
+    {
+      "phrase": "dre",
+      "normalized": "dre",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre dre de 2025",
+        "onde estao os dados de dre"
+      ]
+    },
+    {
+      "phrase": "dre balanco dfc",
+      "normalized": "dre balanco dfc",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "statements",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre dre balanco dfc de 2025",
+        "compare dre balanco dfc por trimestre"
+      ]
+    },
+    {
+      "phrase": "earnings release",
+      "normalized": "earnings release",
+      "docTypeIds": [
+        "fin_earnings_release"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show earnings release for 2025",
+        "compare earnings release by quarter"
+      ]
+    },
+    {
+      "phrase": "economia unitaria",
+      "normalized": "economia unitaria",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show economia unitaria for 2025",
+        "compare economia unitaria by quarter"
+      ]
+    },
+    {
+      "phrase": "esg anual",
+      "normalized": "esg anual",
+      "docTypeIds": [
+        "fin_esg_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show esg anual for 2025",
+        "compare esg anual by quarter"
+      ]
+    },
+    {
+      "phrase": "esg report",
+      "normalized": "esg report",
+      "docTypeIds": [
+        "fin_esg_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show esg report for 2025",
+        "compare esg report by quarter"
+      ]
+    },
+    {
+      "phrase": "estimativa financeira",
+      "normalized": "estimativa financeira",
+      "docTypeIds": [
+        "fin_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show estimativa financeira for 2025",
+        "compare estimativa financeira by quarter"
+      ]
+    },
+    {
+      "phrase": "estrutura acionaria",
+      "normalized": "estrutura acionaria",
+      "docTypeIds": [
+        "fin_cap_table"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "equity_holder",
+        "formatHint": "capital",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show estrutura acionaria for 2025",
+        "compare estrutura acionaria by quarter"
+      ]
+    },
+    {
+      "phrase": "evento material 8-k",
+      "normalized": "evento material 8-k",
+      "docTypeIds": [
+        "fin_8k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show evento material 8-k for 2025",
+        "compare evento material 8-k by quarter"
+      ]
+    },
+    {
+      "phrase": "extrato bancario",
+      "normalized": "extrato bancario",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre extrato bancario de 2025",
+        "compare extrato bancario por trimestre"
+      ]
+    },
+    {
+      "phrase": "extrato conta",
+      "normalized": "extrato conta",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre extrato conta de 2025",
+        "compare extrato conta por trimestre"
+      ]
+    },
+    {
+      "phrase": "extrato da conta bancaria",
+      "normalized": "extrato da conta bancaria",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre extrato da conta bancaria de 2025",
+        "onde estao os dados de extrato da conta bancaria"
+      ]
+    },
+    {
+      "phrase": "extrato do banco",
+      "normalized": "extrato do banco",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre extrato do banco de 2025",
+        "compare extrato do banco por trimestre"
+      ]
+    },
+    {
+      "phrase": "fato relevante sec",
+      "normalized": "fato relevante sec",
+      "docTypeIds": [
+        "fin_8k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show fato relevante sec for 2025",
+        "compare fato relevante sec by quarter"
+      ]
+    },
+    {
+      "phrase": "fechamento contab financeiro",
+      "normalized": "fechamento contab financeiro",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "close",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show fechamento contab financeiro for 2025",
+        "compare fechamento contab financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "fechamento mensal",
+      "normalized": "fechamento mensal",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "close",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show fechamento mensal for 2025",
+        "compare fechamento mensal by quarter"
+      ]
+    },
+    {
+      "phrase": "fechamento mensal financeiro",
+      "normalized": "fechamento mensal financeiro",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre fechamento mensal financeiro de 2025",
+        "onde estao os dados de fechamento mensal financeiro"
+      ]
+    },
+    {
+      "phrase": "financial dashboard",
+      "normalized": "financial dashboard",
+      "docTypeIds": [
+        "fin_kpi_dashboard"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show financial dashboard for 2025",
+        "compare financial dashboard by quarter"
+      ]
+    },
+    {
+      "phrase": "financial forecast",
+      "normalized": "financial forecast",
+      "docTypeIds": [
+        "fin_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show financial forecast for 2025",
+        "compare financial forecast by quarter"
+      ]
+    },
+    {
+      "phrase": "financial statements",
+      "normalized": "financial statements",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "statements",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show financial statements for 2025",
+        "compare financial statements by quarter"
+      ]
+    },
+    {
+      "phrase": "fluxo de caixa",
+      "normalized": "fluxo de caixa",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre fluxo de caixa de 2025",
+        "onde estao os dados de fluxo de caixa"
+      ]
+    },
+    {
+      "phrase": "forecast",
+      "normalized": "forecast",
+      "docTypeIds": [
+        "fin_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show forecast for 2025",
+        "compare forecast by quarter"
+      ]
+    },
+    {
+      "phrase": "forecast continuo",
+      "normalized": "forecast continuo",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show forecast continuo for 2025",
+        "compare forecast continuo by quarter"
+      ]
+    },
+    {
+      "phrase": "forecast de caixa",
+      "normalized": "forecast de caixa",
+      "docTypeIds": [
+        "fin_cash_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre forecast de caixa de 2025",
+        "compare forecast de caixa por trimestre"
+      ]
+    },
+    {
+      "phrase": "forecast financeiro",
+      "normalized": "forecast financeiro",
+      "docTypeIds": [
+        "fin_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show forecast financeiro for 2025",
+        "compare forecast financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "forecast rolling",
+      "normalized": "forecast rolling",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show forecast rolling for 2025",
+        "compare forecast rolling by quarter"
+      ]
+    },
+    {
+      "phrase": "form 10-k",
+      "normalized": "form 10-k",
+      "docTypeIds": [
+        "fin_10k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show form 10-k for 2025",
+        "compare form 10-k by quarter"
+      ]
+    },
+    {
+      "phrase": "form 10-q",
+      "normalized": "form 10-q",
+      "docTypeIds": [
+        "fin_10q"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show form 10-q for 2025",
+        "compare form 10-q by quarter"
+      ]
+    },
+    {
+      "phrase": "form 8-k",
+      "normalized": "form 8-k",
+      "docTypeIds": [
+        "fin_8k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show form 8-k for 2025",
+        "compare form 8-k by quarter"
+      ]
+    },
+    {
+      "phrase": "funil comercial financeiro",
+      "normalized": "funil comercial financeiro",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show funil comercial financeiro for 2025",
+        "compare funil comercial financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "indice covenant",
+      "normalized": "indice covenant",
+      "docTypeIds": [
+        "fin_covenant_compliance_certificate"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre indice covenant de 2025",
+        "compare indice covenant por trimestre"
+      ]
+    },
+    {
+      "phrase": "investor deck",
+      "normalized": "investor deck",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show investor deck for 2025",
+        "compare investor deck by quarter"
+      ]
+    },
+    {
+      "phrase": "investor presentation",
+      "normalized": "investor presentation",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show investor presentation for 2025",
+        "compare investor presentation by quarter"
+      ]
+    },
+    {
+      "phrase": "kpi dashboard",
+      "normalized": "kpi dashboard",
+      "docTypeIds": [
+        "fin_kpi_dashboard"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show kpi dashboard for 2025",
+        "compare kpi dashboard by quarter"
+      ]
+    },
+    {
+      "phrase": "loan schedule",
+      "normalized": "loan schedule",
+      "docTypeIds": [
+        "fin_debt_schedule"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show loan schedule for 2025",
+        "compare loan schedule by quarter"
+      ]
+    },
+    {
+      "phrase": "mapa de caixa futuro",
+      "normalized": "mapa de caixa futuro",
+      "docTypeIds": [
+        "fin_cash_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre mapa de caixa futuro de 2025",
+        "compare mapa de caixa futuro por trimestre"
+      ]
+    },
+    {
+      "phrase": "material conselho financas",
+      "normalized": "material conselho financas",
+      "docTypeIds": [
+        "fin_board_deck_finance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre material conselho financas de 2025",
+        "compare material conselho financas por trimestre"
+      ]
+    },
+    {
+      "phrase": "material event filing",
+      "normalized": "material event filing",
+      "docTypeIds": [
+        "fin_8k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show material event filing for 2025",
+        "compare material event filing by quarter"
+      ]
+    },
+    {
+      "phrase": "modelo cac ltv",
+      "normalized": "modelo cac ltv",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show modelo cac ltv for 2025",
+        "compare modelo cac ltv by quarter"
+      ]
+    },
+    {
+      "phrase": "modelo contribuicao unitaria",
+      "normalized": "modelo contribuicao unitaria",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show modelo contribuicao unitaria for 2025",
+        "compare modelo contribuicao unitaria by quarter"
+      ]
+    },
+    {
+      "phrase": "modelo de unit economics",
+      "normalized": "modelo de unit economics",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre modelo de unit economics de 2025",
+        "onde estao os dados de modelo de unit economics"
+      ]
+    },
+    {
+      "phrase": "modelo payback",
+      "normalized": "modelo payback",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show modelo payback for 2025",
+        "compare modelo payback by quarter"
+      ]
+    },
+    {
+      "phrase": "modelo unit economics",
+      "normalized": "modelo unit economics",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show modelo unit economics for 2025",
+        "compare modelo unit economics by quarter"
+      ]
+    },
+    {
+      "phrase": "month close",
+      "normalized": "month close",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "close",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show month close for 2025",
+        "compare month close by quarter"
+      ]
+    },
+    {
+      "phrase": "monthly close pack",
+      "normalized": "monthly close pack",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "close",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show monthly close pack for 2025",
+        "compare monthly close pack by quarter"
+      ]
+    },
+    {
+      "phrase": "movimentacao bancaria",
+      "normalized": "movimentacao bancaria",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show movimentacao bancaria for 2025",
+        "compare movimentacao bancaria by quarter"
+      ]
+    },
+    {
+      "phrase": "mrr report",
+      "normalized": "mrr report",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show mrr report for 2025",
+        "compare mrr report by quarter"
+      ]
+    },
+    {
+      "phrase": "orcado vs realizado",
+      "normalized": "orcado vs realizado",
+      "docTypeIds": [
+        "fin_variance_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show orcado vs realizado for 2025",
+        "compare orcado vs realizado by quarter"
+      ]
+    },
+    {
+      "phrase": "orcamento",
+      "normalized": "orcamento",
+      "docTypeIds": [
+        "fin_budget"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre orcamento de 2025",
+        "compare orcamento por trimestre"
+      ]
+    },
+    {
+      "phrase": "orcamento anual",
+      "normalized": "orcamento anual",
+      "docTypeIds": [
+        "fin_budget"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre orcamento anual de 2025",
+        "compare orcamento anual por trimestre"
+      ]
+    },
+    {
+      "phrase": "ownership table",
+      "normalized": "ownership table",
+      "docTypeIds": [
+        "fin_cap_table"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "equity_holder",
+        "formatHint": "capital",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show ownership table for 2025",
+        "compare ownership table by quarter"
+      ]
+    },
+    {
+      "phrase": "pack de fechamento",
+      "normalized": "pack de fechamento",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "close",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show pack de fechamento for 2025",
+        "compare pack de fechamento by quarter"
+      ]
+    },
+    {
+      "phrase": "pacote demonstracoes",
+      "normalized": "pacote demonstracoes",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "statements",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre pacote demonstracoes de 2025",
+        "compare pacote demonstracoes por trimestre"
+      ]
+    },
+    {
+      "phrase": "pacote fechamento mensal",
+      "normalized": "pacote fechamento mensal",
+      "docTypeIds": [
+        "fin_monthly_close_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "close",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show pacote fechamento mensal for 2025",
+        "compare pacote fechamento mensal by quarter"
+      ]
+    },
+    {
+      "phrase": "pacote financeiro",
+      "normalized": "pacote financeiro",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "statements",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show pacote financeiro for 2025",
+        "compare pacote financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "painel de kpis",
+      "normalized": "painel de kpis",
+      "docTypeIds": [
+        "fin_kpi_dashboard"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show painel de kpis for 2025",
+        "compare painel de kpis by quarter"
+      ]
+    },
+    {
+      "phrase": "painel financeiro",
+      "normalized": "painel financeiro",
+      "docTypeIds": [
+        "fin_kpi_dashboard"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show painel financeiro for 2025",
+        "compare painel financeiro by quarter"
+      ]
+    },
+    {
+      "phrase": "peca orcamentaria",
+      "normalized": "peca orcamentaria",
+      "docTypeIds": [
+        "fin_budget"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show peca orcamentaria for 2025",
+        "compare peca orcamentaria by quarter"
+      ]
+    },
+    {
+      "phrase": "pipeline de receita",
+      "normalized": "pipeline de receita",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre pipeline de receita de 2025",
+        "onde estao os dados de pipeline de receita"
+      ]
+    },
+    {
+      "phrase": "pipeline de vendas",
+      "normalized": "pipeline de vendas",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show pipeline de vendas for 2025",
+        "compare pipeline de vendas by quarter"
+      ]
+    },
+    {
+      "phrase": "pipeline forecast",
+      "normalized": "pipeline forecast",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show pipeline forecast for 2025",
+        "compare pipeline forecast by quarter"
+      ]
+    },
+    {
+      "phrase": "pipeline report",
+      "normalized": "pipeline report",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show pipeline report for 2025",
+        "compare pipeline report by quarter"
+      ]
+    },
+    {
+      "phrase": "plano de amortizacao",
+      "normalized": "plano de amortizacao",
+      "docTypeIds": [
+        "fin_debt_schedule"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show plano de amortizacao for 2025",
+        "compare plano de amortizacao by quarter"
+      ]
+    },
+    {
+      "phrase": "plano orcamentario",
+      "normalized": "plano orcamentario",
+      "docTypeIds": [
+        "fin_budget"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show plano orcamentario for 2025",
+        "compare plano orcamentario by quarter"
+      ]
+    },
+    {
+      "phrase": "previsao de caixa",
+      "normalized": "previsao de caixa",
+      "docTypeIds": [
+        "fin_cash_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre previsao de caixa de 2025",
+        "compare previsao de caixa por trimestre"
+      ]
+    },
+    {
+      "phrase": "previsao financeira",
+      "normalized": "previsao financeira",
+      "docTypeIds": [
+        "fin_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre previsao financeira de 2025",
+        "compare previsao financeira por trimestre"
+      ]
+    },
+    {
+      "phrase": "previsao rolling",
+      "normalized": "previsao rolling",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre previsao rolling de 2025",
+        "compare previsao rolling por trimestre"
+      ]
+    },
+    {
+      "phrase": "previsao rolling 12 meses",
+      "normalized": "previsao rolling 12 meses",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre previsao rolling 12 meses de 2025",
+        "onde estao os dados de previsao rolling 12 meses"
+      ]
+    },
+    {
+      "phrase": "projecao de caixa",
+      "normalized": "projecao de caixa",
+      "docTypeIds": [
+        "fin_cash_forecast"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre projecao de caixa de 2025",
+        "compare projecao de caixa por trimestre"
+      ]
+    },
+    {
+      "phrase": "projecao de resultados",
+      "normalized": "projecao de resultados",
+      "docTypeIds": [
+        "fin_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show projecao de resultados for 2025",
+        "compare projecao de resultados by quarter"
+      ]
+    },
+    {
+      "phrase": "projecao financeira",
+      "normalized": "projecao financeira",
+      "docTypeIds": [
+        "fin_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show projecao financeira for 2025",
+        "compare projecao financeira by quarter"
+      ]
+    },
+    {
+      "phrase": "projecao rolling",
+      "normalized": "projecao rolling",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show projecao rolling for 2025",
+        "compare projecao rolling by quarter"
+      ]
+    },
+    {
+      "phrase": "quadro societario diluido",
+      "normalized": "quadro societario diluido",
+      "docTypeIds": [
+        "fin_cap_table"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "equity_holder",
+        "formatHint": "capital",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show quadro societario diluido for 2025",
+        "compare quadro societario diluido by quarter"
+      ]
+    },
+    {
+      "phrase": "quarterly sec filing",
+      "normalized": "quarterly sec filing",
+      "docTypeIds": [
+        "fin_10q"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show quarterly sec filing for 2025",
+        "compare quarterly sec filing by quarter"
+      ]
+    },
+    {
+      "phrase": "receita recorrente arr",
+      "normalized": "receita recorrente arr",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show receita recorrente arr for 2025",
+        "compare receita recorrente arr by quarter"
+      ]
+    },
+    {
+      "phrase": "receita recorrente mrr",
+      "normalized": "receita recorrente mrr",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show receita recorrente mrr for 2025",
+        "compare receita recorrente mrr by quarter"
+      ]
+    },
+    {
+      "phrase": "relatorio 10-k",
+      "normalized": "relatorio 10-k",
+      "docTypeIds": [
+        "fin_10k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio 10-k de 2025",
+        "compare relatorio 10-k por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio 10-q",
+      "normalized": "relatorio 10-q",
+      "docTypeIds": [
+        "fin_10q"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio 10-q de 2025",
+        "compare relatorio 10-q por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio 8-k",
+      "normalized": "relatorio 8-k",
+      "docTypeIds": [
+        "fin_8k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio 8-k de 2025",
+        "compare relatorio 8-k por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio ambiental social governanca",
+      "normalized": "relatorio ambiental social governanca",
+      "docTypeIds": [
+        "fin_esg_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio ambiental social governanca de 2025",
+        "compare relatorio ambiental social governanca por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio arr",
+      "normalized": "relatorio arr",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre relatorio arr de 2025",
+        "onde estao os dados de relatorio arr"
+      ]
+    },
+    {
+      "phrase": "relatorio arr mrr",
+      "normalized": "relatorio arr mrr",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio arr mrr de 2025",
+        "compare relatorio arr mrr por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio de coortes",
+      "normalized": "relatorio de coortes",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio de coortes de 2025",
+        "compare relatorio de coortes por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio de sustentabilidade",
+      "normalized": "relatorio de sustentabilidade",
+      "docTypeIds": [
+        "fin_esg_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio de sustentabilidade de 2025",
+        "compare relatorio de sustentabilidade por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio de variacao",
+      "normalized": "relatorio de variacao",
+      "docTypeIds": [
+        "fin_variance_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio de variacao de 2025",
+        "compare relatorio de variacao por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio esg",
+      "normalized": "relatorio esg",
+      "docTypeIds": [
+        "fin_esg_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio esg de 2025",
+        "compare relatorio esg por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio mrr",
+      "normalized": "relatorio mrr",
+      "docTypeIds": [
+        "fin_arr_mrr_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "finance_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre relatorio mrr de 2025",
+        "onde estao os dados de relatorio mrr"
+      ]
+    },
+    {
+      "phrase": "relatorio pipeline",
+      "normalized": "relatorio pipeline",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio pipeline de 2025",
+        "compare relatorio pipeline por trimestre"
+      ]
+    },
+    {
+      "phrase": "relatorio sustentabilidade",
+      "normalized": "relatorio sustentabilidade",
+      "docTypeIds": [
+        "fin_esg_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre relatorio sustentabilidade de 2025",
+        "compare relatorio sustentabilidade por trimestre"
+      ]
+    },
+    {
+      "phrase": "release de ganhos",
+      "normalized": "release de ganhos",
+      "docTypeIds": [
+        "fin_earnings_release"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show release de ganhos for 2025",
+        "compare release de ganhos by quarter"
+      ]
+    },
+    {
+      "phrase": "release de resultados",
+      "normalized": "release de resultados",
+      "docTypeIds": [
+        "fin_earnings_release"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show release de resultados for 2025",
+        "compare release de resultados by quarter"
+      ]
+    },
+    {
+      "phrase": "resultado trimestral",
+      "normalized": "resultado trimestral",
+      "docTypeIds": [
+        "fin_earnings_release"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show resultado trimestral for 2025",
+        "compare resultado trimestral by quarter"
+      ]
+    },
+    {
+      "phrase": "results press release",
+      "normalized": "results press release",
+      "docTypeIds": [
+        "fin_earnings_release"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show results press release for 2025",
+        "compare results press release by quarter"
+      ]
+    },
+    {
+      "phrase": "retencao por coorte",
+      "normalized": "retencao por coorte",
+      "docTypeIds": [
+        "fin_cohort_analysis"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre retencao por coorte de 2025",
+        "compare retencao por coorte por trimestre"
+      ]
+    },
+    {
+      "phrase": "rolling fcst",
+      "normalized": "rolling fcst",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show rolling fcst for 2025",
+        "compare rolling fcst by quarter"
+      ]
+    },
+    {
+      "phrase": "rolling forecast",
+      "normalized": "rolling forecast",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show rolling forecast for 2025",
+        "compare rolling forecast by quarter"
+      ]
+    },
+    {
+      "phrase": "rolling previsao",
+      "normalized": "rolling previsao",
+      "docTypeIds": [
+        "fin_rolling_forecast"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre rolling previsao de 2025",
+        "compare rolling previsao por trimestre"
+      ]
+    },
+    {
+      "phrase": "sales pipeline",
+      "normalized": "sales pipeline",
+      "docTypeIds": [
+        "fin_pipeline_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show sales pipeline for 2025",
+        "compare sales pipeline by quarter"
+      ]
+    },
+    {
+      "phrase": "schedule da divida",
+      "normalized": "schedule da divida",
+      "docTypeIds": [
+        "fin_debt_schedule"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre schedule da divida de 2025",
+        "compare schedule da divida por trimestre"
+      ]
+    },
+    {
+      "phrase": "sec anual 10-k",
+      "normalized": "sec anual 10-k",
+      "docTypeIds": [
+        "fin_10k"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show sec anual 10-k for 2025",
+        "compare sec anual 10-k by quarter"
+      ]
+    },
+    {
+      "phrase": "sec trimestral 10-q",
+      "normalized": "sec trimestral 10-q",
+      "docTypeIds": [
+        "fin_10q"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "business_unit",
+        "formatHint": "filings",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show sec trimestral 10-q for 2025",
+        "compare sec trimestral 10-q by quarter"
+      ]
+    },
+    {
+      "phrase": "slides investidores",
+      "normalized": "slides investidores",
+      "docTypeIds": [
+        "fin_investor_presentation"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show slides investidores for 2025",
+        "compare slides investidores by quarter"
+      ]
+    },
+    {
+      "phrase": "statement bancario",
+      "normalized": "statement bancario",
+      "docTypeIds": [
+        "fin_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show statement bancario for 2025",
+        "compare statement bancario by quarter"
+      ]
+    },
+    {
+      "phrase": "statements pack",
+      "normalized": "statements pack",
+      "docTypeIds": [
+        "fin_statements_pack"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "statements",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show statements pack for 2025",
+        "compare statements pack by quarter"
+      ]
+    },
+    {
+      "phrase": "sustainability report",
+      "normalized": "sustainability report",
+      "docTypeIds": [
+        "fin_esg_report"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "reporting",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show sustainability report for 2025",
+        "compare sustainability report by quarter"
+      ]
+    },
+    {
+      "phrase": "tabela de capitalizacao",
+      "normalized": "tabela de capitalizacao",
+      "docTypeIds": [
+        "fin_cap_table"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "equity_holder",
+        "formatHint": "capital",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre tabela de capitalizacao de 2025",
+        "compare tabela de capitalizacao por trimestre"
+      ]
+    },
+    {
+      "phrase": "unit economics",
+      "normalized": "unit economics",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show unit economics for 2025",
+        "compare unit economics by quarter"
+      ]
+    },
+    {
+      "phrase": "unit economics model",
+      "normalized": "unit economics model",
+      "docTypeIds": [
+        "fin_unit_economics_model"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "business_unit",
+        "formatHint": "dashboard",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show unit economics model for 2025",
+        "compare unit economics model by quarter"
+      ]
+    },
+    {
+      "phrase": "var vs budget",
+      "normalized": "var vs budget",
+      "docTypeIds": [
+        "fin_variance_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show var vs budget for 2025",
+        "compare var vs budget by quarter"
+      ]
+    },
+    {
+      "phrase": "variance report",
+      "normalized": "variance report",
+      "docTypeIds": [
+        "fin_variance_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "business_unit",
+        "formatHint": "planning",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show variance report for 2025",
+        "compare variance report by quarter"
+      ]
+    },
+    {
+      "phrase": "vencimentos divida",
+      "normalized": "vencimentos divida",
+      "docTypeIds": [
+        "fin_debt_schedule"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "bank_or_lender",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre vencimentos divida de 2025",
+        "compare vencimentos divida por trimestre"
+      ]
     }
   ]
 }

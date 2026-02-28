@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "id": "di_identity_redaction_and_safety_rules",
+    "version": "2.0.0",
+    "description": "Identity redaction and safety rules with strict PII safeguards.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity"
+  },
+  "domain": "identity",
+  "redactionRules": [
+    {
+      "id": "id_redaction_001_full_name",
+      "dataType": "full_name",
+      "pattern": "\\b(?:name|nome)[: ]+[A-Za-z][A-Za-z .'-]{1,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_NAME]"
+    },
+    {
+      "id": "id_redaction_002_document_number",
+      "dataType": "document_number",
+      "pattern": "\\b(?:document\\s*number|id\\s*number|numero\\s+do\\s+documento)[:# ]?[A-Z0-9-]{5,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_DOCUMENT_NUMBER]"
+    },
+    {
+      "id": "id_redaction_003_national_id",
+      "dataType": "national_id",
+      "pattern": "\\b(?:SSN|CPF|RG|TIN|NID)[:# ]?[0-9A-Z./-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_NATIONAL_ID]"
+    },
+    {
+      "id": "id_redaction_004_birth_date",
+      "dataType": "birth_date",
+      "pattern": "\\b(?:DOB|date\\s+of\\s+birth|data\\s+de\\s+nascimento)[: ]?[0-9]{1,2}[/-][0-9]{1,2}[/-][0-9]{2,4}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_BIRTH_DATE]"
+    },
+    {
+      "id": "id_redaction_005_address",
+      "dataType": "address",
+      "pattern": "\\b\\d{1,6}\\s+[A-Za-z0-9 .'-]+\\s(?:Street|St|Avenue|Ave|Road|Rd|Rua|Av|Alameda|Travessa)\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ADDRESS]"
+    },
+    {
+      "id": "id_redaction_006_email",
+      "dataType": "email",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "action": "REDACT",
+      "replacement": "[REDACTED_EMAIL]"
+    },
+    {
+      "id": "id_redaction_007_phone",
+      "dataType": "phone",
+      "pattern": "\\+?[0-9][0-9() -]{7,}[0-9]",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PHONE]"
+    },
+    {
+      "id": "id_redaction_008_passport",
+      "dataType": "passport_number",
+      "pattern": "\\b(?:passport|passaporte)\\s*(?:no\\.?|number|#)?\\s*:?\\s*[A-Z0-9]{6,12}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PASSPORT]"
+    },
+    {
+      "id": "id_redaction_009_driver_license",
+      "dataType": "driver_license_number",
+      "pattern": "\\b(?:driver\\s*license|driving\\s*licence|cnh)\\s*(?:no\\.?|number|#)?\\s*:?\\s*[A-Z0-9-]{5,15}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_DRIVER_LICENSE]"
+    },
+    {
+      "id": "id_redaction_010_mrz",
+      "dataType": "mrz",
+      "pattern": "\\b[A-Z0-9<]{30,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_MRZ]"
+    },
+    {
+      "id": "id_redaction_011_qr_payload",
+      "dataType": "qr_payload",
+      "pattern": "\\b(?:qr|pix)[: ]?[A-Za-z0-9+/=._:-]{20,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_QR_PAYLOAD]"
+    },
+    {
+      "id": "id_redaction_012_barcode_payload",
+      "dataType": "barcode_payload",
+      "pattern": "\\b(?:pdf417|barcode|codigo\\s+de\\s+barras)[: ]?[A-Za-z0-9+/=._:-]{18,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_BARCODE_PAYLOAD]"
+    },
+    {
+      "id": "id_redaction_013_business_registration",
+      "dataType": "business_registration_number",
+      "pattern": "\\b(?:business\\s*registration|registration\\s*number|nire|registro\\s+empresarial)[:# ]?[A-Z0-9-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_BUSINESS_REGISTRATION]"
+    },
+    {
+      "id": "id_redaction_014_tax_identifier",
+      "dataType": "tax_identifier",
+      "pattern": "\\b(?:CNPJ|CPF|TIN|tax\\s*id)[:# ]?[0-9A-Z./-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_TAX_IDENTIFIER]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "id_safety_001_no_identity_inference",
+      "severity": "error",
+      "trigger": "missing_critical_identity_fields",
+      "description": "Do not infer missing identity fields from context or other docs.",
+      "action": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "id_safety_002_strong_pii_redaction",
+      "severity": "error",
+      "trigger": "pii_detected_in_output",
+      "description": "Apply strict default redaction for personal/company identifiers.",
+      "action": "WARN_AND_RESTRICT"
+    },
+    {
+      "id": "id_safety_003_scope_lock",
+      "severity": "error",
+      "trigger": "request_uses_unattached_document_context",
+      "description": "Maintain attached-document scope lock.",
+      "action": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "id_safety_004_no_authentication_decision",
+      "severity": "warning",
+      "trigger": "request_for_final_identity_verification_decision",
+      "description": "Do not make final authentication decision; report observed evidence only.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "id_safety_005_expired_document",
+      "severity": "warning",
+      "trigger": "document_expired_or_near_expiry",
+      "description": "Flag expiry risk and avoid acceptance claims.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "id_safety_006_low_quality_scan",
+      "severity": "warning",
+      "trigger": "blurred_or_partial_scan_detected",
+      "description": "Mark values unverified when scan quality is poor.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "id_safety_007_sensitive_machine_zone",
+      "severity": "error",
+      "trigger": "mrz_or_barcode_payload_detected",
+      "description": "Never output full MRZ or barcode payload values.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "id_safety_008_contact_detail_exposure",
+      "severity": "error",
+      "trigger": "address_or_contact_details_detected",
+      "description": "Redact residential address and contact details by default.",
+      "action": "WARN_AND_RESTRICT"
+    }
+  ]
+}

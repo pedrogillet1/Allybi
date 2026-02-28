@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "id": "di_identity_doc_type_catalog",
+    "version": "2.0.0",
+    "description": "Identity doc-type catalog with complete pack references.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "enforcePackRefs": true
+  },
+  "domain": "identity",
+  "docTypes": [
+    {
+      "id": "id_business_registration_certificate",
+      "name": {
+        "en": "Business Registration Certificate",
+        "pt": "Certificado de Registro Empresarial"
+      },
+      "description": "Business registration certificate with legal entity identity and registry status details.",
+      "archetypeId": "identity_business_registry",
+      "detectionPatterns": [
+        "\\bid\\s*business\\s*registration\\s*certificate\\b",
+        "\\bbusiness\\s+registration\\s+certificate\\b|\\bincorporation\\s+certificate\\b",
+        "\\bcertificado\\s+de\\s+registro\\s+empresarial\\b"
+      ],
+      "priority": 130,
+      "detectionHintsRefs": [
+        "di_identity_domain_detection_rules",
+        "doc_aliases_identity"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_identity_sections_id_business_registration_certificate"
+        ],
+        "entities": [
+          "di_identity_entities_id_business_registration_certificate"
+        ],
+        "tables": [
+          "di_identity_tables_id_business_registration_certificate"
+        ],
+        "extraction": [
+          "di_identity_extraction_id_business_registration_certificate"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "business_name",
+        "registration_number",
+        "incorporation_date",
+        "registry_status"
+      ]
+    },
+    {
+      "id": "id_driver_license",
+      "name": {
+        "en": "Driver License",
+        "pt": "Carteira Nacional de Habilitacao"
+      },
+      "description": "Driver license with identity details, issuing authority, and validity timeline.",
+      "archetypeId": "identity_government_id",
+      "detectionPatterns": [
+        "\\bid\\s*driver\\s*license\\b",
+        "\\bdriver\\s+license\\b|\\bdriving\\s+licence\\b",
+        "\\bcarteira\\s+nacional\\s+de\\s+habilitacao\\b|\\bcnh\\b"
+      ],
+      "priority": 129,
+      "detectionHintsRefs": [
+        "di_identity_domain_detection_rules",
+        "doc_aliases_identity"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_identity_sections_id_driver_license"
+        ],
+        "entities": [
+          "di_identity_entities_id_driver_license"
+        ],
+        "tables": [
+          "di_identity_tables_id_driver_license"
+        ],
+        "extraction": [
+          "di_identity_extraction_id_driver_license"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "document_number",
+        "issue_date",
+        "expiry_date",
+        "issuing_authority"
+      ]
+    },
+    {
+      "id": "id_passport",
+      "name": {
+        "en": "Passport",
+        "pt": "Passaporte"
+      },
+      "description": "Passport identity document including MRZ, issuing country, and validity fields.",
+      "archetypeId": "identity_passport",
+      "detectionPatterns": [
+        "\\bid\\s*passport\\b",
+        "\\bpassport\\b|\\bmachine\\s+readable\\s+zone\\b",
+        "\\bpassaporte\\b|\\bzona\\s+de\\s+leitura\\s+mecanica\\b"
+      ],
+      "priority": 128,
+      "detectionHintsRefs": [
+        "di_identity_domain_detection_rules",
+        "doc_aliases_identity"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_identity_sections_id_passport"
+        ],
+        "entities": [
+          "di_identity_entities_id_passport"
+        ],
+        "tables": [
+          "di_identity_tables_id_passport"
+        ],
+        "extraction": [
+          "di_identity_extraction_id_passport"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "passport_number",
+        "nationality",
+        "issue_date",
+        "expiry_date"
+      ]
+    },
+    {
+      "id": "id_proof_of_address",
+      "name": {
+        "en": "Proof of Address",
+        "pt": "Comprovante de Endereco"
+      },
+      "description": "Address proof document such as utility or bank statement used for residency validation.",
+      "archetypeId": "identity_address_proof",
+      "detectionPatterns": [
+        "\\bid\\s*proof\\s*of\\s*address\\b",
+        "\\bproof\\s+of\\s+address\\b|\\butility\\s+bill\\b",
+        "\\bcomprovante\\s+de\\s+endereco\\b|\\bconta\\s+de\\s+luz\\b|\\bconta\\s+de\\s+agua\\b"
+      ],
+      "priority": 127,
+      "detectionHintsRefs": [
+        "di_identity_domain_detection_rules",
+        "doc_aliases_identity"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_identity_sections_id_proof_of_address"
+        ],
+        "entities": [
+          "di_identity_entities_id_proof_of_address"
+        ],
+        "tables": [
+          "di_identity_tables_id_proof_of_address"
+        ],
+        "extraction": [
+          "di_identity_extraction_id_proof_of_address"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "resident_name",
+        "address",
+        "issue_date",
+        "issuer_name"
+      ]
+    }
+  ]
+}

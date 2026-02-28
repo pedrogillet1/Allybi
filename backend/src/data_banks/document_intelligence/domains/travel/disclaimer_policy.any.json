@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "di_travel_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer policy for travel responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel"
+  },
+  "domain": "travel",
+  "disclaimers": [
+    {
+      "id": "travel_disc_001_not_immigration_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This output summarizes travel documents and is not legal immigration advice.",
+        "pt": "Esta saida resume documentos de viagem e nao constitui orientacao juridica de imigracao."
+      }
+    },
+    {
+      "id": "travel_disc_002_schedule_change",
+      "trigger": "always",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Schedules, gates, and terminals may change; confirm with the carrier before travel.",
+        "pt": "Horarios, portoes e terminais podem mudar; confirme com a transportadora antes da viagem."
+      }
+    },
+    {
+      "id": "travel_disc_003_scope_lock",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Dates and references are extracted only from the provided file version.",
+        "pt": "Datas e referencias sao extraidas apenas da versao do arquivo fornecido."
+      }
+    }
+  ]
+}

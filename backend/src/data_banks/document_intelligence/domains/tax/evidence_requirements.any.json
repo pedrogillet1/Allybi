@@ -1,0 +1,201 @@
+{
+  "_meta": {
+    "id": "di_tax_evidence_requirements",
+    "version": "2.0.0",
+    "description": "Tax evidence requirements enforcing citation quality and no-missing-field inference boundaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "tax",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "official_tax_authority_document",
+      "label": {
+        "en": "Official tax authority document",
+        "pt": "Documento oficial da autoridade tributaria"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "taxpayer_signed_return",
+      "label": {
+        "en": "Taxpayer-signed return",
+        "pt": "Declaracao assinada pelo contribuinte"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "bank_settlement_record",
+      "label": {
+        "en": "Bank settlement record",
+        "pt": "Registro bancario de liquidacao"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 4,
+      "type": "supporting_annex",
+      "label": {
+        "en": "Supporting annex",
+        "pt": "Anexo de suporte"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "draft_or_partial_scan",
+      "label": {
+        "en": "Draft/partial scan",
+        "pt": "Rascunho/scan parcial"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "tax_ev_numeric_claim_requires_amount_currency_period",
+      "description": "Numeric tax claims require amount, currency, and period context.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "requiredDimensions": [
+        "amount",
+        "currency",
+        "period",
+        "header_context",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "tax_ev_deadline_claim_requires_date_anchor",
+      "description": "Deadline claims require explicit date and anchor text.",
+      "applies": [
+        "extract",
+        "locate",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "due_date",
+        "date_format",
+        "section_anchor",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "tax_ev_taxpayer_identity_requires_documented_id",
+      "description": "Taxpayer identity requires explicit identifier in the document.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "party_name",
+        "tax_id",
+        "jurisdiction",
+        "source_location"
+      ],
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "tax_ev_no_inference_missing_critical_fields",
+      "description": "Forbid inference of missing critical fields such as taxpayer id, tax period, amount due, or due date.",
+      "applies": [
+        "extract",
+        "summarize",
+        "evaluate",
+        "advise",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "critical_field_presence",
+        "source_location"
+      ],
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "tax_ev_assessment_outcome_requires_notice_reference",
+      "description": "Assessment outcomes require notice reference id and issued date.",
+      "applies": [
+        "evaluate",
+        "summarize"
+      ],
+      "requiredDimensions": [
+        "notice_id",
+        "issue_date",
+        "status",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "tax_ev_annex_values_require_annex_reference",
+      "description": "Values found in annexes require annex id/page citation.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "annex_id",
+        "page",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "tax_req_taxpayer_identity",
+      "field": "taxpayer identity",
+      "minSources": 1,
+      "sourceTypes": [
+        "official_tax_authority_document",
+        "taxpayer_signed_return"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "tax_req_tax_period",
+      "field": "tax period",
+      "minSources": 1,
+      "sourceTypes": [
+        "official_tax_authority_document",
+        "taxpayer_signed_return"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "tax_req_amount_due",
+      "field": "amount due or refund",
+      "minSources": 1,
+      "sourceTypes": [
+        "official_tax_authority_document",
+        "bank_settlement_record"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "tax_req_deadline",
+      "field": "deadline/due date",
+      "minSources": 1,
+      "sourceTypes": [
+        "official_tax_authority_document"
+      ],
+      "failureBehavior": "ask_clarifying_question"
+    }
+  ]
+}

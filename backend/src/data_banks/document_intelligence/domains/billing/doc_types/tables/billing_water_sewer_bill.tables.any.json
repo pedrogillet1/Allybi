@@ -1,0 +1,260 @@
+{
+  "_meta": {
+    "id": "di_billing_tables_billing_water_sewer_bill",
+    "version": "1.0.0",
+    "description": "Expected table patterns for  documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "docType": "billing_water_sewer_bill"
+  },
+  "tableHeaderSynonyms": {
+    "amount": [
+      "amount",
+      "value",
+      "valor",
+      "total",
+      "charge"
+    ],
+    "date": [
+      "date",
+      "data",
+      "posting date",
+      "due date"
+    ],
+    "description": [
+      "description",
+      "details",
+      "descricao",
+      "historico"
+    ],
+    "balance": [
+      "balance",
+      "saldo",
+      "running balance",
+      "ending balance"
+    ],
+    "debit": [
+      "debit",
+      "dr",
+      "debito"
+    ],
+    "credit": [
+      "credit",
+      "cr",
+      "credito"
+    ],
+    "reference": [
+      "reference",
+      "ref",
+      "document",
+      "barcode",
+      "nosso numero"
+    ]
+  },
+  "tables": [
+    {
+      "id": "billing_water_sewer_bill_summary_table",
+      "name": {
+        "en": "Summary Table",
+        "pt": "Tabela de Resumo"
+      },
+      "section": "summary",
+      "expectedColumns": [
+        "metric",
+        "value",
+        "notes"
+      ],
+      "keyRows": [
+        "total"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_line_items_table",
+      "name": {
+        "en": "Line Items",
+        "pt": "Tabela de Itens"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "item",
+        "description",
+        "quantity",
+        "unit_price",
+        "amount"
+      ],
+      "keyRows": [
+        "subtotal"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_charges_table",
+      "name": {
+        "en": "Charges",
+        "pt": "Tabela de Cobrancas"
+      },
+      "section": "charges_and_fees",
+      "expectedColumns": [
+        "charge_code",
+        "description",
+        "amount"
+      ],
+      "keyRows": [
+        "total_charges"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_fees_table",
+      "name": {
+        "en": "Fees",
+        "pt": "Tabela de Taxas"
+      },
+      "section": "charges_and_fees",
+      "expectedColumns": [
+        "fee_type",
+        "description",
+        "amount"
+      ],
+      "keyRows": [
+        "total_fees"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_taxes_table",
+      "name": {
+        "en": "Taxes",
+        "pt": "Tabela de Impostos"
+      },
+      "section": "taxes",
+      "expectedColumns": [
+        "tax_type",
+        "base",
+        "rate",
+        "amount"
+      ],
+      "keyRows": [
+        "total_tax"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_payments_table",
+      "name": {
+        "en": "Payments",
+        "pt": "Tabela de Pagamentos"
+      },
+      "section": "payments_and_credits",
+      "expectedColumns": [
+        "payment_date",
+        "method",
+        "reference",
+        "amount"
+      ],
+      "keyRows": [
+        "total_payments"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_credits_table",
+      "name": {
+        "en": "Credits",
+        "pt": "Tabela de Creditos"
+      },
+      "section": "payments_and_credits",
+      "expectedColumns": [
+        "credit_date",
+        "reason",
+        "amount"
+      ],
+      "keyRows": [
+        "total_credits"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_usage_table",
+      "name": {
+        "en": "Usage or Activity",
+        "pt": "Tabela de Uso ou Atividade"
+      },
+      "section": "usage_or_activity",
+      "expectedColumns": [
+        "date",
+        "description",
+        "quantity",
+        "unit",
+        "amount"
+      ],
+      "keyRows": [
+        "total_usage"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_transactions_table",
+      "name": {
+        "en": "Transactions",
+        "pt": "Tabela de Transacoes"
+      },
+      "section": "usage_or_activity",
+      "expectedColumns": [
+        "transaction_date",
+        "description",
+        "debit",
+        "credit",
+        "balance"
+      ],
+      "keyRows": [
+        "ending_balance"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_adjustments_table",
+      "name": {
+        "en": "Adjustments",
+        "pt": "Tabela de Ajustes"
+      },
+      "section": "adjustments_and_disputes",
+      "expectedColumns": [
+        "adjustment_date",
+        "reason",
+        "amount"
+      ],
+      "keyRows": [
+        "total_adjustments"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_aging_table",
+      "name": {
+        "en": "Aging Buckets",
+        "pt": "Tabela de Faixas de Atraso"
+      },
+      "section": "balance_and_due",
+      "expectedColumns": [
+        "bucket",
+        "amount"
+      ],
+      "keyRows": [
+        "total_past_due"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill_metadata_table",
+      "name": {
+        "en": "Metadata",
+        "pt": "Tabela de Metadados"
+      },
+      "section": "footer_metadata",
+      "expectedColumns": [
+        "key",
+        "value"
+      ],
+      "keyRows": [
+        "document_id"
+      ]
+    }
+  ]
+}

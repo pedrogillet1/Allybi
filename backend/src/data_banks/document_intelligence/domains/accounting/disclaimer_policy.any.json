@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "id": "di_accounting_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer templates for accounting domain — required professional and legal disclaimers.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting"
+  },
+  "domain": "accounting",
+  "disclaimers": [
+    {
+      "id": "acct_disc_001_not_professional_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This analysis is based on the uploaded document(s) and does not constitute professional accounting, auditing, or tax advice. Consult a qualified CPA or auditor for professional opinions.",
+        "pt": "Esta análise é baseada no(s) documento(s) enviado(s) e não constitui consultoria contábil, de auditoria ou tributária profissional. Consulte um contador ou auditor qualificado para opiniões profissionais."
+      }
+    },
+    {
+      "id": "acct_disc_002_not_audit",
+      "trigger": "analysis_resembles_audit_procedure",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "This review is an automated analysis and does not constitute an audit, review, or compilation engagement under professional standards.",
+        "pt": "Esta revisão é uma análise automatizada e não constitui um trabalho de auditoria, revisão ou compilação sob normas profissionais."
+      }
+    },
+    {
+      "id": "acct_disc_003_period_specific",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Balances and transactions reflect the data as of the document date and may not represent current figures.",
+        "pt": "Saldos e transações refletem os dados na data do documento e podem não representar valores atuais."
+      }
+    },
+    {
+      "id": "acct_disc_004_materiality",
+      "trigger": "analysis_involves_thresholds",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Materiality thresholds applied in this analysis are illustrative and should be set by the engagement team.",
+        "pt": "Os limites de materialidade aplicados nesta análise são ilustrativos e devem ser definidos pela equipe do trabalho."
+      }
+    }
+  ]
+}

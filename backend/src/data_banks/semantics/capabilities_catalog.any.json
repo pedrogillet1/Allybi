@@ -247,7 +247,7 @@
         "pt": ["Leia meu último email e resuma as ações.", "Rascunhe uma resposta curta e educada.", "Pesquise no Slack mensagens sobre <tema>."],
         "es": ["Lee mi último email y resume las acciones.", "Redacta una respuesta corta y educada.", "Busca en Slack mensajes sobre <tema>."]
       },
-      "sourceOperators": ["email_read", "email_draft", "email_send", "slack_connect", "slack_search", "connector_status"]
+      "sourceOperators": ["EMAIL_LATEST", "EMAIL_EXPLAIN_LATEST", "EMAIL_SUMMARIZE_PREVIOUS", "EMAIL_DRAFT", "EMAIL_SEND", "EMAIL_DOC_FUSION", "CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_SEARCH", "CONNECTOR_STATUS", "CONNECTOR_DISCONNECT"]
     }
   ]
 }

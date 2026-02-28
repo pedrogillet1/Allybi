@@ -1,0 +1,549 @@
+{
+  "_meta": {
+    "id": "di_identity_lexicon_pt",
+    "version": "1.0.0",
+    "description": "Portuguese lexicon for identity domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "language": "pt"
+  },
+  "domain": "identity",
+  "terms": [
+    {
+      "id": "identity_lex_pt_address_line",
+      "canonical": "linha de endereco",
+      "synonyms": [
+        "logradouro",
+        "endereco residencial"
+      ],
+      "display": "Linha de Endereco",
+      "enRef": "identity_lex_address_line"
+    },
+    {
+      "id": "identity_lex_pt_barcode",
+      "canonical": "codigo de barras",
+      "synonyms": [
+        "pdf417",
+        "codigo 2d"
+      ],
+      "display": "Codigo de Barras",
+      "enRef": "identity_lex_barcode"
+    },
+    {
+      "id": "identity_lex_pt_birth_date",
+      "canonical": "data de nascimento",
+      "synonyms": [
+        "nascimento",
+        "dob"
+      ],
+      "display": "Data de Nascimento",
+      "enRef": "identity_lex_birth_date"
+    },
+    {
+      "id": "identity_lex_pt_birth_place",
+      "canonical": "naturalidade",
+      "synonyms": [
+        "local de nascimento",
+        "cidade de nascimento"
+      ],
+      "display": "Naturalidade",
+      "enRef": "identity_lex_birth_place"
+    },
+    {
+      "id": "identity_lex_pt_business_id",
+      "canonical": "numero de registro empresarial",
+      "synonyms": [
+        "numero de registro",
+        "id da empresa"
+      ],
+      "display": "Registro Empresarial",
+      "enRef": "identity_lex_business_id"
+    },
+    {
+      "id": "identity_lex_pt_business_name",
+      "canonical": "razao social",
+      "synonyms": [
+        "nome empresarial",
+        "nome da empresa"
+      ],
+      "display": "Razao Social",
+      "enRef": "identity_lex_business_name"
+    },
+    {
+      "id": "identity_lex_pt_citizenship",
+      "canonical": "cidadania",
+      "synonyms": [
+        "nacionalidade",
+        "pais de cidadania"
+      ],
+      "display": "Cidadania",
+      "enRef": "identity_lex_citizenship"
+    },
+    {
+      "id": "identity_lex_pt_company_type",
+      "canonical": "tipo societario",
+      "synonyms": [
+        "natureza juridica",
+        "classe empresarial"
+      ],
+      "display": "Tipo Societario",
+      "enRef": "identity_lex_company_type"
+    },
+    {
+      "id": "identity_lex_pt_country_code",
+      "canonical": "codigo do pais",
+      "synonyms": [
+        "sigla do pais",
+        "codigo nacional"
+      ],
+      "display": "Codigo do Pais",
+      "enRef": "identity_lex_country_code"
+    },
+    {
+      "id": "identity_lex_pt_document_class",
+      "canonical": "classe do documento",
+      "synonyms": [
+        "tipo de documento",
+        "classe"
+      ],
+      "display": "Classe do Documento",
+      "enRef": "identity_lex_document_class"
+    },
+    {
+      "id": "identity_lex_pt_document_expiry",
+      "canonical": "data de validade",
+      "synonyms": [
+        "validade",
+        "expiracao"
+      ],
+      "display": "Data de Validade",
+      "enRef": "identity_lex_document_expiry"
+    },
+    {
+      "id": "identity_lex_pt_document_issue_date",
+      "canonical": "data de emissao",
+      "synonyms": [
+        "emitido em",
+        "data de expedicao"
+      ],
+      "display": "Data de Emissao",
+      "enRef": "identity_lex_document_issue_date"
+    },
+    {
+      "id": "identity_lex_pt_document_number",
+      "canonical": "numero do documento",
+      "synonyms": [
+        "numero de identificacao",
+        "id do documento"
+      ],
+      "display": "Numero do Documento",
+      "enRef": "identity_lex_document_number"
+    },
+    {
+      "id": "identity_lex_pt_document_series",
+      "canonical": "serie do documento",
+      "synonyms": [
+        "serie",
+        "lote"
+      ],
+      "display": "Serie do Documento",
+      "enRef": "identity_lex_document_series"
+    },
+    {
+      "id": "identity_lex_pt_document_side",
+      "canonical": "lado do documento",
+      "synonyms": [
+        "frente",
+        "verso"
+      ],
+      "display": "Lado do Documento",
+      "enRef": "identity_lex_document_side"
+    },
+    {
+      "id": "identity_lex_pt_document_template",
+      "canonical": "modelo do documento",
+      "synonyms": [
+        "versao do layout",
+        "template"
+      ],
+      "display": "Modelo do Documento",
+      "enRef": "identity_lex_document_template"
+    },
+    {
+      "id": "identity_lex_pt_driver_license",
+      "canonical": "carteira nacional de habilitacao",
+      "synonyms": [
+        "cnh",
+        "habilitacao"
+      ],
+      "display": "CNH",
+      "enRef": "identity_lex_driver_license"
+    },
+    {
+      "id": "identity_lex_pt_endorsement",
+      "canonical": "observacao de habilitacao",
+      "synonyms": [
+        "restricao",
+        "endosso"
+      ],
+      "display": "Observacao de Habilitacao",
+      "enRef": "identity_lex_endorsement"
+    },
+    {
+      "id": "identity_lex_pt_full_name",
+      "canonical": "nome completo",
+      "synonyms": [
+        "nome civil",
+        "nome legal"
+      ],
+      "display": "Nome Completo",
+      "enRef": "identity_lex_full_name"
+    },
+    {
+      "id": "identity_lex_pt_gender",
+      "canonical": "sexo",
+      "synonyms": [
+        "genero",
+        "marcador de genero"
+      ],
+      "display": "Sexo",
+      "enRef": "identity_lex_gender"
+    },
+    {
+      "id": "identity_lex_pt_holder_signature",
+      "canonical": "assinatura do titular",
+      "synonyms": [
+        "assinatura",
+        "assinatura do portador"
+      ],
+      "display": "Assinatura do Titular",
+      "enRef": "identity_lex_holder_signature"
+    },
+    {
+      "id": "identity_lex_pt_id_card",
+      "canonical": "documento de identidade",
+      "synonyms": [
+        "rg",
+        "identidade"
+      ],
+      "display": "Documento de Identidade",
+      "enRef": "identity_lex_id_card"
+    },
+    {
+      "id": "identity_lex_pt_identifier_hash",
+      "canonical": "hash do identificador",
+      "synonyms": [
+        "id mascarado",
+        "id tokenizado"
+      ],
+      "display": "Hash do Identificador",
+      "enRef": "identity_lex_identifier_hash"
+    },
+    {
+      "id": "identity_lex_pt_incorporation_number",
+      "canonical": "numero de constituicao",
+      "synonyms": [
+        "numero de formacao",
+        "registro de constituicao"
+      ],
+      "display": "Numero de Constituicao",
+      "enRef": "identity_lex_incorporation_number"
+    },
+    {
+      "id": "identity_lex_pt_issuing_authority",
+      "canonical": "orgao emissor",
+      "synonyms": [
+        "autoridade emissora",
+        "orgao expedidor"
+      ],
+      "display": "Orgao Emissor",
+      "enRef": "identity_lex_issuing_authority"
+    },
+    {
+      "id": "identity_lex_pt_issuing_country",
+      "canonical": "pais emissor",
+      "synonyms": [
+        "pais de emissao",
+        "pais de origem"
+      ],
+      "display": "Pais Emissor",
+      "enRef": "identity_lex_issuing_country"
+    },
+    {
+      "id": "identity_lex_pt_issuing_jurisdiction",
+      "canonical": "jurisdicao emissora",
+      "synonyms": [
+        "area emissora",
+        "jurisdicao"
+      ],
+      "display": "Jurisdicao Emissora",
+      "enRef": "identity_lex_issuing_jurisdiction"
+    },
+    {
+      "id": "identity_lex_pt_issuing_state",
+      "canonical": "uf emissora",
+      "synonyms": [
+        "estado emissor",
+        "unidade federativa"
+      ],
+      "display": "UF Emissora",
+      "enRef": "identity_lex_issuing_state"
+    },
+    {
+      "id": "identity_lex_pt_machine_readable_zone",
+      "canonical": "zona de leitura mecanica",
+      "synonyms": [
+        "mrz",
+        "zona legivel"
+      ],
+      "display": "Zona de Leitura Mecanica",
+      "enRef": "identity_lex_machine_readable_zone"
+    },
+    {
+      "id": "identity_lex_pt_name_variants",
+      "canonical": "variacoes de nome",
+      "synonyms": [
+        "nomes alternativos",
+        "alias"
+      ],
+      "display": "Variacoes de Nome",
+      "enRef": "identity_lex_name_variants"
+    },
+    {
+      "id": "identity_lex_pt_national_id",
+      "canonical": "identidade nacional",
+      "synonyms": [
+        "id nacional",
+        "documento governamental"
+      ],
+      "display": "Identidade Nacional",
+      "enRef": "identity_lex_national_id"
+    },
+    {
+      "id": "identity_lex_pt_passport",
+      "canonical": "passaporte",
+      "synonyms": [
+        "documento de viagem",
+        "passaporte internacional"
+      ],
+      "display": "Passaporte",
+      "enRef": "identity_lex_passport"
+    },
+    {
+      "id": "identity_lex_pt_passport_number",
+      "canonical": "numero do passaporte",
+      "synonyms": [
+        "id do passaporte",
+        "numero do documento de viagem"
+      ],
+      "display": "Numero do Passaporte",
+      "enRef": "identity_lex_passport_number"
+    },
+    {
+      "id": "identity_lex_pt_photo_match",
+      "canonical": "correspondencia de foto",
+      "synonyms": [
+        "match facial",
+        "comparacao facial"
+      ],
+      "display": "Correspondencia de Foto",
+      "enRef": "identity_lex_photo_match"
+    },
+    {
+      "id": "identity_lex_pt_place_of_issue",
+      "canonical": "local de emissao",
+      "synonyms": [
+        "cidade emissora",
+        "posto emissor"
+      ],
+      "display": "Local de Emissao",
+      "enRef": "identity_lex_place_of_issue"
+    },
+    {
+      "id": "identity_lex_pt_proof_of_address",
+      "canonical": "comprovante de endereco",
+      "synonyms": [
+        "prova de residencia",
+        "comprovante residencial"
+      ],
+      "display": "Comprovante de Endereco",
+      "enRef": "identity_lex_proof_of_address"
+    },
+    {
+      "id": "identity_lex_pt_public_registry",
+      "canonical": "registro publico",
+      "synonyms": [
+        "registro comercial",
+        "cadastro publico"
+      ],
+      "display": "Registro Publico",
+      "enRef": "identity_lex_public_registry"
+    },
+    {
+      "id": "identity_lex_pt_qr_code",
+      "canonical": "codigo qr",
+      "synonyms": [
+        "qr de validacao",
+        "codigo de leitura"
+      ],
+      "display": "Codigo QR",
+      "enRef": "identity_lex_qr_code"
+    },
+    {
+      "id": "identity_lex_pt_registered_address",
+      "canonical": "endereco registrado",
+      "synonyms": [
+        "endereco comercial",
+        "domicilio juridico"
+      ],
+      "display": "Endereco Registrado",
+      "enRef": "identity_lex_registered_address"
+    },
+    {
+      "id": "identity_lex_pt_registration_date",
+      "canonical": "data de registro",
+      "synonyms": [
+        "data de constituicao",
+        "data de arquivamento"
+      ],
+      "display": "Data de Registro",
+      "enRef": "identity_lex_registration_date"
+    },
+    {
+      "id": "identity_lex_pt_registration_office",
+      "canonical": "orgao de registro",
+      "synonyms": [
+        "junta de registro",
+        "cartorio"
+      ],
+      "display": "Orgao de Registro",
+      "enRef": "identity_lex_registration_office"
+    },
+    {
+      "id": "identity_lex_pt_registration_status",
+      "canonical": "situacao cadastral",
+      "synonyms": [
+        "status de registro",
+        "situacao ativa"
+      ],
+      "display": "Situacao Cadastral",
+      "enRef": "identity_lex_registration_status"
+    },
+    {
+      "id": "identity_lex_pt_residency_document",
+      "canonical": "documento de residencia",
+      "synonyms": [
+        "permissao de residencia",
+        "carteira de residencia"
+      ],
+      "display": "Documento de Residencia",
+      "enRef": "identity_lex_residency_document"
+    },
+    {
+      "id": "identity_lex_pt_residential_address",
+      "canonical": "endereco residencial",
+      "synonyms": [
+        "endereco domiciliar",
+        "residencia"
+      ],
+      "display": "Endereco Residencial",
+      "enRef": "identity_lex_residential_address"
+    },
+    {
+      "id": "identity_lex_pt_security_features",
+      "canonical": "itens de seguranca",
+      "synonyms": [
+        "recursos antifraude",
+        "controles de seguranca"
+      ],
+      "display": "Itens de Seguranca",
+      "enRef": "identity_lex_security_features"
+    },
+    {
+      "id": "identity_lex_pt_serial_number",
+      "canonical": "numero de serie",
+      "synonyms": [
+        "serial",
+        "numero serial"
+      ],
+      "display": "Numero de Serie",
+      "enRef": "identity_lex_serial_number"
+    },
+    {
+      "id": "identity_lex_pt_state_registration",
+      "canonical": "inscricao estadual",
+      "synonyms": [
+        "registro estadual",
+        "ie"
+      ],
+      "display": "Inscricao Estadual",
+      "enRef": "identity_lex_state_registration"
+    },
+    {
+      "id": "identity_lex_pt_supporting_bill",
+      "canonical": "conta de utilidade para comprovacao",
+      "synonyms": [
+        "conta de servico",
+        "fatura de comprovacao"
+      ],
+      "display": "Conta de Utilidade",
+      "enRef": "identity_lex_supporting_bill"
+    },
+    {
+      "id": "identity_lex_pt_tax_id",
+      "canonical": "identificacao fiscal",
+      "synonyms": [
+        "cpf/cnpj",
+        "id fiscal"
+      ],
+      "display": "Identificacao Fiscal",
+      "enRef": "identity_lex_tax_id"
+    },
+    {
+      "id": "identity_lex_pt_validity_period",
+      "canonical": "periodo de validade",
+      "synonyms": [
+        "prazo de validade",
+        "vigencia"
+      ],
+      "display": "Periodo de Validade",
+      "enRef": "identity_lex_validity_period"
+    },
+    {
+      "id": "identity_lex_pt_verification_code",
+      "canonical": "codigo de verificacao",
+      "synonyms": [
+        "codigo validador",
+        "codigo de controle"
+      ],
+      "display": "Codigo de Verificacao",
+      "enRef": "identity_lex_verification_code"
+    },
+    {
+      "id": "identity_lex_pt_visa",
+      "canonical": "visto",
+      "synonyms": [
+        "visto de entrada",
+        "visto de residencia"
+      ],
+      "display": "Visto",
+      "enRef": "identity_lex_visa"
+    },
+    {
+      "id": "identity_lex_pt_watermark",
+      "canonical": "marca d'agua",
+      "synonyms": [
+        "selo de seguranca",
+        "marca de seguranca"
+      ],
+      "display": "Marca d'Agua",
+      "enRef": "identity_lex_watermark"
+    }
+  ]
+}

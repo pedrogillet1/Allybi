@@ -1,0 +1,3421 @@
+{
+  "_meta": {
+    "id": "doc_aliases_insurance",
+    "version": "1.0.0",
+    "description": "Insurance document alias normalization bank.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true,
+    "minAliasConfidence": 0.6
+  },
+  "domain": "insurance",
+  "aliases": [
+    {
+      "phrase": "abertura de sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar abertura de sinistro do periodo",
+        "exportar abertura de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "abrir sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show abrir sinistro for the period",
+        "export abrir sinistro for review"
+      ]
+    },
+    {
+      "phrase": "apolice",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar apolice do periodo",
+        "exportar apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "apolice completa",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar apolice completa do periodo",
+        "exportar apolice completa para revisao"
+      ]
+    },
+    {
+      "phrase": "apolice de seguro",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar apolice de seguro do periodo",
+        "exportar apolice de seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "apolice fatura",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar apolice fatura do periodo",
+        "exportar apolice fatura para revisao"
+      ]
+    },
+    {
+      "phrase": "apolice principal",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar apolice principal do periodo",
+        "exportar apolice principal para revisao"
+      ]
+    },
+    {
+      "phrase": "atualizacao de sinistro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar atualizacao de sinistro do periodo",
+        "exportar atualizacao de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "aviso de andamento do sinistro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aviso de andamento do sinistro do periodo",
+        "exportar aviso de andamento do sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "aviso de negacao de beneficio",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar aviso de negacao de beneficio do periodo",
+        "exportar aviso de negacao de beneficio para revisao"
+      ]
+    },
+    {
+      "phrase": "benefit denial letter",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show benefit denial letter for the period",
+        "export benefit denial letter for review"
+      ]
+    },
+    {
+      "phrase": "benefit denied",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show benefit denied for the period",
+        "export benefit denied for review"
+      ]
+    },
+    {
+      "phrase": "benefit paper",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show benefit paper for the period",
+        "export benefit paper for review"
+      ]
+    },
+    {
+      "phrase": "benefit payout explanation",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show benefit payout explanation for the period",
+        "export benefit payout explanation for review"
+      ]
+    },
+    {
+      "phrase": "benefits and coverage summary",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show benefits and coverage summary for the period",
+        "export benefits and coverage summary for review"
+      ]
+    },
+    {
+      "phrase": "benefits breakdown",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show benefits breakdown for the period",
+        "export benefits breakdown for review"
+      ]
+    },
+    {
+      "phrase": "benefits explanation letter",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show benefits explanation letter for the period",
+        "export benefits explanation letter for review"
+      ]
+    },
+    {
+      "phrase": "benefits notice",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show benefits notice for the period",
+        "export benefits notice for review"
+      ]
+    },
+    {
+      "phrase": "benefits statement",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show benefits statement for the period",
+        "export benefits statement for review"
+      ]
+    },
+    {
+      "phrase": "boleto de premio do seguro",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar boleto de premio do seguro do periodo",
+        "exportar boleto de premio do seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de atualizacao do seguro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carta de atualizacao do seguro do periodo",
+        "exportar carta de atualizacao do seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de negacao de cobertura",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carta de negacao de cobertura do periodo",
+        "exportar carta de negacao de cobertura para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de negativa de sinistro",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carta de negativa de sinistro do periodo",
+        "exportar carta de negativa de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de recusacao de cobertura",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carta de recusacao de cobertura do periodo",
+        "exportar carta de recusacao de cobertura para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de status do sinistro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar carta de status do sinistro do periodo",
+        "exportar carta de status do sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "cert card",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cert card for the period",
+        "export cert card for review"
+      ]
+    },
+    {
+      "phrase": "cert seguro",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cert seguro do periodo",
+        "exportar cert seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "certidao de seguro",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certidao de seguro do periodo",
+        "exportar certidao de seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado apolice",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar certificado apolice do periodo",
+        "exportar certificado apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado de apolice",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de apolice do periodo",
+        "exportar certificado de apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado de cobertura",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de cobertura do periodo",
+        "exportar certificado de cobertura para revisao"
+      ]
+    },
+    {
+      "phrase": "certificado de seguro",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar certificado de seguro do periodo",
+        "exportar certificado de seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "certificate of insurance",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show certificate of insurance for the period",
+        "export certificate of insurance for review"
+      ]
+    },
+    {
+      "phrase": "claim application",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim application for the period",
+        "export claim application for review"
+      ]
+    },
+    {
+      "phrase": "claim benefits breakdown",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim benefits breakdown for the period",
+        "export claim benefits breakdown for review"
+      ]
+    },
+    {
+      "phrase": "claim decision update",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim decision update for the period",
+        "export claim decision update for review"
+      ]
+    },
+    {
+      "phrase": "claim denial letter",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim denial letter for the period",
+        "export claim denial letter for review"
+      ]
+    },
+    {
+      "phrase": "claim denied letter",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim denied letter for the period",
+        "export claim denied letter for review"
+      ]
+    },
+    {
+      "phrase": "claim filed",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim filed for the period",
+        "export claim filed for review"
+      ]
+    },
+    {
+      "phrase": "claim form insurance",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim form insurance for the period",
+        "export claim form insurance for review"
+      ]
+    },
+    {
+      "phrase": "claim intake",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim intake for the period",
+        "export claim intake for review"
+      ]
+    },
+    {
+      "phrase": "claim intake form",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim intake form for the period",
+        "export claim intake form for review"
+      ]
+    },
+    {
+      "phrase": "claim letter update",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim letter update for the period",
+        "export claim letter update for review"
+      ]
+    },
+    {
+      "phrase": "claim packet",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim packet for the period",
+        "export claim packet for review"
+      ]
+    },
+    {
+      "phrase": "claim packet submitted",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim packet submitted for the period",
+        "export claim packet submitted for review"
+      ]
+    },
+    {
+      "phrase": "claim paper",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim paper for the period",
+        "export claim paper for review"
+      ]
+    },
+    {
+      "phrase": "claim progress note",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim progress note for the period",
+        "export claim progress note for review"
+      ]
+    },
+    {
+      "phrase": "claim progress notice",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim progress notice for the period",
+        "export claim progress notice for review"
+      ]
+    },
+    {
+      "phrase": "claim reject letter",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim reject letter for the period",
+        "export claim reject letter for review"
+      ]
+    },
+    {
+      "phrase": "claim status letter",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim status letter for the period",
+        "export claim status letter for review"
+      ]
+    },
+    {
+      "phrase": "claim status msg",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim status msg for the period",
+        "export claim status msg for review"
+      ]
+    },
+    {
+      "phrase": "claim submit",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim submit for the period",
+        "export claim submit for review"
+      ]
+    },
+    {
+      "phrase": "claim tracking",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim tracking for the period",
+        "export claim tracking for review"
+      ]
+    },
+    {
+      "phrase": "claim tracking letter",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show claim tracking letter for the period",
+        "export claim tracking letter for review"
+      ]
+    },
+    {
+      "phrase": "claim update",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show claim update for the period",
+        "export claim update for review"
+      ]
+    },
+    {
+      "phrase": "cobertura doc",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show cobertura doc for the period",
+        "export cobertura doc for review"
+      ]
+    },
+    {
+      "phrase": "cobertura resumo",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cobertura resumo do periodo",
+        "exportar cobertura resumo para revisao"
+      ]
+    },
+    {
+      "phrase": "coberturas seguro",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar coberturas seguro do periodo",
+        "exportar coberturas seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "cobranca de premio",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar cobranca de premio do periodo",
+        "exportar cobranca de premio para revisao"
+      ]
+    },
+    {
+      "phrase": "coi",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar coi do periodo",
+        "exportar coi para revisao"
+      ]
+    },
+    {
+      "phrase": "coi certificate",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show coi certificate for the period",
+        "export coi certificate for review"
+      ]
+    },
+    {
+      "phrase": "coi doc",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show coi doc for the period",
+        "export coi doc for review"
+      ]
+    },
+    {
+      "phrase": "comprovante de beneficios",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar comprovante de beneficios do periodo",
+        "exportar comprovante de beneficios para revisao"
+      ]
+    },
+    {
+      "phrase": "comprovante de seguro",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar comprovante de seguro do periodo",
+        "exportar comprovante de seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "conta de premio do seguro",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar conta de premio do seguro do periodo",
+        "exportar conta de premio do seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "contrato de seguro",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar contrato de seguro do periodo",
+        "exportar contrato de seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "coverage cert",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show coverage cert for the period",
+        "export coverage cert for review"
+      ]
+    },
+    {
+      "phrase": "coverage certificate",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show coverage certificate for the period",
+        "export coverage certificate for review"
+      ]
+    },
+    {
+      "phrase": "coverage cheat sheet",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show coverage cheat sheet for the period",
+        "export coverage cheat sheet for review"
+      ]
+    },
+    {
+      "phrase": "coverage denial notice",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show coverage denial notice for the period",
+        "export coverage denial notice for review"
+      ]
+    },
+    {
+      "phrase": "coverage denied",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show coverage denied for the period",
+        "export coverage denied for review"
+      ]
+    },
+    {
+      "phrase": "coverage highlights",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show coverage highlights for the period",
+        "export coverage highlights for review"
+      ]
+    },
+    {
+      "phrase": "coverage overview",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show coverage overview for the period",
+        "export coverage overview for review"
+      ]
+    },
+    {
+      "phrase": "coverage policy document",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show coverage policy document for the period",
+        "export coverage policy document for review"
+      ]
+    },
+    {
+      "phrase": "coverage snapshot",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show coverage snapshot for the period",
+        "export coverage snapshot for review"
+      ]
+    },
+    {
+      "phrase": "coverage summary",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show coverage summary for the period",
+        "export coverage summary for review"
+      ]
+    },
+    {
+      "phrase": "coverage summary document",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show coverage summary document for the period",
+        "export coverage summary document for review"
+      ]
+    },
+    {
+      "phrase": "demonstrativo de beneficios",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar demonstrativo de beneficios do periodo",
+        "exportar demonstrativo de beneficios para revisao"
+      ]
+    },
+    {
+      "phrase": "denial msg",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show denial msg for the period",
+        "export denial msg for review"
+      ]
+    },
+    {
+      "phrase": "denial notice",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show denial notice for the period",
+        "export denial notice for review"
+      ]
+    },
+    {
+      "phrase": "denial paper",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show denial paper for the period",
+        "export denial paper for review"
+      ]
+    },
+    {
+      "phrase": "denied claim notice",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show denied claim notice for the period",
+        "export denied claim notice for review"
+      ]
+    },
+    {
+      "phrase": "detalhamento de beneficios",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar detalhamento de beneficios do periodo",
+        "exportar detalhamento de beneficios para revisao"
+      ]
+    },
+    {
+      "phrase": "doc apolice",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar doc apolice do periodo",
+        "exportar doc apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "documento da apolice",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar documento da apolice do periodo",
+        "exportar documento da apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "envio de sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar envio de sinistro do periodo",
+        "exportar envio de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "eob",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show eob for the period",
+        "export eob for review"
+      ]
+    },
+    {
+      "phrase": "eob de saude",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar eob de saude do periodo",
+        "exportar eob de saude para revisao"
+      ]
+    },
+    {
+      "phrase": "eob doc",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show eob doc for the period",
+        "export eob doc for review"
+      ]
+    },
+    {
+      "phrase": "eob insurance",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show eob insurance for the period",
+        "export eob insurance for review"
+      ]
+    },
+    {
+      "phrase": "eob letter",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show eob letter for the period",
+        "export eob letter for review"
+      ]
+    },
+    {
+      "phrase": "eob statement",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show eob statement for the period",
+        "export eob statement for review"
+      ]
+    },
+    {
+      "phrase": "explanation of benefits",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show explanation of benefits for the period",
+        "export explanation of benefits for review"
+      ]
+    },
+    {
+      "phrase": "explicacao de beneficios",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar explicacao de beneficios do periodo",
+        "exportar explicacao de beneficios para revisao"
+      ]
+    },
+    {
+      "phrase": "extrato beneficios",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show extrato beneficios for the period",
+        "export extrato beneficios for review"
+      ]
+    },
+    {
+      "phrase": "extrato de beneficios do seguro",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar extrato de beneficios do seguro do periodo",
+        "exportar extrato de beneficios do seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "fatura da apolice",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fatura da apolice do periodo",
+        "exportar fatura da apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "fatura de premio do seguro",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fatura de premio do seguro do periodo",
+        "exportar fatura de premio do seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "fatura de renovacao de seguro",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar fatura de renovacao de seguro do periodo",
+        "exportar fatura de renovacao de seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "filed insurance claim",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show filed insurance claim for the period",
+        "export filed insurance claim for review"
+      ]
+    },
+    {
+      "phrase": "formulario de sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar formulario de sinistro do periodo",
+        "exportar formulario de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "health eob",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show health eob for the period",
+        "export health eob for review"
+      ]
+    },
+    {
+      "phrase": "health insurance eob",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show health insurance eob for the period",
+        "export health insurance eob for review"
+      ]
+    },
+    {
+      "phrase": "indeferimento de sinistro",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar indeferimento de sinistro do periodo",
+        "exportar indeferimento de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "insurance booklet",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show insurance booklet for the period",
+        "export insurance booklet for review"
+      ]
+    },
+    {
+      "phrase": "insurance cert",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show insurance cert for the period",
+        "export insurance cert for review"
+      ]
+    },
+    {
+      "phrase": "insurance certificate",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance certificate for the period",
+        "export insurance certificate for review"
+      ]
+    },
+    {
+      "phrase": "insurance claim doc",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show insurance claim doc for the period",
+        "export insurance claim doc for review"
+      ]
+    },
+    {
+      "phrase": "insurance claim submission",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance claim submission for the period",
+        "export insurance claim submission for review"
+      ]
+    },
+    {
+      "phrase": "insurance claim update letter",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance claim update letter for the period",
+        "export insurance claim update letter for review"
+      ]
+    },
+    {
+      "phrase": "insurance contract policy",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance contract policy for the period",
+        "export insurance contract policy for review"
+      ]
+    },
+    {
+      "phrase": "insurance coverage summary",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance coverage summary for the period",
+        "export insurance coverage summary for review"
+      ]
+    },
+    {
+      "phrase": "insurance denial letter",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance denial letter for the period",
+        "export insurance denial letter for review"
+      ]
+    },
+    {
+      "phrase": "insurance due bill",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show insurance due bill for the period",
+        "export insurance due bill for review"
+      ]
+    },
+    {
+      "phrase": "insurance monthly premium bill",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance monthly premium bill for the period",
+        "export insurance monthly premium bill for review"
+      ]
+    },
+    {
+      "phrase": "insurance papers",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show insurance papers for the period",
+        "export insurance papers for review"
+      ]
+    },
+    {
+      "phrase": "insurance policy",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance policy for the period",
+        "export insurance policy for review"
+      ]
+    },
+    {
+      "phrase": "insurance premium invoice",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance premium invoice for the period",
+        "export insurance premium invoice for review"
+      ]
+    },
+    {
+      "phrase": "insurance proof paper",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show insurance proof paper for the period",
+        "export insurance proof paper for review"
+      ]
+    },
+    {
+      "phrase": "insurance rejection letter",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show insurance rejection letter for the period",
+        "export insurance rejection letter for review"
+      ]
+    },
+    {
+      "phrase": "invoice premio",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show invoice premio for the period",
+        "export invoice premio for review"
+      ]
+    },
+    {
+      "phrase": "liability insurance certificate",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liability insurance certificate for the period",
+        "export liability insurance certificate for review"
+      ]
+    },
+    {
+      "phrase": "loss claim submission",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show loss claim submission for the period",
+        "export loss claim submission for review"
+      ]
+    },
+    {
+      "phrase": "master policy document",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show master policy document for the period",
+        "export master policy document for review"
+      ]
+    },
+    {
+      "phrase": "my policy",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show my policy for the period",
+        "export my policy for review"
+      ]
+    },
+    {
+      "phrase": "negacao de sinistro",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar negacao de sinistro do periodo",
+        "exportar negacao de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "negativa seguro",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar negativa seguro do periodo",
+        "exportar negativa seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "notificacao de negativa do seguro",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao de negativa do seguro do periodo",
+        "exportar notificacao de negativa do seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "notificacao de status do sinistro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar notificacao de status do sinistro do periodo",
+        "exportar notificacao de status do sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "paper de seguro",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar paper de seguro do periodo",
+        "exportar paper de seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "policy bill",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy bill for the period",
+        "export policy bill for review"
+      ]
+    },
+    {
+      "phrase": "policy coverage overview",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show policy coverage overview for the period",
+        "export policy coverage overview for review"
+      ]
+    },
+    {
+      "phrase": "policy coverage sheet",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy coverage sheet for the period",
+        "export policy coverage sheet for review"
+      ]
+    },
+    {
+      "phrase": "policy doc",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy doc for the period",
+        "export policy doc for review"
+      ]
+    },
+    {
+      "phrase": "policy docs",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy docs for the period",
+        "export policy docs for review"
+      ]
+    },
+    {
+      "phrase": "policy document",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show policy document for the period",
+        "export policy document for review"
+      ]
+    },
+    {
+      "phrase": "policy pack",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy pack for the period",
+        "export policy pack for review"
+      ]
+    },
+    {
+      "phrase": "policy pdf",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy pdf for the period",
+        "export policy pdf for review"
+      ]
+    },
+    {
+      "phrase": "policy premium invoice",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show policy premium invoice for the period",
+        "export policy premium invoice for review"
+      ]
+    },
+    {
+      "phrase": "policy resumo",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy resumo for the period",
+        "export policy resumo for review"
+      ]
+    },
+    {
+      "phrase": "policy text",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show policy text for the period",
+        "export policy text for review"
+      ]
+    },
+    {
+      "phrase": "policy wording",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show policy wording for the period",
+        "export policy wording for review"
+      ]
+    },
+    {
+      "phrase": "premio conta",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show premio conta for the period",
+        "export premio conta for review"
+      ]
+    },
+    {
+      "phrase": "premio mensal seguro",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar premio mensal seguro do periodo",
+        "exportar premio mensal seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "premio seguro boleto",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar premio seguro boleto do periodo",
+        "exportar premio seguro boleto para revisao"
+      ]
+    },
+    {
+      "phrase": "premium bill",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show premium bill for the period",
+        "export premium bill for review"
+      ]
+    },
+    {
+      "phrase": "premium due notice",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show premium due notice for the period",
+        "export premium due notice for review"
+      ]
+    },
+    {
+      "phrase": "premium payment bill",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show premium payment bill for the period",
+        "export premium payment bill for review"
+      ]
+    },
+    {
+      "phrase": "premium payment invoice",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show premium payment invoice for the period",
+        "export premium payment invoice for review"
+      ]
+    },
+    {
+      "phrase": "proof of insurance",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show proof of insurance for the period",
+        "export proof of insurance for review"
+      ]
+    },
+    {
+      "phrase": "proof of insurance certificate",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show proof of insurance certificate for the period",
+        "export proof of insurance certificate for review"
+      ]
+    },
+    {
+      "phrase": "proof segurado",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show proof segurado for the period",
+        "export proof segurado for review"
+      ]
+    },
+    {
+      "phrase": "protocolo de sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar protocolo de sinistro do periodo",
+        "exportar protocolo de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "quadro de coberturas",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar quadro de coberturas do periodo",
+        "exportar quadro de coberturas para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar registro de sinistro do periodo",
+        "exportar registro de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "rejection letter seguro",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar rejection letter seguro do periodo",
+        "exportar rejection letter seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "renewal premium invoice",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show renewal premium invoice for the period",
+        "export renewal premium invoice for review"
+      ]
+    },
+    {
+      "phrase": "resumo cobertura",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show resumo cobertura for the period",
+        "export resumo cobertura for review"
+      ]
+    },
+    {
+      "phrase": "resumo da apolice",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar resumo da apolice do periodo",
+        "exportar resumo da apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "resumo de beneficios",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar resumo de beneficios do periodo",
+        "exportar resumo de beneficios para revisao"
+      ]
+    },
+    {
+      "phrase": "resumo de cobertura do seguro",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar resumo de cobertura do seguro do periodo",
+        "exportar resumo de cobertura do seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro apolice",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro apolice do periodo",
+        "exportar seguro apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro beneficios",
+      "normalized": "explanation of benefits",
+      "docTypeIds": [
+        "ins_explanation_of_benefits"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "insured_person",
+        "formatHint": "benefit_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro beneficios do periodo",
+        "exportar seguro beneficios para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro cert",
+      "normalized": "certificate of insurance",
+      "docTypeIds": [
+        "ins_certificate_of_insurance"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "certificate",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro cert do periodo",
+        "exportar seguro cert para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro cobertura",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro cobertura do periodo",
+        "exportar seguro cobertura para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro contrato",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro contrato do periodo",
+        "exportar seguro contrato para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro fatura",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro fatura do periodo",
+        "exportar seguro fatura para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro premium invoice",
+      "normalized": "premium invoice",
+      "docTypeIds": [
+        "ins_premium_invoice"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "policyholder",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro premium invoice do periodo",
+        "exportar seguro premium invoice para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro recusado",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro recusado do periodo",
+        "exportar seguro recusado para revisao"
+      ]
+    },
+    {
+      "phrase": "seguro status letter",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar seguro status letter do periodo",
+        "exportar seguro status letter para revisao"
+      ]
+    },
+    {
+      "phrase": "sinistro aberto",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show sinistro aberto for the period",
+        "export sinistro aberto for review"
+      ]
+    },
+    {
+      "phrase": "sinistro andamento",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show sinistro andamento for the period",
+        "export sinistro andamento for review"
+      ]
+    },
+    {
+      "phrase": "sinistro envio",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show sinistro envio for the period",
+        "export sinistro envio for review"
+      ]
+    },
+    {
+      "phrase": "sinistro form",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show sinistro form for the period",
+        "export sinistro form for review"
+      ]
+    },
+    {
+      "phrase": "sinistro negado",
+      "normalized": "denial letter",
+      "docTypeIds": [
+        "ins_denial_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show sinistro negado for the period",
+        "export sinistro negado for review"
+      ]
+    },
+    {
+      "phrase": "sinistro status",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show sinistro status for the period",
+        "export sinistro status for review"
+      ]
+    },
+    {
+      "phrase": "status carta sinistro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show status carta sinistro for the period",
+        "export status carta sinistro for review"
+      ]
+    },
+    {
+      "phrase": "status claim",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show status claim for the period",
+        "export status claim for review"
+      ]
+    },
+    {
+      "phrase": "status de sinistro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar status de sinistro do periodo",
+        "exportar status de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "status letter seguro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar status letter seguro do periodo",
+        "exportar status letter seguro para revisao"
+      ]
+    },
+    {
+      "phrase": "status notice claim",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show status notice claim for the period",
+        "export status notice claim for review"
+      ]
+    },
+    {
+      "phrase": "submissao de sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar submissao de sinistro do periodo",
+        "exportar submissao de sinistro para revisao"
+      ]
+    },
+    {
+      "phrase": "submission sinistro",
+      "normalized": "insurance claim submission",
+      "docTypeIds": [
+        "ins_claim_submission"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "claim_form",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show submission sinistro for the period",
+        "export submission sinistro for review"
+      ]
+    },
+    {
+      "phrase": "sumario de cobertura",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar sumario de cobertura do periodo",
+        "exportar sumario de cobertura para revisao"
+      ]
+    },
+    {
+      "phrase": "summary apolice",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar summary apolice do periodo",
+        "exportar summary apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "summary of insured coverage",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show summary of insured coverage for the period",
+        "export summary of insured coverage for review"
+      ]
+    },
+    {
+      "phrase": "termos da apolice",
+      "normalized": "insurance policy document",
+      "docTypeIds": [
+        "ins_policy_document"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar termos da apolice do periodo",
+        "exportar termos da apolice para revisao"
+      ]
+    },
+    {
+      "phrase": "update sinistro",
+      "normalized": "claim status letter",
+      "docTypeIds": [
+        "ins_claim_status_letter"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "claimant",
+        "formatHint": "status_letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "show update sinistro for the period",
+        "export update sinistro for review"
+      ]
+    },
+    {
+      "phrase": "visao geral da cobertura",
+      "normalized": "coverage summary",
+      "docTypeIds": [
+        "ins_coverage_summary"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "policyholder",
+        "formatHint": "summary",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostrar visao geral da cobertura do periodo",
+        "exportar visao geral da cobertura para revisao"
+      ]
+    }
+  ]
+}

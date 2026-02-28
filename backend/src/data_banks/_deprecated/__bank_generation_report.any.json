@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "bank_generation_report",
+    "version": "1.0.0",
+    "description": "Generation and wiring notes for recent data bank safety and runtime execution changes.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "snippets": [
+    {
+      "id": "retrieval_query_rewrites_guardrails_2026_02_28",
+      "title": "Retrieval Query Rewrites Safety Upgrade",
+      "summary": [
+        "Rewrite evaluation is now priority-driven with strict condition checks (intent/operator/domain/language).",
+        "Guardrails are enforced per rule: negativePatterns[], requireContextAny[], requireContextAll[], forbidContextAny[].",
+        "Rewrites now produce structured query variants: { text, weight, sourceRuleId, reason }.",
+        "Retrieval executes weighted multi-query variants deterministically instead of concatenating all rewrites into one query string.",
+        "Acronym safety example: finance \\bap\\b rewrite is blocked unless accounts-payable context signals are present."
+      ],
+      "files": [
+        "backend/src/services/retrieval/document_intelligence/ruleInterpreter.ts",
+        "backend/src/services/core/retrieval/retrievalEngine.service.ts",
+        "backend/src/data_banks/retrieval/document_intelligence/query_rewrites.finance.any.json",
+        "backend/src/data_banks/schemas/query_rewrites_schema.any.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "legal_domain_profile",
+    "version": "2.0.0",
+    "description": "Domain profile for legal document intelligence interpretation and grounding.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "displayName": {
+    "en": "Legal",
+    "pt": "Juridico"
+  },
+  "scope": "Legal-domain extraction, retrieval, interpretation, obligation tracking, and policy-aware responses for contracts, corporate records, policies, and litigation artifacts.",
+  "coreConcepts": [
+    "acceptance criteria",
+    "assignment",
+    "audit rights",
+    "board authority",
+    "change orders",
+    "compliance representations",
+    "confidentiality",
+    "consent mechanics",
+    "controller/processor roles",
+    "cure period",
+    "data retention",
+    "damages",
+    "definitions",
+    "delivery milestones",
+    "dispute escalation",
+    "document precedence",
+    "effective date",
+    "fee schedule",
+    "force majeure",
+    "governing law",
+    "indemnification",
+    "ip ownership",
+    "jurisdiction",
+    "liability cap",
+    "license grant",
+    "notice obligations",
+    "payment terms",
+    "privacy rights",
+    "representations and warranties",
+    "security controls",
+    "service levels",
+    "subprocessor restrictions",
+    "survival clauses",
+    "termination for cause",
+    "termination for convenience"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "governing law",
+      "limitation of liability",
+      "indemnification",
+      "confidential information",
+      "effective date",
+      "term and termination",
+      "representations and warranties",
+      "service levels",
+      "data processing",
+      "board resolution",
+      "court order",
+      "settlement terms"
+    ],
+    "mediumConfidence": [
+      "fees schedule",
+      "payment terms",
+      "notice period",
+      "dispute escalation",
+      "change order",
+      "subprocessor list",
+      "security controls",
+      "code of conduct",
+      "cookie settings",
+      "acceptable use",
+      "retention period",
+      "signature block"
+    ]
+  },
+  "relatedDomains": [
+    "finance",
+    "ops"
+  ],
+  "ontologyPrefix": "legal"
+}

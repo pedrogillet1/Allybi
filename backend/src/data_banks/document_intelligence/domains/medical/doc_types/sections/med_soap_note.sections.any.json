@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "id": "medical_med_soap_note_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for SOAP Note.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_soap_note"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "document id",
+        "encounter",
+        "record number",
+        "SOAP Note Document Header",
+        "Nota SOAP Cabecalho do Documento"
+      ]
+    },
+    {
+      "id": "patient_identification",
+      "name": {
+        "en": "Patient Identification",
+        "pt": "Identificacao do Paciente"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Patient Identification",
+        "Identificacao do Paciente",
+        "patient name",
+        "mrn",
+        "dob",
+        "SOAP Note Patient Identification",
+        "Nota SOAP Identificacao do Paciente"
+      ]
+    },
+    {
+      "id": "encounter_context",
+      "name": {
+        "en": "Encounter Context",
+        "pt": "Contexto do Atendimento"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Encounter Context",
+        "Contexto do Atendimento",
+        "admission",
+        "visit date",
+        "service line",
+        "SOAP Note Encounter Context",
+        "Nota SOAP Contexto do Atendimento"
+      ]
+    },
+    {
+      "id": "chief_complaint_reason",
+      "name": {
+        "en": "Chief Complaint / Reason",
+        "pt": "Queixa Principal / Motivo"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Chief Complaint / Reason",
+        "Queixa Principal / Motivo",
+        "chief complaint",
+        "reason for visit",
+        "motivo",
+        "SOAP Note Chief Complaint / Reason",
+        "Nota SOAP Queixa Principal / Motivo"
+      ]
+    },
+    {
+      "id": "history_background",
+      "name": {
+        "en": "History and Background",
+        "pt": "Historia e Contexto"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "History and Background",
+        "Historia e Contexto",
+        "history of present illness",
+        "past medical history",
+        "SOAP Note History and Background",
+        "Nota SOAP Historia e Contexto"
+      ]
+    },
+    {
+      "id": "objective_findings",
+      "name": {
+        "en": "Objective Findings",
+        "pt": "Achados Objetivos"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Objective Findings",
+        "Achados Objetivos",
+        "exam",
+        "physical exam",
+        "objective",
+        "SOAP Note Objective Findings",
+        "Nota SOAP Achados Objetivos"
+      ]
+    },
+    {
+      "id": "vitals_and_measurements",
+      "name": {
+        "en": "Vitals and Measurements",
+        "pt": "Sinais Vitais e Medidas"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Vitals and Measurements",
+        "Sinais Vitais e Medidas",
+        "bp",
+        "heart rate",
+        "temperature",
+        "spo2",
+        "SOAP Note Vitals and Measurements",
+        "Nota SOAP Sinais Vitais e Medidas"
+      ]
+    },
+    {
+      "id": "labs_imaging",
+      "name": {
+        "en": "Laboratory and Imaging",
+        "pt": "Laboratorio e Imagem"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "Laboratory and Imaging",
+        "Laboratorio e Imagem",
+        "laboratory",
+        "impression",
+        "finding",
+        "SOAP Note Laboratory and Imaging",
+        "Nota SOAP Laboratorio e Imagem"
+      ]
+    },
+    {
+      "id": "assessment_documented",
+      "name": {
+        "en": "Documented Assessment",
+        "pt": "Avaliacao Documentada"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Documented Assessment",
+        "Avaliacao Documentada",
+        "assessment",
+        "clinical impression",
+        "diagnosis documented",
+        "SOAP Note Documented Assessment",
+        "Nota SOAP Avaliacao Documentada"
+      ]
+    },
+    {
+      "id": "plan_and_orders",
+      "name": {
+        "en": "Plan and Orders",
+        "pt": "Plano e Condutas"
+      },
+      "required": true,
+      "order": 10,
+      "headingAnchors": [
+        "Plan and Orders",
+        "Plano e Condutas",
+        "plan",
+        "orders",
+        "next steps",
+        "SOAP Note Plan and Orders",
+        "Nota SOAP Plano e Condutas"
+      ]
+    },
+    {
+      "id": "medications_allergies",
+      "name": {
+        "en": "Medications and Allergies",
+        "pt": "Medicacoes e Alergias"
+      },
+      "required": true,
+      "order": 11,
+      "headingAnchors": [
+        "Medications and Allergies",
+        "Medicacoes e Alergias",
+        "medications",
+        "allergies",
+        "contraindication",
+        "SOAP Note Medications and Allergies",
+        "Nota SOAP Medicacoes e Alergias"
+      ]
+    },
+    {
+      "id": "followup_and_disposition",
+      "name": {
+        "en": "Follow-up and Disposition",
+        "pt": "Acompanhamento e Desfecho"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Follow-up and Disposition",
+        "Acompanhamento e Desfecho",
+        "follow-up",
+        "discharge",
+        "referral",
+        "SOAP Note Follow-up and Disposition",
+        "Nota SOAP Acompanhamento e Desfecho"
+      ]
+    },
+    {
+      "id": "patient_instructions",
+      "name": {
+        "en": "Patient Instructions",
+        "pt": "Instrucoes ao Paciente"
+      },
+      "required": false,
+      "order": 13,
+      "headingAnchors": [
+        "Patient Instructions",
+        "Instrucoes ao Paciente",
+        "instructions",
+        "warning signs",
+        "return precautions",
+        "SOAP Note Patient Instructions",
+        "Nota SOAP Instrucoes ao Paciente"
+      ]
+    },
+    {
+      "id": "signoff_and_attestation",
+      "name": {
+        "en": "Signoff and Attestation",
+        "pt": "Assinatura e Atestacao"
+      },
+      "required": true,
+      "order": 14,
+      "headingAnchors": [
+        "Signoff and Attestation",
+        "Assinatura e Atestacao",
+        "signed by",
+        "clinician",
+        "timestamp",
+        "SOAP Note Signoff and Attestation",
+        "Nota SOAP Assinatura e Atestacao"
+      ]
+    },
+    {
+      "id": "annexes_tables",
+      "name": {
+        "en": "Annexes and Tables",
+        "pt": "Anexos e Tabelas"
+      },
+      "required": false,
+      "order": 15,
+      "headingAnchors": [
+        "Annexes and Tables",
+        "Anexos e Tabelas",
+        "table",
+        "appendix",
+        "annex",
+        "SOAP Note Annexes and Tables",
+        "Nota SOAP Anexos e Tabelas"
+      ]
+    }
+  ]
+}

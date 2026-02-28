@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "id": "di_insurance_redaction_and_safety_rules",
+    "version": "2.0.0",
+    "description": "Insurance redaction and safety rules with strict PII safeguards.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance"
+  },
+  "domain": "insurance",
+  "redactionRules": [
+    {
+      "id": "ins_redaction_001_member_name",
+      "dataType": "member_name",
+      "pattern": "\\b(?:member|insured|beneficiary|segurado|beneficiario)\\s*(?:name|nome)[: ]+[A-Za-z][A-Za-z .'-]{1,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_MEMBER_NAME]"
+    },
+    {
+      "id": "ins_redaction_002_member_id",
+      "dataType": "member_id",
+      "pattern": "\\b(?:member\\s*id|subscriber\\s*id|carteirinha|id\\s*do\\s*beneficiario)[:# ]?[A-Z0-9-]{5,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_MEMBER_ID]"
+    },
+    {
+      "id": "ins_redaction_003_policy_number",
+      "dataType": "policy_number",
+      "pattern": "\\b(?:policy\\s*number|policy\\s*no\\.?|numero\\s+da\\s+apolice)[:# ]?[A-Z0-9-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_POLICY_NUMBER]"
+    },
+    {
+      "id": "ins_redaction_004_claim_number",
+      "dataType": "claim_number",
+      "pattern": "\\b(?:claim\\s*number|claim\\s*id|numero\\s+do\\s+sinistro)[:# ]?[A-Z0-9-]{5,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_CLAIM_NUMBER]"
+    },
+    {
+      "id": "ins_redaction_005_tax_id",
+      "dataType": "tax_id",
+      "pattern": "\\b(?:TIN|SSN|CPF|CNPJ)[:# ]?[0-9A-Z./-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_TAX_ID]"
+    },
+    {
+      "id": "ins_redaction_006_address",
+      "dataType": "address",
+      "pattern": "\\b\\d{1,6}\\s+[A-Za-z0-9 .'-]+\\s(?:Street|St|Avenue|Ave|Road|Rd|Rua|Av|Alameda|Travessa)\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ADDRESS]"
+    },
+    {
+      "id": "ins_redaction_007_email",
+      "dataType": "email",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "action": "REDACT",
+      "replacement": "[REDACTED_EMAIL]"
+    },
+    {
+      "id": "ins_redaction_008_phone",
+      "dataType": "phone",
+      "pattern": "\\+?[0-9][0-9() -]{7,}[0-9]",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PHONE]"
+    },
+    {
+      "id": "ins_redaction_009_bank_account",
+      "dataType": "bank_account",
+      "pattern": "\\b(?:account|conta)\\s*(?:no\\.?|number|#)?\\s*:?\\s*[0-9-]{6,20}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_BANK_ACCOUNT]"
+    },
+    {
+      "id": "ins_redaction_010_card_number",
+      "dataType": "card_number",
+      "pattern": "\\b(?:card|cartao)\\s*(?:no\\.?|number|#)?\\s*:?\\s*[0-9-]{8,19}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_CARD_NUMBER]"
+    },
+    {
+      "id": "ins_redaction_011_provider_npi",
+      "dataType": "provider_identifier",
+      "pattern": "\\b(?:NPI|CRM|provider\\s*id|registro\\s+profissional)[:# ]?[A-Z0-9-]{4,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PROVIDER_ID]"
+    },
+    {
+      "id": "ins_redaction_012_qr_payload",
+      "dataType": "qr_payload",
+      "pattern": "\\b(?:pix|qr)[: ]?[A-Za-z0-9+/=._:-]{20,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_QR_PAYLOAD]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "ins_safety_001_no_medical_diagnosis_inference",
+      "severity": "error",
+      "trigger": "request_for_diagnosis_or_treatment",
+      "description": "Do not infer diagnosis/treatment from insurance documents.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "ins_safety_002_no_missing_field_inference",
+      "severity": "error",
+      "trigger": "missing_critical_field_detected",
+      "description": "Never infer missing critical fields (policy number, claim number, insured identity, status).",
+      "action": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "ins_safety_003_scope_lock",
+      "severity": "error",
+      "trigger": "request_uses_unattached_document_context",
+      "description": "Maintain attached-document scope lock.",
+      "action": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "ins_safety_004_strong_pii_redaction",
+      "severity": "error",
+      "trigger": "pii_detected_in_output",
+      "description": "Apply strong default redaction for member/policy/claim identifiers.",
+      "action": "WARN_AND_RESTRICT"
+    },
+    {
+      "id": "ins_safety_005_claim_outcome_uncertainty",
+      "severity": "warning",
+      "trigger": "claim_status_ambiguous",
+      "description": "When claim outcome is ambiguous, mark unverified and request additional evidence.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "ins_safety_006_denial_appeal_boundary",
+      "severity": "warning",
+      "trigger": "query_requests_legal_interpretation_of_denial",
+      "description": "Summarize denial facts only; do not provide legal advice.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "ins_safety_007_sensitive_payment_data",
+      "severity": "error",
+      "trigger": "payment_credentials_detected",
+      "description": "Never expose full payment credentials.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "ins_safety_008_unverified_scan",
+      "severity": "warning",
+      "trigger": "low_quality_scan_or_partial_page",
+      "description": "Mark uncertain values as unverified due to OCR/source limitations.",
+      "action": "DISCLAIMER"
+    }
+  ]
+}

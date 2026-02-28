@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for hr_payroll domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll",
+    "language": "pt"
+  },
+  "domain": "hr_payroll",
+  "terms": [
+    {
+      "id": "hr_payroll_lex_admissao",
+      "canonical": "admissao",
+      "synonyms": [
+        "data de admissao",
+        "inicio de contrato"
+      ],
+      "display": "Admissao"
+    },
+    {
+      "id": "hr_payroll_lex_beneficios",
+      "canonical": "beneficios",
+      "synonyms": [
+        "plano de beneficios",
+        "adesao"
+      ],
+      "display": "Beneficios"
+    },
+    {
+      "id": "hr_payroll_lex_cargo",
+      "canonical": "cargo",
+      "synonyms": [
+        "funcao",
+        "titulo do cargo"
+      ],
+      "display": "Cargo"
+    },
+    {
+      "id": "hr_payroll_lex_departamento",
+      "canonical": "departamento",
+      "synonyms": [
+        "setor",
+        "area"
+      ],
+      "display": "Departamento"
+    },
+    {
+      "id": "hr_payroll_lex_desconto",
+      "canonical": "desconto",
+      "synonyms": [
+        "deducao",
+        "desconto em folha"
+      ],
+      "display": "Desconto"
+    },
+    {
+      "id": "hr_payroll_lex_empresa",
+      "canonical": "empresa",
+      "synonyms": [
+        "empregador",
+        "razao social"
+      ],
+      "display": "Empresa"
+    },
+    {
+      "id": "hr_payroll_lex_folha_de_pagamento",
+      "canonical": "folha de pagamento",
+      "synonyms": [
+        "payroll",
+        "folha"
+      ],
+      "display": "Folha De Pagamento"
+    },
+    {
+      "id": "hr_payroll_lex_folha_de_ponto",
+      "canonical": "folha de ponto",
+      "synonyms": [
+        "ponto",
+        "timesheet"
+      ],
+      "display": "Folha De Ponto"
+    },
+    {
+      "id": "hr_payroll_lex_holerite",
+      "canonical": "holerite",
+      "synonyms": [
+        "contracheque",
+        "recibo de salario"
+      ],
+      "display": "Holerite"
+    },
+    {
+      "id": "hr_payroll_lex_horas_extras",
+      "canonical": "horas extras",
+      "synonyms": [
+        "overtime",
+        "horas adicionais"
+      ],
+      "display": "Horas Extras"
+    },
+    {
+      "id": "hr_payroll_lex_imposto_retido",
+      "canonical": "imposto retido",
+      "synonyms": [
+        "retencao",
+        "tributo retido"
+      ],
+      "display": "Imposto Retido"
+    },
+    {
+      "id": "hr_payroll_lex_liquido",
+      "canonical": "liquido",
+      "synonyms": [
+        "salario liquido",
+        "valor liquido"
+      ],
+      "display": "Liquido"
+    },
+    {
+      "id": "hr_payroll_lex_periodo_de_pagamento",
+      "canonical": "periodo de pagamento",
+      "synonyms": [
+        "competencia",
+        "periodo"
+      ],
+      "display": "Periodo De Pagamento"
+    },
+    {
+      "id": "hr_payroll_lex_reembolso",
+      "canonical": "reembolso",
+      "synonyms": [
+        "ressarcimento",
+        "devolucao"
+      ],
+      "display": "Reembolso"
+    },
+    {
+      "id": "hr_payroll_lex_relatorio_de_despesas",
+      "canonical": "relatorio de despesas",
+      "synonyms": [
+        "prestacao de contas",
+        "expense report"
+      ],
+      "display": "Relatorio De Despesas"
+    },
+    {
+      "id": "hr_payroll_lex_salario_bruto",
+      "canonical": "salario bruto",
+      "synonyms": [
+        "bruto",
+        "vencimentos"
+      ],
+      "display": "Salario Bruto"
+    },
+    {
+      "id": "hr_payroll_lex_salario_liquido",
+      "canonical": "salario liquido",
+      "synonyms": [
+        "net pay",
+        "valor a receber"
+      ],
+      "display": "Salario Liquido"
+    },
+    {
+      "id": "hr_payroll_lex_verificacao_de_emprego",
+      "canonical": "verificacao de emprego",
+      "synonyms": [
+        "comprovacao de emprego",
+        "carta de emprego"
+      ],
+      "display": "Verificacao De Emprego"
+    },
+    {
+      "id": "hr_payroll_lex_vinculo_empregaticio",
+      "canonical": "vinculo empregaticio",
+      "synonyms": [
+        "relacao de trabalho",
+        "contrato"
+      ],
+      "display": "Vinculo Empregaticio"
+    },
+    {
+      "id": "hr_payroll_lex_ytd",
+      "canonical": "ytd",
+      "synonyms": [
+        "acumulado no ano",
+        "ano ate a data"
+      ],
+      "display": "Ytd"
+    }
+  ]
+}

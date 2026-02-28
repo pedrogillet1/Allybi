@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_travel_lexicon_en",
+    "version": "1.0.0",
+    "description": "EN lexicon for travel domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "language": "en"
+  },
+  "domain": "travel",
+  "terms": [
+    {
+      "id": "travel_lex_arrival",
+      "canonical": "arrival",
+      "synonyms": [
+        "landing",
+        "destination arrival"
+      ],
+      "display": "Arrival"
+    },
+    {
+      "id": "travel_lex_baggage_allowance",
+      "canonical": "baggage allowance",
+      "synonyms": [
+        "bag allowance",
+        "checked baggage"
+      ],
+      "display": "Baggage Allowance"
+    },
+    {
+      "id": "travel_lex_boarding_group",
+      "canonical": "boarding group",
+      "synonyms": [
+        "boarding zone",
+        "group"
+      ],
+      "display": "Boarding Group"
+    },
+    {
+      "id": "travel_lex_booking_reference",
+      "canonical": "booking reference",
+      "synonyms": [
+        "reservation code",
+        "confirmation code"
+      ],
+      "display": "Booking Reference"
+    },
+    {
+      "id": "travel_lex_cancellation_policy",
+      "canonical": "cancellation policy",
+      "synonyms": [
+        "refund policy",
+        "change policy"
+      ],
+      "display": "Cancellation Policy"
+    },
+    {
+      "id": "travel_lex_carrier",
+      "canonical": "carrier",
+      "synonyms": [
+        "airline",
+        "operator"
+      ],
+      "display": "Carrier"
+    },
+    {
+      "id": "travel_lex_check_in",
+      "canonical": "check-in",
+      "synonyms": [
+        "online check-in",
+        "counter check-in"
+      ],
+      "display": "Check-in"
+    },
+    {
+      "id": "travel_lex_check_out",
+      "canonical": "check-out",
+      "synonyms": [
+        "departure checkout",
+        "hotel checkout"
+      ],
+      "display": "Check-out"
+    },
+    {
+      "id": "travel_lex_departure",
+      "canonical": "departure",
+      "synonyms": [
+        "takeoff",
+        "origin departure"
+      ],
+      "display": "Departure"
+    },
+    {
+      "id": "travel_lex_fare_class",
+      "canonical": "fare class",
+      "synonyms": [
+        "booking class",
+        "cabin class"
+      ],
+      "display": "Fare Class"
+    },
+    {
+      "id": "travel_lex_flight_number",
+      "canonical": "flight number",
+      "synonyms": [
+        "route number",
+        "service number"
+      ],
+      "display": "Flight Number"
+    },
+    {
+      "id": "travel_lex_gate",
+      "canonical": "gate",
+      "synonyms": [
+        "boarding gate",
+        "gate no"
+      ],
+      "display": "Gate"
+    },
+    {
+      "id": "travel_lex_itinerary",
+      "canonical": "itinerary",
+      "synonyms": [
+        "trip plan",
+        "travel plan"
+      ],
+      "display": "Itinerary"
+    },
+    {
+      "id": "travel_lex_layover",
+      "canonical": "layover",
+      "synonyms": [
+        "connection",
+        "stopover"
+      ],
+      "display": "Layover"
+    },
+    {
+      "id": "travel_lex_pnr",
+      "canonical": "pnr",
+      "synonyms": [
+        "record locator",
+        "reservation locator"
+      ],
+      "display": "Pnr"
+    },
+    {
+      "id": "travel_lex_policy_number",
+      "canonical": "policy number",
+      "synonyms": [
+        "insurance policy id",
+        "policy ref"
+      ],
+      "display": "Policy Number"
+    },
+    {
+      "id": "travel_lex_seat",
+      "canonical": "seat",
+      "synonyms": [
+        "seat assignment",
+        "seat no"
+      ],
+      "display": "Seat"
+    },
+    {
+      "id": "travel_lex_terminal",
+      "canonical": "terminal",
+      "synonyms": [
+        "airport terminal",
+        "terminal no"
+      ],
+      "display": "Terminal"
+    },
+    {
+      "id": "travel_lex_ticket_number",
+      "canonical": "ticket number",
+      "synonyms": [
+        "eticket",
+        "ticket id"
+      ],
+      "display": "Ticket Number"
+    },
+    {
+      "id": "travel_lex_visa_receipt",
+      "canonical": "visa receipt",
+      "synonyms": [
+        "visa application receipt",
+        "consular receipt"
+      ],
+      "display": "Visa Receipt"
+    }
+  ]
+}

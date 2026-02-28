@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "di_education_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for education extraction and reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education"
+  },
+  "domain": "education",
+  "policies": [
+    {
+      "id": "education_val_001_term_consistency",
+      "severity": "error",
+      "description": "Academic term and period dates should align with stated semester/session.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "education_term_period_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "education_val_002_credit_total",
+      "severity": "warning",
+      "description": "Course credit sum should reconcile with reported total credits when provided.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "education_credit_reconciliation",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "education_val_003_identity_match",
+      "severity": "warning",
+      "description": "Student name and student identifier should remain consistent across pages.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "education_student_identity_consistency",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "education_val_004_award_currency",
+      "severity": "error",
+      "description": "Aid award monetary fields must use consistent currency symbols/codes.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "currency_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "education_val_005_document_scope_lock",
+      "severity": "error",
+      "description": "Do not blend grades or aid values from different attached documents.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "single_document_scope_lock",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

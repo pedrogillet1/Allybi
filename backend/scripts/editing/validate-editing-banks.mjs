@@ -86,6 +86,7 @@ function collectCapabilityOps(capabilityBank) {
 function main() {
   const errors = [];
   const warnings = [];
+  const collisionCounts = new Map();
   const requiredFiles = [
     "parsers/operator_catalog.any.json",
     "intent_patterns/docx.en.any.json",
@@ -211,6 +212,7 @@ function main() {
                   warnings.push(
                     `${label} collision: "${pA.id}" example "${example}" also matches "${pB.id}" regex (ops: ${opsA.join(",")} vs ${opsB.join(",")})`,
                   );
+                  collisionCounts.set(label, (collisionCounts.get(label) || 0) + 1);
                 }
                 break; // one collision per example-pattern pair is enough
               }
@@ -220,6 +222,65 @@ function main() {
           }
         }
       }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Pattern hardening coverage checks
+  // ---------------------------------------------------------------------------
+
+  for (const { label, bank } of localePairs) {
+    const patterns = Array.isArray(bank?.patterns) ? bank.patterns : [];
+    if (patterns.length === 0) {
+      errors.push(`${label} has no patterns.`);
+      continue;
+    }
+
+    const tokensNoneCount = patterns.filter(
+      (p) => Array.isArray(p?.triggers?.tokens_none) && p.triggers.tokens_none.length > 0,
+    ).length;
+    const disambiguationCount = patterns.filter(
+      (p) => String(p?.disambiguationGroup || "").trim().length > 0,
+    ).length;
+    const scoreAdjustmentCount = patterns.filter(
+      (p) => p?.scoreAdjustments && typeof p.scoreAdjustments === "object",
+    ).length;
+
+    const tokensNoneCoverage = tokensNoneCount / patterns.length;
+    const disambiguationCoverage = disambiguationCount / patterns.length;
+    const scoreAdjustmentsCoverage = scoreAdjustmentCount / patterns.length;
+
+    if (label.startsWith("XLSX") && tokensNoneCoverage < 0.9) {
+      errors.push(
+        `${label} tokens_none coverage too low (${tokensNoneCount}/${patterns.length}); minimum is 90%.`,
+      );
+    }
+    if (label.startsWith("DOCX") && tokensNoneCoverage < 0.55) {
+      warnings.push(
+        `${label} tokens_none coverage is low (${tokensNoneCount}/${patterns.length}); consider expanding hard negative guards.`,
+      );
+    }
+    if (label.startsWith("XLSX") && disambiguationCoverage < 0.6) {
+      errors.push(
+        `${label} disambiguationGroup coverage too low (${disambiguationCount}/${patterns.length}); minimum is 60%.`,
+      );
+    }
+    if (label.startsWith("XLSX") && scoreAdjustmentsCoverage < 0.75) {
+      warnings.push(
+        `${label} scoreAdjustments coverage is low (${scoreAdjustmentCount}/${patterns.length}); target is 75%+.`,
+      );
+    }
+
+    const collisions = collisionCounts.get(label) || 0;
+    const collisionRatio = collisions / patterns.length;
+    if (collisionRatio > 0.5) {
+      errors.push(
+        `${label} collision ratio too high (${collisions}/${patterns.length}).`,
+      );
+    } else if (collisionRatio > 0.25) {
+      warnings.push(
+        `${label} collision ratio is elevated (${collisions}/${patterns.length}).`,
+      );
     }
   }
 

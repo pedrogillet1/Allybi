@@ -1,25 +1,38 @@
 {
   "_meta": {
     "id": "allybi_crossdoc_grounding",
-    "version": "1.0.0",
-    "description": "Cross-document grounding policy for deterministic editor enrich actions.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-02-12",
+    "version": "1.1.0",
+    "description": "Cross-document grounding policy for deterministic retrieval and editor actions with strict compare gating.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28",
     "owner": "allybi-editing"
   },
   "config": {
     "enabled": true,
-    "editorModeActiveDocumentWritable": true
+    "editorModeActiveDocumentWritable": true,
+    "compareRequiresExplicitResolvedDocs": true,
+    "requireDisambiguationWhenAmbiguous": true
   },
   "retrievalPolicy": {
     "allowedInEditorMode": true,
     "sourceDocsReadOnly": true,
     "maxSourceDocuments": 5,
-    "maxSourceSnippets": 24
+    "maxSourceSnippets": 24,
+    "allowWhenDocLock": false,
+    "requireDomainMatch": true,
+    "compareMinExplicitResolvedDocs": 2
   },
   "citationFormat": {
     "type": "source_pack",
-    "fields": ["documentId", "snippetId", "excerpt"]
+    "fields": [
+      "documentId",
+      "snippetId",
+      "excerpt"
+    ]
   },
   "mergePolicy": {
     "onConflict": "prefer_explicit_user_selected_source",
@@ -28,5 +41,227 @@
   "sourceRequiredRules": [
     "when_user_requests_match_document_x",
     "when_user_requests_use_document_x"
-  ]
+  ],
+  "rules": [
+    {
+      "id": "crossdoc_compare_global_strict",
+      "priority": 100,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "minExplicitResolvedDocs": 2,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 4,
+      "disambiguationQuestion": "Which two documents should I compare?"
+    },
+    {
+      "id": "crossdoc_compare_finance",
+      "priority": 95,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "minExplicitResolvedDocs": 2,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 4,
+      "disambiguationQuestion": "Which finance documents should I compare?"
+    },
+    {
+      "id": "crossdoc_compare_legal",
+      "priority": 95,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "legal"
+      ],
+      "minExplicitResolvedDocs": 2,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 4,
+      "disambiguationQuestion": "Which legal documents should I compare?"
+    },
+    {
+      "id": "crossdoc_compare_medical",
+      "priority": 95,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "minExplicitResolvedDocs": 2,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 4,
+      "disambiguationQuestion": "Which medical reports should I compare?"
+    },
+    {
+      "id": "crossdoc_compare_ops",
+      "priority": 95,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "minExplicitResolvedDocs": 2,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 4,
+      "disambiguationQuestion": "Which ops documents should I compare?"
+    },
+    {
+      "id": "crossdoc_summarize_limited",
+      "priority": 80,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "minExplicitResolvedDocs": 1,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 3,
+      "disambiguationQuestion": "Which document should I summarize first?"
+    },
+    {
+      "id": "crossdoc_extract_limited",
+      "priority": 79,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "minExplicitResolvedDocs": 1,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 3,
+      "disambiguationQuestion": "Which document should I extract from?"
+    },
+    {
+      "id": "crossdoc_locate_limited",
+      "priority": 78,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "minExplicitResolvedDocs": 1,
+      "requireDomainMatch": false,
+      "allowWhenDocLock": true,
+      "maxCandidates": 5,
+      "disambiguationQuestion": "Which document should I search in?"
+    },
+    {
+      "id": "crossdoc_open_navigate_single",
+      "priority": 77,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open",
+        "navigate"
+      ],
+      "minExplicitResolvedDocs": 1,
+      "requireDomainMatch": false,
+      "allowWhenDocLock": true,
+      "maxCandidates": 5,
+      "disambiguationQuestion": "Which file should I open?"
+    },
+    {
+      "id": "crossdoc_monitor_allow_multi",
+      "priority": 76,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "minExplicitResolvedDocs": 1,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 4,
+      "disambiguationQuestion": "Which monitored documents should I include?"
+    },
+    {
+      "id": "crossdoc_advise_allow_multi",
+      "priority": 75,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "minExplicitResolvedDocs": 1,
+      "requireDomainMatch": true,
+      "allowWhenDocLock": false,
+      "maxCandidates": 4,
+      "disambiguationQuestion": "Which document should guide this advice?"
+    }
+  ],
+  "disambiguationTemplates": {
+    "compare": "Which two documents should I compare?",
+    "singleDoc": "Which document should I use?",
+    "domainMismatch": "Which domain should I prioritize for this comparison?"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "CROSSDOC_001_compare_requires_two_docs",
+        "input": {
+          "operator": "compare",
+          "explicitDocsCount": 1
+        },
+        "expect": {
+          "allow": false,
+          "askDisambiguation": true,
+          "reasonCode": "cross_doc_compare_needs_explicit_docs"
+        }
+      },
+      {
+        "id": "CROSSDOC_002_compare_two_docs_allowed",
+        "input": {
+          "operator": "compare",
+          "explicitDocsCount": 2
+        },
+        "expect": {
+          "allow": true
+        }
+      }
+    ]
+  }
 }

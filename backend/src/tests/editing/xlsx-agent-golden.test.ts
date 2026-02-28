@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "@jest/globals";
 import { computeOpsToPatchPlan } from "../../services/editing/spreadsheetModel/computeOpsToPatchPlan";
 import { applyPatchOpsToSpreadsheetModel } from "../../services/editing/spreadsheetModel/spreadsheetModel.patch.apply";
 import type { SpreadsheetModel } from "../../services/editing/spreadsheetModel/spreadsheetModel.types";

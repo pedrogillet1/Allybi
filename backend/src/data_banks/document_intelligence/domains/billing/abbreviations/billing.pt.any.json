@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_billing_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for billing domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "language": "pt"
+  },
+  "domain": "billing",
+  "abbreviations": [
+    {
+      "abbr": "ANS",
+      "expansion": "Agencia Nacional de Saude Suplementar"
+    },
+    {
+      "abbr": "B2B",
+      "expansion": "Business to Business"
+    },
+    {
+      "abbr": "CEP",
+      "expansion": "Codigo de Enderecamento Postal"
+    },
+    {
+      "abbr": "CNPJ",
+      "expansion": "Cadastro Nacional da Pessoa Juridica"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoas Fisicas"
+    },
+    {
+      "abbr": "DDD",
+      "expansion": "Discagem Direta a Distancia"
+    },
+    {
+      "abbr": "EAN",
+      "expansion": "European Article Number"
+    },
+    {
+      "abbr": "ICMS",
+      "expansion": "Imposto sobre Circulacao de Mercadorias e Servicos"
+    },
+    {
+      "abbr": "ISS",
+      "expansion": "Imposto Sobre Servicos"
+    },
+    {
+      "abbr": "kWh",
+      "expansion": "Quilowatt-hora"
+    },
+    {
+      "abbr": "m3",
+      "expansion": "Metro cubico"
+    },
+    {
+      "abbr": "NF",
+      "expansion": "Nota Fiscal"
+    },
+    {
+      "abbr": "NFC-e",
+      "expansion": "Nota Fiscal de Consumidor Eletronica"
+    },
+    {
+      "abbr": "PIS",
+      "expansion": "Programa de Integracao Social"
+    },
+    {
+      "abbr": "PIX",
+      "expansion": "Pagamento Instantaneo"
+    },
+    {
+      "abbr": "PO",
+      "expansion": "Pedido de Compra"
+    },
+    {
+      "abbr": "SKU",
+      "expansion": "Unidade de Controle de Estoque"
+    },
+    {
+      "abbr": "SMS",
+      "expansion": "Servico de Mensagens Curtas"
+    },
+    {
+      "abbr": "TED",
+      "expansion": "Transferencia Eletronica Disponivel"
+    },
+    {
+      "abbr": "TUST",
+      "expansion": "Tarifa de Uso do Sistema de Transmissao"
+    }
+  ]
+}

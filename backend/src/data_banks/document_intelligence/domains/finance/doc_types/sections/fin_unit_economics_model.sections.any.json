@@ -1,0 +1,90 @@
+{
+  "_meta": {
+    "id": "di_finance_sections_fin_unit_economics_model",
+    "version": "2.0.0",
+    "description": "Section map for fin_unit_economics_model.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_unit_economics_model"
+  },
+  "sections": [
+    {
+      "id": "executive_summary",
+      "name": {
+        "en": "Executive Summary",
+        "pt": "Resumo Executivo"
+      },
+      "required": true,
+      "order": 1
+    },
+    {
+      "id": "period_scope",
+      "name": {
+        "en": "Period and Scope",
+        "pt": "Periodo e Escopo"
+      },
+      "required": true,
+      "order": 2
+    },
+    {
+      "id": "assumptions",
+      "name": {
+        "en": "Assumptions",
+        "pt": "Premissas"
+      },
+      "required": false,
+      "order": 3
+    },
+    {
+      "id": "tables_primary",
+      "name": {
+        "en": "Primary Tables",
+        "pt": "Tabelas Principais"
+      },
+      "required": true,
+      "order": 4
+    },
+    {
+      "id": "variance_and_drivers",
+      "name": {
+        "en": "Variance and Drivers",
+        "pt": "Variacoes e Drivers"
+      },
+      "required": false,
+      "order": 5
+    },
+    {
+      "id": "risks_and_constraints",
+      "name": {
+        "en": "Risks and Constraints",
+        "pt": "Riscos e Restricoes"
+      },
+      "required": false,
+      "order": 6
+    },
+    {
+      "id": "definitions",
+      "name": {
+        "en": "Definitions",
+        "pt": "Definicoes"
+      },
+      "required": true,
+      "order": 7
+    },
+    {
+      "id": "appendix",
+      "name": {
+        "en": "Appendix",
+        "pt": "Anexos"
+      },
+      "required": false,
+      "order": 8
+    }
+  ]
+}

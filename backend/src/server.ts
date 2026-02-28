@@ -25,6 +25,7 @@ import { PrismaHistoryService } from "./services/prismaHistory.service";
 import { TelemetryService } from "./services/telemetry";
 import { createAdminAuthService } from "./bootstrap/adminAuthBridge";
 import { createAdminTelemetryAdapter } from "./services/telemetry/adminTelemetryAdapter";
+import { setRealtimeSocketServer } from "./services/realtime/socketGateway.service";
 import {
   startDocumentWorker,
   startPreviewGenerationWorker,
@@ -291,9 +292,18 @@ async function startServer() {
       },
       transports: ["websocket", "polling"],
     });
+    setRealtimeSocketServer(io);
 
     io.on("connection", (socket) => {
       console.log("[Socket.IO] connected:", socket.id);
+
+      socket.on("join-user-room", (rawUserId: unknown) => {
+        const userId = String(rawUserId || "").trim();
+        if (!userId) return;
+        socket.join(userId);
+        socket.join(`user:${userId}`);
+        socket.emit("joined-user-room", { userId });
+      });
 
       socket.on("disconnect", (reason) => {
         console.log("[Socket.IO] disconnected:", socket.id, reason);

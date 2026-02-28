@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_billing_abbreviations_en",
+    "version": "1.0.0",
+    "description": "EN abbreviations for billing domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "language": "en"
+  },
+  "domain": "billing",
+  "abbreviations": [
+    {
+      "abbr": "ACH",
+      "expansion": "Automated Clearing House"
+    },
+    {
+      "abbr": "APR",
+      "expansion": "Annual Percentage Rate"
+    },
+    {
+      "abbr": "ARPU",
+      "expansion": "Average Revenue Per User"
+    },
+    {
+      "abbr": "B2B",
+      "expansion": "Business to Business"
+    },
+    {
+      "abbr": "DSL",
+      "expansion": "Digital Subscriber Line"
+    },
+    {
+      "abbr": "EOM",
+      "expansion": "End of Month"
+    },
+    {
+      "abbr": "GB",
+      "expansion": "Gigabyte"
+    },
+    {
+      "abbr": "GST",
+      "expansion": "Goods and Services Tax"
+    },
+    {
+      "abbr": "IMEI",
+      "expansion": "International Mobile Equipment Identity"
+    },
+    {
+      "abbr": "ISP",
+      "expansion": "Internet Service Provider"
+    },
+    {
+      "abbr": "kWh",
+      "expansion": "Kilowatt Hour"
+    },
+    {
+      "abbr": "MRC",
+      "expansion": "Monthly Recurring Charge"
+    },
+    {
+      "abbr": "MSISDN",
+      "expansion": "Mobile Station International Subscriber Directory Number"
+    },
+    {
+      "abbr": "NRC",
+      "expansion": "Non-Recurring Charge"
+    },
+    {
+      "abbr": "POS",
+      "expansion": "Point of Sale"
+    },
+    {
+      "abbr": "PO",
+      "expansion": "Purchase Order"
+    },
+    {
+      "abbr": "SKU",
+      "expansion": "Stock Keeping Unit"
+    },
+    {
+      "abbr": "SMS",
+      "expansion": "Short Message Service"
+    },
+    {
+      "abbr": "VAT",
+      "expansion": "Value Added Tax"
+    },
+    {
+      "abbr": "VoIP",
+      "expansion": "Voice over Internet Protocol"
+    }
+  ]
+}

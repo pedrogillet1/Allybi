@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for hr_payroll domain documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll",
+    "maxBoostRules": 15,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "hr_payroll",
+  "sectionPriority": [
+    {
+      "section": "employee_and_employer",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "pay_period_summary",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "earnings",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "deductions",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "taxes",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "benefits",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "time_entries",
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "expense_lines",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "reimbursement_totals",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "attestation_and_signatures",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "hr_payroll_boost_001_core_fields",
+      "priority": 95,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query asks key dates, amounts, status, or identifiers",
+      "boostSections": [
+        "employee_and_employer",
+        "pay_period_summary",
+        "earnings"
+      ]
+    },
+    {
+      "id": "hr_payroll_boost_002_reconciliation",
+      "priority": 91,
+      "weight": 2.5,
+      "operators": [
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "condition": "query asks totals tie-out, variance, or mismatch reasons",
+      "boostSections": [
+        "earnings",
+        "deductions",
+        "taxes",
+        "benefits",
+        "time_entries"
+      ]
+    },
+    {
+      "id": "hr_payroll_boost_003_terms",
+      "priority": 86,
+      "weight": 2,
+      "operators": [
+        "summarize",
+        "advise",
+        "evaluate"
+      ],
+      "condition": "query asks policy, terms, or constraints",
+      "boostSections": [
+        "terms_and_notes",
+        "time_entries",
+        "expense_lines"
+      ]
+    },
+    {
+      "id": "hr_payroll_boost_004_identity",
+      "priority": 84,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks who/which account/which traveler/student/employee/property",
+      "boostSections": [
+        "issuer_profile",
+        "recipient_profile",
+        "employee_and_employer"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bstatement\\b",
+      "expansions": [
+        "document",
+        "record",
+        "extrato",
+        "relatorio"
+      ]
+    },
+    {
+      "trigger": "\\breceipt\\b",
+      "expansions": [
+        "proof of payment",
+        "comprovante",
+        "recibo"
+      ]
+    },
+    {
+      "trigger": "\\btotal\\b",
+      "expansions": [
+        "amount",
+        "sum",
+        "valor total"
+      ]
+    },
+    {
+      "trigger": "\\bdue\\b",
+      "expansions": [
+        "deadline",
+        "due date",
+        "vencimento"
+      ]
+    },
+    {
+      "trigger": "\\breference\\b",
+      "expansions": [
+        "id",
+        "number",
+        "codigo",
+        "referencia"
+      ]
+    },
+    {
+      "trigger": "\\bperiod\\b",
+      "expansions": [
+        "date range",
+        "cycle",
+        "competencia"
+      ]
+    }
+  ]
+}

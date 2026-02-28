@@ -1,25 +1,2090 @@
 {
   "_meta": {
     "id": "layout_cues",
-    "version": "1.0.0",
-    "description": "Layout cues for signatures, footers, appendices, and pagination semantics.",
+    "version": "1.1.0",
+    "description": "Layout cues for structural and visual anchors across everyday document domains.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true
   },
   "cues": [
     {
+      "id": "account_box",
+      "patterns": [
+        "account box",
+        "Account Box",
+        "account box:",
+        "conta box",
+        "Conta Box",
+        "conta box:"
+      ],
+      "meaning": "account_box"
+    },
+    {
+      "id": "addressee_block",
+      "patterns": [
+        "a/c",
+        "attention:",
+        "dear",
+        "prezada",
+        "prezado",
+        "to:"
+      ],
+      "meaning": "addressee_block"
+    },
+    {
+      "id": "amount_box",
+      "patterns": [
+        "amount box",
+        "Amount Box",
+        "amount box:",
+        "valor box",
+        "Valor Box",
+        "valor box:"
+      ],
+      "meaning": "amount_box"
+    },
+    {
+      "id": "amount_due_badge",
+      "patterns": [
+        "amount due badge",
+        "Amount Due Badge",
+        "amount due badge:",
+        "valor vencimento badge",
+        "Valor Vencimento Badge",
+        "valor vencimento badge:"
+      ],
+      "meaning": "amount_due_badge"
+    },
+    {
+      "id": "annex_marker",
+      "patterns": [
+        "anexo",
+        "anexo i",
+        "anexo ii",
+        "annex",
+        "annex a",
+        "annex b"
+      ],
+      "meaning": "annex_marker"
+    },
+    {
+      "id": "appendix_marker",
+      "patterns": [
+        "apendice",
+        "apendice a",
+        "appendix",
+        "appendix a",
+        "appendix b"
+      ],
+      "meaning": "appendix_marker"
+    },
+    {
+      "id": "attachment_marker",
+      "patterns": [
+        "anexo",
+        "attached",
+        "attachment",
+        "em anexo",
+        "segue anexo"
+      ],
+      "meaning": "attachment_marker"
+    },
+    {
+      "id": "autopay_badge",
+      "patterns": [
+        "autopay badge",
+        "Autopay Badge",
+        "autopay badge:"
+      ],
+      "meaning": "autopay_badge"
+    },
+    {
+      "id": "barcode_block",
+      "patterns": [
+        "barcode block",
+        "Barcode Block",
+        "barcode block:"
+      ],
+      "meaning": "barcode_block"
+    },
+    {
+      "id": "beneficiary_block",
+      "patterns": [
+        "beneficiary block",
+        "Beneficiary Block",
+        "beneficiary block:"
+      ],
+      "meaning": "beneficiary_block"
+    },
+    {
+      "id": "bibliography_entry",
+      "patterns": [
+        "bibliografia",
+        "bibliography",
+        "references",
+        "referencias bibliograficas",
+        "works cited"
+      ],
+      "meaning": "bibliography_entry"
+    },
+    {
+      "id": "billing_header_bar",
+      "patterns": [
+        "billing header bar",
+        "Billing Header Bar",
+        "billing header bar:"
+      ],
+      "meaning": "billing_header_bar"
+    },
+    {
+      "id": "blockquote_marker",
+      "patterns": [
+        "citacao",
+        "excerpt",
+        "quote",
+        "quoted text",
+        "trecho citado"
+      ],
+      "meaning": "blockquote_marker"
+    },
+    {
+      "id": "bullet_list_marker",
+      "patterns": [
+        "–",
+        "·",
+        "•",
+        "■",
+        "▪",
+        "○"
+      ],
+      "meaning": "bullet_list_marker"
+    },
+    {
+      "id": "callout_box",
+      "patterns": [
+        "atencao:",
+        "attention:",
+        "important:",
+        "importante:",
+        "nota:",
+        "note:"
+      ],
+      "meaning": "callout_box"
+    },
+    {
+      "id": "callout_important",
+      "patterns": [
+        "callout important",
+        "Callout Important",
+        "callout important:"
+      ],
+      "meaning": "callout_important"
+    },
+    {
+      "id": "cancellation_stamp",
+      "patterns": [
+        "cancellation stamp",
+        "Cancellation Stamp",
+        "cancellation stamp:"
+      ],
+      "meaning": "cancellation_stamp"
+    },
+    {
+      "id": "card_last4_box",
+      "patterns": [
+        "card last4 box",
+        "Card Last4 Box",
+        "card last4 box:",
+        "cartao last4 box",
+        "Cartao Last4 Box",
+        "cartao last4 box:"
+      ],
+      "meaning": "card_last4_box"
+    },
+    {
+      "id": "cc_line",
+      "patterns": [
+        "c.c.:",
+        "cc:",
+        "com copia para:",
+        "copia para:",
+        "copy to:"
+      ],
+      "meaning": "cc_line"
+    },
+    {
+      "id": "certification_stamp",
+      "patterns": [
+        "certification stamp",
+        "Certification Stamp",
+        "certification stamp:"
+      ],
+      "meaning": "certification_stamp"
+    },
+    {
+      "id": "chart_title",
+      "patterns": [
+        "chart:",
+        "diagrama:",
+        "figure:",
+        "grafico:",
+        "graph:"
+      ],
+      "meaning": "chart_title"
+    },
+    {
+      "id": "checkbox_checked",
+      "patterns": [
+        "(x)",
+        "[x]",
+        "[X]",
+        "☑",
+        "✓",
+        "✔"
+      ],
+      "meaning": "checkbox_checked"
+    },
+    {
+      "id": "checkbox_unchecked",
+      "patterns": [
+        "( )",
+        "[ ]",
+        "□",
+        "◻",
+        "☐"
+      ],
+      "meaning": "checkbox_unchecked"
+    },
+    {
+      "id": "citation_marker",
+      "patterns": [
+        "[1]",
+        "[2]",
+        "apud",
+        "cf.",
+        "ibid.",
+        "op. cit."
+      ],
+      "meaning": "citation_marker"
+    },
+    {
+      "id": "claim_badge",
+      "patterns": [
+        "claim badge",
+        "Claim Badge",
+        "claim badge:",
+        "sinistro badge",
+        "Sinistro Badge",
+        "sinistro badge:"
+      ],
+      "meaning": "claim_badge"
+    },
+    {
+      "id": "claim_timeline",
+      "patterns": [
+        "claim timeline",
+        "Claim Timeline",
+        "claim timeline:",
+        "sinistro timeline",
+        "Sinistro Timeline",
+        "sinistro timeline:"
+      ],
+      "meaning": "claim_timeline"
+    },
+    {
+      "id": "closing_signature_panel",
+      "patterns": [
+        "closing signature panel",
+        "Closing Signature Panel",
+        "closing signature panel:",
+        "fechamento signature panel",
+        "Fechamento Signature Panel",
+        "fechamento signature panel:"
+      ],
+      "meaning": "closing_signature_panel"
+    },
+    {
+      "id": "closing_valediction",
+      "patterns": [
+        "atenciosamente",
+        "best regards",
+        "cordialmente",
+        "regards",
+        "respeitosamente",
+        "sincerely"
+      ],
+      "meaning": "closing_valediction"
+    },
+    {
+      "id": "co_pay_badge",
+      "patterns": [
+        "co pay badge",
+        "Co Pay Badge",
+        "co pay badge:"
+      ],
+      "meaning": "co_pay_badge"
+    },
+    {
+      "id": "code_block",
+      "patterns": [
+        "```",
+        "code:",
+        "codigo:",
+        "command:",
+        "script:"
+      ],
+      "meaning": "code_block"
+    },
+    {
+      "id": "column_break",
+      "patterns": [
+        "column break",
+        "new column",
+        "nova coluna",
+        "quebra de coluna"
+      ],
+      "meaning": "column_break"
+    },
+    {
+      "id": "comment_annotation",
+      "patterns": [
+        "anotacao:",
+        "comentario:",
+        "comment:",
+        "note:",
+        "observacao:",
+        "reviewer:"
+      ],
+      "meaning": "comment_annotation"
+    },
+    {
+      "id": "confidential_footer",
+      "patterns": [
+        "confidencial",
+        "confidential",
+        "do not distribute",
+        "nao divulgar",
+        "privileged",
+        "sigiloso"
+      ],
+      "meaning": "confidential_footer"
+    },
+    {
+      "id": "continuation_marker",
+      "patterns": [
+        "cont.",
+        "cont. na proxima pagina",
+        "continua",
+        "continuacao",
+        "continued",
+        "continued on next page"
+      ],
+      "meaning": "continuation_marker"
+    },
+    {
+      "id": "coverage_badge",
+      "patterns": [
+        "coverage badge",
+        "Coverage Badge",
+        "coverage badge:"
+      ],
+      "meaning": "coverage_badge"
+    },
+    {
+      "id": "credential_watermark",
+      "patterns": [
+        "credential watermark",
+        "Credential Watermark",
+        "credential watermark:"
+      ],
+      "meaning": "credential_watermark"
+    },
+    {
+      "id": "data_usage_chart",
+      "patterns": [
+        "dados uso chart",
+        "Dados Uso Chart",
+        "dados uso chart:",
+        "data usage chart",
+        "Data Usage Chart",
+        "data usage chart:"
+      ],
+      "meaning": "data_usage_chart"
+    },
+    {
+      "id": "date_line",
+      "patterns": [
+        "data:",
+        "datado de",
+        "date:",
+        "dated this",
+        "dated:",
+        "em __/__/____"
+      ],
+      "meaning": "date_line"
+    },
+    {
+      "id": "date_pill",
+      "patterns": [
+        "data pill",
+        "Data Pill",
+        "data pill:",
+        "date pill",
+        "Date Pill",
+        "date pill:"
+      ],
+      "meaning": "date_pill"
+    },
+    {
+      "id": "deduction_grid",
+      "patterns": [
+        "deduction grid",
+        "Deduction Grid",
+        "deduction grid:"
+      ],
+      "meaning": "deduction_grid"
+    },
+    {
+      "id": "delinquency_badge",
+      "patterns": [
+        "delinquency badge",
+        "Delinquency Badge",
+        "delinquency badge:"
+      ],
+      "meaning": "delinquency_badge"
+    },
+    {
+      "id": "disclaimer_block",
+      "patterns": [
+        "aviso legal",
+        "disclaimer",
+        "este documento",
+        "legal notice",
+        "this document"
+      ],
+      "meaning": "disclaimer_block"
+    },
+    {
+      "id": "disclaimer_ribbon",
+      "patterns": [
+        "disclaimer ribbon",
+        "Disclaimer Ribbon",
+        "disclaimer ribbon:"
+      ],
+      "meaning": "disclaimer_ribbon"
+    },
+    {
+      "id": "divider_ornament",
+      "patterns": [
+        "---",
+        "* * *",
+        "***",
+        "• • •",
+        "===",
+        "oOo"
+      ],
+      "meaning": "divider_ornament"
+    },
+    {
+      "id": "document_id_footer",
+      "patterns": [
+        "document id footer",
+        "Document Id Footer",
+        "document id footer:"
+      ],
+      "meaning": "document_id_footer"
+    },
+    {
+      "id": "document_title_banner",
+      "patterns": [
+        "document title banner",
+        "Document Title Banner",
+        "document title banner:"
+      ],
+      "meaning": "document_title_banner"
+    },
+    {
+      "id": "download_upload_split",
+      "patterns": [
+        "download upload split",
+        "Download Upload Split",
+        "download upload split:"
+      ],
+      "meaning": "download_upload_split"
+    },
+    {
+      "id": "due_date_badge",
+      "patterns": [
+        "due date badge",
+        "Due Date Badge",
+        "due date badge:",
+        "vencimento data badge",
+        "Vencimento Data Badge",
+        "vencimento data badge:"
+      ],
+      "meaning": "due_date_badge"
+    },
+    {
+      "id": "education_seal",
+      "patterns": [
+        "education seal",
+        "Education Seal",
+        "education seal:"
+      ],
+      "meaning": "education_seal"
+    },
+    {
+      "id": "employee_id_badge",
+      "patterns": [
+        "employee id badge",
+        "Employee Id Badge",
+        "employee id badge:"
+      ],
+      "meaning": "employee_id_badge"
+    },
+    {
+      "id": "enclosure_line",
+      "patterns": [
+        "anexos:",
+        "documentos anexos:",
+        "enc.:",
+        "encl:",
+        "enclosure:",
+        "enclosures:"
+      ],
+      "meaning": "enclosure_line"
+    },
+    {
+      "id": "end_of_document",
+      "patterns": [
+        "-- end --",
+        "-- fim --",
+        "###",
+        "end of document",
+        "fim do documento"
+      ],
+      "meaning": "end_of_document"
+    },
+    {
+      "id": "endnote_marker",
+      "patterns": [
+        "end note",
+        "endnote",
+        "endnotes",
+        "notas de fim",
+        "notas finais"
+      ],
+      "meaning": "endnote_marker"
+    },
+    {
+      "id": "enrollment_status_badge",
+      "patterns": [
+        "enrollment status badge",
+        "Enrollment Status Badge",
+        "enrollment status badge:",
+        "matricula status badge",
+        "Matricula Status Badge",
+        "matricula status badge:"
+      ],
+      "meaning": "enrollment_status_badge"
+    },
+    {
+      "id": "exhibit_marker",
+      "patterns": [
+        "doc.",
+        "documento",
+        "exhibit",
+        "exhibit a",
+        "exhibit b",
+        "peca"
+      ],
+      "meaning": "exhibit_marker"
+    },
+    {
+      "id": "fare_conditions_box",
+      "patterns": [
+        "fare conditions box",
+        "Fare Conditions Box",
+        "fare conditions box:"
+      ],
+      "meaning": "fare_conditions_box"
+    },
+    {
+      "id": "fee_breakdown_grid",
+      "patterns": [
+        "fee breakdown grid",
+        "Fee Breakdown Grid",
+        "fee breakdown grid:",
+        "taxa breakdown grid",
+        "Taxa Breakdown Grid",
+        "taxa breakdown grid:"
+      ],
+      "meaning": "fee_breakdown_grid"
+    },
+    {
+      "id": "figure_caption",
+      "patterns": [
+        "fig.",
+        "figura",
+        "figure",
+        "illustration",
+        "ilustracao"
+      ],
+      "meaning": "figure_caption"
+    },
+    {
+      "id": "flight_segment_card",
+      "patterns": [
+        "flight segment card",
+        "Flight Segment Card",
+        "flight segment card:",
+        "flight segment cartao",
+        "Flight Segment Cartao",
+        "flight segment cartao:"
+      ],
+      "meaning": "flight_segment_card"
+    },
+    {
+      "id": "footer_repeat",
+      "patterns": [
+        "bottom margin",
+        "footer",
+        "page footer",
+        "rodape",
+        "rodape da pagina"
+      ],
+      "meaning": "footer_repeat"
+    },
+    {
+      "id": "footnote_marker",
+      "patterns": [
+        "¹",
+        "²",
+        "³",
+        "footnote",
+        "nota de rodape",
+        "note:"
+      ],
+      "meaning": "footnote_marker"
+    },
+    {
+      "id": "fraud_notice_banner",
+      "patterns": [
+        "fraud notice banner",
+        "Fraud Notice Banner",
+        "fraud notice banner:"
+      ],
+      "meaning": "fraud_notice_banner"
+    },
+    {
+      "id": "gpa_badge",
+      "patterns": [
+        "gpa badge",
+        "Gpa Badge",
+        "gpa badge:"
+      ],
+      "meaning": "gpa_badge"
+    },
+    {
+      "id": "grace_period_badge",
+      "patterns": [
+        "grace period badge",
+        "Grace Period Badge",
+        "grace period badge:",
+        "grace periodo badge",
+        "Grace Periodo Badge",
+        "grace periodo badge:"
+      ],
+      "meaning": "grace_period_badge"
+    },
+    {
+      "id": "header_logo_lockup",
+      "patterns": [
+        "header logo lockup",
+        "Header Logo Lockup",
+        "header logo lockup:"
+      ],
+      "meaning": "header_logo_lockup"
+    },
+    {
+      "id": "header_repeat",
+      "patterns": [
+        "cabecalho",
+        "cabecalho da pagina",
+        "header",
+        "page header",
+        "running head"
+      ],
+      "meaning": "header_repeat"
+    },
+    {
+      "id": "highlight_marker",
+      "patterns": [
+        "destaque",
+        "emphasis",
+        "highlight",
+        "highlighted",
+        "marcacao"
+      ],
+      "meaning": "highlight_marker"
+    },
+    {
+      "id": "horizontal_rule",
+      "patterns": [
+        "___",
+        "---",
+        "***",
+        "────",
+        "━━━━"
+      ],
+      "meaning": "horizontal_rule"
+    },
+    {
+      "id": "housing_floorplan_embed",
+      "patterns": [
+        "housing floorplan embed",
+        "Housing Floorplan Embed",
+        "housing floorplan embed:"
+      ],
+      "meaning": "housing_floorplan_embed"
+    },
+    {
+      "id": "identity_photo_box",
+      "patterns": [
+        "identidade photo box",
+        "Identidade Photo Box",
+        "identidade photo box:",
+        "identity photo box",
+        "Identity Photo Box",
+        "identity photo box:"
+      ],
+      "meaning": "identity_photo_box"
+    },
+    {
+      "id": "image_placeholder",
+      "patterns": [
+        "[foto]",
+        "[image]",
+        "[imagem]",
+        "[photo]",
+        "inserir imagem aqui",
+        "insert image here"
+      ],
+      "meaning": "image_placeholder"
+    },
+    {
+      "id": "indented_block",
+      "patterns": [
+        "block indent",
+        "indented",
+        "nested",
+        "recuado",
+        "recuo"
+      ],
+      "meaning": "indented_block"
+    },
+    {
+      "id": "info_box",
+      "patterns": [
+        "for your information",
+        "fyi:",
+        "info:",
+        "informacao:",
+        "information:",
+        "para sua informacao"
+      ],
+      "meaning": "info_box"
+    },
+    {
+      "id": "initials_block",
+      "patterns": [
+        "iniciais:",
+        "initials:",
+        "parafo:",
+        "rubrica:",
+        "visto:"
+      ],
+      "meaning": "initials_block"
+    },
+    {
+      "id": "insurance_plan_chip",
+      "patterns": [
+        "insurance plan chip",
+        "Insurance Plan Chip",
+        "insurance plan chip:",
+        "insurance plano chip",
+        "Insurance Plano Chip",
+        "insurance plano chip:"
+      ],
+      "meaning": "insurance_plan_chip"
+    },
+    {
+      "id": "interest_box",
+      "patterns": [
+        "interest box",
+        "Interest Box",
+        "interest box:",
+        "juros box",
+        "Juros Box",
+        "juros box:"
+      ],
+      "meaning": "interest_box"
+    },
+    {
+      "id": "invoice_totals_card",
+      "patterns": [
+        "invoice totals card",
+        "Invoice Totals Card",
+        "invoice totals card:",
+        "nota totals cartao",
+        "Nota Totals Cartao",
+        "nota totals cartao:"
+      ],
+      "meaning": "invoice_totals_card"
+    },
+    {
+      "id": "issuer_signature_strip",
+      "patterns": [
+        "emissor signature strip",
+        "Emissor Signature Strip",
+        "emissor signature strip:",
+        "issuer signature strip",
+        "Issuer Signature Strip",
+        "issuer signature strip:"
+      ],
+      "meaning": "issuer_signature_strip"
+    },
+    {
+      "id": "itemized_table_header",
+      "patterns": [
+        "itemized table header",
+        "Itemized Table Header",
+        "itemized table header:"
+      ],
+      "meaning": "itemized_table_header"
+    },
+    {
+      "id": "lab_result_table_marker",
+      "patterns": [
+        "lab result table marker",
+        "Lab Result Table Marker",
+        "lab result table marker:"
+      ],
+      "meaning": "lab_result_table_marker"
+    },
+    {
+      "id": "late_fee_banner",
+      "patterns": [
+        "late fee banner",
+        "Late Fee Banner",
+        "late fee banner:",
+        "late taxa banner",
+        "Late Taxa Banner",
+        "late taxa banner:"
+      ],
+      "meaning": "late_fee_banner"
+    },
+    {
+      "id": "letterhead",
+      "patterns": [
+        "cabecalho institucional",
+        "company header",
+        "letterhead",
+        "papel timbrado",
+        "timbre"
+      ],
+      "meaning": "letterhead"
+    },
+    {
+      "id": "line_item_table_grid",
+      "patterns": [
+        "line item table grid",
+        "Line Item Table Grid",
+        "line item table grid:",
+        "linha item table grid",
+        "Linha Item Table Grid",
+        "linha item table grid:"
+      ],
+      "meaning": "line_item_table_grid"
+    },
+    {
+      "id": "loan_amortization_grid",
+      "patterns": [
+        "emprestimo amortization grid",
+        "Emprestimo Amortization Grid",
+        "emprestimo amortization grid:",
+        "loan amortization grid",
+        "Loan Amortization Grid",
+        "loan amortization grid:"
+      ],
+      "meaning": "loan_amortization_grid"
+    },
+    {
+      "id": "logo_placeholder",
+      "patterns": [
+        "[logo]",
+        "company logo",
+        "logo",
+        "logomarca",
+        "logotipo"
+      ],
+      "meaning": "logo_placeholder"
+    },
+    {
+      "id": "map_embed",
+      "patterns": [
+        "map embed",
+        "Map Embed",
+        "map embed:"
+      ],
+      "meaning": "map_embed"
+    },
+    {
+      "id": "margin_note",
+      "patterns": [
+        "margin note",
+        "marginal annotation",
+        "nota lateral",
+        "nota marginal",
+        "side note"
+      ],
+      "meaning": "margin_note"
+    },
+    {
+      "id": "merchant_stamp",
+      "patterns": [
+        "merchant stamp",
+        "Merchant Stamp",
+        "merchant stamp:"
+      ],
+      "meaning": "merchant_stamp"
+    },
+    {
+      "id": "meter_reading_box",
+      "patterns": [
+        "medidor leitura box",
+        "Medidor Leitura Box",
+        "medidor leitura box:",
+        "meter reading box",
+        "Meter Reading Box",
+        "meter reading box:"
+      ],
+      "meaning": "meter_reading_box"
+    },
+    {
+      "id": "minimum_payment_banner",
+      "patterns": [
+        "minimo pagamento banner",
+        "Minimo Pagamento Banner",
+        "minimo pagamento banner:",
+        "minimum payment banner",
+        "Minimum Payment Banner",
+        "minimum payment banner:"
+      ],
+      "meaning": "minimum_payment_banner"
+    },
+    {
+      "id": "mobile_plan_chip",
+      "patterns": [
+        "mobile plan chip",
+        "Mobile Plan Chip",
+        "mobile plan chip:",
+        "mobile plano chip",
+        "Mobile Plano Chip",
+        "mobile plano chip:"
+      ],
+      "meaning": "mobile_plan_chip"
+    },
+    {
+      "id": "mortgage_terms_box",
+      "patterns": [
+        "hipoteca terms box",
+        "Hipoteca Terms Box",
+        "hipoteca terms box:",
+        "mortgage terms box",
+        "Mortgage Terms Box",
+        "mortgage terms box:"
+      ],
+      "meaning": "mortgage_terms_box"
+    },
+    {
+      "id": "national_id_hologram",
+      "patterns": [
+        "national id hologram",
+        "National Id Hologram",
+        "national id hologram:"
+      ],
+      "meaning": "national_id_hologram"
+    },
+    {
+      "id": "net_pay_badge",
+      "patterns": [
+        "net pay badge",
+        "Net Pay Badge",
+        "net pay badge:"
+      ],
+      "meaning": "net_pay_badge"
+    },
+    {
+      "id": "notary_block",
+      "patterns": [
+        "cartorio",
+        "notarial seal",
+        "notarized",
+        "notary public",
+        "reconhecimento de firma",
+        "tabeliao"
+      ],
+      "meaning": "notary_block"
+    },
+    {
+      "id": "notification_banner",
+      "patterns": [
+        "notification banner",
+        "Notification Banner",
+        "notification banner:"
+      ],
+      "meaning": "notification_banner"
+    },
+    {
+      "id": "numbered_list_marker",
+      "patterns": [
+        "1.",
+        "2.",
+        "3.",
+        "a)",
+        "i.",
+        "ii."
+      ],
+      "meaning": "numbered_list_marker"
+    },
+    {
+      "id": "overage_alert_box",
+      "patterns": [
+        "excedente alert box",
+        "Excedente Alert Box",
+        "excedente alert box:",
+        "overage alert box",
+        "Overage Alert Box",
+        "overage alert box:"
+      ],
+      "meaning": "overage_alert_box"
+    },
+    {
+      "id": "owner_signature_box",
+      "patterns": [
+        "owner signature box",
+        "Owner Signature Box",
+        "owner signature box:"
+      ],
+      "meaning": "owner_signature_box"
+    },
+    {
+      "id": "page_break",
+      "patterns": [
+        "form feed",
+        "new page",
+        "nova pagina",
+        "page break",
+        "quebra de pagina"
+      ],
+      "meaning": "page_break"
+    },
+    {
+      "id": "page_number",
+      "patterns": [
+        "p.",
+        "pag.",
+        "page",
+        "pagina",
+        "pg."
+      ],
+      "meaning": "page_number"
+    },
+    {
+      "id": "page_of_total",
+      "patterns": [
+        "1/10",
+        "page 1 of",
+        "page x of y",
+        "pagina 1 de",
+        "pagina x de y"
+      ],
+      "meaning": "page_of_total"
+    },
+    {
+      "id": "page_reference_footer",
+      "patterns": [
+        "page reference footer",
+        "Page Reference Footer",
+        "page reference footer:",
+        "page referencia footer",
+        "Page Referencia Footer",
+        "page referencia footer:"
+      ],
+      "meaning": "page_reference_footer"
+    },
+    {
+      "id": "passenger_panel",
+      "patterns": [
+        "passenger panel",
+        "Passenger Panel",
+        "passenger panel:"
+      ],
+      "meaning": "passenger_panel"
+    },
+    {
+      "id": "passport_mrz_zone",
+      "patterns": [
+        "passaporte mrz zone",
+        "Passaporte Mrz Zone",
+        "passaporte mrz zone:",
+        "passport mrz zone",
+        "Passport Mrz Zone",
+        "passport mrz zone:"
+      ],
+      "meaning": "passport_mrz_zone"
+    },
+    {
+      "id": "payment_channel_chip",
+      "patterns": [
+        "pagamento canal chip",
+        "Pagamento Canal Chip",
+        "pagamento canal chip:",
+        "payment channel chip",
+        "Payment Channel Chip",
+        "payment channel chip:"
+      ],
+      "meaning": "payment_channel_chip"
+    },
+    {
+      "id": "payment_qr_block",
+      "patterns": [
+        "pagamento qr block",
+        "Pagamento Qr Block",
+        "pagamento qr block:",
+        "payment qr block",
+        "Payment Qr Block",
+        "payment qr block:"
+      ],
+      "meaning": "payment_qr_block"
+    },
+    {
+      "id": "payroll_totals_card",
+      "patterns": [
+        "folha totals cartao",
+        "Folha Totals Cartao",
+        "folha totals cartao:",
+        "payroll totals card",
+        "Payroll Totals Card",
+        "payroll totals card:"
+      ],
+      "meaning": "payroll_totals_card"
+    },
+    {
+      "id": "period_selector_pill",
+      "patterns": [
+        "period selector pill",
+        "Period Selector Pill",
+        "period selector pill:",
+        "periodo selector pill",
+        "Periodo Selector Pill",
+        "periodo selector pill:"
+      ],
+      "meaning": "period_selector_pill"
+    },
+    {
+      "id": "policy_number_ribbon",
+      "patterns": [
+        "apolice numero ribbon",
+        "Apolice Numero Ribbon",
+        "apolice numero ribbon:",
+        "policy number ribbon",
+        "Policy Number Ribbon",
+        "policy number ribbon:"
+      ],
+      "meaning": "policy_number_ribbon"
+    },
+    {
+      "id": "policy_terms_box",
+      "patterns": [
+        "apolice terms box",
+        "Apolice Terms Box",
+        "apolice terms box:",
+        "policy terms box",
+        "Policy Terms Box",
+        "policy terms box:"
+      ],
+      "meaning": "policy_terms_box"
+    },
+    {
+      "id": "postal_code_chip",
+      "patterns": [
+        "postal code chip",
+        "Postal Code Chip",
+        "postal code chip:",
+        "postal codigo chip",
+        "Postal Codigo Chip",
+        "postal codigo chip:"
+      ],
+      "meaning": "postal_code_chip"
+    },
+    {
+      "id": "premium_breakdown_card",
+      "patterns": [
+        "premio breakdown cartao",
+        "Premio Breakdown Cartao",
+        "premio breakdown cartao:",
+        "premium breakdown card",
+        "Premium Breakdown Card",
+        "premium breakdown card:"
+      ],
+      "meaning": "premium_breakdown_card"
+    },
+    {
+      "id": "price_tier_grid",
+      "patterns": [
+        "price tier grid",
+        "Price Tier Grid",
+        "price tier grid:"
+      ],
+      "meaning": "price_tier_grid"
+    },
+    {
+      "id": "principal_interest_split",
+      "patterns": [
+        "principal interest split",
+        "Principal Interest Split",
+        "principal interest split:",
+        "principal juros split",
+        "Principal Juros Split",
+        "principal juros split:"
+      ],
+      "meaning": "principal_interest_split"
+    },
+    {
+      "id": "privacy_notice_banner",
+      "patterns": [
+        "privacy notice banner",
+        "Privacy Notice Banner",
+        "privacy notice banner:"
+      ],
+      "meaning": "privacy_notice_banner"
+    },
+    {
+      "id": "progress_tracker",
+      "patterns": [
+        "progress tracker",
+        "Progress Tracker",
+        "progress tracker:"
+      ],
+      "meaning": "progress_tracker"
+    },
+    {
+      "id": "property_id_badge",
+      "patterns": [
+        "imovel id badge",
+        "Imovel Id Badge",
+        "imovel id badge:",
+        "property id badge",
+        "Property Id Badge",
+        "property id badge:"
+      ],
+      "meaning": "property_id_badge"
+    },
+    {
+      "id": "protocol_number",
+      "patterns": [
+        "process:",
+        "processo:",
+        "protocol:",
+        "protocolo:",
+        "ref:",
+        "referencia:"
+      ],
+      "meaning": "protocol_number"
+    },
+    {
+      "id": "provider_contact_box",
+      "patterns": [
+        "prestador contact box",
+        "Prestador Contact Box",
+        "prestador contact box:",
+        "provider contact box",
+        "Provider Contact Box",
+        "provider contact box:"
+      ],
+      "meaning": "provider_contact_box"
+    },
+    {
+      "id": "qr_code_block",
+      "patterns": [
+        "qr code block",
+        "Qr Code Block",
+        "qr code block:",
+        "qr codigo block",
+        "Qr Codigo Block",
+        "qr codigo block:"
+      ],
+      "meaning": "qr_code_block"
+    },
+    {
+      "id": "rate_plan_table",
+      "patterns": [
+        "rate plan table",
+        "Rate Plan Table",
+        "rate plan table:",
+        "taxa plano table",
+        "Taxa Plano Table",
+        "taxa plano table:"
+      ],
+      "meaning": "rate_plan_table"
+    },
+    {
+      "id": "receipt_stamp",
+      "patterns": [
+        "receipt stamp",
+        "Receipt Stamp",
+        "receipt stamp:",
+        "recibo stamp",
+        "Recibo Stamp",
+        "recibo stamp:"
+      ],
+      "meaning": "receipt_stamp"
+    },
+    {
+      "id": "redline_marker",
+      "patterns": [
+        "controle de alteracoes",
+        "markup",
+        "redline",
+        "revisao marcada",
+        "track changes"
+      ],
+      "meaning": "redline_marker"
+    },
+    {
+      "id": "reference_code_pill",
+      "patterns": [
+        "reference code pill",
+        "Reference Code Pill",
+        "reference code pill:",
+        "referencia codigo pill",
+        "Referencia Codigo Pill",
+        "referencia codigo pill:"
+      ],
+      "meaning": "reference_code_pill"
+    },
+    {
+      "id": "reference_line",
+      "patterns": [
+        "nosso ref:",
+        "re:",
+        "ref:",
+        "reference:",
+        "referencia:",
+        "subject ref:"
+      ],
+      "meaning": "reference_line"
+    },
+    {
+      "id": "refund_banner",
+      "patterns": [
+        "refund banner",
+        "Refund Banner",
+        "refund banner:"
+      ],
+      "meaning": "refund_banner"
+    },
+    {
+      "id": "regulatory_footer_notice",
+      "patterns": [
+        "regulatory footer notice",
+        "Regulatory Footer Notice",
+        "regulatory footer notice:"
+      ],
+      "meaning": "regulatory_footer_notice"
+    },
+    {
+      "id": "renewal_notice_banner",
+      "patterns": [
+        "renewal notice banner",
+        "Renewal Notice Banner",
+        "renewal notice banner:"
+      ],
+      "meaning": "renewal_notice_banner"
+    },
+    {
+      "id": "rent_due_box",
+      "patterns": [
+        "rent due box",
+        "Rent Due Box",
+        "rent due box:",
+        "rent vencimento box",
+        "Rent Vencimento Box",
+        "rent vencimento box:"
+      ],
+      "meaning": "rent_due_box"
+    },
+    {
+      "id": "reservation_locator_box",
+      "patterns": [
+        "reservation locator box",
+        "Reservation Locator Box",
+        "reservation locator box:"
+      ],
+      "meaning": "reservation_locator_box"
+    },
+    {
+      "id": "rewards_points_chip",
+      "patterns": [
+        "rewards points chip",
+        "Rewards Points Chip",
+        "rewards points chip:"
+      ],
+      "meaning": "rewards_points_chip"
+    },
+    {
+      "id": "risk_warning_callout",
+      "patterns": [
+        "risk warning callout",
+        "Risk Warning Callout",
+        "risk warning callout:"
+      ],
+      "meaning": "risk_warning_callout"
+    },
+    {
+      "id": "roaming_badge",
+      "patterns": [
+        "roaming badge",
+        "Roaming Badge",
+        "roaming badge:"
+      ],
+      "meaning": "roaming_badge"
+    },
+    {
+      "id": "route_segment_line",
+      "patterns": [
+        "route segment line",
+        "Route Segment Line",
+        "route segment line:",
+        "route segment linha",
+        "Route Segment Linha",
+        "route segment linha:"
+      ],
+      "meaning": "route_segment_line"
+    },
+    {
+      "id": "salary_component_grid",
+      "patterns": [
+        "salary component grid",
+        "Salary Component Grid",
+        "salary component grid:"
+      ],
+      "meaning": "salary_component_grid"
+    },
+    {
+      "id": "salutation",
+      "patterns": [
+        "dear",
+        "excelentissimo",
+        "ilustrissimo",
+        "prezada",
+        "prezado",
+        "to whom it may concern"
+      ],
+      "meaning": "salutation"
+    },
+    {
+      "id": "schedule_marker",
+      "patterns": [
+        "quadro",
+        "schedule",
+        "schedule a",
+        "schedule b",
+        "tabela anexa"
+      ],
+      "meaning": "schedule_marker"
+    },
+    {
+      "id": "schedule_matrix",
+      "patterns": [
+        "schedule matrix",
+        "Schedule Matrix",
+        "schedule matrix:"
+      ],
+      "meaning": "schedule_matrix"
+    },
+    {
+      "id": "score_box",
+      "patterns": [
+        "score box",
+        "Score Box",
+        "score box:"
+      ],
+      "meaning": "score_box"
+    },
+    {
+      "id": "seal_notary",
+      "patterns": [
+        "seal notary",
+        "Seal Notary",
+        "seal notary:"
+      ],
+      "meaning": "seal_notary"
+    },
+    {
+      "id": "section_break",
+      "patterns": [
+        "continuous break",
+        "new section",
+        "nova secao",
+        "quebra de secao",
+        "section break"
+      ],
+      "meaning": "section_break"
+    },
+    {
+      "id": "security_footer",
+      "patterns": [
+        "security footer",
+        "Security Footer",
+        "security footer:"
+      ],
+      "meaning": "security_footer"
+    },
+    {
+      "id": "sender_block",
+      "patterns": [
+        "de:",
+        "enviado por:",
+        "from:",
+        "remetente:",
+        "sender:",
+        "sent by:"
+      ],
+      "meaning": "sender_block"
+    },
+    {
+      "id": "separator_line",
+      "patterns": [
+        "divider",
+        "divisor",
+        "line break",
+        "separador",
+        "separator"
+      ],
+      "meaning": "separator_line"
+    },
+    {
+      "id": "service_address_box",
+      "patterns": [
+        "service address box",
+        "Service Address Box",
+        "service address box:",
+        "service endereco box",
+        "Service Endereco Box",
+        "service endereco box:"
+      ],
+      "meaning": "service_address_box"
+    },
+    {
+      "id": "service_period_chip",
+      "patterns": [
+        "service period chip",
+        "Service Period Chip",
+        "service period chip:",
+        "service periodo chip",
+        "Service Periodo Chip",
+        "service periodo chip:"
+      ],
+      "meaning": "service_period_chip"
+    },
+    {
+      "id": "sidebar",
+      "patterns": [
+        "aside",
+        "barra lateral",
+        "nota lateral",
+        "sidebar",
+        "text box"
+      ],
+      "meaning": "sidebar"
+    },
+    {
       "id": "signature_block",
       "patterns": [
-        "signed by",
+        "assinado por",
+        "assinatura",
+        "de acordo",
+        "firmado por",
         "signature",
-        "assinatura"
+        "signed by"
       ],
       "meaning": "signature_block"
+    },
+    {
+      "id": "signature_witness_block",
+      "patterns": [
+        "signature witness block",
+        "Signature Witness Block",
+        "signature witness block:"
+      ],
+      "meaning": "signature_witness_block"
+    },
+    {
+      "id": "sms_usage_chip",
+      "patterns": [
+        "sms usage chip",
+        "Sms Usage Chip",
+        "sms usage chip:",
+        "sms uso chip",
+        "Sms Uso Chip",
+        "sms uso chip:"
+      ],
+      "meaning": "sms_usage_chip"
+    },
+    {
+      "id": "stamp_approved",
+      "patterns": [
+        "accepted",
+        "aceito",
+        "approved",
+        "aprovado",
+        "authorized",
+        "autorizado"
+      ],
+      "meaning": "stamp_approved"
+    },
+    {
+      "id": "stamp_pending",
+      "patterns": [
+        "aguardando",
+        "awaiting",
+        "em analise",
+        "pendente",
+        "pending",
+        "under review"
+      ],
+      "meaning": "stamp_pending"
+    },
+    {
+      "id": "stamp_rejected",
+      "patterns": [
+        "denied",
+        "disapproved",
+        "negado",
+        "rejected",
+        "rejeitado",
+        "reprovado"
+      ],
+      "meaning": "stamp_rejected"
+    },
+    {
+      "id": "status_badge",
+      "patterns": [
+        "status badge",
+        "Status Badge",
+        "status badge:"
+      ],
+      "meaning": "status_badge"
+    },
+    {
+      "id": "strikethrough_marker",
+      "patterns": [
+        "deleted text",
+        "removed",
+        "strikethrough",
+        "tachado",
+        "texto riscado"
+      ],
+      "meaning": "strikethrough_marker"
+    },
+    {
+      "id": "student_id_box",
+      "patterns": [
+        "student id box",
+        "Student Id Box",
+        "student id box:"
+      ],
+      "meaning": "student_id_box"
+    },
+    {
+      "id": "subject_line",
+      "patterns": [
+        "assunto:",
+        "matter:",
+        "objeto:",
+        "re:",
+        "ref:",
+        "subject:"
+      ],
+      "meaning": "subject_line"
+    },
+    {
+      "id": "subsidy_badge",
+      "patterns": [
+        "subsidy badge",
+        "Subsidy Badge",
+        "subsidy badge:"
+      ],
+      "meaning": "subsidy_badge"
+    },
+    {
+      "id": "summary_totals_strip",
+      "patterns": [
+        "resumo totals strip",
+        "Resumo Totals Strip",
+        "resumo totals strip:",
+        "summary totals strip",
+        "Summary Totals Strip",
+        "summary totals strip:"
+      ],
+      "meaning": "summary_totals_strip"
+    },
+    {
+      "id": "surcharge_banner",
+      "patterns": [
+        "surcharge banner",
+        "Surcharge Banner",
+        "surcharge banner:"
+      ],
+      "meaning": "surcharge_banner"
+    },
+    {
+      "id": "table_caption",
+      "patterns": [
+        "tabela",
+        "tabela:",
+        "table",
+        "table:",
+        "tbl."
+      ],
+      "meaning": "table_caption"
+    },
+    {
+      "id": "tax_withholding_box",
+      "patterns": [
+        "imposto retencao box",
+        "Imposto Retencao Box",
+        "imposto retencao box:",
+        "tax withholding box",
+        "Tax Withholding Box",
+        "tax withholding box:"
+      ],
+      "meaning": "tax_withholding_box"
+    },
+    {
+      "id": "taxpayer_badge",
+      "patterns": [
+        "contribuinte badge",
+        "Contribuinte Badge",
+        "contribuinte badge:",
+        "taxpayer badge",
+        "Taxpayer Badge",
+        "taxpayer badge:"
+      ],
+      "meaning": "taxpayer_badge"
+    },
+    {
+      "id": "tenant_landlord_panel",
+      "patterns": [
+        "tenant landlord panel",
+        "Tenant Landlord Panel",
+        "tenant landlord panel:"
+      ],
+      "meaning": "tenant_landlord_panel"
+    },
+    {
+      "id": "term_dates_chip",
+      "patterns": [
+        "term dates chip",
+        "Term Dates Chip",
+        "term dates chip:"
+      ],
+      "meaning": "term_dates_chip"
+    },
+    {
+      "id": "ticket_barcode_zone",
+      "patterns": [
+        "ticket barcode zone",
+        "Ticket Barcode Zone",
+        "ticket barcode zone:"
+      ],
+      "meaning": "ticket_barcode_zone"
+    },
+    {
+      "id": "time_tracking_grid",
+      "patterns": [
+        "time tracking grid",
+        "Time Tracking Grid",
+        "time tracking grid:"
+      ],
+      "meaning": "time_tracking_grid"
+    },
+    {
+      "id": "timeline_marker",
+      "patterns": [
+        "timeline marker",
+        "Timeline Marker",
+        "timeline marker:"
+      ],
+      "meaning": "timeline_marker"
+    },
+    {
+      "id": "tip_box",
+      "patterns": [
+        "best practice:",
+        "dica:",
+        "hint:",
+        "pro tip:",
+        "sugestao:",
+        "tip:"
+      ],
+      "meaning": "tip_box"
+    },
+    {
+      "id": "toc_entry",
+      "patterns": [
+        "contents",
+        "indice",
+        "sumario",
+        "table of contents",
+        "toc"
+      ],
+      "meaning": "toc_entry"
+    },
+    {
+      "id": "toc_leader_dots",
+      "patterns": [
+        "------",
+        "......",
+        ".......",
+        "........",
+        "· · · ·"
+      ],
+      "meaning": "toc_leader_dots"
+    },
+    {
+      "id": "total_due_banner",
+      "patterns": [
+        "total due banner",
+        "Total Due Banner",
+        "total due banner:",
+        "total vencimento banner",
+        "Total Vencimento Banner",
+        "total vencimento banner:"
+      ],
+      "meaning": "total_due_banner"
+    },
+    {
+      "id": "tracked_change_deletion",
+      "patterns": [
+        "deleted:",
+        "excluido:",
+        "removed:",
+        "removido:",
+        "strikethrough"
+      ],
+      "meaning": "tracked_change_deletion"
+    },
+    {
+      "id": "tracked_change_insertion",
+      "patterns": [
+        "added:",
+        "adicionado:",
+        "inserido:",
+        "inserted:",
+        "new text:"
+      ],
+      "meaning": "tracked_change_insertion"
+    },
+    {
+      "id": "transaction_row_marker",
+      "patterns": [
+        "transacao row marker",
+        "Transacao Row Marker",
+        "transacao row marker:",
+        "transaction row marker",
+        "Transaction Row Marker",
+        "transaction row marker:"
+      ],
+      "meaning": "transaction_row_marker"
+    },
+    {
+      "id": "travel_notice_box",
+      "patterns": [
+        "travel notice box",
+        "Travel Notice Box",
+        "travel notice box:"
+      ],
+      "meaning": "travel_notice_box"
+    },
+    {
+      "id": "tuition_breakdown_card",
+      "patterns": [
+        "tuition breakdown card",
+        "Tuition Breakdown Card",
+        "tuition breakdown card:",
+        "tuition breakdown cartao",
+        "Tuition Breakdown Cartao",
+        "tuition breakdown cartao:"
+      ],
+      "meaning": "tuition_breakdown_card"
+    },
+    {
+      "id": "usage_by_category_chart",
+      "patterns": [
+        "usage by category chart",
+        "Usage By Category Chart",
+        "usage by category chart:",
+        "uso by category chart",
+        "Uso By Category Chart",
+        "uso by category chart:"
+      ],
+      "meaning": "usage_by_category_chart"
+    },
+    {
+      "id": "utility_provider_banner",
+      "patterns": [
+        "utility prestador banner",
+        "Utility Prestador Banner",
+        "utility prestador banner:",
+        "utility provider banner",
+        "Utility Provider Banner",
+        "utility provider banner:"
+      ],
+      "meaning": "utility_provider_banner"
+    },
+    {
+      "id": "validation_stamp",
+      "patterns": [
+        "validation stamp",
+        "Validation Stamp",
+        "validation stamp:"
+      ],
+      "meaning": "validation_stamp"
+    },
+    {
+      "id": "verification_qr_zone",
+      "patterns": [
+        "verificacao qr zone",
+        "Verificacao Qr Zone",
+        "verificacao qr zone:",
+        "verification qr zone",
+        "Verification Qr Zone",
+        "verification qr zone:"
+      ],
+      "meaning": "verification_qr_zone"
+    },
+    {
+      "id": "visa_stamp_block",
+      "patterns": [
+        "visa stamp block",
+        "Visa Stamp Block",
+        "visa stamp block:"
+      ],
+      "meaning": "visa_stamp_block"
+    },
+    {
+      "id": "warning_box",
+      "patterns": [
+        "alert:",
+        "alerta:",
+        "aviso:",
+        "caution:",
+        "cuidado:",
+        "warning:"
+      ],
+      "meaning": "warning_box"
+    },
+    {
+      "id": "warning_callout_red",
+      "patterns": [
+        "warning callout red",
+        "Warning Callout Red",
+        "warning callout red:"
+      ],
+      "meaning": "warning_callout_red"
+    },
+    {
+      "id": "watermark_confidential",
+      "patterns": [
+        "confidencial",
+        "confidential",
+        "private",
+        "restricted",
+        "restrito"
+      ],
+      "meaning": "watermark_confidential"
+    },
+    {
+      "id": "watermark_draft",
+      "patterns": [
+        "draft",
+        "minuta",
+        "preliminar",
+        "preliminary",
+        "rascunho"
+      ],
+      "meaning": "watermark_draft"
+    },
+    {
+      "id": "watermark_final",
+      "patterns": [
+        "approved version",
+        "final",
+        "final version",
+        "versao aprovada",
+        "versao final"
+      ],
+      "meaning": "watermark_final"
+    },
+    {
+      "id": "watermark_paid",
+      "patterns": [
+        "watermark paid",
+        "Watermark Paid",
+        "watermark paid:"
+      ],
+      "meaning": "watermark_paid"
+    },
+    {
+      "id": "watermark_unpaid",
+      "patterns": [
+        "watermark unpaid",
+        "Watermark Unpaid",
+        "watermark unpaid:"
+      ],
+      "meaning": "watermark_unpaid"
+    },
+    {
+      "id": "witness_block",
+      "patterns": [
+        "na presenca de",
+        "testemunha",
+        "testemunhas",
+        "witness",
+        "witnessed by"
+      ],
+      "meaning": "witness_block"
+    },
+    {
+      "id": "ytd_summary_chip",
+      "patterns": [
+        "ytd resumo chip",
+        "Ytd Resumo Chip",
+        "ytd resumo chip:",
+        "ytd summary chip",
+        "Ytd Summary Chip",
+        "ytd summary chip:"
+      ],
+      "meaning": "ytd_summary_chip"
     }
   ]
 }

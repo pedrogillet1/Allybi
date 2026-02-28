@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "id": "medical_domain_profile",
+    "version": "2.0.0",
+    "description": "Domain profile for medical document intelligence with strict safety boundaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "displayName": {
+    "en": "Medical",
+    "pt": "Medico"
+  },
+  "scope": "Medical-document extraction and explanation constrained to document-grounded evidence, explicit units/reference ranges, and clinician-escalation safety boundaries.",
+  "coreConcepts": [
+    "allergy reconciliation",
+    "clinical chronology",
+    "critical value handling",
+    "document grounded explanation",
+    "encounter context integrity",
+    "follow-up adherence cues",
+    "laboratory range validation",
+    "medication safety checks",
+    "non-diagnostic response boundaries",
+    "patient identifier redaction",
+    "problem list consistency",
+    "radiology-pathology linkage",
+    "reference range preservation",
+    "unit preservation for measurements",
+    "vital trend interpretation from source only"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "soap",
+      "history and physical",
+      "progress note",
+      "radiology impression",
+      "reference range",
+      "medication reconciliation",
+      "discharge instructions",
+      "allergy list",
+      "immunization record"
+    ],
+    "mediumConfidence": [
+      "chief complaint",
+      "plan of care",
+      "problem list",
+      "vital signs",
+      "ecg interpretation",
+      "pathology specimen",
+      "follow-up",
+      "referral reason"
+    ]
+  },
+  "relatedDomains": [
+    "ops"
+  ],
+  "ontologyPrefix": "medical"
+}

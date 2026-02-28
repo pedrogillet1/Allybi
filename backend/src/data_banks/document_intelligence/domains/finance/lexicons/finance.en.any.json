@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "id": "di_finance_lexicon_en",
+    "version": "1.0.0",
+    "description": "English lexicon for finance domain — canonical terms, synonyms, and display forms.",
+    "languages": ["en"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "language": "en"
+  },
+  "domain": "finance",
+  "terms": [
+    { "id": "fin_lex_accounts_payable", "canonical": "accounts payable", "synonyms": ["AP", "trade payables", "payables"], "display": "Accounts Payable" },
+    { "id": "fin_lex_accounts_receivable", "canonical": "accounts receivable", "synonyms": ["AR", "trade receivables", "receivables"], "display": "Accounts Receivable" },
+    { "id": "fin_lex_balance_sheet", "canonical": "balance sheet", "synonyms": ["statement of financial position", "BS"], "display": "Balance Sheet" },
+    { "id": "fin_lex_capex", "canonical": "capital expenditure", "synonyms": ["capex", "capital spending", "PP&E additions"], "display": "Capital Expenditure" },
+    { "id": "fin_lex_cash_flow", "canonical": "cash flow statement", "synonyms": ["statement of cash flows", "cash flow", "CFS"], "display": "Cash Flow Statement" },
+    { "id": "fin_lex_cogs", "canonical": "cost of goods sold", "synonyms": ["COGS", "cost of revenue", "cost of sales"], "display": "Cost of Goods Sold" },
+    { "id": "fin_lex_current_ratio", "canonical": "current ratio", "synonyms": ["working capital ratio"], "display": "Current Ratio" },
+    { "id": "fin_lex_dte", "canonical": "debt-to-equity ratio", "synonyms": ["D/E ratio", "leverage ratio", "gearing ratio"], "display": "Debt-to-Equity" },
+    { "id": "fin_lex_ebitda", "canonical": "EBITDA", "synonyms": ["earnings before interest taxes depreciation and amortization"], "display": "EBITDA" },
+    { "id": "fin_lex_eps", "canonical": "earnings per share", "synonyms": ["EPS", "diluted EPS", "basic EPS"], "display": "Earnings Per Share" },
+    { "id": "fin_lex_ev", "canonical": "enterprise value", "synonyms": ["EV", "firm value"], "display": "Enterprise Value" },
+    { "id": "fin_lex_fcf", "canonical": "free cash flow", "synonyms": ["FCF", "unlevered free cash flow", "UFCF"], "display": "Free Cash Flow" },
+    { "id": "fin_lex_goodwill", "canonical": "goodwill", "synonyms": ["goodwill and intangibles"], "display": "Goodwill" },
+    { "id": "fin_lex_gross_margin", "canonical": "gross margin", "synonyms": ["gross profit margin", "GM"], "display": "Gross Margin" },
+    { "id": "fin_lex_income_statement", "canonical": "income statement", "synonyms": ["P&L", "profit and loss", "statement of operations", "statement of income"], "display": "Income Statement" },
+    { "id": "fin_lex_market_cap", "canonical": "market capitalization", "synonyms": ["market cap", "mkt cap"], "display": "Market Capitalization" },
+    { "id": "fin_lex_net_income", "canonical": "net income", "synonyms": ["net profit", "net earnings", "bottom line"], "display": "Net Income" },
+    { "id": "fin_lex_operating_income", "canonical": "operating income", "synonyms": ["EBIT", "operating profit", "operating earnings"], "display": "Operating Income" },
+    { "id": "fin_lex_revenue", "canonical": "revenue", "synonyms": ["net revenue", "total revenue", "sales", "top line"], "display": "Revenue" },
+    { "id": "fin_lex_roe", "canonical": "return on equity", "synonyms": ["ROE"], "display": "Return on Equity" },
+    { "id": "fin_lex_working_capital", "canonical": "working capital", "synonyms": ["net working capital", "NWC"], "display": "Working Capital" }
+  ]
+}

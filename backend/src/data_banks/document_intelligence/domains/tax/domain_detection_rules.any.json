@@ -1,0 +1,170 @@
+{
+  "_meta": {
+    "id": "di_tax_domain_detection_rules",
+    "version": "2.0.0",
+    "description": "Tax domain detection rules with explicit negative disambiguation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "minScore": 0.65,
+    "maxRulesPerDocument": 64
+  },
+  "domain": "tax",
+  "rules": [
+    {
+      "id": "tax_detect_pos_tax_return_markers",
+      "priority": 220,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\btax\\s+return\\b",
+        "\\bincome\\s+tax\\s+return\\b",
+        "\\bdeclaracao\\s+de\\s+imposto\\b"
+      ],
+      "description": "Tax return filing markers."
+    },
+    {
+      "id": "tax_detect_pos_assessment_notice_markers",
+      "priority": 219,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bassessment\\s+notice\\b",
+        "\\bnotice\\s+of\\s+assessment\\b",
+        "\\bnotificacao\\s+de\\s+lancamento\\b"
+      ],
+      "description": "Tax assessment notice markers."
+    },
+    {
+      "id": "tax_detect_pos_payment_slip_markers",
+      "priority": 218,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\btax\\s+payment\\s+slip\\b",
+        "\\bpayment\\s+reference\\b",
+        "\\bdarf\\b|\\bguia\\s+de\\s+pagamento\\b"
+      ],
+      "description": "Tax payment slip markers."
+    },
+    {
+      "id": "tax_detect_pos_property_tax_markers",
+      "priority": 217,
+      "weight": 2.2,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bproperty\\s+tax\\s+bill\\b",
+        "\\bmunicipal\\s+tax\\b",
+        "\\biptu\\b|\\bimposto\\s+predial\\b"
+      ],
+      "description": "Property tax billing markers."
+    },
+    {
+      "id": "tax_detect_pos_authority_markers",
+      "priority": 216,
+      "weight": 2.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\brevenue\\s+service\\b",
+        "\\btax\\s+authority\\b",
+        "\\breceita\\s+federal\\b|\\bfazenda\\s+municipal\\b"
+      ],
+      "description": "Tax authority issuer markers."
+    },
+    {
+      "id": "tax_detect_pos_taxpayer_id_markers",
+      "priority": 215,
+      "weight": 2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\btin\\b|\\beitin\\b|\\bein\\b",
+        "\\bcpf\\b|\\bcnpj\\b",
+        "\\btaxpayer\\s+id\\b"
+      ],
+      "description": "Taxpayer identifier markers."
+    },
+    {
+      "id": "tax_detect_pos_ctx_context_amount_period_01",
+      "priority": 214,
+      "weight": 1.6,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(amount|tax|penalty|interest|refund|saldo|multa|juros)\\b",
+        "\\b(period|tax\\s+year|competencia|ano-base)\\b"
+      ],
+      "description": "Tax amount and period context."
+    },
+    {
+      "id": "tax_detect_pos_ctx_context_amount_period_02",
+      "priority": 213,
+      "weight": 1.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(due\\s+date|deadline|vencimento|prazo)\\b",
+        "\\b(payment|filing|entrega|pagamento)\\b"
+      ],
+      "description": "Tax due date and process context."
+    },
+    {
+      "id": "tax_detect_pos_ctx_context_amount_period_03",
+      "priority": 212,
+      "weight": 1.2,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(base|deduction|credit|withholding|base\\s+de\\s+calculo|deducao|retencao)\\b",
+        "\\b(amount|valor|aliquota)\\b"
+      ],
+      "description": "Tax base and adjustment context."
+    },
+    {
+      "id": "tax_detect_neg_medical_conflict",
+      "priority": 211,
+      "weight": -2.1,
+      "signal": "heading_or_content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bdiagnosis\\b|\\bradiology\\b|\\bsoap\\s+note\\b",
+        "\\bdiagnostico\\b|\\blaboratorio\\b"
+      ],
+      "description": "Negative disambiguation against medical documents."
+    },
+    {
+      "id": "tax_detect_neg_legal_contract_conflict",
+      "priority": 210,
+      "weight": -1.9,
+      "signal": "heading_or_content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bmaster\\s+service\\s+agreement\\b|\\bnon-disclosure\\s+agreement\\b",
+        "\\bcontrato\\b|\\bclausula\\s+de\\s+confidencialidade\\b"
+      ],
+      "description": "Negative disambiguation against legal contracts."
+    },
+    {
+      "id": "tax_detect_neg_insurance_conflict",
+      "priority": 209,
+      "weight": -1.8,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bpolicy\\s+number\\b|\\bclaim\\s+number\\b|\\bexplanation\\s+of\\s+benefits\\b",
+        "\\bapolice\\b|\\bsinistro\\b|\\bdemonstrativo\\s+de\\s+beneficios\\b"
+      ],
+      "description": "Negative disambiguation against insurance documents."
+    }
+  ]
+}

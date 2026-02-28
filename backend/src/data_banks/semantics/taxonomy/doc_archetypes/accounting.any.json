@@ -1,0 +1,1634 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_accounting",
+    "version": "1.0.0",
+    "description": "Accounting document archetypes for document identity classification.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true
+  },
+  "domain": "accounting",
+  "archetypes": [
+    {
+      "id": "accounting_chart_of_accounts",
+      "label": "Chart of Accounts",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "accounting_general_ledger",
+      "label": "General Ledger",
+      "expectedSections": [
+        "Ledger Summary",
+        "Resumo do Razão",
+        "Opening Balances",
+        "Saldos de Abertura",
+        "Transaction Detail by Account",
+        "Detalhes de Transações por Conta",
+        "Adjusting Entries",
+        "Lançamentos de Ajuste",
+        "Closing Balances",
+        "Saldos de Encerramento"
+      ],
+      "headings": [
+        "Ledger Summary",
+        "Resumo do Razão",
+        "Opening Balances",
+        "Saldos de Abertura",
+        "Transaction Detail by Account",
+        "Detalhes de Transações por Conta",
+        "Adjusting Entries",
+        "Lançamentos de Ajuste",
+        "Closing Balances",
+        "Saldos de Encerramento"
+      ],
+      "expectedTableFamilies": [
+        "Debit and credit transaction journal",
+        "Diário de transações débito e crédito",
+        "Account balance roll-forward",
+        "Movimentação de saldo por conta",
+        "Period-end trial balance extract",
+        "Extrato de balancete de encerramento"
+      ],
+      "fieldFamilies": [
+        "Journal entry reference number",
+        "Número de referência do lançamento",
+        "Posting date and effective date",
+        "Data de lançamento e data efetiva",
+        "Debit and credit amounts",
+        "Valores de débito e crédito",
+        "Account number and description",
+        "Número e descrição da conta"
+      ],
+      "redFlags": [
+        "Unbalanced journal entries (debits ≠ credits)",
+        "Lançamentos desbalanceados (débitos ≠ créditos)",
+        "Post-closing entries without authorization",
+        "Lançamentos pós-encerramento sem autorização",
+        "Unusual manual journal entries near period end",
+        "Lançamentos manuais incomuns próximos ao encerramento",
+        "Suspense account balances not cleared",
+        "Saldos em contas transitórias não liquidados"
+      ],
+      "missingQuestions": [
+        "Are all adjusting entries supported by documentation?",
+        "Todos os lançamentos de ajuste possuem documentação suporte?",
+        "Has the ledger been reconciled to all sub-ledgers?",
+        "O razão foi reconciliado com todos os sub-razões?",
+        "Are intercompany eliminations properly reflected?",
+        "As eliminações intercompanhias estão devidamente refletidas?"
+      ]
+    },
+    {
+      "id": "accounting_trial_balance",
+      "label": "Trial Balance",
+      "expectedSections": [
+        "Report Header and Period",
+        "Cabeçalho do Relatório e Período",
+        "Asset Accounts Summary",
+        "Resumo das Contas de Ativo",
+        "Liability and Equity Summary",
+        "Resumo de Passivo e Patrimônio Líquido",
+        "Revenue and Expense Summary",
+        "Resumo de Receitas e Despesas",
+        "Total Debit/Credit Balances",
+        "Total de Saldos Débito/Crédito"
+      ],
+      "headings": [
+        "Report Header and Period",
+        "Cabeçalho do Relatório e Período",
+        "Asset Accounts Summary",
+        "Resumo das Contas de Ativo",
+        "Liability and Equity Summary",
+        "Resumo de Passivo e Patrimônio Líquido",
+        "Revenue and Expense Summary",
+        "Resumo de Receitas e Despesas",
+        "Total Debit/Credit Balances",
+        "Total de Saldos Débito/Crédito"
+      ],
+      "expectedTableFamilies": [
+        "Account listing with debit and credit columns",
+        "Listagem de contas com colunas de débito e crédito",
+        "Adjusted vs. unadjusted balances comparison",
+        "Comparação de saldos ajustados vs. não ajustados",
+        "Account grouping subtotals",
+        "Subtotais por agrupamento de contas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Unadjusted debit/credit balance",
+        "Saldo débito/crédito não ajustado",
+        "Adjustments column",
+        "Coluna de ajustes",
+        "Adjusted debit/credit balance",
+        "Saldo débito/crédito ajustado"
+      ],
+      "redFlags": [
+        "Total debits do not equal total credits",
+        "Total de débitos não é igual ao total de créditos",
+        "Negative balances in asset or expense accounts",
+        "Saldos negativos em contas de ativo ou despesa",
+        "Material adjustments without narrative explanation",
+        "Ajustes materiais sem justificativa narrativa",
+        "Stale balances carried from prior periods",
+        "Saldos obsoletos arrastados de períodos anteriores"
+      ],
+      "missingQuestions": [
+        "Is this the pre-adjustment or post-adjustment trial balance?",
+        "Este é o balancete pré-ajuste ou pós-ajuste?",
+        "Have all reclassification entries been posted?",
+        "Todos os lançamentos de reclassificação foram contabilizados?",
+        "Does the trial balance tie to the general ledger closing balances?",
+        "O balancete fecha com os saldos de encerramento do razão geral?"
+      ]
+    },
+    {
+      "id": "accounting_journal_entry",
+      "label": "Journal Entry",
+      "expectedSections": [
+        "Entry Header and Reference",
+        "Cabeçalho e Referência do Lançamento",
+        "Debit Lines",
+        "Linhas de Débito",
+        "Credit Lines",
+        "Linhas de Crédito",
+        "Supporting Narrative",
+        "Narrativa de Suporte",
+        "Approval and Authorization",
+        "Aprovação e Autorização"
+      ],
+      "headings": [
+        "Entry Header and Reference",
+        "Cabeçalho e Referência do Lançamento",
+        "Debit Lines",
+        "Linhas de Débito",
+        "Credit Lines",
+        "Linhas de Crédito",
+        "Supporting Narrative",
+        "Narrativa de Suporte",
+        "Approval and Authorization",
+        "Aprovação e Autorização"
+      ],
+      "expectedTableFamilies": [
+        "Debit/credit line detail with account codes",
+        "Detalhe de linhas débito/crédito com códigos de conta",
+        "Supporting document cross-reference",
+        "Referência cruzada de documentos suporte",
+        "Multi-currency conversion table",
+        "Tabela de conversão multicurrency"
+      ],
+      "fieldFamilies": [
+        "Journal entry number and type (standard/adjusting/reversing)",
+        "Número e tipo do lançamento (padrão/ajuste/reversão)",
+        "Posting date and reversal date",
+        "Data de lançamento e data de reversão",
+        "Account code and cost center",
+        "Código de conta e centro de custo",
+        "Preparer and approver identifiers",
+        "Identificadores de preparador e aprovador"
+      ],
+      "redFlags": [
+        "Entry does not balance (sum of debits ≠ sum of credits)",
+        "Lançamento não balanceia (soma dos débitos ≠ soma dos créditos)",
+        "Round-dollar amounts suggesting estimation",
+        "Valores redondos sugerindo estimativa",
+        "Missing or vague narrative description",
+        "Descrição narrativa ausente ou vaga",
+        "Entries posted after period lock date",
+        "Lançamentos contabilizados após data de bloqueio do período"
+      ],
+      "missingQuestions": [
+        "Is this a recurring, adjusting, or one-time entry?",
+        "Este é um lançamento recorrente, de ajuste ou avulso?",
+        "Has the entry been reviewed by a second preparer?",
+        "O lançamento foi revisado por um segundo preparador?",
+        "What source document supports this journal entry?",
+        "Qual documento fonte suporta este lançamento contábil?"
+      ]
+    },
+    {
+      "id": "accounting_bank_reconciliation",
+      "label": "Bank Reconciliation",
+      "expectedSections": [
+        "Reconciliation Summary",
+        "Resumo da Reconciliação",
+        "Bank Statement Balance",
+        "Saldo do Extrato Bancário",
+        "Book Balance (GL Cash Account)",
+        "Saldo Contábil (Conta Caixa do Razão)",
+        "Outstanding Checks",
+        "Cheques Pendentes",
+        "Deposits in Transit",
+        "Depósitos em Trânsito",
+        "Reconciling Adjustments",
+        "Ajustes de Reconciliação"
+      ],
+      "headings": [
+        "Reconciliation Summary",
+        "Resumo da Reconciliação",
+        "Bank Statement Balance",
+        "Saldo do Extrato Bancário",
+        "Book Balance (GL Cash Account)",
+        "Saldo Contábil (Conta Caixa do Razão)",
+        "Outstanding Checks",
+        "Cheques Pendentes",
+        "Deposits in Transit",
+        "Depósitos em Trânsito",
+        "Reconciling Adjustments",
+        "Ajustes de Reconciliação"
+      ],
+      "expectedTableFamilies": [
+        "Outstanding check listing with dates and amounts",
+        "Listagem de cheques pendentes com datas e valores",
+        "Deposit in transit detail",
+        "Detalhe de depósitos em trânsito",
+        "Bank adjustment and book adjustment summary",
+        "Resumo de ajustes bancários e ajustes contábeis"
+      ],
+      "fieldFamilies": [
+        "Bank account number and institution",
+        "Número da conta bancária e instituição",
+        "Statement date and GL period",
+        "Data do extrato e período contábil",
+        "Bank balance and book balance",
+        "Saldo bancário e saldo contábil",
+        "Reconciled difference",
+        "Diferença reconciliada"
+      ],
+      "redFlags": [
+        "Unreconciled difference at period end",
+        "Diferença não reconciliada no encerramento do período",
+        "Outstanding checks aged over 90 days",
+        "Cheques pendentes com mais de 90 dias",
+        "Unexplained bank adjustments",
+        "Ajustes bancários inexplicados",
+        "Duplicate deposit entries",
+        "Lançamentos de depósito duplicados"
+      ],
+      "missingQuestions": [
+        "Has the bank statement been obtained directly from the institution?",
+        "O extrato bancário foi obtido diretamente da instituição?",
+        "Are stale-dated outstanding checks being voided?",
+        "Cheques pendentes com data vencida estão sendo anulados?",
+        "Does the reconciled balance tie to the GL cash account?",
+        "O saldo reconciliado fecha com a conta caixa do razão?"
+      ]
+    },
+    {
+      "id": "accounting_depreciation_schedule",
+      "label": "Depreciation Schedule",
+      "expectedSections": [
+        "Schedule Summary",
+        "Resumo do Cronograma",
+        "Depreciation Method Description",
+        "Descrição do Método de Depreciação",
+        "Asset-by-Asset Detail",
+        "Detalhe Ativo por Ativo",
+        "Accumulated Depreciation Roll-Forward",
+        "Movimentação da Depreciação Acumulada",
+        "Remaining Useful Life Analysis",
+        "Análise de Vida Útil Remanescente"
+      ],
+      "headings": [
+        "Schedule Summary",
+        "Resumo do Cronograma",
+        "Depreciation Method Description",
+        "Descrição do Método de Depreciação",
+        "Asset-by-Asset Detail",
+        "Detalhe Ativo por Ativo",
+        "Accumulated Depreciation Roll-Forward",
+        "Movimentação da Depreciação Acumulada",
+        "Remaining Useful Life Analysis",
+        "Análise de Vida Útil Remanescente"
+      ],
+      "expectedTableFamilies": [
+        "Asset register with cost basis and salvage value",
+        "Registro de ativos com custo base e valor residual",
+        "Monthly/annual depreciation expense by asset class",
+        "Despesa de depreciação mensal/anual por classe de ativo",
+        "Accumulated depreciation and net book value",
+        "Depreciação acumulada e valor contábil líquido"
+      ],
+      "fieldFamilies": [
+        "Asset tag number and description",
+        "Número de etiqueta do ativo e descrição",
+        "Acquisition date and cost basis",
+        "Data de aquisição e custo base",
+        "Depreciation method (SL/DDB/SYD/units-of-production)",
+        "Método de depreciação (linear/saldo decrescente duplo/soma dos dígitos/unidades de produção)",
+        "Useful life and salvage value",
+        "Vida útil e valor residual"
+      ],
+      "redFlags": [
+        "Fully depreciated assets still in active use without review",
+        "Ativos totalmente depreciados ainda em uso ativo sem revisão",
+        "Depreciation method changes without disclosure",
+        "Mudanças no método de depreciação sem divulgação",
+        "Net book value exceeds fair market value",
+        "Valor contábil líquido excede valor justo de mercado",
+        "Missing or inconsistent useful life estimates",
+        "Estimativas de vida útil ausentes ou inconsistentes"
+      ],
+      "missingQuestions": [
+        "Has an impairment review been performed on long-lived assets?",
+        "Foi realizada uma revisão de imparidade nos ativos de longa duração?",
+        "Are depreciation policies consistent with prior periods?",
+        "As políticas de depreciação são consistentes com períodos anteriores?",
+        "Are disposed assets removed from the schedule timely?",
+        "Os ativos alienados são removidos do cronograma tempestivamente?"
+      ]
+    },
+    {
+      "id": "accounting_fixed_asset_register",
+      "label": "Fixed Asset Register",
+      "expectedSections": [
+        "Register Overview",
+        "Visão Geral do Registro",
+        "Additions During Period",
+        "Adições no Período",
+        "Disposals and Retirements",
+        "Alienações e Baixas",
+        "Transfers Between Locations/Entities",
+        "Transferências entre Localizações/Entidades",
+        "Net Book Value Summary",
+        "Resumo do Valor Contábil Líquido"
+      ],
+      "headings": [
+        "Register Overview",
+        "Visão Geral do Registro",
+        "Additions During Period",
+        "Adições no Período",
+        "Disposals and Retirements",
+        "Alienações e Baixas",
+        "Transfers Between Locations/Entities",
+        "Transferências entre Localizações/Entidades",
+        "Net Book Value Summary",
+        "Resumo do Valor Contábil Líquido"
+      ],
+      "expectedTableFamilies": [
+        "Asset listing by class and location",
+        "Listagem de ativos por classe e localização",
+        "Capitalization vs. expense threshold analysis",
+        "Análise de limiar de capitalização vs. despesa",
+        "Gain/loss on disposal detail",
+        "Detalhe de ganho/perda na alienação"
+      ],
+      "fieldFamilies": [
+        "Asset ID and serial number",
+        "ID do ativo e número de série",
+        "Asset class and sub-class",
+        "Classe e subclasse do ativo",
+        "Physical location and custodian",
+        "Localização física e responsável",
+        "Original cost and date placed in service",
+        "Custo original e data de entrada em serviço"
+      ],
+      "redFlags": [
+        "Ghost assets (recorded but physically missing)",
+        "Ativos fantasma (registrados mas fisicamente ausentes)",
+        "Assets below capitalization threshold incorrectly capitalized",
+        "Ativos abaixo do limiar de capitalização incorretamente capitalizados",
+        "Missing physical verification dates",
+        "Datas de verificação física ausentes",
+        "Disposals not reflected in the GL",
+        "Alienações não refletidas no razão geral"
+      ],
+      "missingQuestions": [
+        "When was the last physical inventory of fixed assets conducted?",
+        "Quando foi realizado o último inventário físico de ativos fixos?",
+        "Are all capital expenditures above the threshold properly capitalized?",
+        "Todos os gastos de capital acima do limiar estão devidamente capitalizados?",
+        "Is insurance coverage aligned with current asset values?",
+        "A cobertura de seguro está alinhada com os valores atuais dos ativos?"
+      ]
+    },
+    {
+      "id": "accounting_payroll_register",
+      "label": "Payroll Register",
+      "expectedSections": [
+        "Payroll Summary",
+        "Resumo da Folha de Pagamento",
+        "Gross Pay Detail",
+        "Detalhe de Remuneração Bruta",
+        "Withholdings and Deductions",
+        "Retenções e Deduções",
+        "Employer Tax Obligations",
+        "Obrigações Tributárias do Empregador",
+        "Net Pay Distribution",
+        "Distribuição de Pagamento Líquido"
+      ],
+      "headings": [
+        "Payroll Summary",
+        "Resumo da Folha de Pagamento",
+        "Gross Pay Detail",
+        "Detalhe de Remuneração Bruta",
+        "Withholdings and Deductions",
+        "Retenções e Deduções",
+        "Employer Tax Obligations",
+        "Obrigações Tributárias do Empregador",
+        "Net Pay Distribution",
+        "Distribuição de Pagamento Líquido"
+      ],
+      "expectedTableFamilies": [
+        "Employee-level earnings and deductions",
+        "Rendimentos e deduções por funcionário",
+        "Tax withholding summary by jurisdiction",
+        "Resumo de retenção fiscal por jurisdição",
+        "Benefits and retirement contribution allocation",
+        "Alocação de benefícios e contribuições previdenciárias"
+      ],
+      "fieldFamilies": [
+        "Employee ID and pay period",
+        "ID do funcionário e período de pagamento",
+        "Gross wages, overtime, and bonuses",
+        "Salários brutos, horas extras e bônus",
+        "Federal, state, and local tax withholdings",
+        "Retenções fiscais federais, estaduais e municipais",
+        "Net pay and payment method",
+        "Pagamento líquido e método de pagamento"
+      ],
+      "redFlags": [
+        "Duplicate employee payments in same period",
+        "Pagamentos duplicados a funcionários no mesmo período",
+        "Gross-to-net variance outside tolerance",
+        "Variação bruto-líquido fora da tolerância",
+        "Terminated employees still receiving pay",
+        "Funcionários desligados ainda recebendo pagamento",
+        "Withholding rates inconsistent with W-4 elections",
+        "Alíquotas de retenção inconsistentes com as eleições W-4"
+      ],
+      "missingQuestions": [
+        "Have all payroll tax filings been reconciled to the register?",
+        "Todas as declarações de impostos sobre folha foram reconciliadas com o registro?",
+        "Are overtime calculations compliant with labor regulations?",
+        "Os cálculos de horas extras estão em conformidade com a legislação trabalhista?",
+        "Has the payroll been approved by an authorized manager?",
+        "A folha de pagamento foi aprovada por um gerente autorizado?"
+      ]
+    },
+    {
+      "id": "accounting_tax_return",
+      "label": "Tax Return",
+      "expectedSections": [
+        "Return Summary and Filing Status",
+        "Resumo da Declaração e Status de Apresentação",
+        "Income and Revenue Schedules",
+        "Demonstrativos de Renda e Receita",
+        "Deductions and Credits",
+        "Deduções e Créditos",
+        "Tax Computation",
+        "Apuração do Imposto",
+        "Signatures and Preparer Information",
+        "Assinaturas e Informações do Preparador"
+      ],
+      "headings": [
+        "Return Summary and Filing Status",
+        "Resumo da Declaração e Status de Apresentação",
+        "Income and Revenue Schedules",
+        "Demonstrativos de Renda e Receita",
+        "Deductions and Credits",
+        "Deduções e Créditos",
+        "Tax Computation",
+        "Apuração do Imposto",
+        "Signatures and Preparer Information",
+        "Assinaturas e Informações do Preparador"
+      ],
+      "expectedTableFamilies": [
+        "Income schedule by source and category",
+        "Demonstrativo de renda por fonte e categoria",
+        "Depreciation and amortization schedules (Form 4562)",
+        "Demonstrativos de depreciação e amortização (Formulário 4562)",
+        "State apportionment and allocation factors",
+        "Fatores de rateio e alocação estadual"
+      ],
+      "fieldFamilies": [
+        "Taxpayer identification number (EIN/CNPJ)",
+        "Número de identificação do contribuinte (EIN/CNPJ)",
+        "Taxable income and tax rate applied",
+        "Renda tributável e alíquota aplicada",
+        "Tax credits and estimated payments",
+        "Créditos fiscais e pagamentos estimados",
+        "Filing jurisdiction and due date",
+        "Jurisdição de apresentação e data de vencimento"
+      ],
+      "redFlags": [
+        "Book-tax differences not reconciled (Schedule M-1/M-3)",
+        "Diferenças livro-imposto não reconciliadas (Schedule M-1/M-3)",
+        "Carryforward losses applied without supporting schedules",
+        "Prejuízos compensados sem demonstrativos suporte",
+        "Tax positions lacking substantial authority (FIN 48/ASC 740-10)",
+        "Posições fiscais sem autoridade substancial (FIN 48/ASC 740-10)",
+        "Missing state nexus analysis",
+        "Análise de nexo estadual ausente"
+      ],
+      "missingQuestions": [
+        "Have all permanent and temporary differences been identified?",
+        "Todas as diferenças permanentes e temporárias foram identificadas?",
+        "Is the return consistent with the audited financial statements?",
+        "A declaração é consistente com as demonstrações financeiras auditadas?",
+        "Are all required state and local returns also prepared?",
+        "Todas as declarações estaduais e municipais obrigatórias também foram preparadas?"
+      ]
+    },
+    {
+      "id": "accounting_tax_provision",
+      "label": "Tax Provision (ASC 740)",
+      "expectedSections": [
+        "Provision Summary",
+        "Resumo da Provisão",
+        "Current Tax Expense Computation",
+        "Apuração da Despesa Tributária Corrente",
+        "Deferred Tax Asset and Liability Roll-Forward",
+        "Movimentação de Ativo e Passivo Fiscal Diferido",
+        "Effective Tax Rate Reconciliation",
+        "Reconciliação da Taxa Efetiva de Imposto",
+        "Uncertain Tax Positions (UTPs)",
+        "Posições Fiscais Incertas (UTPs)"
+      ],
+      "headings": [
+        "Provision Summary",
+        "Resumo da Provisão",
+        "Current Tax Expense Computation",
+        "Apuração da Despesa Tributária Corrente",
+        "Deferred Tax Asset and Liability Roll-Forward",
+        "Movimentação de Ativo e Passivo Fiscal Diferido",
+        "Effective Tax Rate Reconciliation",
+        "Reconciliação da Taxa Efetiva de Imposto",
+        "Uncertain Tax Positions (UTPs)",
+        "Posições Fiscais Incertas (UTPs)"
+      ],
+      "expectedTableFamilies": [
+        "Deferred tax asset/liability by temporary difference",
+        "Ativo/passivo fiscal diferido por diferença temporária",
+        "Effective tax rate bridge (statutory to effective)",
+        "Ponte de taxa efetiva (estatutária para efetiva)",
+        "Valuation allowance analysis",
+        "Análise de provisão para desvalorização"
+      ],
+      "fieldFamilies": [
+        "Current and deferred tax expense",
+        "Despesa tributária corrente e diferida",
+        "Statutory tax rate by jurisdiction",
+        "Alíquota estatutária por jurisdição",
+        "Temporary and permanent differences",
+        "Diferenças temporárias e permanentes",
+        "Valuation allowance balance and movement",
+        "Saldo e movimentação da provisão para desvalorização"
+      ],
+      "redFlags": [
+        "Effective tax rate deviates materially from statutory rate without explanation",
+        "Taxa efetiva difere materialmente da alíquota estatutária sem explicação",
+        "Deferred tax assets without sufficient positive evidence for realizability",
+        "Ativos fiscais diferidos sem evidência positiva suficiente de realização",
+        "Unrecognized tax benefits not reassessed quarterly",
+        "Benefícios fiscais não reconhecidos sem reavaliação trimestral",
+        "Return-to-provision true-ups not recorded",
+        "Ajustes de retorno-à-provisão não registrados"
+      ],
+      "missingQuestions": [
+        "Has a more-likely-than-not analysis been performed for all UTPs?",
+        "Uma análise de mais-provável-que-não foi realizada para todas as UTPs?",
+        "Are deferred tax balances supported by detailed temporary difference schedules?",
+        "Os saldos de impostos diferidos são suportados por demonstrativos detalhados de diferenças temporárias?",
+        "Is the valuation allowance conclusion consistent with projections?",
+        "A conclusão da provisão para desvalorização é consistente com as projeções?"
+      ]
+    },
+    {
+      "id": "accounting_audit_report",
+      "label": "Audit Report",
+      "expectedSections": [
+        "Independent Auditor's Report",
+        "Relatório do Auditor Independente",
+        "Scope and Basis of Audit",
+        "Escopo e Base da Auditoria",
+        "Audit Opinion",
+        "Opinião de Auditoria",
+        "Key Audit Matters",
+        "Principais Assuntos de Auditoria",
+        "Management Responsibility Statement",
+        "Declaração de Responsabilidade da Administração"
+      ],
+      "headings": [
+        "Independent Auditor's Report",
+        "Relatório do Auditor Independente",
+        "Scope and Basis of Audit",
+        "Escopo e Base da Auditoria",
+        "Audit Opinion",
+        "Opinião de Auditoria",
+        "Key Audit Matters",
+        "Principais Assuntos de Auditoria",
+        "Management Responsibility Statement",
+        "Declaração de Responsabilidade da Administração"
+      ],
+      "expectedTableFamilies": [
+        "Summary of audit adjustments proposed",
+        "Resumo de ajustes de auditoria propostos",
+        "Materiality threshold computation",
+        "Cálculo do limiar de materialidade",
+        "Unadjusted misstatement schedule (SAS summary)",
+        "Demonstrativo de distorções não ajustadas (resumo SAS)"
+      ],
+      "fieldFamilies": [
+        "Audit firm and engagement partner",
+        "Firma de auditoria e sócio responsável",
+        "Audit opinion type (unqualified/qualified/adverse/disclaimer)",
+        "Tipo de opinião (sem ressalva/com ressalva/adversa/abstenção)",
+        "Reporting period and financial statement date",
+        "Período de reporte e data das demonstrações financeiras",
+        "Materiality level applied",
+        "Nível de materialidade aplicado"
+      ],
+      "redFlags": [
+        "Qualified or adverse opinion without clear remediation plan",
+        "Opinião com ressalva ou adversa sem plano de remediação claro",
+        "Going concern emphasis of matter paragraph",
+        "Parágrafo de ênfase sobre continuidade operacional",
+        "Unadjusted misstatements exceeding trivial threshold",
+        "Distorções não ajustadas excedendo o limiar de trivialidade",
+        "Scope limitations noted by auditor",
+        "Limitações de escopo anotadas pelo auditor"
+      ],
+      "missingQuestions": [
+        "Has management responded to all audit findings?",
+        "A administração respondeu a todas as constatações de auditoria?",
+        "Were all proposed adjustments either recorded or documented as passed?",
+        "Todos os ajustes propostos foram registrados ou documentados como dispensados?",
+        "Is the audit opinion consistent with the prior year?",
+        "A opinião de auditoria é consistente com o ano anterior?"
+      ]
+    },
+    {
+      "id": "accounting_cost_allocation_report",
+      "label": "Cost Allocation Report",
+      "expectedSections": [
+        "Allocation Methodology",
+        "Metodologia de Alocação",
+        "Cost Pool Identification",
+        "Identificação de Pools de Custo",
+        "Allocation Base and Drivers",
+        "Base de Alocação e Direcionadores",
+        "Allocated Cost Summary by Recipient",
+        "Resumo de Custos Alocados por Receptor",
+        "Variance Analysis",
+        "Análise de Variação"
+      ],
+      "headings": [
+        "Allocation Methodology",
+        "Metodologia de Alocação",
+        "Cost Pool Identification",
+        "Identificação de Pools de Custo",
+        "Allocation Base and Drivers",
+        "Base de Alocação e Direcionadores",
+        "Allocated Cost Summary by Recipient",
+        "Resumo de Custos Alocados por Receptor",
+        "Variance Analysis",
+        "Análise de Variação"
+      ],
+      "expectedTableFamilies": [
+        "Cost pool composition and total amounts",
+        "Composição dos pools de custo e valores totais",
+        "Allocation driver metrics by department",
+        "Métricas de direcionadores por departamento",
+        "Allocated cost per recipient with percentage share",
+        "Custo alocado por receptor com percentual de participação"
+      ],
+      "fieldFamilies": [
+        "Cost pool category and total",
+        "Categoria do pool de custo e total",
+        "Allocation driver (headcount/square footage/revenue)",
+        "Direcionador de alocação (headcount/metragem/receita)",
+        "Recipient department or entity",
+        "Departamento ou entidade receptora",
+        "Allocated amount and allocation percentage",
+        "Valor alocado e percentual de alocação"
+      ],
+      "redFlags": [
+        "Allocation driver not causally related to cost pool",
+        "Direcionador de alocação sem relação causal com o pool de custo",
+        "Circular allocations between cost centers",
+        "Alocações circulares entre centros de custo",
+        "Allocation percentages do not sum to 100%",
+        "Percentuais de alocação não somam 100%",
+        "Single cost pool used for dissimilar cost types",
+        "Pool de custo único utilizado para tipos de custo diferentes"
+      ],
+      "missingQuestions": [
+        "Are allocation drivers updated for the current period volumes?",
+        "Os direcionadores de alocação foram atualizados com os volumes do período corrente?",
+        "Is the methodology consistent with intercompany transfer pricing policies?",
+        "A metodologia é consistente com as políticas de preços de transferência intercompanhias?",
+        "Have step-down or reciprocal methods been evaluated?",
+        "Métodos de alocação em cascata ou recíprocos foram avaliados?"
+      ]
+    },
+    {
+      "id": "accounting_variance_analysis",
+      "label": "Variance Analysis",
+      "expectedSections": [
+        "Executive Summary of Variances",
+        "Resumo Executivo das Variações",
+        "Revenue Variances",
+        "Variações de Receita",
+        "Cost of Goods Sold Variances",
+        "Variações de Custo dos Produtos Vendidos",
+        "Operating Expense Variances",
+        "Variações de Despesas Operacionais",
+        "Corrective Action Plans",
+        "Planos de Ação Corretiva"
+      ],
+      "headings": [
+        "Executive Summary of Variances",
+        "Resumo Executivo das Variações",
+        "Revenue Variances",
+        "Variações de Receita",
+        "Cost of Goods Sold Variances",
+        "Variações de Custo dos Produtos Vendidos",
+        "Operating Expense Variances",
+        "Variações de Despesas Operacionais",
+        "Corrective Action Plans",
+        "Planos de Ação Corretiva"
+      ],
+      "expectedTableFamilies": [
+        "Budget vs. actual by line item with dollar and % variance",
+        "Orçado vs. realizado por linha com variação em valor e percentual",
+        "Price/volume/mix decomposition",
+        "Decomposição de preço/volume/mix",
+        "Trend analysis across periods",
+        "Análise de tendência entre períodos"
+      ],
+      "fieldFamilies": [
+        "Budget amount and actual amount",
+        "Valor orçado e valor realizado",
+        "Variance in dollars and percentage",
+        "Variação em valor e percentual",
+        "Favorable/unfavorable classification",
+        "Classificação favorável/desfavorável",
+        "Responsible cost center owner",
+        "Responsável pelo centro de custo"
+      ],
+      "redFlags": [
+        "Material variances without management commentary",
+        "Variações materiais sem comentário da administração",
+        "Consistently favorable variances suggesting budget sandbagging",
+        "Variações consistentemente favoráveis sugerindo orçamento conservador",
+        "Timing variances reclassified as permanent without analysis",
+        "Variações de timing reclassificadas como permanentes sem análise",
+        "Volume variances masking unfavorable price variances",
+        "Variações de volume mascarando variações de preço desfavoráveis"
+      ],
+      "missingQuestions": [
+        "Are variances decomposed into price, volume, and mix components?",
+        "As variações estão decompostas em componentes de preço, volume e mix?",
+        "Has management committed to corrective actions for material variances?",
+        "A administração se comprometeu com ações corretivas para variações materiais?",
+        "Is the variance threshold consistent with the entity's materiality policy?",
+        "O limiar de variação é consistente com a política de materialidade da entidade?"
+      ]
+    },
+    {
+      "id": "accounting_fund_accounting_report",
+      "label": "Fund Accounting Report",
+      "expectedSections": [
+        "Fund Overview and Classification",
+        "Visão Geral e Classificação do Fundo",
+        "Statement of Financial Position by Fund",
+        "Balanço Patrimonial por Fundo",
+        "Statement of Activities by Fund",
+        "Demonstração de Atividades por Fundo",
+        "Interfund Transfers",
+        "Transferências Interfundos",
+        "Donor Restriction Compliance",
+        "Conformidade com Restrições de Doadores"
+      ],
+      "headings": [
+        "Fund Overview and Classification",
+        "Visão Geral e Classificação do Fundo",
+        "Statement of Financial Position by Fund",
+        "Balanço Patrimonial por Fundo",
+        "Statement of Activities by Fund",
+        "Demonstração de Atividades por Fundo",
+        "Interfund Transfers",
+        "Transferências Interfundos",
+        "Donor Restriction Compliance",
+        "Conformidade com Restrições de Doadores"
+      ],
+      "expectedTableFamilies": [
+        "Net asset classification (without/with donor restrictions)",
+        "Classificação de ativos líquidos (sem/com restrição de doadores)",
+        "Fund balance roll-forward by fund type",
+        "Movimentação de saldo do fundo por tipo",
+        "Interfund receivable/payable reconciliation",
+        "Reconciliação de contas a receber/pagar interfundos"
+      ],
+      "fieldFamilies": [
+        "Fund code and fund type (general/special/capital/endowment)",
+        "Código do fundo e tipo (geral/especial/capital/dotação)",
+        "Restricted vs. unrestricted net assets",
+        "Ativos líquidos restritos vs. não restritos",
+        "Revenue and expense by fund",
+        "Receita e despesa por fundo",
+        "Interfund transfer amounts and purpose",
+        "Valores e finalidade das transferências interfundos"
+      ],
+      "redFlags": [
+        "Restricted funds used for unrelated purposes",
+        "Fundos restritos utilizados para finalidades não relacionadas",
+        "Interfund balances not eliminated in consolidated view",
+        "Saldos interfundos não eliminados na visão consolidada",
+        "Endowment corpus invasion without board approval",
+        "Invasão do corpus de dotação sem aprovação do conselho",
+        "Missing time or purpose restriction tracking",
+        "Rastreamento de restrições de tempo ou finalidade ausente"
+      ],
+      "missingQuestions": [
+        "Are all donor-restricted funds properly segregated in the GL?",
+        "Todos os fundos com restrição de doadores estão devidamente segregados no razão?",
+        "Has the board approved all interfund transfers?",
+        "O conselho aprovou todas as transferências interfundos?",
+        "Is the endowment spending policy being followed?",
+        "A política de gastos do fundo de dotação está sendo seguida?"
+      ]
+    },
+    {
+      "id": "accounting_management_letter",
+      "label": "Management Letter",
+      "expectedSections": [
+        "Engagement Context",
+        "Contexto do Trabalho",
+        "Summary of Findings",
+        "Resumo das Constatações",
+        "Internal Control Deficiencies",
+        "Deficiências de Controle Interno",
+        "Recommendations",
+        "Recomendações",
+        "Management Response",
+        "Resposta da Administração"
+      ],
+      "headings": [
+        "Engagement Context",
+        "Contexto do Trabalho",
+        "Summary of Findings",
+        "Resumo das Constatações",
+        "Internal Control Deficiencies",
+        "Deficiências de Controle Interno",
+        "Recommendations",
+        "Recomendações",
+        "Management Response",
+        "Resposta da Administração"
+      ],
+      "expectedTableFamilies": [
+        "Finding severity classification matrix",
+        "Matriz de classificação de severidade das constatações",
+        "Prior year findings status tracker",
+        "Rastreador de status de constatações do ano anterior",
+        "Remediation timeline and responsible parties",
+        "Cronograma de remediação e partes responsáveis"
+      ],
+      "fieldFamilies": [
+        "Finding reference number and classification",
+        "Número de referência e classificação da constatação",
+        "Severity rating (material weakness/significant deficiency/observation)",
+        "Classificação de severidade (fraqueza material/deficiência significativa/observação)",
+        "Affected account or process area",
+        "Conta ou área de processo afetada",
+        "Recommended remediation and deadline",
+        "Remediação recomendada e prazo"
+      ],
+      "redFlags": [
+        "Repeat findings from prior year without remediation",
+        "Constatações repetidas do ano anterior sem remediação",
+        "Material weakness in financial reporting controls",
+        "Fraqueza material em controles de reporte financeiro",
+        "Management disagreement with findings",
+        "Discordância da administração com as constatações",
+        "No target date for remediation actions",
+        "Sem data alvo para ações de remediação"
+      ],
+      "missingQuestions": [
+        "Have all prior year management letter points been resolved?",
+        "Todos os pontos da carta de administração do ano anterior foram resolvidos?",
+        "Does management agree with the severity classification?",
+        "A administração concorda com a classificação de severidade?",
+        "Are remediation timelines realistic given available resources?",
+        "Os cronogramas de remediação são realistas dados os recursos disponíveis?"
+      ]
+    },
+    {
+      "id": "accounting_intercompany_invoice",
+      "label": "Intercompany Invoice",
+      "expectedSections": [
+        "Invoice Header",
+        "Cabeçalho da Fatura",
+        "Billing Entity and Receiving Entity",
+        "Entidade Emissora e Entidade Receptora",
+        "Service/Product Line Items",
+        "Itens de Serviço/Produto",
+        "Transfer Pricing Basis",
+        "Base de Preços de Transferência",
+        "Settlement and Payment Terms",
+        "Condições de Liquidação e Pagamento"
+      ],
+      "headings": [
+        "Invoice Header",
+        "Cabeçalho da Fatura",
+        "Billing Entity and Receiving Entity",
+        "Entidade Emissora e Entidade Receptora",
+        "Service/Product Line Items",
+        "Itens de Serviço/Produto",
+        "Transfer Pricing Basis",
+        "Base de Preços de Transferência",
+        "Settlement and Payment Terms",
+        "Condições de Liquidação e Pagamento"
+      ],
+      "expectedTableFamilies": [
+        "Line item detail with unit pricing and totals",
+        "Detalhe de itens com preço unitário e totais",
+        "Currency conversion and withholding tax computation",
+        "Conversão cambial e cálculo de retenção tributária",
+        "Intercompany account reconciliation",
+        "Reconciliação de contas intercompanhias"
+      ],
+      "fieldFamilies": [
+        "Invoice number and date",
+        "Número e data da fatura",
+        "Billing entity legal name and tax ID",
+        "Razão social e CNPJ/EIN da entidade emissora",
+        "Receiving entity legal name and tax ID",
+        "Razão social e CNPJ/EIN da entidade receptora",
+        "Total amount and currency denomination",
+        "Valor total e moeda de denominação"
+      ],
+      "redFlags": [
+        "Transfer price not aligned with arm's length benchmarking study",
+        "Preço de transferência não alinhado com estudo de benchmarking arm's length",
+        "Missing intercompany agreement reference",
+        "Referência de contrato intercompanhias ausente",
+        "Withholding tax not applied where required by treaty",
+        "Retenção de imposto não aplicada onde exigido por tratado",
+        "Invoice issued to dormant or non-operating entity",
+        "Fatura emitida para entidade inativa ou não operacional"
+      ],
+      "missingQuestions": [
+        "Is there a signed intercompany service agreement in place?",
+        "Existe um contrato de prestação de serviços intercompanhias assinado?",
+        "Has the transfer pricing methodology been documented per local requirements?",
+        "A metodologia de preços de transferência foi documentada conforme requisitos locais?",
+        "Are intercompany balances eliminated in consolidated reporting?",
+        "Os saldos intercompanhias são eliminados no reporte consolidado?"
+      ]
+    },
+    {
+      "id": "accounting_transfer_pricing_report",
+      "label": "Transfer Pricing Report",
+      "expectedSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Functional Analysis",
+        "Análise Funcional",
+        "Economic Analysis and Benchmarking",
+        "Análise Econômica e Benchmarking",
+        "Selection of Transfer Pricing Method",
+        "Seleção do Método de Preços de Transferência",
+        "Arm's Length Range Determination",
+        "Determinação do Intervalo Arm's Length",
+        "Conclusion and Recommendations",
+        "Conclusão e Recomendações"
+      ],
+      "headings": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Functional Analysis",
+        "Análise Funcional",
+        "Economic Analysis and Benchmarking",
+        "Análise Econômica e Benchmarking",
+        "Selection of Transfer Pricing Method",
+        "Seleção do Método de Preços de Transferência",
+        "Arm's Length Range Determination",
+        "Determinação do Intervalo Arm's Length",
+        "Conclusion and Recommendations",
+        "Conclusão e Recomendações"
+      ],
+      "expectedTableFamilies": [
+        "Comparable company set with financial indicators",
+        "Conjunto de empresas comparáveis com indicadores financeiros",
+        "Interquartile range of operating margins",
+        "Intervalo interquartil de margens operacionais",
+        "Tested party profitability analysis",
+        "Análise de rentabilidade da parte testada"
+      ],
+      "fieldFamilies": [
+        "Tested party and related party identifiers",
+        "Identificadores da parte testada e parte relacionada",
+        "Controlled transaction type and value",
+        "Tipo e valor da transação controlada",
+        "Selected TP method (CUP/RPM/CPM/TNMM/Profit Split)",
+        "Método de TP selecionado (CUP/RPM/CPM/TNMM/Divisão de Lucros)",
+        "Arm's length range (25th to 75th percentile)",
+        "Intervalo arm's length (percentil 25 ao 75)"
+      ],
+      "redFlags": [
+        "Tested party margin falls outside the interquartile range",
+        "Margem da parte testada fora do intervalo interquartil",
+        "Comparable set includes companies with different risk profiles",
+        "Conjunto de comparáveis inclui empresas com perfis de risco diferentes",
+        "Functional analysis does not match contractual terms",
+        "Análise funcional não corresponde aos termos contratuais",
+        "Documentation not prepared contemporaneously",
+        "Documentação não preparada contemporaneamente"
+      ],
+      "missingQuestions": [
+        "Has the local file been prepared in compliance with OECD/BEPS Action 13?",
+        "O arquivo local foi preparado em conformidade com a Ação 13 da OCDE/BEPS?",
+        "Is the benchmarking study updated with current-year financial data?",
+        "O estudo de benchmarking foi atualizado com dados financeiros do ano corrente?",
+        "Are there any advance pricing agreements (APAs) affecting these transactions?",
+        "Existem acordos prévios de preços (APAs) afetando essas transações?"
+      ]
+    },
+    {
+      "id": "accounting_expense_report",
+      "label": "Expense Report",
+      "expectedSections": [
+        "Report Summary",
+        "Resumo do Relatório",
+        "Itemized Expenses",
+        "Despesas Detalhadas",
+        "Receipt and Documentation Attachment",
+        "Anexo de Recibos e Documentação",
+        "Policy Compliance Checklist",
+        "Checklist de Conformidade com a Política",
+        "Approval Chain",
+        "Cadeia de Aprovação"
+      ],
+      "headings": [
+        "Report Summary",
+        "Resumo do Relatório",
+        "Itemized Expenses",
+        "Despesas Detalhadas",
+        "Receipt and Documentation Attachment",
+        "Anexo de Recibos e Documentação",
+        "Policy Compliance Checklist",
+        "Checklist de Conformidade com a Política",
+        "Approval Chain",
+        "Cadeia de Aprovação"
+      ],
+      "expectedTableFamilies": [
+        "Expense line items by category and date",
+        "Itens de despesa por categoria e data",
+        "Per diem and mileage computation",
+        "Cálculo de diária e quilometragem",
+        "Foreign currency conversion detail",
+        "Detalhe de conversão de moeda estrangeira"
+      ],
+      "fieldFamilies": [
+        "Employee name and department",
+        "Nome do funcionário e departamento",
+        "Expense date and category (travel/meals/lodging/supplies)",
+        "Data e categoria da despesa (viagem/refeição/hospedagem/materiais)",
+        "Amount and currency",
+        "Valor e moeda",
+        "GL account and cost center coding",
+        "Codificação de conta contábil e centro de custo"
+      ],
+      "redFlags": [
+        "Expenses exceeding per diem or policy limits",
+        "Despesas excedendo diárias ou limites da política",
+        "Missing or illegible receipts",
+        "Recibos ausentes ou ilegíveis",
+        "Split transactions to circumvent approval thresholds",
+        "Transações divididas para contornar limiares de aprovação",
+        "Personal expenses coded to business categories",
+        "Despesas pessoais codificadas em categorias empresariais"
+      ],
+      "missingQuestions": [
+        "Are all expenses above the receipt threshold supported by original receipts?",
+        "Todas as despesas acima do limiar de recibo estão suportadas por recibos originais?",
+        "Has the report been approved by the employee's direct manager?",
+        "O relatório foi aprovado pelo gerente direto do funcionário?",
+        "Are advances or corporate card charges properly offset?",
+        "Os adiantamentos ou cobranças de cartão corporativo estão devidamente compensados?"
+      ]
+    },
+    {
+      "id": "accounting_budget_vs_actual",
+      "label": "Budget vs. Actual Report",
+      "expectedSections": [
+        "Summary Dashboard",
+        "Painel Resumo",
+        "Revenue Budget vs. Actual",
+        "Receita Orçada vs. Realizada",
+        "Operating Expense Budget vs. Actual",
+        "Despesas Operacionais Orçadas vs. Realizadas",
+        "Capital Expenditure Budget vs. Actual",
+        "Despesas de Capital Orçadas vs. Realizadas",
+        "Commentary and Action Items",
+        "Comentários e Itens de Ação"
+      ],
+      "headings": [
+        "Summary Dashboard",
+        "Painel Resumo",
+        "Revenue Budget vs. Actual",
+        "Receita Orçada vs. Realizada",
+        "Operating Expense Budget vs. Actual",
+        "Despesas Operacionais Orçadas vs. Realizadas",
+        "Capital Expenditure Budget vs. Actual",
+        "Despesas de Capital Orçadas vs. Realizadas",
+        "Commentary and Action Items",
+        "Comentários e Itens de Ação"
+      ],
+      "expectedTableFamilies": [
+        "Line-by-line budget vs. actual with variance columns",
+        "Linha por linha orçado vs. realizado com colunas de variação",
+        "Year-to-date and full-year forecast comparison",
+        "Comparação acumulado no ano e previsão anual",
+        "Department-level rollup with subtotals",
+        "Consolidação por departamento com subtotais"
+      ],
+      "fieldFamilies": [
+        "Budget period (monthly/quarterly/annual)",
+        "Período orçamentário (mensal/trimestral/anual)",
+        "Budget amount, actual amount, and variance",
+        "Valor orçado, valor realizado e variação",
+        "Percentage of budget utilized",
+        "Percentual do orçamento utilizado",
+        "Responsible department and cost center",
+        "Departamento responsável e centro de custo"
+      ],
+      "redFlags": [
+        "Departments consistently under-spending suggesting budget padding",
+        "Departamentos consistentemente com sub-execução sugerindo orçamento inflado",
+        "Budget amendments not formally approved",
+        "Emendas orçamentárias não formalmente aprovadas",
+        "Actuals exceeding budget without variance justification",
+        "Realizado excedendo orçamento sem justificativa de variação",
+        "Capital spend reclassified as operating to avoid CapEx limits",
+        "Gastos de capital reclassificados como operacional para evitar limites de CapEx"
+      ],
+      "missingQuestions": [
+        "Is the budget based on zero-based or incremental methodology?",
+        "O orçamento é baseado em metodologia base zero ou incremental?",
+        "Have budget holders signed off on their respective sections?",
+        "Os responsáveis pelo orçamento assinaram suas respectivas seções?",
+        "Are forecast updates incorporated into the comparison?",
+        "As atualizações de previsão estão incorporadas na comparação?"
+      ]
+    },
+    {
+      "id": "accounting_financial_audit_workpaper",
+      "label": "Financial Audit Workpaper",
+      "expectedSections": [
+        "Workpaper Index and Cross-References",
+        "Índice e Referências Cruzadas do Papel de Trabalho",
+        "Audit Objective and Assertion Mapping",
+        "Objetivo da Auditoria e Mapeamento de Asserções",
+        "Testing Procedures Performed",
+        "Procedimentos de Teste Realizados",
+        "Sample Selection and Results",
+        "Seleção de Amostras e Resultados",
+        "Conclusion and Disposition",
+        "Conclusão e Disposição"
+      ],
+      "headings": [
+        "Workpaper Index and Cross-References",
+        "Índice e Referências Cruzadas do Papel de Trabalho",
+        "Audit Objective and Assertion Mapping",
+        "Objetivo da Auditoria e Mapeamento de Asserções",
+        "Testing Procedures Performed",
+        "Procedimentos de Teste Realizados",
+        "Sample Selection and Results",
+        "Seleção de Amostras e Resultados",
+        "Conclusion and Disposition",
+        "Conclusão e Disposição"
+      ],
+      "expectedTableFamilies": [
+        "Sample selection with population and sampling method",
+        "Seleção de amostras com população e método de amostragem",
+        "Test results with pass/fail and exception detail",
+        "Resultados dos testes com aprovação/reprovação e detalhe de exceções",
+        "Tickmark legend and workpaper sign-off",
+        "Legenda de marcas de auditoria e assinatura do papel de trabalho"
+      ],
+      "fieldFamilies": [
+        "Workpaper reference number (e.g., A-100, B-200)",
+        "Número de referência do papel de trabalho (ex.: A-100, B-200)",
+        "Financial statement assertion tested (existence/completeness/valuation/rights/presentation)",
+        "Asserção das demonstrações testada (existência/completude/valoração/direitos/apresentação)",
+        "Preparer and reviewer initials with dates",
+        "Iniciais do preparador e revisor com datas",
+        "Conclusion (no exception/exception noted/adjustment required)",
+        "Conclusão (sem exceção/exceção identificada/ajuste necessário)"
+      ],
+      "redFlags": [
+        "Workpapers not reviewed by a senior team member",
+        "Papéis de trabalho não revisados por membro sênior da equipe",
+        "Insufficient sample size for high-risk account",
+        "Tamanho de amostra insuficiente para conta de alto risco",
+        "Exceptions identified but not followed up",
+        "Exceções identificadas mas sem acompanhamento",
+        "Missing cross-reference to lead schedule",
+        "Referência cruzada ausente para o demonstrativo líder"
+      ],
+      "missingQuestions": [
+        "Are all assertions for material accounts adequately tested?",
+        "Todas as asserções para contas materiais estão adequadamente testadas?",
+        "Has the workpaper been signed off by the engagement manager?",
+        "O papel de trabalho foi assinado pelo gerente de engajamento?",
+        "Do conclusions clearly state whether the audit objective was met?",
+        "As conclusões declaram claramente se o objetivo da auditoria foi atingido?"
+      ]
+    },
+    {
+      "id": "accounting_bank_fee_schedule",
+      "label": "Bank Fee Schedule",
+      "expectedSections": [
+        "Fee Schedule Overview",
+        "Visão Geral do Quadro de Tarifas",
+        "Account Maintenance Fees",
+        "Tarifas de Manutenção de Conta",
+        "Transaction-Based Fees",
+        "Tarifas Baseadas em Transações",
+        "Wire Transfer and ACH Fees",
+        "Tarifas de Transferência Bancária e ACH",
+        "Earnings Credit and Offset Analysis",
+        "Análise de Crédito de Rendimento e Compensação"
+      ],
+      "headings": [
+        "Fee Schedule Overview",
+        "Visão Geral do Quadro de Tarifas",
+        "Account Maintenance Fees",
+        "Tarifas de Manutenção de Conta",
+        "Transaction-Based Fees",
+        "Tarifas Baseadas em Transações",
+        "Wire Transfer and ACH Fees",
+        "Tarifas de Transferência Bancária e ACH",
+        "Earnings Credit and Offset Analysis",
+        "Análise de Crédito de Rendimento e Compensação"
+      ],
+      "expectedTableFamilies": [
+        "Fee type with unit price and volume",
+        "Tipo de tarifa com preço unitário e volume",
+        "Earnings credit rate (ECR) computation",
+        "Cálculo da taxa de crédito de rendimento (ECR)",
+        "Monthly fee trend comparison",
+        "Comparação de tendência mensal de tarifas"
+      ],
+      "fieldFamilies": [
+        "AFP service code and description",
+        "Código de serviço AFP e descrição",
+        "Unit price and transaction volume",
+        "Preço unitário e volume de transações",
+        "Total fee by service category",
+        "Tarifa total por categoria de serviço",
+        "Earnings credit offset applied",
+        "Compensação de crédito de rendimento aplicada"
+      ],
+      "redFlags": [
+        "Fees charged not matching contracted rate schedule",
+        "Tarifas cobradas não correspondendo ao quadro de tarifas contratado",
+        "Duplicate service charges across bank accounts",
+        "Cobranças de serviço duplicadas entre contas bancárias",
+        "Earnings credit rate below prevailing market rates",
+        "Taxa de crédito de rendimento abaixo das taxas de mercado vigentes",
+        "Unexplained fee increases period over period",
+        "Aumentos de tarifa inexplicados período a período"
+      ],
+      "missingQuestions": [
+        "Has the fee schedule been benchmarked against other banking proposals?",
+        "O quadro de tarifas foi comparado com outras propostas bancárias?",
+        "Are all AFP service codes reconciled to the bank analysis statement?",
+        "Todos os códigos de serviço AFP estão reconciliados com o demonstrativo de análise bancária?",
+        "Is the earnings credit rate negotiated or at the bank's standard?",
+        "A taxa de crédito de rendimento é negociada ou padrão do banco?"
+      ]
+    },
+    {
+      "id": "accounting_accounts_payable_subledger",
+      "label": "Accounts Payable Subledger",
+      "expectedSections": [
+        "Subledger Summary",
+        "Resumo do Razão Auxiliar",
+        "Vendor Master Listing",
+        "Listagem Cadastral de Fornecedores",
+        "Open Invoice Aging",
+        "Aging de Faturas em Aberto",
+        "Payment History",
+        "Histórico de Pagamentos",
+        "Accrued Liabilities Detail",
+        "Detalhe de Passivos Provisionados"
+      ],
+      "headings": [
+        "Subledger Summary",
+        "Resumo do Razão Auxiliar",
+        "Vendor Master Listing",
+        "Listagem Cadastral de Fornecedores",
+        "Open Invoice Aging",
+        "Aging de Faturas em Aberto",
+        "Payment History",
+        "Histórico de Pagamentos",
+        "Accrued Liabilities Detail",
+        "Detalhe de Passivos Provisionados"
+      ],
+      "expectedTableFamilies": [
+        "Vendor-level aging buckets (current/30/60/90/120+)",
+        "Faixas de aging por fornecedor (corrente/30/60/90/120+)",
+        "Three-way match status (PO/receipt/invoice)",
+        "Status de conciliação tríplice (PO/recebimento/fatura)",
+        "Payment terms analysis by vendor",
+        "Análise de condições de pagamento por fornecedor"
+      ],
+      "fieldFamilies": [
+        "Vendor ID, name, and tax ID (W-9/CNPJ)",
+        "ID do fornecedor, nome e CPF/CNPJ (W-9/CNPJ)",
+        "Invoice number, date, and due date",
+        "Número da fatura, data e vencimento",
+        "Purchase order reference",
+        "Referência de ordem de compra",
+        "Payment method and remittance date",
+        "Método de pagamento e data de remessa"
+      ],
+      "redFlags": [
+        "Invoices without matching purchase orders",
+        "Faturas sem ordens de compra correspondentes",
+        "Duplicate vendor records suggesting fraud risk",
+        "Registros duplicados de fornecedores sugerindo risco de fraude",
+        "Aged payables exceeding contractual terms",
+        "Contas a pagar vencidas excedendo termos contratuais",
+        "Debit balances in AP indicating overpayment",
+        "Saldos devedores no AP indicando pagamento a maior"
+      ],
+      "missingQuestions": [
+        "Is the AP subledger reconciled to the GL control account monthly?",
+        "O razão auxiliar de AP é reconciliado com a conta controle do razão mensalmente?",
+        "Are vendor master file changes subject to dual authorization?",
+        "As alterações no cadastro de fornecedores estão sujeitas a dupla autorização?",
+        "Are early payment discounts being captured per vendor terms?",
+        "Os descontos por antecipação de pagamento estão sendo capturados conforme termos do fornecedor?"
+      ]
+    },
+    {
+      "id": "accounting_accounts_receivable_subledger",
+      "label": "Accounts Receivable Subledger",
+      "expectedSections": [
+        "Subledger Summary",
+        "Resumo do Razão Auxiliar",
+        "Customer Master Listing",
+        "Listagem Cadastral de Clientes",
+        "Open Invoice Aging",
+        "Aging de Faturas em Aberto",
+        "Cash Receipts and Application",
+        "Recebimentos e Aplicação de Caixa",
+        "Allowance for Doubtful Accounts",
+        "Provisão para Devedores Duvidosos"
+      ],
+      "headings": [
+        "Subledger Summary",
+        "Resumo do Razão Auxiliar",
+        "Customer Master Listing",
+        "Listagem Cadastral de Clientes",
+        "Open Invoice Aging",
+        "Aging de Faturas em Aberto",
+        "Cash Receipts and Application",
+        "Recebimentos e Aplicação de Caixa",
+        "Allowance for Doubtful Accounts",
+        "Provisão para Devedores Duvidosos"
+      ],
+      "expectedTableFamilies": [
+        "Customer-level aging buckets (current/30/60/90/120+)",
+        "Faixas de aging por cliente (corrente/30/60/90/120+)",
+        "Cash application log with remittance detail",
+        "Log de aplicação de caixa com detalhe de remessa",
+        "Bad debt reserve roll-forward",
+        "Movimentação da reserva para créditos incobráveis"
+      ],
+      "fieldFamilies": [
+        "Customer ID, name, and credit limit",
+        "ID do cliente, nome e limite de crédito",
+        "Invoice number, date, and payment terms",
+        "Número da fatura, data e condições de pagamento",
+        "Outstanding balance and days past due",
+        "Saldo em aberto e dias vencidos",
+        "Allowance percentage by aging bucket",
+        "Percentual de provisão por faixa de aging"
+      ],
+      "redFlags": [
+        "Customers exceeding credit limits with no approval",
+        "Clientes excedendo limites de crédito sem aprovação",
+        "Unapplied cash receipts growing over time",
+        "Recebimentos não aplicados crescendo ao longo do tempo",
+        "Write-offs without proper authorization",
+        "Baixas sem devida autorização",
+        "Allowance for doubtful accounts not reassessed under ASC 326 (CECL)",
+        "Provisão para devedores duvidosos não reavaliada sob ASC 326 (CECL)"
+      ],
+      "missingQuestions": [
+        "Is the AR subledger reconciled to the GL control account monthly?",
+        "O razão auxiliar de AR é reconciliado com a conta controle do razão mensalmente?",
+        "Has the expected credit loss model been updated with current macro data?",
+        "O modelo de perda de crédito esperada foi atualizado com dados macro atuais?",
+        "Are collection efforts documented for significantly past-due accounts?",
+        "Os esforços de cobrança estão documentados para contas significativamente vencidas?"
+      ]
+    },
+    {
+      "id": "accounting_tax_withholding_certificate",
+      "label": "Tax Withholding Certificate",
+      "expectedSections": [
+        "Certificate Header and Identification",
+        "Cabeçalho e Identificação do Certificado",
+        "Withholding Agent Information",
+        "Informações do Agente de Retenção",
+        "Beneficial Owner Information",
+        "Informações do Beneficiário Efetivo",
+        "Tax Treaty Claim",
+        "Reivindicação de Tratado Tributário",
+        "Certification and Signature",
+        "Certificação e Assinatura"
+      ],
+      "headings": [
+        "Certificate Header and Identification",
+        "Cabeçalho e Identificação do Certificado",
+        "Withholding Agent Information",
+        "Informações do Agente de Retenção",
+        "Beneficial Owner Information",
+        "Informações do Beneficiário Efetivo",
+        "Tax Treaty Claim",
+        "Reivindicação de Tratado Tributário",
+        "Certification and Signature",
+        "Certificação e Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Income type and applicable withholding rate",
+        "Tipo de renda e alíquota de retenção aplicável",
+        "Treaty article and reduced rate summary",
+        "Artigo do tratado e resumo de alíquota reduzida",
+        "Withholding history and remittance dates",
+        "Histórico de retenção e datas de remessa"
+      ],
+      "fieldFamilies": [
+        "Form type (W-8BEN/W-8BEN-E/W-8ECI/W-9)",
+        "Tipo de formulário (W-8BEN/W-8BEN-E/W-8ECI/W-9)",
+        "Taxpayer identification number (TIN/CNPJ/ITIN)",
+        "Número de identificação fiscal (TIN/CNPJ/ITIN)",
+        "Country of residence and treaty article claimed",
+        "País de residência e artigo de tratado reivindicado",
+        "Certification date and expiration",
+        "Data de certificação e vencimento"
+      ],
+      "redFlags": [
+        "Expired withholding certificates still on file",
+        "Certificados de retenção vencidos ainda em arquivo",
+        "Treaty benefits claimed without valid limitation on benefits article",
+        "Benefícios de tratado reivindicados sem artigo válido de limitação de benefícios",
+        "TIN not matching IRS validation records",
+        "TIN não correspondendo aos registros de validação da IRS",
+        "Certificate signed by unauthorized representative",
+        "Certificado assinado por representante não autorizado"
+      ],
+      "missingQuestions": [
+        "Are all withholding certificates current (within 3-year validity)?",
+        "Todos os certificados de retenção estão vigentes (dentro da validade de 3 anos)?",
+        "Has FATCA status been properly documented for foreign payees?",
+        "O status FATCA foi devidamente documentado para beneficiários estrangeiros?",
+        "Is the withholding rate applied consistent with the certificate on file?",
+        "A alíquota de retenção aplicada é consistente com o certificado em arquivo?"
+      ]
+    },
+    {
+      "id": "accounting_consolidated_financial_statement",
+      "label": "Consolidated Financial Statement",
+      "expectedSections": [
+        "Consolidation Basis and Scope",
+        "Base e Escopo da Consolidação",
+        "Consolidated Balance Sheet",
+        "Balanço Patrimonial Consolidado",
+        "Consolidated Income Statement",
+        "Demonstração de Resultados Consolidada",
+        "Intercompany Elimination Schedule",
+        "Demonstrativo de Eliminações Intercompanhias",
+        "Minority Interest / Non-Controlling Interest",
+        "Participação Minoritária / Interesse Não Controlador",
+        "Notes to Consolidated Statements",
+        "Notas Explicativas das Demonstrações Consolidadas"
+      ],
+      "headings": [
+        "Consolidation Basis and Scope",
+        "Base e Escopo da Consolidação",
+        "Consolidated Balance Sheet",
+        "Balanço Patrimonial Consolidado",
+        "Consolidated Income Statement",
+        "Demonstração de Resultados Consolidada",
+        "Intercompany Elimination Schedule",
+        "Demonstrativo de Eliminações Intercompanhias",
+        "Minority Interest / Non-Controlling Interest",
+        "Participação Minoritária / Interesse Não Controlador",
+        "Notes to Consolidated Statements",
+        "Notas Explicativas das Demonstrações Consolidadas"
+      ],
+      "expectedTableFamilies": [
+        "Entity-by-entity pre-elimination balances",
+        "Saldos pré-eliminação por entidade",
+        "Intercompany elimination journal entries",
+        "Lançamentos de eliminação intercompanhias",
+        "Consolidated totals with non-controlling interest split",
+        "Totais consolidados com separação de interesse não controlador"
+      ],
+      "fieldFamilies": [
+        "Reporting entity and subsidiary list",
+        "Entidade de reporte e lista de subsidiárias",
+        "Ownership percentage and consolidation method (full/equity/proportionate)",
+        "Percentual de participação e método de consolidação (integral/equivalência/proporcional)",
+        "Functional currency and translation rate",
+        "Moeda funcional e taxa de conversão",
+        "Goodwill and purchase price allocation",
+        "Ágio e alocação de preço de compra"
+      ],
+      "redFlags": [
+        "Intercompany balances not fully eliminated",
+        "Saldos intercompanhias não totalmente eliminados",
+        "Foreign currency translation adjustments not flowing to OCI",
+        "Ajustes de conversão de moeda estrangeira não fluindo para ORA",
+        "Subsidiaries excluded from consolidation without disclosure",
+        "Subsidiárias excluídas da consolidação sem divulgação",
+        "Goodwill impairment testing not performed annually",
+        "Teste de imparidade de ágio não realizado anualmente"
+      ],
+      "missingQuestions": [
+        "Are all majority-owned subsidiaries included in the consolidation scope?",
+        "Todas as subsidiárias com participação majoritária estão incluídas no escopo de consolidação?",
+        "Has the foreign currency translation been performed using correct closing rates?",
+        "A conversão de moeda estrangeira foi realizada usando as taxas de fechamento corretas?",
+        "Are non-controlling interest calculations consistent with ownership percentages?",
+        "Os cálculos de participação minoritária são consistentes com os percentuais de participação?"
+      ]
+    }
+  ]
+}

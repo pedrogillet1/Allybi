@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -17,7 +17,1501 @@
     "requireOptions": true,
     "requireRiskTradeoffs": true,
     "requireEvidenceSummary": true,
-    "forbidFalseCertainty": true
+    "forbidFalseCertainty": true,
+    "requireUncertaintyStatement": true,
+    "requireWhatChangesMyMind": true,
+    "minimumOptionCount": 2,
+    "optionsFramework": [
+      {
+        "id": "FIN_OF_001",
+        "name": "baseline_vs_alternative",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_002",
+        "name": "cost_vs_risk_matrix",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_003",
+        "name": "short_term_vs_long_term",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_004",
+        "name": "single_owner_vs_committee",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_005",
+        "name": "manual_vs_automation",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_006",
+        "name": "pilot_vs_full_rollout",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_007",
+        "name": "internal_vs_external_dependency",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_008",
+        "name": "high_confidence_vs_fast_iteration",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_009",
+        "name": "best_case_base_case_worst_case",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_010",
+        "name": "option_value_of_waiting",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_011",
+        "name": "reversible_vs_irreversible",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_012",
+        "name": "capacity_bound_vs_demand_bound",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_013",
+        "name": "fixed_scope_vs_variable_scope",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_014",
+        "name": "compliance_first_vs_growth_first",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_015",
+        "name": "counterparty_risk_split",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_016",
+        "name": "quarter_year_reconciliation",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_017",
+        "name": "critical_path_sensitivity",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_018",
+        "name": "leading_vs_lagging_signal",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_019",
+        "name": "evidence_gap_triage",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_020",
+        "name": "fallback_plan_design",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_021",
+        "name": "dependency_failure_mode",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_022",
+        "name": "uncertainty_banding",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_023",
+        "name": "trigger_based_replan",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List concrete signals that would reverse the recommendation.",
+        "optionScaffold": "Option A: Conservative plan; Option B: Balanced plan; Option C: Aggressive plan"
+      },
+      {
+        "id": "FIN_OF_024",
+        "name": "decision_checkpoint_review",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "enforce": {
+          "requireOptions": true,
+          "requireRiskTradeoffs": true,
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true,
+          "requireWhatChangesMyMind": true
+        },
+        "riskLens": [
+          "budget_vs_actual",
+          "counterparty",
+          "liquidity",
+          "quarter_year_mix"
+        ],
+        "evidenceThreshold": "medium_high",
+        "evidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Conservative plan; Opcao B: Balanced plan; Opcao C: Aggressive plan"
+      }
+    ]
   },
-  "templates": []
+  "templates": [
+    {
+      "id": "FIN_TPL_001",
+      "name": "two_option_recommendation",
+      "language": "en",
+      "audience": "executive",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "high",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_002",
+      "name": "three_option_tradeoff",
+      "language": "pt",
+      "audience": "expert",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium_high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_003",
+      "name": "status_quo_vs_change",
+      "language": "en",
+      "audience": "manager",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_004",
+      "name": "risk_first_brief",
+      "language": "pt",
+      "audience": "operator",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_005",
+      "name": "evidence_first_brief",
+      "language": "en",
+      "audience": "executive",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_006",
+      "name": "uncertainty_first_brief",
+      "language": "pt",
+      "audience": "expert",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium_high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_007",
+      "name": "counterparty_impact_view",
+      "language": "en",
+      "audience": "manager",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_008",
+      "name": "quarter_vs_year_alignment",
+      "language": "pt",
+      "audience": "operator",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_009",
+      "name": "cost_sensitivity_view",
+      "language": "en",
+      "audience": "executive",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_010",
+      "name": "timeline_sensitivity_view",
+      "language": "pt",
+      "audience": "expert",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium_high",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_011",
+      "name": "capacity_sensitivity_view",
+      "language": "en",
+      "audience": "manager",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_012",
+      "name": "compliance_gate_review",
+      "language": "pt",
+      "audience": "operator",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_013",
+      "name": "escalation_or_continue",
+      "language": "en",
+      "audience": "executive",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "high",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_014",
+      "name": "pilot_decision_sheet",
+      "language": "pt",
+      "audience": "expert",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium_high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_015",
+      "name": "rollback_decision_sheet",
+      "language": "en",
+      "audience": "manager",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_016",
+      "name": "red_flag_decision_note",
+      "language": "pt",
+      "audience": "operator",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_017",
+      "name": "board_ready_decision_note",
+      "language": "en",
+      "audience": "executive",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_018",
+      "name": "operator_ready_decision_note",
+      "language": "pt",
+      "audience": "expert",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium_high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_019",
+      "name": "exec_one_pager_decision",
+      "language": "en",
+      "audience": "manager",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_020",
+      "name": "technical_appendix_decision",
+      "language": "pt",
+      "audience": "operator",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_021",
+      "name": "high_confidence_path",
+      "language": "en",
+      "audience": "executive",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "high",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_022",
+      "name": "medium_confidence_path",
+      "language": "pt",
+      "audience": "expert",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium_high",
+      "uncertaintyScale": "low_medium_high",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 3,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_023",
+      "name": "low_confidence_path",
+      "language": "en",
+      "audience": "manager",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "If any top two risk signals materialize, downgrade recommendation one level.",
+      "template": "Options: {options}. Risks: {risks}. Evidence threshold: {evidence_threshold}. Uncertainty: {uncertainty}. What changes my mind: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    },
+    {
+      "id": "FIN_TPL_024",
+      "name": "what_changes_my_mind_log",
+      "language": "pt",
+      "audience": "operator",
+      "requiredBlocks": [
+        "options",
+        "risks",
+        "evidence_threshold",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceThreshold": "medium",
+      "uncertaintyScale": "confidence_band_0_100",
+      "whatChangesMyMind": "Se qualquer um dos dois principais sinais de risco ocorrer, reduza a recomendacao em um nivel.",
+      "template": "Opcoes: {options}. Riscos: {risks}. Limiar de evidencia: {evidence_threshold}. Incerteza: {uncertainty}. O que muda minha opiniao: {what_changes_my_mind}.",
+      "evidenceConstraints": {
+        "minEvidenceItems": 2,
+        "maxUnsupportedClaims": 0,
+        "requiredEvidenceTypes": [
+          "ledger_extract",
+          "signed_report",
+          "approved_board_pack"
+        ],
+        "allowInferenceWhenLabeled": true
+      }
+    }
+  ]
 }

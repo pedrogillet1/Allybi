@@ -1,10 +1,14 @@
 {
   "_meta": {
     "id": "file_action_operators",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Databank-driven configuration for file/folder write operators and navigation operators. Executor MUST read detection + entity extraction from here (no hardcoded patterns in TypeScript). Supports EN/PT natural language, confirmation prompts, undo, and safe disambiguation. Includes open operator (non-destructive).",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-02-06",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28",
     "owner": "koda-file-actions"
   },
   "config": {
@@ -85,8 +89,12 @@
       },
       "mustNotContain": {
         "_comment": "Avoid collision with document open requests like 'open folder' in a viewer context.",
-        "en": ["\\bopen\\b.{0,10}\\bfolder\\b"],
-        "pt": ["\\babrir\\b.{0,10}\\bpasta\\b"]
+        "en": [
+          "\\bopen\\b.{0,10}\\bfolder\\b"
+        ],
+        "pt": [
+          "\\babrir\\b.{0,10}\\bpasta\\b"
+        ]
       }
     },
     {
@@ -154,8 +162,12 @@
       },
       "mustContain": {
         "_comment": "Bulk requires a plural indicator.",
-        "en": ["\\b(all|these|those|everything)\\b"],
-        "pt": ["\\b(todos|todas|esses|essas|tudo)\\b"]
+        "en": [
+          "\\b(all|these|those|everything)\\b"
+        ],
+        "pt": [
+          "\\b(todos|todas|esses|essas|tudo)\\b"
+        ]
       }
     },
     {
@@ -205,8 +217,14 @@
       },
       "mustNotContain": {
         "_comment": "Avoid collision with copy/paste text operations.",
-        "en": ["\\bclipboard\\b", "\\bcopy\\s+this\\s+text\\b"],
-        "pt": ["\\b[aá]rea\\s+de\\s+transfer[eê]ncia\\b", "\\bcopiar\\s+este\\s+texto\\b"]
+        "en": [
+          "\\bclipboard\\b",
+          "\\bcopy\\s+this\\s+text\\b"
+        ],
+        "pt": [
+          "\\b[aá]rea\\s+de\\s+transfer[eê]ncia\\b",
+          "\\bcopiar\\s+este\\s+texto\\b"
+        ]
       }
     },
     {
@@ -226,8 +244,14 @@
       },
       "mustNotContain": {
         "_comment": "If message contains folder keywords, prefer folder_rename.",
-        "en": ["\\bfolder\\b", "\\bdirectory\\b"],
-        "pt": ["\\bpasta\\b", "\\bdiret[oó]rio\\b"]
+        "en": [
+          "\\bfolder\\b",
+          "\\bdirectory\\b"
+        ],
+        "pt": [
+          "\\bpasta\\b",
+          "\\bdiret[oó]rio\\b"
+        ]
       }
     },
     {
@@ -246,8 +270,14 @@
         ]
       },
       "mustNotContain": {
-        "en": ["\\bfolder\\b", "\\bdirectory\\b"],
-        "pt": ["\\bpasta\\b", "\\bdiret[oó]rio\\b"]
+        "en": [
+          "\\bfolder\\b",
+          "\\bdirectory\\b"
+        ],
+        "pt": [
+          "\\bpasta\\b",
+          "\\bdiret[oó]rio\\b"
+        ]
       }
     },
     {
@@ -267,8 +297,14 @@
       },
       "mustNotContain": {
         "_comment": "If message contains folder keywords, prefer folder_move.",
-        "en": ["\\bfolder\\b", "\\bdirectory\\b"],
-        "pt": ["\\bpasta\\b", "\\bdiret[oó]rio\\b"]
+        "en": [
+          "\\bfolder\\b",
+          "\\bdirectory\\b"
+        ],
+        "pt": [
+          "\\bpasta\\b",
+          "\\bdiret[oó]rio\\b"
+        ]
       }
     },
     {
@@ -288,8 +324,14 @@
       },
       "mustNotContain": {
         "_comment": "If message contains folder keywords, prefer folder_delete.",
-        "en": ["\\bfolder\\b", "\\bdirectory\\b"],
-        "pt": ["\\bpasta\\b", "\\bdiret[oó]rio\\b"]
+        "en": [
+          "\\bfolder\\b",
+          "\\bdirectory\\b"
+        ],
+        "pt": [
+          "\\bpasta\\b",
+          "\\bdiret[oó]rio\\b"
+        ]
       }
     },
     {
@@ -315,8 +357,14 @@
       },
       "mustNotContain": {
         "_comment": "Avoid mapping inside-doc location questions to open.",
-        "en": ["\\bwhere\\s+in\\b.{0,40}\\b(document|file)\\b", "\\bon\\s+which\\s+page\\b"],
-        "pt": ["\\bonde\\s+no\\b.{0,40}\\b(documento|arquivo)\\b", "\\bem\\s+qual\\s+p[aá]gina\\b"]
+        "en": [
+          "\\bwhere\\s+in\\b.{0,40}\\b(document|file)\\b",
+          "\\bon\\s+which\\s+page\\b"
+        ],
+        "pt": [
+          "\\bonde\\s+no\\b.{0,40}\\b(documento|arquivo)\\b",
+          "\\bem\\s+qual\\s+p[aá]gina\\b"
+        ]
       }
     }
   ],
@@ -332,20 +380,62 @@
         "folderName": {
           "type": "quoted_or_trailing",
           "required": true,
-          "afterKeywords": { "en": ["called", "named", "titled"], "pt": ["chamada", "chamado", "nomeada", "nomeado", "com nome"] }
+          "afterKeywords": {
+            "en": [
+              "called",
+              "named",
+              "titled"
+            ],
+            "pt": [
+              "chamada",
+              "chamado",
+              "nomeada",
+              "nomeado",
+              "com nome"
+            ]
+          }
         },
         "parentFolder": {
           "type": "after_preposition",
           "required": false,
-          "prepositions": { "en": ["inside", "in", "under", "within"], "pt": ["dentro de", "em", "sob", "na", "no"] }
+          "prepositions": {
+            "en": [
+              "inside",
+              "in",
+              "under",
+              "within"
+            ],
+            "pt": [
+              "dentro de",
+              "em",
+              "sob",
+              "na",
+              "no"
+            ]
+          }
         }
       },
       "microcopy": {
-        "success": { "en": "Done — I created the folder **{folderName}**.", "pt": "Pronto — criei a pasta **{folderName}**." },
-        "successWithParent": { "en": "Done — I created **{folderName}** inside **{parentFolder}**.", "pt": "Pronto — criei **{folderName}** dentro de **{parentFolder}**." },
-        "alreadyExists": { "en": "A folder named **{folderName}** already exists.", "pt": "Já existe uma pasta chamada **{folderName}**." },
-        "error": { "en": "Failed to create folder: {error}", "pt": "Falha ao criar pasta: {error}" },
-        "missingEntity": { "en": "Please specify a folder name.", "pt": "Por favor, especifique o nome da pasta." }
+        "success": {
+          "en": "Done — I created the folder **{folderName}**.",
+          "pt": "Pronto — criei a pasta **{folderName}**."
+        },
+        "successWithParent": {
+          "en": "Done — I created **{folderName}** inside **{parentFolder}**.",
+          "pt": "Pronto — criei **{folderName}** dentro de **{parentFolder}**."
+        },
+        "alreadyExists": {
+          "en": "A folder named **{folderName}** already exists.",
+          "pt": "Já existe uma pasta chamada **{folderName}**."
+        },
+        "error": {
+          "en": "Failed to create folder: {error}",
+          "pt": "Falha ao criar pasta: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify a folder name.",
+          "pt": "Por favor, especifique o nome da pasta."
+        }
       }
     },
     "folder_rename": {
@@ -356,18 +446,42 @@
       "canUndo": true,
       "undoAction": "rename_back",
       "entityExtraction": {
-        "folderName": { "type": "first_quoted_or_noun", "required": true },
+        "folderName": {
+          "type": "first_quoted_or_noun",
+          "required": true
+        },
         "newName": {
           "type": "after_keyword",
           "required": true,
-          "keywords": { "en": ["to", "as"], "pt": ["para", "como"] }
+          "keywords": {
+            "en": [
+              "to",
+              "as"
+            ],
+            "pt": [
+              "para",
+              "como"
+            ]
+          }
         }
       },
       "microcopy": {
-        "success": { "en": "Done — renamed **{folderName}** to **{newName}**.", "pt": "Pronto — renomeei **{folderName}** para **{newName}**." },
-        "notFound": { "en": "I couldn't find a folder named **{folderName}**.", "pt": "Não encontrei uma pasta chamada **{folderName}**." },
-        "error": { "en": "Failed to rename folder: {error}", "pt": "Falha ao renomear pasta: {error}" },
-        "missingEntity": { "en": "Please specify the folder name and the new name.", "pt": "Por favor, especifique o nome da pasta e o novo nome." }
+        "success": {
+          "en": "Done — renamed **{folderName}** to **{newName}**.",
+          "pt": "Pronto — renomeei **{folderName}** para **{newName}**."
+        },
+        "notFound": {
+          "en": "I couldn't find a folder named **{folderName}**.",
+          "pt": "Não encontrei uma pasta chamada **{folderName}**."
+        },
+        "error": {
+          "en": "Failed to rename folder: {error}",
+          "pt": "Falha ao renomear pasta: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify the folder name and the new name.",
+          "pt": "Por favor, especifique o nome da pasta e o novo nome."
+        }
       }
     },
     "folder_delete": {
@@ -377,22 +491,43 @@
       "requiresConfirmation": true,
       "canUndo": false,
       "entityExtraction": {
-        "folderName": { "type": "quoted_or_trailing", "required": true }
+        "folderName": {
+          "type": "quoted_or_trailing",
+          "required": true
+        }
       },
       "confirmation": {
         "prompt": {
           "en": "Are you sure you want to delete the folder **{folderName}**? This will also delete all files inside.",
           "pt": "Tem certeza que deseja excluir a pasta **{folderName}**? Isso também excluirá todos os arquivos dentro."
         },
-        "confirmLabel": { "en": "Delete", "pt": "Excluir" },
-        "cancelLabel": { "en": "Cancel", "pt": "Cancelar" },
+        "confirmLabel": {
+          "en": "Delete",
+          "pt": "Excluir"
+        },
+        "cancelLabel": {
+          "en": "Cancel",
+          "pt": "Cancelar"
+        },
         "confirmStyle": "danger"
       },
       "microcopy": {
-        "success": { "en": "Done — deleted the folder **{folderName}** and moved its files to the root.", "pt": "Pronto — excluí a pasta **{folderName}** e movi os arquivos para a raiz." },
-        "notFound": { "en": "I couldn't find a folder named **{folderName}**.", "pt": "Não encontrei uma pasta chamada **{folderName}**." },
-        "error": { "en": "Failed to delete folder: {error}", "pt": "Falha ao excluir pasta: {error}" },
-        "missingEntity": { "en": "Please specify which folder to delete.", "pt": "Por favor, especifique qual pasta excluir." }
+        "success": {
+          "en": "Done — deleted the folder **{folderName}** and moved its files to the root.",
+          "pt": "Pronto — excluí a pasta **{folderName}** e movi os arquivos para a raiz."
+        },
+        "notFound": {
+          "en": "I couldn't find a folder named **{folderName}**.",
+          "pt": "Não encontrei uma pasta chamada **{folderName}**."
+        },
+        "error": {
+          "en": "Failed to delete folder: {error}",
+          "pt": "Falha ao excluir pasta: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify which folder to delete.",
+          "pt": "Por favor, especifique qual pasta excluir."
+        }
       }
     },
     "folder_move": {
@@ -403,21 +538,65 @@
       "canUndo": true,
       "undoAction": "move_back",
       "entityExtraction": {
-        "folderName": { "type": "first_quoted_or_noun", "required": true },
+        "folderName": {
+          "type": "first_quoted_or_noun",
+          "required": true
+        },
         "targetFolder": {
           "type": "after_keyword",
           "required": true,
-          "keywords": { "en": ["to", "into", "inside", "under"], "pt": ["para", "em", "dentro de", "sob"] },
-          "specialValues": { "en": ["root", "top level", "top-level"], "pt": ["raiz", "nível principal"] }
+          "keywords": {
+            "en": [
+              "to",
+              "into",
+              "inside",
+              "under"
+            ],
+            "pt": [
+              "para",
+              "em",
+              "dentro de",
+              "sob"
+            ]
+          },
+          "specialValues": {
+            "en": [
+              "root",
+              "top level",
+              "top-level"
+            ],
+            "pt": [
+              "raiz",
+              "nível principal"
+            ]
+          }
         }
       },
       "microcopy": {
-        "success": { "en": "Done — moved **{folderName}** to **{targetFolder}**.", "pt": "Pronto — movi **{folderName}** para **{targetFolder}**." },
-        "successToRoot": { "en": "Done — moved **{folderName}** to the top level.", "pt": "Pronto — movi **{folderName}** para o nível principal." },
-        "notFound": { "en": "I couldn't find a folder named **{folderName}**.", "pt": "Não encontrei uma pasta chamada **{folderName}**." },
-        "targetNotFound": { "en": "I couldn't find the target folder **{targetFolder}**.", "pt": "Não encontrei a pasta de destino **{targetFolder}**." },
-        "error": { "en": "Failed to move folder: {error}", "pt": "Falha ao mover pasta: {error}" },
-        "missingEntity": { "en": "Please specify the folder to move and the destination.", "pt": "Por favor, especifique a pasta a mover e o destino." }
+        "success": {
+          "en": "Done — moved **{folderName}** to **{targetFolder}**.",
+          "pt": "Pronto — movi **{folderName}** para **{targetFolder}**."
+        },
+        "successToRoot": {
+          "en": "Done — moved **{folderName}** to the top level.",
+          "pt": "Pronto — movi **{folderName}** para o nível principal."
+        },
+        "notFound": {
+          "en": "I couldn't find a folder named **{folderName}**.",
+          "pt": "Não encontrei uma pasta chamada **{folderName}**."
+        },
+        "targetNotFound": {
+          "en": "I couldn't find the target folder **{targetFolder}**.",
+          "pt": "Não encontrei a pasta de destino **{targetFolder}**."
+        },
+        "error": {
+          "en": "Failed to move folder: {error}",
+          "pt": "Falha ao mover pasta: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify the folder to move and the destination.",
+          "pt": "Por favor, especifique a pasta a mover e o destino."
+        }
       }
     },
     "file_move": {
@@ -429,19 +608,53 @@
       "undoAction": "move_back",
       "bulkSupport": true,
       "entityExtraction": {
-        "filename": { "type": "filelike_pattern", "required": true },
+        "filename": {
+          "type": "filelike_pattern",
+          "required": true
+        },
         "targetFolder": {
           "type": "after_keyword",
           "required": true,
-          "keywords": { "en": ["to", "into", "in", "inside", "under"], "pt": ["para", "em", "na", "no", "dentro de", "sob"] }
+          "keywords": {
+            "en": [
+              "to",
+              "into",
+              "in",
+              "inside",
+              "under"
+            ],
+            "pt": [
+              "para",
+              "em",
+              "na",
+              "no",
+              "dentro de",
+              "sob"
+            ]
+          }
         }
       },
       "microcopy": {
-        "success": { "en": "Done — moved **{filename}** to **{targetFolder}**.", "pt": "Pronto — movi **{filename}** para **{targetFolder}**." },
-        "notFound": { "en": "I couldn't find **{filename}** in your documents.", "pt": "Não encontrei **{filename}** nos seus documentos." },
-        "folderNotFound": { "en": "I couldn't find a folder named **{targetFolder}**.", "pt": "Não encontrei uma pasta chamada **{targetFolder}**." },
-        "error": { "en": "Failed to move document: {error}", "pt": "Falha ao mover documento: {error}" },
-        "missingEntity": { "en": "Please specify the file to move and the destination folder.", "pt": "Por favor, especifique o arquivo a mover e a pasta de destino." }
+        "success": {
+          "en": "Done — moved **{filename}** to **{targetFolder}**.",
+          "pt": "Pronto — movi **{filename}** para **{targetFolder}**."
+        },
+        "notFound": {
+          "en": "I couldn't find **{filename}** in your documents.",
+          "pt": "Não encontrei **{filename}** nos seus documentos."
+        },
+        "folderNotFound": {
+          "en": "I couldn't find a folder named **{targetFolder}**.",
+          "pt": "Não encontrei uma pasta chamada **{targetFolder}**."
+        },
+        "error": {
+          "en": "Failed to move document: {error}",
+          "pt": "Falha ao mover documento: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify the file to move and the destination folder.",
+          "pt": "Por favor, especifique o arquivo a mover e a pasta de destino."
+        }
       }
     },
     "file_multi_move": {
@@ -453,19 +666,53 @@
       "canUndo": true,
       "undoAction": "move_back",
       "entityExtraction": {
-        "filenames": { "type": "multiple_filelike", "required": true },
+        "filenames": {
+          "type": "multiple_filelike",
+          "required": true
+        },
         "targetFolder": {
           "type": "after_keyword",
           "required": true,
-          "keywords": { "en": ["to", "into", "in", "inside", "under"], "pt": ["para", "em", "na", "no", "dentro de", "sob"] }
+          "keywords": {
+            "en": [
+              "to",
+              "into",
+              "in",
+              "inside",
+              "under"
+            ],
+            "pt": [
+              "para",
+              "em",
+              "na",
+              "no",
+              "dentro de",
+              "sob"
+            ]
+          }
         }
       },
       "microcopy": {
-        "success": { "en": "Done — moved **{count}** files to **{targetFolder}**.", "pt": "Pronto — movi **{count}** arquivos para **{targetFolder}**." },
-        "partialSuccess": { "en": "Moved **{successCount}** files, **{failCount}** couldn't be found.", "pt": "Movi **{successCount}** arquivos, **{failCount}** não foram encontrados." },
-        "noneFound": { "en": "I couldn't find any of those files.", "pt": "Não encontrei nenhum desses arquivos." },
-        "folderNotFound": { "en": "I couldn't find a folder named **{targetFolder}**.", "pt": "Não encontrei uma pasta chamada **{targetFolder}**." },
-        "missingEntity": { "en": "Please specify the files to move and the destination folder.", "pt": "Por favor, especifique os arquivos a mover e a pasta de destino." }
+        "success": {
+          "en": "Done — moved **{count}** files to **{targetFolder}**.",
+          "pt": "Pronto — movi **{count}** arquivos para **{targetFolder}**."
+        },
+        "partialSuccess": {
+          "en": "Moved **{successCount}** files, **{failCount}** couldn't be found.",
+          "pt": "Movi **{successCount}** arquivos, **{failCount}** não foram encontrados."
+        },
+        "noneFound": {
+          "en": "I couldn't find any of those files.",
+          "pt": "Não encontrei nenhum desses arquivos."
+        },
+        "folderNotFound": {
+          "en": "I couldn't find a folder named **{targetFolder}**.",
+          "pt": "Não encontrei uma pasta chamada **{targetFolder}**."
+        },
+        "missingEntity": {
+          "en": "Please specify the files to move and the destination folder.",
+          "pt": "Por favor, especifique os arquivos a mover e a pasta de destino."
+        }
       }
     },
     "file_copy": {
@@ -477,15 +724,49 @@
       "undoAction": "delete_copy",
       "bulkSupport": true,
       "entityExtraction": {
-        "filename": { "type": "filelike_pattern", "required": true },
-        "targetFolder": { "type": "after_keyword", "required": false, "keywords": { "en": ["to", "into", "in"], "pt": ["para", "em", "na", "no"] } }
+        "filename": {
+          "type": "filelike_pattern",
+          "required": true
+        },
+        "targetFolder": {
+          "type": "after_keyword",
+          "required": false,
+          "keywords": {
+            "en": [
+              "to",
+              "into",
+              "in"
+            ],
+            "pt": [
+              "para",
+              "em",
+              "na",
+              "no"
+            ]
+          }
+        }
       },
       "microcopy": {
-        "success": { "en": "Done — copied **{filename}** to **{targetFolder}**.", "pt": "Pronto — copiei **{filename}** para **{targetFolder}**." },
-        "successSameFolder": { "en": "Done — created a copy of **{filename}**.", "pt": "Pronto — criei uma cópia de **{filename}**." },
-        "notFound": { "en": "I couldn't find **{filename}** in your documents.", "pt": "Não encontrei **{filename}** nos seus documentos." },
-        "error": { "en": "Failed to copy document: {error}", "pt": "Falha ao copiar documento: {error}" },
-        "missingEntity": { "en": "Please specify the file to copy.", "pt": "Por favor, especifique o arquivo a copiar." }
+        "success": {
+          "en": "Done — copied **{filename}** to **{targetFolder}**.",
+          "pt": "Pronto — copiei **{filename}** para **{targetFolder}**."
+        },
+        "successSameFolder": {
+          "en": "Done — created a copy of **{filename}**.",
+          "pt": "Pronto — criei uma cópia de **{filename}**."
+        },
+        "notFound": {
+          "en": "I couldn't find **{filename}** in your documents.",
+          "pt": "Não encontrei **{filename}** nos seus documentos."
+        },
+        "error": {
+          "en": "Failed to copy document: {error}",
+          "pt": "Falha ao copiar documento: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify the file to copy.",
+          "pt": "Por favor, especifique o arquivo a copiar."
+        }
       }
     },
     "file_rename": {
@@ -496,14 +777,42 @@
       "canUndo": true,
       "undoAction": "rename_back",
       "entityExtraction": {
-        "filename": { "type": "filelike_pattern", "required": true },
-        "newName": { "type": "after_keyword", "required": true, "keywords": { "en": ["to", "as"], "pt": ["para", "como"] } }
+        "filename": {
+          "type": "filelike_pattern",
+          "required": true
+        },
+        "newName": {
+          "type": "after_keyword",
+          "required": true,
+          "keywords": {
+            "en": [
+              "to",
+              "as"
+            ],
+            "pt": [
+              "para",
+              "como"
+            ]
+          }
+        }
       },
       "microcopy": {
-        "success": { "en": "Done — renamed **{filename}** to **{newName}**.", "pt": "Pronto — renomeei **{filename}** para **{newName}**." },
-        "notFound": { "en": "I couldn't find **{filename}** in your documents.", "pt": "Não encontrei **{filename}** nos seus documentos." },
-        "error": { "en": "Failed to rename document: {error}", "pt": "Falha ao renomear documento: {error}" },
-        "missingEntity": { "en": "Please specify the file to rename and the new name.", "pt": "Por favor, especifique o arquivo a renomear e o novo nome." }
+        "success": {
+          "en": "Done — renamed **{filename}** to **{newName}**.",
+          "pt": "Pronto — renomeei **{filename}** para **{newName}**."
+        },
+        "notFound": {
+          "en": "I couldn't find **{filename}** in your documents.",
+          "pt": "Não encontrei **{filename}** nos seus documentos."
+        },
+        "error": {
+          "en": "Failed to rename document: {error}",
+          "pt": "Falha ao renomear documento: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify the file to rename and the new name.",
+          "pt": "Por favor, especifique o arquivo a renomear e o novo nome."
+        }
       }
     },
     "file_delete": {
@@ -514,19 +823,43 @@
       "canUndo": false,
       "bulkSupport": true,
       "entityExtraction": {
-        "filename": { "type": "filelike_pattern", "required": true }
+        "filename": {
+          "type": "filelike_pattern",
+          "required": true
+        }
       },
       "confirmation": {
-        "prompt": { "en": "Are you sure you want to delete **{filename}**?", "pt": "Tem certeza que deseja excluir **{filename}**?" },
-        "confirmLabel": { "en": "Delete", "pt": "Excluir" },
-        "cancelLabel": { "en": "Cancel", "pt": "Cancelar" },
+        "prompt": {
+          "en": "Are you sure you want to delete **{filename}**?",
+          "pt": "Tem certeza que deseja excluir **{filename}**?"
+        },
+        "confirmLabel": {
+          "en": "Delete",
+          "pt": "Excluir"
+        },
+        "cancelLabel": {
+          "en": "Cancel",
+          "pt": "Cancelar"
+        },
         "confirmStyle": "danger"
       },
       "microcopy": {
-        "success": { "en": "Done — deleted **{filename}**.", "pt": "Pronto — excluí **{filename}**." },
-        "notFound": { "en": "I couldn't find **{filename}** in your documents.", "pt": "Não encontrei **{filename}** nos seus documentos." },
-        "error": { "en": "Failed to delete document: {error}", "pt": "Falha ao excluir documento: {error}" },
-        "missingEntity": { "en": "Please specify which file to delete.", "pt": "Por favor, especifique qual arquivo excluir." }
+        "success": {
+          "en": "Done — deleted **{filename}**.",
+          "pt": "Pronto — excluí **{filename}**."
+        },
+        "notFound": {
+          "en": "I couldn't find **{filename}** in your documents.",
+          "pt": "Não encontrei **{filename}** nos seus documentos."
+        },
+        "error": {
+          "en": "Failed to delete document: {error}",
+          "pt": "Falha ao excluir documento: {error}"
+        },
+        "missingEntity": {
+          "en": "Please specify which file to delete.",
+          "pt": "Por favor, especifique qual arquivo excluir."
+        }
       }
     },
     "open": {
@@ -536,12 +869,24 @@
       "requiresConfirmation": false,
       "canUndo": false,
       "entityExtraction": {
-        "filename": { "type": "filelike_pattern", "required": true }
+        "filename": {
+          "type": "filelike_pattern",
+          "required": true
+        }
       },
       "microcopy": {
-        "success": { "en": "Here it is: **{filename}**.", "pt": "Aqui está: **{filename}**." },
-        "notFound": { "en": "I couldn't find **{filename}**.", "pt": "Não encontrei **{filename}**." },
-        "missingEntity": { "en": "Which file do you want to open?", "pt": "Qual arquivo você quer abrir?" }
+        "success": {
+          "en": "Here it is: **{filename}**.",
+          "pt": "Aqui está: **{filename}**."
+        },
+        "notFound": {
+          "en": "I couldn't find **{filename}**.",
+          "pt": "Não encontrei **{filename}**."
+        },
+        "missingEntity": {
+          "en": "Which file do you want to open?",
+          "pt": "Qual arquivo você quer abrir?"
+        }
       }
     },
     "undo": {
@@ -551,19 +896,52 @@
       "requiresConfirmation": false,
       "canUndo": false,
       "microcopy": {
-        "success": { "en": "Undone — {undoDescription}.", "pt": "Desfeito — {undoDescription}." },
-        "nothingToUndo": { "en": "Nothing to undo.", "pt": "Nada para desfazer." },
-        "expired": { "en": "The undo window has expired.", "pt": "O tempo para desfazer expirou." },
-        "cannotUndo": { "en": "This action cannot be undone.", "pt": "Esta ação não pode ser desfeita." },
-        "entityNotFound": { "en": "The item no longer exists and cannot be undone.", "pt": "O item não existe mais e não pode ser desfeito." }
+        "success": {
+          "en": "Undone — {undoDescription}.",
+          "pt": "Desfeito — {undoDescription}."
+        },
+        "nothingToUndo": {
+          "en": "Nothing to undo.",
+          "pt": "Nada para desfazer."
+        },
+        "expired": {
+          "en": "The undo window has expired.",
+          "pt": "O tempo para desfazer expirou."
+        },
+        "cannotUndo": {
+          "en": "This action cannot be undone.",
+          "pt": "Esta ação não pode ser desfeita."
+        },
+        "entityNotFound": {
+          "en": "The item no longer exists and cannot be undone.",
+          "pt": "O item não existe mais e não pode ser desfeito."
+        }
       },
       "undoDescriptions": {
-        "folder_create": { "en": "deleted the folder **{folderName}**", "pt": "excluí a pasta **{folderName}**" },
-        "folder_rename": { "en": "renamed **{newName}** back to **{folderName}**", "pt": "renomeei **{newName}** de volta para **{folderName}**" },
-        "folder_move": { "en": "moved **{folderName}** back to **{originalParent}**", "pt": "movi **{folderName}** de volta para **{originalParent}**" },
-        "file_move": { "en": "moved **{filename}** back to **{originalFolder}**", "pt": "movi **{filename}** de volta para **{originalFolder}**" },
-        "file_copy": { "en": "deleted the copy of **{filename}**", "pt": "excluí a cópia de **{filename}**" },
-        "file_rename": { "en": "renamed **{newName}** back to **{filename}**", "pt": "renomeei **{newName}** de volta para **{filename}**" }
+        "folder_create": {
+          "en": "deleted the folder **{folderName}**",
+          "pt": "excluí a pasta **{folderName}**"
+        },
+        "folder_rename": {
+          "en": "renamed **{newName}** back to **{folderName}**",
+          "pt": "renomeei **{newName}** de volta para **{folderName}**"
+        },
+        "folder_move": {
+          "en": "moved **{folderName}** back to **{originalParent}**",
+          "pt": "movi **{folderName}** de volta para **{originalParent}**"
+        },
+        "file_move": {
+          "en": "moved **{filename}** back to **{originalFolder}**",
+          "pt": "movi **{filename}** de volta para **{originalFolder}**"
+        },
+        "file_copy": {
+          "en": "deleted the copy of **{filename}**",
+          "pt": "excluí a cópia de **{filename}**"
+        },
+        "file_rename": {
+          "en": "renamed **{newName}** back to **{filename}**",
+          "pt": "renomeei **{newName}** de volta para **{filename}**"
+        }
       }
     }
   },
@@ -572,8 +950,14 @@
       "baseOperator": "file_move",
       "bulkMethod": "bulkMove",
       "microcopy": {
-        "success": { "en": "Done — moved **{count}** files to **{targetFolder}**.", "pt": "Pronto — movi **{count}** arquivos para **{targetFolder}**." },
-        "partialSuccess": { "en": "Moved **{successCount}** files, **{failCount}** failed.", "pt": "Movi **{successCount}** arquivos, **{failCount}** falharam." }
+        "success": {
+          "en": "Done — moved **{count}** files to **{targetFolder}**.",
+          "pt": "Pronto — movi **{count}** arquivos para **{targetFolder}**."
+        },
+        "partialSuccess": {
+          "en": "Moved **{successCount}** files, **{failCount}** failed.",
+          "pt": "Movi **{successCount}** arquivos, **{failCount}** falharam."
+        }
       }
     },
     "file_bulk_delete": {
@@ -581,20 +965,35 @@
       "bulkMethod": "bulkDelete",
       "requiresConfirmation": true,
       "confirmation": {
-        "prompt": { "en": "Are you sure you want to delete **{count}** files?", "pt": "Tem certeza que deseja excluir **{count}** arquivos?" },
-        "confirmLabel": { "en": "Delete All", "pt": "Excluir Todos" },
-        "cancelLabel": { "en": "Cancel", "pt": "Cancelar" },
+        "prompt": {
+          "en": "Are you sure you want to delete **{count}** files?",
+          "pt": "Tem certeza que deseja excluir **{count}** arquivos?"
+        },
+        "confirmLabel": {
+          "en": "Delete All",
+          "pt": "Excluir Todos"
+        },
+        "cancelLabel": {
+          "en": "Cancel",
+          "pt": "Cancelar"
+        },
         "confirmStyle": "danger"
       },
       "microcopy": {
-        "success": { "en": "Done — deleted **{count}** files.", "pt": "Pronto — excluí **{count}** arquivos." }
+        "success": {
+          "en": "Done — deleted **{count}** files.",
+          "pt": "Pronto — excluí **{count}** arquivos."
+        }
       }
     },
     "file_bulk_copy": {
       "baseOperator": "file_copy",
       "bulkMethod": "bulkCopy",
       "microcopy": {
-        "success": { "en": "Done — copied **{count}** files to **{targetFolder}**.", "pt": "Pronto — copiei **{count}** arquivos para **{targetFolder}**." }
+        "success": {
+          "en": "Done — copied **{count}** files to **{targetFolder}**.",
+          "pt": "Pronto — copiei **{count}** arquivos para **{targetFolder}**."
+        }
       }
     }
   },
@@ -622,46 +1021,605 @@
     },
     "after_keyword": {
       "_comment": "Executor should build a dynamic regex using keywords list per operator (to/as/para/como) and capture following phrase.",
-      "patterns": []
+      "patterns": [
+        "(?:\\bto\\b|\\bas\\b|\\bpara\\b|\\bcomo\\b)\\s+[\"']?([^\"'\\n]+)[\"']?",
+        "(?:\\binto\\b|\\bin\\b|\\binside\\b|\\bem\\b|\\bna\\b|\\bno\\b)\\s+[\"']?([^\"'\\n]+)[\"']?"
+      ]
     },
     "after_preposition": {
       "_comment": "Executor should build a dynamic regex using prepositions list per operator (inside/in/under/dentro/em/sob) and capture following phrase.",
-      "patterns": []
+      "patterns": [
+        "(?:\\binside\\b|\\bwithin\\b|\\bunder\\b|\\bin\\b)\\s+[\"']?([^\"'\\n]+)[\"']?",
+        "(?:\\bdentro\\s+de\\b|\\bem\\b|\\bsob\\b|\\bna\\b|\\bno\\b)\\s+[\"']?([^\"'\\n]+)[\"']?"
+      ]
     },
     "multiple_filelike": {
       "_comment": "Matches multiple filenames separated by commas or 'and'/'e'. Executor handles the extraction in extractMultipleFilenames().",
-      "patterns": []
+      "patterns": [
+        "([\\w\\-\\.\\s]+\\.(?:pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g|gif|webp|svg))(?:\\s*(?:,|and|e)\\s*([\\w\\-\\.\\s]+\\.(?:pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g|gif|webp|svg)))+",
+        "[\"']([^\"']+\\.(?:pdf|xlsx?|docx?|pptx?|csv|txt))[\"'](?:\\s*(?:,|and|e)\\s*[\"']([^\"']+\\.(?:pdf|xlsx?|docx?|pptx?|csv|txt))[\"'])+"
+      ]
     }
   },
   "tests": {
     "_comment": "Detection + entity extraction tests. These assert operator mapping first, then essential entities. Keep these aligned with executor behavior.",
     "cases": [
-      { "id": "DET_T01_en_undo_short", "input": "undo", "expect": { "operator": "undo" } },
-      { "id": "DET_T02_pt_undo", "input": "desfazer", "expect": { "operator": "undo" } },
-      { "id": "DET_T03_en_create_folder_named", "input": "Create a folder called \"Quarterly Reports 2025\"", "expect": { "operator": "folder_create", "folderName": "Quarterly Reports 2025" } },
-      { "id": "DET_T04_pt_create_folder", "input": "criar pasta Relatórios", "expect": { "operator": "folder_create", "folderName": "Relatórios" } },
-      { "id": "DET_T05_en_rename_folder", "input": "rename folder Reports to Archive", "expect": { "operator": "folder_rename", "folderName": "Reports", "newName": "Archive" } },
-      { "id": "DET_T06_pt_rename_folder", "input": "renomear pasta Relatórios para Arquivo", "expect": { "operator": "folder_rename", "folderName": "Relatórios", "newName": "Arquivo" } },
-      { "id": "DET_T07_en_delete_folder", "input": "delete folder Old Stuff", "expect": { "operator": "folder_delete", "folderName": "Old Stuff" } },
-      { "id": "DET_T08_pt_delete_folder", "input": "excluir pasta Coisas antigas", "expect": { "operator": "folder_delete", "folderName": "Coisas antigas" } },
-      { "id": "DET_T09_en_move_folder", "input": "move folder Reports to Archive", "expect": { "operator": "folder_move", "folderName": "Reports", "targetFolder": "Archive" } },
-      { "id": "DET_T10_pt_move_folder", "input": "mover pasta Relatórios para Arquivo", "expect": { "operator": "folder_move", "folderName": "Relatórios", "targetFolder": "Arquivo" } },
-      { "id": "DET_T11_en_move_file", "input": "move report.pdf to Archive", "expect": { "operator": "file_move", "filename": "report.pdf", "targetFolder": "Archive" } },
-      { "id": "DET_T12_pt_move_file", "input": "mover documento.pdf para Arquivo", "expect": { "operator": "file_move", "filename": "documento.pdf", "targetFolder": "Arquivo" } },
-      { "id": "DET_T13_en_copy_file", "input": "make a copy of report.pdf", "expect": { "operator": "file_copy", "filename": "report.pdf" } },
-      { "id": "DET_T14_pt_copy_file", "input": "copiar report.pdf", "expect": { "operator": "file_copy", "filename": "report.pdf" } },
-      { "id": "DET_T15_en_rename_file", "input": "rename report.pdf to report_final.pdf", "expect": { "operator": "file_rename", "filename": "report.pdf", "newName": "report_final.pdf" } },
-      { "id": "DET_T16_pt_rename_file", "input": "renomear report.pdf para report_final.pdf", "expect": { "operator": "file_rename", "filename": "report.pdf", "newName": "report_final.pdf" } },
-      { "id": "DET_T17_en_delete_file", "input": "delete report.pdf", "expect": { "operator": "file_delete", "filename": "report.pdf" } },
-      { "id": "DET_T18_pt_delete_file", "input": "apagar report.pdf", "expect": { "operator": "file_delete", "filename": "report.pdf" } },
-      { "id": "DET_T19_en_open", "input": "open report.pdf", "expect": { "operator": "open", "filename": "report.pdf" } },
-      { "id": "DET_T20_pt_open", "input": "abrir report.pdf", "expect": { "operator": "open", "filename": "report.pdf" } },
-      { "id": "DET_T21_guard_content_question", "input": "Where in the document is ROI mentioned?", "expect": { "operatorNotIn": ["open", "file_move", "file_delete", "folder_create", "folder_delete"] } },
-      { "id": "DET_T22_en_multi_file_move", "input": "move report.pdf and budget.xlsx to Archive", "expect": { "operator": "file_multi_move", "targetFolder": "Archive" } },
-      { "id": "DET_T23_en_bulk_move_these", "input": "move these files to MyProjects", "expect": { "operator": "file_bulk_move", "targetFolder": "MyProjects" } },
-      { "id": "DET_T24_en_nested_folder", "input": "move report.pdf to SubTest inside FinalTest", "expect": { "operator": "file_move", "filename": "report.pdf" } },
-      { "id": "DET_T25_pt_multi_file_move", "input": "mover relatorio.pdf e planilha.xlsx para Arquivo", "expect": { "operator": "file_multi_move", "targetFolder": "Arquivo" } },
-      { "id": "DET_T26_pt_bulk_move_esses", "input": "mover esses arquivos para Projetos", "expect": { "operator": "file_bulk_move", "targetFolder": "Projetos" } }
+      {
+        "id": "DET_T01_en_undo_short",
+        "input": "undo",
+        "expect": {
+          "operator": "undo"
+        }
+      },
+      {
+        "id": "DET_T02_pt_undo",
+        "input": "desfazer",
+        "expect": {
+          "operator": "undo"
+        }
+      },
+      {
+        "id": "DET_T03_en_create_folder_named",
+        "input": "Create a folder called \"Quarterly Reports 2025\"",
+        "expect": {
+          "operator": "folder_create",
+          "folderName": "Quarterly Reports 2025"
+        }
+      },
+      {
+        "id": "DET_T04_pt_create_folder",
+        "input": "criar pasta Relatórios",
+        "expect": {
+          "operator": "folder_create",
+          "folderName": "Relatórios"
+        }
+      },
+      {
+        "id": "DET_T05_en_rename_folder",
+        "input": "rename folder Reports to Archive",
+        "expect": {
+          "operator": "folder_rename",
+          "folderName": "Reports",
+          "newName": "Archive"
+        }
+      },
+      {
+        "id": "DET_T06_pt_rename_folder",
+        "input": "renomear pasta Relatórios para Arquivo",
+        "expect": {
+          "operator": "folder_rename",
+          "folderName": "Relatórios",
+          "newName": "Arquivo"
+        }
+      },
+      {
+        "id": "DET_T07_en_delete_folder",
+        "input": "delete folder Old Stuff",
+        "expect": {
+          "operator": "folder_delete",
+          "folderName": "Old Stuff"
+        }
+      },
+      {
+        "id": "DET_T08_pt_delete_folder",
+        "input": "excluir pasta Coisas antigas",
+        "expect": {
+          "operator": "folder_delete",
+          "folderName": "Coisas antigas"
+        }
+      },
+      {
+        "id": "DET_T09_en_move_folder",
+        "input": "move folder Reports to Archive",
+        "expect": {
+          "operator": "folder_move",
+          "folderName": "Reports",
+          "targetFolder": "Archive"
+        }
+      },
+      {
+        "id": "DET_T10_pt_move_folder",
+        "input": "mover pasta Relatórios para Arquivo",
+        "expect": {
+          "operator": "folder_move",
+          "folderName": "Relatórios",
+          "targetFolder": "Arquivo"
+        }
+      },
+      {
+        "id": "DET_T11_en_move_file",
+        "input": "move report.pdf to Archive",
+        "expect": {
+          "operator": "file_move",
+          "filename": "report.pdf",
+          "targetFolder": "Archive"
+        }
+      },
+      {
+        "id": "DET_T12_pt_move_file",
+        "input": "mover documento.pdf para Arquivo",
+        "expect": {
+          "operator": "file_move",
+          "filename": "documento.pdf",
+          "targetFolder": "Arquivo"
+        }
+      },
+      {
+        "id": "DET_T13_en_copy_file",
+        "input": "make a copy of report.pdf",
+        "expect": {
+          "operator": "file_copy",
+          "filename": "report.pdf"
+        }
+      },
+      {
+        "id": "DET_T14_pt_copy_file",
+        "input": "copiar report.pdf",
+        "expect": {
+          "operator": "file_copy",
+          "filename": "report.pdf"
+        }
+      },
+      {
+        "id": "DET_T15_en_rename_file",
+        "input": "rename report.pdf to report_final.pdf",
+        "expect": {
+          "operator": "file_rename",
+          "filename": "report.pdf",
+          "newName": "report_final.pdf"
+        }
+      },
+      {
+        "id": "DET_T16_pt_rename_file",
+        "input": "renomear report.pdf para report_final.pdf",
+        "expect": {
+          "operator": "file_rename",
+          "filename": "report.pdf",
+          "newName": "report_final.pdf"
+        }
+      },
+      {
+        "id": "DET_T17_en_delete_file",
+        "input": "delete report.pdf",
+        "expect": {
+          "operator": "file_delete",
+          "filename": "report.pdf"
+        }
+      },
+      {
+        "id": "DET_T18_pt_delete_file",
+        "input": "apagar report.pdf",
+        "expect": {
+          "operator": "file_delete",
+          "filename": "report.pdf"
+        }
+      },
+      {
+        "id": "DET_T19_en_open",
+        "input": "open report.pdf",
+        "expect": {
+          "operator": "open",
+          "filename": "report.pdf"
+        }
+      },
+      {
+        "id": "DET_T20_pt_open",
+        "input": "abrir report.pdf",
+        "expect": {
+          "operator": "open",
+          "filename": "report.pdf"
+        }
+      },
+      {
+        "id": "DET_T21_guard_content_question",
+        "input": "Where in the document is ROI mentioned?",
+        "expect": {
+          "operatorNotIn": [
+            "open",
+            "file_move",
+            "file_delete",
+            "folder_create",
+            "folder_delete"
+          ]
+        }
+      },
+      {
+        "id": "DET_T22_en_multi_file_move",
+        "input": "move report.pdf and budget.xlsx to Archive",
+        "expect": {
+          "operator": "file_multi_move",
+          "targetFolder": "Archive"
+        }
+      },
+      {
+        "id": "DET_T23_en_bulk_move_these",
+        "input": "move these files to MyProjects",
+        "expect": {
+          "operator": "file_bulk_move",
+          "targetFolder": "MyProjects"
+        }
+      },
+      {
+        "id": "DET_T24_en_nested_folder",
+        "input": "move report.pdf to SubTest inside FinalTest",
+        "expect": {
+          "operator": "file_move",
+          "filename": "report.pdf"
+        }
+      },
+      {
+        "id": "DET_T25_pt_multi_file_move",
+        "input": "mover relatorio.pdf e planilha.xlsx para Arquivo",
+        "expect": {
+          "operator": "file_multi_move",
+          "targetFolder": "Arquivo"
+        }
+      },
+      {
+        "id": "DET_T26_pt_bulk_move_esses",
+        "input": "mover esses arquivos para Projetos",
+        "expect": {
+          "operator": "file_bulk_move",
+          "targetFolder": "Projetos"
+        }
+      }
     ]
-  }
+  },
+  "aliases": [
+    {
+      "operator": "open",
+      "aliases": [
+        "open this file",
+        "open that file",
+        "open the budget sheet",
+        "open worksheet",
+        "open contract",
+        "open report"
+      ]
+    },
+    {
+      "operator": "file_move",
+      "aliases": [
+        "move file",
+        "relocate file",
+        "put this in folder",
+        "move this document"
+      ]
+    },
+    {
+      "operator": "file_copy",
+      "aliases": [
+        "copy file",
+        "duplicate document",
+        "make a copy",
+        "clone file"
+      ]
+    },
+    {
+      "operator": "file_delete",
+      "aliases": [
+        "delete file",
+        "remove file",
+        "trash document",
+        "archive delete"
+      ]
+    },
+    {
+      "operator": "file_rename",
+      "aliases": [
+        "rename file",
+        "change file name",
+        "retitle document"
+      ]
+    },
+    {
+      "operator": "folder_create",
+      "aliases": [
+        "create folder",
+        "new directory",
+        "make project folder"
+      ]
+    },
+    {
+      "operator": "folder_move",
+      "aliases": [
+        "move folder",
+        "relocate folder",
+        "nest folder"
+      ]
+    },
+    {
+      "operator": "folder_delete",
+      "aliases": [
+        "delete folder",
+        "remove directory",
+        "trash folder"
+      ]
+    },
+    {
+      "operator": "file_bulk_move",
+      "aliases": [
+        "move all files",
+        "move these files",
+        "bulk move files",
+        "move selected files"
+      ]
+    },
+    {
+      "operator": "file_bulk_copy",
+      "aliases": [
+        "copy all files",
+        "duplicate selected files",
+        "bulk copy files"
+      ]
+    },
+    {
+      "operator": "file_bulk_delete",
+      "aliases": [
+        "delete all files",
+        "remove selected files",
+        "bulk delete files"
+      ]
+    },
+    {
+      "operator": "undo",
+      "aliases": [
+        "undo",
+        "revert that",
+        "roll back action",
+        "undo last action"
+      ]
+    }
+  ],
+  "regexTriggers": [
+    {
+      "operator": "open",
+      "pattern": "\\bopen\\b.{0,40}\\b(file|sheet|document|budget|contract|report)\\b",
+      "language": "en",
+      "confidence": 0.84
+    },
+    {
+      "operator": "open",
+      "pattern": "\\babrir\\b.{0,40}\\b(arquivo|planilha|documento|orcamento|contrato|relatorio)\\b",
+      "language": "pt",
+      "confidence": 0.84
+    },
+    {
+      "operator": "file_move",
+      "pattern": "\\b(move|transfer|relocate)\\b.{0,80}\\b(to|into|in)\\b",
+      "language": "en",
+      "confidence": 0.8
+    },
+    {
+      "operator": "file_move",
+      "pattern": "\\b(mover|transferir|realocar)\\b.{0,80}\\b(para|em|no|na)\\b",
+      "language": "pt",
+      "confidence": 0.8
+    },
+    {
+      "operator": "file_copy",
+      "pattern": "\\b(copy|duplicate|clone)\\b.{0,60}\\b(file|document|table)\\b",
+      "language": "en",
+      "confidence": 0.76
+    },
+    {
+      "operator": "file_copy",
+      "pattern": "\\b(copiar|duplicar|clonar)\\b.{0,60}\\b(arquivo|documento|tabela)\\b",
+      "language": "pt",
+      "confidence": 0.76
+    },
+    {
+      "operator": "file_delete",
+      "pattern": "\\b(delete|remove|trash)\\b.{0,60}\\b(file|document)\\b",
+      "language": "en",
+      "confidence": 0.78
+    },
+    {
+      "operator": "file_delete",
+      "pattern": "\\b(excluir|remover|apagar)\\b.{0,60}\\b(arquivo|documento)\\b",
+      "language": "pt",
+      "confidence": 0.78
+    },
+    {
+      "operator": "file_bulk_move",
+      "pattern": "\\b(move|transfer)\\b.{0,10}\\b(all|these|selected)\\b.{0,40}\\b(files|documents)\\b",
+      "language": "en",
+      "confidence": 0.82
+    },
+    {
+      "operator": "file_bulk_move",
+      "pattern": "\\b(mover|transferir)\\b.{0,10}\\b(todos|esses|selecionados)\\b.{0,40}\\b(arquivos|documentos)\\b",
+      "language": "pt",
+      "confidence": 0.82
+    },
+    {
+      "operator": "folder_create",
+      "pattern": "\\b(create|make|add)\\b.{0,20}\\b(folder|directory)\\b",
+      "language": "en",
+      "confidence": 0.83
+    },
+    {
+      "operator": "folder_create",
+      "pattern": "\\b(criar|fazer|adicionar)\\b.{0,20}\\b(pasta|diretorio)\\b",
+      "language": "pt",
+      "confidence": 0.83
+    },
+    {
+      "operator": "undo",
+      "pattern": "^\\s*(undo|revert|roll\\s*back|desfazer|reverter)\\s*[!.?]*\\s*$",
+      "language": "any",
+      "confidence": 0.92
+    },
+    {
+      "operator": "open",
+      "pattern": "\\bexport this table\\b",
+      "language": "en",
+      "confidence": 0.61,
+      "note": "Domain action phrase coverage"
+    },
+    {
+      "operator": "open",
+      "pattern": "\\bcompare clauses\\b",
+      "language": "en",
+      "confidence": 0.58,
+      "note": "Domain action phrase coverage; routed downstream if not file action"
+    }
+  ],
+  "negativeTriggers": [
+    {
+      "pattern": "\\bwhere in the document\\b",
+      "reason": "content_question_not_file_action",
+      "appliesTo": [
+        "open",
+        "file_move",
+        "file_delete"
+      ]
+    },
+    {
+      "pattern": "\\bon which page\\b",
+      "reason": "location_question_not_open_action",
+      "appliesTo": [
+        "open"
+      ]
+    },
+    {
+      "pattern": "\\bsummarize\\b",
+      "reason": "summary_intent_not_file_action",
+      "appliesTo": [
+        "file_move",
+        "file_delete",
+        "folder_create"
+      ]
+    },
+    {
+      "pattern": "\\bexplain\\b",
+      "reason": "explanation_intent_not_file_action",
+      "appliesTo": [
+        "file_move",
+        "file_delete"
+      ]
+    },
+    {
+      "pattern": "\\bquote\\b",
+      "reason": "quote_request_not_file_action",
+      "appliesTo": [
+        "open"
+      ]
+    },
+    {
+      "pattern": "\\bem qual pagina\\b",
+      "reason": "location_question_not_file_action",
+      "appliesTo": [
+        "open"
+      ]
+    },
+    {
+      "pattern": "\\bresumir\\b",
+      "reason": "summary_intent_not_file_action",
+      "appliesTo": [
+        "file_move",
+        "file_delete",
+        "folder_create"
+      ]
+    },
+    {
+      "pattern": "\\bcomparar clausulas\\b",
+      "reason": "legal_compare_intent_not_file_action",
+      "appliesTo": [
+        "file_move",
+        "file_delete",
+        "folder_create"
+      ]
+    },
+    {
+      "pattern": "\\bcalculate\\b",
+      "reason": "calculation_intent_not_file_action",
+      "appliesTo": [
+        "file_move",
+        "file_delete"
+      ]
+    },
+    {
+      "pattern": "\\bmonitor\\b",
+      "reason": "monitor_intent_not_file_action",
+      "appliesTo": [
+        "file_move",
+        "file_delete"
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "input": "open the budget sheet",
+      "operator": "open",
+      "domain": "finance",
+      "expected": "open target disambiguation if needed"
+    },
+    {
+      "input": "export this table to csv",
+      "operator": "file_copy",
+      "domain": "finance",
+      "expected": "copy or export style action path"
+    },
+    {
+      "input": "move q4_forecast.xlsx to Archive",
+      "operator": "file_move",
+      "domain": "finance",
+      "expected": "single file move"
+    },
+    {
+      "input": "compare clauses in msa and sow",
+      "operator": "open",
+      "domain": "legal",
+      "expected": "capture domain phrase then route compare downstream if needed"
+    },
+    {
+      "input": "open indemnity clause section",
+      "operator": "open",
+      "domain": "legal",
+      "expected": "open or navigate to clause candidates"
+    },
+    {
+      "input": "rename contract_v3.docx to contract_final.docx",
+      "operator": "file_rename",
+      "domain": "legal",
+      "expected": "rename action"
+    },
+    {
+      "input": "open cbc report for patient 1204",
+      "operator": "open",
+      "domain": "medical",
+      "expected": "open report candidates safely"
+    },
+    {
+      "input": "move all lab files to follow_up folder",
+      "operator": "file_bulk_move",
+      "domain": "medical",
+      "expected": "bulk move with confirmation policy"
+    },
+    {
+      "input": "delete duplicate imaging file",
+      "operator": "file_delete",
+      "domain": "medical",
+      "expected": "single delete with confirmation"
+    },
+    {
+      "input": "open sla dashboard",
+      "operator": "open",
+      "domain": "ops",
+      "expected": "open dashboard file or tab"
+    },
+    {
+      "input": "move incident reports to q1 archive",
+      "operator": "file_bulk_move",
+      "domain": "ops",
+      "expected": "bulk move action"
+    },
+    {
+      "input": "undo",
+      "operator": "undo",
+      "domain": "any",
+      "expected": "undo previous action if within ttl"
+    }
+  ]
 }

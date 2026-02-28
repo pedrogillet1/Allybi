@@ -8,6 +8,7 @@
  */
 
 import { Router, Request, Response, NextFunction } from "express";
+import { getDocumentIntelligenceBanksInstance } from "../services/core/banks/documentIntelligenceBanks.service";
 
 // Guards
 import { requireAdmin } from "./guards/requireAdmin.guard";
@@ -67,6 +68,39 @@ export function buildAdminRouter(): Router {
       ts: new Date().toISOString(),
       version: VERSION,
       service: "admin-api",
+    });
+  });
+
+  router.get("/banks/health", (_req: Request, res: Response) => {
+    const diagnostics =
+      getDocumentIntelligenceBanksInstance().listDiagnostics();
+    res.json({
+      ok: diagnostics.validationWarnings.length === 0,
+      ts: new Date().toISOString(),
+      service: "document-intelligence-banks",
+      data: diagnostics,
+    });
+  });
+
+  router.get("/banks/diagnostics", (_req: Request, res: Response) => {
+    const diagnostics =
+      getDocumentIntelligenceBanksInstance().listDiagnostics();
+    const totalLoaded = diagnostics.loadedBankIds.length;
+    const totalVersioned = Object.keys(diagnostics.versions).length;
+    const warningCount = diagnostics.validationWarnings.length;
+    const familyCounts = diagnostics.documentIntelligenceFamilyCounts;
+
+    res.json({
+      ok: warningCount === 0,
+      ts: new Date().toISOString(),
+      service: "document-intelligence-banks-diagnostics",
+      summary: {
+        totalBanksLoaded: totalLoaded,
+        totalBanksVersioned: totalVersioned,
+        warningCount,
+        familyCounts,
+      },
+      data: diagnostics,
     });
   });
 

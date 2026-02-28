@@ -101,6 +101,20 @@ const REPORT_DIR = path.resolve(__dirname, "reports");
 const REPORT_FILE = path.join(REPORT_DIR, "query-test-50-gate-results.json");
 const MAX_RESPONSE_WAIT_MS = 180_000;
 
+function buildReportPayload(results: QueryResult[]) {
+  return {
+    meta: {
+      generatedAt: new Date().toISOString(),
+      totalQueries: QUERIES_50.length,
+      documentsAttached: TARGET_DOCUMENTS.map((document) => ({
+        id: document.id,
+        name: document.name,
+      })),
+    },
+    results,
+  };
+}
+
 interface StreamInterceptState {
   lastHttpStatus: number | null;
   lastRequestId: string | null;
@@ -391,7 +405,7 @@ test.describe("50-Query Gate Test", () => {
       if (result.errorDetail) console.log(`[GATE-50] ERROR: ${result.errorDetail}`);
 
       results.push(result);
-      fs.writeFileSync(REPORT_FILE, JSON.stringify(results, null, 2));
+      fs.writeFileSync(REPORT_FILE, JSON.stringify(buildReportPayload(results), null, 2));
       await page.waitForTimeout(1000);
     }
 
@@ -401,9 +415,11 @@ test.describe("50-Query Gate Test", () => {
     const timeouts = results.filter(r => r.status === "timeout").length;
     const truncated = results.filter(r => r.truncation).length;
     const withSources = results.filter(r => r.sources.length > 0).length;
+    const uniqueSources = new Set(results.flatMap((r) => r.sources)).size;
     const avgDuration = Math.round(results.reduce((s, r) => s + r.durationMs, 0) / results.length);
     const avgLength = Math.round(results.filter(r => r.status === "ok").reduce((s, r) => s + r.responseLength, 0) / Math.max(1, ok));
     const shortResponses = results.filter(r => r.status === "ok" && r.responseLength < 100).length;
+    const compareRows = results.filter((r) => r.index === 49 || r.index === 50);
 
     console.log("\n═══════════════════════════════════════════");
     console.log("        50-QUERY GATE TEST RESULTS");
@@ -413,6 +429,7 @@ test.describe("50-Query Gate Test", () => {
     console.log(`Timeouts:         ${timeouts}/50`);
     console.log(`Truncated:        ${truncated}/50`);
     console.log(`With sources:     ${withSources}/50`);
+    console.log(`Unique sources:   ${uniqueSources}`);
     console.log(`Short (<100ch):   ${shortResponses}/50`);
     console.log(`Avg duration:     ${avgDuration}ms`);
     console.log(`Avg resp length:  ${avgLength} chars`);
@@ -420,8 +437,15 @@ test.describe("50-Query Gate Test", () => {
     console.log("═══════════════════════════════════════════");
 
     // ── Assertions ──
-    expect(errors, `${errors} queries errored — backend not stable`).toBeLessThanOrEqual(3);
+    expect(errors, `${errors} queries errored — backend not stable`).toBe(0);
+    expect(timeouts, `${timeouts} queries timed out — backend not stable`).toBe(0);
     expect(truncated, `${truncated} queries truncated — table/response limits too aggressive`).toBe(0);
-    expect(ok, `Only ${ok}/50 ok — too many failures`).toBeGreaterThanOrEqual(45);
+    expect(ok, `Only ${ok}/50 ok — too many failures`).toBe(50);
+    expect(withSources, `Only ${withSources}/50 responses with sources`).toBe(50);
+    expect(uniqueSources, `Only ${uniqueSources} unique sources used across 50 queries`).toBeGreaterThanOrEqual(5);
+    expect(
+      compareRows.every((row) => row.sources.length >= 2),
+      "Cross-doc comparison turns must cite at least two documents",
+    ).toBe(true);
   });
 });

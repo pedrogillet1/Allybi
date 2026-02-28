@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "di_banking_domain_profile",
+    "version": "1.0.0",
+    "description": "Banking domain profile with scope, detection signals, and supported operators.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "displayName": {
+    "en": "Banking",
+    "pt": "Bancario"
+  },
+  "scope": "Retail and commercial banking records including account statements, card statements, loan statements, and payment receipts.",
+  "coreConcepts": [
+    "account_activity",
+    "available_balance",
+    "card_limit",
+    "cleared_transaction",
+    "credit_payment",
+    "debit_transaction",
+    "fees_interest",
+    "installment",
+    "interest_rate",
+    "loan_principal",
+    "minimum_due",
+    "opening_balance",
+    "payment_confirmation",
+    "pending_transaction",
+    "posted_date",
+    "reference_code",
+    "running_balance",
+    "statement_period",
+    "transfer_channel",
+    "value_date"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "account_activity",
+      "available_balance",
+      "card_limit",
+      "cleared_transaction",
+      "credit_payment",
+      "debit_transaction",
+      "fees_interest",
+      "installment",
+      "interest_rate",
+      "loan_principal"
+    ],
+    "mediumConfidence": [
+      "minimum_due",
+      "opening_balance",
+      "payment_confirmation",
+      "pending_transaction",
+      "posted_date",
+      "reference_code",
+      "running_balance",
+      "statement_period",
+      "transfer_channel",
+      "value_date"
+    ]
+  },
+  "relatedDomains": [
+    "billing",
+    "finance",
+    "accounting"
+  ],
+  "ontologyPrefix": "banking"
+}

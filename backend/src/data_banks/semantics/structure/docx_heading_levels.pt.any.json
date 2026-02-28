@@ -1,0 +1,316 @@
+{
+  "_meta": {
+    "id": "docx_heading_levels_pt",
+    "version": "1.0.0",
+    "description": "Portuguese heading level conventions for DOCX structural parsing — maps style names, numbering patterns, and font heuristics to semantic levels.",
+    "languages": ["pt"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": { "enabled": true },
+  "levels": [
+    {
+      "level": 1,
+      "styleNames": ["Título 1", "título 1", "Titulo 1", "Título", "TÍTULO", "Cabeçalho 1"],
+      "xmlStyleIds": ["Ttulo1", "Heading1", "Title"],
+      "outlineLevel": 0,
+      "semanticRole": "document_title_or_major_section",
+      "typicalContent": ["Título do documento", "Seção principal"],
+      "expectedChildren": [2],
+      "tocDepthDefault": true
+    },
+    {
+      "level": 2,
+      "styleNames": ["Título 2", "título 2", "Titulo 2", "Subtítulo", "SUBTÍTULO", "Cabeçalho 2"],
+      "xmlStyleIds": ["Ttulo2", "Heading2", "Subtitle"],
+      "outlineLevel": 1,
+      "semanticRole": "section",
+      "typicalContent": ["Título de seção", "Capítulo"],
+      "expectedChildren": [3],
+      "tocDepthDefault": true
+    },
+    {
+      "level": 3,
+      "styleNames": ["Título 3", "título 3", "Titulo 3", "Cabeçalho 3"],
+      "xmlStyleIds": ["Ttulo3", "Heading3"],
+      "outlineLevel": 2,
+      "semanticRole": "subsection",
+      "typicalContent": ["Subseção", "Tópico"],
+      "expectedChildren": [4],
+      "tocDepthDefault": true
+    },
+    {
+      "level": 4,
+      "styleNames": ["Título 4", "título 4", "Titulo 4", "Cabeçalho 4"],
+      "xmlStyleIds": ["Ttulo4", "Heading4"],
+      "outlineLevel": 3,
+      "semanticRole": "sub_subsection",
+      "typicalContent": ["Sub-subseção", "Detalhe"],
+      "expectedChildren": [5],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 5,
+      "styleNames": ["Título 5", "título 5", "Titulo 5", "Cabeçalho 5"],
+      "xmlStyleIds": ["Ttulo5", "Heading5"],
+      "outlineLevel": 4,
+      "semanticRole": "paragraph_group",
+      "typicalContent": ["Grupo de parágrafos", "Título menor"],
+      "expectedChildren": [6],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 6,
+      "styleNames": ["Título 6", "título 6", "Titulo 6", "Cabeçalho 6"],
+      "xmlStyleIds": ["Ttulo6", "Heading6"],
+      "outlineLevel": 5,
+      "semanticRole": "minor_heading",
+      "typicalContent": ["Título menor", "Título corrido"],
+      "expectedChildren": [7],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 7,
+      "styleNames": ["Título 7", "título 7", "Titulo 7", "Cabeçalho 7"],
+      "xmlStyleIds": ["Ttulo7", "Heading7"],
+      "outlineLevel": 6,
+      "semanticRole": "deep_heading",
+      "typicalContent": ["Título profundo", "Nível de detalhamento"],
+      "expectedChildren": [8],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 8,
+      "styleNames": ["Título 8", "título 8", "Titulo 8", "Cabeçalho 8"],
+      "xmlStyleIds": ["Ttulo8", "Heading8"],
+      "outlineLevel": 7,
+      "semanticRole": "deep_heading",
+      "typicalContent": ["Título profundo", "Sub-detalhe técnico"],
+      "expectedChildren": [9],
+      "tocDepthDefault": false
+    },
+    {
+      "level": 9,
+      "styleNames": ["Título 9", "título 9", "Titulo 9", "Cabeçalho 9"],
+      "xmlStyleIds": ["Ttulo9", "Heading9"],
+      "outlineLevel": 8,
+      "semanticRole": "deepest_heading",
+      "typicalContent": ["Nível mais profundo", "Nó de contorno detalhado"],
+      "expectedChildren": [],
+      "tocDepthDefault": false
+    }
+  ],
+  "numberingPatterns": [
+    {
+      "id": "np_pt_001",
+      "pattern": "^\\d+\\.\\s",
+      "examples": ["1. Introdução", "2. Contexto"],
+      "inferredLevel": 1,
+      "notes": "Número simples + ponto = título de nível superior"
+    },
+    {
+      "id": "np_pt_002",
+      "pattern": "^\\d+\\.\\d+\\.?\\s",
+      "examples": ["1.1 Escopo", "2.3 Definições"],
+      "inferredLevel": 2,
+      "notes": "Numeração decimal de dois níveis"
+    },
+    {
+      "id": "np_pt_003",
+      "pattern": "^\\d+\\.\\d+\\.\\d+\\.?\\s",
+      "examples": ["1.1.1 Visão Geral", "3.2.4 Requisitos"],
+      "inferredLevel": 3,
+      "notes": "Numeração decimal de três níveis"
+    },
+    {
+      "id": "np_pt_004",
+      "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+\\.?\\s",
+      "examples": ["1.1.1.1 Detalhe", "2.3.4.5 Sub-item"],
+      "inferredLevel": 4,
+      "notes": "Numeração decimal de quatro níveis"
+    },
+    {
+      "id": "np_pt_005",
+      "pattern": "^ARTIGO\\s+[IVXLC]+",
+      "examples": ["ARTIGO I", "ARTIGO IV — Definições"],
+      "inferredLevel": 1,
+      "notes": "ARTIGO + numeral romano — nível superior em contratos e estatutos"
+    },
+    {
+      "id": "np_pt_006",
+      "pattern": "^Seção\\s+\\d+",
+      "examples": ["Seção 1", "Seção 12 — Rescisão"],
+      "inferredLevel": 2,
+      "notes": "Seção + número — dentro de um Artigo"
+    },
+    {
+      "id": "np_pt_007",
+      "pattern": "^Parte\\s+\\d+",
+      "examples": ["Parte 1", "Parte 3 — Demonstrações Financeiras"],
+      "inferredLevel": 1,
+      "notes": "Parte + número — divisão principal em regulamentos/relatórios"
+    },
+    {
+      "id": "np_pt_008",
+      "pattern": "^Capítulo\\s+\\d+",
+      "examples": ["Capítulo 1", "Capítulo 5 — Conclusão"],
+      "inferredLevel": 1,
+      "notes": "Capítulo + número — divisão principal de livro/relatório"
+    },
+    {
+      "id": "np_pt_009",
+      "pattern": "^ANEXO\\s+[A-Z]",
+      "examples": ["ANEXO A", "ANEXO B — Precificação"],
+      "inferredLevel": 1,
+      "notes": "ANEXO + letra — apêndice de contrato"
+    },
+    {
+      "id": "np_pt_010",
+      "pattern": "^Apêndice\\s+[A-Z]",
+      "examples": ["Apêndice A", "Apêndice D — Glossário"],
+      "inferredLevel": 1,
+      "notes": "Apêndice + letra — seção suplementar"
+    },
+    {
+      "id": "np_pt_011",
+      "pattern": "^Cláusula\\s+\\d+",
+      "examples": ["Cláusula 1", "Cláusula 15 — Obrigações"],
+      "inferredLevel": 2,
+      "notes": "Cláusula + número — divisão contratual brasileira"
+    },
+    {
+      "id": "np_pt_012",
+      "pattern": "^Item\\s+\\d+",
+      "examples": ["Item 1", "Item 5 — Fatores de Risco"],
+      "inferredLevel": 3,
+      "notes": "Item + número — sub-divisão dentro de Cláusula ou Seção"
+    },
+    {
+      "id": "np_pt_013",
+      "pattern": "^Parágrafo\\s+\\d+",
+      "examples": ["Parágrafo 1", "Parágrafo 3 — Exceções"],
+      "inferredLevel": 3,
+      "notes": "Parágrafo + número — subdivisão legal brasileira (§)"
+    },
+    {
+      "id": "np_pt_014",
+      "pattern": "^§\\s*\\d+",
+      "examples": ["§ 1º", "§ 3º — Das Exceções"],
+      "inferredLevel": 3,
+      "notes": "Símbolo de parágrafo — convenção legal brasileira"
+    },
+    {
+      "id": "np_pt_015",
+      "pattern": "^Inciso\\s+[IVXLC]+",
+      "examples": ["Inciso I", "Inciso IV — Competências"],
+      "inferredLevel": 4,
+      "notes": "Inciso + numeral romano — subdivisão de artigo/parágrafo na legislação brasileira"
+    },
+    {
+      "id": "np_pt_016",
+      "pattern": "^Alínea\\s+[a-z]",
+      "examples": ["Alínea a", "Alínea c — Documentação"],
+      "inferredLevel": 5,
+      "notes": "Alínea + letra — subdivisão de Inciso na legislação brasileira"
+    },
+    {
+      "id": "np_pt_017",
+      "pattern": "^[A-Z]\\.\\s",
+      "examples": ["A. Disposições Gerais", "B. Definições"],
+      "inferredLevel": 1,
+      "notes": "Letra maiúscula + ponto — comum em esquemas legais"
+    },
+    {
+      "id": "np_pt_018",
+      "pattern": "^[a-z]\\.\\s",
+      "examples": ["a. Primeiro item", "b. Segundo item"],
+      "inferredLevel": 3,
+      "notes": "Letra minúscula + ponto — sub-itens em textos legais/acadêmicos"
+    },
+    {
+      "id": "np_pt_019",
+      "pattern": "^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\\.\\s",
+      "examples": ["I. Objetivo", "IV. Metodologia"],
+      "inferredLevel": 1,
+      "notes": "Numeral romano maiúsculo — divisão principal"
+    },
+    {
+      "id": "np_pt_020",
+      "pattern": "^\\(\\d+\\)\\s",
+      "examples": ["(1) Aplica-se o seguinte", "(3) Não obstante"],
+      "inferredLevel": 3,
+      "notes": "Número entre parênteses — sub-seção legal/estatutária"
+    }
+  ],
+  "fontHeuristics": [
+    {
+      "id": "fh_pt_001",
+      "condition": "fontSize >= 18 AND bold == true AND allCaps == false",
+      "inferredLevel": 1,
+      "confidence": 0.85,
+      "notes": "Texto grande em negrito geralmente indica título de nível superior"
+    },
+    {
+      "id": "fh_pt_002",
+      "condition": "fontSize >= 16 AND fontSize < 18 AND bold == true",
+      "inferredLevel": 1,
+      "confidence": 0.75,
+      "notes": "Negrito médio-grande — provavelmente título 1 em documentos de escala menor"
+    },
+    {
+      "id": "fh_pt_003",
+      "condition": "fontSize >= 14 AND fontSize < 16 AND bold == true",
+      "inferredLevel": 2,
+      "confidence": 0.80,
+      "notes": "14-15pt em negrito — forte indicação de título 2"
+    },
+    {
+      "id": "fh_pt_004",
+      "condition": "fontSize >= 12 AND fontSize < 14 AND bold == true AND allCaps == true",
+      "inferredLevel": 2,
+      "confidence": 0.75,
+      "notes": "Tamanho normal em negrito e caixa alta — título 2 em documentos legais/formais"
+    },
+    {
+      "id": "fh_pt_005",
+      "condition": "fontSize >= 12 AND fontSize < 14 AND bold == true AND allCaps == false",
+      "inferredLevel": 3,
+      "confidence": 0.70,
+      "notes": "Tamanho normal em negrito — título 3 quando títulos maiores não usam esse tamanho"
+    },
+    {
+      "id": "fh_pt_006",
+      "condition": "fontSize >= 11 AND bold == true AND italic == true",
+      "inferredLevel": 4,
+      "confidence": 0.65,
+      "notes": "Combinação negrito-itálico — geralmente título 4 ou inferior"
+    },
+    {
+      "id": "fh_pt_007",
+      "condition": "fontSize >= 11 AND bold == false AND italic == true AND underline == true",
+      "inferredLevel": 5,
+      "confidence": 0.55,
+      "notes": "Itálico + sublinhado sem negrito — título menor"
+    },
+    {
+      "id": "fh_pt_008",
+      "condition": "allCaps == true AND bold == false AND fontSize >= 10",
+      "inferredLevel": 3,
+      "confidence": 0.50,
+      "notes": "Caixa alta sem negrito — às vezes usado como subtítulo"
+    },
+    {
+      "id": "fh_pt_009",
+      "condition": "underline == true AND bold == true AND fontSize >= 12",
+      "inferredLevel": 2,
+      "confidence": 0.70,
+      "notes": "Negrito sublinhado em tamanho normal+ — título 2 em convenções antigas do Word"
+    },
+    {
+      "id": "fh_pt_010",
+      "condition": "fontColor != 'auto' AND fontColor != '000000' AND bold == true AND fontSize >= 12",
+      "inferredLevel": 2,
+      "confidence": 0.65,
+      "notes": "Texto colorido em negrito — comumente usado como título em modelos de marca"
+    }
+  ]
+}

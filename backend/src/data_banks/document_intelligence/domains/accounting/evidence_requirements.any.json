@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "id": "di_accounting_evidence_requirements",
+    "version": "1.1.0",
+    "description": "Evidence standards for accounting domain — what counts as valid evidence and citation requirements.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "accounting",
+  "evidenceHierarchy": [
+    { "rank": 1, "type": "general_ledger_posting", "label": { "en": "General ledger posting", "pt": "Lançamento no razão geral" }, "trustLevel": "high" },
+    { "rank": 2, "type": "bank_statement", "label": { "en": "Bank statement", "pt": "Extrato bancário" }, "trustLevel": "high" },
+    { "rank": 3, "type": "trial_balance_report", "label": { "en": "Trial balance report", "pt": "Balancete de verificação" }, "trustLevel": "high" },
+    { "rank": 4, "type": "journal_entry", "label": { "en": "Journal entry with approval", "pt": "Lançamento contábil aprovado" }, "trustLevel": "high" },
+    { "rank": 5, "type": "subledger_detail", "label": { "en": "Subledger detail (AR/AP)", "pt": "Razão auxiliar (CR/CP)" }, "trustLevel": "medium" },
+    { "rank": 6, "type": "reconciliation_workpaper", "label": { "en": "Reconciliation workpaper", "pt": "Papel de trabalho de reconciliação" }, "trustLevel": "medium" },
+    { "rank": 7, "type": "supporting_document", "label": { "en": "Supporting document (invoice, receipt)", "pt": "Documento suporte (nota fiscal, recibo)" }, "trustLevel": "medium" },
+    { "rank": 8, "type": "sign_convention_disclosure", "label": { "en": "Sign convention disclosure", "pt": "Divulgação da convenção de sinal" }, "trustLevel": "medium" }
+  ],
+  "rules": [
+    {
+      "id": "acct_ev_001_balance_claim",
+      "description": "Any account balance claim must cite the GL account number and source report.",
+      "applies": ["extract", "calculate"],
+      "minEvidence": 1,
+      "requiredTypes": ["general_ledger_posting", "trial_balance_report"]
+    },
+    {
+      "id": "acct_ev_002_reconciling_item",
+      "description": "Reconciling items must cite both the book and bank/external source.",
+      "applies": ["validate", "compare"],
+      "minEvidence": 2,
+      "requireDualSource": true
+    },
+    {
+      "id": "acct_ev_003_journal_entry",
+      "description": "Journal entry references must include date, amount, and account(s) affected.",
+      "applies": ["extract", "locate"],
+      "minEvidence": 1,
+      "requireStructuredCitation": true
+    },
+    {
+      "id": "acct_ev_004_aging_bucket",
+      "description": "Aging bucket claims must cite the aging report date and customer/vendor.",
+      "applies": ["extract", "monitor"],
+      "minEvidence": 1,
+      "requireDateContext": true
+    },
+    {
+      "id": "acct_ev_005_control_assertion",
+      "description": "Internal control assertions must cite the control description and testing evidence.",
+      "applies": ["evaluate", "validate"],
+      "minEvidence": 1,
+      "requiredTypes": ["reconciliation_workpaper", "supporting_document"]
+    },
+    {
+      "id": "acct_ev_006_debit_credit_sign_convention",
+      "description": "Any debit/credit-based claim must cite evidence showing the document sign convention (separate debit-credit columns or signed amount plus DR/CR indicator).",
+      "applies": ["extract", "validate", "calculate"],
+      "minEvidence": 1,
+      "requiredTypes": ["general_ledger_posting", "sign_convention_disclosure"],
+      "requireStructuredCitation": true
+    },
+    {
+      "id": "acct_ev_007_signed_amount_interpretation",
+      "description": "When a signed amount column is used, evidence must include at least one line example confirming debit-positive and credit-negative (or the inverse explicitly documented).",
+      "applies": ["extract", "compare", "validate"],
+      "minEvidence": 2,
+      "requiredTypes": ["journal_entry", "sign_convention_disclosure"],
+      "requireDualSource": true
+    }
+  ]
+}

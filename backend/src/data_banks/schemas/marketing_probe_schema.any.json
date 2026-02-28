@@ -1,0 +1,95 @@
+{
+  "_meta": {
+    "id": "marketing_probe_schema",
+    "version": "1.0.0",
+    "description": "Schema for marketing probe banks (keyword taxonomy, pattern library, pain points).",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/marketing_probe_schema.any.json",
+    "title": "Marketing Probe Schema",
+    "type": "object",
+    "required": [
+      "_meta",
+      "config"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "description",
+          "languages",
+          "lastUpdated"
+        ],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "additionalProperties": true
+      },
+      "keywords": {
+        "type": "array"
+      },
+      "patterns": {
+        "type": "array"
+      },
+      "painPoints": {
+        "type": "array"
+      },
+      "clusters": {
+        "type": "array"
+      },
+      "signals": {
+        "type": "array"
+      },
+      "taxonomy": {
+        "type": "object"
+      }
+    },
+    "anyOf": [
+      {
+        "required": [
+          "keywords"
+        ]
+      },
+      {
+        "required": [
+          "patterns"
+        ]
+      },
+      {
+        "required": [
+          "painPoints"
+        ]
+      },
+      {
+        "required": [
+          "clusters"
+        ]
+      },
+      {
+        "required": [
+          "signals"
+        ]
+      },
+      {
+        "required": [
+          "taxonomy"
+        ]
+      }
+    ]
+  }
+}

@@ -11,11 +11,292 @@
   "config": {
     "enabled": true
   },
-  "rules": [],
+  "rules": [
+    {
+      "id": "SRC_001_nav_mode_pills_only",
+      "trigger": "answer mode is nav_pills and response contains inline source text",
+      "check": "answerMode.in(['nav_pills','nav_pill']) == true AND output.containsInlineSources == true",
+      "failureAction": "STRIP_INLINE_SOURCES",
+      "severity": "error",
+      "examples": ["Nav pills response has 'Sources:' label.", "Response lists filenames inline instead of pills."]
+    },
+    {
+      "id": "SRC_002_nav_mode_no_sources_label",
+      "trigger": "answer mode is nav_pills and response contains a 'Sources:' header",
+      "check": "answerMode.in(['nav_pills','nav_pill']) == true AND output.matchesPattern('(?i)^\\s*sources\\s*:', 'm') == true",
+      "failureAction": "STRIP_INLINE_SOURCES",
+      "severity": "error",
+      "examples": ["'Sources:\\n- file.pdf' in nav_pills response.", "'Fontes:' header in PT nav response."]
+    },
+    {
+      "id": "SRC_003_nav_mode_no_file_extensions",
+      "trigger": "answer mode is nav_pills and response body mentions file extensions",
+      "check": "answerMode.in(['nav_pills','nav_pill']) == true AND output.matchesPattern('\\.(pdf|xlsx?|docx?|pptx?|csv)') == true",
+      "failureAction": "STRIP_INLINE_SOURCES",
+      "severity": "error",
+      "examples": ["'See report.pdf for details' in nav response.", "Filename 'data.xlsx' mentioned in body."]
+    },
+    {
+      "id": "SRC_004_nav_mode_max_one_sentence",
+      "trigger": "answer mode is nav_pills and body exceeds one sentence",
+      "check": "answerMode.in(['nav_pills','nav_pill']) == true AND output.sentenceCount > 1",
+      "failureAction": "STRIP_BODY_KEEP_INTRO",
+      "severity": "error",
+      "examples": ["Nav response has 3 sentences.", "Multi-paragraph nav response."]
+    },
+    {
+      "id": "SRC_005_nav_mode_require_pills",
+      "trigger": "answer mode is nav_pills but no source pills are attached",
+      "check": "answerMode.in(['nav_pills','nav_pill']) == true AND attachments.source_buttons.count < 1",
+      "failureAction": "EMIT_NAV_NOT_FOUND",
+      "severity": "error",
+      "examples": ["Nav response with no pills attached.", "Pills array is empty."]
+    },
+    {
+      "id": "SRC_006_doc_grounded_requires_citation",
+      "trigger": "answer mode is doc_grounded and response lacks any source citation",
+      "check": "answerMode.startsWith('doc_grounded') == true AND output.citationCount == 0 AND output.charCount > 50",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE",
+      "severity": "error",
+      "examples": ["Long doc_grounded answer with no citation.", "500-char response, zero source refs."]
+    },
+    {
+      "id": "SRC_007_citation_must_match_retrieved",
+      "trigger": "response cites a document that was not in the retrieval results",
+      "check": "output.citedDocs.any(d => context.retrievedDocs.includes(d) == false)",
+      "failureAction": "BLOCK_AND_REGEN",
+      "severity": "error",
+      "examples": ["Cites 'report_2024.pdf' not in retrieval set.", "References a doc the user hasn't uploaded."]
+    },
+    {
+      "id": "SRC_008_no_hallucinated_page_numbers",
+      "trigger": "response cites a page number that doesn't exist in the source document",
+      "check": "output.pageRefs.any(p => source.pageCount < p)",
+      "failureAction": "BLOCK_AND_REGEN",
+      "severity": "error",
+      "examples": ["Cites 'page 45' in a 20-page document.", "References 'p. 200' in a 50-page PDF."]
+    },
+    {
+      "id": "SRC_009_single_doc_no_cross_contamination",
+      "trigger": "explicit doc ref is active and response contains data from a different document",
+      "check": "context.explicitDocRef.present == true AND output.sourceDocs.any(d => d != context.explicitDocRef.id)",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["User asked about contract A, answer includes data from contract B.", "Explicit ref to invoice.xlsx but citing budget.xlsx."]
+    },
+    {
+      "id": "SRC_010_source_pill_filename_accuracy",
+      "trigger": "source pill displays a filename that doesn't match the actual document name",
+      "check": "attachments.source_buttons.any(b => context.docNameMap[b.docId] != b.displayName)",
+      "failureAction": "BLOCK_AND_REGEN",
+      "severity": "error",
+      "examples": ["Pill shows 'Report Q3' but actual name is 'Financial_Report_Q3_2025.pdf'.", "Truncated filename in pill."]
+    },
+    {
+      "id": "SRC_011_no_duplicate_pills",
+      "trigger": "source pills contain duplicate entries for the same document",
+      "check": "attachments.source_buttons.hasDuplicateDocIds == true",
+      "failureAction": "DEDUPE_PILLS",
+      "severity": "warning",
+      "examples": ["Same PDF appears as 2 separate pills.", "Document listed 3 times in source buttons."]
+    },
+    {
+      "id": "SRC_012_max_source_pills",
+      "trigger": "response attaches more than the maximum allowed source pills",
+      "check": "attachments.source_buttons.count > config.limits.maxSourcesButtonsHard",
+      "failureAction": "TRUNCATE_PILLS",
+      "severity": "warning",
+      "examples": ["12 pills attached when max is 8.", "15 source buttons on a single response."]
+    },
+    {
+      "id": "SRC_013_no_url_leaks",
+      "trigger": "response contains raw internal URLs or storage paths",
+      "check": "output.matchesPattern('(https?://[^\\s]+storage|/tmp/|/var/|s3://|gs://)') == true",
+      "failureAction": "STRIP_AND_REGEN",
+      "severity": "error",
+      "examples": ["Response shows 's3://bucket/file.pdf'.", "Internal URL 'https://storage.internal/doc' leaked."]
+    },
+    {
+      "id": "SRC_014_no_raw_doc_ids",
+      "trigger": "response exposes internal document IDs instead of human-readable names",
+      "check": "output.matchesPattern('[0-9a-f]{24,}|uuid-[0-9a-f-]{36}') == true AND context.debugMode == false",
+      "failureAction": "STRIP_AND_REGEN",
+      "severity": "error",
+      "examples": ["Shows 'doc_65a1b2c3d4e5f6g7h8i9j0k1' instead of filename.", "UUID exposed in response."]
+    },
+    {
+      "id": "SRC_015_citation_format_consistency",
+      "trigger": "response mixes citation formats (some inline, some footnote, some parenthetical)",
+      "check": "output.citationFormats.distinct.count > 1",
+      "failureAction": "NORMALIZE_CITATIONS",
+      "severity": "warning",
+      "examples": ["Mix of [1], (Source: file.pdf), and footnotes.", "Some citations bold, others plain."]
+    },
+    {
+      "id": "SRC_016_source_section_at_end",
+      "trigger": "doc_grounded response has sources mid-text instead of at the end",
+      "check": "answerMode.startsWith('doc_grounded') == true AND output.sourcesSectionPosition != 'end' AND output.sourcesSectionPresent == true",
+      "failureAction": "REORDER_SOURCES",
+      "severity": "warning",
+      "examples": ["'Sources:' block appears before conclusion.", "Citations listed in the middle of the answer."]
+    },
+    {
+      "id": "SRC_017_no_source_fabrication",
+      "trigger": "response cites a section, chapter, or heading that doesn't exist in the source",
+      "check": "output.sectionRefs.any(s => source.sectionIndex.includes(s) == false)",
+      "failureAction": "BLOCK_AND_REGEN",
+      "severity": "error",
+      "examples": ["Cites 'Chapter 7' in a doc with 5 chapters.", "References 'Section 3.4.2' which doesn't exist."]
+    },
+    {
+      "id": "SRC_018_cross_doc_attribution",
+      "trigger": "response attributes a fact to the wrong source document",
+      "check": "output.attributions.any(a => source.docContaining(a.fact) != a.citedDoc)",
+      "failureAction": "BLOCK_AND_REGEN",
+      "severity": "error",
+      "examples": ["Attributes revenue figure to contract instead of financial report.", "Claims clause from doc A but it's in doc B."]
+    },
+    {
+      "id": "SRC_019_editing_mode_no_sources",
+      "trigger": "answer mode is editing and response includes source citations",
+      "check": "answerMode == 'editing' AND output.citationCount > 0",
+      "failureAction": "STRIP_INLINE_SOURCES",
+      "severity": "warning",
+      "examples": ["Edit confirmation includes '[Source: file.pdf]'.", "Source pills on an edit response."]
+    },
+    {
+      "id": "SRC_020_weak_evidence_disclosure",
+      "trigger": "response uses weak evidence without qualifying language",
+      "check": "context.evidenceStrength == 'weak' AND output.qualifyingLanguage == false",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE",
+      "severity": "warning",
+      "examples": ["States fact confidently from a low-relevance passage.", "No hedge language on uncertain data."]
+    },
+    {
+      "id": "SRC_021_multi_doc_answer_all_cited",
+      "trigger": "response synthesizes from multiple docs but only cites some of them",
+      "check": "context.synthesizedDocCount > 1 AND output.citedDocCount < context.synthesizedDocCount",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE",
+      "severity": "warning",
+      "examples": ["Uses 3 docs, only cites 1.", "Synthesized answer cites 2 of 4 sources."]
+    },
+    {
+      "id": "SRC_022_no_metadata_leak",
+      "trigger": "response exposes document metadata (upload date, file size, MIME type)",
+      "check": "output.matchesPattern('(uploaded|file size|mime|content-type|created on)\\s*:?\\s*\\S+', 'i') == true AND context.metadataRequested == false",
+      "failureAction": "STRIP_AND_REGEN",
+      "severity": "warning",
+      "examples": ["'Uploaded on 2025-01-15, 2.3 MB'.", "'Content-Type: application/pdf'."]
+    },
+    {
+      "id": "SRC_023_nav_pills_no_message_actions",
+      "trigger": "nav_pills response includes message action buttons beyond source pills",
+      "check": "answerMode.in(['nav_pills','nav_pill']) == true AND attachments.messageActions.count > 0",
+      "failureAction": "STRIP_MESSAGE_ACTIONS",
+      "severity": "error",
+      "examples": ["Nav response has 'Summarize' action button.", "'Ask follow-up' button on nav_pills response."]
+    },
+    {
+      "id": "SRC_024_source_ordering_by_relevance",
+      "trigger": "source pills are not ordered by relevance score",
+      "check": "attachments.source_buttons.isOrderedByRelevance == false AND attachments.source_buttons.count > 1",
+      "failureAction": "REORDER_PILLS",
+      "severity": "warning",
+      "examples": ["Least relevant doc listed first.", "Random pill ordering."]
+    },
+    {
+      "id": "SRC_025_no_absolute_paths",
+      "trigger": "response contains absolute filesystem paths",
+      "check": "output.matchesPattern('(/Users/|/home/|C:\\\\|D:\\\\)') == true",
+      "failureAction": "STRIP_AND_REGEN",
+      "severity": "error",
+      "examples": ["Shows '/Users/admin/docs/file.pdf'.", "Path 'C:\\Documents\\report.docx' exposed."]
+    },
+    {
+      "id": "SRC_026_source_recency_preference",
+      "trigger": "multiple versions of same doc exist and older version is cited over newer",
+      "check": "context.docVersions.count > 1 AND output.citedVersion < context.docVersions.latest",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE",
+      "severity": "warning",
+      "examples": ["Cites v1 when v3 is available.", "Uses 2023 report when 2025 exists."]
+    },
+    {
+      "id": "SRC_027_no_self_referential_sources",
+      "trigger": "response cites itself or the conversation as a source",
+      "check": "output.citedDocs.any(d => d.type == 'conversation' OR d.type == 'self')",
+      "failureAction": "STRIP_INLINE_SOURCES",
+      "severity": "error",
+      "examples": ["'As I mentioned earlier' cited as source.", "'Based on our conversation' as citation."]
+    },
+    {
+      "id": "SRC_028_pill_count_matches_body_refs",
+      "trigger": "number of source pills doesn't match number of distinct docs referenced in body",
+      "check": "attachments.source_buttons.count != output.distinctDocsReferenced AND answerMode.startsWith('doc_grounded') == true",
+      "failureAction": "RECONCILE_PILLS_AND_BODY",
+      "severity": "warning",
+      "examples": ["Body mentions 3 docs, 5 pills attached.", "2 pills but body references 4 documents."]
+    },
+    {
+      "id": "SRC_029_no_indexing_status_leak",
+      "trigger": "response mentions document indexing status or processing state",
+      "check": "output.matchesPattern('(indexing|processing|parsing|extracting|queued)', 'i') == true AND context.systemMessage == false",
+      "failureAction": "STRIP_AND_REGEN",
+      "severity": "warning",
+      "examples": ["'This document is still being indexed.'", "'Parsing in progress.'"]
+    },
+    {
+      "id": "SRC_030_no_confidence_scores_exposed",
+      "trigger": "response exposes internal confidence or relevance scores",
+      "check": "output.matchesPattern('(confidence|relevance|score|similarity)\\s*:?\\s*0?\\.\\d+', 'i') == true AND context.debugMode == false",
+      "failureAction": "STRIP_AND_REGEN",
+      "severity": "warning",
+      "examples": ["'Relevance: 0.87'.", "'Confidence score: 0.92'."]
+    },
+    {
+      "id": "SRC_031_doc_locked_no_other_sources",
+      "trigger": "document lock is active and response includes sources from unlocked documents",
+      "check": "context.docLock.active == true AND output.sourceDocs.any(d => d != context.docLock.docId)",
+      "failureAction": "REQUIRE_DOC_LOCK",
+      "severity": "error",
+      "examples": ["Doc lock on invoice.pdf but citing budget.xlsx.", "Locked to contract A, sourcing from contract B."]
+    },
+    {
+      "id": "SRC_032_empty_citation_brackets",
+      "trigger": "response contains empty citation brackets or placeholders",
+      "check": "output.matchesPattern('\\[\\s*\\]|\\[citation needed\\]|\\[source\\]|\\[ref\\]', 'i') == true",
+      "failureAction": "BLOCK_AND_REGEN",
+      "severity": "error",
+      "examples": ["Answer has '[] see document'.", "'[citation needed]' left in output."]
+    }
+  ],
   "templates": {
-    "finance": [],
-    "legal": [],
-    "medical": [],
-    "ops": []
+    "finance": [
+      "Source: {{docName}}, {{sectionRef}} ({{periodLabel}}).",
+      "Based on {{docName}} — {{tableRef}}, row '{{rowLabel}}', column '{{colLabel}}'.",
+      "Per {{docName}} ({{docVersion}}), section {{sectionNum}}.",
+      "Financial data sourced from {{docName}}, page {{pageNum}}.",
+      "All figures from {{docName}} unless otherwise noted."
+    ],
+    "legal": [
+      "Per {{docName}}, {{clauseRef}} ({{effectiveDate}}).",
+      "As defined in {{docName}}, Article {{articleNum}}, Section {{sectionNum}}.",
+      "Source: {{docName}} ({{docVersion}}, executed {{executionDate}}).",
+      "Referenced in {{docName}}, Schedule {{scheduleRef}}.",
+      "Contract term from {{docName}}, clause {{clauseNum}}."
+    ],
+    "medical": [
+      "Per {{docName}}, {{labPanel}} results ({{collectionDate}}).",
+      "Source: {{docName}}, {{sectionRef}} — {{providerName}}.",
+      "As recorded in {{docName}}, visit {{visitDate}}.",
+      "Lab reference: {{docName}}, panel {{panelName}} ({{labDate}}).",
+      "Medication per {{docName}}, prescription {{rxDate}}."
+    ],
+    "ops": [
+      "Source: {{docName}}, {{reportSection}} ({{reportPeriod}}).",
+      "Per {{docName}}, dashboard {{dashboardName}} — {{metricName}}.",
+      "Data from {{docName}}, sheet '{{sheetName}}', updated {{lastUpdate}}.",
+      "SLA reference: {{docName}}, section {{slaSection}}.",
+      "Inventory count per {{docName}}, warehouse {{warehouseId}} ({{countDate}})."
+    ]
   }
 }

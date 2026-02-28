@@ -1,0 +1,2351 @@
+{
+  "_meta": {
+    "id": "telecom_usage_patterns",
+    "version": "1.0.0",
+    "description": "Telecom usage extraction patterns across mobile, internet, and CDR statements.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [
+    {
+      "name": "app_usage_pattern",
+      "pattern": "(?:app|application|aplicativo)\\s*[:=]\\s*[A-Za-z0-9._-]+\\s*\\d+[.,]?\\d*\\s*(?:MB|GB)",
+      "examples": [
+        "App=YouTube 1.2 GB"
+      ],
+      "normalization": "normalize_app_usage",
+      "entityType": "telecom_usage",
+      "notes": "Per-app usage line",
+      "id": "tel_001"
+    },
+    {
+      "name": "cdr_row_pattern",
+      "pattern": "(?:caller|origem)\\s*[:=]\\s*[+]?\\d{8,15}.*(?:callee|destino)\\s*[:=]\\s*[+]?\\d{8,15}.*(?:duration|duracao)\\s*[:=]\\s*\\d+[.,]?\\d*\\s*(?:sec|s|min)",
+      "examples": [
+        "caller:+15551230001 callee:+15559870002 duration:3.4 min"
+      ],
+      "normalization": "cdr_normalize_duration",
+      "entityType": "telecom_usage",
+      "notes": "Call detail record row with endpoints and duration",
+      "id": "tel_002"
+    },
+    {
+      "name": "cdr_timestamp_pattern",
+      "pattern": "(?:call\\sdate|data\\sda\\sligacao)\\s*[:=]\\s*\\d{1,2}/\\d{1,2}/\\d{4}\\s+\\d{2}:\\d{2}(?::\\d{2})?",
+      "examples": [
+        "Call Date: 05/12/2026 13:45:11"
+      ],
+      "normalization": "datetime_standardize",
+      "entityType": "telecom_usage",
+      "notes": "CDR timestamp extraction",
+      "id": "tel_003"
+    },
+    {
+      "name": "cell_id_pattern",
+      "pattern": "(?:cell\\sid|cid)\\s*[:=]\\s*[A-Z0-9-]{4,20}",
+      "examples": [
+        "Cell ID: BRSP-9912"
+      ],
+      "normalization": "normalize_cell_id",
+      "entityType": "telecom_usage",
+      "notes": "Cell tower identifier",
+      "id": "tel_004"
+    },
+    {
+      "name": "data_gb_billing_cycle",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb billing\\scycle 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_005"
+    },
+    {
+      "name": "data_gb_ciclo_de_cobranca",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb ciclo\\sde\\scobranca 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_006"
+    },
+    {
+      "name": "data_gb_daily",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb daily 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_007"
+    },
+    {
+      "name": "data_gb_diario",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb diario 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_008"
+    },
+    {
+      "name": "data_gb_mensal",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb mensal 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_009"
+    },
+    {
+      "name": "data_gb_monthly",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb monthly 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_010"
+    },
+    {
+      "name": "data_gb_semanal",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb semanal 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_011"
+    },
+    {
+      "name": "data_gb_weekly",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "data gb weekly 12.5 GB",
+        "data gb: 5 GB"
+      ],
+      "normalization": "data_volume_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in gigabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_012"
+    },
+    {
+      "name": "data_kb_billing_cycle",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb billing\\scycle 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_013"
+    },
+    {
+      "name": "data_kb_ciclo_de_cobranca",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb ciclo\\sde\\scobranca 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_014"
+    },
+    {
+      "name": "data_kb_daily",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb daily 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_015"
+    },
+    {
+      "name": "data_kb_diario",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb diario 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_016"
+    },
+    {
+      "name": "data_kb_mensal",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb mensal 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_017"
+    },
+    {
+      "name": "data_kb_monthly",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb monthly 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_018"
+    },
+    {
+      "name": "data_kb_semanal",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb semanal 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_019"
+    },
+    {
+      "name": "data_kb_weekly",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*KB",
+      "examples": [
+        "data kb weekly 12.5 KB",
+        "data kb: 5 KB"
+      ],
+      "normalization": "data_volume_kb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in kilobytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_020"
+    },
+    {
+      "name": "data_mb_billing_cycle",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb billing\\scycle 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_021"
+    },
+    {
+      "name": "data_mb_ciclo_de_cobranca",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb ciclo\\sde\\scobranca 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_022"
+    },
+    {
+      "name": "data_mb_daily",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb daily 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_023"
+    },
+    {
+      "name": "data_mb_diario",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb diario 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_024"
+    },
+    {
+      "name": "data_mb_mensal",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb mensal 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_025"
+    },
+    {
+      "name": "data_mb_monthly",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb monthly 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_026"
+    },
+    {
+      "name": "data_mb_semanal",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb semanal 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_027"
+    },
+    {
+      "name": "data_mb_weekly",
+      "pattern": "(?:data|dados|download|upload)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "data mb weekly 12.5 MB",
+        "data mb: 5 MB"
+      ],
+      "normalization": "data_volume_mb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in megabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_028"
+    },
+    {
+      "name": "data_tb_billing_cycle",
+      "pattern": "(?:data|dados)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb billing\\scycle 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_029"
+    },
+    {
+      "name": "data_tb_ciclo_de_cobranca",
+      "pattern": "(?:data|dados)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb ciclo\\sde\\scobranca 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_030"
+    },
+    {
+      "name": "data_tb_daily",
+      "pattern": "(?:data|dados)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb daily 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_031"
+    },
+    {
+      "name": "data_tb_diario",
+      "pattern": "(?:data|dados)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb diario 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_032"
+    },
+    {
+      "name": "data_tb_mensal",
+      "pattern": "(?:data|dados)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb mensal 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_033"
+    },
+    {
+      "name": "data_tb_monthly",
+      "pattern": "(?:data|dados)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb monthly 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_034"
+    },
+    {
+      "name": "data_tb_semanal",
+      "pattern": "(?:data|dados)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb semanal 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_035"
+    },
+    {
+      "name": "data_tb_weekly",
+      "pattern": "(?:data|dados)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*TB",
+      "examples": [
+        "data tb weekly 12.5 TB",
+        "data tb: 5 TB"
+      ],
+      "normalization": "data_volume_tb",
+      "entityType": "telecom_usage",
+      "notes": "Data usage in terabytes; normalize numeric value and standardize period bucket.",
+      "id": "tel_036"
+    },
+    {
+      "name": "failed_call_count_pattern",
+      "pattern": "(?:failed\\scalls|ligacoes\\scom\\sfalha)\\s*:?\\s*\\d+",
+      "examples": [
+        "Failed calls: 3"
+      ],
+      "normalization": "normalize_integer",
+      "entityType": "telecom_usage",
+      "notes": "Failed call count",
+      "id": "tel_037"
+    },
+    {
+      "name": "hotspot_usage_gb_billing_cycle",
+      "pattern": "(?:hotspot|tethering)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb billing\\scycle 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_038"
+    },
+    {
+      "name": "hotspot_usage_gb_ciclo_de_cobranca",
+      "pattern": "(?:hotspot|tethering)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb ciclo\\sde\\scobranca 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_039"
+    },
+    {
+      "name": "hotspot_usage_gb_daily",
+      "pattern": "(?:hotspot|tethering)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb daily 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_040"
+    },
+    {
+      "name": "hotspot_usage_gb_diario",
+      "pattern": "(?:hotspot|tethering)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb diario 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_041"
+    },
+    {
+      "name": "hotspot_usage_gb_mensal",
+      "pattern": "(?:hotspot|tethering)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb mensal 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_042"
+    },
+    {
+      "name": "hotspot_usage_gb_monthly",
+      "pattern": "(?:hotspot|tethering)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb monthly 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_043"
+    },
+    {
+      "name": "hotspot_usage_gb_semanal",
+      "pattern": "(?:hotspot|tethering)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb semanal 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_044"
+    },
+    {
+      "name": "hotspot_usage_gb_weekly",
+      "pattern": "(?:hotspot|tethering)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "hotspot usage gb weekly 12.5 GB",
+        "hotspot usage gb: 5 GB"
+      ],
+      "normalization": "hotspot_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Hotspot usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_045"
+    },
+    {
+      "name": "imei_with_usage_context",
+      "pattern": "(?:imei)\\s*[:=]\\s*\\d{14,16}",
+      "examples": [
+        "IMEI: 352099001761481"
+      ],
+      "normalization": "normalize_imei",
+      "entityType": "telecom_usage",
+      "notes": "IMEI in telecom usage context",
+      "id": "tel_046"
+    },
+    {
+      "name": "intl_calls_minutes_billing_cycle",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes billing\\scycle 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_047"
+    },
+    {
+      "name": "intl_calls_minutes_ciclo_de_cobranca",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes ciclo\\sde\\scobranca 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_048"
+    },
+    {
+      "name": "intl_calls_minutes_daily",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes daily 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_049"
+    },
+    {
+      "name": "intl_calls_minutes_diario",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes diario 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_050"
+    },
+    {
+      "name": "intl_calls_minutes_mensal",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes mensal 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_051"
+    },
+    {
+      "name": "intl_calls_minutes_monthly",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes monthly 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_052"
+    },
+    {
+      "name": "intl_calls_minutes_semanal",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes semanal 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_053"
+    },
+    {
+      "name": "intl_calls_minutes_weekly",
+      "pattern": "(?:international\\scalls|ligacoes\\sinternacionais)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "intl calls minutes weekly 12.5 minmin",
+        "intl calls minutes: 5 minmin"
+      ],
+      "normalization": "intl_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "International call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_054"
+    },
+    {
+      "name": "latency_ms_billing_cycle",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms billing\\scycle 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_055"
+    },
+    {
+      "name": "latency_ms_ciclo_de_cobranca",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms ciclo\\sde\\scobranca 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_056"
+    },
+    {
+      "name": "latency_ms_daily",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms daily 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_057"
+    },
+    {
+      "name": "latency_ms_diario",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms diario 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_058"
+    },
+    {
+      "name": "latency_ms_mensal",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms mensal 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_059"
+    },
+    {
+      "name": "latency_ms_monthly",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms monthly 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_060"
+    },
+    {
+      "name": "latency_ms_semanal",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms semanal 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_061"
+    },
+    {
+      "name": "latency_ms_weekly",
+      "pattern": "(?:latency|latencia|ping)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*ms",
+      "examples": [
+        "latency ms weekly 12.5 ms",
+        "latency ms: 5 ms"
+      ],
+      "normalization": "latency_ms",
+      "entityType": "telecom_usage",
+      "notes": "Network latency in ms; normalize numeric value and standardize period bucket.",
+      "id": "tel_062"
+    },
+    {
+      "name": "local_calls_minutes_billing_cycle",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes billing\\scycle 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_063"
+    },
+    {
+      "name": "local_calls_minutes_ciclo_de_cobranca",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes ciclo\\sde\\scobranca 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_064"
+    },
+    {
+      "name": "local_calls_minutes_daily",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes daily 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_065"
+    },
+    {
+      "name": "local_calls_minutes_diario",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes diario 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_066"
+    },
+    {
+      "name": "local_calls_minutes_mensal",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes mensal 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_067"
+    },
+    {
+      "name": "local_calls_minutes_monthly",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes monthly 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_068"
+    },
+    {
+      "name": "local_calls_minutes_semanal",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes semanal 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_069"
+    },
+    {
+      "name": "local_calls_minutes_weekly",
+      "pattern": "(?:local\\scalls|ligacoes\\slocais)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "local calls minutes weekly 12.5 minmin",
+        "local calls minutes: 5 minmin"
+      ],
+      "normalization": "local_call_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Local call minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_070"
+    },
+    {
+      "name": "long_distance_minutes_billing_cycle",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes billing\\scycle 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_071"
+    },
+    {
+      "name": "long_distance_minutes_ciclo_de_cobranca",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes ciclo\\sde\\scobranca 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_072"
+    },
+    {
+      "name": "long_distance_minutes_daily",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes daily 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_073"
+    },
+    {
+      "name": "long_distance_minutes_diario",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes diario 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_074"
+    },
+    {
+      "name": "long_distance_minutes_mensal",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes mensal 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_075"
+    },
+    {
+      "name": "long_distance_minutes_monthly",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes monthly 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_076"
+    },
+    {
+      "name": "long_distance_minutes_semanal",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes semanal 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_077"
+    },
+    {
+      "name": "long_distance_minutes_weekly",
+      "pattern": "(?:long\\sdistance|interurban[ao])\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "long distance minutes weekly 12.5 minmin",
+        "long distance minutes: 5 minmin"
+      ],
+      "normalization": "long_distance_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Long-distance minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_078"
+    },
+    {
+      "name": "mms_count_billing_cycle",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count billing\\scycle 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_079"
+    },
+    {
+      "name": "mms_count_ciclo_de_cobranca",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count ciclo\\sde\\scobranca 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_080"
+    },
+    {
+      "name": "mms_count_daily",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count daily 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_081"
+    },
+    {
+      "name": "mms_count_diario",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count diario 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_082"
+    },
+    {
+      "name": "mms_count_mensal",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count mensal 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_083"
+    },
+    {
+      "name": "mms_count_monthly",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count monthly 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_084"
+    },
+    {
+      "name": "mms_count_semanal",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count semanal 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_085"
+    },
+    {
+      "name": "mms_count_weekly",
+      "pattern": "(?:mms|media\\smessage)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "mms count weekly 12.5 msgs?|mensagens?",
+        "mms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "mms_count",
+      "entityType": "telecom_usage",
+      "notes": "MMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_086"
+    },
+    {
+      "name": "network_type_pattern",
+      "pattern": "(?:network|rede)\\s*[:=]\\s*(?:2G|3G|4G|5G|LTE|NR)",
+      "examples": [
+        "network:5G",
+        "rede:LTE"
+      ],
+      "normalization": "normalize_network_type",
+      "entityType": "telecom_usage",
+      "notes": "Network generation/type value",
+      "id": "tel_087"
+    },
+    {
+      "name": "overage_gb_billing_cycle",
+      "pattern": "(?:overage|excedente)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb billing\\scycle 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_088"
+    },
+    {
+      "name": "overage_gb_ciclo_de_cobranca",
+      "pattern": "(?:overage|excedente)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb ciclo\\sde\\scobranca 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_089"
+    },
+    {
+      "name": "overage_gb_daily",
+      "pattern": "(?:overage|excedente)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb daily 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_090"
+    },
+    {
+      "name": "overage_gb_diario",
+      "pattern": "(?:overage|excedente)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb diario 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_091"
+    },
+    {
+      "name": "overage_gb_mensal",
+      "pattern": "(?:overage|excedente)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb mensal 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_092"
+    },
+    {
+      "name": "overage_gb_monthly",
+      "pattern": "(?:overage|excedente)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb monthly 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_093"
+    },
+    {
+      "name": "overage_gb_semanal",
+      "pattern": "(?:overage|excedente)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb semanal 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_094"
+    },
+    {
+      "name": "overage_gb_weekly",
+      "pattern": "(?:overage|excedente)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "overage gb weekly 12.5 GB",
+        "overage gb: 5 GB"
+      ],
+      "normalization": "overage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Data overage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_095"
+    },
+    {
+      "name": "packet_loss_pct_billing_cycle",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct billing\\scycle 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_096"
+    },
+    {
+      "name": "packet_loss_pct_ciclo_de_cobranca",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct ciclo\\sde\\scobranca 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_097"
+    },
+    {
+      "name": "packet_loss_pct_daily",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct daily 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_098"
+    },
+    {
+      "name": "packet_loss_pct_diario",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct diario 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_099"
+    },
+    {
+      "name": "packet_loss_pct_mensal",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct mensal 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_100"
+    },
+    {
+      "name": "packet_loss_pct_monthly",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct monthly 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_101"
+    },
+    {
+      "name": "packet_loss_pct_semanal",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct semanal 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_102"
+    },
+    {
+      "name": "packet_loss_pct_weekly",
+      "pattern": "(?:packet\\sloss|perda\\sde\\spacotes)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*%",
+      "examples": [
+        "packet loss pct weekly 12.5 %",
+        "packet loss pct: 5 %"
+      ],
+      "normalization": "packet_loss_pct",
+      "entityType": "telecom_usage",
+      "notes": "Packet loss percentage; normalize numeric value and standardize period bucket.",
+      "id": "tel_103"
+    },
+    {
+      "name": "phone_number_e164",
+      "pattern": "[+]?[1-9]\\d{7,14}",
+      "examples": [
+        "+12065550100",
+        "+5511998765432"
+      ],
+      "normalization": "normalize_e164",
+      "entityType": "telecom_usage",
+      "notes": "Phone number normalization for usage links",
+      "id": "tel_104"
+    },
+    {
+      "name": "plan_allowance_gb_billing_cycle",
+      "pattern": "(?:allowance|franquia)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb billing\\scycle 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_105"
+    },
+    {
+      "name": "plan_allowance_gb_ciclo_de_cobranca",
+      "pattern": "(?:allowance|franquia)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb ciclo\\sde\\scobranca 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_106"
+    },
+    {
+      "name": "plan_allowance_gb_daily",
+      "pattern": "(?:allowance|franquia)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb daily 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_107"
+    },
+    {
+      "name": "plan_allowance_gb_diario",
+      "pattern": "(?:allowance|franquia)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb diario 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_108"
+    },
+    {
+      "name": "plan_allowance_gb_mensal",
+      "pattern": "(?:allowance|franquia)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb mensal 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_109"
+    },
+    {
+      "name": "plan_allowance_gb_monthly",
+      "pattern": "(?:allowance|franquia)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb monthly 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_110"
+    },
+    {
+      "name": "plan_allowance_gb_semanal",
+      "pattern": "(?:allowance|franquia)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb semanal 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_111"
+    },
+    {
+      "name": "plan_allowance_gb_weekly",
+      "pattern": "(?:allowance|franquia)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "plan allowance gb weekly 12.5 GB",
+        "plan allowance gb: 5 GB"
+      ],
+      "normalization": "allowance_gb",
+      "entityType": "telecom_usage",
+      "notes": "Plan allowance in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_112"
+    },
+    {
+      "name": "roaming_country_pattern",
+      "pattern": "(?:roaming\\scountry|pais\\sroaming)\\s*[:=]\\s*[A-Z]{2,3}",
+      "examples": [
+        "Roaming Country: USA"
+      ],
+      "normalization": "normalize_country_code",
+      "entityType": "telecom_usage",
+      "notes": "Roaming country indicator",
+      "id": "tel_113"
+    },
+    {
+      "name": "roaming_data_gb_billing_cycle",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb billing\\scycle 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_114"
+    },
+    {
+      "name": "roaming_data_gb_ciclo_de_cobranca",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb ciclo\\sde\\scobranca 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_115"
+    },
+    {
+      "name": "roaming_data_gb_daily",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb daily 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_116"
+    },
+    {
+      "name": "roaming_data_gb_diario",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb diario 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_117"
+    },
+    {
+      "name": "roaming_data_gb_mensal",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb mensal 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_118"
+    },
+    {
+      "name": "roaming_data_gb_monthly",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb monthly 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_119"
+    },
+    {
+      "name": "roaming_data_gb_semanal",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb semanal 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_120"
+    },
+    {
+      "name": "roaming_data_gb_weekly",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "roaming data gb weekly 12.5 GB",
+        "roaming data gb: 5 GB"
+      ],
+      "normalization": "roaming_data_gb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_121"
+    },
+    {
+      "name": "roaming_data_mb_billing_cycle",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb billing\\scycle 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_122"
+    },
+    {
+      "name": "roaming_data_mb_ciclo_de_cobranca",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb ciclo\\sde\\scobranca 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_123"
+    },
+    {
+      "name": "roaming_data_mb_daily",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb daily 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_124"
+    },
+    {
+      "name": "roaming_data_mb_diario",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb diario 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_125"
+    },
+    {
+      "name": "roaming_data_mb_mensal",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb mensal 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_126"
+    },
+    {
+      "name": "roaming_data_mb_monthly",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb monthly 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_127"
+    },
+    {
+      "name": "roaming_data_mb_semanal",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb semanal 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_128"
+    },
+    {
+      "name": "roaming_data_mb_weekly",
+      "pattern": "(?:roaming\\sdata|dados\\sroaming)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*MB",
+      "examples": [
+        "roaming data mb weekly 12.5 MB",
+        "roaming data mb: 5 MB"
+      ],
+      "normalization": "roaming_data_mb",
+      "entityType": "telecom_usage",
+      "notes": "Roaming data in MB; normalize numeric value and standardize period bucket.",
+      "id": "tel_129"
+    },
+    {
+      "name": "session_duration_pattern",
+      "pattern": "(?:session|sessao)\\s*duration\\s*:?\\s*\\d{1,2}:\\d{2}:\\d{2}",
+      "examples": [
+        "Session duration: 01:12:33"
+      ],
+      "normalization": "normalize_hhmmss_duration",
+      "entityType": "telecom_usage",
+      "notes": "Session duration in HH:MM:SS",
+      "id": "tel_130"
+    },
+    {
+      "name": "signal_dbm_billing_cycle",
+      "pattern": "(?:signal|sinal)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm billing\\scycle 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_131"
+    },
+    {
+      "name": "signal_dbm_ciclo_de_cobranca",
+      "pattern": "(?:signal|sinal)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm ciclo\\sde\\scobranca 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_132"
+    },
+    {
+      "name": "signal_dbm_daily",
+      "pattern": "(?:signal|sinal)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm daily 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_133"
+    },
+    {
+      "name": "signal_dbm_diario",
+      "pattern": "(?:signal|sinal)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm diario 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_134"
+    },
+    {
+      "name": "signal_dbm_mensal",
+      "pattern": "(?:signal|sinal)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm mensal 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_135"
+    },
+    {
+      "name": "signal_dbm_monthly",
+      "pattern": "(?:signal|sinal)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm monthly 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_136"
+    },
+    {
+      "name": "signal_dbm_semanal",
+      "pattern": "(?:signal|sinal)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm semanal 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_137"
+    },
+    {
+      "name": "signal_dbm_weekly",
+      "pattern": "(?:signal|sinal)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*dBm",
+      "examples": [
+        "signal dbm weekly 12.5 dBm",
+        "signal dbm: 5 dBm"
+      ],
+      "normalization": "signal_dbm",
+      "entityType": "telecom_usage",
+      "notes": "Signal strength in dBm; normalize numeric value and standardize period bucket.",
+      "id": "tel_138"
+    },
+    {
+      "name": "sms_count_billing_cycle",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count billing\\scycle 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_139"
+    },
+    {
+      "name": "sms_count_ciclo_de_cobranca",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count ciclo\\sde\\scobranca 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_140"
+    },
+    {
+      "name": "sms_count_daily",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count daily 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_141"
+    },
+    {
+      "name": "sms_count_diario",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count diario 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_142"
+    },
+    {
+      "name": "sms_count_mensal",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count mensal 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_143"
+    },
+    {
+      "name": "sms_count_monthly",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count monthly 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_144"
+    },
+    {
+      "name": "sms_count_semanal",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count semanal 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_145"
+    },
+    {
+      "name": "sms_count_weekly",
+      "pattern": "(?:sms|text\\smessage|mensagem)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*msgs?|mensagens?",
+      "examples": [
+        "sms count weekly 12.5 msgs?|mensagens?",
+        "sms count: 5 msgs?|mensagens?"
+      ],
+      "normalization": "sms_count",
+      "entityType": "telecom_usage",
+      "notes": "SMS count; normalize numeric value and standardize period bucket.",
+      "id": "tel_146"
+    },
+    {
+      "name": "social_media_usage_pattern",
+      "pattern": "(?:social\\smedia|redes\\ssociais)\\s*:?\\s*\\d+[.,]?\\d*\\s*(?:MB|GB)",
+      "examples": [
+        "Social media: 800 MB"
+      ],
+      "normalization": "normalize_data_usage",
+      "entityType": "telecom_usage",
+      "notes": "Social media usage",
+      "id": "tel_147"
+    },
+    {
+      "name": "speed_mbps_billing_cycle",
+      "pattern": "(?:speed|velocidade)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps billing\\scycle 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_148"
+    },
+    {
+      "name": "speed_mbps_ciclo_de_cobranca",
+      "pattern": "(?:speed|velocidade)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps ciclo\\sde\\scobranca 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_149"
+    },
+    {
+      "name": "speed_mbps_daily",
+      "pattern": "(?:speed|velocidade)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps daily 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_150"
+    },
+    {
+      "name": "speed_mbps_diario",
+      "pattern": "(?:speed|velocidade)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps diario 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_151"
+    },
+    {
+      "name": "speed_mbps_mensal",
+      "pattern": "(?:speed|velocidade)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps mensal 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_152"
+    },
+    {
+      "name": "speed_mbps_monthly",
+      "pattern": "(?:speed|velocidade)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps monthly 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_153"
+    },
+    {
+      "name": "speed_mbps_semanal",
+      "pattern": "(?:speed|velocidade)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps semanal 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_154"
+    },
+    {
+      "name": "speed_mbps_weekly",
+      "pattern": "(?:speed|velocidade)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*Mbps",
+      "examples": [
+        "speed mbps weekly 12.5 Mbps",
+        "speed mbps: 5 Mbps"
+      ],
+      "normalization": "speed_mbps",
+      "entityType": "telecom_usage",
+      "notes": "Throughput speed in Mbps; normalize numeric value and standardize period bucket.",
+      "id": "tel_155"
+    },
+    {
+      "name": "throttle_notice_pattern",
+      "pattern": "(?:throttled|reduzida)\\s*(?:to|para)\\s*\\d+[.,]?\\d*\\s*(?:kbps|mbps)",
+      "examples": [
+        "Throttled to 512 kbps"
+      ],
+      "normalization": "normalize_throttle_speed",
+      "entityType": "telecom_usage",
+      "notes": "Throttling speed notice",
+      "id": "tel_156"
+    },
+    {
+      "name": "topup_amount_pattern",
+      "pattern": "(?:top[- ]?up|recarga)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
+      "examples": [
+        "Recarga: R$ 30,00",
+        "Top-up: $10.00"
+      ],
+      "normalization": "extract_topup_amount",
+      "entityType": "telecom_usage",
+      "notes": "Recharge/top-up monetary amount",
+      "id": "tel_157"
+    },
+    {
+      "name": "tower_handoff_count_pattern",
+      "pattern": "(?:handoff|troca\\sde\\scelula)\\s*:?\\s*\\d+",
+      "examples": [
+        "Handoff count: 14"
+      ],
+      "normalization": "normalize_integer",
+      "entityType": "telecom_usage",
+      "notes": "Cell handoff count",
+      "id": "tel_158"
+    },
+    {
+      "name": "upload_download_split_pattern",
+      "pattern": "(?:upload|up)\\s*:?\\s*\\d+[.,]?\\d*\\s*(?:MB|GB).*(?:download|down)\\s*:?\\s*\\d+[.,]?\\d*\\s*(?:MB|GB)",
+      "examples": [
+        "Upload: 2 GB Download: 30 GB"
+      ],
+      "normalization": "normalize_upload_download",
+      "entityType": "telecom_usage",
+      "notes": "Upload/download split usage",
+      "id": "tel_159"
+    },
+    {
+      "name": "usage_bucket_peak_offpeak",
+      "pattern": "(?:peak|off-?peak|ponta|fora\\sde\\sponta)\\s*:?\\s*\\d+[.,]?\\d*\\s*(?:min|MB|GB)",
+      "examples": [
+        "peak:120 min"
+      ],
+      "normalization": "normalize_usage_bucket",
+      "entityType": "telecom_usage",
+      "notes": "Peak/off-peak usage bucket",
+      "id": "tel_160"
+    },
+    {
+      "name": "usage_reset_date_pattern",
+      "pattern": "(?:usage\\sreset|renovacao\\sda\\sfranquia)\\s*:?\\s*\\d{1,2}/\\d{1,2}/\\d{4}",
+      "examples": [
+        "Usage reset: 15/06/2026"
+      ],
+      "normalization": "normalize_date",
+      "entityType": "telecom_usage",
+      "notes": "Usage reset date",
+      "id": "tel_161"
+    },
+    {
+      "name": "video_streaming_usage_pattern",
+      "pattern": "(?:video\\sstreaming|streaming\\sde\\svideo)\\s*:?\\s*\\d+[.,]?\\d*\\s*(?:MB|GB)",
+      "examples": [
+        "Video streaming: 3.2 GB"
+      ],
+      "normalization": "normalize_data_usage",
+      "entityType": "telecom_usage",
+      "notes": "Video streaming usage",
+      "id": "tel_162"
+    },
+    {
+      "name": "voice_hours_billing_cycle",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours billing\\scycle 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_163"
+    },
+    {
+      "name": "voice_hours_ciclo_de_cobranca",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours ciclo\\sde\\scobranca 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_164"
+    },
+    {
+      "name": "voice_hours_daily",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours daily 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_165"
+    },
+    {
+      "name": "voice_hours_diario",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours diario 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_166"
+    },
+    {
+      "name": "voice_hours_mensal",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours mensal 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_167"
+    },
+    {
+      "name": "voice_hours_monthly",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours monthly 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_168"
+    },
+    {
+      "name": "voice_hours_semanal",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours semanal 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_169"
+    },
+    {
+      "name": "voice_hours_weekly",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*h(?:ours)?",
+      "examples": [
+        "voice hours weekly 12.5 h(?:ours)?",
+        "voice hours: 5 h(?:ours)?"
+      ],
+      "normalization": "voice_duration_hours",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in hours; normalize numeric value and standardize period bucket.",
+      "id": "tel_170"
+    },
+    {
+      "name": "voice_minutes_billing_cycle",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes billing\\scycle 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_171"
+    },
+    {
+      "name": "voice_minutes_ciclo_de_cobranca",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes ciclo\\sde\\scobranca 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_172"
+    },
+    {
+      "name": "voice_minutes_daily",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes daily 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_173"
+    },
+    {
+      "name": "voice_minutes_diario",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes diario 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_174"
+    },
+    {
+      "name": "voice_minutes_mensal",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes mensal 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_175"
+    },
+    {
+      "name": "voice_minutes_monthly",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes monthly 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_176"
+    },
+    {
+      "name": "voice_minutes_semanal",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes semanal 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_177"
+    },
+    {
+      "name": "voice_minutes_weekly",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*min(?:utes)?",
+      "examples": [
+        "voice minutes weekly 12.5 minmin",
+        "voice minutes: 5 minmin"
+      ],
+      "normalization": "voice_duration_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in minutes; normalize numeric value and standardize period bucket.",
+      "id": "tel_178"
+    },
+    {
+      "name": "voice_seconds_billing_cycle",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds billing\\scycle 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_179"
+    },
+    {
+      "name": "voice_seconds_ciclo_de_cobranca",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds ciclo\\sde\\scobranca 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_180"
+    },
+    {
+      "name": "voice_seconds_daily",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds daily 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_181"
+    },
+    {
+      "name": "voice_seconds_diario",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds diario 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_182"
+    },
+    {
+      "name": "voice_seconds_mensal",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds mensal 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_183"
+    },
+    {
+      "name": "voice_seconds_monthly",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds monthly 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_184"
+    },
+    {
+      "name": "voice_seconds_semanal",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds semanal 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_185"
+    },
+    {
+      "name": "voice_seconds_weekly",
+      "pattern": "(?:voice|call|ligacao|voz)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*sec(?:onds)?|s",
+      "examples": [
+        "voice seconds weekly 12.5 sec(?:onds)?|s",
+        "voice seconds: 5 sec(?:onds)?|s"
+      ],
+      "normalization": "voice_duration_seconds",
+      "entityType": "telecom_usage",
+      "notes": "Voice duration in seconds; normalize numeric value and standardize period bucket.",
+      "id": "tel_186"
+    },
+    {
+      "name": "voicemail_minutes_pattern",
+      "pattern": "(?:voicemail|caixa\\spostal)\\s*:?\\s*\\d+[.,]?\\d*\\s*min",
+      "examples": [
+        "Voicemail: 22 min"
+      ],
+      "normalization": "normalize_minutes",
+      "entityType": "telecom_usage",
+      "notes": "Voicemail usage minutes",
+      "id": "tel_187"
+    },
+    {
+      "name": "wifi_usage_gb_billing_cycle",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:billing\\scycle)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb billing\\scycle 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_188"
+    },
+    {
+      "name": "wifi_usage_gb_ciclo_de_cobranca",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:ciclo\\sde\\scobranca)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb ciclo\\sde\\scobranca 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_189"
+    },
+    {
+      "name": "wifi_usage_gb_daily",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:daily)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb daily 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_190"
+    },
+    {
+      "name": "wifi_usage_gb_diario",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:diario)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb diario 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_191"
+    },
+    {
+      "name": "wifi_usage_gb_mensal",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:mensal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb mensal 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_192"
+    },
+    {
+      "name": "wifi_usage_gb_monthly",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:monthly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb monthly 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_193"
+    },
+    {
+      "name": "wifi_usage_gb_semanal",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:semanal)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb semanal 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_194"
+    },
+    {
+      "name": "wifi_usage_gb_weekly",
+      "pattern": "(?:wifi\\susage|uso\\swifi)\\s*(?:weekly)?\\s*:?\\s*\\d+[.,]?\\d*\\s*GB",
+      "examples": [
+        "wifi usage gb weekly 12.5 GB",
+        "wifi usage gb: 5 GB"
+      ],
+      "normalization": "wifi_usage_gb",
+      "entityType": "telecom_usage",
+      "notes": "Wi-Fi usage in GB; normalize numeric value and standardize period bucket.",
+      "id": "tel_195"
+    },
+    {
+      "name": "zero_rated_usage_pattern",
+      "pattern": "(?:zero[- ]?rated|franquia\\slivre)\\s*:?\\s*\\d+[.,]?\\d*\\s*(?:MB|GB)",
+      "examples": [
+        "Zero-rated: 2 GB"
+      ],
+      "normalization": "normalize_zero_rated_usage",
+      "entityType": "telecom_usage",
+      "notes": "Zero-rated data amount",
+      "id": "tel_196"
+    }
+  ]
+}

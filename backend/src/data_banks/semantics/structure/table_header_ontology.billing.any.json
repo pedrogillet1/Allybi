@@ -1,0 +1,2550 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_billing",
+    "version": "1.0.0",
+    "description": "Table header ontology for billing documents with multilingual synonym coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing"
+  },
+  "domain": "billing",
+  "headers": [
+    {
+      "canonical": "account_amount",
+      "synonyms": [
+        "AA",
+        "account amount",
+        "Account Amount",
+        "account amount field",
+        "account amount value",
+        "account amt",
+        "accountamount",
+        "conta montante",
+        "conta valor",
+        "Conta Valor",
+        "conta valor valor"
+      ],
+      "related": [
+        "account_code",
+        "account_number",
+        "account_total"
+      ]
+    },
+    {
+      "canonical": "account_code",
+      "synonyms": [
+        "AC",
+        "account code",
+        "Account Code",
+        "account code field",
+        "account code value",
+        "accountcode",
+        "conta codigo",
+        "Conta Codigo",
+        "conta codigo valor"
+      ],
+      "related": [
+        "account_count",
+        "account_quantity",
+        "account_type"
+      ]
+    },
+    {
+      "canonical": "account_count",
+      "synonyms": [
+        "AC",
+        "account count",
+        "Account Count",
+        "account count field",
+        "account count value",
+        "accountcount",
+        "conta count",
+        "Conta Count",
+        "conta count valor"
+      ],
+      "related": [
+        "account_date",
+        "account_rate",
+        "account_unit"
+      ]
+    },
+    {
+      "canonical": "account_date",
+      "synonyms": [
+        "account date",
+        "Account Date",
+        "account date field",
+        "account date value",
+        "accountdate",
+        "AD",
+        "conta data",
+        "Conta Data",
+        "conta data valor"
+      ],
+      "related": [
+        "account_end_date",
+        "account_start_date",
+        "adjustment_amount"
+      ]
+    },
+    {
+      "canonical": "account_end_date",
+      "synonyms": [
+        "account end date",
+        "Account End Date",
+        "account end date field",
+        "account end date value",
+        "accountenddate",
+        "AED",
+        "conta fim data",
+        "Conta Fim Data",
+        "conta fim data valor"
+      ],
+      "related": [
+        "account_id",
+        "account_status",
+        "adjustment_code"
+      ]
+    },
+    {
+      "canonical": "account_id",
+      "synonyms": [
+        "account id",
+        "Account Id",
+        "account id field",
+        "account id value",
+        "accountid",
+        "AI",
+        "conta id",
+        "Conta Id",
+        "conta id valor"
+      ],
+      "related": [
+        "account_name",
+        "account_subtotal",
+        "adjustment_count"
+      ]
+    },
+    {
+      "canonical": "account_name",
+      "synonyms": [
+        "account name",
+        "Account Name",
+        "account name field",
+        "account name value",
+        "accountname",
+        "AN",
+        "conta nome",
+        "Conta Nome",
+        "conta nome valor"
+      ],
+      "related": [
+        "account_number",
+        "account_total",
+        "adjustment_date"
+      ]
+    },
+    {
+      "canonical": "account_number",
+      "synonyms": [
+        "account no",
+        "account number",
+        "Account Number",
+        "account number field",
+        "account number value",
+        "accountnumber",
+        "AN",
+        "conta numero",
+        "Conta Numero",
+        "conta numero valor"
+      ],
+      "related": [
+        "account_quantity",
+        "account_type",
+        "adjustment_end_date"
+      ]
+    },
+    {
+      "canonical": "account_quantity",
+      "synonyms": [
+        "account qty",
+        "account quantity",
+        "Account Quantity",
+        "account quantity field",
+        "account quantity value",
+        "accountquantity",
+        "AQ",
+        "conta quantidade",
+        "Conta Quantidade",
+        "conta quantidade valor"
+      ],
+      "related": [
+        "account_rate",
+        "account_unit",
+        "adjustment_id"
+      ]
+    },
+    {
+      "canonical": "account_rate",
+      "synonyms": [
+        "account rate",
+        "Account Rate",
+        "account rate field",
+        "account rate value",
+        "accountrate",
+        "AR",
+        "conta taxa",
+        "Conta Taxa",
+        "conta taxa valor"
+      ],
+      "related": [
+        "account_start_date",
+        "adjustment_amount",
+        "adjustment_name"
+      ]
+    },
+    {
+      "canonical": "account_start_date",
+      "synonyms": [
+        "account start date",
+        "Account Start Date",
+        "account start date field",
+        "account start date value",
+        "accountstartdate",
+        "ASD",
+        "conta inicio data",
+        "Conta Inicio Data",
+        "conta inicio data valor"
+      ],
+      "related": [
+        "account_status",
+        "adjustment_code",
+        "adjustment_number"
+      ]
+    },
+    {
+      "canonical": "account_status",
+      "synonyms": [
+        "account status",
+        "Account Status",
+        "account status field",
+        "account status value",
+        "accountstatus",
+        "AS",
+        "conta status",
+        "Conta Status",
+        "conta status valor"
+      ],
+      "related": [
+        "account_subtotal",
+        "adjustment_count",
+        "adjustment_quantity"
+      ]
+    },
+    {
+      "canonical": "account_subtotal",
+      "synonyms": [
+        "account subtotal",
+        "Account Subtotal",
+        "account subtotal field",
+        "account subtotal value",
+        "accountsubtotal",
+        "AS",
+        "conta subtotal",
+        "Conta Subtotal",
+        "conta subtotal valor"
+      ],
+      "related": [
+        "account_total",
+        "adjustment_date",
+        "adjustment_rate"
+      ]
+    },
+    {
+      "canonical": "account_total",
+      "synonyms": [
+        "account total",
+        "Account Total",
+        "account total field",
+        "account total value",
+        "accounttotal",
+        "AT",
+        "conta total",
+        "Conta Total",
+        "conta total valor"
+      ],
+      "related": [
+        "account_type",
+        "adjustment_end_date",
+        "adjustment_start_date"
+      ]
+    },
+    {
+      "canonical": "account_type",
+      "synonyms": [
+        "account type",
+        "Account Type",
+        "account type field",
+        "account type value",
+        "accounttype",
+        "AT",
+        "conta tipo",
+        "Conta Tipo",
+        "conta tipo valor"
+      ],
+      "related": [
+        "account_unit",
+        "adjustment_id",
+        "adjustment_status"
+      ]
+    },
+    {
+      "canonical": "account_unit",
+      "synonyms": [
+        "account unit",
+        "Account Unit",
+        "account unit field",
+        "account unit value",
+        "accountunit",
+        "AU",
+        "conta unidade",
+        "Conta Unidade",
+        "conta unidade valor"
+      ],
+      "related": [
+        "adjustment_amount",
+        "adjustment_name",
+        "adjustment_subtotal"
+      ]
+    },
+    {
+      "canonical": "adjustment_amount",
+      "synonyms": [
+        "AA",
+        "adjustment amount",
+        "Adjustment Amount",
+        "adjustment amount field",
+        "adjustment amount value",
+        "adjustment amt",
+        "adjustment montante",
+        "adjustment valor",
+        "Adjustment Valor",
+        "adjustment valor valor",
+        "adjustmentamount"
+      ],
+      "related": [
+        "adjustment_code",
+        "adjustment_number",
+        "adjustment_total"
+      ]
+    },
+    {
+      "canonical": "adjustment_code",
+      "synonyms": [
+        "AC",
+        "adjustment code",
+        "Adjustment Code",
+        "adjustment code field",
+        "adjustment code value",
+        "adjustment codigo",
+        "Adjustment Codigo",
+        "adjustment codigo valor",
+        "adjustmentcode"
+      ],
+      "related": [
+        "adjustment_count",
+        "adjustment_quantity",
+        "adjustment_type"
+      ]
+    },
+    {
+      "canonical": "adjustment_count",
+      "synonyms": [
+        "AC",
+        "adjustment count",
+        "Adjustment Count",
+        "adjustment count field",
+        "adjustment count valor",
+        "adjustment count value",
+        "adjustmentcount"
+      ],
+      "related": [
+        "adjustment_date",
+        "adjustment_rate",
+        "adjustment_unit"
+      ]
+    },
+    {
+      "canonical": "adjustment_date",
+      "synonyms": [
+        "AD",
+        "adjustment data",
+        "Adjustment Data",
+        "adjustment data valor",
+        "adjustment date",
+        "Adjustment Date",
+        "adjustment date field",
+        "adjustment date value",
+        "adjustmentdate"
+      ],
+      "related": [
+        "adjustment_end_date",
+        "adjustment_start_date",
+        "amount_amount"
+      ]
+    },
+    {
+      "canonical": "adjustment_end_date",
+      "synonyms": [
+        "adjustment end date",
+        "Adjustment End Date",
+        "adjustment end date field",
+        "adjustment end date value",
+        "adjustment fim data",
+        "Adjustment Fim Data",
+        "adjustment fim data valor",
+        "adjustmentenddate",
+        "AED"
+      ],
+      "related": [
+        "adjustment_id",
+        "adjustment_status",
+        "amount_code"
+      ]
+    },
+    {
+      "canonical": "adjustment_id",
+      "synonyms": [
+        "adjustment id",
+        "Adjustment Id",
+        "adjustment id field",
+        "adjustment id valor",
+        "adjustment id value",
+        "adjustmentid",
+        "AI"
+      ],
+      "related": [
+        "adjustment_name",
+        "adjustment_subtotal",
+        "amount_count"
+      ]
+    },
+    {
+      "canonical": "adjustment_name",
+      "synonyms": [
+        "adjustment name",
+        "Adjustment Name",
+        "adjustment name field",
+        "adjustment name value",
+        "adjustment nome",
+        "Adjustment Nome",
+        "adjustment nome valor",
+        "adjustmentname",
+        "AN"
+      ],
+      "related": [
+        "adjustment_number",
+        "adjustment_total",
+        "amount_date"
+      ]
+    },
+    {
+      "canonical": "adjustment_number",
+      "synonyms": [
+        "adjustment no",
+        "adjustment number",
+        "Adjustment Number",
+        "adjustment number field",
+        "adjustment number value",
+        "adjustment numero",
+        "Adjustment Numero",
+        "adjustment numero valor",
+        "adjustmentnumber",
+        "AN"
+      ],
+      "related": [
+        "adjustment_quantity",
+        "adjustment_type",
+        "amount_end_date"
+      ]
+    },
+    {
+      "canonical": "adjustment_quantity",
+      "synonyms": [
+        "adjustment qty",
+        "adjustment quantidade",
+        "Adjustment Quantidade",
+        "adjustment quantidade valor",
+        "adjustment quantity",
+        "Adjustment Quantity",
+        "adjustment quantity field",
+        "adjustment quantity value",
+        "adjustmentquantity",
+        "AQ"
+      ],
+      "related": [
+        "adjustment_rate",
+        "adjustment_unit",
+        "amount_id"
+      ]
+    },
+    {
+      "canonical": "adjustment_rate",
+      "synonyms": [
+        "adjustment rate",
+        "Adjustment Rate",
+        "adjustment rate field",
+        "adjustment rate value",
+        "adjustment taxa",
+        "Adjustment Taxa",
+        "adjustment taxa valor",
+        "adjustmentrate",
+        "AR"
+      ],
+      "related": [
+        "adjustment_start_date",
+        "amount_amount",
+        "amount_name"
+      ]
+    },
+    {
+      "canonical": "adjustment_start_date",
+      "synonyms": [
+        "adjustment inicio data",
+        "Adjustment Inicio Data",
+        "adjustment inicio data valor",
+        "adjustment start date",
+        "Adjustment Start Date",
+        "adjustment start date field",
+        "adjustment start date value",
+        "adjustmentstartdate",
+        "ASD"
+      ],
+      "related": [
+        "adjustment_status",
+        "amount_code",
+        "amount_number"
+      ]
+    },
+    {
+      "canonical": "adjustment_status",
+      "synonyms": [
+        "adjustment status",
+        "Adjustment Status",
+        "adjustment status field",
+        "adjustment status valor",
+        "adjustment status value",
+        "adjustmentstatus",
+        "AS"
+      ],
+      "related": [
+        "adjustment_subtotal",
+        "amount_count",
+        "amount_quantity"
+      ]
+    },
+    {
+      "canonical": "adjustment_subtotal",
+      "synonyms": [
+        "adjustment subtotal",
+        "Adjustment Subtotal",
+        "adjustment subtotal field",
+        "adjustment subtotal valor",
+        "adjustment subtotal value",
+        "adjustmentsubtotal",
+        "AS"
+      ],
+      "related": [
+        "adjustment_total",
+        "amount_date",
+        "amount_rate"
+      ]
+    },
+    {
+      "canonical": "adjustment_total",
+      "synonyms": [
+        "adjustment total",
+        "Adjustment Total",
+        "adjustment total field",
+        "adjustment total valor",
+        "adjustment total value",
+        "adjustmenttotal",
+        "AT"
+      ],
+      "related": [
+        "adjustment_type",
+        "amount_end_date",
+        "amount_start_date"
+      ]
+    },
+    {
+      "canonical": "adjustment_type",
+      "synonyms": [
+        "adjustment tipo",
+        "Adjustment Tipo",
+        "adjustment tipo valor",
+        "adjustment type",
+        "Adjustment Type",
+        "adjustment type field",
+        "adjustment type value",
+        "adjustmenttype",
+        "AT"
+      ],
+      "related": [
+        "adjustment_unit",
+        "amount_id",
+        "amount_status"
+      ]
+    },
+    {
+      "canonical": "adjustment_unit",
+      "synonyms": [
+        "adjustment unidade",
+        "Adjustment Unidade",
+        "adjustment unidade valor",
+        "adjustment unit",
+        "Adjustment Unit",
+        "adjustment unit field",
+        "adjustment unit value",
+        "adjustmentunit",
+        "AU"
+      ],
+      "related": [
+        "amount_amount",
+        "amount_name",
+        "amount_subtotal"
+      ]
+    },
+    {
+      "canonical": "amount_amount",
+      "synonyms": [
+        "AA",
+        "amount amount",
+        "Amount Amount",
+        "amount amount field",
+        "amount amount value",
+        "amountamount",
+        "amt amount",
+        "montante valor",
+        "valor valor",
+        "Valor Valor",
+        "valor valor valor"
+      ],
+      "related": [
+        "amount_code",
+        "amount_number",
+        "amount_total"
+      ]
+    },
+    {
+      "canonical": "amount_code",
+      "synonyms": [
+        "AC",
+        "amount code",
+        "Amount Code",
+        "amount code field",
+        "amount code value",
+        "amountcode",
+        "amt code",
+        "montante codigo",
+        "valor codigo",
+        "Valor Codigo",
+        "valor codigo valor"
+      ],
+      "related": [
+        "amount_count",
+        "amount_quantity",
+        "amount_type"
+      ]
+    },
+    {
+      "canonical": "amount_count",
+      "synonyms": [
+        "AC",
+        "amount count",
+        "Amount Count",
+        "amount count field",
+        "amount count value",
+        "amountcount",
+        "amt count",
+        "montante count",
+        "valor count",
+        "Valor Count",
+        "valor count valor"
+      ],
+      "related": [
+        "amount_date",
+        "amount_rate",
+        "amount_unit"
+      ]
+    },
+    {
+      "canonical": "amount_date",
+      "synonyms": [
+        "AD",
+        "amount date",
+        "Amount Date",
+        "amount date field",
+        "amount date value",
+        "amountdate",
+        "amt date",
+        "montante data",
+        "valor data",
+        "Valor Data",
+        "valor data valor"
+      ],
+      "related": [
+        "amount_end_date",
+        "amount_start_date",
+        "arrears_amount"
+      ]
+    },
+    {
+      "canonical": "amount_end_date",
+      "synonyms": [
+        "AED",
+        "amount end date",
+        "Amount End Date",
+        "amount end date field",
+        "amount end date value",
+        "amountenddate",
+        "amt end date",
+        "montante fim data",
+        "valor fim data",
+        "Valor Fim Data",
+        "valor fim data valor"
+      ],
+      "related": [
+        "amount_id",
+        "amount_status",
+        "arrears_code"
+      ]
+    },
+    {
+      "canonical": "amount_id",
+      "synonyms": [
+        "AI",
+        "amount id",
+        "Amount Id",
+        "amount id field",
+        "amount id value",
+        "amountid",
+        "amt id",
+        "montante id",
+        "valor id",
+        "Valor Id",
+        "valor id valor"
+      ],
+      "related": [
+        "amount_name",
+        "amount_subtotal",
+        "arrears_count"
+      ]
+    },
+    {
+      "canonical": "amount_name",
+      "synonyms": [
+        "amount name",
+        "Amount Name",
+        "amount name field",
+        "amount name value",
+        "amountname",
+        "amt name",
+        "AN",
+        "montante nome",
+        "valor nome",
+        "Valor Nome",
+        "valor nome valor"
+      ],
+      "related": [
+        "amount_number",
+        "amount_total",
+        "arrears_date"
+      ]
+    },
+    {
+      "canonical": "amount_number",
+      "synonyms": [
+        "amount no",
+        "amount number",
+        "Amount Number",
+        "amount number field",
+        "amount number value",
+        "amountnumber",
+        "amt number",
+        "AN",
+        "montante numero",
+        "valor numero",
+        "Valor Numero",
+        "valor numero valor"
+      ],
+      "related": [
+        "amount_quantity",
+        "amount_type",
+        "arrears_end_date"
+      ]
+    },
+    {
+      "canonical": "amount_quantity",
+      "synonyms": [
+        "amount qty",
+        "amount quantity",
+        "Amount Quantity",
+        "amount quantity field",
+        "amount quantity value",
+        "amountquantity",
+        "amt quantity",
+        "AQ",
+        "montante quantidade",
+        "valor quantidade",
+        "Valor Quantidade",
+        "valor quantidade valor"
+      ],
+      "related": [
+        "amount_rate",
+        "amount_unit",
+        "arrears_id"
+      ]
+    },
+    {
+      "canonical": "amount_rate",
+      "synonyms": [
+        "amount rate",
+        "Amount Rate",
+        "amount rate field",
+        "amount rate value",
+        "amountrate",
+        "amt rate",
+        "AR",
+        "montante taxa",
+        "valor taxa",
+        "Valor Taxa",
+        "valor taxa valor"
+      ],
+      "related": [
+        "amount_start_date",
+        "arrears_amount",
+        "arrears_name"
+      ]
+    },
+    {
+      "canonical": "amount_start_date",
+      "synonyms": [
+        "amount start date",
+        "Amount Start Date",
+        "amount start date field",
+        "amount start date value",
+        "amountstartdate",
+        "amt start date",
+        "ASD",
+        "montante inicio data",
+        "valor inicio data",
+        "Valor Inicio Data",
+        "valor inicio data valor"
+      ],
+      "related": [
+        "amount_status",
+        "arrears_code",
+        "arrears_number"
+      ]
+    },
+    {
+      "canonical": "amount_status",
+      "synonyms": [
+        "amount status",
+        "Amount Status",
+        "amount status field",
+        "amount status value",
+        "amountstatus",
+        "amt status",
+        "AS",
+        "montante status",
+        "valor status",
+        "Valor Status",
+        "valor status valor"
+      ],
+      "related": [
+        "amount_subtotal",
+        "arrears_count",
+        "arrears_quantity"
+      ]
+    },
+    {
+      "canonical": "amount_subtotal",
+      "synonyms": [
+        "amount subtotal",
+        "Amount Subtotal",
+        "amount subtotal field",
+        "amount subtotal value",
+        "amountsubtotal",
+        "amt subtotal",
+        "AS",
+        "montante subtotal",
+        "valor subtotal",
+        "Valor Subtotal",
+        "valor subtotal valor"
+      ],
+      "related": [
+        "amount_total",
+        "arrears_date",
+        "arrears_rate"
+      ]
+    },
+    {
+      "canonical": "amount_total",
+      "synonyms": [
+        "amount total",
+        "Amount Total",
+        "amount total field",
+        "amount total value",
+        "amounttotal",
+        "amt total",
+        "AT",
+        "montante total",
+        "valor total",
+        "Valor Total",
+        "valor total valor"
+      ],
+      "related": [
+        "amount_type",
+        "arrears_end_date",
+        "arrears_start_date"
+      ]
+    },
+    {
+      "canonical": "amount_type",
+      "synonyms": [
+        "amount type",
+        "Amount Type",
+        "amount type field",
+        "amount type value",
+        "amounttype",
+        "amt type",
+        "AT",
+        "montante tipo",
+        "valor tipo",
+        "Valor Tipo",
+        "valor tipo valor"
+      ],
+      "related": [
+        "amount_unit",
+        "arrears_id",
+        "arrears_status"
+      ]
+    },
+    {
+      "canonical": "amount_unit",
+      "synonyms": [
+        "amount unit",
+        "Amount Unit",
+        "amount unit field",
+        "amount unit value",
+        "amountunit",
+        "amt unit",
+        "AU",
+        "montante unidade",
+        "valor unidade",
+        "Valor Unidade",
+        "valor unidade valor"
+      ],
+      "related": [
+        "arrears_amount",
+        "arrears_name",
+        "arrears_subtotal"
+      ]
+    },
+    {
+      "canonical": "arrears_amount",
+      "synonyms": [
+        "AA",
+        "arrears amount",
+        "Arrears Amount",
+        "arrears amount field",
+        "arrears amount value",
+        "arrears amt",
+        "arrears montante",
+        "arrears valor",
+        "Arrears Valor",
+        "arrears valor valor",
+        "arrearsamount"
+      ],
+      "related": [
+        "arrears_code",
+        "arrears_number",
+        "arrears_total"
+      ]
+    },
+    {
+      "canonical": "arrears_code",
+      "synonyms": [
+        "AC",
+        "arrears code",
+        "Arrears Code",
+        "arrears code field",
+        "arrears code value",
+        "arrears codigo",
+        "Arrears Codigo",
+        "arrears codigo valor",
+        "arrearscode"
+      ],
+      "related": [
+        "arrears_count",
+        "arrears_quantity",
+        "arrears_type"
+      ]
+    },
+    {
+      "canonical": "arrears_count",
+      "synonyms": [
+        "AC",
+        "arrears count",
+        "Arrears Count",
+        "arrears count field",
+        "arrears count valor",
+        "arrears count value",
+        "arrearscount"
+      ],
+      "related": [
+        "arrears_date",
+        "arrears_rate",
+        "arrears_unit"
+      ]
+    },
+    {
+      "canonical": "arrears_date",
+      "synonyms": [
+        "AD",
+        "arrears data",
+        "Arrears Data",
+        "arrears data valor",
+        "arrears date",
+        "Arrears Date",
+        "arrears date field",
+        "arrears date value",
+        "arrearsdate"
+      ],
+      "related": [
+        "arrears_end_date",
+        "arrears_start_date",
+        "autopay_amount"
+      ]
+    },
+    {
+      "canonical": "arrears_end_date",
+      "synonyms": [
+        "AED",
+        "arrears end date",
+        "Arrears End Date",
+        "arrears end date field",
+        "arrears end date value",
+        "arrears fim data",
+        "Arrears Fim Data",
+        "arrears fim data valor",
+        "arrearsenddate"
+      ],
+      "related": [
+        "arrears_id",
+        "arrears_status",
+        "autopay_code"
+      ]
+    },
+    {
+      "canonical": "arrears_id",
+      "synonyms": [
+        "AI",
+        "arrears id",
+        "Arrears Id",
+        "arrears id field",
+        "arrears id valor",
+        "arrears id value",
+        "arrearsid"
+      ],
+      "related": [
+        "arrears_name",
+        "arrears_subtotal",
+        "autopay_count"
+      ]
+    },
+    {
+      "canonical": "arrears_name",
+      "synonyms": [
+        "AN",
+        "arrears name",
+        "Arrears Name",
+        "arrears name field",
+        "arrears name value",
+        "arrears nome",
+        "Arrears Nome",
+        "arrears nome valor",
+        "arrearsname"
+      ],
+      "related": [
+        "arrears_number",
+        "arrears_total",
+        "autopay_date"
+      ]
+    },
+    {
+      "canonical": "arrears_number",
+      "synonyms": [
+        "AN",
+        "arrears no",
+        "arrears number",
+        "Arrears Number",
+        "arrears number field",
+        "arrears number value",
+        "arrears numero",
+        "Arrears Numero",
+        "arrears numero valor",
+        "arrearsnumber"
+      ],
+      "related": [
+        "arrears_quantity",
+        "arrears_type",
+        "autopay_end_date"
+      ]
+    },
+    {
+      "canonical": "arrears_quantity",
+      "synonyms": [
+        "AQ",
+        "arrears qty",
+        "arrears quantidade",
+        "Arrears Quantidade",
+        "arrears quantidade valor",
+        "arrears quantity",
+        "Arrears Quantity",
+        "arrears quantity field",
+        "arrears quantity value",
+        "arrearsquantity"
+      ],
+      "related": [
+        "arrears_rate",
+        "arrears_unit",
+        "autopay_id"
+      ]
+    },
+    {
+      "canonical": "arrears_rate",
+      "synonyms": [
+        "AR",
+        "arrears rate",
+        "Arrears Rate",
+        "arrears rate field",
+        "arrears rate value",
+        "arrears taxa",
+        "Arrears Taxa",
+        "arrears taxa valor",
+        "arrearsrate"
+      ],
+      "related": [
+        "arrears_start_date",
+        "autopay_amount",
+        "autopay_name"
+      ]
+    },
+    {
+      "canonical": "arrears_start_date",
+      "synonyms": [
+        "arrears inicio data",
+        "Arrears Inicio Data",
+        "arrears inicio data valor",
+        "arrears start date",
+        "Arrears Start Date",
+        "arrears start date field",
+        "arrears start date value",
+        "arrearsstartdate",
+        "ASD"
+      ],
+      "related": [
+        "arrears_status",
+        "autopay_code",
+        "autopay_number"
+      ]
+    },
+    {
+      "canonical": "arrears_status",
+      "synonyms": [
+        "arrears status",
+        "Arrears Status",
+        "arrears status field",
+        "arrears status valor",
+        "arrears status value",
+        "arrearsstatus",
+        "AS"
+      ],
+      "related": [
+        "arrears_subtotal",
+        "autopay_count",
+        "autopay_quantity"
+      ]
+    },
+    {
+      "canonical": "arrears_subtotal",
+      "synonyms": [
+        "arrears subtotal",
+        "Arrears Subtotal",
+        "arrears subtotal field",
+        "arrears subtotal valor",
+        "arrears subtotal value",
+        "arrearssubtotal",
+        "AS"
+      ],
+      "related": [
+        "arrears_total",
+        "autopay_date",
+        "autopay_rate"
+      ]
+    },
+    {
+      "canonical": "arrears_total",
+      "synonyms": [
+        "arrears total",
+        "Arrears Total",
+        "arrears total field",
+        "arrears total valor",
+        "arrears total value",
+        "arrearstotal",
+        "AT"
+      ],
+      "related": [
+        "arrears_type",
+        "autopay_end_date",
+        "autopay_start_date"
+      ]
+    },
+    {
+      "canonical": "arrears_type",
+      "synonyms": [
+        "arrears tipo",
+        "Arrears Tipo",
+        "arrears tipo valor",
+        "arrears type",
+        "Arrears Type",
+        "arrears type field",
+        "arrears type value",
+        "arrearstype",
+        "AT"
+      ],
+      "related": [
+        "arrears_unit",
+        "autopay_id",
+        "autopay_status"
+      ]
+    },
+    {
+      "canonical": "arrears_unit",
+      "synonyms": [
+        "arrears unidade",
+        "Arrears Unidade",
+        "arrears unidade valor",
+        "arrears unit",
+        "Arrears Unit",
+        "arrears unit field",
+        "arrears unit value",
+        "arrearsunit",
+        "AU"
+      ],
+      "related": [
+        "autopay_amount",
+        "autopay_name",
+        "autopay_subtotal"
+      ]
+    },
+    {
+      "canonical": "autopay_amount",
+      "synonyms": [
+        "AA",
+        "autopay amount",
+        "Autopay Amount",
+        "autopay amount field",
+        "autopay amount value",
+        "autopay amt",
+        "autopay montante",
+        "autopay valor",
+        "Autopay Valor",
+        "autopay valor valor",
+        "autopayamount"
+      ],
+      "related": [
+        "autopay_code",
+        "autopay_number",
+        "autopay_total"
+      ]
+    },
+    {
+      "canonical": "autopay_code",
+      "synonyms": [
+        "AC",
+        "autopay code",
+        "Autopay Code",
+        "autopay code field",
+        "autopay code value",
+        "autopay codigo",
+        "Autopay Codigo",
+        "autopay codigo valor",
+        "autopaycode"
+      ],
+      "related": [
+        "autopay_count",
+        "autopay_quantity",
+        "autopay_type"
+      ]
+    },
+    {
+      "canonical": "autopay_count",
+      "synonyms": [
+        "AC",
+        "autopay count",
+        "Autopay Count",
+        "autopay count field",
+        "autopay count valor",
+        "autopay count value",
+        "autopaycount"
+      ],
+      "related": [
+        "autopay_date",
+        "autopay_rate",
+        "autopay_unit"
+      ]
+    },
+    {
+      "canonical": "autopay_date",
+      "synonyms": [
+        "AD",
+        "autopay data",
+        "Autopay Data",
+        "autopay data valor",
+        "autopay date",
+        "Autopay Date",
+        "autopay date field",
+        "autopay date value",
+        "autopaydate"
+      ],
+      "related": [
+        "autopay_end_date",
+        "autopay_start_date",
+        "balance_amount"
+      ]
+    },
+    {
+      "canonical": "autopay_end_date",
+      "synonyms": [
+        "AED",
+        "autopay end date",
+        "Autopay End Date",
+        "autopay end date field",
+        "autopay end date value",
+        "autopay fim data",
+        "Autopay Fim Data",
+        "autopay fim data valor",
+        "autopayenddate"
+      ],
+      "related": [
+        "autopay_id",
+        "autopay_status",
+        "balance_code"
+      ]
+    },
+    {
+      "canonical": "autopay_id",
+      "synonyms": [
+        "AI",
+        "autopay id",
+        "Autopay Id",
+        "autopay id field",
+        "autopay id valor",
+        "autopay id value",
+        "autopayid"
+      ],
+      "related": [
+        "autopay_name",
+        "autopay_subtotal",
+        "balance_count"
+      ]
+    },
+    {
+      "canonical": "autopay_name",
+      "synonyms": [
+        "AN",
+        "autopay name",
+        "Autopay Name",
+        "autopay name field",
+        "autopay name value",
+        "autopay nome",
+        "Autopay Nome",
+        "autopay nome valor",
+        "autopayname"
+      ],
+      "related": [
+        "autopay_number",
+        "autopay_total",
+        "balance_date"
+      ]
+    },
+    {
+      "canonical": "autopay_number",
+      "synonyms": [
+        "AN",
+        "autopay no",
+        "autopay number",
+        "Autopay Number",
+        "autopay number field",
+        "autopay number value",
+        "autopay numero",
+        "Autopay Numero",
+        "autopay numero valor",
+        "autopaynumber"
+      ],
+      "related": [
+        "autopay_quantity",
+        "autopay_type",
+        "balance_end_date"
+      ]
+    },
+    {
+      "canonical": "autopay_quantity",
+      "synonyms": [
+        "AQ",
+        "autopay qty",
+        "autopay quantidade",
+        "Autopay Quantidade",
+        "autopay quantidade valor",
+        "autopay quantity",
+        "Autopay Quantity",
+        "autopay quantity field",
+        "autopay quantity value",
+        "autopayquantity"
+      ],
+      "related": [
+        "autopay_rate",
+        "autopay_unit",
+        "balance_id"
+      ]
+    },
+    {
+      "canonical": "autopay_rate",
+      "synonyms": [
+        "AR",
+        "autopay rate",
+        "Autopay Rate",
+        "autopay rate field",
+        "autopay rate value",
+        "autopay taxa",
+        "Autopay Taxa",
+        "autopay taxa valor",
+        "autopayrate"
+      ],
+      "related": [
+        "autopay_start_date",
+        "balance_amount",
+        "balance_name"
+      ]
+    },
+    {
+      "canonical": "autopay_start_date",
+      "synonyms": [
+        "ASD",
+        "autopay inicio data",
+        "Autopay Inicio Data",
+        "autopay inicio data valor",
+        "autopay start date",
+        "Autopay Start Date",
+        "autopay start date field",
+        "autopay start date value",
+        "autopaystartdate"
+      ],
+      "related": [
+        "autopay_status",
+        "balance_code",
+        "balance_number"
+      ]
+    },
+    {
+      "canonical": "autopay_status",
+      "synonyms": [
+        "AS",
+        "autopay status",
+        "Autopay Status",
+        "autopay status field",
+        "autopay status valor",
+        "autopay status value",
+        "autopaystatus"
+      ],
+      "related": [
+        "autopay_subtotal",
+        "balance_count",
+        "balance_quantity"
+      ]
+    },
+    {
+      "canonical": "autopay_subtotal",
+      "synonyms": [
+        "AS",
+        "autopay subtotal",
+        "Autopay Subtotal",
+        "autopay subtotal field",
+        "autopay subtotal valor",
+        "autopay subtotal value",
+        "autopaysubtotal"
+      ],
+      "related": [
+        "autopay_total",
+        "balance_date",
+        "balance_rate"
+      ]
+    },
+    {
+      "canonical": "autopay_total",
+      "synonyms": [
+        "AT",
+        "autopay total",
+        "Autopay Total",
+        "autopay total field",
+        "autopay total valor",
+        "autopay total value",
+        "autopaytotal"
+      ],
+      "related": [
+        "autopay_type",
+        "balance_end_date",
+        "balance_start_date"
+      ]
+    },
+    {
+      "canonical": "autopay_type",
+      "synonyms": [
+        "AT",
+        "autopay tipo",
+        "Autopay Tipo",
+        "autopay tipo valor",
+        "autopay type",
+        "Autopay Type",
+        "autopay type field",
+        "autopay type value",
+        "autopaytype"
+      ],
+      "related": [
+        "autopay_unit",
+        "balance_id",
+        "balance_status"
+      ]
+    },
+    {
+      "canonical": "autopay_unit",
+      "synonyms": [
+        "AU",
+        "autopay unidade",
+        "Autopay Unidade",
+        "autopay unidade valor",
+        "autopay unit",
+        "Autopay Unit",
+        "autopay unit field",
+        "autopay unit value",
+        "autopayunit"
+      ],
+      "related": [
+        "balance_amount",
+        "balance_name",
+        "balance_subtotal"
+      ]
+    },
+    {
+      "canonical": "balance_amount",
+      "synonyms": [
+        "BA",
+        "balance amount",
+        "Balance Amount",
+        "balance amount field",
+        "balance amount value",
+        "balance amt",
+        "balanceamount",
+        "saldo montante",
+        "saldo valor",
+        "Saldo Valor",
+        "saldo valor valor"
+      ],
+      "related": [
+        "balance_code",
+        "balance_number",
+        "balance_total"
+      ]
+    },
+    {
+      "canonical": "balance_code",
+      "synonyms": [
+        "balance code",
+        "Balance Code",
+        "balance code field",
+        "balance code value",
+        "balancecode",
+        "BC",
+        "saldo codigo",
+        "Saldo Codigo",
+        "saldo codigo valor"
+      ],
+      "related": [
+        "balance_count",
+        "balance_quantity",
+        "balance_type"
+      ]
+    },
+    {
+      "canonical": "balance_count",
+      "synonyms": [
+        "balance count",
+        "Balance Count",
+        "balance count field",
+        "balance count value",
+        "balancecount",
+        "BC",
+        "saldo count",
+        "Saldo Count",
+        "saldo count valor"
+      ],
+      "related": [
+        "balance_date",
+        "balance_rate",
+        "balance_unit"
+      ]
+    },
+    {
+      "canonical": "balance_date",
+      "synonyms": [
+        "balance date",
+        "Balance Date",
+        "balance date field",
+        "balance date value",
+        "balancedate",
+        "BD",
+        "saldo data",
+        "Saldo Data",
+        "saldo data valor"
+      ],
+      "related": [
+        "balance_end_date",
+        "balance_start_date",
+        "barcode_amount"
+      ]
+    },
+    {
+      "canonical": "balance_end_date",
+      "synonyms": [
+        "balance end date",
+        "Balance End Date",
+        "balance end date field",
+        "balance end date value",
+        "balanceenddate",
+        "BED",
+        "saldo fim data",
+        "Saldo Fim Data",
+        "saldo fim data valor"
+      ],
+      "related": [
+        "balance_id",
+        "balance_status",
+        "barcode_code"
+      ]
+    },
+    {
+      "canonical": "balance_id",
+      "synonyms": [
+        "balance id",
+        "Balance Id",
+        "balance id field",
+        "balance id value",
+        "balanceid",
+        "BI",
+        "saldo id",
+        "Saldo Id",
+        "saldo id valor"
+      ],
+      "related": [
+        "balance_name",
+        "balance_subtotal",
+        "barcode_count"
+      ]
+    },
+    {
+      "canonical": "balance_name",
+      "synonyms": [
+        "balance name",
+        "Balance Name",
+        "balance name field",
+        "balance name value",
+        "balancename",
+        "BN",
+        "saldo nome",
+        "Saldo Nome",
+        "saldo nome valor"
+      ],
+      "related": [
+        "balance_number",
+        "balance_total",
+        "barcode_date"
+      ]
+    },
+    {
+      "canonical": "balance_number",
+      "synonyms": [
+        "balance no",
+        "balance number",
+        "Balance Number",
+        "balance number field",
+        "balance number value",
+        "balancenumber",
+        "BN",
+        "saldo numero",
+        "Saldo Numero",
+        "saldo numero valor"
+      ],
+      "related": [
+        "balance_quantity",
+        "balance_type",
+        "barcode_end_date"
+      ]
+    },
+    {
+      "canonical": "balance_quantity",
+      "synonyms": [
+        "balance qty",
+        "balance quantity",
+        "Balance Quantity",
+        "balance quantity field",
+        "balance quantity value",
+        "balancequantity",
+        "BQ",
+        "saldo quantidade",
+        "Saldo Quantidade",
+        "saldo quantidade valor"
+      ],
+      "related": [
+        "balance_rate",
+        "balance_unit",
+        "barcode_id"
+      ]
+    },
+    {
+      "canonical": "balance_rate",
+      "synonyms": [
+        "balance rate",
+        "Balance Rate",
+        "balance rate field",
+        "balance rate value",
+        "balancerate",
+        "BR",
+        "saldo taxa",
+        "Saldo Taxa",
+        "saldo taxa valor"
+      ],
+      "related": [
+        "balance_start_date",
+        "barcode_amount",
+        "barcode_name"
+      ]
+    },
+    {
+      "canonical": "balance_start_date",
+      "synonyms": [
+        "balance start date",
+        "Balance Start Date",
+        "balance start date field",
+        "balance start date value",
+        "balancestartdate",
+        "BSD",
+        "saldo inicio data",
+        "Saldo Inicio Data",
+        "saldo inicio data valor"
+      ],
+      "related": [
+        "balance_status",
+        "barcode_code",
+        "barcode_number"
+      ]
+    },
+    {
+      "canonical": "balance_status",
+      "synonyms": [
+        "balance status",
+        "Balance Status",
+        "balance status field",
+        "balance status value",
+        "balancestatus",
+        "BS",
+        "saldo status",
+        "Saldo Status",
+        "saldo status valor"
+      ],
+      "related": [
+        "balance_subtotal",
+        "barcode_count",
+        "barcode_quantity"
+      ]
+    },
+    {
+      "canonical": "balance_subtotal",
+      "synonyms": [
+        "balance subtotal",
+        "Balance Subtotal",
+        "balance subtotal field",
+        "balance subtotal value",
+        "balancesubtotal",
+        "BS",
+        "saldo subtotal",
+        "Saldo Subtotal",
+        "saldo subtotal valor"
+      ],
+      "related": [
+        "balance_total",
+        "barcode_date",
+        "barcode_rate"
+      ]
+    },
+    {
+      "canonical": "balance_total",
+      "synonyms": [
+        "balance total",
+        "Balance Total",
+        "balance total field",
+        "balance total value",
+        "balancetotal",
+        "BT",
+        "saldo total",
+        "Saldo Total",
+        "saldo total valor"
+      ],
+      "related": [
+        "balance_type",
+        "barcode_end_date",
+        "barcode_start_date"
+      ]
+    },
+    {
+      "canonical": "balance_type",
+      "synonyms": [
+        "balance type",
+        "Balance Type",
+        "balance type field",
+        "balance type value",
+        "balancetype",
+        "BT",
+        "saldo tipo",
+        "Saldo Tipo",
+        "saldo tipo valor"
+      ],
+      "related": [
+        "balance_unit",
+        "barcode_id",
+        "barcode_status"
+      ]
+    },
+    {
+      "canonical": "balance_unit",
+      "synonyms": [
+        "balance unit",
+        "Balance Unit",
+        "balance unit field",
+        "balance unit value",
+        "balanceunit",
+        "BU",
+        "saldo unidade",
+        "Saldo Unidade",
+        "saldo unidade valor"
+      ],
+      "related": [
+        "barcode_amount",
+        "barcode_name",
+        "barcode_subtotal"
+      ]
+    },
+    {
+      "canonical": "barcode_amount",
+      "synonyms": [
+        "BA",
+        "barcode amount",
+        "Barcode Amount",
+        "barcode amount field",
+        "barcode amount value",
+        "barcode amt",
+        "barcode montante",
+        "barcode valor",
+        "Barcode Valor",
+        "barcode valor valor",
+        "barcodeamount"
+      ],
+      "related": [
+        "barcode_code",
+        "barcode_number",
+        "barcode_total"
+      ]
+    },
+    {
+      "canonical": "barcode_code",
+      "synonyms": [
+        "barcode code",
+        "Barcode Code",
+        "barcode code field",
+        "barcode code value",
+        "barcode codigo",
+        "Barcode Codigo",
+        "barcode codigo valor",
+        "barcodecode",
+        "BC"
+      ],
+      "related": [
+        "barcode_count",
+        "barcode_quantity",
+        "barcode_type"
+      ]
+    },
+    {
+      "canonical": "barcode_count",
+      "synonyms": [
+        "barcode count",
+        "Barcode Count",
+        "barcode count field",
+        "barcode count valor",
+        "barcode count value",
+        "barcodecount",
+        "BC"
+      ],
+      "related": [
+        "barcode_date",
+        "barcode_rate",
+        "barcode_unit"
+      ]
+    },
+    {
+      "canonical": "barcode_date",
+      "synonyms": [
+        "barcode data",
+        "Barcode Data",
+        "barcode data valor",
+        "barcode date",
+        "Barcode Date",
+        "barcode date field",
+        "barcode date value",
+        "barcodedate",
+        "BD"
+      ],
+      "related": [
+        "barcode_end_date",
+        "barcode_start_date",
+        "base_charge_amount"
+      ]
+    },
+    {
+      "canonical": "barcode_end_date",
+      "synonyms": [
+        "barcode end date",
+        "Barcode End Date",
+        "barcode end date field",
+        "barcode end date value",
+        "barcode fim data",
+        "Barcode Fim Data",
+        "barcode fim data valor",
+        "barcodeenddate",
+        "BED"
+      ],
+      "related": [
+        "barcode_id",
+        "barcode_status",
+        "base_charge_code"
+      ]
+    },
+    {
+      "canonical": "barcode_id",
+      "synonyms": [
+        "barcode id",
+        "Barcode Id",
+        "barcode id field",
+        "barcode id valor",
+        "barcode id value",
+        "barcodeid",
+        "BI"
+      ],
+      "related": [
+        "barcode_name",
+        "barcode_subtotal",
+        "base_charge_count"
+      ]
+    },
+    {
+      "canonical": "barcode_name",
+      "synonyms": [
+        "barcode name",
+        "Barcode Name",
+        "barcode name field",
+        "barcode name value",
+        "barcode nome",
+        "Barcode Nome",
+        "barcode nome valor",
+        "barcodename",
+        "BN"
+      ],
+      "related": [
+        "barcode_number",
+        "barcode_total",
+        "base_charge_date"
+      ]
+    },
+    {
+      "canonical": "barcode_number",
+      "synonyms": [
+        "barcode no",
+        "barcode number",
+        "Barcode Number",
+        "barcode number field",
+        "barcode number value",
+        "barcode numero",
+        "Barcode Numero",
+        "barcode numero valor",
+        "barcodenumber",
+        "BN"
+      ],
+      "related": [
+        "barcode_quantity",
+        "barcode_type",
+        "base_charge_end_date"
+      ]
+    },
+    {
+      "canonical": "barcode_quantity",
+      "synonyms": [
+        "barcode qty",
+        "barcode quantidade",
+        "Barcode Quantidade",
+        "barcode quantidade valor",
+        "barcode quantity",
+        "Barcode Quantity",
+        "barcode quantity field",
+        "barcode quantity value",
+        "barcodequantity",
+        "BQ"
+      ],
+      "related": [
+        "barcode_rate",
+        "barcode_unit",
+        "base_charge_id"
+      ]
+    },
+    {
+      "canonical": "barcode_rate",
+      "synonyms": [
+        "barcode rate",
+        "Barcode Rate",
+        "barcode rate field",
+        "barcode rate value",
+        "barcode taxa",
+        "Barcode Taxa",
+        "barcode taxa valor",
+        "barcoderate",
+        "BR"
+      ],
+      "related": [
+        "barcode_start_date",
+        "base_charge_amount",
+        "base_charge_name"
+      ]
+    },
+    {
+      "canonical": "barcode_start_date",
+      "synonyms": [
+        "barcode inicio data",
+        "Barcode Inicio Data",
+        "barcode inicio data valor",
+        "barcode start date",
+        "Barcode Start Date",
+        "barcode start date field",
+        "barcode start date value",
+        "barcodestartdate",
+        "BSD"
+      ],
+      "related": [
+        "barcode_status",
+        "base_charge_code",
+        "base_charge_number"
+      ]
+    },
+    {
+      "canonical": "barcode_status",
+      "synonyms": [
+        "barcode status",
+        "Barcode Status",
+        "barcode status field",
+        "barcode status valor",
+        "barcode status value",
+        "barcodestatus",
+        "BS"
+      ],
+      "related": [
+        "barcode_subtotal",
+        "base_charge_count",
+        "base_charge_quantity"
+      ]
+    },
+    {
+      "canonical": "barcode_subtotal",
+      "synonyms": [
+        "barcode subtotal",
+        "Barcode Subtotal",
+        "barcode subtotal field",
+        "barcode subtotal valor",
+        "barcode subtotal value",
+        "barcodesubtotal",
+        "BS"
+      ],
+      "related": [
+        "barcode_total",
+        "base_charge_date",
+        "base_charge_rate"
+      ]
+    },
+    {
+      "canonical": "barcode_total",
+      "synonyms": [
+        "barcode total",
+        "Barcode Total",
+        "barcode total field",
+        "barcode total valor",
+        "barcode total value",
+        "barcodetotal",
+        "BT"
+      ],
+      "related": [
+        "barcode_type",
+        "base_charge_end_date",
+        "base_charge_start_date"
+      ]
+    },
+    {
+      "canonical": "barcode_type",
+      "synonyms": [
+        "barcode tipo",
+        "Barcode Tipo",
+        "barcode tipo valor",
+        "barcode type",
+        "Barcode Type",
+        "barcode type field",
+        "barcode type value",
+        "barcodetype",
+        "BT"
+      ],
+      "related": [
+        "barcode_unit",
+        "base_charge_id",
+        "base_charge_status"
+      ]
+    },
+    {
+      "canonical": "barcode_unit",
+      "synonyms": [
+        "barcode unidade",
+        "Barcode Unidade",
+        "barcode unidade valor",
+        "barcode unit",
+        "Barcode Unit",
+        "barcode unit field",
+        "barcode unit value",
+        "barcodeunit",
+        "BU"
+      ],
+      "related": [
+        "base_charge_amount",
+        "base_charge_name",
+        "base_charge_subtotal"
+      ]
+    },
+    {
+      "canonical": "base_charge_amount",
+      "synonyms": [
+        "base charge amount",
+        "Base Charge Amount",
+        "base charge amount field",
+        "base charge amount value",
+        "base charge amt",
+        "base cobranca montante",
+        "base cobranca valor",
+        "Base Cobranca Valor",
+        "base cobranca valor valor",
+        "basechargeamount",
+        "BCA"
+      ],
+      "related": [
+        "base_charge_code",
+        "base_charge_number",
+        "base_charge_total"
+      ]
+    },
+    {
+      "canonical": "base_charge_code",
+      "synonyms": [
+        "base charge code",
+        "Base Charge Code",
+        "base charge code field",
+        "base charge code value",
+        "base cobranca codigo",
+        "Base Cobranca Codigo",
+        "base cobranca codigo valor",
+        "basechargecode",
+        "BCC"
+      ],
+      "related": [
+        "base_charge_count",
+        "base_charge_quantity",
+        "base_charge_type"
+      ]
+    },
+    {
+      "canonical": "base_charge_count",
+      "synonyms": [
+        "base charge count",
+        "Base Charge Count",
+        "base charge count field",
+        "base charge count value",
+        "base cobranca count",
+        "Base Cobranca Count",
+        "base cobranca count valor",
+        "basechargecount",
+        "BCC"
+      ],
+      "related": [
+        "base_charge_date",
+        "base_charge_rate",
+        "base_charge_unit"
+      ]
+    },
+    {
+      "canonical": "base_charge_date",
+      "synonyms": [
+        "base charge date",
+        "Base Charge Date",
+        "base charge date field",
+        "base charge date value",
+        "base cobranca data",
+        "Base Cobranca Data",
+        "base cobranca data valor",
+        "basechargedate",
+        "BCD"
+      ],
+      "related": [
+        "base_charge_end_date",
+        "base_charge_start_date",
+        "bill_amount"
+      ]
+    },
+    {
+      "canonical": "base_charge_end_date",
+      "synonyms": [
+        "base charge end date",
+        "Base Charge End Date",
+        "base charge end date field",
+        "base charge end date value",
+        "base cobranca fim data",
+        "Base Cobranca Fim Data",
+        "base cobranca fim data valor",
+        "basechargeenddate",
+        "BCED"
+      ],
+      "related": [
+        "base_charge_id",
+        "base_charge_status",
+        "bill_code"
+      ]
+    },
+    {
+      "canonical": "base_charge_id",
+      "synonyms": [
+        "base charge id",
+        "Base Charge Id",
+        "base charge id field",
+        "base charge id value",
+        "base cobranca id",
+        "Base Cobranca Id",
+        "base cobranca id valor",
+        "basechargeid",
+        "BCI"
+      ],
+      "related": [
+        "base_charge_name",
+        "base_charge_subtotal",
+        "bill_count"
+      ]
+    },
+    {
+      "canonical": "base_charge_name",
+      "synonyms": [
+        "base charge name",
+        "Base Charge Name",
+        "base charge name field",
+        "base charge name value",
+        "base cobranca nome",
+        "Base Cobranca Nome",
+        "base cobranca nome valor",
+        "basechargename",
+        "BCN"
+      ],
+      "related": [
+        "base_charge_number",
+        "base_charge_total",
+        "bill_date"
+      ]
+    },
+    {
+      "canonical": "base_charge_number",
+      "synonyms": [
+        "base charge no",
+        "base charge number",
+        "Base Charge Number",
+        "base charge number field",
+        "base charge number value",
+        "base cobranca numero",
+        "Base Cobranca Numero",
+        "base cobranca numero valor",
+        "basechargenumber",
+        "BCN"
+      ],
+      "related": [
+        "account_amount",
+        "base_charge_quantity",
+        "base_charge_type"
+      ]
+    },
+    {
+      "canonical": "base_charge_quantity",
+      "synonyms": [
+        "base charge qty",
+        "base charge quantity",
+        "Base Charge Quantity",
+        "base charge quantity field",
+        "base charge quantity value",
+        "base cobranca quantidade",
+        "Base Cobranca Quantidade",
+        "base cobranca quantidade valor",
+        "basechargequantity",
+        "BCQ"
+      ],
+      "related": [
+        "account_code",
+        "base_charge_rate",
+        "base_charge_unit"
+      ]
+    },
+    {
+      "canonical": "base_charge_rate",
+      "synonyms": [
+        "base charge rate",
+        "Base Charge Rate",
+        "base charge rate field",
+        "base charge rate value",
+        "base cobranca taxa",
+        "Base Cobranca Taxa",
+        "base cobranca taxa valor",
+        "basechargerate",
+        "BCR"
+      ],
+      "related": [
+        "account_count",
+        "base_charge_start_date",
+        "bill_amount"
+      ]
+    },
+    {
+      "canonical": "base_charge_start_date",
+      "synonyms": [
+        "base charge start date",
+        "Base Charge Start Date",
+        "base charge start date field",
+        "base charge start date value",
+        "base cobranca inicio data",
+        "Base Cobranca Inicio Data",
+        "base cobranca inicio data valor",
+        "basechargestartdate",
+        "BCSD"
+      ],
+      "related": [
+        "account_date",
+        "base_charge_status",
+        "bill_code"
+      ]
+    },
+    {
+      "canonical": "base_charge_status",
+      "synonyms": [
+        "base charge status",
+        "Base Charge Status",
+        "base charge status field",
+        "base charge status value",
+        "base cobranca status",
+        "Base Cobranca Status",
+        "base cobranca status valor",
+        "basechargestatus",
+        "BCS"
+      ],
+      "related": [
+        "account_end_date",
+        "base_charge_subtotal",
+        "bill_count"
+      ]
+    },
+    {
+      "canonical": "base_charge_subtotal",
+      "synonyms": [
+        "base charge subtotal",
+        "Base Charge Subtotal",
+        "base charge subtotal field",
+        "base charge subtotal value",
+        "base cobranca subtotal",
+        "Base Cobranca Subtotal",
+        "base cobranca subtotal valor",
+        "basechargesubtotal",
+        "BCS"
+      ],
+      "related": [
+        "account_id",
+        "base_charge_total",
+        "bill_date"
+      ]
+    },
+    {
+      "canonical": "base_charge_total",
+      "synonyms": [
+        "base charge total",
+        "Base Charge Total",
+        "base charge total field",
+        "base charge total value",
+        "base cobranca total",
+        "Base Cobranca Total",
+        "base cobranca total valor",
+        "basechargetotal",
+        "BCT"
+      ],
+      "related": [
+        "account_amount",
+        "account_name",
+        "base_charge_type"
+      ]
+    },
+    {
+      "canonical": "base_charge_type",
+      "synonyms": [
+        "base charge type",
+        "Base Charge Type",
+        "base charge type field",
+        "base charge type value",
+        "base cobranca tipo",
+        "Base Cobranca Tipo",
+        "base cobranca tipo valor",
+        "basechargetype",
+        "BCT"
+      ],
+      "related": [
+        "account_code",
+        "account_number",
+        "base_charge_unit"
+      ]
+    },
+    {
+      "canonical": "base_charge_unit",
+      "synonyms": [
+        "base charge unit",
+        "Base Charge Unit",
+        "base charge unit field",
+        "base charge unit value",
+        "base cobranca unidade",
+        "Base Cobranca Unidade",
+        "base cobranca unidade valor",
+        "basechargeunit",
+        "BCU"
+      ],
+      "related": [
+        "account_count",
+        "account_quantity",
+        "bill_amount"
+      ]
+    },
+    {
+      "canonical": "bill_amount",
+      "synonyms": [
+        "BA",
+        "bill amount",
+        "Bill Amount",
+        "bill amount field",
+        "bill amount value",
+        "bill amt",
+        "billamount",
+        "fatura montante",
+        "fatura valor",
+        "Fatura Valor",
+        "fatura valor valor"
+      ],
+      "related": [
+        "account_date",
+        "account_rate",
+        "bill_code"
+      ]
+    },
+    {
+      "canonical": "bill_code",
+      "synonyms": [
+        "BC",
+        "bill code",
+        "Bill Code",
+        "bill code field",
+        "bill code value",
+        "billcode",
+        "fatura codigo",
+        "Fatura Codigo",
+        "fatura codigo valor"
+      ],
+      "related": [
+        "account_end_date",
+        "account_start_date",
+        "bill_count"
+      ]
+    },
+    {
+      "canonical": "bill_count",
+      "synonyms": [
+        "BC",
+        "bill count",
+        "Bill Count",
+        "bill count field",
+        "bill count value",
+        "billcount",
+        "fatura count",
+        "Fatura Count",
+        "fatura count valor"
+      ],
+      "related": [
+        "account_id",
+        "account_status",
+        "bill_date"
+      ]
+    },
+    {
+      "canonical": "bill_date",
+      "synonyms": [
+        "BD",
+        "bill date",
+        "Bill Date",
+        "bill date field",
+        "bill date value",
+        "billdate",
+        "fatura data",
+        "Fatura Data",
+        "fatura data valor"
+      ],
+      "related": [
+        "account_amount",
+        "account_name",
+        "account_subtotal"
+      ]
+    }
+  ]
+}

@@ -362,6 +362,13 @@
         "paragraph"
       ]
     },
+    "CONNECTOR_SEARCH": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph",
+        "bullets"
+      ]
+    },
     "CONNECTOR_STATUS": {
       "defaultShape": "paragraph",
       "allowedShapes": [

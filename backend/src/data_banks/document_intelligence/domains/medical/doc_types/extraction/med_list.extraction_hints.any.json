@@ -1,0 +1,562 @@
+{
+  "_meta": {
+    "id": "medical_med_list_extraction_hints",
+    "version": "1.0.0",
+    "description": "Extraction hints for Medication List.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_list"
+  },
+  "hints": [
+    {
+      "id": "med_list_hint_01",
+      "entity": "address",
+      "anchors": [
+        "address",
+        "medication list address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "abstract",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can be buried in annex ii"
+      ]
+    },
+    {
+      "id": "med_list_hint_02",
+      "entity": "case_number",
+      "anchors": [
+        "case number",
+        "medication list case number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix a",
+        "can be buried in exhibit"
+      ]
+    },
+    {
+      "id": "med_list_hint_03",
+      "entity": "city",
+      "anchors": [
+        "city",
+        "medication list city",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "approvals",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix b",
+        "can be buried in exhibit a"
+      ]
+    },
+    {
+      "id": "med_list_hint_04",
+      "entity": "country",
+      "anchors": [
+        "country",
+        "medication list country",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "assessment_plan",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex",
+        "can be buried in exhibit b"
+      ]
+    },
+    {
+      "id": "med_list_hint_05",
+      "entity": "diagnosis_code",
+      "anchors": [
+        "diagnosis code",
+        "medication list diagnosis code",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "attachments",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex i",
+        "can be buried in footnote"
+      ]
+    },
+    {
+      "id": "med_list_hint_06",
+      "entity": "document_number",
+      "anchors": [
+        "document number",
+        "medication list document number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "authorization",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex ii",
+        "can be buried in endnote"
+      ]
+    },
+    {
+      "id": "med_list_hint_07",
+      "entity": "dosage",
+      "anchors": [
+        "dosage",
+        "medication list dosage",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "certifications",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in exhibit",
+        "can be buried in schedule"
+      ]
+    },
+    {
+      "id": "med_list_hint_08",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "medication list effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "compliance_section",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in exhibit a",
+        "can be buried in attachment"
+      ]
+    },
+    {
+      "id": "med_list_hint_09",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "medication list expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "criteria",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in exhibit b",
+        "can be buried in addendum"
+      ]
+    },
+    {
+      "id": "med_list_hint_10",
+      "entity": "lab_value",
+      "anchors": [
+        "lab value",
+        "medication list lab value",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "data_tables",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in footnote",
+        "can be buried in rider"
+      ]
+    },
+    {
+      "id": "med_list_hint_11",
+      "entity": "medication_name",
+      "anchors": [
+        "medication name",
+        "medication list medication name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "detailed_analysis",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in endnote",
+        "can be buried in supplement"
+      ]
+    },
+    {
+      "id": "med_list_hint_12",
+      "entity": "period_reference",
+      "anchors": [
+        "period reference",
+        "medication list period reference",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "disclaimers",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in schedule",
+        "can be buried in definitions section"
+      ]
+    },
+    {
+      "id": "med_list_hint_13",
+      "entity": "person_name",
+      "anchors": [
+        "person name",
+        "medication list person name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "discussion",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in attachment",
+        "can be buried in signature block"
+      ]
+    },
+    {
+      "id": "med_list_hint_14",
+      "entity": "person_role",
+      "anchors": [
+        "person role",
+        "medication list person role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_metadata",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in addendum",
+        "can be buried in metadata header"
+      ]
+    },
+    {
+      "id": "med_list_hint_15",
+      "entity": "person_title",
+      "anchors": [
+        "person title",
+        "medication list person title",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in rider",
+        "can be buried in revision history"
+      ]
+    },
+    {
+      "id": "med_list_hint_16",
+      "entity": "procedure_code",
+      "anchors": [
+        "procedure code",
+        "medication list procedure code",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "findings",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in supplement",
+        "can be buried in appendix"
+      ]
+    },
+    {
+      "id": "med_list_hint_17",
+      "entity": "registration_number",
+      "anchors": [
+        "registration number",
+        "medication list registration number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "glossary",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in definitions section",
+        "can be buried in appendix a"
+      ]
+    },
+    {
+      "id": "med_list_hint_18",
+      "entity": "regulatory_body",
+      "anchors": [
+        "regulatory body",
+        "medication list regulatory body",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in signature block",
+        "can be buried in appendix b"
+      ]
+    },
+    {
+      "id": "med_list_hint_19",
+      "entity": "report_date",
+      "anchors": [
+        "report date",
+        "medication list report date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "history_present_illness",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in metadata header",
+        "can be buried in annex"
+      ]
+    },
+    {
+      "id": "med_list_hint_20",
+      "entity": "state_province",
+      "anchors": [
+        "state province",
+        "medication list state province",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "introduction",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in revision history",
+        "can be buried in annex i"
+      ]
+    },
+    {
+      "id": "med_list_hint_21",
+      "entity": "address",
+      "anchors": [
+        "address",
+        "medication list address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "limitations",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can be buried in annex ii"
+      ]
+    },
+    {
+      "id": "med_list_hint_22",
+      "entity": "case_number",
+      "anchors": [
+        "case number",
+        "medication list case number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "medications",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix a",
+        "can be buried in exhibit"
+      ]
+    },
+    {
+      "id": "med_list_hint_23",
+      "entity": "city",
+      "anchors": [
+        "city",
+        "medication list city",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "methodology",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix b",
+        "can be buried in exhibit a"
+      ]
+    },
+    {
+      "id": "med_list_hint_24",
+      "entity": "country",
+      "anchors": [
+        "country",
+        "medication list country",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "orders",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex",
+        "can be buried in exhibit b"
+      ]
+    },
+    {
+      "id": "med_list_hint_25",
+      "entity": "diagnosis_code",
+      "anchors": [
+        "diagnosis code",
+        "medication list diagnosis code",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "patient_demographics",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex i",
+        "can be buried in footnote"
+      ]
+    },
+    {
+      "id": "med_list_hint_26",
+      "entity": "document_number",
+      "anchors": [
+        "document number",
+        "medication list document number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "physical_examination",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex ii",
+        "can be buried in endnote"
+      ]
+    },
+    {
+      "id": "med_list_hint_27",
+      "entity": "dosage",
+      "anchors": [
+        "dosage",
+        "medication list dosage",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "procedures",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in exhibit",
+        "can be buried in schedule"
+      ]
+    },
+    {
+      "id": "med_list_hint_28",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "medication list effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "protocols",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in exhibit a",
+        "can be buried in attachment"
+      ]
+    },
+    {
+      "id": "med_list_hint_29",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "medication list expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recommendations",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in exhibit b",
+        "can be buried in addendum"
+      ]
+    },
+    {
+      "id": "med_list_hint_30",
+      "entity": "lab_value",
+      "anchors": [
+        "lab value",
+        "medication list lab value",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "red_flags",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in footnote",
+        "can be buried in rider"
+      ]
+    },
+    {
+      "id": "med_list_hint_31",
+      "entity": "medication_name",
+      "anchors": [
+        "medication name",
+        "medication list medication name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "regulatory_references",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in endnote",
+        "can be buried in supplement"
+      ]
+    },
+    {
+      "id": "med_list_hint_32",
+      "entity": "period_reference",
+      "anchors": [
+        "period reference",
+        "medication list period reference",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "results",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in schedule",
+        "can be buried in definitions section"
+      ]
+    },
+    {
+      "id": "med_list_hint_33",
+      "entity": "person_name",
+      "anchors": [
+        "person name",
+        "medication list person name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "review_notes",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in attachment",
+        "can be buried in signature block"
+      ]
+    },
+    {
+      "id": "med_list_hint_34",
+      "entity": "person_role",
+      "anchors": [
+        "person role",
+        "medication list person role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "revision_history",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in addendum",
+        "can be buried in metadata header"
+      ]
+    }
+  ]
+}

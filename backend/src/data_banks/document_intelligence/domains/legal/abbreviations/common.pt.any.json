@@ -1,0 +1,287 @@
+{
+  "_meta": {
+    "id": "legal_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "Portuguese abbreviations for legal domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "language": "pt"
+  },
+  "domain": "legal",
+  "abbreviations": [
+    {
+      "abbr": "AGM",
+      "expansion": "Assembleia Geral Anual"
+    },
+    {
+      "abbr": "AML",
+      "expansion": "Prevencao a Lavagem de Dinheiro"
+    },
+    {
+      "abbr": "APA",
+      "expansion": "Acordo de Compra de Ativos"
+    },
+    {
+      "abbr": "BCR",
+      "expansion": "Regras Corporativas Vinculantes"
+    },
+    {
+      "abbr": "BOD",
+      "expansion": "Conselho de Administracao"
+    },
+    {
+      "abbr": "CCPA",
+      "expansion": "Lei de Privacidade do Consumidor da California"
+    },
+    {
+      "abbr": "COI",
+      "expansion": "Conflito de Interesses"
+    },
+    {
+      "abbr": "DLP",
+      "expansion": "Prevencao de Perda de Dados"
+    },
+    {
+      "abbr": "DNC",
+      "expansion": "Nao Concorrer"
+    },
+    {
+      "abbr": "DNCG",
+      "expansion": "Grupo Nao Contatar"
+    },
+    {
+      "abbr": "DPA",
+      "expansion": "Acordo de Tratamento de Dados"
+    },
+    {
+      "abbr": "DPIA",
+      "expansion": "Avaliacao de Impacto a Protecao de Dados"
+    },
+    {
+      "abbr": "DPO",
+      "expansion": "Encarregado de Protecao de Dados"
+    },
+    {
+      "abbr": "DSAR",
+      "expansion": "Solicitacao de Acesso de Titular de Dados"
+    },
+    {
+      "abbr": "EGM",
+      "expansion": "Assembleia Geral Extraordinaria"
+    },
+    {
+      "abbr": "EULA",
+      "expansion": "Licenca de Usuario Final"
+    },
+    {
+      "abbr": "FCPA",
+      "expansion": "Lei de Praticas Corruptas no Exterior"
+    },
+    {
+      "abbr": "GDPR",
+      "expansion": "Regulamento Geral de Protecao de Dados"
+    },
+    {
+      "abbr": "IP",
+      "expansion": "Propriedade Intelectual"
+    },
+    {
+      "abbr": "JDA",
+      "expansion": "Acordo de Desenvolvimento Conjunto"
+    },
+    {
+      "abbr": "JVA",
+      "expansion": "Acordo de Joint Venture"
+    },
+    {
+      "abbr": "KYC",
+      "expansion": "Conheca Seu Cliente"
+    },
+    {
+      "abbr": "LGPD",
+      "expansion": "Lei Geral de Protecao de Dados"
+    },
+    {
+      "abbr": "LOA",
+      "expansion": "Carta de Autorizacao"
+    },
+    {
+      "abbr": "LOI",
+      "expansion": "Carta de Intencao"
+    },
+    {
+      "abbr": "LPA",
+      "expansion": "Procuracao Limitada"
+    },
+    {
+      "abbr": "MFA",
+      "expansion": "Acordo-Quadro Mutuo"
+    },
+    {
+      "abbr": "MFN",
+      "expansion": "Nacao Mais Favorecida"
+    },
+    {
+      "abbr": "MOU",
+      "expansion": "Memorando de Entendimento"
+    },
+    {
+      "abbr": "MRA",
+      "expansion": "Acordo Mestre de Revenda"
+    },
+    {
+      "abbr": "MSA",
+      "expansion": "Acordo Mestre de Servicos"
+    },
+    {
+      "abbr": "MTA",
+      "expansion": "Acordo de Transferencia de Material"
+    },
+    {
+      "abbr": "NBO",
+      "expansion": "Oferta Nao Vinculante"
+    },
+    {
+      "abbr": "NCA",
+      "expansion": "Acordo de Nao Concorrencia"
+    },
+    {
+      "abbr": "NDA",
+      "expansion": "Acordo de Confidencialidade"
+    },
+    {
+      "abbr": "NDAA",
+      "expansion": "Lei de Autorizacao de Defesa Nacional"
+    },
+    {
+      "abbr": "NFR",
+      "expansion": "Requisito Nao Funcional"
+    },
+    {
+      "abbr": "NIS2",
+      "expansion": "Diretiva 2 de Seguranca de Redes e Informacao"
+    },
+    {
+      "abbr": "NOC",
+      "expansion": "Aviso de Reivindicacao"
+    },
+    {
+      "abbr": "NPA",
+      "expansion": "Avaliacao de Nao Desempenho"
+    },
+    {
+      "abbr": "NSA",
+      "expansion": "Acordo de Nao Aliciamento"
+    },
+    {
+      "abbr": "NTP",
+      "expansion": "Aviso para Prosseguir"
+    },
+    {
+      "abbr": "PII",
+      "expansion": "Informacao Pessoal Identificavel"
+    },
+    {
+      "abbr": "PIPL",
+      "expansion": "Lei de Protecao de Informacoes Pessoais"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Procuracao"
+    },
+    {
+      "abbr": "PPA",
+      "expansion": "Adendo de Finalidade de Tratamento"
+    },
+    {
+      "abbr": "PRA",
+      "expansion": "Adendo de Direitos de Privacidade"
+    },
+    {
+      "abbr": "Q&A",
+      "expansion": "Perguntas e Respostas"
+    },
+    {
+      "abbr": "R&R",
+      "expansion": "Papeis e Responsabilidades"
+    },
+    {
+      "abbr": "RFI",
+      "expansion": "Pedido de Informacao"
+    },
+    {
+      "abbr": "RFP",
+      "expansion": "Pedido de Proposta"
+    },
+    {
+      "abbr": "ROFO",
+      "expansion": "Direito de Primeira Oferta"
+    },
+    {
+      "abbr": "ROFR",
+      "expansion": "Direito de Preferencia"
+    },
+    {
+      "abbr": "ROI",
+      "expansion": "Retorno sobre Investimento"
+    },
+    {
+      "abbr": "SAR",
+      "expansion": "Solicitacao de Acesso do Titular"
+    },
+    {
+      "abbr": "SCC",
+      "expansion": "Clausulas Contratuais Padrao"
+    },
+    {
+      "abbr": "SLA",
+      "expansion": "Acordo de Nivel de Servico"
+    },
+    {
+      "abbr": "SOP",
+      "expansion": "Procedimento Operacional Padrao"
+    },
+    {
+      "abbr": "SOPA",
+      "expansion": "Adendo de Procedimento de Operacoes de Seguranca"
+    },
+    {
+      "abbr": "SOW",
+      "expansion": "Declaracao de Trabalho"
+    },
+    {
+      "abbr": "SPA",
+      "expansion": "Acordo de Compra de Acoes"
+    },
+    {
+      "abbr": "SRA",
+      "expansion": "Adendo de Revisao de Seguranca"
+    },
+    {
+      "abbr": "TBD",
+      "expansion": "A Determinar"
+    },
+    {
+      "abbr": "TIA",
+      "expansion": "Avaliacao de Impacto de Transferencia"
+    },
+    {
+      "abbr": "TLA",
+      "expansion": "Acronimo de Tres Letras"
+    },
+    {
+      "abbr": "TOS",
+      "expansion": "Termos de Servico"
+    },
+    {
+      "abbr": "UKBA",
+      "expansion": "Lei Antissuborno do Reino Unido"
+    }
+  ]
+}

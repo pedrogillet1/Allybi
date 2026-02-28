@@ -1,0 +1,287 @@
+{
+  "_meta": {
+    "id": "legal_abbreviations_en",
+    "version": "1.0.0",
+    "description": "English abbreviations for legal domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "language": "en"
+  },
+  "domain": "legal",
+  "abbreviations": [
+    {
+      "abbr": "AGM",
+      "expansion": "Annual General Meeting"
+    },
+    {
+      "abbr": "AML",
+      "expansion": "Anti-Money Laundering"
+    },
+    {
+      "abbr": "APA",
+      "expansion": "Asset Purchase Agreement"
+    },
+    {
+      "abbr": "BCR",
+      "expansion": "Binding Corporate Rules"
+    },
+    {
+      "abbr": "BOD",
+      "expansion": "Board of Directors"
+    },
+    {
+      "abbr": "CCPA",
+      "expansion": "California Consumer Privacy Act"
+    },
+    {
+      "abbr": "COI",
+      "expansion": "Conflict of Interest"
+    },
+    {
+      "abbr": "DLP",
+      "expansion": "Data Loss Prevention"
+    },
+    {
+      "abbr": "DNC",
+      "expansion": "Do Not Compete"
+    },
+    {
+      "abbr": "DNCG",
+      "expansion": "Do Not Contact Group"
+    },
+    {
+      "abbr": "DPA",
+      "expansion": "Data Processing Agreement"
+    },
+    {
+      "abbr": "DPIA",
+      "expansion": "Data Protection Impact Assessment"
+    },
+    {
+      "abbr": "DPO",
+      "expansion": "Data Protection Officer"
+    },
+    {
+      "abbr": "DSAR",
+      "expansion": "Data Subject Access Request"
+    },
+    {
+      "abbr": "EGM",
+      "expansion": "Extraordinary General Meeting"
+    },
+    {
+      "abbr": "EULA",
+      "expansion": "End User License Agreement"
+    },
+    {
+      "abbr": "FCPA",
+      "expansion": "Foreign Corrupt Practices Act"
+    },
+    {
+      "abbr": "GDPR",
+      "expansion": "General Data Protection Regulation"
+    },
+    {
+      "abbr": "IP",
+      "expansion": "Intellectual Property"
+    },
+    {
+      "abbr": "JDA",
+      "expansion": "Joint Development Agreement"
+    },
+    {
+      "abbr": "JVA",
+      "expansion": "Joint Venture Agreement"
+    },
+    {
+      "abbr": "KYC",
+      "expansion": "Know Your Customer"
+    },
+    {
+      "abbr": "LGPD",
+      "expansion": "Lei Geral de Protecao de Dados"
+    },
+    {
+      "abbr": "LOA",
+      "expansion": "Letter of Authorization"
+    },
+    {
+      "abbr": "LOI",
+      "expansion": "Letter of Intent"
+    },
+    {
+      "abbr": "LPA",
+      "expansion": "Limited Power of Attorney"
+    },
+    {
+      "abbr": "MFA",
+      "expansion": "Mutual Framework Agreement"
+    },
+    {
+      "abbr": "MFN",
+      "expansion": "Most Favored Nation"
+    },
+    {
+      "abbr": "MOU",
+      "expansion": "Memorandum of Understanding"
+    },
+    {
+      "abbr": "MRA",
+      "expansion": "Master Reseller Agreement"
+    },
+    {
+      "abbr": "MSA",
+      "expansion": "Master Service Agreement"
+    },
+    {
+      "abbr": "MTA",
+      "expansion": "Material Transfer Agreement"
+    },
+    {
+      "abbr": "NBO",
+      "expansion": "Non-Binding Offer"
+    },
+    {
+      "abbr": "NCA",
+      "expansion": "Non-Compete Agreement"
+    },
+    {
+      "abbr": "NDA",
+      "expansion": "Non-Disclosure Agreement"
+    },
+    {
+      "abbr": "NDAA",
+      "expansion": "National Defense Authorization Act"
+    },
+    {
+      "abbr": "NFR",
+      "expansion": "Non-Functional Requirement"
+    },
+    {
+      "abbr": "NIS2",
+      "expansion": "Network and Information Security Directive 2"
+    },
+    {
+      "abbr": "NOC",
+      "expansion": "Notice of Claim"
+    },
+    {
+      "abbr": "NPA",
+      "expansion": "Non-Performance Assessment"
+    },
+    {
+      "abbr": "NSA",
+      "expansion": "Non-Solicitation Agreement"
+    },
+    {
+      "abbr": "NTP",
+      "expansion": "Notice to Proceed"
+    },
+    {
+      "abbr": "PII",
+      "expansion": "Personally Identifiable Information"
+    },
+    {
+      "abbr": "PIPL",
+      "expansion": "Personal Information Protection Law"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Power of Attorney"
+    },
+    {
+      "abbr": "PPA",
+      "expansion": "Processing Purpose Addendum"
+    },
+    {
+      "abbr": "PRA",
+      "expansion": "Privacy Rights Addendum"
+    },
+    {
+      "abbr": "Q&A",
+      "expansion": "Questions and Answers"
+    },
+    {
+      "abbr": "R&R",
+      "expansion": "Roles and Responsibilities"
+    },
+    {
+      "abbr": "RFI",
+      "expansion": "Request for Information"
+    },
+    {
+      "abbr": "RFP",
+      "expansion": "Request for Proposal"
+    },
+    {
+      "abbr": "ROFO",
+      "expansion": "Right of First Offer"
+    },
+    {
+      "abbr": "ROFR",
+      "expansion": "Right of First Refusal"
+    },
+    {
+      "abbr": "ROI",
+      "expansion": "Return on Investment"
+    },
+    {
+      "abbr": "SAR",
+      "expansion": "Subject Access Request"
+    },
+    {
+      "abbr": "SCC",
+      "expansion": "Standard Contractual Clauses"
+    },
+    {
+      "abbr": "SLA",
+      "expansion": "Service Level Agreement"
+    },
+    {
+      "abbr": "SOP",
+      "expansion": "Standard Operating Procedure"
+    },
+    {
+      "abbr": "SOPA",
+      "expansion": "Security Operations Procedure Addendum"
+    },
+    {
+      "abbr": "SOW",
+      "expansion": "Statement of Work"
+    },
+    {
+      "abbr": "SPA",
+      "expansion": "Share Purchase Agreement"
+    },
+    {
+      "abbr": "SRA",
+      "expansion": "Security Review Addendum"
+    },
+    {
+      "abbr": "TBD",
+      "expansion": "To Be Determined"
+    },
+    {
+      "abbr": "TIA",
+      "expansion": "Transfer Impact Assessment"
+    },
+    {
+      "abbr": "TLA",
+      "expansion": "Three-Letter Acronym"
+    },
+    {
+      "abbr": "TOS",
+      "expansion": "Terms of Service"
+    },
+    {
+      "abbr": "UKBA",
+      "expansion": "UK Bribery Act"
+    }
+  ]
+}

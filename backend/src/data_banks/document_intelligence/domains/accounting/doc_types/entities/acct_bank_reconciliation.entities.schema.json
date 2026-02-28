@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_bank_reconciliation",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for bank reconciliation documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_bank_reconciliation"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "reconciliationDate",
+      "type": "date",
+      "required": true,
+      "description": "Reconciliation date"
+    },
+    {
+      "id": "bookBalance",
+      "type": "currency",
+      "required": true,
+      "description": "Book balance"
+    },
+    {
+      "id": "bankBalance",
+      "type": "currency",
+      "required": true,
+      "description": "Bank statement balance"
+    },
+    {
+      "id": "adjustedBookBalance",
+      "type": "currency",
+      "required": true,
+      "description": "Adjusted book balance"
+    },
+    {
+      "id": "adjustedBankBalance",
+      "type": "currency",
+      "required": true,
+      "description": "Adjusted bank balance"
+    },
+    {
+      "id": "unreconciledDifference",
+      "type": "currency",
+      "required": false,
+      "description": "Difference after adjustments"
+    }
+  ]
+}

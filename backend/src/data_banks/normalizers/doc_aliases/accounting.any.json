@@ -1,0 +1,4105 @@
+{
+  "_meta": {
+    "id": "doc_aliases_accounting",
+    "version": "1.1.0",
+    "description": "Accounting document alias normalization bank.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true,
+    "minAliasConfidence": 0.6
+  },
+  "domain": "accounting",
+  "aliases": [
+    {
+      "phrase": "chart of accounts",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show chart of accounts for the period",
+        "export chart of accounts for review"
+      ]
+    },
+    {
+      "phrase": "coa",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show coa for the period",
+        "export coa for review"
+      ]
+    },
+    {
+      "phrase": "account chart",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show account chart for the period",
+        "export account chart for review"
+      ]
+    },
+    {
+      "phrase": "account listing",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show account listing for the period",
+        "export account listing for review"
+      ]
+    },
+    {
+      "phrase": "plano de contas",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar plano de contas do periodo",
+        "exportar plano de contas para revisao"
+      ]
+    },
+    {
+      "phrase": "plano contabil",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar plano contabil do periodo",
+        "exportar plano contabil para revisao"
+      ]
+    },
+    {
+      "phrase": "lista de contas",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar lista de contas do periodo",
+        "exportar lista de contas para revisao"
+      ]
+    },
+    {
+      "phrase": "estrutura de contas",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar estrutura de contas do periodo",
+        "exportar estrutura de contas para revisao"
+      ]
+    },
+    {
+      "phrase": "cadastro de contas",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cadastro de contas do periodo",
+        "exportar cadastro de contas para revisao"
+      ]
+    },
+    {
+      "phrase": "plano de contas contabil",
+      "normalized": "chart of accounts",
+      "docTypeIds": [
+        "acct_chart_of_accounts"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar plano de contas contabil do periodo",
+        "exportar plano de contas contabil para revisao"
+      ]
+    },
+    {
+      "phrase": "general ledger export",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show general ledger export for the period",
+        "export general ledger export for review"
+      ]
+    },
+    {
+      "phrase": "general ledger detail",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show general ledger detail for the period",
+        "export general ledger detail for review"
+      ]
+    },
+    {
+      "phrase": "gl export",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show gl export for the period",
+        "export gl export for review"
+      ]
+    },
+    {
+      "phrase": "gl detail",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show gl detail for the period",
+        "export gl detail for review"
+      ]
+    },
+    {
+      "phrase": "ledger export",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show ledger export for the period",
+        "export ledger export for review"
+      ]
+    },
+    {
+      "phrase": "razao geral",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar razao geral do periodo",
+        "exportar razao geral para revisao"
+      ]
+    },
+    {
+      "phrase": "razão geral",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar razão geral do periodo",
+        "exportar razão geral para revisao"
+      ]
+    },
+    {
+      "phrase": "livro razao",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar livro razao do periodo",
+        "exportar livro razao para revisao"
+      ]
+    },
+    {
+      "phrase": "livro razão",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar livro razão do periodo",
+        "exportar livro razão para revisao"
+      ]
+    },
+    {
+      "phrase": "extrato contabil",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar extrato contabil do periodo",
+        "exportar extrato contabil para revisao"
+      ]
+    },
+    {
+      "phrase": "razao analitico",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.68,
+      "examples": [
+        "mostrar razao analitico do periodo",
+        "exportar razao analitico para revisao"
+      ]
+    },
+    {
+      "phrase": "razão analítico",
+      "normalized": "general ledger export",
+      "docTypeIds": [
+        "acct_gl_export"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "ledger",
+        "languageHint": "pt"
+      },
+      "confidence": 0.66,
+      "examples": [
+        "mostrar razão analítico do periodo",
+        "exportar razão analítico para revisao"
+      ]
+    },
+    {
+      "phrase": "trial balance",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show trial balance for the period",
+        "export trial balance for review"
+      ]
+    },
+    {
+      "phrase": "tb report",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show tb report for the period",
+        "export tb report for review"
+      ]
+    },
+    {
+      "phrase": "adjusted trial balance",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show adjusted trial balance for the period",
+        "export adjusted trial balance for review"
+      ]
+    },
+    {
+      "phrase": "unadjusted trial balance",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show unadjusted trial balance for the period",
+        "export unadjusted trial balance for review"
+      ]
+    },
+    {
+      "phrase": "post-closing trial balance",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show post-closing trial balance for the period",
+        "export post-closing trial balance for review"
+      ]
+    },
+    {
+      "phrase": "balancete",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar balancete do periodo",
+        "exportar balancete para revisao"
+      ]
+    },
+    {
+      "phrase": "balancete de verificacao",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar balancete de verificacao do periodo",
+        "exportar balancete de verificacao para revisao"
+      ]
+    },
+    {
+      "phrase": "balancete de verificação",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar balancete de verificação do periodo",
+        "exportar balancete de verificação para revisao"
+      ]
+    },
+    {
+      "phrase": "balancete analitico",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar balancete analitico do periodo",
+        "exportar balancete analitico para revisao"
+      ]
+    },
+    {
+      "phrase": "balancete analítico",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar balancete analítico do periodo",
+        "exportar balancete analítico para revisao"
+      ]
+    },
+    {
+      "phrase": "balancete sintetico",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.68,
+      "examples": [
+        "mostrar balancete sintetico do periodo",
+        "exportar balancete sintetico para revisao"
+      ]
+    },
+    {
+      "phrase": "balancete sintético",
+      "normalized": "trial balance",
+      "docTypeIds": [
+        "acct_trial_balance"
+      ],
+      "hints": {
+        "periodHint": "period_end",
+        "entityHint": "legal_entity",
+        "formatHint": "balance_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.66,
+      "examples": [
+        "mostrar balancete sintético do periodo",
+        "exportar balancete sintético para revisao"
+      ]
+    },
+    {
+      "phrase": "journal entry support",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show journal entry support for the period",
+        "export journal entry support for review"
+      ]
+    },
+    {
+      "phrase": "je support",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show je support for the period",
+        "export je support for review"
+      ]
+    },
+    {
+      "phrase": "journal support package",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show journal support package for the period",
+        "export journal support package for review"
+      ]
+    },
+    {
+      "phrase": "entry support file",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show entry support file for the period",
+        "export entry support file for review"
+      ]
+    },
+    {
+      "phrase": "suporte de lancamento contabil",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar suporte de lancamento contabil do periodo",
+        "exportar suporte de lancamento contabil para revisao"
+      ]
+    },
+    {
+      "phrase": "suporte de lançamento contábil",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar suporte de lançamento contábil do periodo",
+        "exportar suporte de lançamento contábil para revisao"
+      ]
+    },
+    {
+      "phrase": "documentacao de je",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar documentacao de je do periodo",
+        "exportar documentacao de je para revisao"
+      ]
+    },
+    {
+      "phrase": "documentação de je",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar documentação de je do periodo",
+        "exportar documentação de je para revisao"
+      ]
+    },
+    {
+      "phrase": "dossie de lancamento",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar dossie de lancamento do periodo",
+        "exportar dossie de lancamento para revisao"
+      ]
+    },
+    {
+      "phrase": "dossiê de lançamento",
+      "normalized": "journal entry support",
+      "docTypeIds": [
+        "acct_journal_entry_support"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "support_pack",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar dossiê de lançamento do periodo",
+        "exportar dossiê de lançamento para revisao"
+      ]
+    },
+    {
+      "phrase": "ar aging",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show ar aging for the period",
+        "export ar aging for review"
+      ]
+    },
+    {
+      "phrase": "accounts receivable aging",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show accounts receivable aging for the period",
+        "export accounts receivable aging for review"
+      ]
+    },
+    {
+      "phrase": "receivables aging",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show receivables aging for the period",
+        "export receivables aging for review"
+      ]
+    },
+    {
+      "phrase": "aged receivables",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show aged receivables for the period",
+        "export aged receivables for review"
+      ]
+    },
+    {
+      "phrase": "customer aging report",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show customer aging report for the period",
+        "export customer aging report for review"
+      ]
+    },
+    {
+      "phrase": "envelhecimento de contas a receber",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar envelhecimento de contas a receber do periodo",
+        "exportar envelhecimento de contas a receber para revisao"
+      ]
+    },
+    {
+      "phrase": "aging de clientes",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar aging de clientes do periodo",
+        "exportar aging de clientes para revisao"
+      ]
+    },
+    {
+      "phrase": "idade de recebiveis",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar idade de recebiveis do periodo",
+        "exportar idade de recebiveis para revisao"
+      ]
+    },
+    {
+      "phrase": "idade de recebíveis",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar idade de recebíveis do periodo",
+        "exportar idade de recebíveis para revisao"
+      ]
+    },
+    {
+      "phrase": "vencimento de cr",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar vencimento de cr do periodo",
+        "exportar vencimento de cr para revisao"
+      ]
+    },
+    {
+      "phrase": "relatorio de aging de cr",
+      "normalized": "accounts receivable aging",
+      "docTypeIds": [
+        "acct_ar_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "customer",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.68,
+      "examples": [
+        "mostrar relatorio de aging de cr do periodo",
+        "exportar relatorio de aging de cr para revisao"
+      ]
+    },
+    {
+      "phrase": "ap aging",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show ap aging for the period",
+        "export ap aging for review"
+      ]
+    },
+    {
+      "phrase": "accounts payable aging",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show accounts payable aging for the period",
+        "export accounts payable aging for review"
+      ]
+    },
+    {
+      "phrase": "payables aging",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show payables aging for the period",
+        "export payables aging for review"
+      ]
+    },
+    {
+      "phrase": "aged payables",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show aged payables for the period",
+        "export aged payables for review"
+      ]
+    },
+    {
+      "phrase": "vendor aging report",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show vendor aging report for the period",
+        "export vendor aging report for review"
+      ]
+    },
+    {
+      "phrase": "envelhecimento de contas a pagar",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar envelhecimento de contas a pagar do periodo",
+        "exportar envelhecimento de contas a pagar para revisao"
+      ]
+    },
+    {
+      "phrase": "aging de fornecedores",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar aging de fornecedores do periodo",
+        "exportar aging de fornecedores para revisao"
+      ]
+    },
+    {
+      "phrase": "idade de fornecedores",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar idade de fornecedores do periodo",
+        "exportar idade de fornecedores para revisao"
+      ]
+    },
+    {
+      "phrase": "vencimento de cp",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar vencimento de cp do periodo",
+        "exportar vencimento de cp para revisao"
+      ]
+    },
+    {
+      "phrase": "relatorio de aging de cp",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar relatorio de aging de cp do periodo",
+        "exportar relatorio de aging de cp para revisao"
+      ]
+    },
+    {
+      "phrase": "aging de contas a pagar",
+      "normalized": "accounts payable aging",
+      "docTypeIds": [
+        "acct_ap_aging"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "vendor",
+        "formatHint": "aging_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.68,
+      "examples": [
+        "mostrar aging de contas a pagar do periodo",
+        "exportar aging de contas a pagar para revisao"
+      ]
+    },
+    {
+      "phrase": "invoice register",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show invoice register for the period",
+        "export invoice register for review"
+      ]
+    },
+    {
+      "phrase": "invoice listing",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show invoice listing for the period",
+        "export invoice listing for review"
+      ]
+    },
+    {
+      "phrase": "invoice log",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show invoice log for the period",
+        "export invoice log for review"
+      ]
+    },
+    {
+      "phrase": "billing register",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show billing register for the period",
+        "export billing register for review"
+      ]
+    },
+    {
+      "phrase": "registro de faturas",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar registro de faturas do periodo",
+        "exportar registro de faturas para revisao"
+      ]
+    },
+    {
+      "phrase": "lista de faturas",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar lista de faturas do periodo",
+        "exportar lista de faturas para revisao"
+      ]
+    },
+    {
+      "phrase": "cadastro de notas fiscais",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar cadastro de notas fiscais do periodo",
+        "exportar cadastro de notas fiscais para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de notas fiscais",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar registro de notas fiscais do periodo",
+        "exportar registro de notas fiscais para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de faturas",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar controle de faturas do periodo",
+        "exportar controle de faturas para revisao"
+      ]
+    },
+    {
+      "phrase": "livro de faturas",
+      "normalized": "invoice register",
+      "docTypeIds": [
+        "acct_invoice_register"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "counterparty",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar livro de faturas do periodo",
+        "exportar livro de faturas para revisao"
+      ]
+    },
+    {
+      "phrase": "payment run report",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show payment run report for the period",
+        "export payment run report for review"
+      ]
+    },
+    {
+      "phrase": "payment batch report",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show payment batch report for the period",
+        "export payment batch report for review"
+      ]
+    },
+    {
+      "phrase": "payment run summary",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show payment run summary for the period",
+        "export payment run summary for review"
+      ]
+    },
+    {
+      "phrase": "ap payment run",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show ap payment run for the period",
+        "export ap payment run for review"
+      ]
+    },
+    {
+      "phrase": "relatorio de lote de pagamentos",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar relatorio de lote de pagamentos do periodo",
+        "exportar relatorio de lote de pagamentos para revisao"
+      ]
+    },
+    {
+      "phrase": "relatório de lote de pagamentos",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar relatório de lote de pagamentos do periodo",
+        "exportar relatório de lote de pagamentos para revisao"
+      ]
+    },
+    {
+      "phrase": "resumo de pagamentos",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar resumo de pagamentos do periodo",
+        "exportar resumo de pagamentos para revisao"
+      ]
+    },
+    {
+      "phrase": "lote de pagamentos",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar lote de pagamentos do periodo",
+        "exportar lote de pagamentos para revisao"
+      ]
+    },
+    {
+      "phrase": "bordero de pagamentos",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar bordero de pagamentos do periodo",
+        "exportar bordero de pagamentos para revisao"
+      ]
+    },
+    {
+      "phrase": "borderô de pagamentos",
+      "normalized": "payment run report",
+      "docTypeIds": [
+        "acct_payment_run_report"
+      ],
+      "hints": {
+        "periodHint": "weekly",
+        "entityHint": "vendor",
+        "formatHint": "batch_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar borderô de pagamentos do periodo",
+        "exportar borderô de pagamentos para revisao"
+      ]
+    },
+    {
+      "phrase": "bank reconciliation",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show bank reconciliation for the period",
+        "export bank reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "bank rec",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show bank rec for the period",
+        "export bank rec for review"
+      ]
+    },
+    {
+      "phrase": "bank recon",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show bank recon for the period",
+        "export bank recon for review"
+      ]
+    },
+    {
+      "phrase": "cash reconciliation",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show cash reconciliation for the period",
+        "export cash reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "bank reconcilliation",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show bank reconcilliation for the period",
+        "export bank reconcilliation for review"
+      ]
+    },
+    {
+      "phrase": "conciliacao bancaria",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar conciliacao bancaria do periodo",
+        "exportar conciliacao bancaria para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliação bancária",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar conciliação bancária do periodo",
+        "exportar conciliação bancária para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliacao de banco",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar conciliacao de banco do periodo",
+        "exportar conciliacao de banco para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliação de banco",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar conciliação de banco do periodo",
+        "exportar conciliação de banco para revisao"
+      ]
+    },
+    {
+      "phrase": "reconciliacao bancaria",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar reconciliacao bancaria do periodo",
+        "exportar reconciliacao bancaria para revisao"
+      ]
+    },
+    {
+      "phrase": "reconciliação bancária",
+      "normalized": "bank reconciliation",
+      "docTypeIds": [
+        "acct_bank_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.68,
+      "examples": [
+        "mostrar reconciliação bancária do periodo",
+        "exportar reconciliação bancária para revisao"
+      ]
+    },
+    {
+      "phrase": "credit card reconciliation",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show credit card reconciliation for the period",
+        "export credit card reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "card reconciliation",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show card reconciliation for the period",
+        "export card reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "corporate card reconciliation",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show corporate card reconciliation for the period",
+        "export corporate card reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "card rec report",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show card rec report for the period",
+        "export card rec report for review"
+      ]
+    },
+    {
+      "phrase": "conciliacao de cartao de credito",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar conciliacao de cartao de credito do periodo",
+        "exportar conciliacao de cartao de credito para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliação de cartão de crédito",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar conciliação de cartão de crédito do periodo",
+        "exportar conciliação de cartão de crédito para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliacao de cartao corporativo",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar conciliacao de cartao corporativo do periodo",
+        "exportar conciliacao de cartao corporativo para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliação de cartão corporativo",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar conciliação de cartão corporativo do periodo",
+        "exportar conciliação de cartão corporativo para revisao"
+      ]
+    },
+    {
+      "phrase": "reconciliacao de cartao",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar reconciliacao de cartao do periodo",
+        "exportar reconciliacao de cartao para revisao"
+      ]
+    },
+    {
+      "phrase": "reconciliação de cartão",
+      "normalized": "credit card reconciliation",
+      "docTypeIds": [
+        "acct_credit_card_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "card_program",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar reconciliação de cartão do periodo",
+        "exportar reconciliação de cartão para revisao"
+      ]
+    },
+    {
+      "phrase": "intercompany reconciliation",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show intercompany reconciliation for the period",
+        "export intercompany reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "interco reconciliation",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show interco reconciliation for the period",
+        "export interco reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "intercompany rec",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show intercompany rec for the period",
+        "export intercompany rec for review"
+      ]
+    },
+    {
+      "phrase": "due to due from reconciliation",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show due to due from reconciliation for the period",
+        "export due to due from reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "conciliacao intercompany",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar conciliacao intercompany do periodo",
+        "exportar conciliacao intercompany para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliação intercompany",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar conciliação intercompany do periodo",
+        "exportar conciliação intercompany para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliacao entre empresas",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar conciliacao entre empresas do periodo",
+        "exportar conciliacao entre empresas para revisao"
+      ]
+    },
+    {
+      "phrase": "conciliação entre empresas",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar conciliação entre empresas do periodo",
+        "exportar conciliação entre empresas para revisao"
+      ]
+    },
+    {
+      "phrase": "reconciliacao intercompany",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar reconciliacao intercompany do periodo",
+        "exportar reconciliacao intercompany para revisao"
+      ]
+    },
+    {
+      "phrase": "reconciliação intercompany",
+      "normalized": "intercompany reconciliation",
+      "docTypeIds": [
+        "acct_intercompany_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "intercompany",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar reconciliação intercompany do periodo",
+        "exportar reconciliação intercompany para revisao"
+      ]
+    },
+    {
+      "phrase": "fixed asset register",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show fixed asset register for the period",
+        "export fixed asset register for review"
+      ]
+    },
+    {
+      "phrase": "asset register",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show asset register for the period",
+        "export asset register for review"
+      ]
+    },
+    {
+      "phrase": "fixed assets listing",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show fixed assets listing for the period",
+        "export fixed assets listing for review"
+      ]
+    },
+    {
+      "phrase": "ppe register",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show ppe register for the period",
+        "export ppe register for review"
+      ]
+    },
+    {
+      "phrase": "registro de ativo imobilizado",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar registro de ativo imobilizado do periodo",
+        "exportar registro de ativo imobilizado para revisao"
+      ]
+    },
+    {
+      "phrase": "cadastro de imobilizado",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar cadastro de imobilizado do periodo",
+        "exportar cadastro de imobilizado para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de ativos fixos",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar controle de ativos fixos do periodo",
+        "exportar controle de ativos fixos para revisao"
+      ]
+    },
+    {
+      "phrase": "registro de bens",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar registro de bens do periodo",
+        "exportar registro de bens para revisao"
+      ]
+    },
+    {
+      "phrase": "relacao de imobilizado",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar relacao de imobilizado do periodo",
+        "exportar relacao de imobilizado para revisao"
+      ]
+    },
+    {
+      "phrase": "relação de imobilizado",
+      "normalized": "fixed asset register",
+      "docTypeIds": [
+        "acct_fixed_asset_register"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "legal_entity",
+        "formatHint": "register",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar relação de imobilizado do periodo",
+        "exportar relação de imobilizado para revisao"
+      ]
+    },
+    {
+      "phrase": "depreciation schedule",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show depreciation schedule for the period",
+        "export depreciation schedule for review"
+      ]
+    },
+    {
+      "phrase": "depr schedule",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show depr schedule for the period",
+        "export depr schedule for review"
+      ]
+    },
+    {
+      "phrase": "depreciation rollforward",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show depreciation rollforward for the period",
+        "export depreciation rollforward for review"
+      ]
+    },
+    {
+      "phrase": "depreciation report",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show depreciation report for the period",
+        "export depreciation report for review"
+      ]
+    },
+    {
+      "phrase": "cronograma de depreciacao",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar cronograma de depreciacao do periodo",
+        "exportar cronograma de depreciacao para revisao"
+      ]
+    },
+    {
+      "phrase": "cronograma de depreciação",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar cronograma de depreciação do periodo",
+        "exportar cronograma de depreciação para revisao"
+      ]
+    },
+    {
+      "phrase": "quadro de depreciacao",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar quadro de depreciacao do periodo",
+        "exportar quadro de depreciacao para revisao"
+      ]
+    },
+    {
+      "phrase": "quadro de depreciação",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar quadro de depreciação do periodo",
+        "exportar quadro de depreciação para revisao"
+      ]
+    },
+    {
+      "phrase": "tabela de depreciacao",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar tabela de depreciacao do periodo",
+        "exportar tabela de depreciacao para revisao"
+      ]
+    },
+    {
+      "phrase": "depreciacao acumulada",
+      "normalized": "depreciation schedule",
+      "docTypeIds": [
+        "acct_depreciation_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "asset_class",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar depreciacao acumulada do periodo",
+        "exportar depreciacao acumulada para revisao"
+      ]
+    },
+    {
+      "phrase": "prepaids amortization schedule",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show prepaids amortization schedule for the period",
+        "export prepaids amortization schedule for review"
+      ]
+    },
+    {
+      "phrase": "prepaid amortization",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show prepaid amortization for the period",
+        "export prepaid amortization for review"
+      ]
+    },
+    {
+      "phrase": "prepaid rollforward",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show prepaid rollforward for the period",
+        "export prepaid rollforward for review"
+      ]
+    },
+    {
+      "phrase": "deferred expense schedule",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show deferred expense schedule for the period",
+        "export deferred expense schedule for review"
+      ]
+    },
+    {
+      "phrase": "amortizacao de despesas antecipadas",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar amortizacao de despesas antecipadas do periodo",
+        "exportar amortizacao de despesas antecipadas para revisao"
+      ]
+    },
+    {
+      "phrase": "amortização de despesas antecipadas",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar amortização de despesas antecipadas do periodo",
+        "exportar amortização de despesas antecipadas para revisao"
+      ]
+    },
+    {
+      "phrase": "cronograma de prepagos",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar cronograma de prepagos do periodo",
+        "exportar cronograma de prepagos para revisao"
+      ]
+    },
+    {
+      "phrase": "cronograma de pré-pagos",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar cronograma de pré-pagos do periodo",
+        "exportar cronograma de pré-pagos para revisao"
+      ]
+    },
+    {
+      "phrase": "mapa de despesas antecipadas",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar mapa de despesas antecipadas do periodo",
+        "exportar mapa de despesas antecipadas para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de prepagos",
+      "normalized": "prepaids amortization schedule",
+      "docTypeIds": [
+        "acct_prepaids_amortization_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar controle de prepagos do periodo",
+        "exportar controle de prepagos para revisao"
+      ]
+    },
+    {
+      "phrase": "accruals schedule",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show accruals schedule for the period",
+        "export accruals schedule for review"
+      ]
+    },
+    {
+      "phrase": "accrual rollforward",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show accrual rollforward for the period",
+        "export accrual rollforward for review"
+      ]
+    },
+    {
+      "phrase": "accrued expenses schedule",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show accrued expenses schedule for the period",
+        "export accrued expenses schedule for review"
+      ]
+    },
+    {
+      "phrase": "accrual reconciliation",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show accrual reconciliation for the period",
+        "export accrual reconciliation for review"
+      ]
+    },
+    {
+      "phrase": "cronograma de provisoes",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar cronograma de provisoes do periodo",
+        "exportar cronograma de provisoes para revisao"
+      ]
+    },
+    {
+      "phrase": "cronograma de provisões",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar cronograma de provisões do periodo",
+        "exportar cronograma de provisões para revisao"
+      ]
+    },
+    {
+      "phrase": "mapa de accruals",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar mapa de accruals do periodo",
+        "exportar mapa de accruals para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de provisoes",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar controle de provisoes do periodo",
+        "exportar controle de provisoes para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de provisões",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar controle de provisões do periodo",
+        "exportar controle de provisões para revisao"
+      ]
+    },
+    {
+      "phrase": "relatorio de provisoes",
+      "normalized": "accruals schedule",
+      "docTypeIds": [
+        "acct_accruals_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "legal_entity",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar relatorio de provisoes do periodo",
+        "exportar relatorio de provisoes para revisao"
+      ]
+    },
+    {
+      "phrase": "revenue recognition schedule",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show revenue recognition schedule for the period",
+        "export revenue recognition schedule for review"
+      ]
+    },
+    {
+      "phrase": "revrec schedule",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show revrec schedule for the period",
+        "export revrec schedule for review"
+      ]
+    },
+    {
+      "phrase": "revenue rollforward",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show revenue rollforward for the period",
+        "export revenue rollforward for review"
+      ]
+    },
+    {
+      "phrase": "deferred revenue schedule",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show deferred revenue schedule for the period",
+        "export deferred revenue schedule for review"
+      ]
+    },
+    {
+      "phrase": "cronograma de reconhecimento de receita",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar cronograma de reconhecimento de receita do periodo",
+        "exportar cronograma de reconhecimento de receita para revisao"
+      ]
+    },
+    {
+      "phrase": "mapa de reconhecimento de receita",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar mapa de reconhecimento de receita do periodo",
+        "exportar mapa de reconhecimento de receita para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de receita diferida",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar controle de receita diferida do periodo",
+        "exportar controle de receita diferida para revisao"
+      ]
+    },
+    {
+      "phrase": "cronograma de receita diferida",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar cronograma de receita diferida do periodo",
+        "exportar cronograma de receita diferida para revisao"
+      ]
+    },
+    {
+      "phrase": "reconhecimento de receita",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar reconhecimento de receita do periodo",
+        "exportar reconhecimento de receita para revisao"
+      ]
+    },
+    {
+      "phrase": "receita diferida",
+      "normalized": "revenue recognition schedule",
+      "docTypeIds": [
+        "acct_revenue_recognition_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "contract",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar receita diferida do periodo",
+        "exportar receita diferida para revisao"
+      ]
+    },
+    {
+      "phrase": "lease accounting schedule",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show lease accounting schedule for the period",
+        "export lease accounting schedule for review"
+      ]
+    },
+    {
+      "phrase": "lease liability schedule",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show lease liability schedule for the period",
+        "export lease liability schedule for review"
+      ]
+    },
+    {
+      "phrase": "asc 842 schedule",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show asc 842 schedule for the period",
+        "export asc 842 schedule for review"
+      ]
+    },
+    {
+      "phrase": "ifrs 16 schedule",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show ifrs 16 schedule for the period",
+        "export ifrs 16 schedule for review"
+      ]
+    },
+    {
+      "phrase": "cronograma de contabilidade de arrendamento",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar cronograma de contabilidade de arrendamento do periodo",
+        "exportar cronograma de contabilidade de arrendamento para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de arrendamentos",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar controle de arrendamentos do periodo",
+        "exportar controle de arrendamentos para revisao"
+      ]
+    },
+    {
+      "phrase": "mapa de leasing",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar mapa de leasing do periodo",
+        "exportar mapa de leasing para revisao"
+      ]
+    },
+    {
+      "phrase": "mapa de lease",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar mapa de lease do periodo",
+        "exportar mapa de lease para revisao"
+      ]
+    },
+    {
+      "phrase": "cronograma ifrs 16",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar cronograma ifrs 16 do periodo",
+        "exportar cronograma ifrs 16 para revisao"
+      ]
+    },
+    {
+      "phrase": "cronograma asc 842",
+      "normalized": "lease accounting schedule",
+      "docTypeIds": [
+        "acct_lease_accounting_schedule"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "lease_portfolio",
+        "formatHint": "schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar cronograma asc 842 do periodo",
+        "exportar cronograma asc 842 para revisao"
+      ]
+    },
+    {
+      "phrase": "inventory valuation report",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show inventory valuation report for the period",
+        "export inventory valuation report for review"
+      ]
+    },
+    {
+      "phrase": "inventory valuation",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show inventory valuation for the period",
+        "export inventory valuation for review"
+      ]
+    },
+    {
+      "phrase": "stock valuation report",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show stock valuation report for the period",
+        "export stock valuation report for review"
+      ]
+    },
+    {
+      "phrase": "inventory cost report",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show inventory cost report for the period",
+        "export inventory cost report for review"
+      ]
+    },
+    {
+      "phrase": "relatorio de avaliacao de estoque",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar relatorio de avaliacao de estoque do periodo",
+        "exportar relatorio de avaliacao de estoque para revisao"
+      ]
+    },
+    {
+      "phrase": "relatório de avaliação de estoque",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar relatório de avaliação de estoque do periodo",
+        "exportar relatório de avaliação de estoque para revisao"
+      ]
+    },
+    {
+      "phrase": "avaliacao de estoque",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar avaliacao de estoque do periodo",
+        "exportar avaliacao de estoque para revisao"
+      ]
+    },
+    {
+      "phrase": "avaliação de estoque",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar avaliação de estoque do periodo",
+        "exportar avaliação de estoque para revisao"
+      ]
+    },
+    {
+      "phrase": "mapa de estoque valorizado",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar mapa de estoque valorizado do periodo",
+        "exportar mapa de estoque valorizado para revisao"
+      ]
+    },
+    {
+      "phrase": "relatorio de custo de estoque",
+      "normalized": "inventory valuation report",
+      "docTypeIds": [
+        "acct_inventory_valuation_report"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "warehouse",
+        "formatHint": "valuation_report",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar relatorio de custo de estoque do periodo",
+        "exportar relatorio de custo de estoque para revisao"
+      ]
+    },
+    {
+      "phrase": "audit workpaper",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show audit workpaper for the period",
+        "export audit workpaper for review"
+      ]
+    },
+    {
+      "phrase": "working paper",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show working paper for the period",
+        "export working paper for review"
+      ]
+    },
+    {
+      "phrase": "audit support paper",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show audit support paper for the period",
+        "export audit support paper for review"
+      ]
+    },
+    {
+      "phrase": "audit test sheet",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show audit test sheet for the period",
+        "export audit test sheet for review"
+      ]
+    },
+    {
+      "phrase": "papel de trabalho de auditoria",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar papel de trabalho de auditoria do periodo",
+        "exportar papel de trabalho de auditoria para revisao"
+      ]
+    },
+    {
+      "phrase": "papel de trabalho",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar papel de trabalho do periodo",
+        "exportar papel de trabalho para revisao"
+      ]
+    },
+    {
+      "phrase": "workpaper de auditoria",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar workpaper de auditoria do periodo",
+        "exportar workpaper de auditoria para revisao"
+      ]
+    },
+    {
+      "phrase": "documento de auditoria",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar documento de auditoria do periodo",
+        "exportar documento de auditoria para revisao"
+      ]
+    },
+    {
+      "phrase": "suporte de auditoria",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar suporte de auditoria do periodo",
+        "exportar suporte de auditoria para revisao"
+      ]
+    },
+    {
+      "phrase": "teste de auditoria",
+      "normalized": "audit workpaper",
+      "docTypeIds": [
+        "acct_audit_workpaper"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit_area",
+        "formatHint": "workpaper",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar teste de auditoria do periodo",
+        "exportar teste de auditoria para revisao"
+      ]
+    },
+    {
+      "phrase": "pbc list",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show pbc list for the period",
+        "export pbc list for review"
+      ]
+    },
+    {
+      "phrase": "prepared by client list",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show prepared by client list for the period",
+        "export prepared by client list for review"
+      ]
+    },
+    {
+      "phrase": "audit request list",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show audit request list for the period",
+        "export audit request list for review"
+      ]
+    },
+    {
+      "phrase": "client request tracker",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show client request tracker for the period",
+        "export client request tracker for review"
+      ]
+    },
+    {
+      "phrase": "lista pbc",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar lista pbc do periodo",
+        "exportar lista pbc para revisao"
+      ]
+    },
+    {
+      "phrase": "lista de pendencias de auditoria",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar lista de pendencias de auditoria do periodo",
+        "exportar lista de pendencias de auditoria para revisao"
+      ]
+    },
+    {
+      "phrase": "lista de pendências de auditoria",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar lista de pendências de auditoria do periodo",
+        "exportar lista de pendências de auditoria para revisao"
+      ]
+    },
+    {
+      "phrase": "lista de solicitacoes do auditor",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar lista de solicitacoes do auditor do periodo",
+        "exportar lista de solicitacoes do auditor para revisao"
+      ]
+    },
+    {
+      "phrase": "lista de solicitações do auditor",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar lista de solicitações do auditor do periodo",
+        "exportar lista de solicitações do auditor para revisao"
+      ]
+    },
+    {
+      "phrase": "controle de pbc",
+      "normalized": "pbc list",
+      "docTypeIds": [
+        "acct_pbc_list"
+      ],
+      "hints": {
+        "periodHint": "period_unspecified",
+        "entityHint": "audit",
+        "formatHint": "request_list",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar controle de pbc do periodo",
+        "exportar controle de pbc para revisao"
+      ]
+    },
+    {
+      "phrase": "controls narrative",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show controls narrative for the period",
+        "export controls narrative for review"
+      ]
+    },
+    {
+      "phrase": "internal controls narrative",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show internal controls narrative for the period",
+        "export internal controls narrative for review"
+      ]
+    },
+    {
+      "phrase": "process control narrative",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show process control narrative for the period",
+        "export process control narrative for review"
+      ]
+    },
+    {
+      "phrase": "control documentation",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show control documentation for the period",
+        "export control documentation for review"
+      ]
+    },
+    {
+      "phrase": "narrativa de controles",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar narrativa de controles do periodo",
+        "exportar narrativa de controles para revisao"
+      ]
+    },
+    {
+      "phrase": "narrativa de controles internos",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar narrativa de controles internos do periodo",
+        "exportar narrativa de controles internos para revisao"
+      ]
+    },
+    {
+      "phrase": "documentacao de controles",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar documentacao de controles do periodo",
+        "exportar documentacao de controles para revisao"
+      ]
+    },
+    {
+      "phrase": "documentação de controles",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar documentação de controles do periodo",
+        "exportar documentação de controles para revisao"
+      ]
+    },
+    {
+      "phrase": "descricao de controles",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar descricao de controles do periodo",
+        "exportar descricao de controles para revisao"
+      ]
+    },
+    {
+      "phrase": "descrição de controles",
+      "normalized": "controls narrative",
+      "docTypeIds": [
+        "acct_controls_narrative"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "process",
+        "formatHint": "narrative",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar descrição de controles do periodo",
+        "exportar descrição de controles para revisao"
+      ]
+    },
+    {
+      "phrase": "management representation letter",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show management representation letter for the period",
+        "export management representation letter for review"
+      ]
+    },
+    {
+      "phrase": "management rep letter",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show management rep letter for the period",
+        "export management rep letter for review"
+      ]
+    },
+    {
+      "phrase": "representation letter",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show representation letter for the period",
+        "export representation letter for review"
+      ]
+    },
+    {
+      "phrase": "audit representation letter",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show audit representation letter for the period",
+        "export audit representation letter for review"
+      ]
+    },
+    {
+      "phrase": "carta de representacao da administracao",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar carta de representacao da administracao do periodo",
+        "exportar carta de representacao da administracao para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de representação da administração",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostrar carta de representação da administração do periodo",
+        "exportar carta de representação da administração para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de representacao gerencial",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.76,
+      "examples": [
+        "mostrar carta de representacao gerencial do periodo",
+        "exportar carta de representacao gerencial para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de representação gerencial",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.74,
+      "examples": [
+        "mostrar carta de representação gerencial do periodo",
+        "exportar carta de representação gerencial para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de responsabilidade da administracao",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.72,
+      "examples": [
+        "mostrar carta de responsabilidade da administracao do periodo",
+        "exportar carta de responsabilidade da administracao para revisao"
+      ]
+    },
+    {
+      "phrase": "carta de responsabilidade da administração",
+      "normalized": "management representation letter",
+      "docTypeIds": [
+        "acct_management_rep_letter"
+      ],
+      "hints": {
+        "periodHint": "annual",
+        "entityHint": "management",
+        "formatHint": "letter",
+        "languageHint": "pt"
+      },
+      "confidence": 0.7,
+      "examples": [
+        "mostrar carta de responsabilidade da administração do periodo",
+        "exportar carta de responsabilidade da administração para revisao"
+      ]
+    }
+  ]
+}

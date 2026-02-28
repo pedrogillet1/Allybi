@@ -42,11 +42,57 @@ function addDays(d: Date, days: number): Date {
   return x;
 }
 
+type RetrievalRuleEventRow = {
+  id: string;
+  at: Date;
+  domain: string;
+  operator: string;
+  intent: string;
+  meta: unknown;
+};
+
+function asObject(input: unknown): Record<string, unknown> {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return {};
+  return input as Record<string, unknown>;
+}
+
+function toFiniteNumber(input: unknown): number | null {
+  const parsed = Number(input);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 // ---------------------------------------------------------------------------
 // Factory
 // ---------------------------------------------------------------------------
 
 export function createAdminTelemetryAdapter(prisma: PrismaClient) {
+  async function loadRuleEvents(
+    range: string,
+  ): Promise<RetrievalRuleEventRow[]> {
+    const since = rangeToDate(range);
+    try {
+      return await prisma.retrievalEvent.findMany({
+        where: {
+          at: { gte: since },
+          strategy: "document_intelligence_rule_event",
+        },
+        select: {
+          id: true,
+          at: true,
+          domain: true,
+          operator: true,
+          intent: true,
+          meta: true,
+        },
+        orderBy: { at: "desc" },
+        take: 50000,
+      });
+    } catch (err) {
+      console.error("[adminTelemetryAdapter] loadRuleEvents error:", err);
+      return [];
+    }
+  }
+
   return {
     // ========================================================================
     // OVERVIEW
@@ -522,6 +568,188 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         console.error("[adminTelemetryAdapter] queries error:", err);
         return { items: [], nextCursor: null };
       }
+    },
+
+    async retrievalRewriteRulesTop({
+      range,
+      limit,
+    }: {
+      range: string;
+      limit: number;
+    }) {
+      const events = await loadRuleEvents(range);
+      const rewriteEvents = events.filter((event) => {
+        const meta = asObject(event.meta);
+        return meta.eventType === "retrieval.rewrite_applied";
+      });
+      const totalHits = rewriteEvents.length;
+      const aggregates = new Map<
+        string,
+        { hitCount: number; variantSum: number; domains: Set<string> }
+      >();
+
+      for (const event of rewriteEvents) {
+        const meta = asObject(event.meta);
+        const ruleId = String(meta.ruleId || "").trim();
+        if (!ruleId) continue;
+        const variantCount = toFiniteNumber(meta.variantCount) ?? 0;
+        const aggregate = aggregates.get(ruleId) || {
+          hitCount: 0,
+          variantSum: 0,
+          domains: new Set<string>(),
+        };
+        aggregate.hitCount += 1;
+        aggregate.variantSum += Math.max(0, variantCount);
+        aggregate.domains.add(String(event.domain || "unknown"));
+        aggregates.set(ruleId, aggregate);
+      }
+
+      const items = Array.from(aggregates.entries())
+        .map(([ruleId, aggregate]) => ({
+          ruleId,
+          hitCount: aggregate.hitCount,
+          hitRate: totalHits > 0 ? aggregate.hitCount / totalHits : 0,
+          averageVariants:
+            aggregate.hitCount > 0
+              ? aggregate.variantSum / aggregate.hitCount
+              : 0,
+          domains: Array.from(aggregate.domains).sort((a, b) =>
+            a.localeCompare(b),
+          ),
+        }))
+        .sort((a, b) => {
+          if (b.hitCount !== a.hitCount) return b.hitCount - a.hitCount;
+          if (b.averageVariants !== a.averageVariants) {
+            return b.averageVariants - a.averageVariants;
+          }
+          return a.ruleId.localeCompare(b.ruleId);
+        })
+        .slice(0, Math.max(1, limit));
+
+      return { items, totalHits };
+    },
+
+    async retrievalBoostRulesTop({
+      range,
+      limit,
+    }: {
+      range: string;
+      limit: number;
+    }) {
+      const events = await loadRuleEvents(range);
+      const hitCounts = new Map<string, number>();
+      const applied = new Map<
+        string,
+        { appliedCount: number; positiveDelta: number }
+      >();
+
+      for (const event of events) {
+        const meta = asObject(event.meta);
+        const eventType = String(meta.eventType || "").trim();
+        const ruleId = String(meta.ruleId || "").trim();
+        if (!ruleId) continue;
+
+        if (eventType === "retrieval.boost_rule_hit") {
+          hitCounts.set(ruleId, (hitCounts.get(ruleId) || 0) + 1);
+        }
+
+        if (eventType === "retrieval.boost_rule_applied") {
+          const summary = asObject(meta.scoreDeltaSummary);
+          const delta = toFiniteNumber(summary.totalDelta) ?? 0;
+          const current = applied.get(ruleId) || {
+            appliedCount: 0,
+            positiveDelta: 0,
+          };
+          current.appliedCount += 1;
+          current.positiveDelta += Math.max(0, delta);
+          applied.set(ruleId, current);
+        }
+      }
+
+      const items = Array.from(applied.entries())
+        .map(([ruleId, stats]) => ({
+          ruleId,
+          positiveDeltaTotal: stats.positiveDelta,
+          appliedCount: stats.appliedCount,
+          hitCount: hitCounts.get(ruleId) || 0,
+          avgPositiveDelta:
+            stats.appliedCount > 0
+              ? stats.positiveDelta / stats.appliedCount
+              : 0,
+        }))
+        .filter((item) => item.positiveDeltaTotal > 0)
+        .sort((a, b) => {
+          if (b.positiveDeltaTotal !== a.positiveDeltaTotal) {
+            return b.positiveDeltaTotal - a.positiveDeltaTotal;
+          }
+          if (b.appliedCount !== a.appliedCount) {
+            return b.appliedCount - a.appliedCount;
+          }
+          return a.ruleId.localeCompare(b.ruleId);
+        })
+        .slice(0, Math.max(1, limit));
+
+      return { items };
+    },
+
+    async retrievalWorstRules({
+      range,
+      limit,
+      minHits,
+    }: {
+      range: string;
+      limit: number;
+      minHits?: number;
+    }) {
+      const events = await loadRuleEvents(range);
+      const minimumHits = Math.max(1, Math.floor(Number(minHits ?? 3)));
+      const hitCounts = new Map<string, number>();
+      const positiveDeltas = new Map<string, number>();
+
+      for (const event of events) {
+        const meta = asObject(event.meta);
+        const eventType = String(meta.eventType || "").trim();
+        const ruleId = String(meta.ruleId || "").trim();
+        if (!ruleId) continue;
+
+        if (eventType === "retrieval.boost_rule_hit") {
+          hitCounts.set(ruleId, (hitCounts.get(ruleId) || 0) + 1);
+          continue;
+        }
+
+        if (eventType === "retrieval.boost_rule_applied") {
+          const summary = asObject(meta.scoreDeltaSummary);
+          const delta = toFiniteNumber(summary.totalDelta) ?? 0;
+          positiveDeltas.set(
+            ruleId,
+            (positiveDeltas.get(ruleId) || 0) + Math.max(0, delta),
+          );
+        }
+      }
+
+      const totalHitCount = Array.from(hitCounts.values()).reduce(
+        (sum, value) => sum + value,
+        0,
+      );
+      const items = Array.from(hitCounts.entries())
+        .map(([ruleId, hitCount]) => ({
+          ruleId,
+          hitCount,
+          hitRate: totalHitCount > 0 ? hitCount / totalHitCount : 0,
+          positiveDeltaTotal: positiveDeltas.get(ruleId) || 0,
+        }))
+        .filter(
+          (item) =>
+            item.hitCount >= minimumHits && item.positiveDeltaTotal <= 0,
+        )
+        .sort((a, b) => {
+          if (b.hitRate !== a.hitRate) return b.hitRate - a.hitRate;
+          if (b.hitCount !== a.hitCount) return b.hitCount - a.hitCount;
+          return a.ruleId.localeCompare(b.ruleId);
+        })
+        .slice(0, Math.max(1, limit));
+
+      return { items, totalHitCount };
     },
 
     // ========================================================================

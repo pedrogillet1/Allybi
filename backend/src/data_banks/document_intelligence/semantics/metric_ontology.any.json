@@ -1,0 +1,1481 @@
+{
+  "_meta": {
+    "id": "di_metric_ontology",
+    "version": "1.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "di_domain_ontology",
+      "di_entity_ontology",
+      "di_unit_and_measurement_ontology"
+    ],
+    "usedBy": [],
+    "tests": [
+      "SSOT_METRIC_001"
+    ],
+    "lastUpdated": "2026-02-27",
+    "description": "di_metric_ontology (document_intelligence) configuration bank."
+  },
+  "config": {
+    "enabled": true
+  },
+  "metrics": [
+    {
+      "id": "accounts_receivable_turnover",
+      "label": "Accounts Receivable Turnover",
+      "labelPt": "Giro de Contas a Receber",
+      "domain": "finance",
+      "category": "efficiency",
+      "unitId": "count",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "revenue",
+        "working_capital"
+      ],
+      "aliases": {
+        "en": [
+          "receivable turnover",
+          "AR turnover",
+          "receivables turnover ratio"
+        ],
+        "pt": [
+          "giro de recebíveis",
+          "rotatividade de contas a receber",
+          "giro de contas a receber"
+        ]
+      }
+    },
+    {
+      "id": "capex",
+      "label": "Capital Expenditure",
+      "labelPt": "Despesas de Capital",
+      "domain": "finance",
+      "category": "financial_performance",
+      "unitId": "currency",
+      "direction": "neutral",
+      "relatedMetrics": [
+        "free_cash_flow",
+        "operating_expense"
+      ],
+      "aliases": {
+        "en": [
+          "capex",
+          "capital expenditure",
+          "capital spending",
+          "cap ex"
+        ],
+        "pt": [
+          "capex",
+          "despesas de capital",
+          "investimento de capital",
+          "gastos de capital"
+        ]
+      }
+    },
+    {
+      "id": "current_ratio",
+      "label": "Current Ratio",
+      "labelPt": "Índice de Liquidez Corrente",
+      "domain": "finance",
+      "category": "liquidity",
+      "unitId": "count",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "quick_ratio",
+        "working_capital"
+      ],
+      "aliases": {
+        "en": [
+          "current ratio",
+          "liquidity ratio",
+          "working capital ratio"
+        ],
+        "pt": [
+          "índice de liquidez corrente",
+          "liquidez corrente",
+          "razão corrente"
+        ]
+      }
+    },
+    {
+      "id": "debt_to_equity",
+      "label": "Debt-to-Equity Ratio",
+      "labelPt": "Índice de Endividamento",
+      "domain": "finance",
+      "category": "leverage",
+      "unitId": "count",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "interest_coverage",
+        "return_on_equity"
+      ],
+      "aliases": {
+        "en": [
+          "debt-to-equity",
+          "D/E ratio",
+          "leverage ratio",
+          "gearing ratio"
+        ],
+        "pt": [
+          "endividamento",
+          "índice de endividamento",
+          "relação dívida/patrimônio"
+        ]
+      }
+    },
+    {
+      "id": "earnings_per_share",
+      "label": "Earnings Per Share",
+      "labelPt": "Lucro por Ação",
+      "domain": "finance",
+      "category": "valuation",
+      "unitId": "currency",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "net_income",
+        "price_to_earnings"
+      ],
+      "aliases": {
+        "en": [
+          "EPS",
+          "earnings per share",
+          "per-share earnings"
+        ],
+        "pt": [
+          "LPA",
+          "lucro por ação",
+          "ganho por ação"
+        ]
+      }
+    },
+    {
+      "id": "ebitda",
+      "label": "EBITDA",
+      "labelPt": "EBITDA",
+      "domain": "finance",
+      "category": "financial_performance",
+      "unitId": "currency",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "operating_margin",
+        "net_income",
+        "revenue"
+      ],
+      "aliases": {
+        "en": [
+          "EBITDA",
+          "earnings before interest taxes depreciation amortization",
+          "operating earnings"
+        ],
+        "pt": [
+          "EBITDA",
+          "LAJIDA",
+          "lucro antes de juros impostos depreciação e amortização"
+        ]
+      }
+    },
+    {
+      "id": "free_cash_flow",
+      "label": "Free Cash Flow",
+      "labelPt": "Fluxo de Caixa Livre",
+      "domain": "finance",
+      "category": "liquidity",
+      "unitId": "currency",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "capex",
+        "net_income",
+        "working_capital"
+      ],
+      "aliases": {
+        "en": [
+          "FCF",
+          "free cash flow",
+          "available cash flow"
+        ],
+        "pt": [
+          "FCL",
+          "fluxo de caixa livre",
+          "caixa livre"
+        ]
+      }
+    },
+    {
+      "id": "gross_margin",
+      "label": "Gross Margin",
+      "labelPt": "Margem Bruta",
+      "domain": "finance",
+      "category": "profitability",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "operating_margin",
+        "net_profit_margin",
+        "revenue"
+      ],
+      "aliases": {
+        "en": [
+          "gross margin",
+          "gross profit margin",
+          "GM",
+          "gross profit percentage"
+        ],
+        "pt": [
+          "margem bruta",
+          "margem de lucro bruto",
+          "MB"
+        ]
+      }
+    },
+    {
+      "id": "interest_coverage",
+      "label": "Interest Coverage Ratio",
+      "labelPt": "Índice de Cobertura de Juros",
+      "domain": "finance",
+      "category": "leverage",
+      "unitId": "count",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "debt_to_equity",
+        "ebitda"
+      ],
+      "aliases": {
+        "en": [
+          "interest coverage",
+          "ICR",
+          "times interest earned",
+          "TIE"
+        ],
+        "pt": [
+          "cobertura de juros",
+          "índice de cobertura de juros",
+          "ICJ"
+        ]
+      }
+    },
+    {
+      "id": "inventory_turnover",
+      "label": "Inventory Turnover",
+      "labelPt": "Giro de Estoque",
+      "domain": "finance",
+      "category": "efficiency",
+      "unitId": "count",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "accounts_receivable_turnover",
+        "working_capital"
+      ],
+      "aliases": {
+        "en": [
+          "inventory turnover",
+          "stock turnover",
+          "inventory turns"
+        ],
+        "pt": [
+          "giro de estoque",
+          "rotatividade de estoque",
+          "giro de inventário"
+        ]
+      }
+    },
+    {
+      "id": "net_income",
+      "label": "Net Income",
+      "labelPt": "Lucro Líquido",
+      "domain": "finance",
+      "category": "financial_performance",
+      "unitId": "currency",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "revenue",
+        "net_profit_margin",
+        "earnings_per_share"
+      ],
+      "aliases": {
+        "en": [
+          "net income",
+          "net profit",
+          "bottom line",
+          "net earnings"
+        ],
+        "pt": [
+          "lucro líquido",
+          "resultado líquido",
+          "lucro final"
+        ]
+      }
+    },
+    {
+      "id": "net_profit_margin",
+      "label": "Net Profit Margin",
+      "labelPt": "Margem de Lucro Líquido",
+      "domain": "finance",
+      "category": "profitability",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "gross_margin",
+        "operating_margin",
+        "net_income"
+      ],
+      "aliases": {
+        "en": [
+          "net margin",
+          "profit margin",
+          "net profit margin",
+          "bottom-line margin"
+        ],
+        "pt": [
+          "margem líquida",
+          "margem de lucro líquido",
+          "margem de resultado"
+        ]
+      }
+    },
+    {
+      "id": "operating_expense",
+      "label": "Operating Expense",
+      "labelPt": "Despesa Operacional",
+      "domain": "finance",
+      "category": "financial_performance",
+      "unitId": "currency",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "operating_margin",
+        "capex",
+        "revenue"
+      ],
+      "aliases": {
+        "en": [
+          "opex",
+          "operating expense",
+          "operating costs",
+          "operating expenditure"
+        ],
+        "pt": [
+          "opex",
+          "despesa operacional",
+          "custos operacionais",
+          "gastos operacionais"
+        ]
+      }
+    },
+    {
+      "id": "operating_margin",
+      "label": "Operating Margin",
+      "labelPt": "Margem Operacional",
+      "domain": "finance",
+      "category": "profitability",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "gross_margin",
+        "net_profit_margin",
+        "ebitda"
+      ],
+      "aliases": {
+        "en": [
+          "operating margin",
+          "operating profit margin",
+          "EBIT margin",
+          "OPM"
+        ],
+        "pt": [
+          "margem operacional",
+          "margem EBIT",
+          "margem de lucro operacional"
+        ]
+      }
+    },
+    {
+      "id": "price_to_earnings",
+      "label": "Price-to-Earnings Ratio",
+      "labelPt": "Índice Preço/Lucro",
+      "domain": "finance",
+      "category": "valuation",
+      "unitId": "count",
+      "direction": "neutral",
+      "relatedMetrics": [
+        "earnings_per_share",
+        "net_income"
+      ],
+      "aliases": {
+        "en": [
+          "P/E ratio",
+          "price-to-earnings",
+          "PE ratio",
+          "earnings multiple"
+        ],
+        "pt": [
+          "P/L",
+          "preço/lucro",
+          "índice preço/lucro",
+          "múltiplo de lucro"
+        ]
+      }
+    },
+    {
+      "id": "quick_ratio",
+      "label": "Quick Ratio",
+      "labelPt": "Índice de Liquidez Seca",
+      "domain": "finance",
+      "category": "liquidity",
+      "unitId": "count",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "current_ratio",
+        "working_capital"
+      ],
+      "aliases": {
+        "en": [
+          "quick ratio",
+          "acid-test ratio",
+          "acid test",
+          "liquid ratio"
+        ],
+        "pt": [
+          "liquidez seca",
+          "índice de liquidez seca",
+          "teste ácido"
+        ]
+      }
+    },
+    {
+      "id": "return_on_assets",
+      "label": "Return on Assets",
+      "labelPt": "Retorno sobre Ativos",
+      "domain": "finance",
+      "category": "profitability",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "return_on_equity",
+        "net_income"
+      ],
+      "aliases": {
+        "en": [
+          "ROA",
+          "return on assets",
+          "asset return",
+          "return on total assets"
+        ],
+        "pt": [
+          "ROA",
+          "retorno sobre ativos",
+          "rentabilidade dos ativos"
+        ]
+      }
+    },
+    {
+      "id": "return_on_equity",
+      "label": "Return on Equity",
+      "labelPt": "Retorno sobre Patrimônio Líquido",
+      "domain": "finance",
+      "category": "profitability",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "return_on_assets",
+        "net_income",
+        "debt_to_equity"
+      ],
+      "aliases": {
+        "en": [
+          "ROE",
+          "return on equity",
+          "equity return",
+          "shareholder return"
+        ],
+        "pt": [
+          "ROE",
+          "retorno sobre patrimônio",
+          "rentabilidade do patrimônio"
+        ]
+      }
+    },
+    {
+      "id": "revenue",
+      "label": "Revenue",
+      "labelPt": "Receita",
+      "domain": "finance",
+      "category": "financial_performance",
+      "unitId": "currency",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "net_income",
+        "gross_margin",
+        "operating_margin"
+      ],
+      "aliases": {
+        "en": [
+          "sales",
+          "top line",
+          "turnover",
+          "gross revenue"
+        ],
+        "pt": [
+          "receita",
+          "vendas",
+          "faturamento",
+          "receita bruta"
+        ]
+      }
+    },
+    {
+      "id": "working_capital",
+      "label": "Working Capital",
+      "labelPt": "Capital de Giro",
+      "domain": "finance",
+      "category": "liquidity",
+      "unitId": "currency",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "current_ratio",
+        "quick_ratio",
+        "free_cash_flow"
+      ],
+      "aliases": {
+        "en": [
+          "working capital",
+          "net working capital",
+          "NWC",
+          "operating capital"
+        ],
+        "pt": [
+          "capital de giro",
+          "capital circulante",
+          "capital de trabalho"
+        ]
+      }
+    },
+    {
+      "id": "breach_penalty",
+      "label": "Breach Penalty",
+      "labelPt": "Penalidade por Violação",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "penalty_amount",
+        "damages_claimed",
+        "termination_fee"
+      ],
+      "aliases": {
+        "en": [
+          "breach penalty",
+          "contractual penalty",
+          "breach fine",
+          "default penalty"
+        ],
+        "pt": [
+          "penalidade por violação",
+          "multa contratual por violação",
+          "penalidade por inadimplência"
+        ]
+      }
+    },
+    {
+      "id": "contract_value",
+      "label": "Contract Value",
+      "labelPt": "Valor do Contrato",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "neutral",
+      "relatedMetrics": [
+        "penalty_amount",
+        "liability_cap",
+        "escrow_amount"
+      ],
+      "aliases": {
+        "en": [
+          "contract value",
+          "deal value",
+          "agreement value",
+          "total contract amount"
+        ],
+        "pt": [
+          "valor do contrato",
+          "valor contratual",
+          "montante do contrato"
+        ]
+      }
+    },
+    {
+      "id": "damages_claimed",
+      "label": "Damages Claimed",
+      "labelPt": "Danos Reivindicados",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "settlement_value",
+        "liability_cap",
+        "insurance_coverage"
+      ],
+      "aliases": {
+        "en": [
+          "damages claimed",
+          "claimed damages",
+          "damage amount",
+          "compensation claimed"
+        ],
+        "pt": [
+          "danos reivindicados",
+          "indenização pleiteada",
+          "danos reclamados"
+        ]
+      }
+    },
+    {
+      "id": "escrow_amount",
+      "label": "Escrow Amount",
+      "labelPt": "Valor em Custódia",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "neutral",
+      "relatedMetrics": [
+        "contract_value",
+        "retention_amount"
+      ],
+      "aliases": {
+        "en": [
+          "escrow amount",
+          "escrow funds",
+          "escrow deposit",
+          "held in escrow"
+        ],
+        "pt": [
+          "valor em custódia",
+          "depósito em garantia",
+          "valor caucionado"
+        ]
+      }
+    },
+    {
+      "id": "insurance_coverage",
+      "label": "Insurance Coverage",
+      "labelPt": "Cobertura de Seguro",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "liability_cap",
+        "damages_claimed"
+      ],
+      "aliases": {
+        "en": [
+          "insurance coverage",
+          "coverage amount",
+          "insured amount",
+          "policy limit"
+        ],
+        "pt": [
+          "cobertura de seguro",
+          "valor segurado",
+          "limite da apólice"
+        ]
+      }
+    },
+    {
+      "id": "liability_cap",
+      "label": "Liability Cap",
+      "labelPt": "Limite de Responsabilidade",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "neutral",
+      "relatedMetrics": [
+        "contract_value",
+        "insurance_coverage",
+        "damages_claimed"
+      ],
+      "aliases": {
+        "en": [
+          "liability cap",
+          "liability limit",
+          "maximum liability",
+          "cap on liability"
+        ],
+        "pt": [
+          "limite de responsabilidade",
+          "teto de responsabilidade",
+          "limite de indenização"
+        ]
+      }
+    },
+    {
+      "id": "penalty_amount",
+      "label": "Penalty Amount",
+      "labelPt": "Valor da Multa",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "contract_value",
+        "breach_penalty",
+        "termination_fee"
+      ],
+      "aliases": {
+        "en": [
+          "penalty amount",
+          "fine amount",
+          "penalty fee",
+          "contractual penalty"
+        ],
+        "pt": [
+          "valor da multa",
+          "multa contratual",
+          "penalidade",
+          "valor da penalidade"
+        ]
+      }
+    },
+    {
+      "id": "retention_amount",
+      "label": "Retention Amount",
+      "labelPt": "Valor de Retenção",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "neutral",
+      "relatedMetrics": [
+        "contract_value",
+        "escrow_amount"
+      ],
+      "aliases": {
+        "en": [
+          "retention amount",
+          "holdback amount",
+          "retained amount",
+          "retention sum"
+        ],
+        "pt": [
+          "valor de retenção",
+          "retenção contratual",
+          "valor retido"
+        ]
+      }
+    },
+    {
+      "id": "settlement_value",
+      "label": "Settlement Value",
+      "labelPt": "Valor de Acordo",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "damages_claimed",
+        "liability_cap"
+      ],
+      "aliases": {
+        "en": [
+          "settlement value",
+          "settlement amount",
+          "agreed settlement",
+          "compromise amount"
+        ],
+        "pt": [
+          "valor de acordo",
+          "valor da transação",
+          "valor do acordo judicial"
+        ]
+      }
+    },
+    {
+      "id": "termination_fee",
+      "label": "Termination Fee",
+      "labelPt": "Taxa de Rescisão",
+      "domain": "legal",
+      "category": "legal_metric",
+      "unitId": "currency",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "contract_value",
+        "penalty_amount",
+        "breach_penalty"
+      ],
+      "aliases": {
+        "en": [
+          "termination fee",
+          "break fee",
+          "early termination fee",
+          "cancellation fee"
+        ],
+        "pt": [
+          "taxa de rescisão",
+          "multa rescisória",
+          "taxa de cancelamento"
+        ]
+      }
+    },
+    {
+      "id": "blood_pressure_diastolic",
+      "label": "Blood Pressure (Diastolic)",
+      "labelPt": "Pressão Arterial (Diastólica)",
+      "domain": "medical",
+      "category": "vital_sign",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "blood_pressure_systolic",
+        "heart_rate"
+      ],
+      "aliases": {
+        "en": [
+          "diastolic pressure",
+          "diastolic BP",
+          "diastolic blood pressure",
+          "lower blood pressure"
+        ],
+        "pt": [
+          "pressão diastólica",
+          "PA diastólica",
+          "pressão mínima"
+        ]
+      }
+    },
+    {
+      "id": "blood_pressure_systolic",
+      "label": "Blood Pressure (Systolic)",
+      "labelPt": "Pressão Arterial (Sistólica)",
+      "domain": "medical",
+      "category": "vital_sign",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "blood_pressure_diastolic",
+        "heart_rate"
+      ],
+      "aliases": {
+        "en": [
+          "systolic pressure",
+          "systolic BP",
+          "systolic blood pressure",
+          "upper blood pressure"
+        ],
+        "pt": [
+          "pressão sistólica",
+          "PA sistólica",
+          "pressão máxima"
+        ]
+      }
+    },
+    {
+      "id": "bmi",
+      "label": "Body Mass Index",
+      "labelPt": "Índice de Massa Corporal",
+      "domain": "medical",
+      "category": "clinical_measure",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "cholesterol_total",
+        "glucose_level"
+      ],
+      "aliases": {
+        "en": [
+          "BMI",
+          "body mass index",
+          "body mass",
+          "mass index"
+        ],
+        "pt": [
+          "IMC",
+          "índice de massa corporal",
+          "índice de massa"
+        ]
+      }
+    },
+    {
+      "id": "cholesterol_total",
+      "label": "Total Cholesterol",
+      "labelPt": "Colesterol Total",
+      "domain": "medical",
+      "category": "lab_metric",
+      "unitId": "count",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "glucose_level",
+        "bmi"
+      ],
+      "aliases": {
+        "en": [
+          "total cholesterol",
+          "cholesterol",
+          "serum cholesterol",
+          "TC"
+        ],
+        "pt": [
+          "colesterol total",
+          "colesterol",
+          "CT"
+        ]
+      }
+    },
+    {
+      "id": "creatinine",
+      "label": "Creatinine",
+      "labelPt": "Creatinina",
+      "domain": "medical",
+      "category": "lab_metric",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "hemoglobin",
+        "white_blood_cell_count"
+      ],
+      "aliases": {
+        "en": [
+          "creatinine",
+          "serum creatinine",
+          "creat",
+          "sCr"
+        ],
+        "pt": [
+          "creatinina",
+          "creatinina sérica",
+          "Cr"
+        ]
+      }
+    },
+    {
+      "id": "glucose_level",
+      "label": "Glucose Level",
+      "labelPt": "Nível de Glicose",
+      "domain": "medical",
+      "category": "lab_metric",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "cholesterol_total",
+        "bmi",
+        "hemoglobin"
+      ],
+      "aliases": {
+        "en": [
+          "glucose",
+          "blood glucose",
+          "blood sugar",
+          "fasting glucose"
+        ],
+        "pt": [
+          "glicose",
+          "glicemia",
+          "açúcar no sangue",
+          "glicose em jejum"
+        ]
+      }
+    },
+    {
+      "id": "heart_rate",
+      "label": "Heart Rate",
+      "labelPt": "Frequência Cardíaca",
+      "domain": "medical",
+      "category": "vital_sign",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "blood_pressure_systolic",
+        "blood_pressure_diastolic",
+        "respiratory_rate"
+      ],
+      "aliases": {
+        "en": [
+          "heart rate",
+          "pulse",
+          "HR",
+          "pulse rate"
+        ],
+        "pt": [
+          "frequência cardíaca",
+          "FC",
+          "pulso",
+          "batimentos"
+        ]
+      }
+    },
+    {
+      "id": "hemoglobin",
+      "label": "Hemoglobin",
+      "labelPt": "Hemoglobina",
+      "domain": "medical",
+      "category": "lab_metric",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "white_blood_cell_count",
+        "platelet_count",
+        "creatinine"
+      ],
+      "aliases": {
+        "en": [
+          "hemoglobin",
+          "Hb",
+          "haemoglobin",
+          "Hgb"
+        ],
+        "pt": [
+          "hemoglobina",
+          "Hb",
+          "Hgb"
+        ]
+      }
+    },
+    {
+      "id": "length_of_stay",
+      "label": "Length of Stay",
+      "labelPt": "Tempo de Internação",
+      "domain": "medical",
+      "category": "clinical_outcome",
+      "unitId": "time",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "pain_score",
+        "oxygen_saturation"
+      ],
+      "aliases": {
+        "en": [
+          "length of stay",
+          "LOS",
+          "hospital stay",
+          "days admitted"
+        ],
+        "pt": [
+          "tempo de internação",
+          "permanência hospitalar",
+          "dias de internação"
+        ]
+      }
+    },
+    {
+      "id": "oxygen_saturation",
+      "label": "Oxygen Saturation",
+      "labelPt": "Saturação de Oxigênio",
+      "domain": "medical",
+      "category": "vital_sign",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "respiratory_rate",
+        "heart_rate"
+      ],
+      "aliases": {
+        "en": [
+          "SpO2",
+          "oxygen saturation",
+          "O2 sat",
+          "pulse oximetry"
+        ],
+        "pt": [
+          "SpO2",
+          "saturação de oxigênio",
+          "saturação O2"
+        ]
+      }
+    },
+    {
+      "id": "pain_score",
+      "label": "Pain Score",
+      "labelPt": "Escala de Dor",
+      "domain": "medical",
+      "category": "clinical_measure",
+      "unitId": "count",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "length_of_stay",
+        "temperature"
+      ],
+      "aliases": {
+        "en": [
+          "pain score",
+          "pain scale",
+          "VAS",
+          "pain level"
+        ],
+        "pt": [
+          "escala de dor",
+          "EVA",
+          "nível de dor",
+          "escore de dor"
+        ]
+      }
+    },
+    {
+      "id": "platelet_count",
+      "label": "Platelet Count",
+      "labelPt": "Contagem de Plaquetas",
+      "domain": "medical",
+      "category": "lab_metric",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "hemoglobin",
+        "white_blood_cell_count"
+      ],
+      "aliases": {
+        "en": [
+          "platelet count",
+          "platelets",
+          "PLT",
+          "thrombocyte count"
+        ],
+        "pt": [
+          "plaquetas",
+          "contagem de plaquetas",
+          "PLT"
+        ]
+      }
+    },
+    {
+      "id": "respiratory_rate",
+      "label": "Respiratory Rate",
+      "labelPt": "Frequência Respiratória",
+      "domain": "medical",
+      "category": "vital_sign",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "heart_rate",
+        "oxygen_saturation"
+      ],
+      "aliases": {
+        "en": [
+          "respiratory rate",
+          "RR",
+          "breathing rate",
+          "breaths per minute"
+        ],
+        "pt": [
+          "frequência respiratória",
+          "FR",
+          "taxa respiratória"
+        ]
+      }
+    },
+    {
+      "id": "temperature",
+      "label": "Body Temperature",
+      "labelPt": "Temperatura Corporal",
+      "domain": "medical",
+      "category": "vital_sign",
+      "unitId": "temperature_unit",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "heart_rate",
+        "respiratory_rate"
+      ],
+      "aliases": {
+        "en": [
+          "temperature",
+          "body temp",
+          "temp",
+          "core temperature"
+        ],
+        "pt": [
+          "temperatura",
+          "temperatura corporal",
+          "temp"
+        ]
+      }
+    },
+    {
+      "id": "white_blood_cell_count",
+      "label": "White Blood Cell Count",
+      "labelPt": "Contagem de Leucócitos",
+      "domain": "medical",
+      "category": "lab_metric",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "hemoglobin",
+        "platelet_count",
+        "creatinine"
+      ],
+      "aliases": {
+        "en": [
+          "WBC",
+          "white blood cell count",
+          "leukocyte count",
+          "white cell count"
+        ],
+        "pt": [
+          "leucócitos",
+          "contagem de leucócitos",
+          "glóbulos brancos",
+          "WBC"
+        ]
+      }
+    },
+    {
+      "id": "customer_satisfaction_score",
+      "label": "Customer Satisfaction Score",
+      "labelPt": "Índice de Satisfação do Cliente",
+      "domain": "operations",
+      "category": "operational_kpi",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "resolution_rate",
+        "first_response_time"
+      ],
+      "aliases": {
+        "en": [
+          "CSAT",
+          "customer satisfaction",
+          "satisfaction score",
+          "customer rating"
+        ],
+        "pt": [
+          "CSAT",
+          "satisfação do cliente",
+          "índice de satisfação"
+        ]
+      }
+    },
+    {
+      "id": "cycle_time",
+      "label": "Cycle Time",
+      "labelPt": "Tempo de Ciclo",
+      "domain": "operations",
+      "category": "efficiency",
+      "unitId": "time",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "throughput",
+        "mean_time_to_repair"
+      ],
+      "aliases": {
+        "en": [
+          "cycle time",
+          "processing time",
+          "lead time",
+          "turnaround time"
+        ],
+        "pt": [
+          "tempo de ciclo",
+          "tempo de processamento",
+          "tempo de resposta"
+        ]
+      }
+    },
+    {
+      "id": "defect_rate",
+      "label": "Defect Rate",
+      "labelPt": "Taxa de Defeitos",
+      "domain": "operations",
+      "category": "operational_kpi",
+      "unitId": "percentage",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "throughput",
+        "cycle_time"
+      ],
+      "aliases": {
+        "en": [
+          "defect rate",
+          "failure rate",
+          "error rate",
+          "reject rate"
+        ],
+        "pt": [
+          "taxa de defeitos",
+          "taxa de falhas",
+          "taxa de erros"
+        ]
+      }
+    },
+    {
+      "id": "first_response_time",
+      "label": "First Response Time",
+      "labelPt": "Tempo de Primeira Resposta",
+      "domain": "operations",
+      "category": "sla_metric",
+      "unitId": "time",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "resolution_rate",
+        "customer_satisfaction_score"
+      ],
+      "aliases": {
+        "en": [
+          "first response time",
+          "FRT",
+          "initial response time",
+          "time to first response"
+        ],
+        "pt": [
+          "tempo de primeira resposta",
+          "TRP",
+          "tempo inicial de resposta"
+        ]
+      }
+    },
+    {
+      "id": "inventory_level",
+      "label": "Inventory Level",
+      "labelPt": "Nível de Estoque",
+      "domain": "operations",
+      "category": "operational_kpi",
+      "unitId": "count",
+      "direction": "target_range",
+      "relatedMetrics": [
+        "throughput",
+        "cycle_time"
+      ],
+      "aliases": {
+        "en": [
+          "inventory level",
+          "stock level",
+          "on-hand inventory",
+          "inventory on hand"
+        ],
+        "pt": [
+          "nível de estoque",
+          "estoque disponível",
+          "estoque em mãos"
+        ]
+      }
+    },
+    {
+      "id": "mean_time_between_failures",
+      "label": "Mean Time Between Failures",
+      "labelPt": "Tempo Médio entre Falhas",
+      "domain": "operations",
+      "category": "risk_metric",
+      "unitId": "time",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "mean_time_to_repair",
+        "uptime_percentage"
+      ],
+      "aliases": {
+        "en": [
+          "MTBF",
+          "mean time between failures",
+          "time between failures",
+          "failure interval"
+        ],
+        "pt": [
+          "MTBF",
+          "tempo médio entre falhas",
+          "TMEF"
+        ]
+      }
+    },
+    {
+      "id": "mean_time_to_repair",
+      "label": "Mean Time to Repair",
+      "labelPt": "Tempo Médio de Reparo",
+      "domain": "operations",
+      "category": "risk_metric",
+      "unitId": "time",
+      "direction": "lower_is_better",
+      "relatedMetrics": [
+        "mean_time_between_failures",
+        "uptime_percentage"
+      ],
+      "aliases": {
+        "en": [
+          "MTTR",
+          "mean time to repair",
+          "repair time",
+          "mean time to restore"
+        ],
+        "pt": [
+          "MTTR",
+          "tempo médio de reparo",
+          "TMDR",
+          "tempo de restauração"
+        ]
+      }
+    },
+    {
+      "id": "resolution_rate",
+      "label": "Resolution Rate",
+      "labelPt": "Taxa de Resolução",
+      "domain": "operations",
+      "category": "sla_metric",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "first_response_time",
+        "customer_satisfaction_score"
+      ],
+      "aliases": {
+        "en": [
+          "resolution rate",
+          "solve rate",
+          "fix rate",
+          "closure rate"
+        ],
+        "pt": [
+          "taxa de resolução",
+          "taxa de solução",
+          "índice de resolução"
+        ]
+      }
+    },
+    {
+      "id": "throughput",
+      "label": "Throughput",
+      "labelPt": "Vazão",
+      "domain": "operations",
+      "category": "operational_kpi",
+      "unitId": "count",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "cycle_time",
+        "defect_rate"
+      ],
+      "aliases": {
+        "en": [
+          "throughput",
+          "output rate",
+          "production rate",
+          "processing capacity"
+        ],
+        "pt": [
+          "vazão",
+          "taxa de produção",
+          "capacidade de processamento"
+        ]
+      }
+    },
+    {
+      "id": "uptime_percentage",
+      "label": "Uptime Percentage",
+      "labelPt": "Percentual de Disponibilidade",
+      "domain": "operations",
+      "category": "sla_metric",
+      "unitId": "percentage",
+      "direction": "higher_is_better",
+      "relatedMetrics": [
+        "mean_time_to_repair",
+        "mean_time_between_failures"
+      ],
+      "aliases": {
+        "en": [
+          "uptime",
+          "availability",
+          "uptime percentage",
+          "system availability"
+        ],
+        "pt": [
+          "disponibilidade",
+          "uptime",
+          "percentual de disponibilidade"
+        ]
+      }
+    }
+  ]
+}

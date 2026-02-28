@@ -1,0 +1,154 @@
+{
+  "_meta": {
+    "id": "medical_evidence_requirements",
+    "version": "2.0.0",
+    "description": "Evidence requirements for medical extraction and explanation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "medical",
+  "evidenceHierarchy": [
+    {
+      "id": "medical_evidence_hierarchy_001",
+      "rank": 1,
+      "type": "signed_clinical_document",
+      "label": {
+        "en": "Signed clinical document",
+        "pt": "Documento clinico assinado"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "id": "medical_evidence_hierarchy_002",
+      "rank": 2,
+      "type": "structured_lab_table",
+      "label": {
+        "en": "Structured lab table",
+        "pt": "Tabela laboratorial estruturada"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "id": "medical_evidence_hierarchy_003",
+      "rank": 3,
+      "type": "imaging_impression_section",
+      "label": {
+        "en": "Imaging impression section",
+        "pt": "Secao de impressao de imagem"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "id": "medical_evidence_hierarchy_004",
+      "rank": 4,
+      "type": "medication_or_allergy_list",
+      "label": {
+        "en": "Medication/allergy list",
+        "pt": "Lista de medicacao/alergia"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "id": "medical_evidence_hierarchy_005",
+      "rank": 5,
+      "type": "draft_note",
+      "label": {
+        "en": "Draft note",
+        "pt": "Rascunho de nota"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "medical_evidence_units_required",
+      "description": "Numeric findings must retain original units.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "structured_lab_table",
+        "signed_clinical_document"
+      ]
+    },
+    {
+      "id": "medical_evidence_reference_range_required",
+      "description": "Lab/vital findings should keep document reference range where present.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "structured_lab_table"
+      ]
+    },
+    {
+      "id": "medical_evidence_no_diagnosis_generation",
+      "description": "Do not generate diagnosis advice from evidence.",
+      "applies": [
+        "advise",
+        "evaluate",
+        "summarize"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_clinical_document"
+      ]
+    },
+    {
+      "id": "medical_evidence_clinician_escalation",
+      "description": "For critical/abnormal findings include clinician follow-up language.",
+      "applies": [
+        "monitor",
+        "summarize",
+        "advise"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_clinical_document",
+        "structured_lab_table"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "medical_requirement_patient_context",
+      "field": "patient context fields",
+      "minSources": 1,
+      "sourceTypes": [
+        "signed_clinical_document"
+      ],
+      "failureBehavior": "ask_clarifying_question"
+    },
+    {
+      "id": "medical_requirement_measurement_fields",
+      "field": "measurements with unit/range",
+      "minSources": 1,
+      "sourceTypes": [
+        "structured_lab_table"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "medical_requirement_medication_allergy",
+      "field": "medications/allergies",
+      "minSources": 1,
+      "sourceTypes": [
+        "medication_or_allergy_list"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    }
+  ]
+}

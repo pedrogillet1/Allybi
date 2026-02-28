@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting hr_payroll documents from headings, content, and table structure.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 32
+  },
+  "domain": "hr_payroll",
+  "rules": [
+    {
+      "id": "hr_detect_001_pay_stub",
+      "priority": 100,
+      "weight": 3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bpay stub\\b",
+        "\\bpayslip\\b",
+        "\\bholerite\\b",
+        "\\bcontracheque\\b"
+      ],
+      "description": "Pay stub markers"
+    },
+    {
+      "id": "hr_detect_002_timesheet",
+      "priority": 98,
+      "weight": 2.8,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\btimesheet\\b",
+        "\\btimecard\\b",
+        "\\bfolha de ponto\\b"
+      ],
+      "description": "Timesheet markers"
+    },
+    {
+      "id": "hr_detect_003_expense_report",
+      "priority": 97,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bexpense report\\b",
+        "\\breimbursement\\b",
+        "\\brelatorio de despesas\\b"
+      ],
+      "description": "Expense report markers"
+    },
+    {
+      "id": "hr_detect_004_employment_verification",
+      "priority": 96,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bemployment verification letter\\b",
+        "\\bproof of employment\\b",
+        "\\bcomprovacao de emprego\\b"
+      ],
+      "description": "Employment verification markers"
+    },
+    {
+      "id": "hr_detect_005_benefits_summary",
+      "priority": 95,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bbenefits enrollment summary\\b",
+        "\\bcoverage level\\b",
+        "\\bbeneficios\\b"
+      ],
+      "description": "Benefits summary markers"
+    },
+    {
+      "id": "hr_payroll_detect_999_scope_lock",
+      "priority": 70,
+      "weight": 1.4,
+      "signal": "content",
+      "patterns": [
+        "\\bdocument\\s+number\\b",
+        "\\breference\\b",
+        "\\bpage\\s+\\d+\\b"
+      ],
+      "description": "Generic structural markers for scoped document extraction"
+    }
+  ]
+}

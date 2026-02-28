@@ -1,4 +1,5 @@
 import * as crypto from "crypto";
+import { URLSearchParams } from "url";
 import { google, gmail_v1 } from "googleapis";
 
 import type { ConnectorProvider } from "../connectorsRegistry";
@@ -624,6 +625,26 @@ export class GmailOAuthService {
       redirectAfter: verified.redirectAfter ?? null,
       extState: verified.extState ?? null,
     };
+  }
+
+  async revokeAccess(userId: string): Promise<boolean> {
+    const payload = await this.tokenVault
+      .getDecryptedPayload(userId, "gmail")
+      .catch(() => null);
+    const token = payload?.refreshToken || payload?.accessToken;
+    if (!token) return false;
+
+    try {
+      const body = new URLSearchParams({ token }).toString();
+      const response = await fetch("https://oauth2.googleapis.com/revoke", {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body,
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
   }
 }
 

@@ -1,0 +1,306 @@
+{
+  "_meta": {
+    "id": "legal_nda_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for Non-Disclosure Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_nda"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "title",
+        "agreement date",
+        "version",
+        "Non-Disclosure Agreement Document Header",
+        "Acordo de Confidencialidade Cabecalho do Documento"
+      ]
+    },
+    {
+      "id": "parties",
+      "name": {
+        "en": "Parties",
+        "pt": "Partes"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Parties",
+        "Partes",
+        "between",
+        "party",
+        "counterparty",
+        "Non-Disclosure Agreement Parties",
+        "Acordo de Confidencialidade Partes"
+      ]
+    },
+    {
+      "id": "recitals_background",
+      "name": {
+        "en": "Recitals and Background",
+        "pt": "Considerandos e Contexto"
+      },
+      "required": false,
+      "order": 3,
+      "headingAnchors": [
+        "Recitals and Background",
+        "Considerandos e Contexto",
+        "whereas",
+        "background",
+        "purpose",
+        "Non-Disclosure Agreement Recitals and Background",
+        "Acordo de Confidencialidade Considerandos e Contexto"
+      ]
+    },
+    {
+      "id": "definitions",
+      "name": {
+        "en": "Definitions",
+        "pt": "Definicoes"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Definitions",
+        "Definicoes",
+        "means",
+        "defined terms",
+        "definition",
+        "Non-Disclosure Agreement Definitions",
+        "Acordo de Confidencialidade Definicoes"
+      ]
+    },
+    {
+      "id": "scope_of_services",
+      "name": {
+        "en": "Scope of Services / Subject Matter",
+        "pt": "Escopo de Servicos / Objeto"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "Scope of Services / Subject Matter",
+        "Escopo de Servicos / Objeto",
+        "scope",
+        "services",
+        "statement of work",
+        "Non-Disclosure Agreement Scope of Services / Subject Matter",
+        "Acordo de Confidencialidade Escopo de Servicos / Objeto"
+      ]
+    },
+    {
+      "id": "fees_and_payment",
+      "name": {
+        "en": "Fees and Payment Terms",
+        "pt": "Remuneracao e Pagamento"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Fees and Payment Terms",
+        "Remuneracao e Pagamento",
+        "fees",
+        "payment",
+        "invoice",
+        "Non-Disclosure Agreement Fees and Payment Terms",
+        "Acordo de Confidencialidade Remuneracao e Pagamento"
+      ]
+    },
+    {
+      "id": "term_and_renewal",
+      "name": {
+        "en": "Term and Renewal",
+        "pt": "Prazo e Renovacao"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Term and Renewal",
+        "Prazo e Renovacao",
+        "term",
+        "renewal",
+        "commencement",
+        "Non-Disclosure Agreement Term and Renewal",
+        "Acordo de Confidencialidade Prazo e Renovacao"
+      ]
+    },
+    {
+      "id": "termination",
+      "name": {
+        "en": "Termination",
+        "pt": "Rescisao"
+      },
+      "required": true,
+      "order": 8,
+      "headingAnchors": [
+        "Termination",
+        "Rescisao",
+        "terminate",
+        "termination for cause",
+        "survival",
+        "Non-Disclosure Agreement Termination",
+        "Acordo de Confidencialidade Rescisao"
+      ]
+    },
+    {
+      "id": "confidentiality_privacy",
+      "name": {
+        "en": "Confidentiality and Privacy",
+        "pt": "Confidencialidade e Privacidade"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Confidentiality and Privacy",
+        "Confidencialidade e Privacidade",
+        "confidential information",
+        "privacy",
+        "personal data",
+        "Non-Disclosure Agreement Confidentiality and Privacy",
+        "Acordo de Confidencialidade Confidencialidade e Privacidade"
+      ]
+    },
+    {
+      "id": "security_compliance",
+      "name": {
+        "en": "Security and Compliance",
+        "pt": "Seguranca e Conformidade"
+      },
+      "required": false,
+      "order": 10,
+      "headingAnchors": [
+        "Security and Compliance",
+        "Seguranca e Conformidade",
+        "security measures",
+        "compliance",
+        "controls",
+        "Non-Disclosure Agreement Security and Compliance",
+        "Acordo de Confidencialidade Seguranca e Conformidade"
+      ]
+    },
+    {
+      "id": "ip_and_license",
+      "name": {
+        "en": "IP and License",
+        "pt": "Propriedade Intelectual e Licenca"
+      },
+      "required": false,
+      "order": 11,
+      "headingAnchors": [
+        "IP and License",
+        "Propriedade Intelectual e Licenca",
+        "intellectual property",
+        "license grant",
+        "ownership",
+        "Non-Disclosure Agreement IP and License",
+        "Acordo de Confidencialidade Propriedade Intelectual e Licenca"
+      ]
+    },
+    {
+      "id": "liability_and_indemnity",
+      "name": {
+        "en": "Liability and Indemnity",
+        "pt": "Responsabilidade e Indenizacao"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Liability and Indemnity",
+        "Responsabilidade e Indenizacao",
+        "liability",
+        "indemnify",
+        "damages",
+        "Non-Disclosure Agreement Liability and Indemnity",
+        "Acordo de Confidencialidade Responsabilidade e Indenizacao"
+      ]
+    },
+    {
+      "id": "dispute_resolution",
+      "name": {
+        "en": "Dispute Resolution",
+        "pt": "Resolucao de Disputas"
+      },
+      "required": true,
+      "order": 13,
+      "headingAnchors": [
+        "Dispute Resolution",
+        "Resolucao de Disputas",
+        "governing law",
+        "jurisdiction",
+        "arbitration",
+        "Non-Disclosure Agreement Dispute Resolution",
+        "Acordo de Confidencialidade Resolucao de Disputas"
+      ]
+    },
+    {
+      "id": "notices_misc",
+      "name": {
+        "en": "Notices and Miscellaneous",
+        "pt": "Notificacoes e Disposicoes Gerais"
+      },
+      "required": false,
+      "order": 14,
+      "headingAnchors": [
+        "Notices and Miscellaneous",
+        "Notificacoes e Disposicoes Gerais",
+        "notice",
+        "assignment",
+        "entire agreement",
+        "Non-Disclosure Agreement Notices and Miscellaneous",
+        "Acordo de Confidencialidade Notificacoes e Disposicoes Gerais"
+      ]
+    },
+    {
+      "id": "signatures",
+      "name": {
+        "en": "Signatures",
+        "pt": "Assinaturas"
+      },
+      "required": true,
+      "order": 15,
+      "headingAnchors": [
+        "Signatures",
+        "Assinaturas",
+        "signature",
+        "executed",
+        "authorized signatory",
+        "Non-Disclosure Agreement Signatures",
+        "Acordo de Confidencialidade Assinaturas"
+      ]
+    },
+    {
+      "id": "annexes_schedules",
+      "name": {
+        "en": "Annexes and Schedules",
+        "pt": "Anexos e Apensos"
+      },
+      "required": false,
+      "order": 16,
+      "headingAnchors": [
+        "Annexes and Schedules",
+        "Anexos e Apensos",
+        "schedule",
+        "annex",
+        "appendix",
+        "Non-Disclosure Agreement Annexes and Schedules",
+        "Acordo de Confidencialidade Anexos e Apensos"
+      ]
+    }
+  ]
+}

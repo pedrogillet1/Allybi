@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "id": "medical_reasoning_scaffolds",
+    "version": "2.0.0",
+    "description": "Medical reasoning scaffolds for extraction and safe explanation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "scaffolds": [
+    {
+      "id": "medical_scaffold_structured_extract",
+      "name": "Structured extract scaffold",
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "steps": [
+        "detect note/report type",
+        "extract measurements",
+        "preserve units and ranges",
+        "extract medications/allergies",
+        "attach citations"
+      ]
+    },
+    {
+      "id": "medical_scaffold_safe_summary",
+      "name": "Safety-bounded summary scaffold",
+      "operators": [
+        "summarize",
+        "evaluate",
+        "advise"
+      ],
+      "steps": [
+        "compile document-grounded findings",
+        "avoid diagnosis/treatment advice",
+        "highlight abnormal/critical values",
+        "recommend clinician follow-up"
+      ]
+    },
+    {
+      "id": "medical_scaffold_followup_tracking",
+      "name": "Follow-up tracking scaffold",
+      "operators": [
+        "monitor",
+        "locate",
+        "compare"
+      ],
+      "steps": [
+        "collect due windows",
+        "identify pending tasks",
+        "compare prior/current measurements",
+        "flag missing follow-up evidence"
+      ]
+    }
+  ]
+}

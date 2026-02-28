@@ -1,0 +1,642 @@
+{
+  "_meta": {
+    "id": "medical_retrieval_strategies",
+    "version": "2.0.0",
+    "description": "Retrieval strategies for medical documents with evidence-first behavior.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "maxBoostRules": 50,
+    "maxQueryExpansionTerms": 90
+  },
+  "domain": "medical",
+  "sectionPriority": [
+    {
+      "id": "medical_section_priority_001",
+      "section": "document_header",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_section_priority_002",
+      "section": "patient_identification",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "medical_section_priority_003",
+      "section": "encounter_context",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_section_priority_004",
+      "section": "chief_complaint_reason",
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "medical_section_priority_005",
+      "section": "history_background",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_section_priority_006",
+      "section": "objective_findings",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "medical_section_priority_007",
+      "section": "vitals_and_measurements",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_section_priority_008",
+      "section": "labs_imaging",
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "medical_section_priority_009",
+      "section": "assessment_documented",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_section_priority_010",
+      "section": "plan_and_orders",
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "medical_section_priority_011",
+      "section": "medications_allergies",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_section_priority_012",
+      "section": "followup_and_disposition",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "medical_section_priority_013",
+      "section": "patient_instructions",
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "medical_section_priority_014",
+      "section": "signoff_and_attestation",
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "medical_section_priority_015",
+      "section": "annexes_tables",
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "medical_boost_001",
+      "priority": 110,
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references soap note",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_soap_note"
+    },
+    {
+      "id": "medical_boost_002",
+      "priority": 109,
+      "weight": 2.67,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references history and physical",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_history_and_physical"
+    },
+    {
+      "id": "medical_boost_003",
+      "priority": 108,
+      "weight": 2.64,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references progress note",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_progress_note"
+    },
+    {
+      "id": "medical_boost_004",
+      "priority": 107,
+      "weight": 2.61,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references consult note",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_consult_note"
+    },
+    {
+      "id": "medical_boost_005",
+      "priority": 106,
+      "weight": 2.58,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references emergency note",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_emergency_note"
+    },
+    {
+      "id": "medical_boost_006",
+      "priority": 105,
+      "weight": 2.55,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references nursing note",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_nursing_note"
+    },
+    {
+      "id": "medical_boost_007",
+      "priority": 104,
+      "weight": 2.52,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references care plan",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_care_plan"
+    },
+    {
+      "id": "medical_boost_008",
+      "priority": 103,
+      "weight": 2.49,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references discharge summary",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_discharge_summary"
+    },
+    {
+      "id": "medical_boost_009",
+      "priority": 102,
+      "weight": 2.46,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references followup instructions",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_followup_instructions"
+    },
+    {
+      "id": "medical_boost_010",
+      "priority": 101,
+      "weight": 2.43,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references referral letter",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_referral_letter"
+    },
+    {
+      "id": "medical_boost_011",
+      "priority": 100,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references lab results report",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_lab_results_report"
+    },
+    {
+      "id": "medical_boost_012",
+      "priority": 99,
+      "weight": 2.37,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references radiology report",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_radiology_report"
+    },
+    {
+      "id": "medical_boost_013",
+      "priority": 98,
+      "weight": 2.34,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references pathology report",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_pathology_report"
+    },
+    {
+      "id": "medical_boost_014",
+      "priority": 97,
+      "weight": 2.31,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references ecg report",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_ecg_report"
+    },
+    {
+      "id": "medical_boost_015",
+      "priority": 96,
+      "weight": 2.28,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references vitals chart",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_vitals_chart"
+    },
+    {
+      "id": "medical_boost_016",
+      "priority": 95,
+      "weight": 2.25,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references medication list",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_medication_list"
+    },
+    {
+      "id": "medical_boost_017",
+      "priority": 94,
+      "weight": 2.22,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references prescription",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_prescription"
+    },
+    {
+      "id": "medical_boost_018",
+      "priority": 93,
+      "weight": 2.19,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references allergy list",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_allergy_list"
+    },
+    {
+      "id": "medical_boost_019",
+      "priority": 92,
+      "weight": 2.16,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references immunization record",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_immunization_record"
+    },
+    {
+      "id": "medical_boost_020",
+      "priority": 91,
+      "weight": 2.13,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references problem list",
+      "boostSections": [
+        "patient_identification",
+        "objective_findings",
+        "vitals_and_measurements",
+        "labs_imaging",
+        "plan_and_orders"
+      ],
+      "docTypeId": "med_problem_list"
+    }
+  ],
+  "queryExpansion": [
+    "chief complaint",
+    "history of present illness",
+    "objective findings",
+    "vitals trend",
+    "reference range",
+    "abnormal flag",
+    "medication dose",
+    "route frequency",
+    "allergy reaction",
+    "immunization date",
+    "problem status",
+    "follow-up window",
+    "discharge instruction",
+    "referral reason",
+    "ecg rhythm",
+    "radiology impression",
+    "pathology specimen",
+    "lab panel",
+    "critical value",
+    "return precautions"
+  ],
+  "strategies": [
+    {
+      "id": "medical_strategy_evidence_first",
+      "operators": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "description": "Always extract objective fields with units and reference ranges before narrative summary.",
+      "steps": [
+        "detect doc type",
+        "collect objective findings",
+        "preserve unit + reference range",
+        "attach citations",
+        "summarize without diagnosis advice"
+      ]
+    },
+    {
+      "id": "medical_strategy_safety_guarded",
+      "operators": [
+        "advise",
+        "evaluate",
+        "monitor"
+      ],
+      "description": "For risk or severity queries, provide document-grounded explanation and clinician referral cue.",
+      "steps": [
+        "locate relevant findings",
+        "avoid diagnosis claims",
+        "state uncertainty",
+        "add clinician escalation line"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6002 @@
+{
+  "_meta": {
+    "id": "doc_aliases_banking",
+    "version": "1.0.0",
+    "description": "Banking document alias normalization bank with EN/PT/slang coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "schemaId": "doc_identity_schema"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.62
+  },
+  "domain": "banking",
+  "aliases": [
+    {
+      "phrase": "account statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show account statement for the last period",
+        "compare account statement by account"
+      ]
+    },
+    {
+      "phrase": "ach transfer list",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show ach transfer list for the last period",
+        "compare ach transfer list by account"
+      ]
+    },
+    {
+      "phrase": "acordo de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar acordo de covenant do ultimo periodo",
+        "comparar acordo de covenant por account"
+      ]
+    },
+    {
+      "phrase": "acquirer fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show acquirer fee report for the last period",
+        "compare acquirer fee report by account"
+      ]
+    },
+    {
+      "phrase": "ajuste bancario",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar ajuste bancario do ultimo periodo",
+        "comparar ajuste bancario por account"
+      ]
+    },
+    {
+      "phrase": "amortizacao da divida",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar amortizacao da divida do ultimo periodo",
+        "comparar amortizacao da divida por account"
+      ]
+    },
+    {
+      "phrase": "anuidade de cartao",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar anuidade de cartao do ultimo periodo",
+        "comparar anuidade de cartao por account"
+      ]
+    },
+    {
+      "phrase": "arquivo de pix",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar arquivo de pix do ultimo periodo",
+        "comparar arquivo de pix por account"
+      ]
+    },
+    {
+      "phrase": "arquivo de remessa bancaria",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar arquivo de remessa bancaria do ultimo periodo",
+        "comparar arquivo de remessa bancaria por account"
+      ]
+    },
+    {
+      "phrase": "arquivo de ted",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar arquivo de ted do ultimo periodo",
+        "comparar arquivo de ted por account"
+      ]
+    },
+    {
+      "phrase": "arquivo de transferencia",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar arquivo de transferencia do ultimo periodo",
+        "comparar arquivo de transferencia por account"
+      ]
+    },
+    {
+      "phrase": "atm fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show atm fee report for the last period",
+        "compare atm fee report by account"
+      ]
+    },
+    {
+      "phrase": "baixa bancaria conciliada",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar baixa bancaria conciliada do ultimo periodo",
+        "comparar baixa bancaria conciliada por account"
+      ]
+    },
+    {
+      "phrase": "balancete bancario",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar balancete bancario do ultimo periodo",
+        "comparar balancete bancario por account"
+      ]
+    },
+    {
+      "phrase": "bank account reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank account reconciliation for the last period",
+        "compare bank account reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "bank account tie out",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank account tie out for the last period",
+        "compare bank account tie out by account"
+      ]
+    },
+    {
+      "phrase": "bank balance statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show bank balance statement for the last period",
+        "compare bank balance statement by account"
+      ]
+    },
+    {
+      "phrase": "bank balancing report",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank balancing report for the last period",
+        "compare bank balancing report by account"
+      ]
+    },
+    {
+      "phrase": "bank closing reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank closing reconciliation for the last period",
+        "compare bank closing reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "bank covenant report",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show bank covenant report for the last period",
+        "compare bank covenant report by account"
+      ]
+    },
+    {
+      "phrase": "bank debt obligations",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show bank debt obligations for the last period",
+        "compare bank debt obligations by account"
+      ]
+    },
+    {
+      "phrase": "bank fee detail",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show bank fee detail for the last period",
+        "compare bank fee detail by account"
+      ]
+    },
+    {
+      "phrase": "bank fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show bank fee report for the last period",
+        "compare bank fee report by account"
+      ]
+    },
+    {
+      "phrase": "bank feed reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank feed reconciliation for the last period",
+        "compare bank feed reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "bank ledger statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show bank ledger statement for the last period",
+        "compare bank ledger statement by account"
+      ]
+    },
+    {
+      "phrase": "bank loan tracker",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show bank loan tracker for the last period",
+        "compare bank loan tracker by account"
+      ]
+    },
+    {
+      "phrase": "bank match report",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank match report for the last period",
+        "compare bank match report by account"
+      ]
+    },
+    {
+      "phrase": "bank movement reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank movement reconciliation for the last period",
+        "compare bank movement reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "bank rec",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank rec for the last period",
+        "compare bank rec by account"
+      ]
+    },
+    {
+      "phrase": "bank recon",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank recon for the last period",
+        "compare bank recon by account"
+      ]
+    },
+    {
+      "phrase": "bank reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank reconciliation for the last period",
+        "compare bank reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "bank reconciliation detail",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank reconciliation detail for the last period",
+        "compare bank reconciliation detail by account"
+      ]
+    },
+    {
+      "phrase": "bank reconciliation report",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank reconciliation report for the last period",
+        "compare bank reconciliation report by account"
+      ]
+    },
+    {
+      "phrase": "bank reconciliation statement",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank reconciliation statement for the last period",
+        "compare bank reconciliation statement by account"
+      ]
+    },
+    {
+      "phrase": "bank remittance transfer",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show bank remittance transfer for the last period",
+        "compare bank remittance transfer by account"
+      ]
+    },
+    {
+      "phrase": "bank statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show bank statement for the last period",
+        "compare bank statement by account"
+      ]
+    },
+    {
+      "phrase": "bank statement detail",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show bank statement detail for the last period",
+        "compare bank statement detail by account"
+      ]
+    },
+    {
+      "phrase": "bank statement report",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show bank statement report for the last period",
+        "compare bank statement report by account"
+      ]
+    },
+    {
+      "phrase": "bank tariff report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show bank tariff report for the last period",
+        "compare bank tariff report by account"
+      ]
+    },
+    {
+      "phrase": "bank tie-out",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show bank tie-out for the last period",
+        "compare bank tie-out by account"
+      ]
+    },
+    {
+      "phrase": "bank transfer file",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show bank transfer file for the last period",
+        "compare bank transfer file by account"
+      ]
+    },
+    {
+      "phrase": "banking liquidity summary",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show banking liquidity summary for the last period",
+        "compare banking liquidity summary by account"
+      ]
+    },
+    {
+      "phrase": "banking rec report",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show banking rec report for the last period",
+        "compare banking rec report by account"
+      ]
+    },
+    {
+      "phrase": "banking snapshot statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show banking snapshot statement for the last period",
+        "compare banking snapshot statement by account"
+      ]
+    },
+    {
+      "phrase": "banking statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show banking statement for the last period",
+        "compare banking statement by account"
+      ]
+    },
+    {
+      "phrase": "banking tie-out",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show banking tie-out for the last period",
+        "compare banking tie-out by account"
+      ]
+    },
+    {
+      "phrase": "boletim diario de tesouraria",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar boletim diario de tesouraria do ultimo periodo",
+        "comparar boletim diario de tesouraria por account"
+      ]
+    },
+    {
+      "phrase": "borrower compliance",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show borrower compliance for the last period",
+        "compare borrower compliance by account"
+      ]
+    },
+    {
+      "phrase": "buffer de caixa",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar buffer de caixa do ultimo periodo",
+        "comparar buffer de caixa por account"
+      ]
+    },
+    {
+      "phrase": "caixa disponivel",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar caixa disponivel do ultimo periodo",
+        "comparar caixa disponivel por account"
+      ]
+    },
+    {
+      "phrase": "capacidade de pagamento de curto prazo",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar capacidade de pagamento de curto prazo do ultimo periodo",
+        "comparar capacidade de pagamento de curto prazo por account"
+      ]
+    },
+    {
+      "phrase": "card fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show card fee report for the last period",
+        "compare card fee report by account"
+      ]
+    },
+    {
+      "phrase": "card processing fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show card processing fee report for the last period",
+        "compare card processing fee report by account"
+      ]
+    },
+    {
+      "phrase": "card statement",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show card statement for the last period",
+        "compare card statement by account"
+      ]
+    },
+    {
+      "phrase": "carta de banco credor",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar carta de banco credor do ultimo periodo",
+        "comparar carta de banco credor por account"
+      ]
+    },
+    {
+      "phrase": "cash availability report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show cash availability report for the last period",
+        "compare cash availability report by account"
+      ]
+    },
+    {
+      "phrase": "cash buffer report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show cash buffer report for the last period",
+        "compare cash buffer report by account"
+      ]
+    },
+    {
+      "phrase": "cash concentration report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show cash concentration report for the last period",
+        "compare cash concentration report by account"
+      ]
+    },
+    {
+      "phrase": "cash flow statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show cash flow statement for the last period",
+        "compare cash flow statement by account"
+      ]
+    },
+    {
+      "phrase": "cash in cash out statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show cash in cash out statement for the last period",
+        "compare cash in cash out statement by account"
+      ]
+    },
+    {
+      "phrase": "cash ledger statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show cash ledger statement for the last period",
+        "compare cash ledger statement by account"
+      ]
+    },
+    {
+      "phrase": "cash movement statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show cash movement statement for the last period",
+        "compare cash movement statement by account"
+      ]
+    },
+    {
+      "phrase": "cash pool position",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show cash pool position for the last period",
+        "compare cash pool position by account"
+      ]
+    },
+    {
+      "phrase": "cash position report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show cash position report for the last period",
+        "compare cash position report by account"
+      ]
+    },
+    {
+      "phrase": "cash position statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show cash position statement for the last period",
+        "compare cash position statement by account"
+      ]
+    },
+    {
+      "phrase": "cash reconciliation report",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show cash reconciliation report for the last period",
+        "compare cash reconciliation report by account"
+      ]
+    },
+    {
+      "phrase": "cash runway report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show cash runway report for the last period",
+        "compare cash runway report by account"
+      ]
+    },
+    {
+      "phrase": "cash sweep report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show cash sweep report for the last period",
+        "compare cash sweep report by account"
+      ]
+    },
+    {
+      "phrase": "cash transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show cash transfer report for the last period",
+        "compare cash transfer report by account"
+      ]
+    },
+    {
+      "phrase": "cash vs bank rec",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show cash vs bank rec for the last period",
+        "compare cash vs bank rec by account"
+      ]
+    },
+    {
+      "phrase": "cenario de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar cenario de liquidez do ultimo periodo",
+        "comparar cenario de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "chargeback fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show chargeback fee report for the last period",
+        "compare chargeback fee report by account"
+      ]
+    },
+    {
+      "phrase": "checkbook reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show checkbook reconciliation for the last period",
+        "compare checkbook reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "checking account fees",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show checking account fees for the last period",
+        "compare checking account fees by account"
+      ]
+    },
+    {
+      "phrase": "closing balance statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show closing balance statement for the last period",
+        "compare closing balance statement by account"
+      ]
+    },
+    {
+      "phrase": "cobertura do servico da divida",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cobertura do servico da divida do ultimo periodo",
+        "comparar cobertura do servico da divida por account"
+      ]
+    },
+    {
+      "phrase": "cobranca de tarifa bancaria",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar cobranca de tarifa bancaria do ultimo periodo",
+        "comparar cobranca de tarifa bancaria por account"
+      ]
+    },
+    {
+      "phrase": "concentracao de caixa",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar concentracao de caixa do ultimo periodo",
+        "comparar concentracao de caixa por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao bancaria",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao bancaria do ultimo periodo",
+        "comparar conciliacao bancaria por account"
+      ]
+    },
+    {
+      "phrase": "conciliação bancária",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliação bancária do ultimo periodo",
+        "comparar conciliação bancária por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao de banco",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao de banco do ultimo periodo",
+        "comparar conciliacao de banco por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao de conta corrente",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao de conta corrente do ultimo periodo",
+        "comparar conciliacao de conta corrente por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao de deposito",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao de deposito do ultimo periodo",
+        "comparar conciliacao de deposito por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao de extrato",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao de extrato do ultimo periodo",
+        "comparar conciliacao de extrato por account"
+      ]
+    },
+    {
+      "phrase": "conciliação de feed bancário",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliação de feed bancário do ultimo periodo",
+        "comparar conciliação de feed bancário por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao de movimentacao bancaria",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao de movimentacao bancaria do ultimo periodo",
+        "comparar conciliacao de movimentacao bancaria por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao de saque",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao de saque do ultimo periodo",
+        "comparar conciliacao de saque por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao do banco",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao do banco do ultimo periodo",
+        "comparar conciliacao do banco por account"
+      ]
+    },
+    {
+      "phrase": "conciliacao financeira",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conciliacao financeira do ultimo periodo",
+        "comparar conciliacao financeira por account"
+      ]
+    },
+    {
+      "phrase": "conferencia banco razao",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conferencia banco razao do ultimo periodo",
+        "comparar conferencia banco razao por account"
+      ]
+    },
+    {
+      "phrase": "conferencia de conta bancaria",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conferencia de conta bancaria do ultimo periodo",
+        "comparar conferencia de conta bancaria por account"
+      ]
+    },
+    {
+      "phrase": "conferencia de transferencias",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar conferencia de transferencias do ultimo periodo",
+        "comparar conferencia de transferencias por account"
+      ]
+    },
+    {
+      "phrase": "conferencia extrato banco",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar conferencia extrato banco do ultimo periodo",
+        "comparar conferencia extrato banco por account"
+      ]
+    },
+    {
+      "phrase": "consolidado de caixa e bancos",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar consolidado de caixa e bancos do ultimo periodo",
+        "comparar consolidado de caixa e bancos por account"
+      ]
+    },
+    {
+      "phrase": "controle de emprestimos",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar controle de emprestimos do ultimo periodo",
+        "comparar controle de emprestimos por account"
+      ]
+    },
+    {
+      "phrase": "controle de financiamentos",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar controle de financiamentos do ultimo periodo",
+        "comparar controle de financiamentos por account"
+      ]
+    },
+    {
+      "phrase": "controle de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar controle de liquidez do ultimo periodo",
+        "comparar controle de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "controle de parcelas do financiamento",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar controle de parcelas do financiamento do ultimo periodo",
+        "comparar controle de parcelas do financiamento por account"
+      ]
+    },
+    {
+      "phrase": "corporate treasury snapshot",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show corporate treasury snapshot for the last period",
+        "compare corporate treasury snapshot by account"
+      ]
+    },
+    {
+      "phrase": "covenant bancario",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar covenant bancario do ultimo periodo",
+        "comparar covenant bancario por account"
+      ]
+    },
+    {
+      "phrase": "covenant breach tracker",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show covenant breach tracker for the last period",
+        "compare covenant breach tracker by account"
+      ]
+    },
+    {
+      "phrase": "covenant compliance",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show covenant compliance for the last period",
+        "compare covenant compliance by account"
+      ]
+    },
+    {
+      "phrase": "covenant financeiro",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar covenant financeiro do ultimo periodo",
+        "comparar covenant financeiro por account"
+      ]
+    },
+    {
+      "phrase": "covenant waiver follow-up",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show covenant waiver follow-up for the last period",
+        "compare covenant waiver follow-up by account"
+      ]
+    },
+    {
+      "phrase": "credit card statement",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show credit card statement for the last period",
+        "compare credit card statement by account"
+      ]
+    },
+    {
+      "phrase": "credit covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show credit covenant for the last period",
+        "compare credit covenant by account"
+      ]
+    },
+    {
+      "phrase": "credit line covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show credit line covenant for the last period",
+        "compare credit line covenant by account"
+      ]
+    },
+    {
+      "phrase": "cronograma da divida",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cronograma da divida do ultimo periodo",
+        "comparar cronograma da divida por account"
+      ]
+    },
+    {
+      "phrase": "cross-border transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show cross-border transfer report for the last period",
+        "compare cross-border transfer report by account"
+      ]
+    },
+    {
+      "phrase": "cumprimento de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar cumprimento de covenant do ultimo periodo",
+        "comparar cumprimento de covenant por account"
+      ]
+    },
+    {
+      "phrase": "daily bank rec",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show daily bank rec for the last period",
+        "compare daily bank rec by account"
+      ]
+    },
+    {
+      "phrase": "daily cash statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show daily cash statement for the last period",
+        "compare daily cash statement by account"
+      ]
+    },
+    {
+      "phrase": "daily liquidity report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show daily liquidity report for the last period",
+        "compare daily liquidity report by account"
+      ]
+    },
+    {
+      "phrase": "daily treasury brief",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show daily treasury brief for the last period",
+        "compare daily treasury brief by account"
+      ]
+    },
+    {
+      "phrase": "debit card statement",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show debit card statement for the last period",
+        "compare debit card statement by account"
+      ]
+    },
+    {
+      "phrase": "debt covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt covenant for the last period",
+        "compare debt covenant by account"
+      ]
+    },
+    {
+      "phrase": "debt drawdown report",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt drawdown report for the last period",
+        "compare debt drawdown report by account"
+      ]
+    },
+    {
+      "phrase": "debt ratio covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt ratio covenant for the last period",
+        "compare debt ratio covenant by account"
+      ]
+    },
+    {
+      "phrase": "debt repayment plan",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt repayment plan for the last period",
+        "compare debt repayment plan by account"
+      ]
+    },
+    {
+      "phrase": "debt rollover plan",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt rollover plan for the last period",
+        "compare debt rollover plan by account"
+      ]
+    },
+    {
+      "phrase": "debt service",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt service for the last period",
+        "compare debt service by account"
+      ]
+    },
+    {
+      "phrase": "debt service coverage",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show debt service coverage for the last period",
+        "compare debt service coverage by account"
+      ]
+    },
+    {
+      "phrase": "demonstracao de fluxo de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar demonstracao de fluxo de caixa do ultimo periodo",
+        "comparar demonstracao de fluxo de caixa por account"
+      ]
+    },
+    {
+      "phrase": "demonstrativo de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar demonstrativo de caixa do ultimo periodo",
+        "comparar demonstrativo de caixa por account"
+      ]
+    },
+    {
+      "phrase": "deposit reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show deposit reconciliation for the last period",
+        "compare deposit reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "dfc",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar dfc do ultimo periodo",
+        "comparar dfc por account"
+      ]
+    },
+    {
+      "phrase": "diferencas bancarias",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar diferencas bancarias do ultimo periodo",
+        "comparar diferencas bancarias por account"
+      ]
+    },
+    {
+      "phrase": "disponibilidade de caixa",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar disponibilidade de caixa do ultimo periodo",
+        "comparar disponibilidade de caixa por account"
+      ]
+    },
+    {
+      "phrase": "divida bancaria",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar divida bancaria do ultimo periodo",
+        "comparar divida bancaria por account"
+      ]
+    },
+    {
+      "phrase": "electronic transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show electronic transfer report for the last period",
+        "compare electronic transfer report by account"
+      ]
+    },
+    {
+      "phrase": "emprestimo bancario",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar emprestimo bancario do ultimo periodo",
+        "comparar emprestimo bancario por account"
+      ]
+    },
+    {
+      "phrase": "extrato bancario",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato bancario do ultimo periodo",
+        "comparar extrato bancario por account"
+      ]
+    },
+    {
+      "phrase": "extrato conciliado",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar extrato conciliado do ultimo periodo",
+        "comparar extrato conciliado por account"
+      ]
+    },
+    {
+      "phrase": "extrato consolidado de bancos",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato consolidado de bancos do ultimo periodo",
+        "comparar extrato consolidado de bancos por account"
+      ]
+    },
+    {
+      "phrase": "extrato de cartao",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar extrato de cartao do ultimo periodo",
+        "comparar extrato de cartao por account"
+      ]
+    },
+    {
+      "phrase": "extrato de conta",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato de conta do ultimo periodo",
+        "comparar extrato de conta por account"
+      ]
+    },
+    {
+      "phrase": "extrato de movimentacao",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato de movimentacao do ultimo periodo",
+        "comparar extrato de movimentacao por account"
+      ]
+    },
+    {
+      "phrase": "extrato de pix",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato de pix do ultimo periodo",
+        "comparar extrato de pix por account"
+      ]
+    },
+    {
+      "phrase": "extrato de ted",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato de ted do ultimo periodo",
+        "comparar extrato de ted por account"
+      ]
+    },
+    {
+      "phrase": "extrato de transferencias",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato de transferencias do ultimo periodo",
+        "comparar extrato de transferencias por account"
+      ]
+    },
+    {
+      "phrase": "extrato financeiro",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar extrato financeiro do ultimo periodo",
+        "comparar extrato financeiro por account"
+      ]
+    },
+    {
+      "phrase": "facility covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show facility covenant for the last period",
+        "compare facility covenant by account"
+      ]
+    },
+    {
+      "phrase": "fatura de cartao",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar fatura de cartao do ultimo periodo",
+        "comparar fatura de cartao por account"
+      ]
+    },
+    {
+      "phrase": "fechamento bancario",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fechamento bancario do ultimo periodo",
+        "comparar fechamento bancario por account"
+      ]
+    },
+    {
+      "phrase": "fechamento de caixa e banco",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar fechamento de caixa e banco do ultimo periodo",
+        "comparar fechamento de caixa e banco por account"
+      ]
+    },
+    {
+      "phrase": "feed bancario conciliado",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar feed bancario conciliado do ultimo periodo",
+        "comparar feed bancario conciliado por account"
+      ]
+    },
+    {
+      "phrase": "fila de transferencias",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar fila de transferencias do ultimo periodo",
+        "comparar fila de transferencias por account"
+      ]
+    },
+    {
+      "phrase": "financial covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show financial covenant for the last period",
+        "compare financial covenant by account"
+      ]
+    },
+    {
+      "phrase": "financiamento bancario",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar financiamento bancario do ultimo periodo",
+        "comparar financiamento bancario por account"
+      ]
+    },
+    {
+      "phrase": "fluxo de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar fluxo de caixa do ultimo periodo",
+        "comparar fluxo de caixa por account"
+      ]
+    },
+    {
+      "phrase": "fluxo de caixa diario",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar fluxo de caixa diario do ultimo periodo",
+        "comparar fluxo de caixa diario por account"
+      ]
+    },
+    {
+      "phrase": "fluxo de caixa mensal",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar fluxo de caixa mensal do ultimo periodo",
+        "comparar fluxo de caixa mensal por account"
+      ]
+    },
+    {
+      "phrase": "fund transfer log",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show fund transfer log for the last period",
+        "compare fund transfer log by account"
+      ]
+    },
+    {
+      "phrase": "funding position report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show funding position report for the last period",
+        "compare funding position report by account"
+      ]
+    },
+    {
+      "phrase": "funds movement statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show funds movement statement for the last period",
+        "compare funds movement statement by account"
+      ]
+    },
+    {
+      "phrase": "gestao de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar gestao de liquidez do ultimo periodo",
+        "comparar gestao de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "horizonte de caixa",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar horizonte de caixa do ultimo periodo",
+        "comparar horizonte de caixa por account"
+      ]
+    },
+    {
+      "phrase": "indice de endividamento covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar indice de endividamento covenant do ultimo periodo",
+        "comparar indice de endividamento covenant por account"
+      ]
+    },
+    {
+      "phrase": "instant transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show instant transfer report for the last period",
+        "compare instant transfer report by account"
+      ]
+    },
+    {
+      "phrase": "interbank transfer",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show interbank transfer for the last period",
+        "compare interbank transfer by account"
+      ]
+    },
+    {
+      "phrase": "internal transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show internal transfer report for the last period",
+        "compare internal transfer report by account"
+      ]
+    },
+    {
+      "phrase": "iof de cartao",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar iof de cartao do ultimo periodo",
+        "comparar iof de cartao por account"
+      ]
+    },
+    {
+      "phrase": "issuer fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show issuer fee report for the last period",
+        "compare issuer fee report by account"
+      ]
+    },
+    {
+      "phrase": "itens nao conciliados banco",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar itens nao conciliados banco do ultimo periodo",
+        "comparar itens nao conciliados banco por account"
+      ]
+    },
+    {
+      "phrase": "ledger to bank rec",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show ledger to bank rec for the last period",
+        "compare ledger to bank rec by account"
+      ]
+    },
+    {
+      "phrase": "lender covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show lender covenant for the last period",
+        "compare lender covenant by account"
+      ]
+    },
+    {
+      "phrase": "lender reporting pack",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show lender reporting pack for the last period",
+        "compare lender reporting pack by account"
+      ]
+    },
+    {
+      "phrase": "linha de credito covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar linha de credito covenant do ultimo periodo",
+        "comparar linha de credito covenant por account"
+      ]
+    },
+    {
+      "phrase": "liquidez de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar liquidez de caixa do ultimo periodo",
+        "comparar liquidez de caixa por account"
+      ]
+    },
+    {
+      "phrase": "liquidez de curto prazo",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar liquidez de curto prazo do ultimo periodo",
+        "comparar liquidez de curto prazo por account"
+      ]
+    },
+    {
+      "phrase": "liquidity bridge",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liquidity bridge for the last period",
+        "compare liquidity bridge by account"
+      ]
+    },
+    {
+      "phrase": "liquidity forecast",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liquidity forecast for the last period",
+        "compare liquidity forecast by account"
+      ]
+    },
+    {
+      "phrase": "liquidity health report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liquidity health report for the last period",
+        "compare liquidity health report by account"
+      ]
+    },
+    {
+      "phrase": "liquidity management report",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liquidity management report for the last period",
+        "compare liquidity management report by account"
+      ]
+    },
+    {
+      "phrase": "liquidity planning",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liquidity planning for the last period",
+        "compare liquidity planning by account"
+      ]
+    },
+    {
+      "phrase": "liquidity position",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liquidity position for the last period",
+        "compare liquidity position by account"
+      ]
+    },
+    {
+      "phrase": "liquidity statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show liquidity statement for the last period",
+        "compare liquidity statement by account"
+      ]
+    },
+    {
+      "phrase": "liquidity watchlist",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show liquidity watchlist for the last period",
+        "compare liquidity watchlist by account"
+      ]
+    },
+    {
+      "phrase": "loan compliance report",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show loan compliance report for the last period",
+        "compare loan compliance report by account"
+      ]
+    },
+    {
+      "phrase": "loan covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show loan covenant for the last period",
+        "compare loan covenant by account"
+      ]
+    },
+    {
+      "phrase": "loan monitoring report",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show loan monitoring report for the last period",
+        "compare loan monitoring report by account"
+      ]
+    },
+    {
+      "phrase": "loan payment schedule",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show loan payment schedule for the last period",
+        "compare loan payment schedule by account"
+      ]
+    },
+    {
+      "phrase": "loan servicing report",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show loan servicing report for the last period",
+        "compare loan servicing report by account"
+      ]
+    },
+    {
+      "phrase": "log de transferencias",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar log de transferencias do ultimo periodo",
+        "comparar log de transferencias por account"
+      ]
+    },
+    {
+      "phrase": "lote de transferencias",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar lote de transferencias do ultimo periodo",
+        "comparar lote de transferencias por account"
+      ]
+    },
+    {
+      "phrase": "mapa de conciliacao bancaria",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar mapa de conciliacao bancaria do ultimo periodo",
+        "comparar mapa de conciliacao bancaria por account"
+      ]
+    },
+    {
+      "phrase": "mapa de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar mapa de liquidez do ultimo periodo",
+        "comparar mapa de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "merchant fee statement",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show merchant fee statement for the last period",
+        "compare merchant fee statement by account"
+      ]
+    },
+    {
+      "phrase": "minimum liquidity covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show minimum liquidity covenant for the last period",
+        "compare minimum liquidity covenant by account"
+      ]
+    },
+    {
+      "phrase": "monitoramento de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar monitoramento de covenant do ultimo periodo",
+        "comparar monitoramento de covenant por account"
+      ]
+    },
+    {
+      "phrase": "monthly bank fees",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show monthly bank fees for the last period",
+        "compare monthly bank fees by account"
+      ]
+    },
+    {
+      "phrase": "monthly bank rec",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show monthly bank rec for the last period",
+        "compare monthly bank rec by account"
+      ]
+    },
+    {
+      "phrase": "monthly cash statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show monthly cash statement for the last period",
+        "compare monthly cash statement by account"
+      ]
+    },
+    {
+      "phrase": "movimentacao de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar movimentacao de caixa do ultimo periodo",
+        "comparar movimentacao de caixa por account"
+      ]
+    },
+    {
+      "phrase": "movimentacao de transferencia",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar movimentacao de transferencia do ultimo periodo",
+        "comparar movimentacao de transferencia por account"
+      ]
+    },
+    {
+      "phrase": "movimento bancario",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar movimento bancario do ultimo periodo",
+        "comparar movimento bancario por account"
+      ]
+    },
+    {
+      "phrase": "near-term liquidity",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show near-term liquidity for the last period",
+        "compare near-term liquidity by account"
+      ]
+    },
+    {
+      "phrase": "net cash movement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show net cash movement for the last period",
+        "compare net cash movement by account"
+      ]
+    },
+    {
+      "phrase": "net debt and liquidity",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show net debt and liquidity for the last period",
+        "compare net debt and liquidity by account"
+      ]
+    },
+    {
+      "phrase": "obrigacoes com bancos",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar obrigacoes com bancos do ultimo periodo",
+        "comparar obrigacoes com bancos por account"
+      ]
+    },
+    {
+      "phrase": "opening balance statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show opening balance statement for the last period",
+        "compare opening balance statement by account"
+      ]
+    },
+    {
+      "phrase": "operating cash statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show operating cash statement for the last period",
+        "compare operating cash statement by account"
+      ]
+    },
+    {
+      "phrase": "ordem de transferencia",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar ordem de transferencia do ultimo periodo",
+        "comparar ordem de transferencia por account"
+      ]
+    },
+    {
+      "phrase": "outbound wire",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show outbound wire for the last period",
+        "compare outbound wire by account"
+      ]
+    },
+    {
+      "phrase": "outstanding checks rec",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show outstanding checks rec for the last period",
+        "compare outstanding checks rec by account"
+      ]
+    },
+    {
+      "phrase": "overdraft fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show overdraft fee report for the last period",
+        "compare overdraft fee report by account"
+      ]
+    },
+    {
+      "phrase": "pagamento de principal e juros",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar pagamento de principal e juros do ultimo periodo",
+        "comparar pagamento de principal e juros por account"
+      ]
+    },
+    {
+      "phrase": "pagamento por transferencia",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar pagamento por transferencia do ultimo periodo",
+        "comparar pagamento por transferencia por account"
+      ]
+    },
+    {
+      "phrase": "painel de tesouraria",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar painel de tesouraria do ultimo periodo",
+        "comparar painel de tesouraria por account"
+      ]
+    },
+    {
+      "phrase": "payment card report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show payment card report for the last period",
+        "compare payment card report by account"
+      ]
+    },
+    {
+      "phrase": "payment rail transfer",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show payment rail transfer for the last period",
+        "compare payment rail transfer by account"
+      ]
+    },
+    {
+      "phrase": "payment transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show payment transfer report for the last period",
+        "compare payment transfer report by account"
+      ]
+    },
+    {
+      "phrase": "pendencias de conciliacao bancaria",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar pendencias de conciliacao bancaria do ultimo periodo",
+        "comparar pendencias de conciliacao bancaria por account"
+      ]
+    },
+    {
+      "phrase": "planejamento de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar planejamento de liquidez do ultimo periodo",
+        "comparar planejamento de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "plano de pagamento de emprestimo",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar plano de pagamento de emprestimo do ultimo periodo",
+        "comparar plano de pagamento de emprestimo por account"
+      ]
+    },
+    {
+      "phrase": "pooling de caixa",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar pooling de caixa do ultimo periodo",
+        "comparar pooling de caixa por account"
+      ]
+    },
+    {
+      "phrase": "posicao de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar posicao de caixa do ultimo periodo",
+        "comparar posicao de caixa por account"
+      ]
+    },
+    {
+      "phrase": "posicao de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar posicao de liquidez do ultimo periodo",
+        "comparar posicao de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "posicao de tesouraria",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar posicao de tesouraria do ultimo periodo",
+        "comparar posicao de tesouraria por account"
+      ]
+    },
+    {
+      "phrase": "prazo da divida",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar prazo da divida do ultimo periodo",
+        "comparar prazo da divida por account"
+      ]
+    },
+    {
+      "phrase": "principal and interest schedule",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show principal and interest schedule for the last period",
+        "compare principal and interest schedule by account"
+      ]
+    },
+    {
+      "phrase": "projecao de caixa",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar projecao de caixa do ultimo periodo",
+        "comparar projecao de caixa por account"
+      ]
+    },
+    {
+      "phrase": "recon of bank feed",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show recon of bank feed for the last period",
+        "compare recon of bank feed by account"
+      ]
+    },
+    {
+      "phrase": "reconcile bank account",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show reconcile bank account for the last period",
+        "compare reconcile bank account by account"
+      ]
+    },
+    {
+      "phrase": "reconciliar conta bancaria",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar reconciliar conta bancaria do ultimo periodo",
+        "comparar reconciliar conta bancaria por account"
+      ]
+    },
+    {
+      "phrase": "refinancing covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show refinancing covenant for the last period",
+        "compare refinancing covenant by account"
+      ]
+    },
+    {
+      "phrase": "relatorio de conciliacao bancaria",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar relatorio de conciliacao bancaria do ultimo periodo",
+        "comparar relatorio de conciliacao bancaria por account"
+      ]
+    },
+    {
+      "phrase": "relatorio de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar relatorio de covenant do ultimo periodo",
+        "comparar relatorio de covenant por account"
+      ]
+    },
+    {
+      "phrase": "relatorio de emprestimos",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar relatorio de emprestimos do ultimo periodo",
+        "comparar relatorio de emprestimos por account"
+      ]
+    },
+    {
+      "phrase": "relatorio de fluxo de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar relatorio de fluxo de caixa do ultimo periodo",
+        "comparar relatorio de fluxo de caixa por account"
+      ]
+    },
+    {
+      "phrase": "relatorio de pix",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar relatorio de pix do ultimo periodo",
+        "comparar relatorio de pix por account"
+      ]
+    },
+    {
+      "phrase": "relatorio de tarifas bancarias",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar relatorio de tarifas bancarias do ultimo periodo",
+        "comparar relatorio de tarifas bancarias por account"
+      ]
+    },
+    {
+      "phrase": "relatorio de ted",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar relatorio de ted do ultimo periodo",
+        "comparar relatorio de ted por account"
+      ]
+    },
+    {
+      "phrase": "relatorio de transferencia bancaria",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar relatorio de transferencia bancaria do ultimo periodo",
+        "comparar relatorio de transferencia bancaria por account"
+      ]
+    },
+    {
+      "phrase": "remessa bancaria",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar remessa bancaria do ultimo periodo",
+        "comparar remessa bancaria por account"
+      ]
+    },
+    {
+      "phrase": "renegociacao de divida",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar renegociacao de divida do ultimo periodo",
+        "comparar renegociacao de divida por account"
+      ]
+    },
+    {
+      "phrase": "reporte para credor",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar reporte para credor do ultimo periodo",
+        "comparar reporte para credor por account"
+      ]
+    },
+    {
+      "phrase": "restricoes de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar restricoes de covenant do ultimo periodo",
+        "comparar restricoes de covenant por account"
+      ]
+    },
+    {
+      "phrase": "resumo conciliacao banco",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar resumo conciliacao banco do ultimo periodo",
+        "comparar resumo conciliacao banco por account"
+      ]
+    },
+    {
+      "phrase": "resumo de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar resumo de caixa do ultimo periodo",
+        "comparar resumo de caixa por account"
+      ]
+    },
+    {
+      "phrase": "resumo de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar resumo de liquidez do ultimo periodo",
+        "comparar resumo de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "resumo de taxas de cartao",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar resumo de taxas de cartao do ultimo periodo",
+        "comparar resumo de taxas de cartao por account"
+      ]
+    },
+    {
+      "phrase": "resumo de transferencias",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar resumo de transferencias do ultimo periodo",
+        "comparar resumo de transferencias por account"
+      ]
+    },
+    {
+      "phrase": "rolagem de divida",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar rolagem de divida do ultimo periodo",
+        "comparar rolagem de divida por account"
+      ]
+    },
+    {
+      "phrase": "runway de caixa",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar runway de caixa do ultimo periodo",
+        "comparar runway de caixa por account"
+      ]
+    },
+    {
+      "phrase": "saida por transferencia",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar saida por transferencia do ultimo periodo",
+        "comparar saida por transferencia por account"
+      ]
+    },
+    {
+      "phrase": "saidas e entradas de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar saidas e entradas de caixa do ultimo periodo",
+        "comparar saidas e entradas de caixa por account"
+      ]
+    },
+    {
+      "phrase": "saldo bancario do periodo",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar saldo bancario do periodo do ultimo periodo",
+        "comparar saldo bancario do periodo por account"
+      ]
+    },
+    {
+      "phrase": "saldo banco x razao",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar saldo banco x razao do ultimo periodo",
+        "comparar saldo banco x razao por account"
+      ]
+    },
+    {
+      "phrase": "saldo de caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar saldo de caixa do ultimo periodo",
+        "comparar saldo de caixa por account"
+      ]
+    },
+    {
+      "phrase": "saldo de tesouraria",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar saldo de tesouraria do ultimo periodo",
+        "comparar saldo de tesouraria por account"
+      ]
+    },
+    {
+      "phrase": "saldo inicial e final caixa",
+      "normalized": "extrato_fluxo_caixa",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostrar saldo inicial e final caixa do ultimo periodo",
+        "comparar saldo inicial e final caixa por account"
+      ]
+    },
+    {
+      "phrase": "saude de liquidez",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar saude de liquidez do ultimo periodo",
+        "comparar saude de liquidez por account"
+      ]
+    },
+    {
+      "phrase": "senior debt covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show senior debt covenant for the last period",
+        "compare senior debt covenant by account"
+      ]
+    },
+    {
+      "phrase": "service charge statement",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show service charge statement for the last period",
+        "compare service charge statement by account"
+      ]
+    },
+    {
+      "phrase": "settlement transfer file",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show settlement transfer file for the last period",
+        "compare settlement transfer file by account"
+      ]
+    },
+    {
+      "phrase": "short-term liquidity",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show short-term liquidity for the last period",
+        "compare short-term liquidity by account"
+      ]
+    },
+    {
+      "phrase": "statement of cash flows",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show statement of cash flows for the last period",
+        "compare statement of cash flows by account"
+      ]
+    },
+    {
+      "phrase": "statement reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show statement reconciliation for the last period",
+        "compare statement reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "sumario de tesouraria",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar sumario de tesouraria do ultimo periodo",
+        "comparar sumario de tesouraria por account"
+      ]
+    },
+    {
+      "phrase": "sweep transfer",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show sweep transfer for the last period",
+        "compare sweep transfer by account"
+      ]
+    },
+    {
+      "phrase": "swift transfer log",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show swift transfer log for the last period",
+        "compare swift transfer log by account"
+      ]
+    },
+    {
+      "phrase": "tarifa bancaria",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa bancaria do ultimo periodo",
+        "comparar tarifa bancaria por account"
+      ]
+    },
+    {
+      "phrase": "tarifa de conta corrente",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa de conta corrente do ultimo periodo",
+        "comparar tarifa de conta corrente por account"
+      ]
+    },
+    {
+      "phrase": "tarifa de maquininhas",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa de maquininhas do ultimo periodo",
+        "comparar tarifa de maquininhas por account"
+      ]
+    },
+    {
+      "phrase": "tarifa de pix",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa de pix do ultimo periodo",
+        "comparar tarifa de pix por account"
+      ]
+    },
+    {
+      "phrase": "tarifa de saque",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa de saque do ultimo periodo",
+        "comparar tarifa de saque por account"
+      ]
+    },
+    {
+      "phrase": "tarifa de servico bancario",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa de servico bancario do ultimo periodo",
+        "comparar tarifa de servico bancario por account"
+      ]
+    },
+    {
+      "phrase": "tarifa de ted",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa de ted do ultimo periodo",
+        "comparar tarifa de ted por account"
+      ]
+    },
+    {
+      "phrase": "tarifa por transferencia",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar tarifa por transferencia do ultimo periodo",
+        "comparar tarifa por transferencia por account"
+      ]
+    },
+    {
+      "phrase": "taxa de adquirencia",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar taxa de adquirencia do ultimo periodo",
+        "comparar taxa de adquirencia por account"
+      ]
+    },
+    {
+      "phrase": "taxa de cartao",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar taxa de cartao do ultimo periodo",
+        "comparar taxa de cartao por account"
+      ]
+    },
+    {
+      "phrase": "taxa de chargeback",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar taxa de chargeback do ultimo periodo",
+        "comparar taxa de chargeback por account"
+      ]
+    },
+    {
+      "phrase": "taxa de emissor",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar taxa de emissor do ultimo periodo",
+        "comparar taxa de emissor por account"
+      ]
+    },
+    {
+      "phrase": "taxa de processamento cartao",
+      "normalized": "tarifas_cartao_banco",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostrar taxa de processamento cartao do ultimo periodo",
+        "comparar taxa de processamento cartao por account"
+      ]
+    },
+    {
+      "phrase": "ted enviada",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar ted enviada do ultimo periodo",
+        "comparar ted enviada por account"
+      ]
+    },
+    {
+      "phrase": "tesouraria diaria",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar tesouraria diaria do ultimo periodo",
+        "comparar tesouraria diaria por account"
+      ]
+    },
+    {
+      "phrase": "teste de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar teste de covenant do ultimo periodo",
+        "comparar teste de covenant por account"
+      ]
+    },
+    {
+      "phrase": "tie-out bancario",
+      "normalized": "conciliacao_bancaria",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostrar tie-out bancario do ultimo periodo",
+        "comparar tie-out bancario por account"
+      ]
+    },
+    {
+      "phrase": "transaction fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show transaction fee report for the last period",
+        "compare transaction fee report by account"
+      ]
+    },
+    {
+      "phrase": "transfer ledger",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show transfer ledger for the last period",
+        "compare transfer ledger by account"
+      ]
+    },
+    {
+      "phrase": "transfer log",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show transfer log for the last period",
+        "compare transfer log by account"
+      ]
+    },
+    {
+      "phrase": "transfer statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show transfer statement for the last period",
+        "compare transfer statement by account"
+      ]
+    },
+    {
+      "phrase": "transferencia bancaria",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar transferencia bancaria do ultimo periodo",
+        "comparar transferencia bancaria por account"
+      ]
+    },
+    {
+      "phrase": "transferencia entre contas",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar transferencia entre contas do ultimo periodo",
+        "comparar transferencia entre contas por account"
+      ]
+    },
+    {
+      "phrase": "transferencia internacional",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar transferencia internacional do ultimo periodo",
+        "comparar transferencia internacional por account"
+      ]
+    },
+    {
+      "phrase": "transferencia recebida",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar transferencia recebida do ultimo periodo",
+        "comparar transferencia recebida por account"
+      ]
+    },
+    {
+      "phrase": "transferencia swift",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar transferencia swift do ultimo periodo",
+        "comparar transferencia swift por account"
+      ]
+    },
+    {
+      "phrase": "transferencia urgente",
+      "normalized": "transferencia_bancaria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostrar transferencia urgente do ultimo periodo",
+        "comparar transferencia urgente por account"
+      ]
+    },
+    {
+      "phrase": "treasury cash statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show treasury cash statement for the last period",
+        "compare treasury cash statement by account"
+      ]
+    },
+    {
+      "phrase": "treasury dashboard",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show treasury dashboard for the last period",
+        "compare treasury dashboard by account"
+      ]
+    },
+    {
+      "phrase": "treasury outlook",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show treasury outlook for the last period",
+        "compare treasury outlook by account"
+      ]
+    },
+    {
+      "phrase": "treasury position",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show treasury position for the last period",
+        "compare treasury position by account"
+      ]
+    },
+    {
+      "phrase": "treasury reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show treasury reconciliation for the last period",
+        "compare treasury reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "treasury transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show treasury transfer report for the last period",
+        "compare treasury transfer report by account"
+      ]
+    },
+    {
+      "phrase": "unreconciled bank items",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show unreconciled bank items for the last period",
+        "compare unreconciled bank items by account"
+      ]
+    },
+    {
+      "phrase": "violacao de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar violacao de covenant do ultimo periodo",
+        "comparar violacao de covenant por account"
+      ]
+    },
+    {
+      "phrase": "visao de tesouraria",
+      "normalized": "posicao_liquidez_tesouraria",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostrar visao de tesouraria do ultimo periodo",
+        "comparar visao de tesouraria por account"
+      ]
+    },
+    {
+      "phrase": "waiver de covenant",
+      "normalized": "emprestimo_covenant",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostrar waiver de covenant do ultimo periodo",
+        "comparar waiver de covenant por account"
+      ]
+    },
+    {
+      "phrase": "wire fee report",
+      "normalized": "card_fees_banking",
+      "docTypeIds": [
+        "fin_expense_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "expense_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show wire fee report for the last period",
+        "compare wire fee report by account"
+      ]
+    },
+    {
+      "phrase": "wire queue",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show wire queue for the last period",
+        "compare wire queue by account"
+      ]
+    },
+    {
+      "phrase": "wire statement",
+      "normalized": "bank_statement_cashflow",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show wire statement for the last period",
+        "compare wire statement by account"
+      ]
+    },
+    {
+      "phrase": "wire transfer batch",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show wire transfer batch for the last period",
+        "compare wire transfer batch by account"
+      ]
+    },
+    {
+      "phrase": "wire transfer detail",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show wire transfer detail for the last period",
+        "compare wire transfer detail by account"
+      ]
+    },
+    {
+      "phrase": "wire transfer list",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show wire transfer list for the last period",
+        "compare wire transfer list by account"
+      ]
+    },
+    {
+      "phrase": "wire transfer report",
+      "normalized": "wire_transfer_payments",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "bank_account",
+        "formatHint": "payment_batch",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show wire transfer report for the last period",
+        "compare wire transfer report by account"
+      ]
+    },
+    {
+      "phrase": "withdrawal reconciliation",
+      "normalized": "bank_reconciliation",
+      "docTypeIds": [
+        "acct_bank_rec",
+        "acct_cash_reconciliation"
+      ],
+      "hints": {
+        "periodHint": "reported_period",
+        "entityHint": "bank_account",
+        "formatHint": "reconciliation",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show withdrawal reconciliation for the last period",
+        "compare withdrawal reconciliation by account"
+      ]
+    },
+    {
+      "phrase": "working capital covenant",
+      "normalized": "loan_covenant_debt",
+      "docTypeIds": [
+        "fin_covenant",
+        "fin_working_capital_report",
+        "fin_treasury_report"
+      ],
+      "hints": {
+        "periodHint": "future_period",
+        "entityHint": "bank_or_lender",
+        "formatHint": "credit_doc",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show working capital covenant for the last period",
+        "compare working capital covenant by account"
+      ]
+    },
+    {
+      "phrase": "working capital position",
+      "normalized": "liquidity_treasury_position",
+      "docTypeIds": [
+        "fin_treasury_report",
+        "fin_working_capital_report",
+        "fin_cash_flow_statement"
+      ],
+      "hints": {
+        "periodHint": "near_term_period",
+        "entityHint": "business_unit",
+        "formatHint": "treasury",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show working capital position for the last period",
+        "compare working capital position by account"
+      ]
+    }
+  ]
+}

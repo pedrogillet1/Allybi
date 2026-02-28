@@ -278,13 +278,14 @@
     {
       "id": "connectors",
       "intentFamily": "connectors",
-      "description": "Connector lifecycle actions: connect/sync/status/disconnect (Gmail/Outlook/Slack).",
+      "description": "Connector lifecycle actions: connect/sync/search/status/disconnect (Gmail/Outlook/Slack).",
       "priority": 93,
       "defaultAnswerMode": "action_receipt",
       "defaultOutputShape": "paragraph",
       "operators": [
         "CONNECT_START",
         "CONNECTOR_SYNC",
+        "CONNECTOR_SEARCH",
         "CONNECTOR_STATUS",
         "CONNECTOR_DISCONNECT"
       ],

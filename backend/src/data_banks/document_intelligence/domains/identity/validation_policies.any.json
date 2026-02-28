@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "id": "di_identity_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for identity domain with consistency and quality checks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity"
+  },
+  "domain": "identity",
+  "policies": [
+    {
+      "id": "id_val_001_primary_field_presence",
+      "severity": "error",
+      "description": "Primary identity fields must be explicitly present for verified output.",
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "check": "critical_field_presence",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "id_val_002_date_consistency",
+      "severity": "error",
+      "description": "Issue date must not be after expiry date.",
+      "applies": [
+        "extract",
+        "validate",
+        "monitor"
+      ],
+      "check": "date_order",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "id_val_003_doc_number_format",
+      "severity": "warning",
+      "description": "Document numbers should match expected format patterns when known.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "identifier_format",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "id_val_004_cross_zone_match",
+      "severity": "warning",
+      "description": "Visual zone and machine-readable fields should not conflict.",
+      "applies": [
+        "compare",
+        "validate"
+      ],
+      "check": "cross_zone_consistency",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "id_val_005_recency_for_address_proof",
+      "severity": "warning",
+      "description": "Address proofs older than configured recency threshold should be flagged.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "document_recency",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "id_val_006_business_registry_status",
+      "severity": "warning",
+      "description": "Business registration status must be explicit when certificate is used for compliance.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "check": "status_presence",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "id_val_007_no_inference_guard",
+      "severity": "error",
+      "description": "No inferred identity values when source fields are absent or unreadable.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "check": "critical_field_presence",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "id_val_008_scope_lock",
+      "severity": "error",
+      "description": "Responses must remain constrained to attached documents.",
+      "applies": [
+        "all"
+      ],
+      "check": "wrong_doc_scope_lock",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

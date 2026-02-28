@@ -1,12 +1,13 @@
 {
   "_meta": {
     "id": "doc_aliases_ops",
-    "version": "1.0.0",
-    "description": "User alias mapping for ops documents.",
+    "version": "2.0.0",
+    "description": "Production-grade user alias mapping for operations documents. Maps EN/PT phrases to canonical doc types with metadata hints.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-27",
+    "updatedAt": "2026-02-27T22:00:00Z"
   },
   "config": {
     "enabled": true,
@@ -16,12 +17,2437 @@
   "domain": "ops",
   "aliases": [
     {
-      "alias": "ops document",
-      "docTypes": [],
+      "phrase": "access control policy",
+      "normalized": "access_control_policy",
+      "docTypeIds": [
+        "access_control_policy"
+      ],
       "hints": {
-        "period": "unknown",
-        "owner": "unknown"
-      }
+        "entityHint": "department"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "review access control policy",
+        "open access control policy"
+      ]
+    },
+    {
+      "phrase": "acordo de nivel de servico",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "acordo de nivel de servico do fornecedor",
+        "revisar acordo de nivel de servico"
+      ]
+    },
+    {
+      "phrase": "action item tracker",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "open action item tracker",
+        "review action item tracker"
+      ]
+    },
+    {
+      "phrase": "action items",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "list action items",
+        "outstanding action items"
+      ]
+    },
+    {
+      "phrase": "alert playbook",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "follow the alert playbook",
+        "alert playbook for P1"
+      ]
+    },
+    {
+      "phrase": "alert procedure",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "check alert procedure",
+        "follow alert procedure"
+      ]
+    },
+    {
+      "phrase": "asset register",
+      "normalized": "it_asset_register",
+      "docTypeIds": [
+        "it_asset_register"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open the asset register",
+        "review IT asset register"
+      ]
+    },
+    {
+      "phrase": "audit",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "start the audit",
+        "run the audit"
+      ]
+    },
+    {
+      "phrase": "audit checklist",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "open the audit checklist",
+        "run audit checklist"
+      ]
+    },
+    {
+      "phrase": "audit findings",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "quarterly"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "review audit findings",
+        "latest audit findings"
+      ]
+    },
+    {
+      "phrase": "audit log",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "check the audit log",
+        "review audit log"
+      ]
+    },
+    {
+      "phrase": "audit report",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "quarterly"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "quarterly audit report",
+        "open the audit report"
+      ]
+    },
+    {
+      "phrase": "audit trail",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "check audit trail",
+        "review audit trail"
+      ]
+    },
+    {
+      "phrase": "auditoria",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "iniciar auditoria",
+        "lista de auditoria"
+      ]
+    },
+    {
+      "phrase": "bcp",
+      "normalized": "bcp_plan",
+      "docTypeIds": [
+        "bcp_plan"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open the bcp",
+        "review bcp"
+      ]
+    },
+    {
+      "phrase": "business continuity plan",
+      "normalized": "bcp_plan",
+      "docTypeIds": [
+        "bcp_plan"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "review business continuity plan",
+        "BCP document"
+      ]
+    },
+    {
+      "phrase": "capacity plan",
+      "normalized": "capacity_plan",
+      "docTypeIds": [
+        "capacity_plan"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "review capacity plan",
+        "update the capacity plan"
+      ]
+    },
+    {
+      "phrase": "change log",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "check the change log",
+        "latest change log"
+      ]
+    },
+    {
+      "phrase": "change management",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "change management procedure",
+        "follow change management"
+      ]
+    },
+    {
+      "phrase": "change request",
+      "normalized": "change_request",
+      "docTypeIds": [
+        "change_request"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "submit a change request",
+        "review change request"
+      ]
+    },
+    {
+      "phrase": "checklist",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "open the checklist",
+        "daily checklist"
+      ]
+    },
+    {
+      "phrase": "checklist de auditoria",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.96,
+      "examples": [
+        "abrir checklist de auditoria",
+        "checklist de auditoria mensal"
+      ]
+    },
+    {
+      "phrase": "checklist de conformidade",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist",
+        "quality_assurance_checklist"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "checklist de conformidade regulatoria",
+        "executar checklist de conformidade"
+      ]
+    },
+    {
+      "phrase": "checklist de inspecao",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "checklist de inspecao da fabrica",
+        "executar checklist de inspecao"
+      ]
+    },
+    {
+      "phrase": "checklist de manutencao",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "shift",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "checklist de manutencao preventiva",
+        "executar checklist de manutencao"
+      ]
+    },
+    {
+      "phrase": "checklist de seguranca",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "checklist de seguranca do trabalho",
+        "executar checklist de seguranca"
+      ]
+    },
+    {
+      "phrase": "checklist de turno",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "shift",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "checklist de turno da manha",
+        "preencher checklist de turno"
+      ]
+    },
+    {
+      "phrase": "checklist diario",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "daily",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "checklist diario de operacoes",
+        "executar checklist diario"
+      ]
+    },
+    {
+      "phrase": "checklist operacional",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "checklist operacional do site",
+        "abrir checklist operacional"
+      ]
+    },
+    {
+      "phrase": "compliance audit",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist",
+        "quality_assurance_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "run compliance audit",
+        "compliance audit checklist"
+      ]
+    },
+    {
+      "phrase": "compliance checklist",
+      "normalized": "quality_assurance_checklist",
+      "docTypeIds": [
+        "quality_assurance_checklist",
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "open compliance checklist",
+        "review compliance checklist"
+      ]
+    },
+    {
+      "phrase": "compliance runbook",
+      "normalized": "compliance_runbook",
+      "docTypeIds": [
+        "compliance_runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open the compliance runbook",
+        "follow compliance runbook"
+      ]
+    },
+    {
+      "phrase": "contrato de fornecedor",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement",
+        "vendor_performance_review"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "contrato de fornecedor de TI",
+        "revisar contrato de fornecedor"
+      ]
+    },
+    {
+      "phrase": "contrato de servico",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "contrato de servico do datacenter",
+        "ver contrato de servico"
+      ]
+    },
+    {
+      "phrase": "contrato de sla",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "contrato de SLA com fornecedor",
+        "revisar contrato de SLA"
+      ]
+    },
+    {
+      "phrase": "customer support playbook",
+      "normalized": "customer_support_playbook",
+      "docTypeIds": [
+        "customer_support_playbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open customer support playbook",
+        "follow support playbook"
+      ]
+    },
+    {
+      "phrase": "daily checklist",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "daily"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open the daily checklist",
+        "complete daily checklist"
+      ]
+    },
+    {
+      "phrase": "data retention schedule",
+      "normalized": "data_retention_schedule",
+      "docTypeIds": [
+        "data_retention_schedule"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "review data retention schedule",
+        "check data retention policy"
+      ]
+    },
+    {
+      "phrase": "deployment guide",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "follow the deployment guide",
+        "check the deployment guide"
+      ]
+    },
+    {
+      "phrase": "deployment runbook",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.96,
+      "examples": [
+        "follow the deployment runbook",
+        "open deployment runbook"
+      ]
+    },
+    {
+      "phrase": "disaster recovery",
+      "normalized": "disaster_recovery_plan",
+      "docTypeIds": [
+        "disaster_recovery_plan"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "disaster recovery plan",
+        "review disaster recovery"
+      ]
+    },
+    {
+      "phrase": "disaster recovery plan",
+      "normalized": "disaster_recovery_plan",
+      "docTypeIds": [
+        "disaster_recovery_plan"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "open the disaster recovery plan",
+        "test the disaster recovery plan"
+      ]
+    },
+    {
+      "phrase": "escalation matrix",
+      "normalized": "escalation_matrix",
+      "docTypeIds": [
+        "escalation_matrix"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "check the escalation matrix",
+        "escalation matrix for P1"
+      ]
+    },
+    {
+      "phrase": "escalation procedure",
+      "normalized": "escalation_matrix",
+      "docTypeIds": [
+        "escalation_matrix",
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "follow escalation procedure",
+        "review escalation procedure"
+      ]
+    },
+    {
+      "phrase": "failure mode analysis",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report",
+        "incident_postmortem"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "review failure mode analysis",
+        "FMEA document"
+      ]
+    },
+    {
+      "phrase": "guia de deploy",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "seguir o guia de deploy",
+        "abrir guia de deploy"
+      ]
+    },
+    {
+      "phrase": "guia de implantacao",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "guia de implantacao do sistema",
+        "seguir guia de implantacao"
+      ]
+    },
+    {
+      "phrase": "guia de operacao",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "guia de operacao do datacenter",
+        "abrir guia de operacao"
+      ]
+    },
+    {
+      "phrase": "guia operacional",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "guia operacional da planta",
+        "seguir guia operacional"
+      ]
+    },
+    {
+      "phrase": "incident",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "log the incident",
+        "review the incident"
+      ]
+    },
+    {
+      "phrase": "incident analysis",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem",
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "conduct incident analysis",
+        "incident analysis report"
+      ]
+    },
+    {
+      "phrase": "incident log",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "check the incident log",
+        "latest incident log entry"
+      ]
+    },
+    {
+      "phrase": "incident postmortem",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "write incident postmortem",
+        "review incident postmortem"
+      ]
+    },
+    {
+      "phrase": "incident report",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "open the incident report",
+        "file an incident report"
+      ]
+    },
+    {
+      "phrase": "incident response",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook",
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "follow incident response",
+        "incident response procedure"
+      ]
+    },
+    {
+      "phrase": "incident summary",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "incident summary from last week",
+        "write incident summary"
+      ]
+    },
+    {
+      "phrase": "incident ticket",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "open the incident ticket",
+        "review incident ticket"
+      ]
+    },
+    {
+      "phrase": "incident timeline",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem",
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "review the incident timeline",
+        "build incident timeline"
+      ]
+    },
+    {
+      "phrase": "incidente",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "registrar incidente",
+        "relatorio do incidente"
+      ]
+    },
+    {
+      "phrase": "inspection checklist",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open the inspection checklist",
+        "plant inspection checklist"
+      ]
+    },
+    {
+      "phrase": "instrucao de trabalho",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "instrucao de trabalho da linha de montagem",
+        "ver instrucao de trabalho"
+      ]
+    },
+    {
+      "phrase": "instrucao operacional",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "instrucao operacional do equipamento",
+        "abrir instrucao operacional"
+      ]
+    },
+    {
+      "phrase": "inventory report",
+      "normalized": "inventory_report",
+      "docTypeIds": [
+        "inventory_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "open inventory report",
+        "review latest inventory report"
+      ]
+    },
+    {
+      "phrase": "kpi dashboard",
+      "normalized": "kpi_dashboard",
+      "docTypeIds": [
+        "kpi_dashboard"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "monthly"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open KPI dashboard",
+        "review KPI dashboard"
+      ]
+    },
+    {
+      "phrase": "livro de ocorrencias",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "registrar no livro de ocorrencias",
+        "abrir livro de ocorrencias"
+      ]
+    },
+    {
+      "phrase": "maintenance checklist",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "shift"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "complete maintenance checklist",
+        "open maintenance checklist"
+      ]
+    },
+    {
+      "phrase": "maintenance log",
+      "normalized": "maintenance_log",
+      "docTypeIds": [
+        "maintenance_log"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "shift"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "check the maintenance log",
+        "update maintenance log"
+      ]
+    },
+    {
+      "phrase": "maintenance procedure",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "follow maintenance procedure",
+        "maintenance procedure for HVAC"
+      ]
+    },
+    {
+      "phrase": "manual de operacoes",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure",
+        "training_manual"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "abrir manual de operacoes",
+        "manual de operacoes da planta"
+      ]
+    },
+    {
+      "phrase": "manual de procedimentos",
+      "normalized": "policy_manual",
+      "docTypeIds": [
+        "policy_manual",
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "manual de procedimentos da area",
+        "consultar manual de procedimentos"
+      ]
+    },
+    {
+      "phrase": "manual de treinamento",
+      "normalized": "training_manual",
+      "docTypeIds": [
+        "training_manual"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "abrir manual de treinamento",
+        "manual de treinamento do sistema"
+      ]
+    },
+    {
+      "phrase": "manual operacional",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "manual operacional do equipamento",
+        "abrir manual operacional"
+      ]
+    },
+    {
+      "phrase": "meeting minutes",
+      "normalized": "meeting_minutes",
+      "docTypeIds": [
+        "meeting_minutes"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "review meeting minutes",
+        "latest meeting minutes"
+      ]
+    },
+    {
+      "phrase": "monitoring runbook",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "open the monitoring runbook",
+        "follow monitoring runbook"
+      ]
+    },
+    {
+      "phrase": "ocorrencia",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "registrar ocorrencia",
+        "ver ocorrencia"
+      ]
+    },
+    {
+      "phrase": "on-call runbook",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "shift"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "check the on-call runbook",
+        "follow on-call runbook"
+      ]
+    },
+    {
+      "phrase": "onboarding checklist",
+      "normalized": "onboarding_checklist",
+      "docTypeIds": [
+        "onboarding_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "open onboarding checklist",
+        "complete onboarding checklist"
+      ]
+    },
+    {
+      "phrase": "operating procedure",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "follow the operating procedure",
+        "review operating procedure"
+      ]
+    },
+    {
+      "phrase": "operational guide",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "operational guide for the plant",
+        "check operational guide"
+      ]
+    },
+    {
+      "phrase": "operational procedure",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "follow operational procedure",
+        "review operational procedure"
+      ]
+    },
+    {
+      "phrase": "operations manual",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure",
+        "policy_manual"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "open the operations manual",
+        "check operations manual"
+      ]
+    },
+    {
+      "phrase": "outage report",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "file outage report",
+        "review the outage report"
+      ]
+    },
+    {
+      "phrase": "padrao operacional",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "padrao operacional da linha",
+        "seguir padrao operacional"
+      ]
+    },
+    {
+      "phrase": "performance review",
+      "normalized": "vendor_performance_review",
+      "docTypeIds": [
+        "vendor_performance_review"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "quarterly"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "vendor performance review",
+        "review performance metrics"
+      ]
+    },
+    {
+      "phrase": "plano de contingencia",
+      "normalized": "bcp_plan",
+      "docTypeIds": [
+        "bcp_plan",
+        "disaster_recovery_plan"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "plano de contingencia do datacenter",
+        "ativar plano de contingencia"
+      ]
+    },
+    {
+      "phrase": "plano de continuidade",
+      "normalized": "bcp_plan",
+      "docTypeIds": [
+        "bcp_plan"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "plano de continuidade de negocios",
+        "revisar plano de continuidade"
+      ]
+    },
+    {
+      "phrase": "plano de recuperacao",
+      "normalized": "disaster_recovery_plan",
+      "docTypeIds": [
+        "disaster_recovery_plan"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "plano de recuperacao de desastre",
+        "seguir plano de recuperacao"
+      ]
+    },
+    {
+      "phrase": "playbook",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook",
+        "customer_support_playbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "follow the playbook",
+        "incident playbook"
+      ]
+    },
+    {
+      "phrase": "playbook de incidente",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "seguir playbook de incidente",
+        "abrir playbook de incidente"
+      ]
+    },
+    {
+      "phrase": "policy manual",
+      "normalized": "policy_manual",
+      "docTypeIds": [
+        "policy_manual"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open the policy manual",
+        "review policy manual"
+      ]
+    },
+    {
+      "phrase": "post-incident review",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "conduct post-incident review",
+        "schedule post-incident review"
+      ]
+    },
+    {
+      "phrase": "postmortem",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "write the postmortem",
+        "review the postmortem"
+      ]
+    },
+    {
+      "phrase": "pre-deployment checklist",
+      "normalized": "release_checklist",
+      "docTypeIds": [
+        "release_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "run the pre-deployment checklist",
+        "complete pre-deployment checklist"
+      ]
+    },
+    {
+      "phrase": "procedimento",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "seguir o procedimento",
+        "abrir procedimento"
+      ]
+    },
+    {
+      "phrase": "procedimento de emergencia",
+      "normalized": "disaster_recovery_plan",
+      "docTypeIds": [
+        "disaster_recovery_plan",
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "procedimento de emergencia do site",
+        "seguir procedimento de emergencia"
+      ]
+    },
+    {
+      "phrase": "procedimento de seguranca",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure",
+        "access_control_policy"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "procedimento de seguranca da planta",
+        "seguir procedimento de seguranca"
+      ]
+    },
+    {
+      "phrase": "procedimento operacional",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "procedimento operacional padrao",
+        "seguir procedimento operacional"
+      ]
+    },
+    {
+      "phrase": "procedimento padrao",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "procedimento padrao de operacao",
+        "seguir procedimento padrao"
+      ]
+    },
+    {
+      "phrase": "process document",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure",
+        "process_map"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "review the process document",
+        "update process document"
+      ]
+    },
+    {
+      "phrase": "process flow",
+      "normalized": "process_map",
+      "docTypeIds": [
+        "process_map"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "review the process flow",
+        "check process flow"
+      ]
+    },
+    {
+      "phrase": "process map",
+      "normalized": "process_map",
+      "docTypeIds": [
+        "process_map"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open the process map",
+        "review process map"
+      ]
+    },
+    {
+      "phrase": "project status report",
+      "normalized": "project_status_report",
+      "docTypeIds": [
+        "project_status_report"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "weekly"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "latest project status report",
+        "review project status"
+      ]
+    },
+    {
+      "phrase": "quality audit",
+      "normalized": "quality_assurance_checklist",
+      "docTypeIds": [
+        "quality_assurance_checklist"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "run quality audit",
+        "quality audit checklist"
+      ]
+    },
+    {
+      "phrase": "quality checklist",
+      "normalized": "quality_assurance_checklist",
+      "docTypeIds": [
+        "quality_assurance_checklist"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open quality checklist",
+        "complete quality checklist"
+      ]
+    },
+    {
+      "phrase": "recovery plan",
+      "normalized": "disaster_recovery_plan",
+      "docTypeIds": [
+        "disaster_recovery_plan"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "activate recovery plan",
+        "follow the recovery plan"
+      ]
+    },
+    {
+      "phrase": "registro de incidente",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.94,
+      "examples": [
+        "abrir registro de incidente",
+        "preencher registro de incidente"
+      ]
+    },
+    {
+      "phrase": "registro de manutencao",
+      "normalized": "maintenance_log",
+      "docTypeIds": [
+        "maintenance_log"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "shift",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "atualizar registro de manutencao",
+        "ver registro de manutencao"
+      ]
+    },
+    {
+      "phrase": "registro de ocorrencia",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "preencher registro de ocorrencia",
+        "abrir registro de ocorrencia"
+      ]
+    },
+    {
+      "phrase": "relatorio de auditoria",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "quarterly",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "relatorio de auditoria trimestral",
+        "abrir relatorio de auditoria"
+      ]
+    },
+    {
+      "phrase": "relatorio de incidente",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.96,
+      "examples": [
+        "relatorio de incidente do site",
+        "redigir relatorio de incidente"
+      ]
+    },
+    {
+      "phrase": "relatorio de interrupcao",
+      "normalized": "incident_report",
+      "docTypeIds": [
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "relatorio de interrupcao do servico",
+        "preencher relatorio de interrupcao"
+      ]
+    },
+    {
+      "phrase": "relatorio pos-incidente",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "redigir relatorio pos-incidente",
+        "revisar relatorio pos-incidente"
+      ]
+    },
+    {
+      "phrase": "release checklist",
+      "normalized": "release_checklist",
+      "docTypeIds": [
+        "release_checklist"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open release checklist",
+        "complete release checklist"
+      ]
+    },
+    {
+      "phrase": "remediation plan",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem",
+        "incident_report"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "create remediation plan",
+        "review remediation plan"
+      ]
+    },
+    {
+      "phrase": "response procedure",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "follow the response procedure",
+        "incident response procedure"
+      ]
+    },
+    {
+      "phrase": "retrospectiva",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "retrospectiva do incidente",
+        "agendar retrospectiva"
+      ]
+    },
+    {
+      "phrase": "risk register",
+      "normalized": "risk_register",
+      "docTypeIds": [
+        "risk_register"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open the risk register",
+        "update risk register"
+      ]
+    },
+    {
+      "phrase": "root cause analysis",
+      "normalized": "incident_postmortem",
+      "docTypeIds": [
+        "incident_postmortem"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "write root cause analysis",
+        "review the root cause analysis"
+      ]
+    },
+    {
+      "phrase": "roteiro de deploy",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "seguir roteiro de deploy",
+        "abrir roteiro de deploy"
+      ]
+    },
+    {
+      "phrase": "roteiro operacional",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "roteiro operacional do turno",
+        "seguir roteiro operacional"
+      ]
+    },
+    {
+      "phrase": "runbook",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "open the runbook",
+        "follow the runbook"
+      ]
+    },
+    {
+      "phrase": "runbook de incidente",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "seguir runbook de incidente",
+        "abrir runbook de incidente"
+      ]
+    },
+    {
+      "phrase": "runbook de monitoramento",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "runbook de monitoramento do sistema",
+        "abrir runbook de monitoramento"
+      ]
+    },
+    {
+      "phrase": "runbook de plantao",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "periodHint": "shift",
+        "languageHint": "pt"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "runbook de plantao noturno",
+        "seguir runbook de plantao"
+      ]
+    },
+    {
+      "phrase": "safety audit",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "conduct safety audit",
+        "safety audit checklist"
+      ]
+    },
+    {
+      "phrase": "safety checklist",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "complete safety checklist",
+        "open safety checklist"
+      ]
+    },
+    {
+      "phrase": "safety procedure",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "follow safety procedure",
+        "review safety procedure"
+      ]
+    },
+    {
+      "phrase": "service agreement",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "review the service agreement",
+        "check service agreement terms"
+      ]
+    },
+    {
+      "phrase": "service catalog",
+      "normalized": "service_catalog",
+      "docTypeIds": [
+        "service_catalog"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "open the service catalog",
+        "check service catalog"
+      ]
+    },
+    {
+      "phrase": "service contract",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "review the service contract",
+        "service contract with vendor"
+      ]
+    },
+    {
+      "phrase": "service level",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "check service level",
+        "service level metrics"
+      ]
+    },
+    {
+      "phrase": "service level agreement",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "review the service level agreement",
+        "service level agreement with AWS"
+      ]
+    },
+    {
+      "phrase": "shift checklist",
+      "normalized": "audit_checklist",
+      "docTypeIds": [
+        "audit_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "shift"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "complete shift checklist",
+        "morning shift checklist"
+      ]
+    },
+    {
+      "phrase": "shift handover",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "shift"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "prepare shift handover",
+        "shift handover document"
+      ]
+    },
+    {
+      "phrase": "sla",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "check the sla",
+        "sla with the vendor"
+      ]
+    },
+    {
+      "phrase": "sla breach",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "report sla breach",
+        "check for sla breach"
+      ]
+    },
+    {
+      "phrase": "sla compliance",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "monthly"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "check sla compliance",
+        "sla compliance report"
+      ]
+    },
+    {
+      "phrase": "sla do fornecedor",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "verificar SLA do fornecedor",
+        "abrir SLA do fornecedor"
+      ]
+    },
+    {
+      "phrase": "sla metrics",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "monthly"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "review sla metrics",
+        "monthly sla metrics"
+      ]
+    },
+    {
+      "phrase": "sla report",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "monthly"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "generate sla report",
+        "monthly sla report"
+      ]
+    },
+    {
+      "phrase": "sop",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open the sop",
+        "follow the sop"
+      ]
+    },
+    {
+      "phrase": "standard operating procedure",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.98,
+      "examples": [
+        "review the standard operating procedure",
+        "update standard operating procedure"
+      ]
+    },
+    {
+      "phrase": "standard procedure",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "follow standard procedure",
+        "check the standard procedure"
+      ]
+    },
+    {
+      "phrase": "supplier agreement",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "review supplier agreement",
+        "supplier agreement terms"
+      ]
+    },
+    {
+      "phrase": "supplier sla",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement",
+        "vendor_performance_review"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "check supplier sla",
+        "review supplier sla terms"
+      ]
+    },
+    {
+      "phrase": "termos de servico",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "termos de servico do fornecedor",
+        "revisar termos de servico"
+      ]
+    },
+    {
+      "phrase": "training manual",
+      "normalized": "training_manual",
+      "docTypeIds": [
+        "training_manual"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "open the training manual",
+        "review training manual"
+      ]
+    },
+    {
+      "phrase": "troubleshooting guide",
+      "normalized": "runbook",
+      "docTypeIds": [
+        "runbook"
+      ],
+      "hints": {
+        "entityHint": "department"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "check troubleshooting guide",
+        "troubleshooting guide for errors"
+      ]
+    },
+    {
+      "phrase": "vendor agreement",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "review vendor agreement",
+        "check vendor agreement"
+      ]
+    },
+    {
+      "phrase": "vendor contract",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "open the vendor contract",
+        "review vendor contract terms"
+      ]
+    },
+    {
+      "phrase": "vendor performance review",
+      "normalized": "vendor_performance_review",
+      "docTypeIds": [
+        "vendor_performance_review"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "periodHint": "quarterly"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open vendor performance review",
+        "quarterly vendor performance review"
+      ]
+    },
+    {
+      "phrase": "vendor sla",
+      "normalized": "service_level_agreement",
+      "docTypeIds": [
+        "service_level_agreement"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.95,
+      "examples": [
+        "open the vendor sla",
+        "review vendor sla"
+      ]
+    },
+    {
+      "phrase": "verificacao de conformidade",
+      "normalized": "quality_assurance_checklist",
+      "docTypeIds": [
+        "quality_assurance_checklist"
+      ],
+      "hints": {
+        "entityHint": "department",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "executar verificacao de conformidade",
+        "resultado da verificacao de conformidade"
+      ]
+    },
+    {
+      "phrase": "verificacao de qualidade",
+      "normalized": "quality_assurance_checklist",
+      "docTypeIds": [
+        "quality_assurance_checklist"
+      ],
+      "hints": {
+        "entityHint": "site",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "verificacao de qualidade da producao",
+        "executar verificacao de qualidade"
+      ]
+    },
+    {
+      "phrase": "work instruction",
+      "normalized": "standard_operating_procedure",
+      "docTypeIds": [
+        "standard_operating_procedure"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "follow the work instruction",
+        "update work instruction"
+      ]
+    },
+    {
+      "phrase": "work order",
+      "normalized": "procurement_request",
+      "docTypeIds": [
+        "procurement_request"
+      ],
+      "hints": {
+        "entityHint": "site"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "open the work order",
+        "create a work order"
+      ]
     }
   ]
 }

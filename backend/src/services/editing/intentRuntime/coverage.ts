@@ -60,10 +60,7 @@ export interface CoverageReport {
 // Test case loader
 // ---------------------------------------------------------------------------
 
-function loadTestCases(
-  testDir: string,
-  evalDir?: string,
-): GoldenTestCase[] {
+function loadTestCases(testDir: string, evalDir?: string): GoldenTestCase[] {
   const files = [
     "excel.en.json",
     "excel.pt.json",
@@ -385,12 +382,8 @@ export function generateMarkdownReport(report: CoverageReport): string {
   if (groupMap.size > 0) {
     lines.push("## Coverage by Domain/Language");
     lines.push("");
-    lines.push(
-      "| Domain | Language | Total | Passed | Failed | Rate |",
-    );
-    lines.push(
-      "|--------|----------|-------|--------|--------|------|",
-    );
+    lines.push("| Domain | Language | Total | Passed | Failed | Rate |");
+    lines.push("|--------|----------|-------|--------|--------|------|");
 
     const sortedKeys = [...groupMap.keys()].sort();
     for (const key of sortedKeys) {

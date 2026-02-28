@@ -26,6 +26,14 @@ export function resolveChatPreferredLanguage(
   language: unknown,
   message: string,
 ): ChatLanguage {
+  // Explicit request wins. Auto-detection is only for match/auto/no-language.
+  if (
+    typeof language === "string" &&
+    SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)
+  ) {
+    return language as ChatLanguage;
+  }
+
   if (String(message || "").trim()) {
     const detection = getDetector().detect({
       env: currentEnv(),
@@ -75,11 +83,5 @@ export function resolveChatPreferredLanguage(
     }
   }
 
-  if (
-    typeof language === "string" &&
-    SUPPORTED_CHAT_LANGUAGES.has(language as ChatLanguage)
-  ) {
-    return language as ChatLanguage;
-  }
   return "en";
 }

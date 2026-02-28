@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "di_identity_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for identity domain analysis and extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity"
+  },
+  "domain": "identity",
+  "scaffolds": [
+    {
+      "id": "id_scaffold_001_primary_id_extraction",
+      "name": "Primary ID Extraction",
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "steps": [
+        "Determine document type and side (front/back) from layout cues",
+        "Extract name, document number, issuer, issue/expiry dates",
+        "Extract date of birth, nationality, and jurisdiction fields",
+        "Map each extracted field to page/zone anchor",
+        "Mask sensitive identifiers in output",
+        "Mark unreadable/missing fields as unverified without inference"
+      ]
+    },
+    {
+      "id": "id_scaffold_002_passport_mrz_check",
+      "name": "Passport MRZ and Visual Cross-Check",
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "steps": [
+        "Locate MRZ lines and parse passport key fields",
+        "Cross-check MRZ values against visual inspection zone fields",
+        "Validate issue and expiry timeline consistency",
+        "Flag mismatches and unclear characters",
+        "Record confidence notes for OCR-sensitive characters",
+        "Return strict citation for each verified field"
+      ]
+    },
+    {
+      "id": "id_scaffold_003_address_proof_review",
+      "name": "Proof-of-Address Review",
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ],
+      "steps": [
+        "Identify issuing institution and statement date",
+        "Extract full address line and recipient name",
+        "Check address completeness and recency criteria",
+        "Validate that the document type matches accepted proof classes",
+        "Mark missing lines or obscured values as unverified",
+        "Summarize pass/fail readiness with citations"
+      ]
+    },
+    {
+      "id": "id_scaffold_004_business_registration_review",
+      "name": "Business Registration Certificate Review",
+      "operators": [
+        "extract",
+        "validate",
+        "evaluate"
+      ],
+      "steps": [
+        "Extract legal entity name, registration number, and registry office",
+        "Extract incorporation date and status",
+        "Validate jurisdiction and company type fields",
+        "Cross-check references to annexes or registry extracts",
+        "Flag missing critical fields without inference",
+        "Provide document-grounded compliance summary"
+      ]
+    }
+  ]
+}

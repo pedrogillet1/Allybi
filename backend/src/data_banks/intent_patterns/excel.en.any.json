@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "English intent patterns for Excel/XLSX editing operations.",
     "domain": "excel",
-    "lastUpdated": "2026-02-12",
+    "lastUpdated": "2026-02-28",
     "languages": [
       "en"
     ]
@@ -45,7 +45,26 @@
           "chart",
           "formula",
           "merge",
-          "wrap"
+          "wrap",
+          "formatted",
+          "percentage",
+          "decimal",
+          "graph",
+          "plot",
+          "table",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "freeze",
+          "validation",
+          "conditional formatting",
+          "data bars",
+          "color scale",
+          "top n",
+          "format as"
         ],
         "regex_any": [
           "\\b(?:set|change|replace|put|write|enter)\\b.*\\b(?:to|=|value|with)\\b",
@@ -84,6 +103,16 @@
           "slot": "value",
           "ask_en": "What value should I set?",
           "ask_pt": "Qual valor devo definir?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
@@ -99,7 +128,41 @@
           "Create a chart",
           "Sort by column A"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "value",
+          "set",
+          "change"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "currency",
+          "percent",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "sort",
+          "filter",
+          "chart",
+          "formula"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.set_value.range",
@@ -129,7 +192,26 @@
           "chart",
           "formula",
           "merge",
-          "wrap"
+          "wrap",
+          "formatted",
+          "percentage",
+          "decimal",
+          "graph",
+          "plot",
+          "table",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "freeze",
+          "validation",
+          "conditional formatting",
+          "data bars",
+          "color scale",
+          "top n",
+          "format as"
         ],
         "regex_any": [
           "\\b(?:set|fill|change|replace|put)\\b.*\\b(?:every|all|each|cells?|selection|selected\\s+cells?)\\b.*\\b(?:to|=|with)\\b"
@@ -167,6 +249,16 @@
           "slot": "value",
           "ask_en": "What value should I fill in?",
           "ask_pt": "Qual valor devo preencher?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
@@ -180,6 +272,41 @@
           "Set formula =SUM(A1:A10)",
           "Format A1:A10 as currency"
         ]
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "set",
+          "fill"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "currency",
+          "percent",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "sort",
+          "filter",
+          "chart",
+          "formula"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
       }
     },
     {
@@ -198,6 +325,41 @@
         "regex_any": [
           "\\bconvert\\b.*\\bnumeric\\b",
           "\\bto\\s+numb(?:er|eric)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "merge",
+          "wrap",
+          "freeze",
+          "validation",
+          "conditional formatting",
+          "data bars",
+          "color scale",
+          "top n",
+          "format as"
         ]
       },
       "slotExtractors": [
@@ -227,13 +389,60 @@
         "positive": [
           "Convert SUMMARY 1!D35:D48 to numeric values",
           "Change text numbers to actual numbers in A1:A50",
-          "Convert the range to numbers"
+          "Convert the range to numbers",
+          "In Sheet1!A1:A10, apply set_value numeric_convert."
         ],
         "negative": [
           "Convert to PDF",
           "Convert chart to bar"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "numeric",
+          "convert",
+          "change"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.formula.single",
@@ -248,6 +457,33 @@
         "regex_any": [
           "\\b(?:set|apply|write|put|enter)\\b.*\\bformula\\b",
           "\\bformula\\b.*=\\s*[A-Z]"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "merge",
+          "wrap",
+          "freeze",
+          "validation",
+          "conditional formatting",
+          "data bars",
+          "color scale",
+          "top n"
         ]
       },
       "slotExtractors": [
@@ -282,19 +518,63 @@
           "slot": "formula",
           "ask_en": "What formula should I apply?",
           "ask_pt": "Qual fórmula devo aplicar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Set formula =SUM(A1:A10) in B1",
           "Apply formula =B2+B3 in C2",
-          "Write formula =VLOOKUP(A1,Sheet2!A:B,2,FALSE) in D1"
+          "Write formula =VLOOKUP(A1,Sheet2!A:B,2,FALSE) in D1",
+          "In Sheet1!A1:A10, apply formula single."
         ],
         "negative": [
           "Set value to 100",
           "Format as currency"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.formula_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.formula.range",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formula",
+          "equation"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.formula.range",
@@ -308,6 +588,33 @@
         "regex_any": [
           "\\bformula\\b.*\\b(?:across|range|fill|apply to)\\b",
           "\\bapply\\b.*\\bformula\\b.*\\b(?:to|across|in)\\b.*:"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "merge",
+          "wrap",
+          "freeze",
+          "validation",
+          "conditional formatting",
+          "data bars",
+          "color scale",
+          "top n"
         ]
       },
       "slotExtractors": [
@@ -340,12 +647,61 @@
       "examples": {
         "positive": [
           "Apply formula =A1*2 across B1:B100",
-          "Set formula =SUM(A1:A5) in the range C1:C20"
+          "Set formula =SUM(A1:A5) in the range C1:C20",
+          "In Sheet1!A1:A10, apply formula range.",
+          "Apply formula range on the selected range."
         ],
         "negative": [
-          "Apply bold to the range"
+          "Apply bold to the range",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.formula_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.formula.single",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "formula"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "formula",
+          "ask_en": "What formula should I apply?",
+          "ask_pt": "Qual fórmula devo aplicar?"
+        }
+      ]
     },
     {
       "id": "excel.fill_down",
@@ -363,6 +719,32 @@
           "\\bfill\\s+down\\b",
           "\\bcopy\\s+down\\b",
           "\\bdrag\\s+down\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "rewrite",
+          "summarize",
+          "translate",
+          "sort",
+          "filter"
         ]
       },
       "slotExtractors": [
@@ -391,13 +773,54 @@
         "positive": [
           "Fill down from A1 to A100",
           "Copy down the formula",
-          "Drag down B2:B50"
+          "Drag down B2:B50",
+          "In Sheet1!A1:A10, apply fill_down."
         ],
         "negative": [
           "Fill right",
           "Fill with zeros"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.fill_direction",
+      "mutuallyExclusiveWith": [
+        "excel.fill_right",
+        "excel.fill_series"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "down",
+          "fill"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.fill_right",
@@ -414,6 +837,32 @@
         "regex_any": [
           "\\bfill\\s+right\\b",
           "\\bcopy\\s+right\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "rewrite",
+          "summarize",
+          "translate",
+          "sort",
+          "filter"
         ]
       },
       "slotExtractors": [
@@ -441,13 +890,55 @@
       "examples": {
         "positive": [
           "Fill right from A1 to E1",
-          "Copy right the formula"
+          "Copy right the formula",
+          "In Sheet1!A1:A10, apply fill_right.",
+          "Apply fill_right on the selected range."
         ],
         "negative": [
           "Fill down",
           "Align right"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.fill_direction",
+      "mutuallyExclusiveWith": [
+        "excel.fill_down",
+        "excel.fill_series"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "right",
+          "fill"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.bold",
@@ -461,6 +952,31 @@
         "regex_any": [
           "\\b(?:make|set|apply)\\b.*\\bbold\\b",
           "\\bbold\\b.*\\b(?:this|the|selected|range|cells?)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
         ]
       },
       "slotExtractors": [
@@ -490,12 +1006,53 @@
         "positive": [
           "Make A1:A10 bold",
           "Bold the selected cells",
-          "Apply bold to the header row"
+          "Apply bold to the header row",
+          "In Sheet1!A1:A10, apply format bold."
         ],
         "negative": [
-          "Set value to bold text"
+          "Set value to bold text",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "bold"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.bold_toggle",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.italic",
@@ -510,6 +1067,31 @@
         "regex_any": [
           "\\b(?:make|set|apply)\\b.*\\bitalic\\b",
           "\\bitalici[sz]e\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
         ]
       },
       "slotExtractors": [
@@ -538,12 +1120,55 @@
       "examples": {
         "positive": [
           "Make A1:A10 italic",
-          "Italicize the selection"
+          "Italicize the selection",
+          "In Sheet1!A1:A10, apply format italic.",
+          "Apply format italic on the selected range."
         ],
         "negative": [
-          "Write italic text in A1"
+          "Write italic text in A1",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "italic",
+          "italicize"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.italic_toggle",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.underline",
@@ -557,6 +1182,31 @@
         "regex_any": [
           "\\b(?:make|set|apply)\\b.*\\bunderline\\b",
           "\\bunderline\\b.*\\b(?:this|the|selected)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
         ]
       },
       "slotExtractors": [
@@ -585,12 +1235,54 @@
       "examples": {
         "positive": [
           "Underline A1:A10",
-          "Apply underline to the header"
+          "Apply underline to the header",
+          "In Sheet1!A1:A10, apply format underline.",
+          "Apply format underline on the selected range."
         ],
         "negative": [
-          "Remove underline"
+          "Remove underline",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "underline"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.underline_toggle",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.color",
@@ -605,6 +1297,31 @@
         "regex_any": [
           "\\b(?:make|set|change|apply)\\b.*\\b(?:color|colour|font color)\\b",
           "\\b(?:color|colour)\\b.*\\b(?:to|red|blue|green|black|white)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
         ]
       },
       "slotExtractors": [
@@ -640,18 +1357,58 @@
           "slot": "color",
           "ask_en": "What color should I apply?",
           "ask_pt": "Qual cor devo aplicar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Make the text red in A1:A10",
           "Change color to blue",
-          "Set font color to green for the selection"
+          "Set font color to green for the selection",
+          "In Sheet1!A1:A10, apply format color."
         ],
         "negative": [
-          "Color scale conditional formatting"
+          "Color scale conditional formatting",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "color",
+          "colour"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.format_color",
+      "requiresContext": {}
     },
     {
       "id": "excel.format.font",
@@ -665,6 +1422,31 @@
         "regex_any": [
           "\\b(?:change|set|apply|use)\\b.*\\bfont\\b",
           "\\bfont\\b.*\\b(?:to|family)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
         ]
       },
       "slotExtractors": [
@@ -704,12 +1486,53 @@
         "positive": [
           "Change font to Arial in A1:A10",
           "Set font to Calibri 14pt",
-          "Use Times New Roman for the header"
+          "Use Times New Roman for the header",
+          "In Sheet1!A1:A10, apply format font."
         ],
         "negative": [
-          "Set font color to red"
+          "Set font color to red",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "font"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.format_font",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "fontFamily",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.format.number_format",
@@ -729,6 +1552,31 @@
           "\\bformat\\b.*\\b(?:as|to)\\b.*\\b(?:currency|percent|date|number|accounting)\\b",
           "\\b(?:currency|percent|percentage)\\b\\s*\\bformat\\b",
           "\\bapply\\b.*\\b(?:currency|percent|number)\\b.*\\bformat\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
         ]
       },
       "slotExtractors": [
@@ -764,6 +1612,16 @@
           "slot": "pattern",
           "ask_en": "What number format should I apply? (e.g., currency, percentage, date)",
           "ask_pt": "Qual formato numérico devo aplicar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
@@ -778,7 +1636,40 @@
           "Format the text as bold",
           "Create a table"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.number_format",
+      "mutuallyExclusiveWith": [
+        "excel.format.custom_number_format",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "format",
+          "currency"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.format.custom_number_format",
@@ -791,6 +1682,37 @@
           "\\bformat\\b.*#,##",
           "\\bformat\\b.*0\\.0+%",
           "\\bformat\\b.*\\b(?:MM|DD|YYYY|HH)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
+        ],
+        "tokens_any": [
+          "format",
+          "style",
+          "currency",
+          "yyyy"
         ]
       },
       "slotExtractors": [
@@ -824,12 +1746,59 @@
         "positive": [
           "Apply currency format $#,##0.00 to D35:D48",
           "Format as 0.00%",
-          "Use format MM/DD/YYYY"
+          "Use format MM/DD/YYYY",
+          "In Sheet1!A1:A10, apply format custom_number_format."
         ],
         "negative": [
-          "Format text as bold"
+          "Format text as bold",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.number_format",
+      "mutuallyExclusiveWith": [
+        "excel.format.number_format",
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.fill_blank_cells",
+        "excel.formula.single",
+        "excel.formula.range"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "format",
+          "style"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "pattern",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.sort.single_key",
@@ -845,6 +1814,33 @@
         "regex_any": [
           "\\bsort\\b.*\\b(?:by|ascending|descending|asc|desc|a-z|z-a)\\b",
           "\\border\\b.*\\bby\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "gráfico",
+          "grafico",
+          "tabela",
+          "rewrite",
+          "summarize",
+          "translate",
+          "filter"
         ]
       },
       "slotExtractors": [
@@ -891,7 +1887,49 @@
           "Filter rows",
           "Create chart"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sort_action",
+      "mutuallyExclusiveWith": [
+        "excel.filter.apply",
+        "excel.filter.clear"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sort",
+          "order"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sortBy",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.filter.apply",
@@ -905,6 +1943,31 @@
         "regex_any": [
           "\\bfilter\\b.*\\b(?:by|where|rows?|column)\\b",
           "\\bapply\\b.*\\bfilter\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "rewrite",
+          "summarize",
+          "translate",
+          "sort"
         ]
       },
       "slotExtractors": [
@@ -938,13 +2001,55 @@
         "positive": [
           "Filter rows where NOI > 100000",
           "Filter by column A equals Sales",
-          "Apply filter to the table"
+          "Apply filter to the table",
+          "In Sheet1!A1:A10, apply filter apply."
         ],
         "negative": [
           "Clear filter",
           "Sort ascending"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.filter_action",
+      "mutuallyExclusiveWith": [
+        "excel.filter.clear",
+        "excel.sort.single_key"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "filter"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "filter",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.filter.clear",
@@ -959,6 +2064,31 @@
         "regex_any": [
           "\\bclear\\b.*\\bfilter\\b",
           "\\bremove\\b.*\\bfilter\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "rewrite",
+          "summarize",
+          "translate",
+          "sort"
         ]
       },
       "slotExtractors": [
@@ -987,13 +2117,56 @@
         "positive": [
           "Clear filters",
           "Remove all filters",
-          "Clear filter from column A"
+          "Clear filter from column A",
+          "In Sheet1!A1:A10, apply filter clear."
         ],
         "negative": [
           "Apply filter",
           "Filter rows"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.filter_action",
+      "mutuallyExclusiveWith": [
+        "excel.filter.apply",
+        "excel.sort.single_key"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "clear",
+          "filter"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.table.create",
@@ -1007,6 +2180,30 @@
         "regex_any": [
           "\\b(?:create|make|format as|convert to)\\b.*\\btable\\b",
           "\\btable\\b.*\\b(?:create|from)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate",
+          "chart",
+          "graph",
+          "plot",
+          "sort",
+          "filter"
         ]
       },
       "slotExtractors": [
@@ -1048,7 +2245,46 @@
           "Create a chart",
           "Create a new sheet"
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "table"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.table_create",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "hasHeaders",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.create",
@@ -1065,6 +2301,27 @@
         "regex_any": [
           "\\b(?:create|make|add|build|generate)\\b.*\\b(?:chart|graph|plot)\\b",
           "\\bvisuali[sz]e\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -1113,7 +2370,51 @@
           "Edit the chart title",
           "Delete the chart"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_create",
+      "mutuallyExclusiveWith": [
+        "excel.chart.create_specific",
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "chart",
+          "graph"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartType",
+          "ask_en": "Which chart type should I use?",
+          "ask_pt": "Qual tipo de gráfico devo usar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.create_specific",
@@ -1123,6 +2424,35 @@
       "triggers": {
         "regex_any": [
           "\\b(?:bar|column|line|pie|scatter|area|bubble|histogram|doughnut|donut|combo|radar|waterfall|treemap|funnel|stacked)\\b.*\\b(?:chart|graph|plot)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar"
+        ],
+        "tokens_any": [
+          "chart",
+          "graph",
+          "create",
+          "stacked",
+          "scatter",
+          "plot"
         ]
       },
       "slotExtractors": [
@@ -1162,12 +2492,58 @@
         "positive": [
           "Create a stacked bar chart",
           "Make a pie chart from A1:B10",
-          "Scatter plot of X vs Y"
+          "Scatter plot of X vs Y",
+          "In Sheet1!A1:A10, apply chart create_specific."
         ],
         "negative": [
-          "Sort by chart data"
+          "Sort by chart data",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_create",
+      "mutuallyExclusiveWith": [
+        "excel.chart.create",
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "chart",
+          "graph"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartType",
+          "ask_en": "Which chart type should I use?",
+          "ask_pt": "Qual tipo de gráfico devo usar?"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.update",
@@ -1178,6 +2554,36 @@
         "regex_any": [
           "\\b(?:change|update|modify|edit)\\b.*\\bchart\\b",
           "\\bchart\\b.*\\b(?:title|legend|axis|series|type)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar"
+        ],
+        "tokens_any": [
+          "chart",
+          "graph",
+          "change",
+          "title",
+          "revenue",
+          "update",
+          "type"
         ]
       },
       "slotExtractors": [
@@ -1207,13 +2613,58 @@
         "positive": [
           "Change the chart title to Revenue",
           "Update the chart type to line",
-          "Move the legend to the bottom"
+          "Move the legend to the bottom",
+          "In Sheet1!A1:A10, apply chart update."
         ],
         "negative": [
           "Create a chart",
           "Delete chart"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "chart",
+          "graph"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartId",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        },
+        {
+          "slot": "title",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.cond_format.color_scale",
@@ -1225,6 +2676,37 @@
           "\\bcolor\\s*scale\\b",
           "\\bconditional\\s*format\\b.*\\bcolor\\b",
           "\\bheat\\s*map\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "format",
+          "style",
+          "color",
+          "scale",
+          "heat",
+          "range",
+          "conditional",
+          "formatting"
         ]
       },
       "slotExtractors": [
@@ -1253,12 +2735,54 @@
         "positive": [
           "Apply color scale to A1:A50",
           "Add a heat map to the range",
-          "Conditional formatting with color scale"
+          "Conditional formatting with color scale",
+          "In Sheet1!A1:A10, apply cond_format color_scale."
         ],
         "negative": [
-          "Change font color"
+          "Change font color",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.data_bars",
+        "excel.cond_format.top_n"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "format",
+          "style"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.cond_format",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.cond_format.data_bars",
@@ -1269,6 +2793,34 @@
         "regex_any": [
           "\\bdata\\s*bars?\\b",
           "\\bconditional\\s*format\\b.*\\bbar\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "format",
+          "style",
+          "data",
+          "bars",
+          "selection"
         ]
       },
       "slotExtractors": [
@@ -1296,12 +2848,55 @@
       "examples": {
         "positive": [
           "Add data bars to the selection",
-          "Apply data bars to A1:A50"
+          "Apply data bars to A1:A50",
+          "In Sheet1!A1:A10, apply cond_format data_bars.",
+          "Apply cond_format data_bars on the selected range."
         ],
         "negative": [
-          "Create a bar chart"
+          "Create a bar chart",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.color_scale",
+        "excel.cond_format.top_n"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "format",
+          "style"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.cond_format",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.cond_format.top_n",
@@ -1312,6 +2907,36 @@
         "regex_any": [
           "\\b(?:highlight|format)\\b.*\\btop\\s*\\d+\\b",
           "\\btop\\s*\\d+\\b.*\\b(?:highlight|format|color)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "format",
+          "style",
+          "values",
+          "highlight",
+          "green",
+          "show",
+          "bold"
         ]
       },
       "slotExtractors": [
@@ -1345,12 +2970,54 @@
         "positive": [
           "Highlight the top 10 values",
           "Format top 5 in green",
-          "Show top 3 values in bold"
+          "Show top 3 values in bold",
+          "In Sheet1!A1:A10, apply cond_format top_n."
         ],
         "negative": [
-          "Sort descending"
+          "Sort descending",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.color_scale",
+        "excel.cond_format.data_bars"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "format",
+          "style"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.cond_format",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "topN",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.data_validation",
@@ -1362,6 +3029,35 @@
           "\\b(?:data\\s*)?validation\\b",
           "\\bdropdown\\b.*\\blist\\b",
           "\\badd\\b.*\\bdropdown\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
+        ],
+        "tokens_any": [
+          "validation",
+          "dropdown",
+          "data",
+          "create",
+          "list",
+          "maybe"
         ]
       },
       "slotExtractors": [
@@ -1395,12 +3091,54 @@
         "positive": [
           "Add data validation to A1:A10",
           "Create a dropdown list in B2",
-          "Add a dropdown with Yes, No, Maybe"
+          "Add a dropdown with Yes, No, Maybe",
+          "In Sheet1!A1:A10, apply data_validation."
         ],
         "negative": [
-          "Validate the formula"
+          "Validate the formula",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.cond_format.color_scale",
+        "excel.cond_format.data_bars"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "validation",
+          "dropdown"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_validation",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "validation",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.freeze_panes",
@@ -1414,6 +3152,30 @@
         "regex_any": [
           "\\bfreeze\\b.*\\b(?:pane|row|column|header|top)\\b",
           "\\bfreeze\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate",
+          "chart",
+          "graph",
+          "plot",
+          "sort",
+          "filter"
         ]
       },
       "slotExtractors": [
@@ -1453,9 +3215,49 @@
           "Freeze header row"
         ],
         "negative": [
-          "Unfreeze panes"
+          "Unfreeze panes",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "freeze"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.freeze_panes",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        },
+        {
+          "slot": "row",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.merge_cells",
@@ -1471,6 +3273,30 @@
         ],
         "regex_any": [
           "\\bmerge\\b.*\\bcells?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate",
+          "chart",
+          "graph",
+          "plot",
+          "sort",
+          "filter"
         ]
       },
       "slotExtractors": [
@@ -1498,12 +3324,55 @@
       "examples": {
         "positive": [
           "Merge cells A1:D1",
-          "Merge the selected cells"
+          "Merge the selected cells",
+          "In Sheet1!A1:A10, apply merge_cells.",
+          "Apply merge_cells on the selected range."
         ],
         "negative": [
-          "Merge paragraphs"
+          "Merge paragraphs",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "cells",
+          "merge"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.merge_cells",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.wrap_text",
@@ -1515,6 +3384,38 @@
           "\\bwrap\\s*text\\b",
           "\\btext\\s*wrap\\b",
           "\\benable\\b.*\\bwrap\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate"
+        ],
+        "tokens_any": [
+          "wrap",
+          "text",
+          "enable",
+          "turn",
+          "wrapping"
         ]
       },
       "slotExtractors": [
@@ -1549,12 +3450,54 @@
         "positive": [
           "Wrap text in A1:A10",
           "Enable text wrap",
-          "Turn on text wrapping"
+          "Turn on text wrapping",
+          "In Sheet1!A1:A10, apply wrap_text."
         ],
         "negative": [
-          "Unwrap text"
+          "Unwrap text",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "wrap",
+          "text"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.wrap_text",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "enabled",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.auto_fit",
@@ -1566,6 +3509,39 @@
           "\\bauto\\s*fit\\b",
           "\\bfit\\s*columns?\\b",
           "\\bresize\\b.*\\bcolumns?\\b.*\\bfit\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "rewrite",
+          "summarize",
+          "translate",
+          "chart",
+          "graph",
+          "plot",
+          "sort",
+          "filter"
+        ],
+        "tokens_any": [
+          "fit",
+          "auto",
+          "columns",
+          "resize",
+          "content",
+          "column",
+          "widths"
         ]
       },
       "slotExtractors": [
@@ -1594,12 +3570,54 @@
         "positive": [
           "Auto fit columns",
           "Resize columns to fit content",
-          "Auto fit column widths"
+          "Auto fit column widths",
+          "In Sheet1!A1:A10, apply auto_fit."
         ],
         "negative": [
-          "Fit to page"
+          "Fit to page",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.formula.single"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "fit",
+          "auto"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.auto_fit",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.insert_rows",
@@ -1610,6 +3628,41 @@
         "regex_any": [
           "\\b(?:insert|add)\\b.*\\brows?\\b",
           "\\brows?\\b.*\\b(?:insert|add)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "validation"
+        ],
+        "tokens_any": [
+          "insert",
+          "add",
+          "rows",
+          "above",
+          "after",
+          "header"
         ]
       },
       "slotExtractors": [
@@ -1644,13 +3697,53 @@
         "positive": [
           "Insert 3 rows above row 5",
           "Add a row after the header",
-          "Insert rows at A10"
+          "Insert rows at A10",
+          "In Sheet1!A1:A10, apply insert_rows."
         ],
         "negative": [
           "Delete rows",
           "Insert columns"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_structural",
+      "mutuallyExclusiveWith": [
+        "excel.delete_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "insert",
+          "add"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "count",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.delete_rows",
@@ -1660,6 +3753,40 @@
       "triggers": {
         "regex_any": [
           "\\b(?:delete|remove)\\b.*\\brows?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "validation"
+        ],
+        "tokens_any": [
+          "delete",
+          "remove",
+          "rows",
+          "through",
+          "selected"
         ]
       },
       "slotExtractors": [
@@ -1687,13 +3814,54 @@
       "examples": {
         "positive": [
           "Delete rows 5 through 10",
-          "Remove the selected rows"
+          "Remove the selected rows",
+          "In Sheet1!A1:A10, apply delete_rows.",
+          "Apply delete_rows on the selected range."
         ],
         "negative": [
           "Insert rows",
           "Delete columns"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_structural",
+      "mutuallyExclusiveWith": [
+        "excel.insert_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "delete",
+          "remove"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.insert_columns",
@@ -1703,6 +3871,41 @@
       "triggers": {
         "regex_any": [
           "\\b(?:insert|add)\\b.*\\bcolumns?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "validation"
+        ],
+        "tokens_any": [
+          "insert",
+          "add",
+          "columns",
+          "column",
+          "before",
+          "after"
         ]
       },
       "slotExtractors": [
@@ -1736,13 +3939,54 @@
       "examples": {
         "positive": [
           "Insert 2 columns before column D",
-          "Add a column after B"
+          "Add a column after B",
+          "In Sheet1!A1:A10, apply insert_columns.",
+          "Apply insert_columns on the selected range."
         ],
         "negative": [
           "Delete columns",
           "Insert rows"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_structural",
+      "mutuallyExclusiveWith": [
+        "excel.delete_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "insert",
+          "add"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "count",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.delete_columns",
@@ -1752,6 +3996,40 @@
       "triggers": {
         "regex_any": [
           "\\b(?:delete|remove)\\b.*\\bcolumns?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "validation"
+        ],
+        "tokens_any": [
+          "delete",
+          "remove",
+          "columns",
+          "through",
+          "column"
         ]
       },
       "slotExtractors": [
@@ -1779,12 +4057,54 @@
       "examples": {
         "positive": [
           "Delete columns C through E",
-          "Remove column D"
+          "Remove column D",
+          "In Sheet1!A1:A10, apply delete_columns.",
+          "Apply delete_columns on the selected range."
         ],
         "negative": [
-          "Delete rows"
+          "Delete rows",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_structural",
+      "mutuallyExclusiveWith": [
+        "excel.insert_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "delete",
+          "remove"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.add_sheet",
@@ -1794,6 +4114,41 @@
       "triggers": {
         "regex_any": [
           "\\b(?:add|create|insert|new)\\b.*\\b(?:sheet|worksheet|tab)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "validation"
+        ],
+        "tokens_any": [
+          "sheet",
+          "called",
+          "summary",
+          "create",
+          "worksheet",
+          "insert"
         ]
       },
       "slotExtractors": [
@@ -1817,12 +4172,49 @@
         "positive": [
           "Add a new sheet called Summary",
           "Create a new worksheet",
-          "Insert a new tab"
+          "Insert a new tab",
+          "In Sheet1!A1:A10, apply add_sheet."
         ],
         "negative": [
-          "Rename sheet"
+          "Rename sheet",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sheet_structural",
+      "mutuallyExclusiveWith": [
+        "excel.rename_sheet",
+        "excel.delete_sheet"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sheet",
+          "called"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.rename_sheet",
@@ -1833,6 +4225,40 @@
         "regex_any": [
           "\\brename\\b.*\\b(?:sheet|worksheet|tab)\\b",
           "\\b(?:sheet|tab)\\b.*\\brename\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "validation"
+        ],
+        "tokens_any": [
+          "sheet",
+          "rename",
+          "revenue",
+          "sheet1",
+          "data"
         ]
       },
       "slotExtractors": [
@@ -1862,18 +4288,53 @@
           "slot": "newName",
           "ask_en": "What should the new name be?",
           "ask_pt": "Qual deve ser o novo nome?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Rename the sheet to Revenue",
-          "Rename Sheet1 to Data"
+          "Rename Sheet1 to Data",
+          "In Sheet1!A1:A10, apply rename_sheet.",
+          "Apply rename_sheet on the selected range."
         ],
         "negative": [
           "Delete sheet",
           "Add sheet"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sheet_structural",
+      "mutuallyExclusiveWith": [
+        "excel.add_sheet",
+        "excel.delete_sheet"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sheet",
+          "rename"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.delete_sheet",
@@ -1883,6 +4344,40 @@
       "triggers": {
         "regex_any": [
           "\\b(?:delete|remove)\\b.*\\b(?:sheet|worksheet|tab)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "validation"
+        ],
+        "tokens_any": [
+          "delete",
+          "remove",
+          "sheet",
+          "sheet2",
+          "summary"
         ]
       },
       "slotExtractors": [
@@ -1905,13 +4400,50 @@
       "examples": {
         "positive": [
           "Delete Sheet2",
-          "Remove the Summary tab"
+          "Remove the Summary tab",
+          "In Sheet1!A1:A10, apply delete_sheet.",
+          "Apply delete_sheet on the selected range."
         ],
         "negative": [
           "Add sheet",
           "Rename sheet"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.sheet_structural",
+      "mutuallyExclusiveWith": [
+        "excel.add_sheet",
+        "excel.rename_sheet"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "delete",
+          "remove"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.hide_rows",
@@ -1921,6 +4453,37 @@
       "triggers": {
         "regex_any": [
           "\\bhide\\b.*\\brows?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "bold",
+          "italic",
+          "underline",
+          "currency",
+          "percent",
+          "validation"
+        ],
+        "tokens_any": [
+          "hide",
+          "rows",
+          "through",
+          "selected"
         ]
       },
       "slotExtractors": [
@@ -1949,13 +4512,54 @@
       "examples": {
         "positive": [
           "Hide rows 5 through 10",
-          "Hide the selected rows"
+          "Hide the selected rows",
+          "In Sheet1!A1:A10, apply hide_rows.",
+          "Apply hide_rows on the selected range."
         ],
         "negative": [
           "Show rows",
           "Hide columns"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.show_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "hide",
+          "rows"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.hide_columns",
@@ -1965,6 +4569,37 @@
       "triggers": {
         "regex_any": [
           "\\bhide\\b.*\\bcolumns?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "bold",
+          "italic",
+          "underline",
+          "currency",
+          "percent",
+          "validation"
+        ],
+        "tokens_any": [
+          "hide",
+          "columns",
+          "through",
+          "column"
         ]
       },
       "slotExtractors": [
@@ -1993,12 +4628,54 @@
       "examples": {
         "positive": [
           "Hide columns C through E",
-          "Hide column D"
+          "Hide column D",
+          "In Sheet1!A1:A10, apply hide_columns.",
+          "Apply hide_columns on the selected range."
         ],
         "negative": [
-          "Show columns"
+          "Show columns",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.show_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "hide",
+          "columns"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.show_rows",
@@ -2008,6 +4685,37 @@
       "triggers": {
         "regex_any": [
           "\\b(?:show|unhide)\\b.*\\brows?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "bold",
+          "italic",
+          "underline",
+          "currency",
+          "percent",
+          "validation"
+        ],
+        "tokens_any": [
+          "show",
+          "rows",
+          "hidden",
+          "unhide"
         ]
       },
       "slotExtractors": [
@@ -2036,12 +4744,54 @@
       "examples": {
         "positive": [
           "Show hidden rows",
-          "Unhide rows 5 to 10"
+          "Unhide rows 5 to 10",
+          "In Sheet1!A1:A10, apply show_rows.",
+          "Apply show_rows on the selected range."
         ],
         "negative": [
-          "Hide rows"
+          "Hide rows",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.rows_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.hide_rows"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "show",
+          "rows"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.show_columns",
@@ -2051,6 +4801,38 @@
       "triggers": {
         "regex_any": [
           "\\b(?:show|unhide)\\b.*\\bcolumns?\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "bold",
+          "italic",
+          "underline",
+          "currency",
+          "percent",
+          "validation"
+        ],
+        "tokens_any": [
+          "show",
+          "columns",
+          "hidden",
+          "unhide",
+          "column"
         ]
       },
       "slotExtractors": [
@@ -2079,12 +4861,54 @@
       "examples": {
         "positive": [
           "Show hidden columns",
-          "Unhide column D"
+          "Unhide column D",
+          "In Sheet1!A1:A10, apply show_columns.",
+          "Apply show_columns on the selected range."
         ],
         "negative": [
-          "Hide columns"
+          "Hide columns",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.columns_visibility",
+      "mutuallyExclusiveWith": [
+        "excel.hide_columns"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "show",
+          "columns"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.sum",
@@ -2100,6 +4924,31 @@
         "regex_any": [
           "^(?!.*\\bformula\\b)(?!.*=).*\\b(?:sum|total|add up)\\b.*\\b(?:of|in|for|column|range)\\b",
           "^(?!.*\\bformula\\b)(?!.*=).*\\bcalculate\\b.*\\bsum\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
         ]
       },
       "slotExtractors": [
@@ -2134,13 +4983,56 @@
         "positive": [
           "Sum column A",
           "Calculate the total of B2:B50",
-          "Add up the values in the selection"
+          "Add up the values in the selection",
+          "In Sheet1!A1:A10, apply aggregation sum."
         ],
         "negative": [
           "Set formula =SUM",
           "Average the range"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.average",
+        "excel.aggregation.count",
+        "excel.aggregation.max",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "sum",
+          "total"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.average",
@@ -2156,6 +5048,31 @@
         "regex_any": [
           "\\b(?:average|mean|avg)\\b.*\\b(?:of|in|for|column|range)\\b",
           "\\bcalculate\\b.*\\b(?:average|mean)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
         ]
       },
       "slotExtractors": [
@@ -2190,12 +5107,56 @@
         "positive": [
           "Average column B",
           "Calculate the mean of A1:A100",
-          "What's the average of the selection?"
+          "What's the average of the selection?",
+          "In Sheet1!A1:A10, apply aggregation average."
         ],
         "negative": [
-          "Sum the range"
+          "Sum the range",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.count",
+        "excel.aggregation.max",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "average",
+          "mean"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.count",
@@ -2208,6 +5169,31 @@
         ],
         "regex_any": [
           "\\bcount\\b.*\\b(?:of|in|for|column|range|cells?|values?)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
         ]
       },
       "slotExtractors": [
@@ -2241,12 +5227,56 @@
       "examples": {
         "positive": [
           "Count the values in A1:A50",
-          "How many cells have data?"
+          "How many cells have data?",
+          "In Sheet1!A1:A10, apply aggregation count.",
+          "Apply aggregation count on the selected range."
         ],
         "negative": [
-          "Sum the range"
+          "Sum the range",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.max",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "count"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.max",
@@ -2262,6 +5292,31 @@
         ],
         "regex_any": [
           "\\b(?:max|maximum|highest|largest)\\b.*\\b(?:of|in|for|value)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
         ]
       },
       "slotExtractors": [
@@ -2296,12 +5351,56 @@
         "positive": [
           "Find the max value in column B",
           "What's the highest value?",
-          "Maximum of the selection"
+          "Maximum of the selection",
+          "In Sheet1!A1:A10, apply aggregation max."
         ],
         "negative": [
-          "Minimum of the range"
+          "Minimum of the range",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count",
+        "excel.aggregation.min"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "max",
+          "maximum"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.aggregation.min",
@@ -2317,6 +5416,31 @@
         ],
         "regex_any": [
           "\\b(?:min|minimum|lowest|smallest)\\b.*\\b(?:of|in|for|value)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico"
         ]
       },
       "slotExtractors": [
@@ -2351,12 +5475,56 @@
         "positive": [
           "Find the min value in column B",
           "What's the lowest value?",
-          "Minimum of the range"
+          "Minimum of the range",
+          "In Sheet1!A1:A10, apply aggregation min."
         ],
         "negative": [
-          "Maximum of the range"
+          "Maximum of the range",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.aggregation",
+      "mutuallyExclusiveWith": [
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count",
+        "excel.aggregation.max"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "min",
+          "minimum"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "insert row"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "targetCell",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.fill_blank_cells",
@@ -2368,6 +5536,49 @@
           "\\b(?:if|where|when)\\b.*\\bblank\\b.*\\bfill\\b",
           "\\bfill\\b.*\\bblank\\b",
           "\\bblank\\b.*\\b(?:set|fill|replace|put)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart",
+          "graph",
+          "plot",
+          "table",
+          "sort",
+          "filter",
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "merge",
+          "wrap",
+          "freeze",
+          "validation",
+          "conditional formatting",
+          "data bars",
+          "color scale",
+          "top n",
+          "format as"
+        ],
+        "tokens_any": [
+          "blank",
+          "fill",
+          "cells",
+          "cell",
+          "replace",
+          "empty"
         ]
       },
       "slotExtractors": [
@@ -2403,12 +5614,59 @@
         "positive": [
           "If any cell is blank in D35:D48, fill it with 0",
           "Fill blank cells with N/A",
-          "Replace empty cells with 0"
+          "Replace empty cells with 0",
+          "In Sheet1!A1:A10, apply fill_blank_cells."
         ],
         "negative": [
-          "Delete blank rows"
+          "Delete blank rows",
+          "Rewrite this paragraph in a formal tone."
         ]
-      }
+      },
+      "disambiguationGroup": "excel.value_assignment",
+      "mutuallyExclusiveWith": [
+        "excel.set_value.single",
+        "excel.set_value.range",
+        "excel.set_value.numeric_convert",
+        "excel.formula.single",
+        "excel.formula.range",
+        "excel.format.number_format",
+        "excel.format.custom_number_format"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "blank",
+          "fill"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "currency",
+          "percent",
+          "percentage",
+          "decimal",
+          "chart"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "value",
+          "ask_en": "What value should I set?",
+          "ask_pt": "Qual valor devo definir?"
+        }
+      ]
     },
     {
       "id": "excel.fill_series",
@@ -2427,6 +5685,32 @@
           "\\bauto.?fill\\b",
           "\\bsequence\\b.*\\b(?:from|starting|through)\\b",
           "\\b(?:generate|create)\\b.*\\bseries\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "gráfico",
+          "grafico",
+          "rewrite",
+          "summarize",
+          "translate",
+          "sort",
+          "filter"
         ]
       },
       "slotExtractors": [
@@ -2462,7 +5746,49 @@
           "Fill down the formula",
           "Fill blank cells"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.fill_direction",
+      "mutuallyExclusiveWith": [
+        "excel.fill_down",
+        "excel.fill_right"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "fill",
+          "series"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {
+        "explicitRange": true
+      },
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        },
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I use?",
+          "ask_pt": "Qual planilha devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.set_series",
@@ -2477,6 +5803,27 @@
           "\\bchart\\b.*\\b(?:series|data\\s+series)\\b",
           "\\b(?:add|change|update|modify)\\b.*\\bseries\\b.*\\bchart\\b",
           "\\bseries\\b.*\\b(?:range|data|source)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -2506,19 +5853,56 @@
           "slot": "chartId",
           "ask_en": "Which chart should I update?",
           "ask_pt": "Qual gráfico devo atualizar?"
+        },
+        {
+          "slot": "series",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Change the chart data series to B1:B50",
           "Update chart series from column C",
-          "Add series from D1:D20 to the chart"
+          "Add series from D1:D20 to the chart",
+          "In Sheet1!A1:A10, apply chart set_series."
         ],
         "negative": [
           "Create a new chart",
           "Delete the chart"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "series"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.chart.set_titles",
@@ -2534,6 +5918,27 @@
           "\\b(?:set|change|rename|update)\\b.*\\bchart\\s+title\\b",
           "\\baxis\\s+title\\b",
           "\\b(?:x|y).?axis\\b.*\\btitle\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -2563,19 +5968,56 @@
           "slot": "title",
           "ask_en": "What should the chart title be?",
           "ask_pt": "Qual deve ser o título do gráfico?"
+        },
+        {
+          "slot": "chartId",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
         }
       ],
       "examples": {
         "positive": [
           "Set the chart title to 'Revenue 2026'",
           "Change axis title to 'Months'",
-          "Rename the chart to 'Sales Report'"
+          "Rename the chart to 'Sales Report'",
+          "In Sheet1!A1:A10, apply chart set_titles."
         ],
         "negative": [
           "Create a chart",
           "Delete the chart title"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_axes",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "title"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
     },
     {
       "id": "excel.chart.set_axes",
@@ -2587,6 +6029,36 @@
           "\\bchart\\b.*\\b(?:axis|axes)\\b",
           "\\b(?:set|change|configure|format|update)\\b.*\\b(?:x.?axis|y.?axis|axes)\\b",
           "\\baxis\\b.*\\b(?:scale|range|min|max|label)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar"
+        ],
+        "tokens_any": [
+          "chart",
+          "graph",
+          "axes",
+          "axis",
+          "configure",
+          "scale",
+          "1000"
         ]
       },
       "slotExtractors": [
@@ -2617,7 +6089,46 @@
           "Create a chart",
           "Set the chart title"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.delete",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "chart",
+          "graph"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "chartId",
+          "ask_en": "What value should I use?",
+          "ask_pt": "Qual valor devo usar?"
+        }
+      ]
     },
     {
       "id": "excel.chart.delete",
@@ -2632,6 +6143,27 @@
         "regex_any": [
           "\\b(?:delete|remove|destroy)\\b.*\\bchart\\b",
           "\\bchart\\b.*\\b(?:delete|remove)\\b"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "sort",
+          "filter",
+          "ordenar",
+          "classificar",
+          "filtrar"
         ]
       },
       "slotExtractors": [
@@ -2662,13 +6194,562 @@
         "positive": [
           "Delete the chart",
           "Remove the chart from this sheet",
-          "Delete chart 'Sales'"
+          "Delete chart 'Sales'",
+          "In Sheet1!A1:A10, apply chart delete."
         ],
         "negative": [
           "Delete row 5",
           "Remove the filter"
         ]
-      }
+      },
+      "disambiguationGroup": "excel.chart_update",
+      "mutuallyExclusiveWith": [
+        "excel.chart.update",
+        "excel.chart.set_series",
+        "excel.chart.set_titles",
+        "excel.chart.set_axes",
+        "excel.chart.create",
+        "excel.chart.create_specific"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "delete",
+          "remove"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.remove_duplicates",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "remove duplicates",
+          "dedup",
+          "deduplicate",
+          "delete duplicates",
+          "unique rows",
+          "remove duplicate rows"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "format as"
+        ],
+        "regex_any": [
+          "\\b(?:remove\\\\s+duplicates|dedup|deduplicate|delete\\\\s+duplicates|unique\\\\s+rows)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_REMOVE_DUPLICATES",
+          "rangeA1": "$rangeA1"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Remove duplicates from this range",
+          "Dedup the data",
+          "Delete duplicate rows",
+          "Keep only unique rows"
+        ],
+        "negative": [
+          "Remove the filter",
+          "Delete row 5"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.trim_whitespace",
+        "excel.normalize_values"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "remove duplicates",
+          "dedup"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_cleaning",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
+    },
+    {
+      "id": "excel.trim_whitespace",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 70,
+      "triggers": {
+        "tokens_any": [
+          "trim",
+          "trim whitespace",
+          "clean whitespace",
+          "strip spaces",
+          "remove extra spaces",
+          "clean up spaces"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "format as"
+        ],
+        "regex_any": [
+          "\\b(?:trim|trim\\\\s+whitespace|clean\\\\s+whitespace|strip\\\\s+spaces|remove\\\\s+extra\\\\s+spaces)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_TRIM_WHITESPACE",
+          "rangeA1": "$rangeA1"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Trim whitespace from these cells",
+          "Clean up extra spaces",
+          "Strip leading and trailing spaces",
+          "In Sheet1!A1:A10, apply trim_whitespace."
+        ],
+        "negative": [
+          "Trim the first 5 rows",
+          "Delete spaces between words"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.remove_duplicates",
+        "excel.normalize_values"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "trim",
+          "trim whitespace"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_cleaning",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
+    },
+    {
+      "id": "excel.normalize_values",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 70,
+      "triggers": {
+        "tokens_any": [
+          "normalize",
+          "standardize",
+          "normalize values",
+          "standardize values",
+          "normalize dates",
+          "normalize numbers",
+          "standardize text"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "format as"
+        ],
+        "regex_any": [
+          "\\b(?:normalize|standardize|normalize\\\\s+values|standardize\\\\s+values|normalize\\\\s+dates)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        },
+        {
+          "type": "ENUM",
+          "out": "normalization",
+          "values": [
+            "dates",
+            "numbers",
+            "text_case"
+          ]
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_NORMALIZE_VALUES",
+          "rangeA1": "$rangeA1",
+          "normalization": "$normalization"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "normalization",
+          "ask_en": "What kind of normalization? (dates, numbers, or text_case)",
+          "ask_pt": "Que tipo de normalização? (datas, números ou maiúsculas/minúsculas)"
+        },
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Normalize dates in this column",
+          "Standardize the text to uppercase",
+          "Normalize numbers in range A1:A50",
+          "In Sheet1!A1:A10, apply normalize_values."
+        ],
+        "negative": [
+          "Format as currency",
+          "Change the font"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.remove_duplicates",
+        "excel.trim_whitespace"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "normalize",
+          "standardize"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.data_cleaning",
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.set_protection",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 65,
+      "triggers": {
+        "tokens_any": [
+          "protect sheet",
+          "protect this sheet",
+          "lock sheet",
+          "sheet protection",
+          "password protect"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "format as"
+        ],
+        "regex_any": [
+          "\\b(?:protect\\\\s+sheet|protect\\\\s+this\\\\s+sheet|lock\\\\s+sheet|sheet\\\\s+protection|password\\\\s+protect)\\b"
+        ]
+      },
+      "slotExtractors": [],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_PROTECTION"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Protect this sheet",
+          "Lock the sheet",
+          "Add sheet protection",
+          "In Sheet1!A1:A10, apply set_protection."
+        ],
+        "negative": [
+          "Lock cells A1:B5",
+          "Freeze the header row"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.lock_cells"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "protect sheet",
+          "protect this sheet"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.protection",
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.lock_cells",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 65,
+      "triggers": {
+        "tokens_any": [
+          "lock cells",
+          "unlock cells",
+          "protect cells",
+          "cell protection",
+          "lock range",
+          "unlock range"
+        ],
+        "tokens_none": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "chart",
+          "graph",
+          "plot",
+          "format as"
+        ],
+        "regex_any": [
+          "\\b(?:lock\\\\s+cells|unlock\\\\s+cells|protect\\\\s+cells|cell\\\\s+protection|lock\\\\s+range)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "RANGE_A1",
+          "out": "rangeA1"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_LOCK_CELLS",
+          "rangeA1": "$rangeA1",
+          "locked": true
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Lock cells A1:D10",
+          "Protect these cells",
+          "Unlock the header row",
+          "In Sheet1!A1:A10, apply lock_cells."
+        ],
+        "negative": [
+          "Protect the sheet",
+          "Freeze panes"
+        ]
+      },
+      "mutuallyExclusiveWith": [
+        "excel.set_protection"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "lock cells",
+          "unlock cells"
+        ],
+        "penalizeIfTokensPresent": [
+          "formula",
+          "=sum(",
+          "=if(",
+          "=vlookup(",
+          "=xlookup(",
+          "=index(",
+          "=match(",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "disambiguationGroup": "excel.protection",
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "rangeA1",
+          "ask_en": "Which range should I use?",
+          "ask_pt": "Qual intervalo devo usar?"
+        }
+      ]
     }
   ]
 }

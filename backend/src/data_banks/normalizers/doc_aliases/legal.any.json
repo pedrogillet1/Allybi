@@ -1,27 +1,3476 @@
 {
   "_meta": {
     "id": "doc_aliases_legal",
-    "version": "1.0.0",
-    "description": "User alias mapping for legal documents.",
+    "version": "2.0.0",
+    "description": "Alias mapping for legal document detection (EN/PT + colloquial phrases).",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
     "domain": "legal",
-    "caseInsensitive": true
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.74
   },
   "domain": "legal",
   "aliases": [
     {
-      "alias": "legal document",
-      "docTypes": [],
+      "phrase": "acao judicial inicial",
+      "normalized": "acao judicial inicial",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
       "hints": {
-        "period": "unknown",
-        "owner": "unknown"
-      }
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find acao judicial inicial with latest effective date",
+        "extract obligations from acao judicial inicial"
+      ]
+    },
+    {
+      "phrase": "acceptable use policy",
+      "normalized": "acceptable use policy",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find acceptable use policy with latest effective date",
+        "extract obligations from acceptable use policy"
+      ]
+    },
+    {
+      "phrase": "acceptable use terms",
+      "normalized": "acceptable use terms",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find acceptable use terms with latest effective date",
+        "extract obligations from acceptable use terms"
+      ]
+    },
+    {
+      "phrase": "acordo de associado comercial",
+      "normalized": "acordo de associado comercial",
+      "docTypeIds": [
+        "legal_baa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de associado comercial with latest effective date",
+        "extract obligations from acordo de associado comercial"
+      ]
+    },
+    {
+      "phrase": "acordo de confidencialidade",
+      "normalized": "acordo de confidencialidade",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de confidencialidade with latest effective date",
+        "extract obligations from acordo de confidencialidade"
+      ]
+    },
+    {
+      "phrase": "acordo de consultoria",
+      "normalized": "acordo de consultoria",
+      "docTypeIds": [
+        "legal_consulting_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de consultoria with latest effective date",
+        "extract obligations from acordo de consultoria"
+      ]
+    },
+    {
+      "phrase": "acordo de distribuicao",
+      "normalized": "acordo de distribuicao",
+      "docTypeIds": [
+        "legal_reseller_distribution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de distribuicao with latest effective date",
+        "extract obligations from acordo de distribuicao"
+      ]
+    },
+    {
+      "phrase": "acordo de emprego",
+      "normalized": "acordo de emprego",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de emprego with latest effective date",
+        "extract obligations from acordo de emprego"
+      ]
+    },
+    {
+      "phrase": "acordo de joint venture",
+      "normalized": "acordo de joint venture",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de joint venture with latest effective date",
+        "extract obligations from acordo de joint venture"
+      ]
+    },
+    {
+      "phrase": "acordo de licenciamento",
+      "normalized": "acordo de licenciamento",
+      "docTypeIds": [
+        "legal_license_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de licenciamento with latest effective date",
+        "extract obligations from acordo de licenciamento"
+      ]
+    },
+    {
+      "phrase": "acordo de nao divulgacao",
+      "normalized": "acordo de nao divulgacao",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de nao divulgacao with latest effective date",
+        "extract obligations from acordo de nao divulgacao"
+      ]
+    },
+    {
+      "phrase": "acordo de não divulgação",
+      "normalized": "acordo de nao divulgacao",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de não divulgação with latest effective date",
+        "extract obligations from acordo de não divulgação"
+      ]
+    },
+    {
+      "phrase": "acordo de nivel de servico",
+      "normalized": "acordo de nivel de servico",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de nivel de servico with latest effective date",
+        "extract obligations from acordo de nivel de servico"
+      ]
+    },
+    {
+      "phrase": "acordo de nível de serviço",
+      "normalized": "acordo de nivel de servico",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de nível de serviço with latest effective date",
+        "extract obligations from acordo de nível de serviço"
+      ]
+    },
+    {
+      "phrase": "acordo de parceria",
+      "normalized": "acordo de parceria",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de parceria with latest effective date",
+        "extract obligations from acordo de parceria"
+      ]
+    },
+    {
+      "phrase": "acordo de revenda",
+      "normalized": "acordo de revenda",
+      "docTypeIds": [
+        "legal_reseller_distribution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de revenda with latest effective date",
+        "extract obligations from acordo de revenda"
+      ]
+    },
+    {
+      "phrase": "acordo de transacao",
+      "normalized": "acordo de transacao",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de transacao with latest effective date",
+        "extract obligations from acordo de transacao"
+      ]
+    },
+    {
+      "phrase": "acordo de tratamento de dados",
+      "normalized": "acordo de tratamento de dados",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo de tratamento de dados with latest effective date",
+        "extract obligations from acordo de tratamento de dados"
+      ]
+    },
+    {
+      "phrase": "acordo hipaa",
+      "normalized": "acordo hipaa",
+      "docTypeIds": [
+        "legal_baa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo hipaa with latest effective date",
+        "extract obligations from acordo hipaa"
+      ]
+    },
+    {
+      "phrase": "acordo judicial",
+      "normalized": "acordo judicial",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo judicial with latest effective date",
+        "extract obligations from acordo judicial"
+      ]
+    },
+    {
+      "phrase": "acordo mestre de servicos",
+      "normalized": "acordo mestre de servicos",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo mestre de servicos with latest effective date",
+        "extract obligations from acordo mestre de servicos"
+      ]
+    },
+    {
+      "phrase": "acordo mestre de serviços",
+      "normalized": "acordo mestre de servicos",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find acordo mestre de serviços with latest effective date",
+        "extract obligations from acordo mestre de serviços"
+      ]
+    },
+    {
+      "phrase": "adendo de tratamento de dados",
+      "normalized": "adendo de tratamento de dados",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find adendo de tratamento de dados with latest effective date",
+        "extract obligations from adendo de tratamento de dados"
+      ]
+    },
+    {
+      "phrase": "aditivo de dados",
+      "normalized": "aditivo de dados",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find aditivo de dados with latest effective date",
+        "extract obligations from aditivo de dados"
+      ]
+    },
+    {
+      "phrase": "advisory services agreement",
+      "normalized": "advisory services agreement",
+      "docTypeIds": [
+        "legal_consulting_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find advisory services agreement with latest effective date",
+        "extract obligations from advisory services agreement"
+      ]
+    },
+    {
+      "phrase": "agreement confidentiality",
+      "normalized": "agreement confidentiality",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find agreement confidentiality with latest effective date",
+        "extract obligations from agreement confidentiality"
+      ]
+    },
+    {
+      "phrase": "articles of incorporation",
+      "normalized": "articles of incorporation",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find articles of incorporation with latest effective date",
+        "extract obligations from articles of incorporation"
+      ]
+    },
+    {
+      "phrase": "assignment of intellectual property",
+      "normalized": "assignment of intellectual property",
+      "docTypeIds": [
+        "legal_ip_assignment"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find assignment of intellectual property with latest effective date",
+        "extract obligations from assignment of intellectual property"
+      ]
+    },
+    {
+      "phrase": "ata de conselho",
+      "normalized": "ata de conselho",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find ata de conselho with latest effective date",
+        "extract obligations from ata de conselho"
+      ]
+    },
+    {
+      "phrase": "ata de reuniao do conselho",
+      "normalized": "ata de reuniao do conselho",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find ata de reuniao do conselho with latest effective date",
+        "extract obligations from ata de reuniao do conselho"
+      ]
+    },
+    {
+      "phrase": "aup",
+      "normalized": "aup",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find aup with latest effective date",
+        "extract obligations from aup"
+      ]
+    },
+    {
+      "phrase": "aviso de cookies",
+      "normalized": "aviso de cookies",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find aviso de cookies with latest effective date",
+        "extract obligations from aviso de cookies"
+      ]
+    },
+    {
+      "phrase": "aviso de privacidade",
+      "normalized": "aviso de privacidade",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find aviso de privacidade with latest effective date",
+        "extract obligations from aviso de privacidade"
+      ]
+    },
+    {
+      "phrase": "baa",
+      "normalized": "baa",
+      "docTypeIds": [
+        "legal_baa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find baa with latest effective date",
+        "extract obligations from baa"
+      ]
+    },
+    {
+      "phrase": "board minutes",
+      "normalized": "board minutes",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find board minutes with latest effective date",
+        "extract obligations from board minutes"
+      ]
+    },
+    {
+      "phrase": "board resolution",
+      "normalized": "board resolution",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find board resolution with latest effective date",
+        "extract obligations from board resolution"
+      ]
+    },
+    {
+      "phrase": "business associate agreement",
+      "normalized": "business associate agreement",
+      "docTypeIds": [
+        "legal_baa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find business associate agreement with latest effective date",
+        "extract obligations from business associate agreement"
+      ]
+    },
+    {
+      "phrase": "business conduct code",
+      "normalized": "business conduct code",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find business conduct code with latest effective date",
+        "extract obligations from business conduct code"
+      ]
+    },
+    {
+      "phrase": "bylaws",
+      "normalized": "bylaws",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find bylaws with latest effective date",
+        "extract obligations from bylaws"
+      ]
+    },
+    {
+      "phrase": "carta oferta",
+      "normalized": "carta oferta",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find carta oferta with latest effective date",
+        "extract obligations from carta oferta"
+      ]
+    },
+    {
+      "phrase": "carta proposta de emprego",
+      "normalized": "carta proposta de emprego",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find carta proposta de emprego with latest effective date",
+        "extract obligations from carta proposta de emprego"
+      ]
+    },
+    {
+      "phrase": "carta societaria",
+      "normalized": "carta societaria",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find carta societaria with latest effective date",
+        "extract obligations from carta societaria"
+      ]
+    },
+    {
+      "phrase": "cessao de propriedade intelectual",
+      "normalized": "cessao de propriedade intelectual",
+      "docTypeIds": [
+        "legal_ip_assignment"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find cessao de propriedade intelectual with latest effective date",
+        "extract obligations from cessao de propriedade intelectual"
+      ]
+    },
+    {
+      "phrase": "channel partner agreement",
+      "normalized": "channel partner agreement",
+      "docTypeIds": [
+        "legal_reseller_distribution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find channel partner agreement with latest effective date",
+        "extract obligations from channel partner agreement"
+      ]
+    },
+    {
+      "phrase": "civil complaint",
+      "normalized": "civil complaint",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find civil complaint with latest effective date",
+        "extract obligations from civil complaint"
+      ]
+    },
+    {
+      "phrase": "code of conduct",
+      "normalized": "code of conduct",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find code of conduct with latest effective date",
+        "extract obligations from code of conduct"
+      ]
+    },
+    {
+      "phrase": "codigo de conduta",
+      "normalized": "codigo de conduta",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find codigo de conduta with latest effective date",
+        "extract obligations from codigo de conduta"
+      ]
+    },
+    {
+      "phrase": "código de conduta",
+      "normalized": "codigo de conduta",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find código de conduta with latest effective date",
+        "extract obligations from código de conduta"
+      ]
+    },
+    {
+      "phrase": "confidentiality agreement",
+      "normalized": "confidentiality agreement",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find confidentiality agreement with latest effective date",
+        "extract obligations from confidentiality agreement"
+      ]
+    },
+    {
+      "phrase": "consent in lieu of meeting",
+      "normalized": "consent in lieu of meeting",
+      "docTypeIds": [
+        "legal_written_consent"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find consent in lieu of meeting with latest effective date",
+        "extract obligations from consent in lieu of meeting"
+      ]
+    },
+    {
+      "phrase": "consentimento por escrito",
+      "normalized": "consentimento por escrito",
+      "docTypeIds": [
+        "legal_written_consent"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find consentimento por escrito with latest effective date",
+        "extract obligations from consentimento por escrito"
+      ]
+    },
+    {
+      "phrase": "consentimento sem reuniao",
+      "normalized": "consentimento sem reuniao",
+      "docTypeIds": [
+        "legal_written_consent"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find consentimento sem reuniao with latest effective date",
+        "extract obligations from consentimento sem reuniao"
+      ]
+    },
+    {
+      "phrase": "consultancy agreement",
+      "normalized": "consultancy agreement",
+      "docTypeIds": [
+        "legal_consulting_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find consultancy agreement with latest effective date",
+        "extract obligations from consultancy agreement"
+      ]
+    },
+    {
+      "phrase": "consulting agreement",
+      "normalized": "consulting agreement",
+      "docTypeIds": [
+        "legal_consulting_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find consulting agreement with latest effective date",
+        "extract obligations from consulting agreement"
+      ]
+    },
+    {
+      "phrase": "contractor agreement",
+      "normalized": "contractor agreement",
+      "docTypeIds": [
+        "legal_contractor_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find contractor agreement with latest effective date",
+        "extract obligations from contractor agreement"
+      ]
+    },
+    {
+      "phrase": "contrato consultivo",
+      "normalized": "contrato consultivo",
+      "docTypeIds": [
+        "legal_consulting_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato consultivo with latest effective date",
+        "extract obligations from contrato consultivo"
+      ]
+    },
+    {
+      "phrase": "contrato de autônomo",
+      "normalized": "contrato de autonomo",
+      "docTypeIds": [
+        "legal_contractor_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de autônomo with latest effective date",
+        "extract obligations from contrato de autônomo"
+      ]
+    },
+    {
+      "phrase": "contrato de autonomo",
+      "normalized": "contrato de autonomo",
+      "docTypeIds": [
+        "legal_contractor_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de autonomo with latest effective date",
+        "extract obligations from contrato de autonomo"
+      ]
+    },
+    {
+      "phrase": "contrato de consultoria",
+      "normalized": "contrato de consultoria",
+      "docTypeIds": [
+        "legal_consulting_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de consultoria with latest effective date",
+        "extract obligations from contrato de consultoria"
+      ]
+    },
+    {
+      "phrase": "contrato de distribuidor",
+      "normalized": "contrato de distribuidor",
+      "docTypeIds": [
+        "legal_reseller_distribution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de distribuidor with latest effective date",
+        "extract obligations from contrato de distribuidor"
+      ]
+    },
+    {
+      "phrase": "contrato de licenca",
+      "normalized": "contrato de licenca",
+      "docTypeIds": [
+        "legal_license_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de licenca with latest effective date",
+        "extract obligations from contrato de licenca"
+      ]
+    },
+    {
+      "phrase": "contrato de prestador",
+      "normalized": "contrato de prestador",
+      "docTypeIds": [
+        "legal_contractor_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de prestador with latest effective date",
+        "extract obligations from contrato de prestador"
+      ]
+    },
+    {
+      "phrase": "contrato de sociedade operacional",
+      "normalized": "contrato de sociedade operacional",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de sociedade operacional with latest effective date",
+        "extract obligations from contrato de sociedade operacional"
+      ]
+    },
+    {
+      "phrase": "contrato de trabalho",
+      "normalized": "contrato de trabalho",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato de trabalho with latest effective date",
+        "extract obligations from contrato de trabalho"
+      ]
+    },
+    {
+      "phrase": "contrato guarda-chuva de servicos",
+      "normalized": "contrato guarda chuva de servicos",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato guarda-chuva de servicos with latest effective date",
+        "extract obligations from contrato guarda-chuva de servicos"
+      ]
+    },
+    {
+      "phrase": "contrato mestre",
+      "normalized": "contrato mestre",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato mestre with latest effective date",
+        "extract obligations from contrato mestre"
+      ]
+    },
+    {
+      "phrase": "contrato social",
+      "normalized": "contrato social",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato social with latest effective date",
+        "extract obligations from contrato social"
+      ]
+    },
+    {
+      "phrase": "contrato trabalhista",
+      "normalized": "contrato trabalhista",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find contrato trabalhista with latest effective date",
+        "extract obligations from contrato trabalhista"
+      ]
+    },
+    {
+      "phrase": "cookie policy",
+      "normalized": "cookie policy",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find cookie policy with latest effective date",
+        "extract obligations from cookie policy"
+      ]
+    },
+    {
+      "phrase": "cookie settings policy",
+      "normalized": "cookie settings policy",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find cookie settings policy with latest effective date",
+        "extract obligations from cookie settings policy"
+      ]
+    },
+    {
+      "phrase": "cookies notice",
+      "normalized": "cookies notice",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find cookies notice with latest effective date",
+        "extract obligations from cookies notice"
+      ]
+    },
+    {
+      "phrase": "corporate charter",
+      "normalized": "corporate charter",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find corporate charter with latest effective date",
+        "extract obligations from corporate charter"
+      ]
+    },
+    {
+      "phrase": "corporate resolution",
+      "normalized": "corporate resolution",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find corporate resolution with latest effective date",
+        "extract obligations from corporate resolution"
+      ]
+    },
+    {
+      "phrase": "court order",
+      "normalized": "court order",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find court order with latest effective date",
+        "extract obligations from court order"
+      ]
+    },
+    {
+      "phrase": "data privacy notice",
+      "normalized": "data privacy notice",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find data privacy notice with latest effective date",
+        "extract obligations from data privacy notice"
+      ]
+    },
+    {
+      "phrase": "data processing addendum",
+      "normalized": "data processing addendum",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find data processing addendum with latest effective date",
+        "extract obligations from data processing addendum"
+      ]
+    },
+    {
+      "phrase": "data processing agreement",
+      "normalized": "data processing agreement",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find data processing agreement with latest effective date",
+        "extract obligations from data processing agreement"
+      ]
+    },
+    {
+      "phrase": "data retention policy",
+      "normalized": "data retention policy",
+      "docTypeIds": [
+        "legal_data_retention_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find data retention policy with latest effective date",
+        "extract obligations from data retention policy"
+      ]
+    },
+    {
+      "phrase": "decisao judicial",
+      "normalized": "decisao judicial",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find decisao judicial with latest effective date",
+        "extract obligations from decisao judicial"
+      ]
+    },
+    {
+      "phrase": "declaracao de trabalho",
+      "normalized": "declaracao de trabalho",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find declaracao de trabalho with latest effective date",
+        "extract obligations from declaracao de trabalho"
+      ]
+    },
+    {
+      "phrase": "distribution agreement",
+      "normalized": "distribution agreement",
+      "docTypeIds": [
+        "legal_reseller_distribution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find distribution agreement with latest effective date",
+        "extract obligations from distribution agreement"
+      ]
+    },
+    {
+      "phrase": "doc de escopo",
+      "normalized": "doc de escopo",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find doc de escopo with latest effective date",
+        "extract obligations from doc de escopo"
+      ]
+    },
+    {
+      "phrase": "doc de sigilo",
+      "normalized": "doc de sigilo",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find doc de sigilo with latest effective date",
+        "extract obligations from doc de sigilo"
+      ]
+    },
+    {
+      "phrase": "dpa",
+      "normalized": "dpa",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find dpa with latest effective date",
+        "extract obligations from dpa"
+      ]
+    },
+    {
+      "phrase": "employment agreement",
+      "normalized": "employment agreement",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find employment agreement with latest effective date",
+        "extract obligations from employment agreement"
+      ]
+    },
+    {
+      "phrase": "employment contract",
+      "normalized": "employment contract",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find employment contract with latest effective date",
+        "extract obligations from employment contract"
+      ]
+    },
+    {
+      "phrase": "employment offer",
+      "normalized": "employment offer",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find employment offer with latest effective date",
+        "extract obligations from employment offer"
+      ]
+    },
+    {
+      "phrase": "end user license agreement",
+      "normalized": "end user license agreement",
+      "docTypeIds": [
+        "legal_eula"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find end user license agreement with latest effective date",
+        "extract obligations from end user license agreement"
+      ]
+    },
+    {
+      "phrase": "end-user terms",
+      "normalized": "end user terms",
+      "docTypeIds": [
+        "legal_eula"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find end-user terms with latest effective date",
+        "extract obligations from end-user terms"
+      ]
+    },
+    {
+      "phrase": "escopo de trabalho",
+      "normalized": "escopo de trabalho",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find escopo de trabalho with latest effective date",
+        "extract obligations from escopo de trabalho"
+      ]
+    },
+    {
+      "phrase": "escopo do projeto",
+      "normalized": "escopo do projeto",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find escopo do projeto with latest effective date",
+        "extract obligations from escopo do projeto"
+      ]
+    },
+    {
+      "phrase": "estatuto social",
+      "normalized": "estatuto social",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find estatuto social with latest effective date",
+        "extract obligations from estatuto social"
+      ]
+    },
+    {
+      "phrase": "ethics policy",
+      "normalized": "ethics policy",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find ethics policy with latest effective date",
+        "extract obligations from ethics policy"
+      ]
+    },
+    {
+      "phrase": "eula",
+      "normalized": "eula",
+      "docTypeIds": [
+        "legal_eula"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find eula with latest effective date",
+        "extract obligations from eula"
+      ]
+    },
+    {
+      "phrase": "framework services agreement",
+      "normalized": "framework services agreement",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find framework services agreement with latest effective date",
+        "extract obligations from framework services agreement"
+      ]
+    },
+    {
+      "phrase": "freelancer contract",
+      "normalized": "freelancer contract",
+      "docTypeIds": [
+        "legal_contractor_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find freelancer contract with latest effective date",
+        "extract obligations from freelancer contract"
+      ]
+    },
+    {
+      "phrase": "hipaa business associate",
+      "normalized": "hipaa business associate",
+      "docTypeIds": [
+        "legal_baa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find hipaa business associate with latest effective date",
+        "extract obligations from hipaa business associate"
+      ]
+    },
+    {
+      "phrase": "independent contractor agreement",
+      "normalized": "independent contractor agreement",
+      "docTypeIds": [
+        "legal_contractor_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find independent contractor agreement with latest effective date",
+        "extract obligations from independent contractor agreement"
+      ]
+    },
+    {
+      "phrase": "information security policy",
+      "normalized": "information security policy",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find information security policy with latest effective date",
+        "extract obligations from information security policy"
+      ]
+    },
+    {
+      "phrase": "infosec policy",
+      "normalized": "infosec policy",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find infosec policy with latest effective date",
+        "extract obligations from infosec policy"
+      ]
+    },
+    {
+      "phrase": "invention assignment",
+      "normalized": "invention assignment",
+      "docTypeIds": [
+        "legal_ip_assignment"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find invention assignment with latest effective date",
+        "extract obligations from invention assignment"
+      ]
+    },
+    {
+      "phrase": "ip assignment",
+      "normalized": "ip assignment",
+      "docTypeIds": [
+        "legal_ip_assignment"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find ip assignment with latest effective date",
+        "extract obligations from ip assignment"
+      ]
+    },
+    {
+      "phrase": "ip assignment agreement",
+      "normalized": "ip assignment agreement",
+      "docTypeIds": [
+        "legal_ip_assignment"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find ip assignment agreement with latest effective date",
+        "extract obligations from ip assignment agreement"
+      ]
+    },
+    {
+      "phrase": "job offer letter",
+      "normalized": "job offer letter",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find job offer letter with latest effective date",
+        "extract obligations from job offer letter"
+      ]
+    },
+    {
+      "phrase": "joint venture agreement",
+      "normalized": "joint venture agreement",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find joint venture agreement with latest effective date",
+        "extract obligations from joint venture agreement"
+      ]
+    },
+    {
+      "phrase": "judicial order",
+      "normalized": "judicial order",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find judicial order with latest effective date",
+        "extract obligations from judicial order"
+      ]
+    },
+    {
+      "phrase": "jv agreement",
+      "normalized": "jv agreement",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find jv agreement with latest effective date",
+        "extract obligations from jv agreement"
+      ]
+    },
+    {
+      "phrase": "labor agreement",
+      "normalized": "labor agreement",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find labor agreement with latest effective date",
+        "extract obligations from labor agreement"
+      ]
+    },
+    {
+      "phrase": "legal brief",
+      "normalized": "legal brief",
+      "docTypeIds": [
+        "legal_motion_brief"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find legal brief with latest effective date",
+        "extract obligations from legal brief"
+      ]
+    },
+    {
+      "phrase": "legal complaint",
+      "normalized": "legal complaint",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find legal complaint with latest effective date",
+        "extract obligations from legal complaint"
+      ]
+    },
+    {
+      "phrase": "licenca de usuario final",
+      "normalized": "licenca de usuario final",
+      "docTypeIds": [
+        "legal_eula"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find licenca de usuario final with latest effective date",
+        "extract obligations from licenca de usuario final"
+      ]
+    },
+    {
+      "phrase": "license agreement",
+      "normalized": "license agreement",
+      "docTypeIds": [
+        "legal_license_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find license agreement with latest effective date",
+        "extract obligations from license agreement"
+      ]
+    },
+    {
+      "phrase": "licensing agreement",
+      "normalized": "licensing agreement",
+      "docTypeIds": [
+        "legal_license_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find licensing agreement with latest effective date",
+        "extract obligations from licensing agreement"
+      ]
+    },
+    {
+      "phrase": "main services contract",
+      "normalized": "main services contract",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find main services contract with latest effective date",
+        "extract obligations from main services contract"
+      ]
+    },
+    {
+      "phrase": "mandado judicial",
+      "normalized": "mandado judicial",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find mandado judicial with latest effective date",
+        "extract obligations from mandado judicial"
+      ]
+    },
+    {
+      "phrase": "manifestacao processual",
+      "normalized": "manifestacao processual",
+      "docTypeIds": [
+        "legal_motion_brief"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find manifestacao processual with latest effective date",
+        "extract obligations from manifestacao processual"
+      ]
+    },
+    {
+      "phrase": "master service agreement",
+      "normalized": "master service agreement",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find master service agreement with latest effective date",
+        "extract obligations from master service agreement"
+      ]
+    },
+    {
+      "phrase": "master services agreement",
+      "normalized": "master services agreement",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find master services agreement with latest effective date",
+        "extract obligations from master services agreement"
+      ]
+    },
+    {
+      "phrase": "meeting minutes",
+      "normalized": "meeting minutes",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find meeting minutes with latest effective date",
+        "extract obligations from meeting minutes"
+      ]
+    },
+    {
+      "phrase": "memorandum of law",
+      "normalized": "memorandum of law",
+      "docTypeIds": [
+        "legal_motion_brief"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find memorandum of law with latest effective date",
+        "extract obligations from memorandum of law"
+      ]
+    },
+    {
+      "phrase": "memorial juridico",
+      "normalized": "memorial juridico",
+      "docTypeIds": [
+        "legal_motion_brief"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find memorial juridico with latest effective date",
+        "extract obligations from memorial juridico"
+      ]
+    },
+    {
+      "phrase": "minuta de reuniao",
+      "normalized": "minuta de reuniao",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find minuta de reuniao with latest effective date",
+        "extract obligations from minuta de reuniao"
+      ]
+    },
+    {
+      "phrase": "minutes of meeting",
+      "normalized": "minutes of meeting",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find minutes of meeting with latest effective date",
+        "extract obligations from minutes of meeting"
+      ]
+    },
+    {
+      "phrase": "motion",
+      "normalized": "motion",
+      "docTypeIds": [
+        "legal_motion_brief"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find motion with latest effective date",
+        "extract obligations from motion"
+      ]
+    },
+    {
+      "phrase": "msa",
+      "normalized": "msa",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find msa with latest effective date",
+        "extract obligations from msa"
+      ]
+    },
+    {
+      "phrase": "mutual nda",
+      "normalized": "mutual nda",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find mutual nda with latest effective date",
+        "extract obligations from mutual nda"
+      ]
+    },
+    {
+      "phrase": "n d a",
+      "normalized": "n d a",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find n d a with latest effective date",
+        "extract obligations from n d a"
+      ]
+    },
+    {
+      "phrase": "nda",
+      "normalized": "nda",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find nda with latest effective date",
+        "extract obligations from nda"
+      ]
+    },
+    {
+      "phrase": "non disclosure agreement",
+      "normalized": "non disclosure agreement",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find non disclosure agreement with latest effective date",
+        "extract obligations from non disclosure agreement"
+      ]
+    },
+    {
+      "phrase": "non-disclosure agreement",
+      "normalized": "non disclosure agreement",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find non-disclosure agreement with latest effective date",
+        "extract obligations from non-disclosure agreement"
+      ]
+    },
+    {
+      "phrase": "offer letter",
+      "normalized": "offer letter",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find offer letter with latest effective date",
+        "extract obligations from offer letter"
+      ]
+    },
+    {
+      "phrase": "one way nda",
+      "normalized": "one way nda",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find one way nda with latest effective date",
+        "extract obligations from one way nda"
+      ]
+    },
+    {
+      "phrase": "ordem judicial",
+      "normalized": "ordem judicial",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find ordem judicial with latest effective date",
+        "extract obligations from ordem judicial"
+      ]
+    },
+    {
+      "phrase": "order of court",
+      "normalized": "order of court",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find order of court with latest effective date",
+        "extract obligations from order of court"
+      ]
+    },
+    {
+      "phrase": "papel de sigilo",
+      "normalized": "papel de sigilo",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find papel de sigilo with latest effective date",
+        "extract obligations from papel de sigilo"
+      ]
+    },
+    {
+      "phrase": "partnership agreement",
+      "normalized": "partnership agreement",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find partnership agreement with latest effective date",
+        "extract obligations from partnership agreement"
+      ]
+    },
+    {
+      "phrase": "peticao inicial",
+      "normalized": "peticao inicial",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find peticao inicial with latest effective date",
+        "extract obligations from peticao inicial"
+      ]
+    },
+    {
+      "phrase": "petição inicial",
+      "normalized": "peticao inicial",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find petição inicial with latest effective date",
+        "extract obligations from petição inicial"
+      ]
+    },
+    {
+      "phrase": "peticao intermediaria",
+      "normalized": "peticao intermediaria",
+      "docTypeIds": [
+        "legal_motion_brief"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find peticao intermediaria with latest effective date",
+        "extract obligations from peticao intermediaria"
+      ]
+    },
+    {
+      "phrase": "petition",
+      "normalized": "petition",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find petition with latest effective date",
+        "extract obligations from petition"
+      ]
+    },
+    {
+      "phrase": "politica de cookies",
+      "normalized": "politica de cookies",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de cookies with latest effective date",
+        "extract obligations from politica de cookies"
+      ]
+    },
+    {
+      "phrase": "politica de dados pessoais",
+      "normalized": "politica de dados pessoais",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de dados pessoais with latest effective date",
+        "extract obligations from politica de dados pessoais"
+      ]
+    },
+    {
+      "phrase": "politica de etica",
+      "normalized": "politica de etica",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de etica with latest effective date",
+        "extract obligations from politica de etica"
+      ]
+    },
+    {
+      "phrase": "politica de privacidade",
+      "normalized": "politica de privacidade",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de privacidade with latest effective date",
+        "extract obligations from politica de privacidade"
+      ]
+    },
+    {
+      "phrase": "politica de retencao de dados",
+      "normalized": "politica de retencao de dados",
+      "docTypeIds": [
+        "legal_data_retention_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de retencao de dados with latest effective date",
+        "extract obligations from politica de retencao de dados"
+      ]
+    },
+    {
+      "phrase": "politica de retenção de dados",
+      "normalized": "politica de retencao de dados",
+      "docTypeIds": [
+        "legal_data_retention_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de retenção de dados with latest effective date",
+        "extract obligations from politica de retenção de dados"
+      ]
+    },
+    {
+      "phrase": "politica de seguranca",
+      "normalized": "politica de seguranca",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de seguranca with latest effective date",
+        "extract obligations from politica de seguranca"
+      ]
+    },
+    {
+      "phrase": "política de segurança",
+      "normalized": "politica de seguranca",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find política de segurança with latest effective date",
+        "extract obligations from política de segurança"
+      ]
+    },
+    {
+      "phrase": "politica de seguranca da informacao",
+      "normalized": "politica de seguranca da informacao",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de seguranca da informacao with latest effective date",
+        "extract obligations from politica de seguranca da informacao"
+      ]
+    },
+    {
+      "phrase": "politica de sla",
+      "normalized": "politica de sla",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de sla with latest effective date",
+        "extract obligations from politica de sla"
+      ]
+    },
+    {
+      "phrase": "politica de uso aceitavel",
+      "normalized": "politica de uso aceitavel",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de uso aceitavel with latest effective date",
+        "extract obligations from politica de uso aceitavel"
+      ]
+    },
+    {
+      "phrase": "politica de uso adequado",
+      "normalized": "politica de uso adequado",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find politica de uso adequado with latest effective date",
+        "extract obligations from politica de uso adequado"
+      ]
+    },
+    {
+      "phrase": "preferencias de cookies",
+      "normalized": "preferencias de cookies",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find preferencias de cookies with latest effective date",
+        "extract obligations from preferencias de cookies"
+      ]
+    },
+    {
+      "phrase": "privacy notice",
+      "normalized": "privacy notice",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find privacy notice with latest effective date",
+        "extract obligations from privacy notice"
+      ]
+    },
+    {
+      "phrase": "privacy policy",
+      "normalized": "privacy policy",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find privacy policy with latest effective date",
+        "extract obligations from privacy policy"
+      ]
+    },
+    {
+      "phrase": "processor agreement",
+      "normalized": "processor agreement",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find processor agreement with latest effective date",
+        "extract obligations from processor agreement"
+      ]
+    },
+    {
+      "phrase": "proposta de contratacao",
+      "normalized": "proposta de contratacao",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find proposta de contratacao with latest effective date",
+        "extract obligations from proposta de contratacao"
+      ]
+    },
+    {
+      "phrase": "records retention policy",
+      "normalized": "records retention policy",
+      "docTypeIds": [
+        "legal_data_retention_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find records retention policy with latest effective date",
+        "extract obligations from records retention policy"
+      ]
+    },
+    {
+      "phrase": "regras de uso",
+      "normalized": "regras de uso",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find regras de uso with latest effective date",
+        "extract obligations from regras de uso"
+      ]
+    },
+    {
+      "phrase": "release agreement",
+      "normalized": "release agreement",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find release agreement with latest effective date",
+        "extract obligations from release agreement"
+      ]
+    },
+    {
+      "phrase": "reseller agreement",
+      "normalized": "reseller agreement",
+      "docTypeIds": [
+        "legal_reseller_distribution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find reseller agreement with latest effective date",
+        "extract obligations from reseller agreement"
+      ]
+    },
+    {
+      "phrase": "resolucao de conselho",
+      "normalized": "resolucao de conselho",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find resolucao de conselho with latest effective date",
+        "extract obligations from resolucao de conselho"
+      ]
+    },
+    {
+      "phrase": "resolução de conselho",
+      "normalized": "resolucao de conselho",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find resolução de conselho with latest effective date",
+        "extract obligations from resolução de conselho"
+      ]
+    },
+    {
+      "phrase": "resolucao societaria",
+      "normalized": "resolucao societaria",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find resolucao societaria with latest effective date",
+        "extract obligations from resolucao societaria"
+      ]
+    },
+    {
+      "phrase": "resolution of board",
+      "normalized": "resolution of board",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find resolution of board with latest effective date",
+        "extract obligations from resolution of board"
+      ]
+    },
+    {
+      "phrase": "retention schedule policy",
+      "normalized": "retention schedule policy",
+      "docTypeIds": [
+        "legal_data_retention_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find retention schedule policy with latest effective date",
+        "extract obligations from retention schedule policy"
+      ]
+    },
+    {
+      "phrase": "scope of work",
+      "normalized": "scope of work",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find scope of work with latest effective date",
+        "extract obligations from scope of work"
+      ]
+    },
+    {
+      "phrase": "security policy",
+      "normalized": "security policy",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find security policy with latest effective date",
+        "extract obligations from security policy"
+      ]
+    },
+    {
+      "phrase": "service level agreement",
+      "normalized": "service level agreement",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find service level agreement with latest effective date",
+        "extract obligations from service level agreement"
+      ]
+    },
+    {
+      "phrase": "service levels",
+      "normalized": "service levels",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find service levels with latest effective date",
+        "extract obligations from service levels"
+      ]
+    },
+    {
+      "phrase": "settlement agreement",
+      "normalized": "settlement agreement",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find settlement agreement with latest effective date",
+        "extract obligations from settlement agreement"
+      ]
+    },
+    {
+      "phrase": "settlement deed",
+      "normalized": "settlement deed",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find settlement deed with latest effective date",
+        "extract obligations from settlement deed"
+      ]
+    },
+    {
+      "phrase": "shareholder written consent",
+      "normalized": "shareholder written consent",
+      "docTypeIds": [
+        "legal_written_consent"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find shareholder written consent with latest effective date",
+        "extract obligations from shareholder written consent"
+      ]
+    },
+    {
+      "phrase": "sla",
+      "normalized": "sla",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find sla with latest effective date",
+        "extract obligations from sla"
+      ]
+    },
+    {
+      "phrase": "software license contract",
+      "normalized": "software license contract",
+      "docTypeIds": [
+        "legal_license_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find software license contract with latest effective date",
+        "extract obligations from software license contract"
+      ]
+    },
+    {
+      "phrase": "sow",
+      "normalized": "sow",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find sow with latest effective date",
+        "extract obligations from sow"
+      ]
+    },
+    {
+      "phrase": "statement of work",
+      "normalized": "statement of work",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find statement of work with latest effective date",
+        "extract obligations from statement of work"
+      ]
+    },
+    {
+      "phrase": "tabela de retencao",
+      "normalized": "tabela de retencao",
+      "docTypeIds": [
+        "legal_data_retention_policy"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find tabela de retencao with latest effective date",
+        "extract obligations from tabela de retencao"
+      ]
+    },
+    {
+      "phrase": "termo de acordo",
+      "normalized": "termo de acordo",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find termo de acordo with latest effective date",
+        "extract obligations from termo de acordo"
+      ]
+    },
+    {
+      "phrase": "termo de cessao de ip",
+      "normalized": "termo de cessao de ip",
+      "docTypeIds": [
+        "legal_ip_assignment"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find termo de cessao de ip with latest effective date",
+        "extract obligations from termo de cessao de ip"
+      ]
+    },
+    {
+      "phrase": "termo de confidencialidade",
+      "normalized": "termo de confidencialidade",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find termo de confidencialidade with latest effective date",
+        "extract obligations from termo de confidencialidade"
+      ]
+    },
+    {
+      "phrase": "termos de licenca do usuario",
+      "normalized": "termos de licenca do usuario",
+      "docTypeIds": [
+        "legal_eula"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find termos de licenca do usuario with latest effective date",
+        "extract obligations from termos de licenca do usuario"
+      ]
+    },
+    {
+      "phrase": "termos de servico",
+      "normalized": "termos de servico",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "terms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find termos de servico with latest effective date",
+        "extract obligations from termos de servico"
+      ]
+    },
+    {
+      "phrase": "termos de uso",
+      "normalized": "termos de uso",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "terms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find termos de uso with latest effective date",
+        "extract obligations from termos de uso"
+      ]
+    },
+    {
+      "phrase": "termos e condicoes",
+      "normalized": "termos e condicoes",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "terms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "find termos e condicoes with latest effective date",
+        "extract obligations from termos e condicoes"
+      ]
+    },
+    {
+      "phrase": "terms and conditions",
+      "normalized": "terms and conditions",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "terms",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find terms and conditions with latest effective date",
+        "extract obligations from terms and conditions"
+      ]
+    },
+    {
+      "phrase": "terms of service",
+      "normalized": "terms of service",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "terms",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find terms of service with latest effective date",
+        "extract obligations from terms of service"
+      ]
+    },
+    {
+      "phrase": "uptime agreement",
+      "normalized": "uptime agreement",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find uptime agreement with latest effective date",
+        "extract obligations from uptime agreement"
+      ]
+    },
+    {
+      "phrase": "user terms",
+      "normalized": "user terms",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "terms",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find user terms with latest effective date",
+        "extract obligations from user terms"
+      ]
+    },
+    {
+      "phrase": "work contract",
+      "normalized": "work contract",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find work contract with latest effective date",
+        "extract obligations from work contract"
+      ]
+    },
+    {
+      "phrase": "work statement",
+      "normalized": "work statement",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find work statement with latest effective date",
+        "extract obligations from work statement"
+      ]
+    },
+    {
+      "phrase": "written consent",
+      "normalized": "written consent",
+      "docTypeIds": [
+        "legal_written_consent"
+      ],
+      "hints": {
+        "periodHint": "effective_date_or_term",
+        "entityHint": "parties_obligations_dates",
+        "formatHint": "agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "find written consent with latest effective date",
+        "extract obligations from written consent"
+      ]
     }
   ]
 }

@@ -1,0 +1,188 @@
+{
+  "_meta": {
+    "id": "di_banking_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for banking domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "language": "pt"
+  },
+  "domain": "banking",
+  "terms": [
+    {
+      "id": "banking_lex_pt_saldo_conta",
+      "canonical": "saldo da conta",
+      "synonyms": [
+        "saldo disponivel",
+        "saldo contabil"
+      ],
+      "display": "Saldo da Conta"
+    },
+    {
+      "id": "banking_lex_pt_codigo_autorizacao",
+      "canonical": "codigo de autorizacao",
+      "synonyms": [
+        "codigo auth",
+        "codigo aprovacao"
+      ],
+      "display": "Codigo de Autorizacao"
+    },
+    {
+      "id": "banking_lex_pt_limite_cartao",
+      "canonical": "limite do cartao",
+      "synonyms": [
+        "limite de credito"
+      ],
+      "display": "Limite do Cartao"
+    },
+    {
+      "id": "banking_lex_pt_estorno",
+      "canonical": "estorno",
+      "synonyms": [
+        "reversao",
+        "chargeback"
+      ],
+      "display": "Estorno"
+    },
+    {
+      "id": "banking_lex_pt_saldo_final",
+      "canonical": "saldo final",
+      "synonyms": [
+        "saldo de encerramento"
+      ],
+      "display": "Saldo Final"
+    },
+    {
+      "id": "banking_lex_pt_debito",
+      "canonical": "debito",
+      "synonyms": [
+        "saida",
+        "lancamento a debito"
+      ],
+      "display": "Debito"
+    },
+    {
+      "id": "banking_lex_pt_deposito",
+      "canonical": "deposito",
+      "synonyms": [
+        "credito em conta"
+      ],
+      "display": "Deposito"
+    },
+    {
+      "id": "banking_lex_pt_parcela",
+      "canonical": "parcela",
+      "synonyms": [
+        "prestacao"
+      ],
+      "display": "Parcela"
+    },
+    {
+      "id": "banking_lex_pt_juros",
+      "canonical": "juros",
+      "synonyms": [
+        "encargo financeiro"
+      ],
+      "display": "Juros"
+    },
+    {
+      "id": "banking_lex_pt_principal",
+      "canonical": "principal",
+      "synonyms": [
+        "saldo principal"
+      ],
+      "display": "Principal"
+    },
+    {
+      "id": "banking_lex_pt_pagamento_minimo",
+      "canonical": "pagamento minimo",
+      "synonyms": [
+        "minimo da fatura"
+      ],
+      "display": "Pagamento Minimo"
+    },
+    {
+      "id": "banking_lex_pt_saldo_inicial",
+      "canonical": "saldo inicial",
+      "synonyms": [
+        "saldo de abertura"
+      ],
+      "display": "Saldo Inicial"
+    },
+    {
+      "id": "banking_lex_pt_cheque_especial",
+      "canonical": "cheque especial",
+      "synonyms": [
+        "saldo negativo"
+      ],
+      "display": "Cheque Especial"
+    },
+    {
+      "id": "banking_lex_pt_comprovante",
+      "canonical": "comprovante de pagamento",
+      "synonyms": [
+        "comprovante",
+        "recibo bancario"
+      ],
+      "display": "Comprovante de Pagamento"
+    },
+    {
+      "id": "banking_lex_pt_data_lancamento",
+      "canonical": "data de lancamento",
+      "synonyms": [
+        "data de postagem"
+      ],
+      "display": "Data de Lancamento"
+    },
+    {
+      "id": "banking_lex_pt_referencia",
+      "canonical": "numero de referencia",
+      "synonyms": [
+        "id da transacao",
+        "protocolo"
+      ],
+      "display": "Numero de Referencia"
+    },
+    {
+      "id": "banking_lex_pt_saldo_corrente",
+      "canonical": "saldo corrente",
+      "synonyms": [
+        "saldo progressivo"
+      ],
+      "display": "Saldo Corrente"
+    },
+    {
+      "id": "banking_lex_pt_periodo",
+      "canonical": "periodo do extrato",
+      "synonyms": [
+        "ciclo"
+      ],
+      "display": "Periodo do Extrato"
+    },
+    {
+      "id": "banking_lex_pt_transferencia",
+      "canonical": "transferencia",
+      "synonyms": [
+        "ted",
+        "pix",
+        "doc"
+      ],
+      "display": "Transferencia"
+    },
+    {
+      "id": "banking_lex_pt_data_valor",
+      "canonical": "data valor",
+      "synonyms": [
+        "data efetiva",
+        "data liquidacao"
+      ],
+      "display": "Data Valor"
+    }
+  ]
+}

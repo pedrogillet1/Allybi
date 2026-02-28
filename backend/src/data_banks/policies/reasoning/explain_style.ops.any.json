@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,6 +14,16 @@
   },
   "domain": "ops",
   "audienceStyles": [
+    {
+      "audience": "auditor",
+      "tone": "skeptical",
+      "defaultDepth": "detailed"
+    },
+    {
+      "audience": "executive",
+      "tone": "concise",
+      "defaultDepth": "executive_brief"
+    },
     {
       "audience": "expert",
       "tone": "precise",
@@ -23,11 +33,692 @@
       "audience": "general",
       "tone": "clear",
       "defaultDepth": "summary"
+    },
+    {
+      "audience": "manager",
+      "tone": "pragmatic",
+      "defaultDepth": "paragraph"
+    },
+    {
+      "audience": "operator",
+      "tone": "actionable",
+      "defaultDepth": "paragraph"
     }
   ],
   "depthLadder": [
+    "executive_brief",
+    "summary",
     "paragraph",
     "detailed",
-    "executive_brief"
+    "decision_memo",
+    "audit_trail"
+  ],
+  "templates": [
+    {
+      "id": "OPS_EXP_001",
+      "audience": "executive",
+      "depth": "executive_brief",
+      "language": "en",
+      "tone": "concise",
+      "structure": [
+        "answer",
+        "top_evidence",
+        "top_risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=executive; Depth=executive_brief; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_002",
+      "audience": "executive",
+      "depth": "summary",
+      "language": "pt",
+      "tone": "concise",
+      "structure": [
+        "answer",
+        "evidence",
+        "risks",
+        "uncertainty"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=executive; Profundidade=summary; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_003",
+      "audience": "executive",
+      "depth": "paragraph",
+      "language": "en",
+      "tone": "concise",
+      "structure": [
+        "answer",
+        "context",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 2,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=executive; Depth=paragraph; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_004",
+      "audience": "executive",
+      "depth": "detailed",
+      "language": "pt",
+      "tone": "concise",
+      "structure": [
+        "answer",
+        "context",
+        "options",
+        "tradeoffs",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 3,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=executive; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_005",
+      "audience": "expert",
+      "depth": "executive_brief",
+      "language": "en",
+      "tone": "precise",
+      "structure": [
+        "answer",
+        "top_evidence",
+        "top_risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=expert; Depth=executive_brief; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_006",
+      "audience": "expert",
+      "depth": "summary",
+      "language": "pt",
+      "tone": "precise",
+      "structure": [
+        "answer",
+        "evidence",
+        "risks",
+        "uncertainty"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=expert; Profundidade=summary; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_007",
+      "audience": "expert",
+      "depth": "paragraph",
+      "language": "en",
+      "tone": "precise",
+      "structure": [
+        "answer",
+        "context",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 2,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=expert; Depth=paragraph; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_008",
+      "audience": "expert",
+      "depth": "detailed",
+      "language": "pt",
+      "tone": "precise",
+      "structure": [
+        "answer",
+        "context",
+        "options",
+        "tradeoffs",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 3,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=expert; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_009",
+      "audience": "manager",
+      "depth": "executive_brief",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "top_evidence",
+        "top_risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=manager; Depth=executive_brief; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_010",
+      "audience": "manager",
+      "depth": "summary",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "evidence",
+        "risks",
+        "uncertainty"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=manager; Profundidade=summary; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_011",
+      "audience": "manager",
+      "depth": "paragraph",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 2,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=manager; Depth=paragraph; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_012",
+      "audience": "manager",
+      "depth": "detailed",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "options",
+        "tradeoffs",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 3,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=manager; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_013",
+      "audience": "operator",
+      "depth": "executive_brief",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "top_evidence",
+        "top_risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=operator; Depth=executive_brief; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_014",
+      "audience": "operator",
+      "depth": "summary",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "evidence",
+        "risks",
+        "uncertainty"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=operator; Profundidade=summary; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_015",
+      "audience": "operator",
+      "depth": "paragraph",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 2,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=operator; Depth=paragraph; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_016",
+      "audience": "operator",
+      "depth": "detailed",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "options",
+        "tradeoffs",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 3,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=operator; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_017",
+      "audience": "general",
+      "depth": "executive_brief",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "top_evidence",
+        "top_risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=general; Depth=executive_brief; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_018",
+      "audience": "general",
+      "depth": "summary",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "evidence",
+        "risks",
+        "uncertainty"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=general; Profundidade=summary; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_019",
+      "audience": "general",
+      "depth": "paragraph",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 2,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=general; Depth=paragraph; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_020",
+      "audience": "general",
+      "depth": "detailed",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "options",
+        "tradeoffs",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 3,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=general; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_021",
+      "audience": "auditor",
+      "depth": "executive_brief",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "top_evidence",
+        "top_risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=auditor; Depth=executive_brief; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_022",
+      "audience": "auditor",
+      "depth": "summary",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "evidence",
+        "risks",
+        "uncertainty"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 1,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=auditor; Profundidade=summary; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    },
+    {
+      "id": "OPS_EXP_023",
+      "audience": "auditor",
+      "depth": "paragraph",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "next_step"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 2,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "State confidence explicitly and separate facts from assumptions.",
+      "template": "Audience=auditor; Depth=paragraph; Provide evidence-bounded explanation with options, risks, and what changes my mind."
+    },
+    {
+      "id": "OPS_EXP_024",
+      "audience": "auditor",
+      "depth": "detailed",
+      "language": "pt",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "context",
+        "options",
+        "tradeoffs",
+        "evidence",
+        "risks",
+        "uncertainty",
+        "what_changes_my_mind"
+      ],
+      "evidenceConstraints": {
+        "minCitations": 3,
+        "maxClaimsWithoutEvidence": 0,
+        "requiredEvidenceTypes": [
+          "runbook",
+          "incident_history",
+          "kpi_dashboard"
+        ],
+        "forbidFabrication": true,
+        "requireConfidenceLabel": true
+      },
+      "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
+      "template": "Audiencia=auditor; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
+    }
   ]
 }

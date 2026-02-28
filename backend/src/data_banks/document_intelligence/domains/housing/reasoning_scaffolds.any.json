@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "id": "di_housing_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for housing analysis tasks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing"
+  },
+  "domain": "housing",
+  "scaffolds": [
+    {
+      "id": "housing_scaffold_001_identify_scope",
+      "name": "Identify Document Scope",
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "steps": [
+        "Locate document title/type and primary reference identifiers",
+        "Confirm issuer and recipient/traveler/student/employee/property context",
+        "Capture document period/date range boundaries",
+        "Map key sections likely to answer the user question",
+        "Return scoped extraction plan with citation anchors"
+      ]
+    },
+    {
+      "id": "housing_scaffold_002_extract_core",
+      "name": "Extract Core Fields",
+      "operators": [
+        "extract",
+        "summarize"
+      ],
+      "steps": [
+        "Extract key entities from header and summary sections",
+        "Extract line-item or event details from tabular sections",
+        "Normalize dates, currency, and identifiers",
+        "Validate required field presence for the detected doc type",
+        "Present concise structured output with missing fields flagged"
+      ]
+    },
+    {
+      "id": "housing_scaffold_003_reconcile",
+      "name": "Reconcile Numeric and Date Logic",
+      "operators": [
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "steps": [
+        "Compute subtotal/tax/fee/credit/debit relationships where applicable",
+        "Check chronological consistency across all extracted dates",
+        "Validate status fields against computed balances or timelines",
+        "Record mismatches with exact source evidence",
+        "Return pass/fail checks with confidence and next checks"
+      ]
+    },
+    {
+      "id": "housing_scaffold_004_advise",
+      "name": "Evidence-Based Guidance",
+      "operators": [
+        "evaluate",
+        "advise"
+      ],
+      "steps": [
+        "Restate user goal and relevant constraints from the document",
+        "Identify decisions or actions supported by evidence",
+        "Highlight policy/terms that limit interpretation",
+        "List unresolved data gaps and required supporting docs",
+        "Provide neutral next steps without inventing policy"
+      ]
+    }
+  ]
+}

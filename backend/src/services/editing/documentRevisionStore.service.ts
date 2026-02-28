@@ -970,6 +970,31 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
               buf = await this.docxEditor.updateTableOfContents(buf);
               break;
             }
+            // --- Page / section break operations ---
+            case "docx_page_break": {
+              if (!pid) continue;
+              const position = String((p as any).position || "before")
+                .trim()
+                .toLowerCase() as "before" | "after";
+              buf = await this.docxEditor.insertPageBreak(
+                buf,
+                pid,
+                position === "after" ? "after" : "before",
+              );
+              break;
+            }
+            case "docx_section_break": {
+              if (!pid) continue;
+              const breakType = String(
+                (p as any).breakType || "nextPage",
+              ).trim() as "nextPage" | "continuous";
+              buf = await this.docxEditor.insertSectionBreak(
+                buf,
+                pid,
+                breakType === "continuous" ? "continuous" : "nextPage",
+              );
+              break;
+            }
             // --- Section operations ---
             case "docx_delete_section": {
               const headingPid = String(

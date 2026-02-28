@@ -1,0 +1,613 @@
+{
+  "_meta": {
+    "id": "di_tax_lexicon_en",
+    "version": "1.0.0",
+    "description": "English lexicon for tax domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "language": "en"
+  },
+  "domain": "tax",
+  "terms": [
+    {
+      "id": "tax_lex_adjusted_gross_income",
+      "canonical": "adjusted gross income",
+      "synonyms": [
+        "agi",
+        "gross income adjusted"
+      ],
+      "display": "Adjusted Gross Income"
+    },
+    {
+      "id": "tax_lex_advance_tax",
+      "canonical": "advance tax payment",
+      "synonyms": [
+        "estimated tax",
+        "prepayment"
+      ],
+      "display": "Advance Tax Payment"
+    },
+    {
+      "id": "tax_lex_assessment",
+      "canonical": "tax assessment",
+      "synonyms": [
+        "assessment notice",
+        "tax determination"
+      ],
+      "display": "Tax Assessment"
+    },
+    {
+      "id": "tax_lex_assessment_year",
+      "canonical": "assessment year",
+      "synonyms": [
+        "tax year under assessment",
+        "fiscal year assessed"
+      ],
+      "display": "Assessment Year"
+    },
+    {
+      "id": "tax_lex_audit_flag",
+      "canonical": "audit flag",
+      "synonyms": [
+        "review flag",
+        "audit indicator"
+      ],
+      "display": "Audit Flag"
+    },
+    {
+      "id": "tax_lex_balance_due",
+      "canonical": "balance due",
+      "synonyms": [
+        "amount due",
+        "tax due"
+      ],
+      "display": "Balance Due"
+    },
+    {
+      "id": "tax_lex_capital_gain",
+      "canonical": "capital gain",
+      "synonyms": [
+        "gain on sale",
+        "asset gain"
+      ],
+      "display": "Capital Gain"
+    },
+    {
+      "id": "tax_lex_carryforward",
+      "canonical": "carryforward",
+      "synonyms": [
+        "loss carryforward",
+        "credit carryforward"
+      ],
+      "display": "Carryforward"
+    },
+    {
+      "id": "tax_lex_credit",
+      "canonical": "tax credit",
+      "synonyms": [
+        "credit",
+        "rebate credit"
+      ],
+      "display": "Tax Credit"
+    },
+    {
+      "id": "tax_lex_declaration",
+      "canonical": "tax declaration",
+      "synonyms": [
+        "return declaration",
+        "declaration form"
+      ],
+      "display": "Tax Declaration"
+    },
+    {
+      "id": "tax_lex_deduction",
+      "canonical": "tax deduction",
+      "synonyms": [
+        "deductible amount",
+        "allowable deduction"
+      ],
+      "display": "Tax Deduction"
+    },
+    {
+      "id": "tax_lex_dependent",
+      "canonical": "dependent",
+      "synonyms": [
+        "tax dependent",
+        "household dependent"
+      ],
+      "display": "Dependent"
+    },
+    {
+      "id": "tax_lex_digital_signature",
+      "canonical": "digital signature",
+      "synonyms": [
+        "e-signature",
+        "electronic signature"
+      ],
+      "display": "Digital Signature"
+    },
+    {
+      "id": "tax_lex_document_reference",
+      "canonical": "document reference",
+      "synonyms": [
+        "reference number",
+        "protocol"
+      ],
+      "display": "Document Reference"
+    },
+    {
+      "id": "tax_lex_effective_rate",
+      "canonical": "effective tax rate",
+      "synonyms": [
+        "etr",
+        "effective rate"
+      ],
+      "display": "Effective Tax Rate"
+    },
+    {
+      "id": "tax_lex_employer_withholding",
+      "canonical": "employer withholding",
+      "synonyms": [
+        "payroll withholding",
+        "withholding at source"
+      ],
+      "display": "Employer Withholding"
+    },
+    {
+      "id": "tax_lex_estimated_tax",
+      "canonical": "estimated tax",
+      "synonyms": [
+        "quarterly estimate",
+        "advance estimate"
+      ],
+      "display": "Estimated Tax"
+    },
+    {
+      "id": "tax_lex_filing_date",
+      "canonical": "filing date",
+      "synonyms": [
+        "submission date",
+        "return date"
+      ],
+      "display": "Filing Date"
+    },
+    {
+      "id": "tax_lex_filing_status",
+      "canonical": "filing status",
+      "synonyms": [
+        "status",
+        "return status"
+      ],
+      "display": "Filing Status"
+    },
+    {
+      "id": "tax_lex_gross_income",
+      "canonical": "gross income",
+      "synonyms": [
+        "total income",
+        "income before deductions"
+      ],
+      "display": "Gross Income"
+    },
+    {
+      "id": "tax_lex_income_tax",
+      "canonical": "income tax",
+      "synonyms": [
+        "personal income tax",
+        "federal income tax"
+      ],
+      "display": "Income Tax"
+    },
+    {
+      "id": "tax_lex_installment",
+      "canonical": "installment payment",
+      "synonyms": [
+        "tax installment",
+        "split payment"
+      ],
+      "display": "Installment Payment"
+    },
+    {
+      "id": "tax_lex_interest",
+      "canonical": "interest charge",
+      "synonyms": [
+        "late interest",
+        "interest penalty"
+      ],
+      "display": "Interest Charge"
+    },
+    {
+      "id": "tax_lex_itemized_deduction",
+      "canonical": "itemized deduction",
+      "synonyms": [
+        "itemized expenses",
+        "specific deductions"
+      ],
+      "display": "Itemized Deduction"
+    },
+    {
+      "id": "tax_lex_jurisdiction",
+      "canonical": "tax jurisdiction",
+      "synonyms": [
+        "tax authority",
+        "tax office"
+      ],
+      "display": "Tax Jurisdiction"
+    },
+    {
+      "id": "tax_lex_late_fee",
+      "canonical": "late fee",
+      "synonyms": [
+        "delay fee",
+        "late filing fee"
+      ],
+      "display": "Late Fee"
+    },
+    {
+      "id": "tax_lex_liability",
+      "canonical": "tax liability",
+      "synonyms": [
+        "owed tax",
+        "liability amount"
+      ],
+      "display": "Tax Liability"
+    },
+    {
+      "id": "tax_lex_notice",
+      "canonical": "tax notice",
+      "synonyms": [
+        "notice letter",
+        "official notice"
+      ],
+      "display": "Tax Notice"
+    },
+    {
+      "id": "tax_lex_notice_date",
+      "canonical": "notice date",
+      "synonyms": [
+        "notification date",
+        "issued date"
+      ],
+      "display": "Notice Date"
+    },
+    {
+      "id": "tax_lex_objection",
+      "canonical": "objection filing",
+      "synonyms": [
+        "appeal filing",
+        "contest filing"
+      ],
+      "display": "Objection Filing"
+    },
+    {
+      "id": "tax_lex_paid_amount",
+      "canonical": "paid amount",
+      "synonyms": [
+        "amount paid",
+        "paid tax"
+      ],
+      "display": "Paid Amount"
+    },
+    {
+      "id": "tax_lex_payment_channel",
+      "canonical": "payment channel",
+      "synonyms": [
+        "payment method",
+        "collection channel"
+      ],
+      "display": "Payment Channel"
+    },
+    {
+      "id": "tax_lex_payment_deadline",
+      "canonical": "payment deadline",
+      "synonyms": [
+        "due date",
+        "payment due"
+      ],
+      "display": "Payment Deadline"
+    },
+    {
+      "id": "tax_lex_payment_reference",
+      "canonical": "payment reference",
+      "synonyms": [
+        "payment code",
+        "reference id"
+      ],
+      "display": "Payment Reference"
+    },
+    {
+      "id": "tax_lex_payment_slip",
+      "canonical": "payment slip",
+      "synonyms": [
+        "payment voucher",
+        "tax slip"
+      ],
+      "display": "Payment Slip"
+    },
+    {
+      "id": "tax_lex_penalty",
+      "canonical": "penalty",
+      "synonyms": [
+        "fine",
+        "penalty charge"
+      ],
+      "display": "Penalty"
+    },
+    {
+      "id": "tax_lex_period",
+      "canonical": "tax period",
+      "synonyms": [
+        "assessment period",
+        "fiscal period"
+      ],
+      "display": "Tax Period"
+    },
+    {
+      "id": "tax_lex_property_assessment",
+      "canonical": "property assessment value",
+      "synonyms": [
+        "assessed value",
+        "valuation"
+      ],
+      "display": "Property Assessment Value"
+    },
+    {
+      "id": "tax_lex_property_tax",
+      "canonical": "property tax",
+      "synonyms": [
+        "real estate tax",
+        "municipal tax"
+      ],
+      "display": "Property Tax"
+    },
+    {
+      "id": "tax_lex_property_tax_bill",
+      "canonical": "property tax bill",
+      "synonyms": [
+        "property tax invoice",
+        "assessment bill"
+      ],
+      "display": "Property Tax Bill"
+    },
+    {
+      "id": "tax_lex_receipt_number",
+      "canonical": "receipt number",
+      "synonyms": [
+        "transaction receipt",
+        "payment receipt"
+      ],
+      "display": "Receipt Number"
+    },
+    {
+      "id": "tax_lex_refund",
+      "canonical": "tax refund",
+      "synonyms": [
+        "refund amount",
+        "tax rebate"
+      ],
+      "display": "Tax Refund"
+    },
+    {
+      "id": "tax_lex_residency_status",
+      "canonical": "residency status",
+      "synonyms": [
+        "resident status",
+        "tax residency"
+      ],
+      "display": "Residency Status"
+    },
+    {
+      "id": "tax_lex_return_copy",
+      "canonical": "return copy",
+      "synonyms": [
+        "filed return copy",
+        "submitted return"
+      ],
+      "display": "Return Copy"
+    },
+    {
+      "id": "tax_lex_return_type",
+      "canonical": "return type",
+      "synonyms": [
+        "tax form type",
+        "declaration type"
+      ],
+      "display": "Return Type"
+    },
+    {
+      "id": "tax_lex_self_employment_tax",
+      "canonical": "self-employment tax",
+      "synonyms": [
+        "independent tax",
+        "self employed contribution"
+      ],
+      "display": "Self-Employment Tax"
+    },
+    {
+      "id": "tax_lex_social_contribution",
+      "canonical": "social contribution",
+      "synonyms": [
+        "social tax",
+        "contribution levy"
+      ],
+      "display": "Social Contribution"
+    },
+    {
+      "id": "tax_lex_standard_deduction",
+      "canonical": "standard deduction",
+      "synonyms": [
+        "default deduction",
+        "fixed deduction"
+      ],
+      "display": "Standard Deduction"
+    },
+    {
+      "id": "tax_lex_state_tax",
+      "canonical": "state tax",
+      "synonyms": [
+        "regional tax",
+        "state levy"
+      ],
+      "display": "State Tax"
+    },
+    {
+      "id": "tax_lex_surcharge",
+      "canonical": "surcharge",
+      "synonyms": [
+        "additional levy",
+        "supplemental tax"
+      ],
+      "display": "Surcharge"
+    },
+    {
+      "id": "tax_lex_tax_base",
+      "canonical": "tax base",
+      "synonyms": [
+        "taxable base",
+        "assessment base"
+      ],
+      "display": "Tax Base"
+    },
+    {
+      "id": "tax_lex_tax_code",
+      "canonical": "tax code",
+      "synonyms": [
+        "tax article",
+        "legal basis"
+      ],
+      "display": "Tax Code"
+    },
+    {
+      "id": "tax_lex_tax_credit_limit",
+      "canonical": "tax credit limit",
+      "synonyms": [
+        "credit cap",
+        "credit ceiling"
+      ],
+      "display": "Tax Credit Limit"
+    },
+    {
+      "id": "tax_lex_tax_form",
+      "canonical": "tax form",
+      "synonyms": [
+        "return form",
+        "declaration form"
+      ],
+      "display": "Tax Form"
+    },
+    {
+      "id": "tax_lex_tax_id",
+      "canonical": "taxpayer identification number",
+      "synonyms": [
+        "tin",
+        "tax id"
+      ],
+      "display": "Taxpayer ID"
+    },
+    {
+      "id": "tax_lex_tax_office",
+      "canonical": "tax office",
+      "synonyms": [
+        "revenue office",
+        "authority office"
+      ],
+      "display": "Tax Office"
+    },
+    {
+      "id": "tax_lex_taxable_income",
+      "canonical": "taxable income",
+      "synonyms": [
+        "income subject to tax",
+        "assessable income"
+      ],
+      "display": "Taxable Income"
+    },
+    {
+      "id": "tax_lex_taxpayer",
+      "canonical": "taxpayer",
+      "synonyms": [
+        "declarant",
+        "filer"
+      ],
+      "display": "Taxpayer"
+    },
+    {
+      "id": "tax_lex_taxpayer_address",
+      "canonical": "taxpayer address",
+      "synonyms": [
+        "registered address",
+        "mailing address"
+      ],
+      "display": "Taxpayer Address"
+    },
+    {
+      "id": "tax_lex_taxpayer_name",
+      "canonical": "taxpayer name",
+      "synonyms": [
+        "filer name",
+        "declarant name"
+      ],
+      "display": "Taxpayer Name"
+    },
+    {
+      "id": "tax_lex_taxpayer_signature",
+      "canonical": "taxpayer signature",
+      "synonyms": [
+        "filer signature",
+        "declarant signature"
+      ],
+      "display": "Taxpayer Signature"
+    },
+    {
+      "id": "tax_lex_third_party_withholding",
+      "canonical": "third party withholding",
+      "synonyms": [
+        "withheld by payer",
+        "source withholding"
+      ],
+      "display": "Third-Party Withholding"
+    },
+    {
+      "id": "tax_lex_underpayment",
+      "canonical": "underpayment",
+      "synonyms": [
+        "short payment",
+        "insufficient payment"
+      ],
+      "display": "Underpayment"
+    },
+    {
+      "id": "tax_lex_valuation_date",
+      "canonical": "valuation date",
+      "synonyms": [
+        "assessment date",
+        "valuation cutoff"
+      ],
+      "display": "Valuation Date"
+    },
+    {
+      "id": "tax_lex_withholding",
+      "canonical": "withholding",
+      "synonyms": [
+        "retained tax",
+        "tax withheld"
+      ],
+      "display": "Withholding"
+    },
+    {
+      "id": "tax_lex_year_to_date_tax",
+      "canonical": "year to date tax",
+      "synonyms": [
+        "ytd tax",
+        "accumulated tax"
+      ],
+      "display": "Year-to-Date Tax"
+    }
+  ]
+}

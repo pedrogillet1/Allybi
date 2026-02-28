@@ -3,7 +3,10 @@ import { logger } from "../../utils/logger";
 import crypto from "crypto";
 import { DiffBuilderService } from "./diffBuilder.service";
 import { EditPlanService } from "./editPlan.service";
-import { EditReceiptService } from "./editReceipt.service";
+import {
+  EditReceiptService,
+  buildTemplateContext,
+} from "./editReceipt.service";
 import { RationaleBuilderService } from "./rationaleBuilder.service";
 import { ApplyVerificationService } from "./apply/applyVerification.service";
 import { EditingPolicyService } from "./policy/EditingPolicyService";
@@ -103,6 +106,7 @@ export class EditOrchestratorService {
     ctx: EditExecutionContext,
     request: EditPlanRequest,
   ): Promise<EditPlanResult> {
+    const t0 = Date.now();
     const result = this.planService.plan(request);
     if (!result.ok) {
       await this.track("edit_failed", ctx, {
@@ -110,6 +114,7 @@ export class EditOrchestratorService {
         operator: request.operator,
         documentId: request.documentId,
         error: result.error || "Plan failed",
+        plan_ms: Date.now() - t0,
       });
       return result;
     }
@@ -120,6 +125,7 @@ export class EditOrchestratorService {
       missingRequiredEntities:
         result.plan?.missingRequiredEntities?.length || 0,
       checks: result.plan?.diagnostics.checks || [],
+      plan_ms: Date.now() - t0,
     });
     return result;
   }
@@ -128,6 +134,7 @@ export class EditOrchestratorService {
     ctx: EditExecutionContext,
     request: EditPreviewRequest,
   ): Promise<EditPreviewResult> {
+    const t0Preview = Date.now();
     try {
       const sim = similarity(request.beforeText, request.proposedText);
       const preserveTokens =
@@ -182,7 +189,9 @@ export class EditOrchestratorService {
         documentId: request.plan.documentId,
         targetId: request.target.id,
         operator: request.plan.operator,
+        canonicalOperator: request.plan.canonicalOperator,
         domain: request.plan.domain,
+        templateContext: buildTemplateContext(request.plan),
         // UI requirement: do not show internal policy reasons like "similarity below threshold"
         // in the user-facing assistant message. The preview card already indicates review/apply.
         note: undefined,
@@ -197,6 +206,7 @@ export class EditOrchestratorService {
         similarity: sim,
         preservePass,
         requiresConfirmation,
+        preview_ms: Date.now() - t0Preview,
       });
 
       return {
@@ -247,6 +257,7 @@ export class EditOrchestratorService {
         error: "Revision store is not configured.",
       };
     }
+    const t0Apply = Date.now();
 
     const operatorContract = getRuntimeOperatorContract(request.plan.operator);
     if (!operatorContract || operatorContract.domain !== request.plan.domain) {
@@ -280,8 +291,10 @@ export class EditOrchestratorService {
           documentId: request.plan.documentId,
           targetId: request.target.id,
           operator: request.plan.operator,
+          canonicalOperator: request.plan.canonicalOperator,
           domain: request.plan.domain,
-          note: "User confirmation required before committing revision.",
+          templateContext: buildTemplateContext(request.plan),
+          note: undefined,
         }),
       };
     }
@@ -335,6 +348,7 @@ export class EditOrchestratorService {
         targetId: request.target.id,
         revisionId: created.revisionId,
         trustLevel: request.trustLevel || ctx.trustLevel || "normal_user",
+        apply_ms: Date.now() - t0Apply,
       });
 
       const hash = (value: string): string =>
@@ -557,8 +571,10 @@ export class EditOrchestratorService {
             documentId: request.plan.documentId,
             targetId: request.target.id,
             operator: request.plan.operator,
+            canonicalOperator: request.plan.canonicalOperator,
             domain: request.plan.domain,
-            note: "EDIT_NOOP_NO_CHANGES",
+            templateContext: buildTemplateContext(request.plan),
+            note: undefined,
           }),
           proof,
           blockedReason: {
@@ -594,7 +610,9 @@ export class EditOrchestratorService {
           documentId: created.revisionId,
           targetId: request.target.id,
           operator: request.plan.operator,
+          canonicalOperator: request.plan.canonicalOperator,
           domain: request.plan.domain,
+          templateContext: buildTemplateContext(request.plan),
         }),
       };
       // Contract validation (fail-closed for deploy-grade correctness)
@@ -660,8 +678,10 @@ export class EditOrchestratorService {
             documentId: request.plan.documentId,
             targetId: request.target.id,
             operator: request.plan.operator,
+            canonicalOperator: request.plan.canonicalOperator,
             domain: request.plan.domain,
-            note: "EDIT_NOOP_NO_CHANGES",
+            templateContext: buildTemplateContext(request.plan),
+            note: undefined,
           }),
           blockedReason: {
             code: "EDIT_NOOP_NO_CHANGES",
@@ -855,10 +875,9 @@ export class EditOrchestratorService {
         verifiedBitwise: restored.verifiedBitwise,
         verificationReason: restored.verificationReason,
         receipt: this.receiptBuilder.build({
-          stage: "applied",
+          stage: "undo",
           language: ctx.language || "en",
           documentId: restored.restoredRevisionId,
-          note: "Revision restored successfully.",
         }),
       };
     } catch (error) {

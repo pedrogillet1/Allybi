@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "di_billing_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer policy for billing responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing"
+  },
+  "domain": "billing",
+  "disclaimers": [
+    {
+      "id": "billing_disc_001_not_legal_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This output summarizes document content and is not legal, financial, or tax advice.",
+        "pt": "Esta saida resume o conteudo do documento e nao constitui orientacao juridica, financeira ou tributaria."
+      }
+    },
+    {
+      "id": "billing_disc_002_document_scope",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Amounts and dates reflect the uploaded document and may not represent current account status.",
+        "pt": "Valores e datas refletem o documento enviado e podem nao representar o status atual da conta."
+      }
+    },
+    {
+      "id": "billing_disc_003_dispute_process",
+      "trigger": "analysis_involves_dispute",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "For formal disputes, confirm required procedures with the issuer or regulator.",
+        "pt": "Para contestacoes formais, confirme os procedimentos exigidos com o emissor ou regulador."
+      }
+    }
+  ]
+}

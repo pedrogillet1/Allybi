@@ -1,0 +1,126 @@
+{
+  "_meta": {
+    "id": "di_insurance_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer styling rules for insurance domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance"
+  },
+  "domain": "insurance",
+  "audienceProfiles": [
+    {
+      "id": "member",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "low"
+    },
+    {
+      "id": "claims_specialist",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "underwriter",
+      "tone": "analytical",
+      "defaultDepth": "decision_memo",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "auditor",
+      "tone": "skeptical",
+      "defaultDepth": "audit_trail",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "ins_style_001_amount_split",
+      "rule": "Always separate billed, allowed, paid, and member-responsibility amounts.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "summarize"
+      ]
+    },
+    {
+      "id": "ins_style_002_status_labels",
+      "rule": "Use explicit claim status labels: submitted, in review, approved, denied, partial.",
+      "applies": [
+        "extract",
+        "summarize",
+        "monitor"
+      ]
+    },
+    {
+      "id": "ins_style_003_policy_context",
+      "rule": "Always include policy number (masked), coverage period, and issuer for policy claims.",
+      "applies": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "ins_style_004_denial_context",
+      "rule": "Denial statements must include reason code/text and appeal window if present.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "ins_style_005_uncertainty_marker",
+      "rule": "Do not infer missing claim or policy data; mark as unverified.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "advise",
+        "summarize"
+      ]
+    },
+    {
+      "id": "ins_style_006_scope_lock",
+      "rule": "Keep attached-document scope lock explicit.",
+      "applies": [
+        "all"
+      ]
+    },
+    {
+      "id": "ins_style_007_mask_identifiers",
+      "rule": "Mask member ids, policy numbers, and personal identifiers by default.",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,522 @@
+{
+  "_meta": {
+    "id": "medical_med_discharge_summary_tables",
+    "version": "2.0.0",
+    "description": "Expected table signatures for Discharge Summary.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_discharge_summary"
+  },
+  "tables": [
+    {
+      "id": "med_discharge_summary_vitals_trend_table",
+      "name": {
+        "en": "Discharge Summary Vitals Trend Table",
+        "pt": "Resumo de Alta Vitals Trend Table"
+      },
+      "section": "document_header",
+      "expectedColumns": [
+        "timestamp",
+        "heart_rate_bpm",
+        "bp_mmHg",
+        "temp_c",
+        "spo2_percent"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "timestamp": [
+          "timestamp",
+          "timestamp",
+          "timestamp_value"
+        ],
+        "heart_rate_bpm": [
+          "heart_rate_bpm",
+          "heart rate bpm",
+          "heart_rate_bpm_value"
+        ],
+        "bp_mmHg": [
+          "bp_mmHg",
+          "bp mmHg",
+          "bp_mmHg_value"
+        ],
+        "temp_c": [
+          "temp_c",
+          "temp c",
+          "temp_c_value"
+        ],
+        "spo2_percent": [
+          "spo2_percent",
+          "spo2 percent",
+          "spo2_percent_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    },
+    {
+      "id": "med_discharge_summary_lab_results_table",
+      "name": {
+        "en": "Discharge Summary Lab Results Table",
+        "pt": "Resumo de Alta Lab Results Table"
+      },
+      "section": "patient_identification",
+      "expectedColumns": [
+        "test_name",
+        "result_value",
+        "unit",
+        "reference_range",
+        "flag"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "test_name": [
+          "test_name",
+          "test name",
+          "test_name_value"
+        ],
+        "result_value": [
+          "result_value",
+          "result value",
+          "result_value_value"
+        ],
+        "unit": [
+          "unit",
+          "unit",
+          "unit_value"
+        ],
+        "reference_range": [
+          "reference_range",
+          "reference range",
+          "reference_range_value"
+        ],
+        "flag": [
+          "flag",
+          "flag",
+          "flag_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    },
+    {
+      "id": "med_discharge_summary_medication_administration_table",
+      "name": {
+        "en": "Discharge Summary Medication Administration Table",
+        "pt": "Resumo de Alta Medication Administration Table"
+      },
+      "section": "encounter_context",
+      "expectedColumns": [
+        "medication",
+        "dose",
+        "route",
+        "frequency",
+        "start_stop"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "medication": [
+          "medication",
+          "medication",
+          "medication_value"
+        ],
+        "dose": [
+          "dose",
+          "dose",
+          "dose_value"
+        ],
+        "route": [
+          "route",
+          "route",
+          "route_value"
+        ],
+        "frequency": [
+          "frequency",
+          "frequency",
+          "frequency_value"
+        ],
+        "start_stop": [
+          "start_stop",
+          "start stop",
+          "start_stop_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    },
+    {
+      "id": "med_discharge_summary_allergy_and_reaction_table",
+      "name": {
+        "en": "Discharge Summary Allergy And Reaction Table",
+        "pt": "Resumo de Alta Allergy And Reaction Table"
+      },
+      "section": "chief_complaint_reason",
+      "expectedColumns": [
+        "substance",
+        "reaction",
+        "severity",
+        "status",
+        "last_updated"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "substance": [
+          "substance",
+          "substance",
+          "substance_value"
+        ],
+        "reaction": [
+          "reaction",
+          "reaction",
+          "reaction_value"
+        ],
+        "severity": [
+          "severity",
+          "severity",
+          "severity_value"
+        ],
+        "status": [
+          "status",
+          "status",
+          "status_value"
+        ],
+        "last_updated": [
+          "last_updated",
+          "last updated",
+          "last_updated_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "status"
+          ]
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": [
+            "last_updated"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    },
+    {
+      "id": "med_discharge_summary_problem_list_table",
+      "name": {
+        "en": "Discharge Summary Problem List Table",
+        "pt": "Resumo de Alta Problem List Table"
+      },
+      "section": "history_background",
+      "expectedColumns": [
+        "problem",
+        "status",
+        "onset_date",
+        "resolution_date",
+        "note"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "problem": [
+          "problem",
+          "problem",
+          "problem_value"
+        ],
+        "status": [
+          "status",
+          "status",
+          "status_value"
+        ],
+        "onset_date": [
+          "onset_date",
+          "onset date",
+          "onset_date_value"
+        ],
+        "resolution_date": [
+          "resolution_date",
+          "resolution date",
+          "resolution_date_value"
+        ],
+        "note": [
+          "note",
+          "note",
+          "note_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "status",
+            "note"
+          ]
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": [
+            "onset_date",
+            "resolution_date"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    },
+    {
+      "id": "med_discharge_summary_care_plan_goals_table",
+      "name": {
+        "en": "Discharge Summary Care Plan Goals Table",
+        "pt": "Resumo de Alta Care Plan Goals Table"
+      },
+      "section": "objective_findings",
+      "expectedColumns": [
+        "goal",
+        "intervention",
+        "owner",
+        "target_date",
+        "status"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "goal": [
+          "goal",
+          "goal",
+          "goal_value"
+        ],
+        "intervention": [
+          "intervention",
+          "intervention",
+          "intervention_value"
+        ],
+        "owner": [
+          "owner",
+          "owner",
+          "owner_value"
+        ],
+        "target_date": [
+          "target_date",
+          "target date",
+          "target_date_value"
+        ],
+        "status": [
+          "status",
+          "status",
+          "status_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "status"
+          ]
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": [
+            "target_date"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    },
+    {
+      "id": "med_discharge_summary_followup_tasks_table",
+      "name": {
+        "en": "Discharge Summary Followup Tasks Table",
+        "pt": "Resumo de Alta Followup Tasks Table"
+      },
+      "section": "vitals_and_measurements",
+      "expectedColumns": [
+        "task",
+        "responsible_party",
+        "due_window",
+        "priority",
+        "completion"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "task": [
+          "task",
+          "task",
+          "task_value"
+        ],
+        "responsible_party": [
+          "responsible_party",
+          "responsible party",
+          "responsible_party_value"
+        ],
+        "due_window": [
+          "due_window",
+          "due window",
+          "due_window_value"
+        ],
+        "priority": [
+          "priority",
+          "priority",
+          "priority_value"
+        ],
+        "completion": [
+          "completion",
+          "completion",
+          "completion_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": [
+            "due_window"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    },
+    {
+      "id": "med_discharge_summary_document_signoff_table",
+      "name": {
+        "en": "Discharge Summary Document Signoff Table",
+        "pt": "Resumo de Alta Document Signoff Table"
+      },
+      "section": "labs_imaging",
+      "expectedColumns": [
+        "clinician",
+        "role",
+        "timestamp",
+        "location",
+        "method"
+      ],
+      "keyRows": [
+        "baseline",
+        "abnormal",
+        "latest"
+      ],
+      "headerSynonyms": {
+        "clinician": [
+          "clinician",
+          "clinician",
+          "clinician_value"
+        ],
+        "role": [
+          "role",
+          "role",
+          "role_value"
+        ],
+        "timestamp": [
+          "timestamp",
+          "timestamp",
+          "timestamp_value"
+        ],
+        "location": [
+          "location",
+          "location",
+          "location_value"
+        ],
+        "method": [
+          "method",
+          "method",
+          "method_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "preserve original unit cells",
+        "preserve reference range text when present"
+      ]
+    }
+  ]
+}

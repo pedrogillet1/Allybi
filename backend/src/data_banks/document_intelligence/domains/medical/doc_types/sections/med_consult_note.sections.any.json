@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "id": "medical_med_consult_note_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for Consult Note.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_consult_note"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "document id",
+        "encounter",
+        "record number",
+        "Consult Note Document Header",
+        "Nota de Consulta Cabecalho do Documento"
+      ]
+    },
+    {
+      "id": "patient_identification",
+      "name": {
+        "en": "Patient Identification",
+        "pt": "Identificacao do Paciente"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Patient Identification",
+        "Identificacao do Paciente",
+        "patient name",
+        "mrn",
+        "dob",
+        "Consult Note Patient Identification",
+        "Nota de Consulta Identificacao do Paciente"
+      ]
+    },
+    {
+      "id": "encounter_context",
+      "name": {
+        "en": "Encounter Context",
+        "pt": "Contexto do Atendimento"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Encounter Context",
+        "Contexto do Atendimento",
+        "admission",
+        "visit date",
+        "service line",
+        "Consult Note Encounter Context",
+        "Nota de Consulta Contexto do Atendimento"
+      ]
+    },
+    {
+      "id": "chief_complaint_reason",
+      "name": {
+        "en": "Chief Complaint / Reason",
+        "pt": "Queixa Principal / Motivo"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Chief Complaint / Reason",
+        "Queixa Principal / Motivo",
+        "chief complaint",
+        "reason for visit",
+        "motivo",
+        "Consult Note Chief Complaint / Reason",
+        "Nota de Consulta Queixa Principal / Motivo"
+      ]
+    },
+    {
+      "id": "history_background",
+      "name": {
+        "en": "History and Background",
+        "pt": "Historia e Contexto"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "History and Background",
+        "Historia e Contexto",
+        "history of present illness",
+        "past medical history",
+        "Consult Note History and Background",
+        "Nota de Consulta Historia e Contexto"
+      ]
+    },
+    {
+      "id": "objective_findings",
+      "name": {
+        "en": "Objective Findings",
+        "pt": "Achados Objetivos"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Objective Findings",
+        "Achados Objetivos",
+        "exam",
+        "physical exam",
+        "objective",
+        "Consult Note Objective Findings",
+        "Nota de Consulta Achados Objetivos"
+      ]
+    },
+    {
+      "id": "vitals_and_measurements",
+      "name": {
+        "en": "Vitals and Measurements",
+        "pt": "Sinais Vitais e Medidas"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Vitals and Measurements",
+        "Sinais Vitais e Medidas",
+        "bp",
+        "heart rate",
+        "temperature",
+        "spo2",
+        "Consult Note Vitals and Measurements",
+        "Nota de Consulta Sinais Vitais e Medidas"
+      ]
+    },
+    {
+      "id": "labs_imaging",
+      "name": {
+        "en": "Laboratory and Imaging",
+        "pt": "Laboratorio e Imagem"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "Laboratory and Imaging",
+        "Laboratorio e Imagem",
+        "laboratory",
+        "impression",
+        "finding",
+        "Consult Note Laboratory and Imaging",
+        "Nota de Consulta Laboratorio e Imagem"
+      ]
+    },
+    {
+      "id": "assessment_documented",
+      "name": {
+        "en": "Documented Assessment",
+        "pt": "Avaliacao Documentada"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Documented Assessment",
+        "Avaliacao Documentada",
+        "assessment",
+        "clinical impression",
+        "diagnosis documented",
+        "Consult Note Documented Assessment",
+        "Nota de Consulta Avaliacao Documentada"
+      ]
+    },
+    {
+      "id": "plan_and_orders",
+      "name": {
+        "en": "Plan and Orders",
+        "pt": "Plano e Condutas"
+      },
+      "required": true,
+      "order": 10,
+      "headingAnchors": [
+        "Plan and Orders",
+        "Plano e Condutas",
+        "plan",
+        "orders",
+        "next steps",
+        "Consult Note Plan and Orders",
+        "Nota de Consulta Plano e Condutas"
+      ]
+    },
+    {
+      "id": "medications_allergies",
+      "name": {
+        "en": "Medications and Allergies",
+        "pt": "Medicacoes e Alergias"
+      },
+      "required": true,
+      "order": 11,
+      "headingAnchors": [
+        "Medications and Allergies",
+        "Medicacoes e Alergias",
+        "medications",
+        "allergies",
+        "contraindication",
+        "Consult Note Medications and Allergies",
+        "Nota de Consulta Medicacoes e Alergias"
+      ]
+    },
+    {
+      "id": "followup_and_disposition",
+      "name": {
+        "en": "Follow-up and Disposition",
+        "pt": "Acompanhamento e Desfecho"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Follow-up and Disposition",
+        "Acompanhamento e Desfecho",
+        "follow-up",
+        "discharge",
+        "referral",
+        "Consult Note Follow-up and Disposition",
+        "Nota de Consulta Acompanhamento e Desfecho"
+      ]
+    },
+    {
+      "id": "patient_instructions",
+      "name": {
+        "en": "Patient Instructions",
+        "pt": "Instrucoes ao Paciente"
+      },
+      "required": false,
+      "order": 13,
+      "headingAnchors": [
+        "Patient Instructions",
+        "Instrucoes ao Paciente",
+        "instructions",
+        "warning signs",
+        "return precautions",
+        "Consult Note Patient Instructions",
+        "Nota de Consulta Instrucoes ao Paciente"
+      ]
+    },
+    {
+      "id": "signoff_and_attestation",
+      "name": {
+        "en": "Signoff and Attestation",
+        "pt": "Assinatura e Atestacao"
+      },
+      "required": true,
+      "order": 14,
+      "headingAnchors": [
+        "Signoff and Attestation",
+        "Assinatura e Atestacao",
+        "signed by",
+        "clinician",
+        "timestamp",
+        "Consult Note Signoff and Attestation",
+        "Nota de Consulta Assinatura e Atestacao"
+      ]
+    },
+    {
+      "id": "annexes_tables",
+      "name": {
+        "en": "Annexes and Tables",
+        "pt": "Anexos e Tabelas"
+      },
+      "required": false,
+      "order": 15,
+      "headingAnchors": [
+        "Annexes and Tables",
+        "Anexos e Tabelas",
+        "table",
+        "appendix",
+        "annex",
+        "Consult Note Annexes and Tables",
+        "Nota de Consulta Anexos e Tabelas"
+      ]
+    }
+  ]
+}

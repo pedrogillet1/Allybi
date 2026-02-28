@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "id": "di_travel_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Document type catalog for travel domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel"
+  },
+  "domain": "travel",
+  "docTypes": [
+    {
+      "id": "travel_boarding_pass",
+      "name": {
+        "en": "Boarding Pass",
+        "pt": "Cartao de Embarque"
+      },
+      "description": "Boarding Pass detection profile for travel extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bboarding\\s+pass\\b",
+        "\\btravel\\s+boarding\\s+pass\\b",
+        "\\bcartao\\s+de\\s+embarque\\b"
+      ],
+      "priority": 119
+    },
+    {
+      "id": "travel_car_rental_agreement",
+      "name": {
+        "en": "Car Rental Agreement",
+        "pt": "Contrato de Locacao de Veiculo"
+      },
+      "description": "Car Rental Agreement detection profile for travel extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bcar\\s+rental\\s+agreement\\b",
+        "\\btravel\\s+car\\s+rental\\s+agreement\\b",
+        "\\bcontrato\\s+de\\s+locacao\\s+de\\s+veiculo\\b"
+      ],
+      "priority": 117
+    },
+    {
+      "id": "travel_hotel_booking_confirmation",
+      "name": {
+        "en": "Hotel Booking Confirmation",
+        "pt": "Confirmacao de Reserva de Hotel"
+      },
+      "description": "Hotel Booking Confirmation detection profile for travel extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bhotel\\s+booking\\s+confirmation\\b",
+        "\\btravel\\s+hotel\\s+booking\\s+confirmation\\b",
+        "\\bconfirmacao\\s+de\\s+reserva\\s+de\\s+hotel\\b"
+      ],
+      "priority": 118
+    },
+    {
+      "id": "travel_itinerary",
+      "name": {
+        "en": "Travel Itinerary",
+        "pt": "Itinerario de Viagem"
+      },
+      "description": "Travel Itinerary detection profile for travel extraction and interpretation.",
+      "detectionPatterns": [
+        "\\btravel\\s+itinerary\\b",
+        "\\btravel\\s+itinerary\\b",
+        "\\bitinerario\\s+de\\s+viagem\\b"
+      ],
+      "priority": 120
+    },
+    {
+      "id": "travel_travel_insurance_policy",
+      "name": {
+        "en": "Travel Insurance Policy",
+        "pt": "Apolice de Seguro Viagem"
+      },
+      "description": "Travel Insurance Policy detection profile for travel extraction and interpretation.",
+      "detectionPatterns": [
+        "\\btravel\\s+insurance\\s+policy\\b",
+        "\\btravel\\s+travel\\s+insurance\\s+policy\\b",
+        "\\bapolice\\s+de\\s+seguro\\s+viagem\\b"
+      ],
+      "priority": 116
+    },
+    {
+      "id": "travel_visa_application_receipt",
+      "name": {
+        "en": "Visa Application Receipt",
+        "pt": "Recibo de Solicitacao de Visto"
+      },
+      "description": "Visa Application Receipt detection profile for travel extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bvisa\\s+application\\s+receipt\\b",
+        "\\btravel\\s+visa\\s+application\\s+receipt\\b",
+        "\\brecibo\\s+de\\s+solicitacao\\s+de\\s+visto\\b"
+      ],
+      "priority": 115
+    }
+  ]
+}

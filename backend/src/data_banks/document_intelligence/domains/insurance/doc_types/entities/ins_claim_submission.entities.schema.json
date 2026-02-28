@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "id": "di_insurance_entities_ins_claim_submission",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for ins_claim_submission.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_claim_submission"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Document issuer or authority"
+    },
+    {
+      "id": "subject_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary subject referenced by the document"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": false,
+      "description": "Official document number"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": false,
+      "description": "Document effective date"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Jurisdiction or governing authority"
+    },
+    {
+      "id": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current processing or legal status"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code when monetary values are present"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total document amount when applicable"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date for payment or action"
+    },
+    {
+      "id": "reference_id",
+      "type": "string",
+      "required": false,
+      "description": "External reference id"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "claim_number",
+      "type": "string",
+      "required": true,
+      "description": "Claim identifier"
+    },
+    {
+      "id": "claimant_name",
+      "type": "string",
+      "required": true,
+      "description": "Claimant name"
+    },
+    {
+      "id": "policy_number",
+      "type": "string",
+      "required": true,
+      "description": "Linked policy number"
+    },
+    {
+      "id": "incident_date",
+      "type": "date",
+      "required": false,
+      "description": "Incident/service date"
+    },
+    {
+      "id": "submission_date",
+      "type": "date",
+      "required": true,
+      "description": "Submission date"
+    },
+    {
+      "id": "claim_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Total claimed amount"
+    },
+    {
+      "id": "claim_status",
+      "type": "string",
+      "required": true,
+      "description": "Claim status"
+    },
+    {
+      "id": "incident_description",
+      "type": "string",
+      "required": false,
+      "description": "Incident description"
+    },
+    {
+      "id": "supporting_doc_count",
+      "type": "number",
+      "required": false,
+      "description": "Count of supporting docs"
+    },
+    {
+      "id": "assigned_adjuster",
+      "type": "string",
+      "required": false,
+      "description": "Assigned adjuster"
+    },
+    {
+      "id": "insurance_doc_type",
+      "type": "string",
+      "required": true,
+      "description": "Resolved doc type: ins_claim_submission"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "id": "legal_redaction_and_safety_rules",
+    "version": "2.0.0",
+    "description": "Redaction rules and safety guardrails for legal content.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "redactionRules": [
+    {
+      "id": "legal_redaction_001",
+      "dataType": "personal_email",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "action": "REDACT",
+      "replacement": "[REDACTED_EMAIL]"
+    },
+    {
+      "id": "legal_redaction_002",
+      "dataType": "personal_phone",
+      "pattern": "\\+?[0-9][0-9\\-() ]{7,}[0-9]",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PHONE]"
+    },
+    {
+      "id": "legal_redaction_003",
+      "dataType": "tax_identifier",
+      "pattern": "\\b(?:EIN|CPF|CNPJ|SSN)[:# ]?[A-Z0-9./-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_TAX_ID]"
+    },
+    {
+      "id": "legal_redaction_004",
+      "dataType": "bank_account",
+      "pattern": "\\b(?:IBAN|account number|routing)[:# ]?[A-Z0-9-]{8,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ACCOUNT]"
+    },
+    {
+      "id": "legal_redaction_005",
+      "dataType": "signature_image_marker",
+      "pattern": "\\b(signature image|signed by)\\b",
+      "action": "MASK",
+      "replacement": "[SIGNATURE_PRESENT]"
+    },
+    {
+      "id": "legal_redaction_006",
+      "dataType": "home_address",
+      "pattern": "\\b\\d{1,5}\\s+[A-Za-z0-9 .-]+\\s(?:Street|St|Avenue|Ave|Road|Rd|Rua|Av|Alameda)\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ADDRESS]"
+    },
+    {
+      "id": "legal_redaction_007",
+      "dataType": "passport_or_id",
+      "pattern": "\\b(?:passport|rg|driver license)[:# ]?[A-Z0-9-]{5,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ID]"
+    },
+    {
+      "id": "legal_redaction_008",
+      "dataType": "secret_key_material",
+      "pattern": "\\b(?:api[_ -]?key|secret|private key)\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_SECRET]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "legal_safety_001",
+      "severity": "error",
+      "trigger": "user requests legal advice beyond source interpretation",
+      "description": "Block unsupported legal advice and provide limitation disclaimer.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "legal_safety_002",
+      "severity": "warning",
+      "trigger": "user asks to alter source wording without evidence",
+      "description": "Warn and request source citation before modification claims.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "legal_safety_003",
+      "severity": "warning",
+      "trigger": "ambiguous party/date/governing law fields",
+      "description": "Require ambiguity callout and clarifying question.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "legal_safety_004",
+      "severity": "error",
+      "trigger": "request to hide or falsify obligations",
+      "description": "Refuse manipulation/fabrication requests.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "legal_safety_005",
+      "severity": "warning",
+      "trigger": "high-risk litigation recommendation without cited order/motion",
+      "description": "Warn and require direct evidence.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "legal_safety_006",
+      "severity": "warning",
+      "trigger": "sensitive personal data in response body",
+      "description": "Apply redaction policy before output.",
+      "action": "DISCLAIMER"
+    }
+  ]
+}

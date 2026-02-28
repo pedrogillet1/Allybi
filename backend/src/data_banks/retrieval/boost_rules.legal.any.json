@@ -1,0 +1,1992 @@
+{
+  "_meta": {
+    "id": "boost_rules_legal",
+    "version": "1.0.0",
+    "description": "Domain boost rules for legal retrieval ranking by intent, operator, doc type, and section anchors.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "maxMatchedRules": 6,
+    "maxDocumentIntelligenceBoost": 0.45,
+    "coefficientRange": "0..3"
+  },
+  "domain": "legal",
+  "rules": [
+    {
+      "id": "legal_advise_general_unlock",
+      "priority": 90,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "liability",
+          "weight": 2.5
+        },
+        {
+          "section": "indemnity",
+          "weight": 2.3
+        },
+        {
+          "section": "termination",
+          "weight": 2.1
+        },
+        {
+          "section": "governing_law",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_advise_doc_lock",
+      "priority": 89,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "liability",
+          "weight": 1.9
+        },
+        {
+          "section": "indemnity",
+          "weight": 1.75
+        },
+        {
+          "section": "termination",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_advise_explicit_doc_type",
+      "priority": 88,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "indemnity",
+          "weight": 2.2
+        },
+        {
+          "section": "termination",
+          "weight": 2.02
+        },
+        {
+          "section": "governing_law",
+          "weight": 1.84
+        },
+        {
+          "section": "dispute_resolution",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_calculate_general_unlock",
+      "priority": 87,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "fees_schedule",
+          "weight": 2.5
+        },
+        {
+          "section": "service_credits",
+          "weight": 2.3
+        },
+        {
+          "section": "payment_terms",
+          "weight": 2.1
+        },
+        {
+          "section": "late_fees",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_calculate_doc_lock",
+      "priority": 86,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "fees_schedule",
+          "weight": 1.9
+        },
+        {
+          "section": "service_credits",
+          "weight": 1.75
+        },
+        {
+          "section": "payment_terms",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_calculate_explicit_doc_type",
+      "priority": 85,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "service_credits",
+          "weight": 2.2
+        },
+        {
+          "section": "payment_terms",
+          "weight": 2.02
+        },
+        {
+          "section": "late_fees",
+          "weight": 1.84
+        },
+        {
+          "section": "billing_table",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_compare_general_unlock",
+      "priority": 84,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "definitions",
+          "weight": 2.5
+        },
+        {
+          "section": "term",
+          "weight": 2.3
+        },
+        {
+          "section": "termination",
+          "weight": 2.1
+        },
+        {
+          "section": "liability",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_compare_doc_lock",
+      "priority": 83,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "definitions",
+          "weight": 1.9
+        },
+        {
+          "section": "term",
+          "weight": 1.75
+        },
+        {
+          "section": "termination",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_compare_explicit_doc_type",
+      "priority": 82,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "term",
+          "weight": 2.2
+        },
+        {
+          "section": "termination",
+          "weight": 2.02
+        },
+        {
+          "section": "liability",
+          "weight": 1.84
+        },
+        {
+          "section": "indemnity",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_evaluate_general_unlock",
+      "priority": 81,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "liability",
+          "weight": 2.5
+        },
+        {
+          "section": "indemnity",
+          "weight": 2.3
+        },
+        {
+          "section": "termination",
+          "weight": 2.1
+        },
+        {
+          "section": "governing_law",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_evaluate_doc_lock",
+      "priority": 80,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "liability",
+          "weight": 1.9
+        },
+        {
+          "section": "indemnity",
+          "weight": 1.75
+        },
+        {
+          "section": "termination",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_evaluate_explicit_doc_type",
+      "priority": 79,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "indemnity",
+          "weight": 2.2
+        },
+        {
+          "section": "termination",
+          "weight": 2.02
+        },
+        {
+          "section": "governing_law",
+          "weight": 1.84
+        },
+        {
+          "section": "payment_terms",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_extract_general_unlock",
+      "priority": 78,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "parties",
+          "weight": 2.5
+        },
+        {
+          "section": "definitions",
+          "weight": 2.3
+        },
+        {
+          "section": "payment_terms",
+          "weight": 2.1
+        },
+        {
+          "section": "termination",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_extract_doc_lock",
+      "priority": 77,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "parties",
+          "weight": 1.9
+        },
+        {
+          "section": "definitions",
+          "weight": 1.75
+        },
+        {
+          "section": "payment_terms",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_extract_explicit_doc_type",
+      "priority": 76,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "definitions",
+          "weight": 2.2
+        },
+        {
+          "section": "payment_terms",
+          "weight": 2.02
+        },
+        {
+          "section": "termination",
+          "weight": 1.84
+        },
+        {
+          "section": "signature_block",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_locate_general_unlock",
+      "priority": 75,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "definitions",
+          "weight": 2.3
+        },
+        {
+          "section": "clauses_index",
+          "weight": 2.1
+        },
+        {
+          "section": "schedule_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_locate_doc_lock",
+      "priority": 74,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "definitions",
+          "weight": 1.75
+        },
+        {
+          "section": "clauses_index",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_locate_explicit_doc_type",
+      "priority": 73,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "definitions",
+          "weight": 2.2
+        },
+        {
+          "section": "clauses_index",
+          "weight": 2.02
+        },
+        {
+          "section": "schedule_index",
+          "weight": 1.84
+        },
+        {
+          "section": "annex_index",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_monitor_general_unlock",
+      "priority": 72,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "obligations_calendar",
+          "weight": 2.5
+        },
+        {
+          "section": "notice_requirements",
+          "weight": 2.3
+        },
+        {
+          "section": "renewal_terms",
+          "weight": 2.1
+        },
+        {
+          "section": "service_levels",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_monitor_doc_lock",
+      "priority": 71,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "obligations_calendar",
+          "weight": 1.9
+        },
+        {
+          "section": "notice_requirements",
+          "weight": 1.75
+        },
+        {
+          "section": "renewal_terms",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_monitor_explicit_doc_type",
+      "priority": 70,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "notice_requirements",
+          "weight": 2.2
+        },
+        {
+          "section": "renewal_terms",
+          "weight": 2.02
+        },
+        {
+          "section": "service_levels",
+          "weight": 1.84
+        },
+        {
+          "section": "payment_terms",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_navigate_general_unlock",
+      "priority": 69,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "clauses_index",
+          "weight": 2.3
+        },
+        {
+          "section": "schedule_index",
+          "weight": 2.1
+        },
+        {
+          "section": "annex_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_navigate_doc_lock",
+      "priority": 68,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "clauses_index",
+          "weight": 1.75
+        },
+        {
+          "section": "schedule_index",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_navigate_explicit_doc_type",
+      "priority": 67,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "clauses_index",
+          "weight": 2.2
+        },
+        {
+          "section": "schedule_index",
+          "weight": 2.02
+        },
+        {
+          "section": "annex_index",
+          "weight": 1.84
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_open_general_unlock",
+      "priority": 66,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 2.5
+        },
+        {
+          "section": "clauses_index",
+          "weight": 2.3
+        },
+        {
+          "section": "schedule_index",
+          "weight": 2.1
+        },
+        {
+          "section": "annex_index",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_open_doc_lock",
+      "priority": 65,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "table_of_contents",
+          "weight": 1.9
+        },
+        {
+          "section": "clauses_index",
+          "weight": 1.75
+        },
+        {
+          "section": "schedule_index",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_open_explicit_doc_type",
+      "priority": 64,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "clauses_index",
+          "weight": 2.2
+        },
+        {
+          "section": "schedule_index",
+          "weight": 2.02
+        },
+        {
+          "section": "annex_index",
+          "weight": 1.84
+        },
+        {
+          "section": "bookmarks",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_summarize_general_unlock",
+      "priority": 63,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "recitals",
+          "weight": 2.5
+        },
+        {
+          "section": "scope_of_services",
+          "weight": 2.3
+        },
+        {
+          "section": "obligations",
+          "weight": 2.1
+        },
+        {
+          "section": "liability",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_summarize_doc_lock",
+      "priority": 62,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "recitals",
+          "weight": 1.9
+        },
+        {
+          "section": "scope_of_services",
+          "weight": 1.75
+        },
+        {
+          "section": "obligations",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_summarize_explicit_doc_type",
+      "priority": 61,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "scope_of_services",
+          "weight": 2.2
+        },
+        {
+          "section": "obligations",
+          "weight": 2.02
+        },
+        {
+          "section": "liability",
+          "weight": 1.84
+        },
+        {
+          "section": "termination",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_validate_general_unlock",
+      "priority": 60,
+      "weight": 1.6,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.6
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.35
+        },
+        {
+          "docType": "nda",
+          "weight": 2.1
+        },
+        {
+          "docType": "dpa",
+          "weight": 1.85
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "definitions",
+          "weight": 2.5
+        },
+        {
+          "section": "liability",
+          "weight": 2.3
+        },
+        {
+          "section": "indemnity",
+          "weight": 2.1
+        },
+        {
+          "section": "termination",
+          "weight": 1.9
+        }
+      ],
+      "guardrails": {
+        "lockAware": true,
+        "requireDomainMatch": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_validate_doc_lock",
+      "priority": 59,
+      "weight": 1.1,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "docLock": true,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 1.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 1.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "definitions",
+          "weight": 1.9
+        },
+        {
+          "section": "liability",
+          "weight": 1.75
+        },
+        {
+          "section": "indemnity",
+          "weight": 1.6
+        }
+      ],
+      "guardrails": {
+        "honorDocLock": true,
+        "noCrossDomainBoost": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_validate_explicit_doc_type",
+      "priority": 58,
+      "weight": 1.4,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "explicitDocTypes": [
+        "master_service_agreement",
+        "statement_of_work"
+      ],
+      "conditions": {
+        "docLock": false,
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "explicitDocTypes": [
+          "master_service_agreement",
+          "statement_of_work"
+        ]
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.4
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.1
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "liability",
+          "weight": 2.2
+        },
+        {
+          "section": "indemnity",
+          "weight": 2.02
+        },
+        {
+          "section": "termination",
+          "weight": 1.84
+        },
+        {
+          "section": "notices",
+          "weight": 1.66
+        }
+      ],
+      "guardrails": {
+        "explicitSignalsOnly": true,
+        "requireResolvedDocType": true,
+        "coefficientRange": "0..3"
+      }
+    },
+    {
+      "id": "legal_evaluate_core_clauses",
+      "priority": 68,
+      "weight": 1.9,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.8
+        },
+        {
+          "docType": "vendor_contract",
+          "weight": 2.6
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "liability",
+          "weight": 2.9
+        },
+        {
+          "section": "indemnity",
+          "weight": 2.9
+        },
+        {
+          "section": "termination",
+          "weight": 2.8
+        },
+        {
+          "section": "governing_law",
+          "weight": 2.8
+        },
+        {
+          "section": "payment_terms",
+          "weight": 2.7
+        }
+      ],
+      "guardrails": {
+        "mustCoverClausePack": true
+      }
+    },
+    {
+      "id": "legal_validate_core_clauses",
+      "priority": 67,
+      "weight": 1.8,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "docLock": false
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.8
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.4
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "liability",
+          "weight": 2.8
+        },
+        {
+          "section": "indemnity",
+          "weight": 2.8
+        },
+        {
+          "section": "termination",
+          "weight": 2.7
+        },
+        {
+          "section": "governing_law",
+          "weight": 2.7
+        },
+        {
+          "section": "payment_terms",
+          "weight": 2.6
+        }
+      ],
+      "guardrails": {
+        "clauseCrossReferenceCheck": true
+      }
+    },
+    {
+      "id": "legal_compare_clause_order",
+      "priority": 66,
+      "weight": 1.7,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "legal"
+        ],
+        "docLock": false,
+        "minExplicitResolvedDocs": 2
+      },
+      "boostDocTypes": [
+        {
+          "docType": "master_service_agreement",
+          "weight": 2.7
+        },
+        {
+          "docType": "statement_of_work",
+          "weight": 2.5
+        }
+      ],
+      "boostSections": [
+        {
+          "section": "definitions",
+          "weight": 2.7
+        },
+        {
+          "section": "term",
+          "weight": 2.7
+        },
+        {
+          "section": "termination",
+          "weight": 2.8
+        },
+        {
+          "section": "liability",
+          "weight": 2.8
+        }
+      ],
+      "guardrails": {
+        "compareNeedsResolvedDocs": true
+      }
+    }
+  ]
+}

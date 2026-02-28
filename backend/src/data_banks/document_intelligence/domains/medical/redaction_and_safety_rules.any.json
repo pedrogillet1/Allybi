@@ -1,0 +1,132 @@
+{
+  "_meta": {
+    "id": "medical_redaction_and_safety_rules",
+    "version": "2.0.0",
+    "description": "Medical redaction and safety rules with diagnosis-advice hard boundaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "redactionRules": [
+    {
+      "id": "medical_redaction_001",
+      "dataType": "patient_name",
+      "pattern": "\\b(patient name|nome do paciente)[: ]+[A-Za-z][A-Za-z .-]{1,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PATIENT_NAME]"
+    },
+    {
+      "id": "medical_redaction_002",
+      "dataType": "mrn",
+      "pattern": "\\b(?:MRN|prontuario|record number)[:# ]?[A-Z0-9-]{4,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_MRN]"
+    },
+    {
+      "id": "medical_redaction_003",
+      "dataType": "national_id",
+      "pattern": "\\b(?:CPF|RG|SSN)[:# ]?[0-9A-Z./-]{6,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_NATIONAL_ID]"
+    },
+    {
+      "id": "medical_redaction_004",
+      "dataType": "date_of_birth",
+      "pattern": "\\b(?:DOB|date of birth|data de nascimento)[: ]?[0-9]{1,2}[/-][0-9]{1,2}[/-][0-9]{2,4}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_DOB]"
+    },
+    {
+      "id": "medical_redaction_005",
+      "dataType": "address",
+      "pattern": "\\b\\d{1,5}\\s+[A-Za-z0-9 .-]+\\s(?:Street|St|Avenue|Ave|Road|Rd|Rua|Av|Alameda)\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_ADDRESS]"
+    },
+    {
+      "id": "medical_redaction_006",
+      "dataType": "phone",
+      "pattern": "\\+?[0-9][0-9\\-() ]{7,}[0-9]",
+      "action": "REDACT",
+      "replacement": "[REDACTED_PHONE]"
+    },
+    {
+      "id": "medical_redaction_007",
+      "dataType": "email",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "action": "REDACT",
+      "replacement": "[REDACTED_EMAIL]"
+    },
+    {
+      "id": "medical_redaction_008",
+      "dataType": "insurance_id",
+      "pattern": "\\b(?:policy number|insurance id|carteirinha)[:# ]?[A-Z0-9-]{5,}\\b",
+      "action": "REDACT",
+      "replacement": "[REDACTED_INSURANCE_ID]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "medical_safety_001",
+      "severity": "error",
+      "trigger": "request_for_new_diagnosis_or_differential",
+      "description": "Forbid diagnosis advice generation not explicitly documented in source.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "medical_safety_002",
+      "severity": "error",
+      "trigger": "request_for_treatment_or_prescribing_advice",
+      "description": "Forbid treatment recommendation or prescribing advice.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "medical_safety_003",
+      "severity": "warning",
+      "trigger": "critical_value_detected",
+      "description": "Respond with document-grounded explanation and direct user to clinician urgently.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "medical_safety_004",
+      "severity": "warning",
+      "trigger": "severe_symptom_or_red_flag_documented",
+      "description": "Explain documented red flag and include \"see clinician\" guidance.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "medical_safety_005",
+      "severity": "warning",
+      "trigger": "ambiguity_in_measurements_or_context",
+      "description": "Do not resolve ambiguity; request clarification and advise clinician review.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "medical_safety_006",
+      "severity": "error",
+      "trigger": "missing_document_evidence_for_claim",
+      "description": "Block non-grounded clinical claims and require citation.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "medical_safety_007",
+      "severity": "warning",
+      "trigger": "patient_identifier_detected_in_output",
+      "description": "Apply redaction before returning output.",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "medical_safety_008",
+      "severity": "error",
+      "trigger": "user_requests_override_of_clinician_referral_boundary",
+      "description": "Do not bypass clinician referral boundary.",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    }
+  ]
+}

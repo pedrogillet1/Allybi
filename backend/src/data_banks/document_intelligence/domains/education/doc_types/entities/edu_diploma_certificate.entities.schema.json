@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "id": "di_education_entities_edu_diploma_certificate",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for edu_diploma_certificate.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education",
+    "docType": "edu_diploma_certificate"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "document_title",
+      "type": "string",
+      "required": false,
+      "description": "Document title"
+    },
+    {
+      "id": "document_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Issuer name"
+    },
+    {
+      "id": "issuer_tax_id",
+      "type": "string",
+      "required": false,
+      "description": "Issuer tax identifier"
+    },
+    {
+      "id": "recipient_name",
+      "type": "string",
+      "required": true,
+      "description": "Recipient name"
+    },
+    {
+      "id": "recipient_id",
+      "type": "string",
+      "required": false,
+      "description": "Recipient identifier"
+    },
+    {
+      "id": "account_reference",
+      "type": "string",
+      "required": false,
+      "description": "Account/reference number"
+    },
+    {
+      "id": "statement_number",
+      "type": "string",
+      "required": false,
+      "description": "Statement number"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "ISO currency code"
+    },
+    {
+      "id": "unit_scale",
+      "type": "string",
+      "required": false,
+      "description": "Unit scale if any"
+    },
+    {
+      "id": "subtotal_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Subtotal amount"
+    },
+    {
+      "id": "tax_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Tax amount"
+    },
+    {
+      "id": "fee_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Fee amount"
+    },
+    {
+      "id": "discount_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Discount amount"
+    },
+    {
+      "id": "credit_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Credit amount"
+    },
+    {
+      "id": "debit_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Debit amount"
+    },
+    {
+      "id": "paid_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Paid amount"
+    },
+    {
+      "id": "balance_due",
+      "type": "currency",
+      "required": false,
+      "description": "Balance due"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Total amount"
+    },
+    {
+      "id": "payment_status",
+      "type": "string",
+      "required": false,
+      "description": "Payment status"
+    },
+    {
+      "id": "payment_method",
+      "type": "string",
+      "required": false,
+      "description": "Payment method"
+    },
+    {
+      "id": "source_system",
+      "type": "string",
+      "required": false,
+      "description": "Source system"
+    },
+    {
+      "id": "document_language",
+      "type": "string",
+      "required": false,
+      "description": "Detected language"
+    },
+    {
+      "id": "line_item_count",
+      "type": "number",
+      "required": false,
+      "description": "Line item count"
+    },
+    {
+      "id": "page_count",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidence_score",
+      "type": "number",
+      "required": false,
+      "description": "Extraction confidence score"
+    },
+    {
+      "id": "student_id",
+      "type": "string",
+      "required": false,
+      "description": "Student identifier"
+    },
+    {
+      "id": "institution_name",
+      "type": "string",
+      "required": true,
+      "description": "Institution name"
+    },
+    {
+      "id": "program_name",
+      "type": "string",
+      "required": false,
+      "description": "Program or major"
+    },
+    {
+      "id": "academic_term",
+      "type": "string",
+      "required": false,
+      "description": "Term label"
+    },
+    {
+      "id": "gpa",
+      "type": "number",
+      "required": false,
+      "description": "Grade point average"
+    },
+    {
+      "id": "credits_attempted",
+      "type": "number",
+      "required": false,
+      "description": "Attempted credits"
+    },
+    {
+      "id": "credits_earned",
+      "type": "number",
+      "required": false,
+      "description": "Earned credits"
+    },
+    {
+      "id": "graduation_date",
+      "type": "date",
+      "required": false,
+      "description": "Graduation date"
+    },
+    {
+      "id": "course_code",
+      "type": "string",
+      "required": false,
+      "description": "Course code"
+    },
+    {
+      "id": "course_title",
+      "type": "string",
+      "required": false,
+      "description": "Course title"
+    },
+    {
+      "id": "course_grade",
+      "type": "string",
+      "required": false,
+      "description": "Course grade"
+    },
+    {
+      "id": "attendance_rate",
+      "type": "number",
+      "required": false,
+      "description": "Attendance percentage"
+    },
+    {
+      "id": "aid_award_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Financial aid amount"
+    },
+    {
+      "id": "aid_type",
+      "type": "string",
+      "required": false,
+      "description": "Aid type"
+    },
+    {
+      "id": "advisor_name",
+      "type": "string",
+      "required": false,
+      "description": "Advisor name"
+    }
+  ]
+}

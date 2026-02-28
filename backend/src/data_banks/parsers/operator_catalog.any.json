@@ -1338,6 +1338,726 @@
         "en": "Updating table cell...",
         "pt": "Atualizando célula da tabela..."
       }
+    },
+    "XLSX_REMOVE_DUPLICATES": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["rangeA1"],
+      "optionalSlots": ["keyColumns", "hasHeader"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Removing duplicate rows...",
+        "pt": "Removendo linhas duplicadas..."
+      }
+    },
+    "XLSX_TRIM_WHITESPACE": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["rangeA1"],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Trimming whitespace...",
+        "pt": "Removendo espaços em branco..."
+      }
+    },
+    "XLSX_NORMALIZE_VALUES": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["rangeA1", "normalization"],
+      "optionalSlots": ["textCase", "dateFormat"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Normalizing values...",
+        "pt": "Normalizando valores..."
+      }
+    },
+    "XLSX_SET_PROTECTION": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName"],
+      "optionalSlots": ["password"],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Protecting sheet...",
+        "pt": "Protegendo planilha..."
+      }
+    },
+    "XLSX_LOCK_CELLS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["rangeA1", "locked"],
+      "optionalSlots": ["hidden"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting cell protection...",
+        "pt": "Configurando proteção de células..."
+      }
+    },
+    "DOCX_PAGE_BREAK": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["paragraphId"],
+      "optionalSlots": ["position"],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Inserting page break...",
+        "pt": "Inserindo quebra de página..."
+      }
+    },
+    "DOCX_SECTION_BREAK": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["paragraphId"],
+      "optionalSlots": ["breakType"],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Inserting section break...",
+        "pt": "Inserindo quebra de seção..."
+      }
+    },
+    "PY_BINNING": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column"],
+      "optionalSlots": ["rangeA1", "method", "bins", "boundaries", "labels", "outputColumn"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Binning values in {{column}}...",
+        "pt": "Categorizando valores em {{column}}..."
+      }
+    },
+    "PY_CALC_CROSS_SHEET_MERGE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["leftSheet", "rightSheet", "joinKey"],
+      "optionalSlots": ["joinType", "selectColumns", "outputSheetName"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Merging {{leftSheet}} with {{rightSheet}}...",
+        "pt": "Mesclando {{leftSheet}} com {{rightSheet}}..."
+      }
+    },
+    "PY_CALC_DERIVE_COLUMN": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "sourceColumns", "expression", "outputColumn"],
+      "optionalSlots": ["outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Deriving column {{outputColumn}}...",
+        "pt": "Derivando coluna {{outputColumn}}..."
+      }
+    },
+    "PY_CALC_FORMULA_BULK": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "expression", "outputRangeA1"],
+      "optionalSlots": ["rangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying bulk formula...",
+        "pt": "Aplicando fórmula em lote..."
+      }
+    },
+    "PY_CALC_GROUPBY_AGG": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "groupByColumns", "aggregations"],
+      "optionalSlots": ["rangeA1", "outputSheetName", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Grouping and aggregating data...",
+        "pt": "Agrupando e agregando dados..."
+      }
+    },
+    "PY_CALC_PERCENTILE_RANK": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column"],
+      "optionalSlots": ["rangeA1", "partitionBy", "method", "ascending", "outputColumn"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Computing percentile rank for {{column}}...",
+        "pt": "Calculando rank percentual para {{column}}..."
+      }
+    },
+    "PY_CALC_WINDOW_FUNCTION": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column", "windowFunc"],
+      "optionalSlots": ["rangeA1", "windowSize", "partitionBy", "outputColumn"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Computing {{windowFunc}} on {{column}}...",
+        "pt": "Calculando {{windowFunc}} em {{column}}..."
+      }
+    },
+    "PY_CHART_AREA": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "xColumn", "yColumns"],
+      "optionalSlots": ["rangeA1", "stacked", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating area chart...",
+        "pt": "Criando gráfico de área..."
+      }
+    },
+    "PY_CHART_BAR": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "categoryColumn", "valueColumns"],
+      "optionalSlots": ["rangeA1", "stacked", "horizontal", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": ["XLSX_CHART_CREATE"],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating bar chart...",
+        "pt": "Criando gráfico de barras..."
+      }
+    },
+    "PY_CHART_BOX": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "columns"],
+      "optionalSlots": ["rangeA1", "groupBy", "showOutliers", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating box plot...",
+        "pt": "Criando box plot..."
+      }
+    },
+    "PY_CHART_COMBO": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "xColumn", "series"],
+      "optionalSlots": ["rangeA1", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating combo chart...",
+        "pt": "Criando gráfico combo..."
+      }
+    },
+    "PY_CHART_HEATMAP": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName"],
+      "optionalSlots": ["rangeA1", "rowLabels", "columnLabels", "colorMap", "annotate", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating heatmap...",
+        "pt": "Criando mapa de calor..."
+      }
+    },
+    "PY_CHART_HISTOGRAM": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column"],
+      "optionalSlots": ["rangeA1", "bins", "kde", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating histogram of {{column}}...",
+        "pt": "Criando histograma de {{column}}..."
+      }
+    },
+    "PY_CHART_LINE": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "xColumn", "yColumns"],
+      "optionalSlots": ["rangeA1", "title", "xLabel", "yLabel", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": ["XLSX_CHART_CREATE"],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating line chart...",
+        "pt": "Criando gráfico de linhas..."
+      }
+    },
+    "PY_CHART_PIE": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "labelColumn", "valueColumn"],
+      "optionalSlots": ["rangeA1", "title", "showPercentages", "maxSlices", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": ["XLSX_CHART_CREATE"],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating pie chart...",
+        "pt": "Criando gráfico de pizza..."
+      }
+    },
+    "PY_CHART_SCATTER": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "xColumn", "yColumn"],
+      "optionalSlots": ["rangeA1", "colorByColumn", "sizeByColumn", "trendline", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": ["XLSX_CHART_CREATE"],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating scatter plot...",
+        "pt": "Criando gráfico de dispersão..."
+      }
+    },
+    "PY_CHART_WATERFALL": {
+      "domain": "python",
+      "runtimeOperator": "PY_CHART",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "categoryColumn", "valueColumn"],
+      "optionalSlots": ["rangeA1", "showTotal", "increaseColor", "decreaseColor", "totalColor", "title", "outputFormat", "insertIntoSheet"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating waterfall chart...",
+        "pt": "Criando gráfico em cascata..."
+      }
+    },
+    "PY_CLEAN_DEDUP_FUZZY": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column"],
+      "optionalSlots": ["rangeA1", "threshold", "method", "action", "outputColumn"],
+      "conflictsWith": ["XLSX_REMOVE_DUPLICATES"],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Finding fuzzy duplicates in {{column}}...",
+        "pt": "Encontrando duplicatas aproximadas em {{column}}..."
+      }
+    },
+    "PY_CLEAN_MISSING_VALUES": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "strategy"],
+      "optionalSlots": ["rangeA1", "columns", "fillValue", "minNonNull"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Handling missing values...",
+        "pt": "Tratando valores ausentes..."
+      }
+    },
+    "PY_CLEAN_TYPE_COERCE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "conversions"],
+      "optionalSlots": ["rangeA1"],
+      "conflictsWith": ["XLSX_NORMALIZE_VALUES"],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Converting column types...",
+        "pt": "Convertendo tipos de coluna..."
+      }
+    },
+    "PY_CURRENCY_CONVERT": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column", "fromCurrency", "toCurrency"],
+      "optionalSlots": ["rangeA1", "exchangeRate", "rateDate", "outputColumn"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Converting {{fromCurrency}} to {{toCurrency}}...",
+        "pt": "Convertendo {{fromCurrency}} para {{toCurrency}}..."
+      }
+    },
+    "PY_DATE_FEATURES": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "dateColumn"],
+      "optionalSlots": ["rangeA1", "features"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Extracting date features from {{dateColumn}}...",
+        "pt": "Extraindo features de data de {{dateColumn}}..."
+      }
+    },
+    "PY_ENCODE_CATEGORICAL": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "columns"],
+      "optionalSlots": ["rangeA1", "method", "dropFirst", "ordinalOrder"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Encoding categorical columns...",
+        "pt": "Codificando colunas categóricas..."
+      }
+    },
+    "PY_NORMALIZE_SCALE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "columns", "method"],
+      "optionalSlots": ["rangeA1", "outputColumns"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Normalizing columns...",
+        "pt": "Normalizando colunas..."
+      }
+    },
+    "PY_OUTLIER_DETECT": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "columns"],
+      "optionalSlots": ["rangeA1", "method", "threshold", "outputColumn", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Detecting outliers...",
+        "pt": "Detectando outliers..."
+      }
+    },
+    "PY_OUTLIER_REMOVE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "columns"],
+      "optionalSlots": ["rangeA1", "method", "threshold", "action"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Removing outliers...",
+        "pt": "Removendo outliers..."
+      }
+    },
+    "PY_PIVOT_TABLE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "rowFields", "valueFields"],
+      "optionalSlots": ["rangeA1", "columnFields", "aggFunc", "margins", "outputSheetName", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating pivot table...",
+        "pt": "Criando tabela dinâmica..."
+      }
+    },
+    "PY_PIVOT_UNPIVOT": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "idColumns", "valueColumns"],
+      "optionalSlots": ["rangeA1", "variableName", "valueName", "outputSheetName", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Unpivoting data...",
+        "pt": "Desfazendo pivot dos dados..."
+      }
+    },
+    "PY_RESHAPE_STACK": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sourceSheets"],
+      "optionalSlots": ["addSourceColumn", "sourceColumnName", "outputSheetName", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Stacking sheets...",
+        "pt": "Empilhando planilhas..."
+      }
+    },
+    "PY_RESHAPE_TRANSPOSE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName"],
+      "optionalSlots": ["rangeA1", "hasHeaders", "outputSheetName", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Transposing data...",
+        "pt": "Transpondo dados..."
+      }
+    },
+    "PY_SAMPLE_DATA": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName"],
+      "optionalSlots": ["rangeA1", "sampleSize", "sampleFraction", "method", "stratifyColumn", "randomSeed", "outputSheetName", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Sampling data...",
+        "pt": "Amostrando dados..."
+      }
+    },
+    "PY_STATS_CORRELATION": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "columns"],
+      "optionalSlots": ["rangeA1", "method", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Computing correlation matrix...",
+        "pt": "Calculando matriz de correlação..."
+      }
+    },
+    "PY_STATS_DESCRIPTIVE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName"],
+      "optionalSlots": ["rangeA1", "columns", "percentiles", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Computing descriptive statistics...",
+        "pt": "Calculando estatísticas descritivas..."
+      }
+    },
+    "PY_STATS_HYPOTHESIS_TEST": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "testType", "columns"],
+      "optionalSlots": ["rangeA1", "alpha", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Running {{testType}} hypothesis test...",
+        "pt": "Executando teste de hipótese {{testType}}..."
+      }
+    },
+    "PY_STATS_REGRESSION": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "dependentColumn", "independentColumns"],
+      "optionalSlots": ["rangeA1", "regressionType", "polynomialDegree", "outputRangeA1", "includeResiduals"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Running regression analysis...",
+        "pt": "Executando análise de regressão..."
+      }
+    },
+    "PY_TEXT_CLEAN_NORMALIZE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "columns"],
+      "optionalSlots": ["rangeA1", "operations", "outputColumn"],
+      "conflictsWith": ["XLSX_TRIM_WHITESPACE", "XLSX_NORMALIZE_VALUES"],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Cleaning and normalizing text...",
+        "pt": "Limpando e normalizando texto..."
+      }
+    },
+    "PY_TEXT_EXTRACT_REGEX": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column", "pattern"],
+      "optionalSlots": ["rangeA1", "groupIndex", "outputColumn"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Extracting text with regex...",
+        "pt": "Extraindo texto com regex..."
+      }
+    },
+    "PY_TEXT_SPLIT_COLUMN": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "column", "delimiter"],
+      "optionalSlots": ["rangeA1", "maxSplits", "outputColumnNames"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Splitting column {{column}}...",
+        "pt": "Dividindo coluna {{column}}..."
+      }
+    },
+    "PY_TIME_SERIES_DECOMPOSE": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "dateColumn", "valueColumn"],
+      "optionalSlots": ["rangeA1", "model", "period", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Decomposing time series...",
+        "pt": "Decompondo série temporal..."
+      }
+    },
+    "PY_TIME_SERIES_FORECAST": {
+      "domain": "python",
+      "runtimeOperator": "PY_COMPUTE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "dateColumn", "valueColumn", "periods"],
+      "optionalSlots": ["rangeA1", "frequency", "method", "confidenceLevel", "outputRangeA1"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Forecasting {{periods}} periods...",
+        "pt": "Prevendo {{periods}} períodos..."
+      }
+    },
+    "PY_WRITEBACK_RESULTS": {
+      "domain": "python",
+      "runtimeOperator": "PY_WRITEBACK",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": ["sheetName", "outputRangeA1", "data"],
+      "optionalSlots": ["includeHeaders", "formatNumbers"],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Writing results to {{outputRangeA1}}...",
+        "pt": "Escrevendo resultados em {{outputRangeA1}}..."
+      }
     }
   }
 }

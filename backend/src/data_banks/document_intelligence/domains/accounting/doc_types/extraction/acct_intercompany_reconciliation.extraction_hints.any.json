@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "id": "di_accounting_extraction_acct_intercompany_reconciliation",
+    "version": "1.1.0",
+    "description": "Extraction hints for intercompany reconciliation documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_intercompany_reconciliation"
+  },
+  "hints": [
+    {
+      "id": "hint_period",
+      "entity": "period",
+      "anchors": [
+        "period",
+        "reporting period",
+        "competencia",
+        "periodo"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_entity",
+      "entity": "entity",
+      "anchors": [
+        "entity",
+        "company",
+        "legal entity",
+        "empresa"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_currency",
+      "entity": "currency",
+      "anchors": [
+        "currency",
+        "moeda",
+        "curr",
+        "reporting currency"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_basis",
+      "entity": "basis",
+      "anchors": [
+        "basis",
+        "accounting basis",
+        "base contabil",
+        "regime"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_source_system",
+      "entity": "sourceSystem",
+      "anchors": [
+        "source system",
+        "erp",
+        "sistema origem",
+        "origem"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_counterpartyEntity",
+      "entity": "counterpartyEntity",
+      "anchors": [
+        "counterparty entity",
+        "counterparty Entity",
+        "counterpartyEntity"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_reconciliationDate",
+      "entity": "reconciliationDate",
+      "anchors": [
+        "reconciliation date",
+        "reconciliation Date",
+        "reconciliationDate"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_dueFromBalance",
+      "entity": "dueFromBalance",
+      "anchors": [
+        "due from balance",
+        "due From Balance",
+        "dueFromBalance"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_dueToBalance",
+      "entity": "dueToBalance",
+      "anchors": [
+        "due to balance",
+        "due To Balance",
+        "dueToBalance"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    }
+  ]
+}

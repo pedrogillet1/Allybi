@@ -1,0 +1,2540 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_banking",
+    "version": "1.0.0",
+    "description": "Table header ontology for banking documents with multilingual synonym coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "headers": [
+    {
+      "canonical": "account_amount",
+      "synonyms": [
+        "AA",
+        "account amount",
+        "Account Amount",
+        "account amount field",
+        "account amount value",
+        "account amt",
+        "accountamount",
+        "conta montante",
+        "conta valor",
+        "Conta Valor",
+        "conta valor valor"
+      ],
+      "related": [
+        "account_code",
+        "account_number",
+        "account_total"
+      ]
+    },
+    {
+      "canonical": "account_code",
+      "synonyms": [
+        "AC",
+        "account code",
+        "Account Code",
+        "account code field",
+        "account code value",
+        "accountcode",
+        "conta codigo",
+        "Conta Codigo",
+        "conta codigo valor"
+      ],
+      "related": [
+        "account_count",
+        "account_quantity",
+        "account_type"
+      ]
+    },
+    {
+      "canonical": "account_count",
+      "synonyms": [
+        "AC",
+        "account count",
+        "Account Count",
+        "account count field",
+        "account count value",
+        "accountcount",
+        "conta count",
+        "Conta Count",
+        "conta count valor"
+      ],
+      "related": [
+        "account_date",
+        "account_rate",
+        "account_unit"
+      ]
+    },
+    {
+      "canonical": "account_date",
+      "synonyms": [
+        "account date",
+        "Account Date",
+        "account date field",
+        "account date value",
+        "accountdate",
+        "AD",
+        "conta data",
+        "Conta Data",
+        "conta data valor"
+      ],
+      "related": [
+        "account_end_date",
+        "account_start_date",
+        "ach_amount"
+      ]
+    },
+    {
+      "canonical": "account_end_date",
+      "synonyms": [
+        "account end date",
+        "Account End Date",
+        "account end date field",
+        "account end date value",
+        "accountenddate",
+        "AED",
+        "conta fim data",
+        "Conta Fim Data",
+        "conta fim data valor"
+      ],
+      "related": [
+        "account_id",
+        "account_status",
+        "ach_code"
+      ]
+    },
+    {
+      "canonical": "account_id",
+      "synonyms": [
+        "account id",
+        "Account Id",
+        "account id field",
+        "account id value",
+        "accountid",
+        "AI",
+        "conta id",
+        "Conta Id",
+        "conta id valor"
+      ],
+      "related": [
+        "account_name",
+        "account_subtotal",
+        "ach_count"
+      ]
+    },
+    {
+      "canonical": "account_name",
+      "synonyms": [
+        "account name",
+        "Account Name",
+        "account name field",
+        "account name value",
+        "accountname",
+        "AN",
+        "conta nome",
+        "Conta Nome",
+        "conta nome valor"
+      ],
+      "related": [
+        "account_number",
+        "account_total",
+        "ach_date"
+      ]
+    },
+    {
+      "canonical": "account_number",
+      "synonyms": [
+        "account no",
+        "account number",
+        "Account Number",
+        "account number field",
+        "account number value",
+        "accountnumber",
+        "AN",
+        "conta numero",
+        "Conta Numero",
+        "conta numero valor"
+      ],
+      "related": [
+        "account_quantity",
+        "account_type",
+        "ach_end_date"
+      ]
+    },
+    {
+      "canonical": "account_quantity",
+      "synonyms": [
+        "account qty",
+        "account quantity",
+        "Account Quantity",
+        "account quantity field",
+        "account quantity value",
+        "accountquantity",
+        "AQ",
+        "conta quantidade",
+        "Conta Quantidade",
+        "conta quantidade valor"
+      ],
+      "related": [
+        "account_rate",
+        "account_unit",
+        "ach_id"
+      ]
+    },
+    {
+      "canonical": "account_rate",
+      "synonyms": [
+        "account rate",
+        "Account Rate",
+        "account rate field",
+        "account rate value",
+        "accountrate",
+        "AR",
+        "conta taxa",
+        "Conta Taxa",
+        "conta taxa valor"
+      ],
+      "related": [
+        "account_start_date",
+        "ach_amount",
+        "ach_name"
+      ]
+    },
+    {
+      "canonical": "account_start_date",
+      "synonyms": [
+        "account start date",
+        "Account Start Date",
+        "account start date field",
+        "account start date value",
+        "accountstartdate",
+        "ASD",
+        "conta inicio data",
+        "Conta Inicio Data",
+        "conta inicio data valor"
+      ],
+      "related": [
+        "account_status",
+        "ach_code",
+        "ach_number"
+      ]
+    },
+    {
+      "canonical": "account_status",
+      "synonyms": [
+        "account status",
+        "Account Status",
+        "account status field",
+        "account status value",
+        "accountstatus",
+        "AS",
+        "conta status",
+        "Conta Status",
+        "conta status valor"
+      ],
+      "related": [
+        "account_subtotal",
+        "ach_count",
+        "ach_quantity"
+      ]
+    },
+    {
+      "canonical": "account_subtotal",
+      "synonyms": [
+        "account subtotal",
+        "Account Subtotal",
+        "account subtotal field",
+        "account subtotal value",
+        "accountsubtotal",
+        "AS",
+        "conta subtotal",
+        "Conta Subtotal",
+        "conta subtotal valor"
+      ],
+      "related": [
+        "account_total",
+        "ach_date",
+        "ach_rate"
+      ]
+    },
+    {
+      "canonical": "account_total",
+      "synonyms": [
+        "account total",
+        "Account Total",
+        "account total field",
+        "account total value",
+        "accounttotal",
+        "AT",
+        "conta total",
+        "Conta Total",
+        "conta total valor"
+      ],
+      "related": [
+        "account_type",
+        "ach_end_date",
+        "ach_start_date"
+      ]
+    },
+    {
+      "canonical": "account_type",
+      "synonyms": [
+        "account type",
+        "Account Type",
+        "account type field",
+        "account type value",
+        "accounttype",
+        "AT",
+        "conta tipo",
+        "Conta Tipo",
+        "conta tipo valor"
+      ],
+      "related": [
+        "account_unit",
+        "ach_id",
+        "ach_status"
+      ]
+    },
+    {
+      "canonical": "account_unit",
+      "synonyms": [
+        "account unit",
+        "Account Unit",
+        "account unit field",
+        "account unit value",
+        "accountunit",
+        "AU",
+        "conta unidade",
+        "Conta Unidade",
+        "conta unidade valor"
+      ],
+      "related": [
+        "ach_amount",
+        "ach_name",
+        "ach_subtotal"
+      ]
+    },
+    {
+      "canonical": "ach_amount",
+      "synonyms": [
+        "AA",
+        "ach amount",
+        "Ach Amount",
+        "ach amount field",
+        "ach amount value",
+        "ach amt",
+        "ach montante",
+        "ach valor",
+        "Ach Valor",
+        "ach valor valor",
+        "achamount"
+      ],
+      "related": [
+        "ach_code",
+        "ach_number",
+        "ach_total"
+      ]
+    },
+    {
+      "canonical": "ach_code",
+      "synonyms": [
+        "AC",
+        "ach code",
+        "Ach Code",
+        "ach code field",
+        "ach code value",
+        "ach codigo",
+        "Ach Codigo",
+        "ach codigo valor",
+        "achcode"
+      ],
+      "related": [
+        "ach_count",
+        "ach_quantity",
+        "ach_type"
+      ]
+    },
+    {
+      "canonical": "ach_count",
+      "synonyms": [
+        "AC",
+        "ach count",
+        "Ach Count",
+        "ach count field",
+        "ach count valor",
+        "ach count value",
+        "achcount"
+      ],
+      "related": [
+        "ach_date",
+        "ach_rate",
+        "ach_unit"
+      ]
+    },
+    {
+      "canonical": "ach_date",
+      "synonyms": [
+        "ach data",
+        "Ach Data",
+        "ach data valor",
+        "ach date",
+        "Ach Date",
+        "ach date field",
+        "ach date value",
+        "achdate",
+        "AD"
+      ],
+      "related": [
+        "ach_end_date",
+        "ach_start_date",
+        "amount_amount"
+      ]
+    },
+    {
+      "canonical": "ach_end_date",
+      "synonyms": [
+        "ach end date",
+        "Ach End Date",
+        "ach end date field",
+        "ach end date value",
+        "ach fim data",
+        "Ach Fim Data",
+        "ach fim data valor",
+        "achenddate",
+        "AED"
+      ],
+      "related": [
+        "ach_id",
+        "ach_status",
+        "amount_code"
+      ]
+    },
+    {
+      "canonical": "ach_id",
+      "synonyms": [
+        "ach id",
+        "Ach Id",
+        "ach id field",
+        "ach id valor",
+        "ach id value",
+        "achid",
+        "AI"
+      ],
+      "related": [
+        "ach_name",
+        "ach_subtotal",
+        "amount_count"
+      ]
+    },
+    {
+      "canonical": "ach_name",
+      "synonyms": [
+        "ach name",
+        "Ach Name",
+        "ach name field",
+        "ach name value",
+        "ach nome",
+        "Ach Nome",
+        "ach nome valor",
+        "achname",
+        "AN"
+      ],
+      "related": [
+        "ach_number",
+        "ach_total",
+        "amount_date"
+      ]
+    },
+    {
+      "canonical": "ach_number",
+      "synonyms": [
+        "ach no",
+        "ach number",
+        "Ach Number",
+        "ach number field",
+        "ach number value",
+        "ach numero",
+        "Ach Numero",
+        "ach numero valor",
+        "achnumber",
+        "AN"
+      ],
+      "related": [
+        "ach_quantity",
+        "ach_type",
+        "amount_end_date"
+      ]
+    },
+    {
+      "canonical": "ach_quantity",
+      "synonyms": [
+        "ach qty",
+        "ach quantidade",
+        "Ach Quantidade",
+        "ach quantidade valor",
+        "ach quantity",
+        "Ach Quantity",
+        "ach quantity field",
+        "ach quantity value",
+        "achquantity",
+        "AQ"
+      ],
+      "related": [
+        "ach_rate",
+        "ach_unit",
+        "amount_id"
+      ]
+    },
+    {
+      "canonical": "ach_rate",
+      "synonyms": [
+        "ach rate",
+        "Ach Rate",
+        "ach rate field",
+        "ach rate value",
+        "ach taxa",
+        "Ach Taxa",
+        "ach taxa valor",
+        "achrate",
+        "AR"
+      ],
+      "related": [
+        "ach_start_date",
+        "amount_amount",
+        "amount_name"
+      ]
+    },
+    {
+      "canonical": "ach_start_date",
+      "synonyms": [
+        "ach inicio data",
+        "Ach Inicio Data",
+        "ach inicio data valor",
+        "ach start date",
+        "Ach Start Date",
+        "ach start date field",
+        "ach start date value",
+        "achstartdate",
+        "ASD"
+      ],
+      "related": [
+        "ach_status",
+        "amount_code",
+        "amount_number"
+      ]
+    },
+    {
+      "canonical": "ach_status",
+      "synonyms": [
+        "ach status",
+        "Ach Status",
+        "ach status field",
+        "ach status valor",
+        "ach status value",
+        "achstatus",
+        "AS"
+      ],
+      "related": [
+        "ach_subtotal",
+        "amount_count",
+        "amount_quantity"
+      ]
+    },
+    {
+      "canonical": "ach_subtotal",
+      "synonyms": [
+        "ach subtotal",
+        "Ach Subtotal",
+        "ach subtotal field",
+        "ach subtotal valor",
+        "ach subtotal value",
+        "achsubtotal",
+        "AS"
+      ],
+      "related": [
+        "ach_total",
+        "amount_date",
+        "amount_rate"
+      ]
+    },
+    {
+      "canonical": "ach_total",
+      "synonyms": [
+        "ach total",
+        "Ach Total",
+        "ach total field",
+        "ach total valor",
+        "ach total value",
+        "achtotal",
+        "AT"
+      ],
+      "related": [
+        "ach_type",
+        "amount_end_date",
+        "amount_start_date"
+      ]
+    },
+    {
+      "canonical": "ach_type",
+      "synonyms": [
+        "ach tipo",
+        "Ach Tipo",
+        "ach tipo valor",
+        "ach type",
+        "Ach Type",
+        "ach type field",
+        "ach type value",
+        "achtype",
+        "AT"
+      ],
+      "related": [
+        "ach_unit",
+        "amount_id",
+        "amount_status"
+      ]
+    },
+    {
+      "canonical": "ach_unit",
+      "synonyms": [
+        "ach unidade",
+        "Ach Unidade",
+        "ach unidade valor",
+        "ach unit",
+        "Ach Unit",
+        "ach unit field",
+        "ach unit value",
+        "achunit",
+        "AU"
+      ],
+      "related": [
+        "amount_amount",
+        "amount_name",
+        "amount_subtotal"
+      ]
+    },
+    {
+      "canonical": "amount_amount",
+      "synonyms": [
+        "AA",
+        "amount amount",
+        "Amount Amount",
+        "amount amount field",
+        "amount amount value",
+        "amountamount",
+        "amt amount",
+        "montante valor",
+        "valor valor",
+        "Valor Valor",
+        "valor valor valor"
+      ],
+      "related": [
+        "amount_code",
+        "amount_number",
+        "amount_total"
+      ]
+    },
+    {
+      "canonical": "amount_code",
+      "synonyms": [
+        "AC",
+        "amount code",
+        "Amount Code",
+        "amount code field",
+        "amount code value",
+        "amountcode",
+        "amt code",
+        "montante codigo",
+        "valor codigo",
+        "Valor Codigo",
+        "valor codigo valor"
+      ],
+      "related": [
+        "amount_count",
+        "amount_quantity",
+        "amount_type"
+      ]
+    },
+    {
+      "canonical": "amount_count",
+      "synonyms": [
+        "AC",
+        "amount count",
+        "Amount Count",
+        "amount count field",
+        "amount count value",
+        "amountcount",
+        "amt count",
+        "montante count",
+        "valor count",
+        "Valor Count",
+        "valor count valor"
+      ],
+      "related": [
+        "amount_date",
+        "amount_rate",
+        "amount_unit"
+      ]
+    },
+    {
+      "canonical": "amount_date",
+      "synonyms": [
+        "AD",
+        "amount date",
+        "Amount Date",
+        "amount date field",
+        "amount date value",
+        "amountdate",
+        "amt date",
+        "montante data",
+        "valor data",
+        "Valor Data",
+        "valor data valor"
+      ],
+      "related": [
+        "amount_end_date",
+        "amount_start_date",
+        "authorization_amount"
+      ]
+    },
+    {
+      "canonical": "amount_end_date",
+      "synonyms": [
+        "AED",
+        "amount end date",
+        "Amount End Date",
+        "amount end date field",
+        "amount end date value",
+        "amountenddate",
+        "amt end date",
+        "montante fim data",
+        "valor fim data",
+        "Valor Fim Data",
+        "valor fim data valor"
+      ],
+      "related": [
+        "amount_id",
+        "amount_status",
+        "authorization_code"
+      ]
+    },
+    {
+      "canonical": "amount_id",
+      "synonyms": [
+        "AI",
+        "amount id",
+        "Amount Id",
+        "amount id field",
+        "amount id value",
+        "amountid",
+        "amt id",
+        "montante id",
+        "valor id",
+        "Valor Id",
+        "valor id valor"
+      ],
+      "related": [
+        "amount_name",
+        "amount_subtotal",
+        "authorization_count"
+      ]
+    },
+    {
+      "canonical": "amount_name",
+      "synonyms": [
+        "amount name",
+        "Amount Name",
+        "amount name field",
+        "amount name value",
+        "amountname",
+        "amt name",
+        "AN",
+        "montante nome",
+        "valor nome",
+        "Valor Nome",
+        "valor nome valor"
+      ],
+      "related": [
+        "amount_number",
+        "amount_total",
+        "authorization_date"
+      ]
+    },
+    {
+      "canonical": "amount_number",
+      "synonyms": [
+        "amount no",
+        "amount number",
+        "Amount Number",
+        "amount number field",
+        "amount number value",
+        "amountnumber",
+        "amt number",
+        "AN",
+        "montante numero",
+        "valor numero",
+        "Valor Numero",
+        "valor numero valor"
+      ],
+      "related": [
+        "amount_quantity",
+        "amount_type",
+        "authorization_end_date"
+      ]
+    },
+    {
+      "canonical": "amount_quantity",
+      "synonyms": [
+        "amount qty",
+        "amount quantity",
+        "Amount Quantity",
+        "amount quantity field",
+        "amount quantity value",
+        "amountquantity",
+        "amt quantity",
+        "AQ",
+        "montante quantidade",
+        "valor quantidade",
+        "Valor Quantidade",
+        "valor quantidade valor"
+      ],
+      "related": [
+        "amount_rate",
+        "amount_unit",
+        "authorization_id"
+      ]
+    },
+    {
+      "canonical": "amount_rate",
+      "synonyms": [
+        "amount rate",
+        "Amount Rate",
+        "amount rate field",
+        "amount rate value",
+        "amountrate",
+        "amt rate",
+        "AR",
+        "montante taxa",
+        "valor taxa",
+        "Valor Taxa",
+        "valor taxa valor"
+      ],
+      "related": [
+        "amount_start_date",
+        "authorization_amount",
+        "authorization_name"
+      ]
+    },
+    {
+      "canonical": "amount_start_date",
+      "synonyms": [
+        "amount start date",
+        "Amount Start Date",
+        "amount start date field",
+        "amount start date value",
+        "amountstartdate",
+        "amt start date",
+        "ASD",
+        "montante inicio data",
+        "valor inicio data",
+        "Valor Inicio Data",
+        "valor inicio data valor"
+      ],
+      "related": [
+        "amount_status",
+        "authorization_code",
+        "authorization_number"
+      ]
+    },
+    {
+      "canonical": "amount_status",
+      "synonyms": [
+        "amount status",
+        "Amount Status",
+        "amount status field",
+        "amount status value",
+        "amountstatus",
+        "amt status",
+        "AS",
+        "montante status",
+        "valor status",
+        "Valor Status",
+        "valor status valor"
+      ],
+      "related": [
+        "amount_subtotal",
+        "authorization_count",
+        "authorization_quantity"
+      ]
+    },
+    {
+      "canonical": "amount_subtotal",
+      "synonyms": [
+        "amount subtotal",
+        "Amount Subtotal",
+        "amount subtotal field",
+        "amount subtotal value",
+        "amountsubtotal",
+        "amt subtotal",
+        "AS",
+        "montante subtotal",
+        "valor subtotal",
+        "Valor Subtotal",
+        "valor subtotal valor"
+      ],
+      "related": [
+        "amount_total",
+        "authorization_date",
+        "authorization_rate"
+      ]
+    },
+    {
+      "canonical": "amount_total",
+      "synonyms": [
+        "amount total",
+        "Amount Total",
+        "amount total field",
+        "amount total value",
+        "amounttotal",
+        "amt total",
+        "AT",
+        "montante total",
+        "valor total",
+        "Valor Total",
+        "valor total valor"
+      ],
+      "related": [
+        "amount_type",
+        "authorization_end_date",
+        "authorization_start_date"
+      ]
+    },
+    {
+      "canonical": "amount_type",
+      "synonyms": [
+        "amount type",
+        "Amount Type",
+        "amount type field",
+        "amount type value",
+        "amounttype",
+        "amt type",
+        "AT",
+        "montante tipo",
+        "valor tipo",
+        "Valor Tipo",
+        "valor tipo valor"
+      ],
+      "related": [
+        "amount_unit",
+        "authorization_id",
+        "authorization_status"
+      ]
+    },
+    {
+      "canonical": "amount_unit",
+      "synonyms": [
+        "amount unit",
+        "Amount Unit",
+        "amount unit field",
+        "amount unit value",
+        "amountunit",
+        "amt unit",
+        "AU",
+        "montante unidade",
+        "valor unidade",
+        "Valor Unidade",
+        "valor unidade valor"
+      ],
+      "related": [
+        "authorization_amount",
+        "authorization_name",
+        "authorization_subtotal"
+      ]
+    },
+    {
+      "canonical": "authorization_amount",
+      "synonyms": [
+        "AA",
+        "authorization amount",
+        "Authorization Amount",
+        "authorization amount field",
+        "authorization amount value",
+        "authorization amt",
+        "authorization montante",
+        "authorization valor",
+        "Authorization Valor",
+        "authorization valor valor",
+        "authorizationamount"
+      ],
+      "related": [
+        "authorization_code",
+        "authorization_number",
+        "authorization_total"
+      ]
+    },
+    {
+      "canonical": "authorization_code",
+      "synonyms": [
+        "AC",
+        "authorization code",
+        "Authorization Code",
+        "authorization code field",
+        "authorization code value",
+        "authorization codigo",
+        "Authorization Codigo",
+        "authorization codigo valor",
+        "authorizationcode"
+      ],
+      "related": [
+        "authorization_count",
+        "authorization_quantity",
+        "authorization_type"
+      ]
+    },
+    {
+      "canonical": "authorization_count",
+      "synonyms": [
+        "AC",
+        "authorization count",
+        "Authorization Count",
+        "authorization count field",
+        "authorization count valor",
+        "authorization count value",
+        "authorizationcount"
+      ],
+      "related": [
+        "authorization_date",
+        "authorization_rate",
+        "authorization_unit"
+      ]
+    },
+    {
+      "canonical": "authorization_date",
+      "synonyms": [
+        "AD",
+        "authorization data",
+        "Authorization Data",
+        "authorization data valor",
+        "authorization date",
+        "Authorization Date",
+        "authorization date field",
+        "authorization date value",
+        "authorizationdate"
+      ],
+      "related": [
+        "authorization_end_date",
+        "authorization_start_date",
+        "available_balance_amount"
+      ]
+    },
+    {
+      "canonical": "authorization_end_date",
+      "synonyms": [
+        "AED",
+        "authorization end date",
+        "Authorization End Date",
+        "authorization end date field",
+        "authorization end date value",
+        "authorization fim data",
+        "Authorization Fim Data",
+        "authorization fim data valor",
+        "authorizationenddate"
+      ],
+      "related": [
+        "authorization_id",
+        "authorization_status",
+        "available_balance_code"
+      ]
+    },
+    {
+      "canonical": "authorization_id",
+      "synonyms": [
+        "AI",
+        "authorization id",
+        "Authorization Id",
+        "authorization id field",
+        "authorization id valor",
+        "authorization id value",
+        "authorizationid"
+      ],
+      "related": [
+        "authorization_name",
+        "authorization_subtotal",
+        "available_balance_count"
+      ]
+    },
+    {
+      "canonical": "authorization_name",
+      "synonyms": [
+        "AN",
+        "authorization name",
+        "Authorization Name",
+        "authorization name field",
+        "authorization name value",
+        "authorization nome",
+        "Authorization Nome",
+        "authorization nome valor",
+        "authorizationname"
+      ],
+      "related": [
+        "authorization_number",
+        "authorization_total",
+        "available_balance_date"
+      ]
+    },
+    {
+      "canonical": "authorization_number",
+      "synonyms": [
+        "AN",
+        "authorization no",
+        "authorization number",
+        "Authorization Number",
+        "authorization number field",
+        "authorization number value",
+        "authorization numero",
+        "Authorization Numero",
+        "authorization numero valor",
+        "authorizationnumber"
+      ],
+      "related": [
+        "authorization_quantity",
+        "authorization_type",
+        "available_balance_end_date"
+      ]
+    },
+    {
+      "canonical": "authorization_quantity",
+      "synonyms": [
+        "AQ",
+        "authorization qty",
+        "authorization quantidade",
+        "Authorization Quantidade",
+        "authorization quantidade valor",
+        "authorization quantity",
+        "Authorization Quantity",
+        "authorization quantity field",
+        "authorization quantity value",
+        "authorizationquantity"
+      ],
+      "related": [
+        "authorization_rate",
+        "authorization_unit",
+        "available_balance_id"
+      ]
+    },
+    {
+      "canonical": "authorization_rate",
+      "synonyms": [
+        "AR",
+        "authorization rate",
+        "Authorization Rate",
+        "authorization rate field",
+        "authorization rate value",
+        "authorization taxa",
+        "Authorization Taxa",
+        "authorization taxa valor",
+        "authorizationrate"
+      ],
+      "related": [
+        "authorization_start_date",
+        "available_balance_amount",
+        "available_balance_name"
+      ]
+    },
+    {
+      "canonical": "authorization_start_date",
+      "synonyms": [
+        "ASD",
+        "authorization inicio data",
+        "Authorization Inicio Data",
+        "authorization inicio data valor",
+        "authorization start date",
+        "Authorization Start Date",
+        "authorization start date field",
+        "authorization start date value",
+        "authorizationstartdate"
+      ],
+      "related": [
+        "authorization_status",
+        "available_balance_code",
+        "available_balance_number"
+      ]
+    },
+    {
+      "canonical": "authorization_status",
+      "synonyms": [
+        "AS",
+        "authorization status",
+        "Authorization Status",
+        "authorization status field",
+        "authorization status valor",
+        "authorization status value",
+        "authorizationstatus"
+      ],
+      "related": [
+        "authorization_subtotal",
+        "available_balance_count",
+        "available_balance_quantity"
+      ]
+    },
+    {
+      "canonical": "authorization_subtotal",
+      "synonyms": [
+        "AS",
+        "authorization subtotal",
+        "Authorization Subtotal",
+        "authorization subtotal field",
+        "authorization subtotal valor",
+        "authorization subtotal value",
+        "authorizationsubtotal"
+      ],
+      "related": [
+        "authorization_total",
+        "available_balance_date",
+        "available_balance_rate"
+      ]
+    },
+    {
+      "canonical": "authorization_total",
+      "synonyms": [
+        "AT",
+        "authorization total",
+        "Authorization Total",
+        "authorization total field",
+        "authorization total valor",
+        "authorization total value",
+        "authorizationtotal"
+      ],
+      "related": [
+        "authorization_type",
+        "available_balance_end_date",
+        "available_balance_start_date"
+      ]
+    },
+    {
+      "canonical": "authorization_type",
+      "synonyms": [
+        "AT",
+        "authorization tipo",
+        "Authorization Tipo",
+        "authorization tipo valor",
+        "authorization type",
+        "Authorization Type",
+        "authorization type field",
+        "authorization type value",
+        "authorizationtype"
+      ],
+      "related": [
+        "authorization_unit",
+        "available_balance_id",
+        "available_balance_status"
+      ]
+    },
+    {
+      "canonical": "authorization_unit",
+      "synonyms": [
+        "AU",
+        "authorization unidade",
+        "Authorization Unidade",
+        "authorization unidade valor",
+        "authorization unit",
+        "Authorization Unit",
+        "authorization unit field",
+        "authorization unit value",
+        "authorizationunit"
+      ],
+      "related": [
+        "available_balance_amount",
+        "available_balance_name",
+        "available_balance_subtotal"
+      ]
+    },
+    {
+      "canonical": "available_balance_amount",
+      "synonyms": [
+        "ABA",
+        "available balance amount",
+        "Available Balance Amount",
+        "available balance amount field",
+        "available balance amount value",
+        "available balance amt",
+        "available saldo montante",
+        "available saldo valor",
+        "Available Saldo Valor",
+        "available saldo valor valor",
+        "availablebalanceamount"
+      ],
+      "related": [
+        "available_balance_code",
+        "available_balance_number",
+        "available_balance_total"
+      ]
+    },
+    {
+      "canonical": "available_balance_code",
+      "synonyms": [
+        "ABC",
+        "available balance code",
+        "Available Balance Code",
+        "available balance code field",
+        "available balance code value",
+        "available saldo codigo",
+        "Available Saldo Codigo",
+        "available saldo codigo valor",
+        "availablebalancecode"
+      ],
+      "related": [
+        "available_balance_count",
+        "available_balance_quantity",
+        "available_balance_type"
+      ]
+    },
+    {
+      "canonical": "available_balance_count",
+      "synonyms": [
+        "ABC",
+        "available balance count",
+        "Available Balance Count",
+        "available balance count field",
+        "available balance count value",
+        "available saldo count",
+        "Available Saldo Count",
+        "available saldo count valor",
+        "availablebalancecount"
+      ],
+      "related": [
+        "available_balance_date",
+        "available_balance_rate",
+        "available_balance_unit"
+      ]
+    },
+    {
+      "canonical": "available_balance_date",
+      "synonyms": [
+        "ABD",
+        "available balance date",
+        "Available Balance Date",
+        "available balance date field",
+        "available balance date value",
+        "available saldo data",
+        "Available Saldo Data",
+        "available saldo data valor",
+        "availablebalancedate"
+      ],
+      "related": [
+        "available_balance_end_date",
+        "available_balance_start_date",
+        "bank_amount"
+      ]
+    },
+    {
+      "canonical": "available_balance_end_date",
+      "synonyms": [
+        "ABED",
+        "available balance end date",
+        "Available Balance End Date",
+        "available balance end date field",
+        "available balance end date value",
+        "available saldo fim data",
+        "Available Saldo Fim Data",
+        "available saldo fim data valor",
+        "availablebalanceenddate"
+      ],
+      "related": [
+        "available_balance_id",
+        "available_balance_status",
+        "bank_code"
+      ]
+    },
+    {
+      "canonical": "available_balance_id",
+      "synonyms": [
+        "ABI",
+        "available balance id",
+        "Available Balance Id",
+        "available balance id field",
+        "available balance id value",
+        "available saldo id",
+        "Available Saldo Id",
+        "available saldo id valor",
+        "availablebalanceid"
+      ],
+      "related": [
+        "available_balance_name",
+        "available_balance_subtotal",
+        "bank_count"
+      ]
+    },
+    {
+      "canonical": "available_balance_name",
+      "synonyms": [
+        "ABN",
+        "available balance name",
+        "Available Balance Name",
+        "available balance name field",
+        "available balance name value",
+        "available saldo nome",
+        "Available Saldo Nome",
+        "available saldo nome valor",
+        "availablebalancename"
+      ],
+      "related": [
+        "available_balance_number",
+        "available_balance_total",
+        "bank_date"
+      ]
+    },
+    {
+      "canonical": "available_balance_number",
+      "synonyms": [
+        "ABN",
+        "available balance no",
+        "available balance number",
+        "Available Balance Number",
+        "available balance number field",
+        "available balance number value",
+        "available saldo numero",
+        "Available Saldo Numero",
+        "available saldo numero valor",
+        "availablebalancenumber"
+      ],
+      "related": [
+        "available_balance_quantity",
+        "available_balance_type",
+        "bank_end_date"
+      ]
+    },
+    {
+      "canonical": "available_balance_quantity",
+      "synonyms": [
+        "ABQ",
+        "available balance qty",
+        "available balance quantity",
+        "Available Balance Quantity",
+        "available balance quantity field",
+        "available balance quantity value",
+        "available saldo quantidade",
+        "Available Saldo Quantidade",
+        "available saldo quantidade valor",
+        "availablebalancequantity"
+      ],
+      "related": [
+        "available_balance_rate",
+        "available_balance_unit",
+        "bank_id"
+      ]
+    },
+    {
+      "canonical": "available_balance_rate",
+      "synonyms": [
+        "ABR",
+        "available balance rate",
+        "Available Balance Rate",
+        "available balance rate field",
+        "available balance rate value",
+        "available saldo taxa",
+        "Available Saldo Taxa",
+        "available saldo taxa valor",
+        "availablebalancerate"
+      ],
+      "related": [
+        "available_balance_start_date",
+        "bank_amount",
+        "bank_name"
+      ]
+    },
+    {
+      "canonical": "available_balance_start_date",
+      "synonyms": [
+        "ABSD",
+        "available balance start date",
+        "Available Balance Start Date",
+        "available balance start date field",
+        "available balance start date value",
+        "available saldo inicio data",
+        "Available Saldo Inicio Data",
+        "available saldo inicio data valor",
+        "availablebalancestartdate"
+      ],
+      "related": [
+        "available_balance_status",
+        "bank_code",
+        "bank_number"
+      ]
+    },
+    {
+      "canonical": "available_balance_status",
+      "synonyms": [
+        "ABS",
+        "available balance status",
+        "Available Balance Status",
+        "available balance status field",
+        "available balance status value",
+        "available saldo status",
+        "Available Saldo Status",
+        "available saldo status valor",
+        "availablebalancestatus"
+      ],
+      "related": [
+        "available_balance_subtotal",
+        "bank_count",
+        "bank_quantity"
+      ]
+    },
+    {
+      "canonical": "available_balance_subtotal",
+      "synonyms": [
+        "ABS",
+        "available balance subtotal",
+        "Available Balance Subtotal",
+        "available balance subtotal field",
+        "available balance subtotal value",
+        "available saldo subtotal",
+        "Available Saldo Subtotal",
+        "available saldo subtotal valor",
+        "availablebalancesubtotal"
+      ],
+      "related": [
+        "available_balance_total",
+        "bank_date",
+        "bank_rate"
+      ]
+    },
+    {
+      "canonical": "available_balance_total",
+      "synonyms": [
+        "ABT",
+        "available balance total",
+        "Available Balance Total",
+        "available balance total field",
+        "available balance total value",
+        "available saldo total",
+        "Available Saldo Total",
+        "available saldo total valor",
+        "availablebalancetotal"
+      ],
+      "related": [
+        "available_balance_type",
+        "bank_end_date",
+        "bank_start_date"
+      ]
+    },
+    {
+      "canonical": "available_balance_type",
+      "synonyms": [
+        "ABT",
+        "available balance type",
+        "Available Balance Type",
+        "available balance type field",
+        "available balance type value",
+        "available saldo tipo",
+        "Available Saldo Tipo",
+        "available saldo tipo valor",
+        "availablebalancetype"
+      ],
+      "related": [
+        "available_balance_unit",
+        "bank_id",
+        "bank_status"
+      ]
+    },
+    {
+      "canonical": "available_balance_unit",
+      "synonyms": [
+        "ABU",
+        "available balance unit",
+        "Available Balance Unit",
+        "available balance unit field",
+        "available balance unit value",
+        "available saldo unidade",
+        "Available Saldo Unidade",
+        "available saldo unidade valor",
+        "availablebalanceunit"
+      ],
+      "related": [
+        "bank_amount",
+        "bank_name",
+        "bank_subtotal"
+      ]
+    },
+    {
+      "canonical": "bank_amount",
+      "synonyms": [
+        "BA",
+        "bank amount",
+        "Bank Amount",
+        "bank amount field",
+        "bank amount value",
+        "bank amt",
+        "bank montante",
+        "bank valor",
+        "Bank Valor",
+        "bank valor valor",
+        "bankamount"
+      ],
+      "related": [
+        "bank_code",
+        "bank_number",
+        "bank_total"
+      ]
+    },
+    {
+      "canonical": "bank_code",
+      "synonyms": [
+        "bank code",
+        "Bank Code",
+        "bank code field",
+        "bank code value",
+        "bank codigo",
+        "Bank Codigo",
+        "bank codigo valor",
+        "bankcode",
+        "BC"
+      ],
+      "related": [
+        "bank_count",
+        "bank_quantity",
+        "bank_type"
+      ]
+    },
+    {
+      "canonical": "bank_count",
+      "synonyms": [
+        "bank count",
+        "Bank Count",
+        "bank count field",
+        "bank count valor",
+        "bank count value",
+        "bankcount",
+        "BC"
+      ],
+      "related": [
+        "bank_date",
+        "bank_rate",
+        "bank_unit"
+      ]
+    },
+    {
+      "canonical": "bank_date",
+      "synonyms": [
+        "bank data",
+        "Bank Data",
+        "bank data valor",
+        "bank date",
+        "Bank Date",
+        "bank date field",
+        "bank date value",
+        "bankdate",
+        "BD"
+      ],
+      "related": [
+        "bank_end_date",
+        "bank_start_date",
+        "beneficiary_amount"
+      ]
+    },
+    {
+      "canonical": "bank_end_date",
+      "synonyms": [
+        "bank end date",
+        "Bank End Date",
+        "bank end date field",
+        "bank end date value",
+        "bank fim data",
+        "Bank Fim Data",
+        "bank fim data valor",
+        "bankenddate",
+        "BED"
+      ],
+      "related": [
+        "bank_id",
+        "bank_status",
+        "beneficiary_code"
+      ]
+    },
+    {
+      "canonical": "bank_id",
+      "synonyms": [
+        "bank id",
+        "Bank Id",
+        "bank id field",
+        "bank id valor",
+        "bank id value",
+        "bankid",
+        "BI"
+      ],
+      "related": [
+        "bank_name",
+        "bank_subtotal",
+        "beneficiary_count"
+      ]
+    },
+    {
+      "canonical": "bank_name",
+      "synonyms": [
+        "bank name",
+        "Bank Name",
+        "bank name field",
+        "bank name value",
+        "bank nome",
+        "Bank Nome",
+        "bank nome valor",
+        "bankname",
+        "BN"
+      ],
+      "related": [
+        "bank_number",
+        "bank_total",
+        "beneficiary_date"
+      ]
+    },
+    {
+      "canonical": "bank_number",
+      "synonyms": [
+        "bank no",
+        "bank number",
+        "Bank Number",
+        "bank number field",
+        "bank number value",
+        "bank numero",
+        "Bank Numero",
+        "bank numero valor",
+        "banknumber",
+        "BN"
+      ],
+      "related": [
+        "bank_quantity",
+        "bank_type",
+        "beneficiary_end_date"
+      ]
+    },
+    {
+      "canonical": "bank_quantity",
+      "synonyms": [
+        "bank qty",
+        "bank quantidade",
+        "Bank Quantidade",
+        "bank quantidade valor",
+        "bank quantity",
+        "Bank Quantity",
+        "bank quantity field",
+        "bank quantity value",
+        "bankquantity",
+        "BQ"
+      ],
+      "related": [
+        "bank_rate",
+        "bank_unit",
+        "beneficiary_id"
+      ]
+    },
+    {
+      "canonical": "bank_rate",
+      "synonyms": [
+        "bank rate",
+        "Bank Rate",
+        "bank rate field",
+        "bank rate value",
+        "bank taxa",
+        "Bank Taxa",
+        "bank taxa valor",
+        "bankrate",
+        "BR"
+      ],
+      "related": [
+        "bank_start_date",
+        "beneficiary_amount",
+        "beneficiary_name"
+      ]
+    },
+    {
+      "canonical": "bank_start_date",
+      "synonyms": [
+        "bank inicio data",
+        "Bank Inicio Data",
+        "bank inicio data valor",
+        "bank start date",
+        "Bank Start Date",
+        "bank start date field",
+        "bank start date value",
+        "bankstartdate",
+        "BSD"
+      ],
+      "related": [
+        "bank_status",
+        "beneficiary_code",
+        "beneficiary_number"
+      ]
+    },
+    {
+      "canonical": "bank_status",
+      "synonyms": [
+        "bank status",
+        "Bank Status",
+        "bank status field",
+        "bank status valor",
+        "bank status value",
+        "bankstatus",
+        "BS"
+      ],
+      "related": [
+        "bank_subtotal",
+        "beneficiary_count",
+        "beneficiary_quantity"
+      ]
+    },
+    {
+      "canonical": "bank_subtotal",
+      "synonyms": [
+        "bank subtotal",
+        "Bank Subtotal",
+        "bank subtotal field",
+        "bank subtotal valor",
+        "bank subtotal value",
+        "banksubtotal",
+        "BS"
+      ],
+      "related": [
+        "bank_total",
+        "beneficiary_date",
+        "beneficiary_rate"
+      ]
+    },
+    {
+      "canonical": "bank_total",
+      "synonyms": [
+        "bank total",
+        "Bank Total",
+        "bank total field",
+        "bank total valor",
+        "bank total value",
+        "banktotal",
+        "BT"
+      ],
+      "related": [
+        "bank_type",
+        "beneficiary_end_date",
+        "beneficiary_start_date"
+      ]
+    },
+    {
+      "canonical": "bank_type",
+      "synonyms": [
+        "bank tipo",
+        "Bank Tipo",
+        "bank tipo valor",
+        "bank type",
+        "Bank Type",
+        "bank type field",
+        "bank type value",
+        "banktype",
+        "BT"
+      ],
+      "related": [
+        "bank_unit",
+        "beneficiary_id",
+        "beneficiary_status"
+      ]
+    },
+    {
+      "canonical": "bank_unit",
+      "synonyms": [
+        "bank unidade",
+        "Bank Unidade",
+        "bank unidade valor",
+        "bank unit",
+        "Bank Unit",
+        "bank unit field",
+        "bank unit value",
+        "bankunit",
+        "BU"
+      ],
+      "related": [
+        "beneficiary_amount",
+        "beneficiary_name",
+        "beneficiary_subtotal"
+      ]
+    },
+    {
+      "canonical": "beneficiary_amount",
+      "synonyms": [
+        "BA",
+        "beneficiary amount",
+        "Beneficiary Amount",
+        "beneficiary amount field",
+        "beneficiary amount value",
+        "beneficiary amt",
+        "beneficiary montante",
+        "beneficiary valor",
+        "Beneficiary Valor",
+        "beneficiary valor valor",
+        "beneficiaryamount"
+      ],
+      "related": [
+        "beneficiary_code",
+        "beneficiary_number",
+        "beneficiary_total"
+      ]
+    },
+    {
+      "canonical": "beneficiary_code",
+      "synonyms": [
+        "BC",
+        "beneficiary code",
+        "Beneficiary Code",
+        "beneficiary code field",
+        "beneficiary code value",
+        "beneficiary codigo",
+        "Beneficiary Codigo",
+        "beneficiary codigo valor",
+        "beneficiarycode"
+      ],
+      "related": [
+        "beneficiary_count",
+        "beneficiary_quantity",
+        "beneficiary_type"
+      ]
+    },
+    {
+      "canonical": "beneficiary_count",
+      "synonyms": [
+        "BC",
+        "beneficiary count",
+        "Beneficiary Count",
+        "beneficiary count field",
+        "beneficiary count valor",
+        "beneficiary count value",
+        "beneficiarycount"
+      ],
+      "related": [
+        "beneficiary_date",
+        "beneficiary_rate",
+        "beneficiary_unit"
+      ]
+    },
+    {
+      "canonical": "beneficiary_date",
+      "synonyms": [
+        "BD",
+        "beneficiary data",
+        "Beneficiary Data",
+        "beneficiary data valor",
+        "beneficiary date",
+        "Beneficiary Date",
+        "beneficiary date field",
+        "beneficiary date value",
+        "beneficiarydate"
+      ],
+      "related": [
+        "beneficiary_end_date",
+        "beneficiary_start_date",
+        "branch_amount"
+      ]
+    },
+    {
+      "canonical": "beneficiary_end_date",
+      "synonyms": [
+        "BED",
+        "beneficiary end date",
+        "Beneficiary End Date",
+        "beneficiary end date field",
+        "beneficiary end date value",
+        "beneficiary fim data",
+        "Beneficiary Fim Data",
+        "beneficiary fim data valor",
+        "beneficiaryenddate"
+      ],
+      "related": [
+        "beneficiary_id",
+        "beneficiary_status",
+        "branch_code"
+      ]
+    },
+    {
+      "canonical": "beneficiary_id",
+      "synonyms": [
+        "beneficiary id",
+        "Beneficiary Id",
+        "beneficiary id field",
+        "beneficiary id valor",
+        "beneficiary id value",
+        "beneficiaryid",
+        "BI"
+      ],
+      "related": [
+        "beneficiary_name",
+        "beneficiary_subtotal",
+        "branch_count"
+      ]
+    },
+    {
+      "canonical": "beneficiary_name",
+      "synonyms": [
+        "beneficiary name",
+        "Beneficiary Name",
+        "beneficiary name field",
+        "beneficiary name value",
+        "beneficiary nome",
+        "Beneficiary Nome",
+        "beneficiary nome valor",
+        "beneficiaryname",
+        "BN"
+      ],
+      "related": [
+        "beneficiary_number",
+        "beneficiary_total",
+        "branch_date"
+      ]
+    },
+    {
+      "canonical": "beneficiary_number",
+      "synonyms": [
+        "beneficiary no",
+        "beneficiary number",
+        "Beneficiary Number",
+        "beneficiary number field",
+        "beneficiary number value",
+        "beneficiary numero",
+        "Beneficiary Numero",
+        "beneficiary numero valor",
+        "beneficiarynumber",
+        "BN"
+      ],
+      "related": [
+        "beneficiary_quantity",
+        "beneficiary_type",
+        "branch_end_date"
+      ]
+    },
+    {
+      "canonical": "beneficiary_quantity",
+      "synonyms": [
+        "beneficiary qty",
+        "beneficiary quantidade",
+        "Beneficiary Quantidade",
+        "beneficiary quantidade valor",
+        "beneficiary quantity",
+        "Beneficiary Quantity",
+        "beneficiary quantity field",
+        "beneficiary quantity value",
+        "beneficiaryquantity",
+        "BQ"
+      ],
+      "related": [
+        "beneficiary_rate",
+        "beneficiary_unit",
+        "branch_id"
+      ]
+    },
+    {
+      "canonical": "beneficiary_rate",
+      "synonyms": [
+        "beneficiary rate",
+        "Beneficiary Rate",
+        "beneficiary rate field",
+        "beneficiary rate value",
+        "beneficiary taxa",
+        "Beneficiary Taxa",
+        "beneficiary taxa valor",
+        "beneficiaryrate",
+        "BR"
+      ],
+      "related": [
+        "beneficiary_start_date",
+        "branch_amount",
+        "branch_name"
+      ]
+    },
+    {
+      "canonical": "beneficiary_start_date",
+      "synonyms": [
+        "beneficiary inicio data",
+        "Beneficiary Inicio Data",
+        "beneficiary inicio data valor",
+        "beneficiary start date",
+        "Beneficiary Start Date",
+        "beneficiary start date field",
+        "beneficiary start date value",
+        "beneficiarystartdate",
+        "BSD"
+      ],
+      "related": [
+        "beneficiary_status",
+        "branch_code",
+        "branch_number"
+      ]
+    },
+    {
+      "canonical": "beneficiary_status",
+      "synonyms": [
+        "beneficiary status",
+        "Beneficiary Status",
+        "beneficiary status field",
+        "beneficiary status valor",
+        "beneficiary status value",
+        "beneficiarystatus",
+        "BS"
+      ],
+      "related": [
+        "beneficiary_subtotal",
+        "branch_count",
+        "branch_quantity"
+      ]
+    },
+    {
+      "canonical": "beneficiary_subtotal",
+      "synonyms": [
+        "beneficiary subtotal",
+        "Beneficiary Subtotal",
+        "beneficiary subtotal field",
+        "beneficiary subtotal valor",
+        "beneficiary subtotal value",
+        "beneficiarysubtotal",
+        "BS"
+      ],
+      "related": [
+        "beneficiary_total",
+        "branch_date",
+        "branch_rate"
+      ]
+    },
+    {
+      "canonical": "beneficiary_total",
+      "synonyms": [
+        "beneficiary total",
+        "Beneficiary Total",
+        "beneficiary total field",
+        "beneficiary total valor",
+        "beneficiary total value",
+        "beneficiarytotal",
+        "BT"
+      ],
+      "related": [
+        "beneficiary_type",
+        "branch_end_date",
+        "branch_start_date"
+      ]
+    },
+    {
+      "canonical": "beneficiary_type",
+      "synonyms": [
+        "beneficiary tipo",
+        "Beneficiary Tipo",
+        "beneficiary tipo valor",
+        "beneficiary type",
+        "Beneficiary Type",
+        "beneficiary type field",
+        "beneficiary type value",
+        "beneficiarytype",
+        "BT"
+      ],
+      "related": [
+        "beneficiary_unit",
+        "branch_id",
+        "branch_status"
+      ]
+    },
+    {
+      "canonical": "beneficiary_unit",
+      "synonyms": [
+        "beneficiary unidade",
+        "Beneficiary Unidade",
+        "beneficiary unidade valor",
+        "beneficiary unit",
+        "Beneficiary Unit",
+        "beneficiary unit field",
+        "beneficiary unit value",
+        "beneficiaryunit",
+        "BU"
+      ],
+      "related": [
+        "branch_amount",
+        "branch_name",
+        "branch_subtotal"
+      ]
+    },
+    {
+      "canonical": "branch_amount",
+      "synonyms": [
+        "BA",
+        "branch amount",
+        "Branch Amount",
+        "branch amount field",
+        "branch amount value",
+        "branch amt",
+        "branch montante",
+        "branch valor",
+        "Branch Valor",
+        "branch valor valor",
+        "branchamount"
+      ],
+      "related": [
+        "branch_code",
+        "branch_number",
+        "branch_total"
+      ]
+    },
+    {
+      "canonical": "branch_code",
+      "synonyms": [
+        "BC",
+        "branch code",
+        "Branch Code",
+        "branch code field",
+        "branch code value",
+        "branch codigo",
+        "Branch Codigo",
+        "branch codigo valor",
+        "branchcode"
+      ],
+      "related": [
+        "branch_count",
+        "branch_quantity",
+        "branch_type"
+      ]
+    },
+    {
+      "canonical": "branch_count",
+      "synonyms": [
+        "BC",
+        "branch count",
+        "Branch Count",
+        "branch count field",
+        "branch count valor",
+        "branch count value",
+        "branchcount"
+      ],
+      "related": [
+        "branch_date",
+        "branch_rate",
+        "branch_unit"
+      ]
+    },
+    {
+      "canonical": "branch_date",
+      "synonyms": [
+        "BD",
+        "branch data",
+        "Branch Data",
+        "branch data valor",
+        "branch date",
+        "Branch Date",
+        "branch date field",
+        "branch date value",
+        "branchdate"
+      ],
+      "related": [
+        "branch_end_date",
+        "branch_start_date",
+        "card_amount"
+      ]
+    },
+    {
+      "canonical": "branch_end_date",
+      "synonyms": [
+        "BED",
+        "branch end date",
+        "Branch End Date",
+        "branch end date field",
+        "branch end date value",
+        "branch fim data",
+        "Branch Fim Data",
+        "branch fim data valor",
+        "branchenddate"
+      ],
+      "related": [
+        "branch_id",
+        "branch_status",
+        "card_code"
+      ]
+    },
+    {
+      "canonical": "branch_id",
+      "synonyms": [
+        "BI",
+        "branch id",
+        "Branch Id",
+        "branch id field",
+        "branch id valor",
+        "branch id value",
+        "branchid"
+      ],
+      "related": [
+        "branch_name",
+        "branch_subtotal",
+        "card_count"
+      ]
+    },
+    {
+      "canonical": "branch_name",
+      "synonyms": [
+        "BN",
+        "branch name",
+        "Branch Name",
+        "branch name field",
+        "branch name value",
+        "branch nome",
+        "Branch Nome",
+        "branch nome valor",
+        "branchname"
+      ],
+      "related": [
+        "branch_number",
+        "branch_total",
+        "card_date"
+      ]
+    },
+    {
+      "canonical": "branch_number",
+      "synonyms": [
+        "BN",
+        "branch no",
+        "branch number",
+        "Branch Number",
+        "branch number field",
+        "branch number value",
+        "branch numero",
+        "Branch Numero",
+        "branch numero valor",
+        "branchnumber"
+      ],
+      "related": [
+        "account_amount",
+        "branch_quantity",
+        "branch_type"
+      ]
+    },
+    {
+      "canonical": "branch_quantity",
+      "synonyms": [
+        "BQ",
+        "branch qty",
+        "branch quantidade",
+        "Branch Quantidade",
+        "branch quantidade valor",
+        "branch quantity",
+        "Branch Quantity",
+        "branch quantity field",
+        "branch quantity value",
+        "branchquantity"
+      ],
+      "related": [
+        "account_code",
+        "branch_rate",
+        "branch_unit"
+      ]
+    },
+    {
+      "canonical": "branch_rate",
+      "synonyms": [
+        "BR",
+        "branch rate",
+        "Branch Rate",
+        "branch rate field",
+        "branch rate value",
+        "branch taxa",
+        "Branch Taxa",
+        "branch taxa valor",
+        "branchrate"
+      ],
+      "related": [
+        "account_count",
+        "branch_start_date",
+        "card_amount"
+      ]
+    },
+    {
+      "canonical": "branch_start_date",
+      "synonyms": [
+        "branch inicio data",
+        "Branch Inicio Data",
+        "branch inicio data valor",
+        "branch start date",
+        "Branch Start Date",
+        "branch start date field",
+        "branch start date value",
+        "branchstartdate",
+        "BSD"
+      ],
+      "related": [
+        "account_date",
+        "branch_status",
+        "card_code"
+      ]
+    },
+    {
+      "canonical": "branch_status",
+      "synonyms": [
+        "branch status",
+        "Branch Status",
+        "branch status field",
+        "branch status valor",
+        "branch status value",
+        "branchstatus",
+        "BS"
+      ],
+      "related": [
+        "account_end_date",
+        "branch_subtotal",
+        "card_count"
+      ]
+    },
+    {
+      "canonical": "branch_subtotal",
+      "synonyms": [
+        "branch subtotal",
+        "Branch Subtotal",
+        "branch subtotal field",
+        "branch subtotal valor",
+        "branch subtotal value",
+        "branchsubtotal",
+        "BS"
+      ],
+      "related": [
+        "account_id",
+        "branch_total",
+        "card_date"
+      ]
+    },
+    {
+      "canonical": "branch_total",
+      "synonyms": [
+        "branch total",
+        "Branch Total",
+        "branch total field",
+        "branch total valor",
+        "branch total value",
+        "branchtotal",
+        "BT"
+      ],
+      "related": [
+        "account_amount",
+        "account_name",
+        "branch_type"
+      ]
+    },
+    {
+      "canonical": "branch_type",
+      "synonyms": [
+        "branch tipo",
+        "Branch Tipo",
+        "branch tipo valor",
+        "branch type",
+        "Branch Type",
+        "branch type field",
+        "branch type value",
+        "branchtype",
+        "BT"
+      ],
+      "related": [
+        "account_code",
+        "account_number",
+        "branch_unit"
+      ]
+    },
+    {
+      "canonical": "branch_unit",
+      "synonyms": [
+        "branch unidade",
+        "Branch Unidade",
+        "branch unidade valor",
+        "branch unit",
+        "Branch Unit",
+        "branch unit field",
+        "branch unit value",
+        "branchunit",
+        "BU"
+      ],
+      "related": [
+        "account_count",
+        "account_quantity",
+        "card_amount"
+      ]
+    },
+    {
+      "canonical": "card_amount",
+      "synonyms": [
+        "CA",
+        "card amount",
+        "Card Amount",
+        "card amount field",
+        "card amount value",
+        "card amt",
+        "cardamount",
+        "cartao montante",
+        "cartao valor",
+        "Cartao Valor",
+        "cartao valor valor"
+      ],
+      "related": [
+        "account_date",
+        "account_rate",
+        "card_code"
+      ]
+    },
+    {
+      "canonical": "card_code",
+      "synonyms": [
+        "card code",
+        "Card Code",
+        "card code field",
+        "card code value",
+        "cardcode",
+        "cartao codigo",
+        "Cartao Codigo",
+        "cartao codigo valor",
+        "CC"
+      ],
+      "related": [
+        "account_end_date",
+        "account_start_date",
+        "card_count"
+      ]
+    },
+    {
+      "canonical": "card_count",
+      "synonyms": [
+        "card count",
+        "Card Count",
+        "card count field",
+        "card count value",
+        "cardcount",
+        "cartao count",
+        "Cartao Count",
+        "cartao count valor",
+        "CC"
+      ],
+      "related": [
+        "account_id",
+        "account_status",
+        "card_date"
+      ]
+    },
+    {
+      "canonical": "card_date",
+      "synonyms": [
+        "card date",
+        "Card Date",
+        "card date field",
+        "card date value",
+        "carddate",
+        "cartao data",
+        "Cartao Data",
+        "cartao data valor",
+        "CD"
+      ],
+      "related": [
+        "account_amount",
+        "account_name",
+        "account_subtotal"
+      ]
+    }
+  ]
+}

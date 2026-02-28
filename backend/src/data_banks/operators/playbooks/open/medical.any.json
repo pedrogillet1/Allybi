@@ -2,24 +2,259 @@
   "_meta": {
     "id": "operator_playbook_open_medical",
     "version": "1.0.0",
-    "description": "open operator playbook for medical documents.",
+    "description": "open operator playbook for medical documents with deterministic behavior and domain guardrails.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
     "operator": "open",
-    "domain": "medical"
+    "domain": "medical",
+    "runtimeIntent": "operator_handler_and_prompt_builder",
+    "deterministic": true,
+    "outputPolicy": {
+      "navPillsOnly": true,
+      "allowSourceRequests": false,
+      "askSingleQuestionOnly": true
+    }
   },
   "operator": "open",
   "domain": "medical",
-  "lookFor": [],
+  "lookFor": [
+    "keyword: reference range",
+    "keyword: critical value",
+    "keyword: red flag",
+    "keyword: abnormal",
+    "keyword: consult professional",
+    "keyword: urgent care",
+    "keyword: emergency signs",
+    "keyword: wbc",
+    "keyword: leucocitos",
+    "keyword: hemoglobin",
+    "keyword: creatinine",
+    "keyword: glucose",
+    "keyword: troponin",
+    "keyword: blood pressure",
+    "keyword: oxygen saturation",
+    "heading: impression",
+    "heading: assessment",
+    "heading: plan",
+    "heading: medications",
+    "heading: allergies",
+    "table header: test",
+    "table header: result",
+    "table header: units",
+    "table header: reference range",
+    "table header: flag",
+    "doc type: lab report",
+    "doc type: cbc panel",
+    "doc type: discharge summary",
+    "doc type: imaging report",
+    "doc type: medication list",
+    "doc type: triage note",
+    "doc type: pathology report",
+    "intent phrase: open",
+    "intent phrase: open the budget sheet",
+    "intent phrase: open that file",
+    "intent phrase: bring up document",
+    "signal: asks to open attachment",
+    "signal: ambiguous file name"
+  ],
   "outputStructure": {
-    "requiredBlocks": [],
-    "optionalBlocks": []
+    "requiredBlocks": [
+      "Navigation Pills",
+      "Selection State",
+      "Disambiguation Question",
+      "Next Action Prompt"
+    ],
+    "optionalBlocks": [
+      "Recent Files",
+      "Suggested Pills",
+      "Ambiguity Reason"
+    ]
   },
-  "validationChecks": [],
-  "askQuestionWhen": []
+  "validationChecks": [
+    {
+      "id": "check_01_domain_match",
+      "condition": "always",
+      "check": "Request domain must resolve to medical.",
+      "onFail": "Ask one domain disambiguation question."
+    },
+    {
+      "id": "check_02_operator_match",
+      "condition": "always",
+      "check": "Resolved operator must stay open.",
+      "onFail": "Return one operator disambiguation question."
+    },
+    {
+      "id": "check_03_evidence_presence",
+      "condition": "missing direct anchor evidence",
+      "check": "At least one matching anchor from lookFor is required before final answer.",
+      "onFail": "Ask one clarification question."
+    },
+    {
+      "id": "check_04_period_consistency",
+      "condition": "query includes time period",
+      "check": "Compared or reported periods must be explicitly aligned.",
+      "onFail": "Ask one period clarification question."
+    },
+    {
+      "id": "check_05_units_consistency",
+      "condition": "numeric values present",
+      "check": "Units and scales must be consistent before computing or comparing.",
+      "onFail": "Ask one units clarification question."
+    },
+    {
+      "id": "check_06_scope_clarity",
+      "condition": "multiple docs or sections match",
+      "check": "Scope must be explicit before final output.",
+      "onFail": "Ask one scope disambiguation question."
+    },
+    {
+      "id": "check_07_missing_required_input",
+      "condition": "required input field missing",
+      "check": "Required input fields for operator must be present.",
+      "onFail": "Ask one missing-input question."
+    },
+    {
+      "id": "check_08_term_consistency",
+      "condition": "defined term appears",
+      "check": "Defined terms must remain consistent in wording and capitalization.",
+      "onFail": "Ask one term clarification question."
+    },
+    {
+      "id": "check_09_no_vague_block",
+      "condition": "always",
+      "check": "Output must only use deterministic named blocks from outputStructure.",
+      "onFail": "Regenerate with required blocks only."
+    },
+    {
+      "id": "check_10_single_question_rule",
+      "condition": "clarification needed",
+      "check": "Ask exactly one crisp question, not a questionnaire.",
+      "onFail": "Trim to one question."
+    },
+    {
+      "id": "open_01_nav_pills_only",
+      "condition": "always",
+      "check": "Open output must only include nav pills and one disambiguation question when unresolved.",
+      "onFail": "Regenerate without source requests."
+    },
+    {
+      "id": "open_02_no_sources",
+      "condition": "always",
+      "check": "Open output must not request or cite sources.",
+      "onFail": "Remove source references."
+    },
+    {
+      "id": "open_03_disambiguate_file",
+      "condition": "multiple file matches",
+      "check": "Ask one crisp question to select the target file.",
+      "onFail": "Ask one filename selection question."
+    },
+    {
+      "id": "domain_01",
+      "condition": "domain specific",
+      "check": "reference range shown with every interpreted lab value when available",
+      "onFail": "Ask one domain-specific clarification question."
+    },
+    {
+      "id": "domain_02",
+      "condition": "domain specific",
+      "check": "units match reference range units before comparison",
+      "onFail": "Ask one domain-specific clarification question."
+    },
+    {
+      "id": "domain_03",
+      "condition": "domain specific",
+      "check": "critical values trigger explicit safety escalation language",
+      "onFail": "Ask one domain-specific clarification question."
+    },
+    {
+      "id": "domain_04",
+      "condition": "domain specific",
+      "check": "trend claims require at least two dated measurements",
+      "onFail": "Ask one domain-specific clarification question."
+    },
+    {
+      "id": "domain_05",
+      "condition": "domain specific",
+      "check": "medication advice includes safety boundary and non diagnostic disclaimer",
+      "onFail": "Ask one domain-specific clarification question."
+    }
+  ],
+  "askQuestionWhen": [
+    {
+      "id": "ask_01_missing_scope",
+      "condition": "multiple candidate docs and no explicit scope",
+      "questionTemplate": "Which document should I use?"
+    },
+    {
+      "id": "ask_02_missing_period",
+      "condition": "time period required but not explicit",
+      "questionTemplate": "Which period should I use?"
+    },
+    {
+      "id": "ask_03_missing_units",
+      "condition": "numeric request with ambiguous units",
+      "questionTemplate": "Which units should I use?"
+    },
+    {
+      "id": "ask_04_missing_doc_type",
+      "condition": "doc type required to retrieve correct section",
+      "questionTemplate": "Which document type should I prioritize?"
+    },
+    {
+      "id": "ask_05_conflicting_inputs",
+      "condition": "inputs conflict across provided evidence",
+      "questionTemplate": "Which value should I treat as authoritative?"
+    },
+    {
+      "id": "ask_06_format_preference",
+      "condition": "user did not specify output granularity",
+      "questionTemplate": "Do you want a concise answer or detailed output?"
+    },
+    {
+      "id": "ask_07_precision_preference",
+      "condition": "numeric output requested without precision preference",
+      "questionTemplate": "How many decimals should I use?"
+    },
+    {
+      "id": "ask_08_compare_scope",
+      "condition": "compare requested with fewer than two explicit docs",
+      "questionTemplate": "Which two documents should I compare?"
+    },
+    {
+      "id": "ask_09_missing_anchor",
+      "condition": "no matching anchors found for requested field",
+      "questionTemplate": "Which section should I search first?"
+    },
+    {
+      "id": "ask_10_next_step",
+      "condition": "answer completed and follow-up path unclear",
+      "questionTemplate": "Do you want me to proceed to the next step?"
+    },
+    {
+      "id": "ask_open_target",
+      "condition": "open target ambiguous",
+      "questionTemplate": "Which file should I open?"
+    },
+    {
+      "id": "ask_open_sheet",
+      "condition": "file resolved but sheet or tab ambiguous",
+      "questionTemplate": "Which sheet or tab should I open?"
+    },
+    {
+      "id": "ask_domain_01",
+      "condition": "domain-specific ambiguity",
+      "questionTemplate": "Which specific test result should I focus on first?"
+    },
+    {
+      "id": "ask_domain_02",
+      "condition": "domain-specific ambiguity",
+      "questionTemplate": "Do you want trends over time or only the latest value?"
+    }
+  ]
 }

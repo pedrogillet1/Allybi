@@ -969,6 +969,146 @@ export class XlsxFileEditorService {
         throw new Error(
           "CHART_ENGINE_UNAVAILABLE: local XLSX fallback cannot create chart objects.",
         );
+      } else if (kind === "remove_duplicates") {
+        const rangeA1 = String(
+          (op as any).rangeA1 || (op as any).range || "",
+        ).trim();
+        if (!rangeA1) throw new Error("remove_duplicates requires rangeA1");
+        const { sheetName, a1 } = parseRangeA1(rangeA1);
+        const ws = wb.getWorksheet(sheetName);
+        if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
+        const { startRow, endRow, startCol, endCol } = parseA1RectOnWorksheet(
+          ws,
+          a1,
+        );
+        const hasHeader = (op as any).hasHeader !== false;
+        const dataStart = hasHeader ? startRow + 1 : startRow;
+        const width = endCol - startCol + 1;
+        const keyColsRaw = Array.isArray((op as any).keyColumns)
+          ? ((op as any).keyColumns as number[]).map(
+              (n: number) => Math.trunc(Number(n)) - 1,
+            )
+          : Array.from({ length: width }, (_, i) => i);
+        const seen = new Set<string>();
+        const dupeRows: number[] = [];
+        for (let r = dataStart; r <= endRow; r += 1) {
+          const parts: string[] = [];
+          for (const ki of keyColsRaw) {
+            const c = startCol + ki;
+            const val = ws.getCell(r, c).value;
+            parts.push(JSON.stringify(val ?? ""));
+          }
+          const fp = parts.join("|");
+          if (seen.has(fp)) {
+            dupeRows.push(r);
+          } else {
+            seen.add(fp);
+          }
+        }
+        // Delete bottom-up to keep row indices stable
+        for (let i = dupeRows.length - 1; i >= 0; i -= 1) {
+          ws.spliceRows(dupeRows[i], 1);
+        }
+      } else if (kind === "trim_whitespace") {
+        const rangeA1 = String(
+          (op as any).rangeA1 || (op as any).range || "",
+        ).trim();
+        if (!rangeA1) throw new Error("trim_whitespace requires rangeA1");
+        const { sheetName, a1 } = parseRangeA1(rangeA1);
+        const ws = wb.getWorksheet(sheetName);
+        if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
+        const { startRow, endRow, startCol, endCol } = parseA1RectOnWorksheet(
+          ws,
+          a1,
+        );
+        for (let r = startRow; r <= endRow; r += 1) {
+          for (let c = startCol; c <= endCol; c += 1) {
+            const cell = ws.getCell(r, c);
+            if (typeof cell.value === "string") {
+              const trimmed = cell.value.trim();
+              if (trimmed !== cell.value) {
+                cell.value = trimmed as any;
+              }
+            }
+          }
+        }
+      } else if (kind === "normalize_values") {
+        const rangeA1 = String(
+          (op as any).rangeA1 || (op as any).range || "",
+        ).trim();
+        if (!rangeA1) throw new Error("normalize_values requires rangeA1");
+        const normalization = String(
+          (op as any).normalization || "",
+        ).toLowerCase();
+        if (!["dates", "numbers", "text_case"].includes(normalization))
+          throw new Error(
+            "normalize_values requires normalization: dates|numbers|text_case",
+          );
+        const { sheetName, a1 } = parseRangeA1(rangeA1);
+        const ws = wb.getWorksheet(sheetName);
+        if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
+        const { startRow, endRow, startCol, endCol } = parseA1RectOnWorksheet(
+          ws,
+          a1,
+        );
+        for (let r = startRow; r <= endRow; r += 1) {
+          for (let c = startCol; c <= endCol; c += 1) {
+            const cell = ws.getCell(r, c);
+            const val = cell.value;
+            if (val == null) continue;
+            if (normalization === "text_case" && typeof val === "string") {
+              const mode = String(
+                (op as any).textCase || "lower",
+              ).toLowerCase();
+              if (mode === "upper") cell.value = val.toUpperCase() as any;
+              else if (mode === "title")
+                cell.value = val.replace(/\b\w/g, (ch: string) =>
+                  ch.toUpperCase(),
+                ) as any;
+              else cell.value = val.toLowerCase() as any;
+            } else if (normalization === "numbers" && typeof val === "string") {
+              const cleaned = val.replace(/[,$\s%]/g, "");
+              const n = Number(cleaned);
+              if (Number.isFinite(n)) cell.value = n as any;
+            } else if (normalization === "dates" && typeof val === "string") {
+              const d = new Date(val);
+              if (!Number.isNaN(d.getTime())) cell.value = d as any;
+            }
+          }
+        }
+      } else if (kind === "set_protection") {
+        const sheetName = String(
+          (op as any).sheetName || (op as any).sheetId || "Sheet1",
+        ).trim();
+        const ws = wb.getWorksheet(sheetName);
+        if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
+        const password = String((op as any).password || "").trim() || undefined;
+        const options =
+          (op as any).options && typeof (op as any).options === "object"
+            ? (op as any).options
+            : {};
+        await ws.protect(password as any, options);
+      } else if (kind === "lock_cells") {
+        const rangeA1 = String(
+          (op as any).rangeA1 || (op as any).range || "",
+        ).trim();
+        if (!rangeA1) throw new Error("lock_cells requires rangeA1");
+        const { sheetName, a1 } = parseRangeA1(rangeA1);
+        const ws = wb.getWorksheet(sheetName);
+        if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
+        const { startRow, endRow, startCol, endCol } = parseA1RectOnWorksheet(
+          ws,
+          a1,
+        );
+        const locked = (op as any).locked !== false;
+        const hidden =
+          typeof (op as any).hidden === "boolean" ? (op as any).hidden : false;
+        for (let r = startRow; r <= endRow; r += 1) {
+          for (let c = startCol; c <= endCol; c += 1) {
+            const cell = ws.getCell(r, c) as any;
+            cell.protection = { locked, hidden };
+          }
+        }
       } else {
         throw new Error(`Unsupported compute op: ${kind}`);
       }

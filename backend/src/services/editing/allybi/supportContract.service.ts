@@ -19,10 +19,13 @@ interface SupportGateResult {
 interface SupportContractInput {
   instruction: string;
   domain: EditDomain;
+  language?: "en" | "pt";
   runtimeOperator: EditOperator;
   canonicalOperator?: string | null;
   intentSource?: EditIntentSource;
   resolvedTargetId?: string | null;
+  resolvedTargetCandidateCount?: number;
+  isAmbiguousTarget?: boolean;
   viewerContext?: {
     selection?: unknown;
     sheetName?: string;
@@ -91,10 +94,41 @@ function makeBlocked(
   return { code, gate, message, ...(details ? { details } : {}) };
 }
 
+function resolveUxPrompt(
+  promptKey: string,
+  language: "en" | "pt",
+  params?: Record<string, string>,
+): string | null {
+  try {
+    const ux = safeEditingBank<any>("editing_ux");
+    const template =
+      ux?.prompts?.[promptKey]?.[language] || ux?.prompts?.[promptKey]?.en;
+    if (!template) return null;
+    if (!params) return template;
+    return template.replace(
+      /\{\{(\w+)\}\}/g,
+      (_: string, k: string) => params[k] ?? "",
+    );
+  } catch {
+    return null;
+  }
+}
+
 function hydrateClarificationMessage(
   missingSlots: string[],
   language: "en" | "pt" = "en",
 ): string {
+  // If the only missing slot is rangeA1, use the specialized UX prompt
+  if (
+    missingSlots.length === 1 &&
+    (missingSlots[0] === "rangeA1" || missingSlots[0] === "range")
+  ) {
+    const uxMsg = resolveUxPrompt("range_required", language, {
+      exampleRange: "A1:D10",
+    });
+    if (uxMsg) return uxMsg;
+  }
+
   try {
     const microcopy = safeEditingBank<any>("editing_microcopy");
     const template =
@@ -118,6 +152,8 @@ export class SupportContractService {
     let patternCovered = false;
     let slotsSatisfied = false;
     let clarificationSlots: string[] = [];
+
+    const slotContext: Record<string, unknown> = {};
 
     if (source === "explicit_operator" || !rtDomain) {
       patternCovered = true;
@@ -161,6 +197,12 @@ export class SupportContractService {
         slotsSatisfied = true;
         pushGate(gates, "pattern_coverage", true);
         pushGate(gates, "slot_fill", true);
+        // Collect slot data from resolved plan for downstream template hydration
+        for (const op of runtime.ops) {
+          for (const [k, v] of Object.entries(op.params)) {
+            if (v != null && slotContext[k] === undefined) slotContext[k] = v;
+          }
+        }
       }
     }
 
@@ -235,8 +277,9 @@ export class SupportContractService {
     }
 
     if (!slotsSatisfied) {
+      const lang = input.language || "en";
       const clarificationMessage = clarificationSlots.length
-        ? hydrateClarificationMessage(clarificationSlots)
+        ? hydrateClarificationMessage(clarificationSlots, lang)
         : "Missing required parameters before this edit can be applied.";
       return {
         ok: false,
@@ -253,14 +296,44 @@ export class SupportContractService {
       };
     }
 
+    if (
+      input.isAmbiguousTarget &&
+      (input.resolvedTargetCandidateCount ?? 0) > 1
+    ) {
+      const lang = input.language || "en";
+      const ambiguousMsg =
+        resolveUxPrompt("ambiguous_target", lang, {
+          candidateCount: String(input.resolvedTargetCandidateCount),
+        }) ||
+        `Found ${input.resolvedTargetCandidateCount} possible targets. Which one should I edit?`;
+      return {
+        ok: false,
+        outcomeType: "clarification_required",
+        blockedReason: makeBlocked(
+          "scope_resolution",
+          "AMBIGUOUS_TARGET",
+          ambiguousMsg,
+          { candidateCount: input.resolvedTargetCandidateCount },
+        ),
+        gates,
+      };
+    }
+
     if (!hasScope) {
+      const lang = input.language || "en";
+      // Use editing_ux prompts for better UX messages
+      const scopeMessage =
+        resolveUxPrompt("no_selection_confirm", lang, {
+          fallbackScope:
+            input.domain === "sheets" ? "active sheet" : "current section",
+        }) || "Could not resolve a concrete target for this edit.";
       return {
         ok: false,
         outcomeType: "blocked",
         blockedReason: makeBlocked(
           "scope_resolution",
           "TARGET_NOT_RESOLVED",
-          "Could not resolve a concrete target for this edit.",
+          scopeMessage,
         ),
         gates,
       };
@@ -289,6 +362,8 @@ export class SupportContractService {
       ok: true,
       gates,
       resolvedCanonicalOperator,
+      details:
+        Object.keys(slotContext).length > 0 ? { slotContext } : undefined,
     };
   }
 }

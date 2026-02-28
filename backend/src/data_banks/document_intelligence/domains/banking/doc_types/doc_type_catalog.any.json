@@ -1,0 +1,82 @@
+{
+  "_meta": {
+    "id": "di_banking_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Document type catalog for banking domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "docTypes": [
+    {
+      "id": "banking_bank_statement",
+      "name": {
+        "en": "Bank Statement",
+        "pt": "Extrato Bancario"
+      },
+      "description": "Deposit account statement with transactions, balances, and period totals.",
+      "detectionPatterns": [
+        "\\bbank statement\\b",
+        "\\baccount statement\\b",
+        "\\bextrato bancario\\b",
+        "\\bopening balance\\b",
+        "\\bclosing balance\\b"
+      ],
+      "priority": 100
+    },
+    {
+      "id": "banking_credit_card_statement",
+      "name": {
+        "en": "Credit Card Statement",
+        "pt": "Fatura de Cartao"
+      },
+      "description": "Card statement with purchases, credits, fees, and minimum payment details.",
+      "detectionPatterns": [
+        "\\bcredit card statement\\b",
+        "\\bcard ending\\b",
+        "\\bminimum payment\\b",
+        "\\bfatura de cartao\\b",
+        "\\blimite\\b"
+      ],
+      "priority": 99
+    },
+    {
+      "id": "banking_loan_statement",
+      "name": {
+        "en": "Loan Statement",
+        "pt": "Extrato de Emprestimo"
+      },
+      "description": "Loan servicing statement with principal, interest, escrow, and payoff details.",
+      "detectionPatterns": [
+        "\\bloan statement\\b",
+        "\\bmortgage statement\\b",
+        "\\bprincipal\\b",
+        "\\bextrato de emprestimo\\b",
+        "\\bparcela\\b"
+      ],
+      "priority": 98
+    },
+    {
+      "id": "banking_payment_receipt",
+      "name": {
+        "en": "Banking Payment Receipt",
+        "pt": "Comprovante de Pagamento"
+      },
+      "description": "Receipt confirming transfer or bill payment from a bank channel.",
+      "detectionPatterns": [
+        "\\bpayment receipt\\b",
+        "\\btransfer receipt\\b",
+        "\\bcomprovante de pagamento\\b",
+        "\\bted\\b",
+        "\\bpix\\b"
+      ],
+      "priority": 97
+    }
+  ]
+}

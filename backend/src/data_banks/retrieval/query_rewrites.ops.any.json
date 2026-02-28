@@ -1,0 +1,1404 @@
+{
+  "_meta": {
+    "id": "query_rewrites_ops",
+    "version": "1.0.0",
+    "description": "Domain query rewrite rules for ops retrieval with tight synonym expansion and phrase normalization.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "maxRewriteTerms": 12,
+    "avoidGenericExplosions": true
+  },
+  "domain": "ops",
+  "rules": [
+    {
+      "id": "ops_rewrite_001",
+      "priority": 90,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bsla\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "service level agreement",
+          "weight": 1
+        },
+        {
+          "value": "service level target",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_002",
+      "priority": 88,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\btempo de resposta\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "response time",
+          "weight": 1
+        },
+        {
+          "value": "latency",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_003",
+      "priority": 87,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bresponse time\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "latency",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_004",
+      "priority": 86,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\buptime\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "availability",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_005",
+      "priority": 84,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdowntime\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "service outage",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_006",
+      "priority": 83,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\berror budget\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "reliability budget",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_007",
+      "priority": 82,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bincident\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "outage event",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_008",
+      "priority": 80,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bsev1\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "severity 1",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_009",
+      "priority": 79,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bsev2\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "severity 2",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_010",
+      "priority": 78,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmttr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "mean time to recovery",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_011",
+      "priority": 76,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmtbf\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "mean time between failures",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_012",
+      "priority": 75,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\boncall\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "on call rota",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_013",
+      "priority": 74,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brunbook\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "operational playbook",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_014",
+      "priority": 72,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bpostmortem\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "incident retrospective",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_015",
+      "priority": 71,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bbreach\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "violation",
+          "weight": 1
+        },
+        {
+          "value": "target miss",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_016",
+      "priority": 70,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bchecklist\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "task checklist",
+          "weight": 1
+        },
+        {
+          "value": "completeness list",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_017",
+      "priority": 68,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcapacity\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "resource headroom",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_018",
+      "priority": 67,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\balert storm\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "alert flood",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_019",
+      "priority": 66,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bchange failure rate\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "deployment failure rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_020",
+      "priority": 64,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bservice desk\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "support desk",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_021",
+      "priority": 63,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bticket backlog\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "support backlog",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_022",
+      "priority": 62,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bescalation\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "incident escalation",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_023",
+      "priority": 60,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmean acknowledgment time\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "time to acknowledge",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_024",
+      "priority": 59,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\btime to detect\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "mttd",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_025",
+      "priority": 58,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\btime to recover\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "mttr",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_026",
+      "priority": 56,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bthroughput\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "request volume",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_027",
+      "priority": 55,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bburn rate\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "error budget burn rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_028",
+      "priority": 54,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmaintenance window\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "planned downtime window",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_029",
+      "priority": 52,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bops review\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "operational review",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_030",
+      "priority": 51,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brca\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "root cause analysis",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_031",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bresponse sla\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "response time sla",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_032",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bresolution sla\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "resolution time sla",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_033",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bfirst response\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "first reply time",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_034",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcustomer impact\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "user impact",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_035",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bincident trend\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "incident trajectory",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "ops_rewrite_036",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "ops"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bplaybook adherence\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "runbook adherence",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "ops"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "operator_playbook_schema",
+    "version": "1.0.0",
+    "description": "Schema for operator playbook banks by domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/operator_playbook_schema.any.json",
+    "title": "Operator Playbook Bank Schema",
+    "type": "object",
+    "required": [
+      "_meta",
+      "config",
+      "operator",
+      "domain",
+      "lookFor",
+      "outputStructure",
+      "validationChecks",
+      "askQuestionWhen"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "description",
+          "languages",
+          "lastUpdated"
+        ],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "operator",
+          "domain"
+        ],
+        "additionalProperties": true
+      },
+      "operator": {
+        "type": "string"
+      },
+      "domain": {
+        "type": "string"
+      },
+      "lookFor": {
+        "type": "array"
+      },
+      "outputStructure": {
+        "type": "object",
+        "required": [
+          "requiredBlocks",
+          "optionalBlocks"
+        ],
+        "additionalProperties": true
+      },
+      "validationChecks": {
+        "type": "array"
+      },
+      "askQuestionWhen": {
+        "type": "array"
+      }
+    }
+  }
+}

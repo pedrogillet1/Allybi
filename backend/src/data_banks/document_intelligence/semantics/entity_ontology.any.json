@@ -1,0 +1,1172 @@
+{
+  "_meta": {
+    "id": "di_entity_ontology",
+    "version": "1.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "di_domain_ontology"
+    ],
+    "usedBy": [
+      "di_metric_ontology",
+      "di_unit_and_measurement_ontology"
+    ],
+    "tests": [
+      "SSOT_ENTITY_001"
+    ],
+    "lastUpdated": "2026-02-27",
+    "description": "di_entity_ontology (document_intelligence) configuration bank."
+  },
+  "config": {
+    "enabled": true
+  },
+  "entityTypes": [
+    {
+      "id": "effective_date",
+      "label": "Effective Date",
+      "labelPt": "Data de Vigência",
+      "category": "date",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "after 'Effective Date:' or 'Data de Vigência:'",
+        "date format",
+        "near document start"
+      ],
+      "examples": {
+        "en": [
+          "January 1, 2026",
+          "effective as of 03/15/2025"
+        ],
+        "pt": [
+          "1 de janeiro de 2026",
+          "vigente a partir de 15/03/2025"
+        ]
+      }
+    },
+    {
+      "id": "execution_date",
+      "label": "Execution Date",
+      "labelPt": "Data de Execução",
+      "category": "date",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "after 'executed on' or 'firmado em'",
+        "date format",
+        "near signatures"
+      ],
+      "examples": {
+        "en": [
+          "executed on March 10, 2026",
+          "dated this 5th day of February"
+        ],
+        "pt": [
+          "firmado em 10 de março de 2026",
+          "datado de 5 de fevereiro"
+        ]
+      }
+    },
+    {
+      "id": "expiration_date",
+      "label": "Expiration Date",
+      "labelPt": "Data de Vencimento",
+      "category": "date",
+      "domains": [
+        "finance",
+        "legal",
+        "medical"
+      ],
+      "extractionHints": [
+        "after 'expires on' or 'vence em'",
+        "date format",
+        "near term/duration clauses"
+      ],
+      "examples": {
+        "en": [
+          "expires on December 31, 2027",
+          "valid until 06/30/2026"
+        ],
+        "pt": [
+          "vence em 31 de dezembro de 2027",
+          "válido até 30/06/2026"
+        ]
+      }
+    },
+    {
+      "id": "filing_date",
+      "label": "Filing Date",
+      "labelPt": "Data de Protocolo",
+      "category": "date",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "extractionHints": [
+        "after 'filed on' or 'protocolado em'",
+        "date format",
+        "near case header"
+      ],
+      "examples": {
+        "en": [
+          "filed on April 2, 2026",
+          "filing date: 2025-11-15"
+        ],
+        "pt": [
+          "protocolado em 2 de abril de 2026",
+          "data de protocolo: 15/11/2025"
+        ]
+      }
+    },
+    {
+      "id": "period_reference",
+      "label": "Period Reference",
+      "labelPt": "Referência de Período",
+      "category": "date",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "date range",
+        "fiscal quarter/year",
+        "after 'for the period' or 'para o período'"
+      ],
+      "examples": {
+        "en": [
+          "Q3 2025",
+          "for the period ending December 31, 2025",
+          "FY2025"
+        ],
+        "pt": [
+          "3T 2025",
+          "para o período encerrado em 31 de dezembro de 2025",
+          "AF2025"
+        ]
+      }
+    },
+    {
+      "id": "report_date",
+      "label": "Report Date",
+      "labelPt": "Data do Relatório",
+      "category": "date",
+      "domains": [
+        "finance",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "after 'Report Date:' or 'Data do Relatório:'",
+        "date format",
+        "document header"
+      ],
+      "examples": {
+        "en": [
+          "Report Date: February 15, 2026",
+          "as of 01/31/2026"
+        ],
+        "pt": [
+          "Data do Relatório: 15 de fevereiro de 2026",
+          "em 31/01/2026"
+        ]
+      }
+    },
+    {
+      "id": "account_number",
+      "label": "Account Number",
+      "labelPt": "Número da Conta",
+      "category": "financial",
+      "domains": [
+        "finance"
+      ],
+      "extractionHints": [
+        "numeric sequence",
+        "after 'Account' or 'Conta'",
+        "masked digits"
+      ],
+      "examples": {
+        "en": [
+          "Acct #1234-5678-90",
+          "Account: 00112233"
+        ],
+        "pt": [
+          "Conta nº 1234-5678-90",
+          "Conta: 00112233"
+        ]
+      }
+    },
+    {
+      "id": "cost_center",
+      "label": "Cost Center",
+      "labelPt": "Centro de Custo",
+      "category": "financial",
+      "domains": [
+        "finance",
+        "operations"
+      ],
+      "extractionHints": [
+        "alphanumeric code",
+        "after 'Cost Center' or 'Centro de Custo'"
+      ],
+      "examples": {
+        "en": [
+          "CC-4500",
+          "Cost Center: MKTG-001"
+        ],
+        "pt": [
+          "CC-4500",
+          "Centro de Custo: MKTG-001"
+        ]
+      }
+    },
+    {
+      "id": "fiscal_period",
+      "label": "Fiscal Period",
+      "labelPt": "Período Fiscal",
+      "category": "financial",
+      "domains": [
+        "finance"
+      ],
+      "extractionHints": [
+        "after 'Fiscal' or 'Exercício'",
+        "quarter or year format"
+      ],
+      "examples": {
+        "en": [
+          "FY2025",
+          "Fiscal Year 2025-2026",
+          "Q2 FY26"
+        ],
+        "pt": [
+          "AF2025",
+          "Exercício Fiscal 2025-2026",
+          "2T AF26"
+        ]
+      }
+    },
+    {
+      "id": "gl_code",
+      "label": "GL Code",
+      "labelPt": "Código Contábil",
+      "category": "financial",
+      "domains": [
+        "finance"
+      ],
+      "extractionHints": [
+        "numeric code",
+        "after 'GL' or 'General Ledger' or 'Conta Contábil'"
+      ],
+      "examples": {
+        "en": [
+          "GL 6100",
+          "General Ledger Code: 4010-200"
+        ],
+        "pt": [
+          "CC 6100",
+          "Conta Contábil: 4010-200"
+        ]
+      }
+    },
+    {
+      "id": "invoice_number",
+      "label": "Invoice Number",
+      "labelPt": "Número da Nota Fiscal",
+      "category": "financial",
+      "domains": [
+        "finance",
+        "operations"
+      ],
+      "extractionHints": [
+        "alphanumeric",
+        "after 'Invoice' or 'NF' or 'Nota Fiscal'"
+      ],
+      "examples": {
+        "en": [
+          "INV-2026-00431",
+          "Invoice #78901"
+        ],
+        "pt": [
+          "NF-2026-00431",
+          "Nota Fiscal nº 78901"
+        ]
+      }
+    },
+    {
+      "id": "case_number",
+      "label": "Case Number",
+      "labelPt": "Número do Processo",
+      "category": "identifier",
+      "domains": [
+        "legal",
+        "medical"
+      ],
+      "extractionHints": [
+        "alphanumeric code",
+        "after 'Case No.' or 'Processo nº'"
+      ],
+      "examples": {
+        "en": [
+          "Case No. 2025-CV-01234",
+          "Docket #45678"
+        ],
+        "pt": [
+          "Processo nº 2025-CV-01234",
+          "Autos nº 45678"
+        ]
+      }
+    },
+    {
+      "id": "document_number",
+      "label": "Document Number",
+      "labelPt": "Número do Documento",
+      "category": "identifier",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "alphanumeric code",
+        "after 'Doc No.' or 'Documento nº'",
+        "document header"
+      ],
+      "examples": {
+        "en": [
+          "DOC-2026-0042",
+          "Document No. RPT-5678"
+        ],
+        "pt": [
+          "DOC-2026-0042",
+          "Documento nº RPT-5678"
+        ]
+      }
+    },
+    {
+      "id": "reference_code",
+      "label": "Reference Code",
+      "labelPt": "Código de Referência",
+      "category": "identifier",
+      "domains": [
+        "finance",
+        "legal",
+        "operations"
+      ],
+      "extractionHints": [
+        "alphanumeric code",
+        "after 'Ref' or 'Referência'"
+      ],
+      "examples": {
+        "en": [
+          "Ref: PRJ-2026-A1",
+          "Reference Code: TX-99012"
+        ],
+        "pt": [
+          "Ref: PRJ-2026-A1",
+          "Código de Referência: TX-99012"
+        ]
+      }
+    },
+    {
+      "id": "registration_number",
+      "label": "Registration Number",
+      "labelPt": "Número de Registro",
+      "category": "identifier",
+      "domains": [
+        "legal",
+        "finance",
+        "medical"
+      ],
+      "extractionHints": [
+        "alphanumeric",
+        "after 'Registration' or 'Registro'"
+      ],
+      "examples": {
+        "en": [
+          "Registration No. 12345678",
+          "CRM-SP 123456"
+        ],
+        "pt": [
+          "Registro nº 12345678",
+          "CRM-SP 123456"
+        ]
+      }
+    },
+    {
+      "id": "tax_id",
+      "label": "Tax ID",
+      "labelPt": "CPF/CNPJ",
+      "category": "identifier",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "formatted numeric",
+        "after 'Tax ID' or 'CNPJ' or 'CPF' or 'EIN'"
+      ],
+      "examples": {
+        "en": [
+          "EIN: 12-3456789",
+          "Tax ID: 987-65-4321"
+        ],
+        "pt": [
+          "CNPJ: 12.345.678/0001-90",
+          "CPF: 123.456.789-00"
+        ]
+      }
+    },
+    {
+      "id": "article_number",
+      "label": "Article Number",
+      "labelPt": "Número do Artigo",
+      "category": "legal",
+      "domains": [
+        "legal"
+      ],
+      "extractionHints": [
+        "after 'Article' or 'Artigo'",
+        "roman or arabic numeral"
+      ],
+      "examples": {
+        "en": [
+          "Article IV",
+          "Article 12"
+        ],
+        "pt": [
+          "Artigo IV",
+          "Artigo 12"
+        ]
+      }
+    },
+    {
+      "id": "clause_reference",
+      "label": "Clause Reference",
+      "labelPt": "Referência de Cláusula",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "extractionHints": [
+        "after 'Clause' or 'Section' or 'Cláusula'",
+        "numeric or alphanumeric"
+      ],
+      "examples": {
+        "en": [
+          "Section 4.2(a)",
+          "Clause 7.1"
+        ],
+        "pt": [
+          "Cláusula 4.2(a)",
+          "Seção 7.1"
+        ]
+      }
+    },
+    {
+      "id": "court_name",
+      "label": "Court Name",
+      "labelPt": "Nome do Tribunal",
+      "category": "legal",
+      "domains": [
+        "legal"
+      ],
+      "extractionHints": [
+        "proper noun",
+        "after 'Court' or 'Tribunal'",
+        "capitalized"
+      ],
+      "examples": {
+        "en": [
+          "United States District Court",
+          "Superior Court of California"
+        ],
+        "pt": [
+          "Tribunal de Justiça de São Paulo",
+          "Supremo Tribunal Federal"
+        ]
+      }
+    },
+    {
+      "id": "jurisdiction",
+      "label": "Jurisdiction",
+      "labelPt": "Jurisdição",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "extractionHints": [
+        "after 'jurisdiction' or 'foro'",
+        "geographic name",
+        "near governing law section"
+      ],
+      "examples": {
+        "en": [
+          "State of Delaware",
+          "Southern District of New York"
+        ],
+        "pt": [
+          "Comarca de São Paulo",
+          "Foro Central da Capital"
+        ]
+      }
+    },
+    {
+      "id": "statute_citation",
+      "label": "Statute Citation",
+      "labelPt": "Citação Legislativa",
+      "category": "legal",
+      "domains": [
+        "legal",
+        "finance"
+      ],
+      "extractionHints": [
+        "legal citation format",
+        "after 'pursuant to' or 'nos termos de'"
+      ],
+      "examples": {
+        "en": [
+          "26 U.S.C. § 501(c)(3)",
+          "Securities Act of 1933, Section 5"
+        ],
+        "pt": [
+          "Lei nº 6.404/76, Art. 159",
+          "Código Civil, Art. 421"
+        ]
+      }
+    },
+    {
+      "id": "address",
+      "label": "Address",
+      "labelPt": "Endereço",
+      "category": "location",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "street number",
+        "multi-line format",
+        "after 'Address' or 'Endereço'"
+      ],
+      "examples": {
+        "en": [
+          "123 Main Street, Suite 400",
+          "1600 Pennsylvania Avenue NW"
+        ],
+        "pt": [
+          "Rua Augusta, 1234, Sala 400",
+          "Av. Paulista, 1578"
+        ]
+      }
+    },
+    {
+      "id": "city",
+      "label": "City",
+      "labelPt": "Cidade",
+      "category": "location",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "proper noun",
+        "after 'City' or 'Cidade'",
+        "within address block"
+      ],
+      "examples": {
+        "en": [
+          "New York",
+          "San Francisco"
+        ],
+        "pt": [
+          "São Paulo",
+          "Rio de Janeiro"
+        ]
+      }
+    },
+    {
+      "id": "country",
+      "label": "Country",
+      "labelPt": "País",
+      "category": "location",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "proper noun",
+        "after state/province in address",
+        "ISO country name"
+      ],
+      "examples": {
+        "en": [
+          "United States",
+          "Brazil"
+        ],
+        "pt": [
+          "Estados Unidos",
+          "Brasil"
+        ]
+      }
+    },
+    {
+      "id": "state_province",
+      "label": "State/Province",
+      "labelPt": "Estado/Província",
+      "category": "location",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "abbreviation or proper noun",
+        "after city name",
+        "two-letter code"
+      ],
+      "examples": {
+        "en": [
+          "California",
+          "NY",
+          "Texas"
+        ],
+        "pt": [
+          "São Paulo",
+          "SP",
+          "Minas Gerais"
+        ]
+      }
+    },
+    {
+      "id": "diagnosis_code",
+      "label": "Diagnosis Code",
+      "labelPt": "Código de Diagnóstico",
+      "category": "medical",
+      "domains": [
+        "medical"
+      ],
+      "extractionHints": [
+        "ICD-10 format",
+        "alphanumeric code",
+        "after 'Dx' or 'CID'"
+      ],
+      "examples": {
+        "en": [
+          "ICD-10: E11.9",
+          "Dx: J06.9"
+        ],
+        "pt": [
+          "CID-10: E11.9",
+          "CID: J06.9"
+        ]
+      }
+    },
+    {
+      "id": "dosage",
+      "label": "Dosage",
+      "labelPt": "Dosagem",
+      "category": "medical",
+      "domains": [
+        "medical"
+      ],
+      "extractionHints": [
+        "numeric with unit",
+        "mg/mL/mcg",
+        "after medication name"
+      ],
+      "examples": {
+        "en": [
+          "500mg twice daily",
+          "10mL every 8 hours"
+        ],
+        "pt": [
+          "500mg duas vezes ao dia",
+          "10mL a cada 8 horas"
+        ]
+      }
+    },
+    {
+      "id": "lab_value",
+      "label": "Lab Value",
+      "labelPt": "Valor Laboratorial",
+      "category": "medical",
+      "domains": [
+        "medical"
+      ],
+      "extractionHints": [
+        "numeric with unit",
+        "after test name",
+        "may include reference range"
+      ],
+      "examples": {
+        "en": [
+          "HbA1c: 7.2%",
+          "WBC: 8,500/uL",
+          "Creatinine: 1.1 mg/dL"
+        ],
+        "pt": [
+          "HbA1c: 7,2%",
+          "Leucócitos: 8.500/uL",
+          "Creatinina: 1,1 mg/dL"
+        ]
+      }
+    },
+    {
+      "id": "medication_name",
+      "label": "Medication Name",
+      "labelPt": "Nome do Medicamento",
+      "category": "medical",
+      "domains": [
+        "medical"
+      ],
+      "extractionHints": [
+        "proper noun or generic drug name",
+        "capitalized",
+        "near dosage"
+      ],
+      "examples": {
+        "en": [
+          "Metformin",
+          "Lisinopril 10mg",
+          "Amoxicillin"
+        ],
+        "pt": [
+          "Metformina",
+          "Lisinopril 10mg",
+          "Amoxicilina"
+        ]
+      }
+    },
+    {
+      "id": "procedure_code",
+      "label": "Procedure Code",
+      "labelPt": "Código de Procedimento",
+      "category": "medical",
+      "domains": [
+        "medical"
+      ],
+      "extractionHints": [
+        "CPT or TUSS format",
+        "numeric code",
+        "after 'Procedure' or 'Procedimento'"
+      ],
+      "examples": {
+        "en": [
+          "CPT 99213",
+          "CPT: 36415"
+        ],
+        "pt": [
+          "TUSS 10101012",
+          "Procedimento: 40301117"
+        ]
+      }
+    },
+    {
+      "id": "currency_amount",
+      "label": "Currency Amount",
+      "labelPt": "Valor Monetário",
+      "category": "money",
+      "domains": [
+        "finance",
+        "legal",
+        "operations"
+      ],
+      "extractionHints": [
+        "currency symbol",
+        "numeric with decimals",
+        "after '$' or 'R$' or 'USD'"
+      ],
+      "examples": {
+        "en": [
+          "$1,250,000.00",
+          "USD 500,000"
+        ],
+        "pt": [
+          "R$ 1.250.000,00",
+          "BRL 500.000"
+        ]
+      }
+    },
+    {
+      "id": "currency_code",
+      "label": "Currency Code",
+      "labelPt": "Código da Moeda",
+      "category": "money",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "three-letter ISO code",
+        "near monetary amount"
+      ],
+      "examples": {
+        "en": [
+          "USD",
+          "EUR",
+          "GBP"
+        ],
+        "pt": [
+          "BRL",
+          "USD",
+          "EUR"
+        ]
+      }
+    },
+    {
+      "id": "exchange_rate",
+      "label": "Exchange Rate",
+      "labelPt": "Taxa de Câmbio",
+      "category": "money",
+      "domains": [
+        "finance"
+      ],
+      "extractionHints": [
+        "decimal number",
+        "after 'rate' or 'taxa'",
+        "currency pair"
+      ],
+      "examples": {
+        "en": [
+          "USD/BRL: 5.12",
+          "exchange rate of 1.08"
+        ],
+        "pt": [
+          "USD/BRL: 5,12",
+          "taxa de câmbio de 1,08"
+        ]
+      }
+    },
+    {
+      "id": "interest_rate",
+      "label": "Interest Rate",
+      "labelPt": "Taxa de Juros",
+      "category": "money",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "percentage",
+        "after 'interest' or 'juros'",
+        "per annum/per month"
+      ],
+      "examples": {
+        "en": [
+          "5.25% per annum",
+          "SOFR + 2.00%"
+        ],
+        "pt": [
+          "5,25% ao ano",
+          "CDI + 2,00%"
+        ]
+      }
+    },
+    {
+      "id": "tax_rate",
+      "label": "Tax Rate",
+      "labelPt": "Alíquota de Imposto",
+      "category": "money",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "percentage",
+        "after 'tax' or 'imposto' or 'alíquota'"
+      ],
+      "examples": {
+        "en": [
+          "sales tax: 8.25%",
+          "withholding rate: 15%"
+        ],
+        "pt": [
+          "ICMS: 18%",
+          "alíquota de retenção: 15%"
+        ]
+      }
+    },
+    {
+      "id": "company_name",
+      "label": "Company Name",
+      "labelPt": "Nome da Empresa",
+      "category": "organization",
+      "domains": [
+        "finance",
+        "legal",
+        "operations"
+      ],
+      "extractionHints": [
+        "proper noun",
+        "capitalized",
+        "followed by Inc./LLC/Ltd./S.A./Ltda."
+      ],
+      "examples": {
+        "en": [
+          "Acme Corporation",
+          "Global Tech Inc."
+        ],
+        "pt": [
+          "Empresa Exemplo S.A.",
+          "Tech Global Ltda."
+        ]
+      }
+    },
+    {
+      "id": "counterparty",
+      "label": "Counterparty",
+      "labelPt": "Contraparte",
+      "category": "organization",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "after 'between' or 'entre'",
+        "second party named",
+        "proper noun"
+      ],
+      "examples": {
+        "en": [
+          "Counterparty: Beta Holdings LLC",
+          "the Seller"
+        ],
+        "pt": [
+          "Contraparte: Beta Holdings Ltda.",
+          "o Vendedor"
+        ]
+      }
+    },
+    {
+      "id": "department",
+      "label": "Department",
+      "labelPt": "Departamento",
+      "category": "organization",
+      "domains": [
+        "finance",
+        "operations"
+      ],
+      "extractionHints": [
+        "after 'Department' or 'Departamento'",
+        "organizational unit"
+      ],
+      "examples": {
+        "en": [
+          "Finance Department",
+          "Human Resources"
+        ],
+        "pt": [
+          "Departamento Financeiro",
+          "Recursos Humanos"
+        ]
+      }
+    },
+    {
+      "id": "regulatory_body",
+      "label": "Regulatory Body",
+      "labelPt": "Órgão Regulador",
+      "category": "organization",
+      "domains": [
+        "finance",
+        "legal",
+        "medical"
+      ],
+      "extractionHints": [
+        "government agency",
+        "proper noun",
+        "capitalized acronym"
+      ],
+      "examples": {
+        "en": [
+          "SEC",
+          "FDA",
+          "EPA"
+        ],
+        "pt": [
+          "CVM",
+          "ANVISA",
+          "Banco Central"
+        ]
+      }
+    },
+    {
+      "id": "subsidiary",
+      "label": "Subsidiary",
+      "labelPt": "Subsidiária",
+      "category": "organization",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "after 'subsidiary' or 'subsidiária'",
+        "proper noun",
+        "ownership context"
+      ],
+      "examples": {
+        "en": [
+          "Acme International (a wholly-owned subsidiary)",
+          "SubCo LLC"
+        ],
+        "pt": [
+          "Acme Internacional (subsidiária integral)",
+          "SubCo Ltda."
+        ]
+      }
+    },
+    {
+      "id": "person_name",
+      "label": "Person Name",
+      "labelPt": "Nome da Pessoa",
+      "category": "person",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "proper noun",
+        "capitalized",
+        "after 'Name:' or 'Nome:'"
+      ],
+      "examples": {
+        "en": [
+          "John Smith",
+          "Dr. Maria Santos"
+        ],
+        "pt": [
+          "João Silva",
+          "Dra. Maria Santos"
+        ]
+      }
+    },
+    {
+      "id": "person_role",
+      "label": "Person Role",
+      "labelPt": "Função da Pessoa",
+      "category": "person",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "after person name",
+        "job title",
+        "organizational role"
+      ],
+      "examples": {
+        "en": [
+          "Chief Financial Officer",
+          "Attending Physician",
+          "Project Manager"
+        ],
+        "pt": [
+          "Diretor Financeiro",
+          "Médico Assistente",
+          "Gerente de Projeto"
+        ]
+      }
+    },
+    {
+      "id": "person_title",
+      "label": "Person Title",
+      "labelPt": "Título da Pessoa",
+      "category": "person",
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "operations"
+      ],
+      "extractionHints": [
+        "honorific",
+        "before person name",
+        "Mr./Mrs./Dr./Prof."
+      ],
+      "examples": {
+        "en": [
+          "Dr.",
+          "Mr.",
+          "Hon."
+        ],
+        "pt": [
+          "Dr.",
+          "Sr.",
+          "Exmo."
+        ]
+      }
+    },
+    {
+      "id": "signatory",
+      "label": "Signatory",
+      "labelPt": "Signatário",
+      "category": "person",
+      "domains": [
+        "finance",
+        "legal"
+      ],
+      "extractionHints": [
+        "near signature line",
+        "after 'By:' or 'Por:'",
+        "proper noun"
+      ],
+      "examples": {
+        "en": [
+          "By: Jane Doe, CEO",
+          "Authorized Signatory: Robert Chen"
+        ],
+        "pt": [
+          "Por: Maria Silva, CEO",
+          "Signatário Autorizado: Roberto Santos"
+        ]
+      }
+    },
+    {
+      "id": "witness",
+      "label": "Witness",
+      "labelPt": "Testemunha",
+      "category": "person",
+      "domains": [
+        "legal"
+      ],
+      "extractionHints": [
+        "after 'Witness' or 'Testemunha'",
+        "near signature block",
+        "proper noun"
+      ],
+      "examples": {
+        "en": [
+          "Witness: Michael Brown",
+          "Witnessed by: Sarah Lee"
+        ],
+        "pt": [
+          "Testemunha: Miguel Santos",
+          "Testemunhado por: Sara Lima"
+        ]
+      }
+    }
+  ]
+}

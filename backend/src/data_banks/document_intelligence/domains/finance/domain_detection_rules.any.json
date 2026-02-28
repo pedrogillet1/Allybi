@@ -1,0 +1,415 @@
+{
+  "_meta": {
+    "id": "di_finance_domain_detection_rules",
+    "version": "2.0.0",
+    "description": "Finance domain detection rules with explicit negative disambiguation against accounting patterns.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "minScore": 0.65,
+    "maxRulesPerDocument": 48
+  },
+  "domain": "finance",
+  "rules": [
+    {
+      "id": "fin_detect_neg_acct_aging_conflict",
+      "priority": 172,
+      "weight": -2.3,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\baccounts payable aging\\b",
+        "\\baccounts receivable aging\\b",
+        "\\baging de contas\\b"
+      ],
+      "description": "Negative disambiguation rule against finance false positives: acct_aging_conflict"
+    },
+    {
+      "id": "fin_detect_neg_acct_gl_conflict",
+      "priority": 174,
+      "weight": -2.6,
+      "signal": "heading_or_content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bgeneral ledger\\b",
+        "\\braz[aã]o geral\\b",
+        "\\blivro raz[aã]o\\b"
+      ],
+      "description": "Negative disambiguation rule against finance false positives: acct_gl_conflict"
+    },
+    {
+      "id": "fin_detect_neg_acct_je_conflict",
+      "priority": 173,
+      "weight": -2.5,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bjournal entry\\b",
+        "\\blan[cç]amento cont[aá]bil\\b",
+        "\\bje support\\b"
+      ],
+      "description": "Negative disambiguation rule against finance false positives: acct_je_conflict"
+    },
+    {
+      "id": "fin_detect_neg_acct_reconciliation_conflict",
+      "priority": 171,
+      "weight": -2.2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bbank reconciliation\\b",
+        "\\bconcilia[cç][aã]o banc[aá]ria\\b"
+      ],
+      "description": "Negative disambiguation rule against finance false positives: acct_reconciliation_conflict"
+    },
+    {
+      "id": "fin_detect_neg_acct_trial_balance_conflict",
+      "priority": 175,
+      "weight": -2.8,
+      "signal": "heading_or_content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\btrial balance\\b",
+        "\\bbalancete\\b"
+      ],
+      "description": "Negative disambiguation rule against finance false positives: acct_trial_balance_conflict"
+    },
+    {
+      "id": "fin_detect_neg_tax_compliance_conflict",
+      "priority": 170,
+      "weight": -1.8,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\btax filing\\b",
+        "\\bnota fiscal\\b",
+        "\\bsped\\b"
+      ],
+      "description": "Negative disambiguation rule against finance false positives: tax_compliance_conflict"
+    },
+    {
+      "id": "fin_detect_pos_board_reporting",
+      "priority": 195,
+      "weight": 2,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bboard deck\\b",
+        "\\bconselho\\b",
+        "\\bdeck financeiro\\b"
+      ],
+      "description": "Positive finance detection rule: board_reporting"
+    },
+    {
+      "id": "fin_detect_pos_context_01",
+      "priority": 193,
+      "weight": 1.1,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_02",
+      "priority": 192,
+      "weight": 1.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_03",
+      "priority": 191,
+      "weight": 1.5,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_04",
+      "priority": 190,
+      "weight": 1.7000000000000002,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_05",
+      "priority": 189,
+      "weight": 1.1,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_06",
+      "priority": 188,
+      "weight": 1.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_07",
+      "priority": 187,
+      "weight": 1.5,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_08",
+      "priority": 186,
+      "weight": 1.7000000000000002,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_09",
+      "priority": 185,
+      "weight": 1.1,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_10",
+      "priority": 184,
+      "weight": 1.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_11",
+      "priority": 183,
+      "weight": 1.5,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_12",
+      "priority": 182,
+      "weight": 1.7000000000000002,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_13",
+      "priority": 181,
+      "weight": 1.1,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_14",
+      "priority": 180,
+      "weight": 1.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_15",
+      "priority": 179,
+      "weight": 1.5,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_16",
+      "priority": 178,
+      "weight": 1.7000000000000002,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_17",
+      "priority": 177,
+      "weight": 1.1,
+      "signal": "table_header_cluster",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(revenue|ebitda|net income|cash)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_context_18",
+      "priority": 176,
+      "weight": 1.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b(guidance|runway|burn|liquidity)\\b",
+        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+      ],
+      "description": "Contextual finance signal requiring metric + period context."
+    },
+    {
+      "id": "fin_detect_pos_kpi_cluster",
+      "priority": 194,
+      "weight": 1.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bEBITDA\\b",
+        "\\beps\\b",
+        "\\bgross margin\\b",
+        "\\bfree cash flow\\b"
+      ],
+      "description": "Positive finance detection rule: kpi_cluster"
+    },
+    {
+      "id": "fin_detect_pos_planning_cluster",
+      "priority": 198,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bbudget\\b",
+        "\\bforecast\\b",
+        "\\bor[cç]amento\\b",
+        "\\bprevis[aã]o\\b",
+        "\\bor[cç]ado vs realizado\\b"
+      ],
+      "description": "Positive finance detection rule: planning_cluster"
+    },
+    {
+      "id": "fin_detect_pos_saas_finance_cluster",
+      "priority": 196,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bARR\\b",
+        "\\bMRR\\b",
+        "\\bNRR\\b",
+        "\\bchurn\\b",
+        "\\bunit economics\\b",
+        "\\bcohort\\b"
+      ],
+      "description": "Positive finance detection rule: saas_finance_cluster"
+    },
+    {
+      "id": "fin_detect_pos_sec_filing",
+      "priority": 200,
+      "weight": 3,
+      "signal": "heading_or_metadata",
+      "ruleType": "positive",
+      "patterns": [
+        "\\b10-K\\b",
+        "\\b10-Q\\b",
+        "\\b8-K\\b",
+        "\\bSEC\\s+filing\\b"
+      ],
+      "description": "Positive finance detection rule: sec_filing"
+    },
+    {
+      "id": "fin_detect_pos_statements_cluster",
+      "priority": 199,
+      "weight": 2.8,
+      "signal": "heading",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bincome statement\\b",
+        "\\bbalance sheet\\b",
+        "\\bcash flow statement\\b",
+        "\\bdre\\b",
+        "\\bbalan[çc]o\\b",
+        "\\bfluxo de caixa\\b"
+      ],
+      "description": "Positive finance detection rule: statements_cluster"
+    },
+    {
+      "id": "fin_detect_pos_treasury_cluster",
+      "priority": 197,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bcash forecast\\b",
+        "\\bbank statement\\b",
+        "\\bdebt schedule\\b",
+        "\\bcovenant\\b",
+        "\\bextrato banc[aá]rio\\b"
+      ],
+      "description": "Positive finance detection rule: treasury_cluster"
+    }
+  ]
+}

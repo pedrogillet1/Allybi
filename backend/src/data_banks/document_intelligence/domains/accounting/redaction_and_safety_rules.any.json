@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "di_accounting_redaction_and_safety_rules",
+    "version": "1.0.0",
+    "description": "Redaction and safety rules for accounting domain — PII handling and sensitive data policies.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting"
+  },
+  "domain": "accounting",
+  "redactionRules": [
+    {
+      "id": "acct_redact_001_ssn",
+      "dataType": "SSN",
+      "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+      "action": "REDACT",
+      "replacement": "[SSN REDACTED]"
+    },
+    {
+      "id": "acct_redact_002_bank_account",
+      "dataType": "bank_account_number",
+      "pattern": "\\b(?:account\\s*(?:no\\.?|number|#)\\s*:?\\s*)\\d{8,17}\\b",
+      "action": "REDACT",
+      "replacement": "[ACCOUNT REDACTED]"
+    },
+    {
+      "id": "acct_redact_003_ein",
+      "dataType": "employer_id",
+      "pattern": "\\b(?:EIN|employer\\s+id)\\s*:?\\s*\\d{2}-\\d{7}\\b",
+      "action": "REDACT",
+      "replacement": "[EIN REDACTED]"
+    },
+    {
+      "id": "acct_redact_004_vendor_bank",
+      "dataType": "vendor_banking_details",
+      "pattern": "\\b(?:routing|swift|iban|bic)\\s*(?:no\\.?|number|#|code)?\\s*:?\\s*[A-Z0-9]{8,34}\\b",
+      "action": "REDACT",
+      "replacement": "[BANKING DETAIL REDACTED]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "acct_safety_001_no_audit_opinion",
+      "severity": "error",
+      "description": "Never state or imply an audit opinion. Only describe what the documents show.",
+      "trigger": "query asks for audit conclusion",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "acct_safety_002_no_fraud_accusation",
+      "severity": "error",
+      "description": "Never accuse individuals or entities of fraud. Flag anomalies neutrally.",
+      "trigger": "analysis reveals potential irregularity",
+      "action": "NEUTRAL_FLAG"
+    },
+    {
+      "id": "acct_safety_003_no_tax_filing",
+      "severity": "warning",
+      "description": "Do not generate content intended to be filed with tax authorities.",
+      "trigger": "query asks to prepare a tax return or filing",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "acct_safety_004_confidential_workpapers",
+      "severity": "warning",
+      "description": "Audit workpapers may be privileged. Do not reproduce full workpaper content verbatim.",
+      "trigger": "document is identified as audit workpaper",
+      "action": "SUMMARIZE_ONLY"
+    }
+  ]
+}

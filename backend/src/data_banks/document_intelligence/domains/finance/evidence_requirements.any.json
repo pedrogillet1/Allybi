@@ -1,0 +1,380 @@
+{
+  "_meta": {
+    "id": "di_finance_evidence_requirements",
+    "version": "2.0.0",
+    "description": "Finance evidence requirements enforcing period/currency/unit and header-context integrity.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "finance",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "audited_statement",
+      "label": {
+        "en": "Audited statement",
+        "pt": "Demonstracao auditada"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "regulatory_filing",
+      "label": {
+        "en": "Regulatory filing",
+        "pt": "Arquivo regulatorio"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "board_approved_pack",
+      "label": {
+        "en": "Board approved pack",
+        "pt": "Pacote aprovado pelo conselho"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 4,
+      "type": "management_report",
+      "label": {
+        "en": "Management report",
+        "pt": "Relatorio gerencial"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "raw_export",
+      "label": {
+        "en": "Raw export",
+        "pt": "Exportacao bruta"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "fin_ev_001_numeric_claim_requires_header_context",
+      "description": "numeric claim requires header context",
+      "applies": [
+        "extract"
+      ],
+      "requiredDimensions": [
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_002_numeric_claim_requires_row_and_column",
+      "description": "numeric claim requires row and column",
+      "applies": [
+        "extract"
+      ],
+      "requiredDimensions": [
+        "row_header",
+        "column_header",
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_003_calculation_requires_inputs",
+      "description": "calculation requires inputs",
+      "applies": [
+        "calculate"
+      ],
+      "requiredDimensions": [
+        "numerator_source",
+        "denominator_source",
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_004_mixed_currency_block",
+      "description": "mixed currency block",
+      "applies": [
+        "calculate"
+      ],
+      "requiredDimensions": [
+        "currency",
+        "conversion_rate",
+        "period",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_005_period_alignment_for_compare",
+      "description": "period alignment for compare",
+      "applies": [
+        "compare"
+      ],
+      "requiredDimensions": [
+        "period",
+        "granularity",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_006_budget_vs_actual_explicit_label",
+      "description": "budget vs actual explicit label",
+      "applies": [
+        "compare"
+      ],
+      "requiredDimensions": [
+        "scenario_label",
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_007_forecast_must_disclose_assumptions",
+      "description": "forecast must disclose assumptions",
+      "applies": [
+        "evaluate"
+      ],
+      "requiredDimensions": [
+        "assumptions",
+        "period",
+        "unit",
+        "currency",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_008_variance_must_include_base",
+      "description": "variance must include base",
+      "applies": [
+        "compare"
+      ],
+      "requiredDimensions": [
+        "base_value",
+        "comparison_value",
+        "unit",
+        "period",
+        "currency",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_009_table_value_requires_table_name",
+      "description": "table value requires table name",
+      "applies": [
+        "extract"
+      ],
+      "requiredDimensions": [
+        "table_name",
+        "row_header",
+        "column_header",
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_010_ratio_requires_unit_consistency",
+      "description": "ratio requires unit consistency",
+      "applies": [
+        "calculate"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "currency",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_011_kpi_dashboard_requires_timestamp",
+      "description": "kpi dashboard requires timestamp",
+      "applies": [
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "period",
+        "data_timestamp",
+        "unit",
+        "currency",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_012_arr_mrr_requires_recurring_scope",
+      "description": "arr mrr requires recurring scope",
+      "applies": [
+        "extract"
+      ],
+      "requiredDimensions": [
+        "recurring_scope",
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_013_pipeline_requires_stage_definition",
+      "description": "pipeline requires stage definition",
+      "applies": [
+        "evaluate"
+      ],
+      "requiredDimensions": [
+        "stage_definition",
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_014_cohort_requires_cohort_key",
+      "description": "cohort requires cohort key",
+      "applies": [
+        "compare"
+      ],
+      "requiredDimensions": [
+        "cohort_key",
+        "period",
+        "unit",
+        "currency",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_015_cash_forecast_requires_opening_and_closing",
+      "description": "cash forecast requires opening and closing",
+      "applies": [
+        "validate"
+      ],
+      "requiredDimensions": [
+        "opening_balance",
+        "closing_balance",
+        "currency",
+        "period",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_016_bank_statement_requires_account_context",
+      "description": "bank statement requires account context",
+      "applies": [
+        "extract"
+      ],
+      "requiredDimensions": [
+        "account_id",
+        "statement_period",
+        "currency",
+        "period",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_017_debt_schedule_requires_maturity_and_rate",
+      "description": "debt schedule requires maturity and rate",
+      "applies": [
+        "extract"
+      ],
+      "requiredDimensions": [
+        "maturity_date",
+        "interest_rate",
+        "currency",
+        "period",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_018_covenant_requires_threshold_and_result",
+      "description": "covenant requires threshold and result",
+      "applies": [
+        "validate"
+      ],
+      "requiredDimensions": [
+        "threshold",
+        "actual",
+        "period",
+        "unit",
+        "currency",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_019_board_deck_requires_source_trace",
+      "description": "board deck requires source trace",
+      "applies": [
+        "summarize"
+      ],
+      "requiredDimensions": [
+        "source_table",
+        "period",
+        "currency",
+        "unit",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_020_esg_numeric_requires_boundary",
+      "description": "esg numeric requires boundary",
+      "applies": [
+        "extract"
+      ],
+      "requiredDimensions": [
+        "boundary_definition",
+        "period",
+        "unit",
+        "currency",
+        "header_context"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    }
+  ],
+  "mandatoryContext": [
+    "period",
+    "currency",
+    "unit",
+    "header_context"
+  ]
+}

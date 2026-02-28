@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "id": "editing_ux",
+    "version": "1.0.0",
+    "description": "UX clarification prompts for editing flows — selection, range, and ambiguity resolution.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "fallbackLanguage": "en"
+  },
+  "prompts": {
+    "no_selection_confirm": {
+      "en": "No selection provided. I'll apply to {{fallbackScope}} — confirm?",
+      "pt": "Nenhuma selecao fornecida. Vou aplicar em {{fallbackScope}} — confirmar?"
+    },
+    "range_required": {
+      "en": "This action needs a range (e.g., {{exampleRange}}). Select a range or type it.",
+      "pt": "Esta acao precisa de um intervalo (ex.: {{exampleRange}}). Selecione ou digite um intervalo."
+    },
+    "ambiguous_target": {
+      "en": "I found {{candidateCount}} possible targets. Which one should I edit?",
+      "pt": "Encontrei {{candidateCount}} alvos possiveis. Qual deles devo editar?"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "EUX_001_no_selection_en",
+        "assert": "prompts.no_selection_confirm.en != ''"
+      },
+      {
+        "id": "EUX_002_range_required_pt",
+        "assert": "prompts.range_required.pt != ''"
+      },
+      {
+        "id": "EUX_003_ambiguous_target_en",
+        "assert": "prompts.ambiguous_target.en != ''"
+      }
+    ]
+  }
+}

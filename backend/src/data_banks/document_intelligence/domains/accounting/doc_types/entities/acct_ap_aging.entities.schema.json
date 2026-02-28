@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_ap_aging",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for ap aging documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_ap_aging"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "asOfDate",
+      "type": "date",
+      "required": true,
+      "description": "Aging report date"
+    },
+    {
+      "id": "totalApBalance",
+      "type": "currency",
+      "required": true,
+      "description": "Total AP balance"
+    },
+    {
+      "id": "bucketCurrent",
+      "type": "currency",
+      "required": true,
+      "description": "Current bucket"
+    },
+    {
+      "id": "bucket1_30",
+      "type": "currency",
+      "required": true,
+      "description": "1-30 days bucket"
+    },
+    {
+      "id": "bucketOver90",
+      "type": "currency",
+      "required": true,
+      "description": "Over-90 bucket"
+    },
+    {
+      "id": "vendorCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of vendors with open balances"
+    }
+  ]
+}

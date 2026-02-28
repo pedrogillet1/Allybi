@@ -1,0 +1,2580 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_insurance",
+    "version": "1.0.0",
+    "description": "Table header ontology for insurance documents with multilingual synonym coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance"
+  },
+  "domain": "insurance",
+  "headers": [
+    {
+      "canonical": "accident_date_amount",
+      "synonyms": [
+        "accident data montante",
+        "accident data valor",
+        "Accident Data Valor",
+        "accident data valor valor",
+        "accident date amount",
+        "Accident Date Amount",
+        "accident date amount field",
+        "accident date amount value",
+        "accident date amt",
+        "accidentdateamount",
+        "ADA"
+      ],
+      "related": [
+        "accident_date_code",
+        "accident_date_quantity",
+        "accident_date_type"
+      ]
+    },
+    {
+      "canonical": "accident_date_code",
+      "synonyms": [
+        "accident data codigo",
+        "Accident Data Codigo",
+        "accident data codigo valor",
+        "accident date code",
+        "Accident Date Code",
+        "accident date code field",
+        "accident date code value",
+        "accidentdatecode",
+        "ADC"
+      ],
+      "related": [
+        "accident_date_count",
+        "accident_date_rate",
+        "accident_date_unit"
+      ]
+    },
+    {
+      "canonical": "accident_date_count",
+      "synonyms": [
+        "accident data count",
+        "Accident Data Count",
+        "accident data count valor",
+        "accident date count",
+        "Accident Date Count",
+        "accident date count field",
+        "accident date count value",
+        "accidentdatecount",
+        "ADC"
+      ],
+      "related": [
+        "accident_date_end_date",
+        "accident_date_start_date",
+        "amount_amount"
+      ]
+    },
+    {
+      "canonical": "accident_date_end_date",
+      "synonyms": [
+        "accident data fim data",
+        "Accident Data Fim Data",
+        "accident data fim data valor",
+        "accident date end date",
+        "Accident Date End Date",
+        "accident date end date field",
+        "accident date end date value",
+        "accidentdateenddate",
+        "ADED"
+      ],
+      "related": [
+        "accident_date_id",
+        "accident_date_status",
+        "amount_code"
+      ]
+    },
+    {
+      "canonical": "accident_date_id",
+      "synonyms": [
+        "accident data id",
+        "Accident Data Id",
+        "accident data id valor",
+        "accident date id",
+        "Accident Date Id",
+        "accident date id field",
+        "accident date id value",
+        "accidentdateid",
+        "ADI"
+      ],
+      "related": [
+        "accident_date_name",
+        "accident_date_subtotal",
+        "amount_count"
+      ]
+    },
+    {
+      "canonical": "accident_date_name",
+      "synonyms": [
+        "accident data nome",
+        "Accident Data Nome",
+        "accident data nome valor",
+        "accident date name",
+        "Accident Date Name",
+        "accident date name field",
+        "accident date name value",
+        "accidentdatename",
+        "ADN"
+      ],
+      "related": [
+        "accident_date_number",
+        "accident_date_total",
+        "amount_date"
+      ]
+    },
+    {
+      "canonical": "accident_date_number",
+      "synonyms": [
+        "accident data numero",
+        "Accident Data Numero",
+        "accident data numero valor",
+        "accident date no",
+        "accident date number",
+        "Accident Date Number",
+        "accident date number field",
+        "accident date number value",
+        "accidentdatenumber",
+        "ADN"
+      ],
+      "related": [
+        "accident_date_quantity",
+        "accident_date_type",
+        "amount_end_date"
+      ]
+    },
+    {
+      "canonical": "accident_date_quantity",
+      "synonyms": [
+        "accident data quantidade",
+        "Accident Data Quantidade",
+        "accident data quantidade valor",
+        "accident date qty",
+        "accident date quantity",
+        "Accident Date Quantity",
+        "accident date quantity field",
+        "accident date quantity value",
+        "accidentdatequantity",
+        "ADQ"
+      ],
+      "related": [
+        "accident_date_rate",
+        "accident_date_unit",
+        "amount_id"
+      ]
+    },
+    {
+      "canonical": "accident_date_rate",
+      "synonyms": [
+        "accident data taxa",
+        "Accident Data Taxa",
+        "accident data taxa valor",
+        "accident date rate",
+        "Accident Date Rate",
+        "accident date rate field",
+        "accident date rate value",
+        "accidentdaterate",
+        "ADR"
+      ],
+      "related": [
+        "accident_date_start_date",
+        "amount_amount",
+        "amount_name"
+      ]
+    },
+    {
+      "canonical": "accident_date_start_date",
+      "synonyms": [
+        "accident data inicio data",
+        "Accident Data Inicio Data",
+        "accident data inicio data valor",
+        "accident date start date",
+        "Accident Date Start Date",
+        "accident date start date field",
+        "accident date start date value",
+        "accidentdatestartdate",
+        "ADSD"
+      ],
+      "related": [
+        "accident_date_status",
+        "amount_code",
+        "amount_number"
+      ]
+    },
+    {
+      "canonical": "accident_date_status",
+      "synonyms": [
+        "accident data status",
+        "Accident Data Status",
+        "accident data status valor",
+        "accident date status",
+        "Accident Date Status",
+        "accident date status field",
+        "accident date status value",
+        "accidentdatestatus",
+        "ADS"
+      ],
+      "related": [
+        "accident_date_subtotal",
+        "amount_count",
+        "amount_quantity"
+      ]
+    },
+    {
+      "canonical": "accident_date_subtotal",
+      "synonyms": [
+        "accident data subtotal",
+        "Accident Data Subtotal",
+        "accident data subtotal valor",
+        "accident date subtotal",
+        "Accident Date Subtotal",
+        "accident date subtotal field",
+        "accident date subtotal value",
+        "accidentdatesubtotal",
+        "ADS"
+      ],
+      "related": [
+        "accident_date_total",
+        "amount_date",
+        "amount_rate"
+      ]
+    },
+    {
+      "canonical": "accident_date_total",
+      "synonyms": [
+        "accident data total",
+        "Accident Data Total",
+        "accident data total valor",
+        "accident date total",
+        "Accident Date Total",
+        "accident date total field",
+        "accident date total value",
+        "accidentdatetotal",
+        "ADT"
+      ],
+      "related": [
+        "accident_date_type",
+        "amount_end_date",
+        "amount_start_date"
+      ]
+    },
+    {
+      "canonical": "accident_date_type",
+      "synonyms": [
+        "accident data tipo",
+        "Accident Data Tipo",
+        "accident data tipo valor",
+        "accident date type",
+        "Accident Date Type",
+        "accident date type field",
+        "accident date type value",
+        "accidentdatetype",
+        "ADT"
+      ],
+      "related": [
+        "accident_date_unit",
+        "amount_id",
+        "amount_status"
+      ]
+    },
+    {
+      "canonical": "accident_date_unit",
+      "synonyms": [
+        "accident data unidade",
+        "Accident Data Unidade",
+        "accident data unidade valor",
+        "accident date unit",
+        "Accident Date Unit",
+        "accident date unit field",
+        "accident date unit value",
+        "accidentdateunit",
+        "ADU"
+      ],
+      "related": [
+        "amount_amount",
+        "amount_name",
+        "amount_subtotal"
+      ]
+    },
+    {
+      "canonical": "amount_amount",
+      "synonyms": [
+        "AA",
+        "amount amount",
+        "Amount Amount",
+        "amount amount field",
+        "amount amount value",
+        "amountamount",
+        "amt amount",
+        "montante valor",
+        "valor valor",
+        "Valor Valor",
+        "valor valor valor"
+      ],
+      "related": [
+        "amount_code",
+        "amount_number",
+        "amount_total"
+      ]
+    },
+    {
+      "canonical": "amount_code",
+      "synonyms": [
+        "AC",
+        "amount code",
+        "Amount Code",
+        "amount code field",
+        "amount code value",
+        "amountcode",
+        "amt code",
+        "montante codigo",
+        "valor codigo",
+        "Valor Codigo",
+        "valor codigo valor"
+      ],
+      "related": [
+        "amount_count",
+        "amount_quantity",
+        "amount_type"
+      ]
+    },
+    {
+      "canonical": "amount_count",
+      "synonyms": [
+        "AC",
+        "amount count",
+        "Amount Count",
+        "amount count field",
+        "amount count value",
+        "amountcount",
+        "amt count",
+        "montante count",
+        "valor count",
+        "Valor Count",
+        "valor count valor"
+      ],
+      "related": [
+        "amount_date",
+        "amount_rate",
+        "amount_unit"
+      ]
+    },
+    {
+      "canonical": "amount_date",
+      "synonyms": [
+        "AD",
+        "amount date",
+        "Amount Date",
+        "amount date field",
+        "amount date value",
+        "amountdate",
+        "amt date",
+        "montante data",
+        "valor data",
+        "Valor Data",
+        "valor data valor"
+      ],
+      "related": [
+        "amount_end_date",
+        "amount_start_date",
+        "approved_amount_amount"
+      ]
+    },
+    {
+      "canonical": "amount_end_date",
+      "synonyms": [
+        "AED",
+        "amount end date",
+        "Amount End Date",
+        "amount end date field",
+        "amount end date value",
+        "amountenddate",
+        "amt end date",
+        "montante fim data",
+        "valor fim data",
+        "Valor Fim Data",
+        "valor fim data valor"
+      ],
+      "related": [
+        "amount_id",
+        "amount_status",
+        "approved_amount_code"
+      ]
+    },
+    {
+      "canonical": "amount_id",
+      "synonyms": [
+        "AI",
+        "amount id",
+        "Amount Id",
+        "amount id field",
+        "amount id value",
+        "amountid",
+        "amt id",
+        "montante id",
+        "valor id",
+        "Valor Id",
+        "valor id valor"
+      ],
+      "related": [
+        "amount_name",
+        "amount_subtotal",
+        "approved_amount_count"
+      ]
+    },
+    {
+      "canonical": "amount_name",
+      "synonyms": [
+        "amount name",
+        "Amount Name",
+        "amount name field",
+        "amount name value",
+        "amountname",
+        "amt name",
+        "AN",
+        "montante nome",
+        "valor nome",
+        "Valor Nome",
+        "valor nome valor"
+      ],
+      "related": [
+        "amount_number",
+        "amount_total",
+        "approved_amount_date"
+      ]
+    },
+    {
+      "canonical": "amount_number",
+      "synonyms": [
+        "amount no",
+        "amount number",
+        "Amount Number",
+        "amount number field",
+        "amount number value",
+        "amountnumber",
+        "amt number",
+        "AN",
+        "montante numero",
+        "valor numero",
+        "Valor Numero",
+        "valor numero valor"
+      ],
+      "related": [
+        "amount_quantity",
+        "amount_type",
+        "approved_amount_end_date"
+      ]
+    },
+    {
+      "canonical": "amount_quantity",
+      "synonyms": [
+        "amount qty",
+        "amount quantity",
+        "Amount Quantity",
+        "amount quantity field",
+        "amount quantity value",
+        "amountquantity",
+        "amt quantity",
+        "AQ",
+        "montante quantidade",
+        "valor quantidade",
+        "Valor Quantidade",
+        "valor quantidade valor"
+      ],
+      "related": [
+        "amount_rate",
+        "amount_unit",
+        "approved_amount_id"
+      ]
+    },
+    {
+      "canonical": "amount_rate",
+      "synonyms": [
+        "amount rate",
+        "Amount Rate",
+        "amount rate field",
+        "amount rate value",
+        "amountrate",
+        "amt rate",
+        "AR",
+        "montante taxa",
+        "valor taxa",
+        "Valor Taxa",
+        "valor taxa valor"
+      ],
+      "related": [
+        "amount_start_date",
+        "approved_amount_amount",
+        "approved_amount_name"
+      ]
+    },
+    {
+      "canonical": "amount_start_date",
+      "synonyms": [
+        "amount start date",
+        "Amount Start Date",
+        "amount start date field",
+        "amount start date value",
+        "amountstartdate",
+        "amt start date",
+        "ASD",
+        "montante inicio data",
+        "valor inicio data",
+        "Valor Inicio Data",
+        "valor inicio data valor"
+      ],
+      "related": [
+        "amount_status",
+        "approved_amount_code",
+        "approved_amount_number"
+      ]
+    },
+    {
+      "canonical": "amount_status",
+      "synonyms": [
+        "amount status",
+        "Amount Status",
+        "amount status field",
+        "amount status value",
+        "amountstatus",
+        "amt status",
+        "AS",
+        "montante status",
+        "valor status",
+        "Valor Status",
+        "valor status valor"
+      ],
+      "related": [
+        "amount_subtotal",
+        "approved_amount_count",
+        "approved_amount_quantity"
+      ]
+    },
+    {
+      "canonical": "amount_subtotal",
+      "synonyms": [
+        "amount subtotal",
+        "Amount Subtotal",
+        "amount subtotal field",
+        "amount subtotal value",
+        "amountsubtotal",
+        "amt subtotal",
+        "AS",
+        "montante subtotal",
+        "valor subtotal",
+        "Valor Subtotal",
+        "valor subtotal valor"
+      ],
+      "related": [
+        "amount_total",
+        "approved_amount_date",
+        "approved_amount_rate"
+      ]
+    },
+    {
+      "canonical": "amount_total",
+      "synonyms": [
+        "amount total",
+        "Amount Total",
+        "amount total field",
+        "amount total value",
+        "amounttotal",
+        "amt total",
+        "AT",
+        "montante total",
+        "valor total",
+        "Valor Total",
+        "valor total valor"
+      ],
+      "related": [
+        "amount_type",
+        "approved_amount_end_date",
+        "approved_amount_start_date"
+      ]
+    },
+    {
+      "canonical": "amount_type",
+      "synonyms": [
+        "amount type",
+        "Amount Type",
+        "amount type field",
+        "amount type value",
+        "amounttype",
+        "amt type",
+        "AT",
+        "montante tipo",
+        "valor tipo",
+        "Valor Tipo",
+        "valor tipo valor"
+      ],
+      "related": [
+        "amount_unit",
+        "approved_amount_id",
+        "approved_amount_status"
+      ]
+    },
+    {
+      "canonical": "amount_unit",
+      "synonyms": [
+        "amount unit",
+        "Amount Unit",
+        "amount unit field",
+        "amount unit value",
+        "amountunit",
+        "amt unit",
+        "AU",
+        "montante unidade",
+        "valor unidade",
+        "Valor Unidade",
+        "valor unidade valor"
+      ],
+      "related": [
+        "approved_amount_amount",
+        "approved_amount_name",
+        "approved_amount_subtotal"
+      ]
+    },
+    {
+      "canonical": "approved_amount_amount",
+      "synonyms": [
+        "AAA",
+        "approved amount amount",
+        "Approved Amount Amount",
+        "approved amount amount field",
+        "approved amount amount value",
+        "approved amt amount",
+        "approved montante valor",
+        "approved valor valor",
+        "Approved Valor Valor",
+        "approved valor valor valor",
+        "approvedamountamount"
+      ],
+      "related": [
+        "approved_amount_code",
+        "approved_amount_number",
+        "approved_amount_total"
+      ]
+    },
+    {
+      "canonical": "approved_amount_code",
+      "synonyms": [
+        "AAC",
+        "approved amount code",
+        "Approved Amount Code",
+        "approved amount code field",
+        "approved amount code value",
+        "approved amt code",
+        "approved montante codigo",
+        "approved valor codigo",
+        "Approved Valor Codigo",
+        "approved valor codigo valor",
+        "approvedamountcode"
+      ],
+      "related": [
+        "approved_amount_count",
+        "approved_amount_quantity",
+        "approved_amount_type"
+      ]
+    },
+    {
+      "canonical": "approved_amount_count",
+      "synonyms": [
+        "AAC",
+        "approved amount count",
+        "Approved Amount Count",
+        "approved amount count field",
+        "approved amount count value",
+        "approved amt count",
+        "approved montante count",
+        "approved valor count",
+        "Approved Valor Count",
+        "approved valor count valor",
+        "approvedamountcount"
+      ],
+      "related": [
+        "approved_amount_date",
+        "approved_amount_rate",
+        "approved_amount_unit"
+      ]
+    },
+    {
+      "canonical": "approved_amount_date",
+      "synonyms": [
+        "AAD",
+        "approved amount date",
+        "Approved Amount Date",
+        "approved amount date field",
+        "approved amount date value",
+        "approved amt date",
+        "approved montante data",
+        "approved valor data",
+        "Approved Valor Data",
+        "approved valor data valor",
+        "approvedamountdate"
+      ],
+      "related": [
+        "approved_amount_end_date",
+        "approved_amount_start_date",
+        "beneficiary_amount"
+      ]
+    },
+    {
+      "canonical": "approved_amount_end_date",
+      "synonyms": [
+        "AAED",
+        "approved amount end date",
+        "Approved Amount End Date",
+        "approved amount end date field",
+        "approved amount end date value",
+        "approved amt end date",
+        "approved montante fim data",
+        "approved valor fim data",
+        "Approved Valor Fim Data",
+        "approved valor fim data valor",
+        "approvedamountenddate"
+      ],
+      "related": [
+        "approved_amount_id",
+        "approved_amount_status",
+        "beneficiary_code"
+      ]
+    },
+    {
+      "canonical": "approved_amount_id",
+      "synonyms": [
+        "AAI",
+        "approved amount id",
+        "Approved Amount Id",
+        "approved amount id field",
+        "approved amount id value",
+        "approved amt id",
+        "approved montante id",
+        "approved valor id",
+        "Approved Valor Id",
+        "approved valor id valor",
+        "approvedamountid"
+      ],
+      "related": [
+        "approved_amount_name",
+        "approved_amount_subtotal",
+        "beneficiary_count"
+      ]
+    },
+    {
+      "canonical": "approved_amount_name",
+      "synonyms": [
+        "AAN",
+        "approved amount name",
+        "Approved Amount Name",
+        "approved amount name field",
+        "approved amount name value",
+        "approved amt name",
+        "approved montante nome",
+        "approved valor nome",
+        "Approved Valor Nome",
+        "approved valor nome valor",
+        "approvedamountname"
+      ],
+      "related": [
+        "approved_amount_number",
+        "approved_amount_total",
+        "beneficiary_date"
+      ]
+    },
+    {
+      "canonical": "approved_amount_number",
+      "synonyms": [
+        "AAN",
+        "approved amount no",
+        "approved amount number",
+        "Approved Amount Number",
+        "approved amount number field",
+        "approved amount number value",
+        "approved amt number",
+        "approved montante numero",
+        "approved valor numero",
+        "Approved Valor Numero",
+        "approved valor numero valor",
+        "approvedamountnumber"
+      ],
+      "related": [
+        "approved_amount_quantity",
+        "approved_amount_type",
+        "beneficiary_end_date"
+      ]
+    },
+    {
+      "canonical": "approved_amount_quantity",
+      "synonyms": [
+        "AAQ",
+        "approved amount qty",
+        "approved amount quantity",
+        "Approved Amount Quantity",
+        "approved amount quantity field",
+        "approved amount quantity value",
+        "approved amt quantity",
+        "approved montante quantidade",
+        "approved valor quantidade",
+        "Approved Valor Quantidade",
+        "approved valor quantidade valor",
+        "approvedamountquantity"
+      ],
+      "related": [
+        "approved_amount_rate",
+        "approved_amount_unit",
+        "beneficiary_id"
+      ]
+    },
+    {
+      "canonical": "approved_amount_rate",
+      "synonyms": [
+        "AAR",
+        "approved amount rate",
+        "Approved Amount Rate",
+        "approved amount rate field",
+        "approved amount rate value",
+        "approved amt rate",
+        "approved montante taxa",
+        "approved valor taxa",
+        "Approved Valor Taxa",
+        "approved valor taxa valor",
+        "approvedamountrate"
+      ],
+      "related": [
+        "approved_amount_start_date",
+        "beneficiary_amount",
+        "beneficiary_name"
+      ]
+    },
+    {
+      "canonical": "approved_amount_start_date",
+      "synonyms": [
+        "AASD",
+        "approved amount start date",
+        "Approved Amount Start Date",
+        "approved amount start date field",
+        "approved amount start date value",
+        "approved amt start date",
+        "approved montante inicio data",
+        "approved valor inicio data",
+        "Approved Valor Inicio Data",
+        "approved valor inicio data valor",
+        "approvedamountstartdate"
+      ],
+      "related": [
+        "approved_amount_status",
+        "beneficiary_code",
+        "beneficiary_number"
+      ]
+    },
+    {
+      "canonical": "approved_amount_status",
+      "synonyms": [
+        "AAS",
+        "approved amount status",
+        "Approved Amount Status",
+        "approved amount status field",
+        "approved amount status value",
+        "approved amt status",
+        "approved montante status",
+        "approved valor status",
+        "Approved Valor Status",
+        "approved valor status valor",
+        "approvedamountstatus"
+      ],
+      "related": [
+        "approved_amount_subtotal",
+        "beneficiary_count",
+        "beneficiary_quantity"
+      ]
+    },
+    {
+      "canonical": "approved_amount_subtotal",
+      "synonyms": [
+        "AAS",
+        "approved amount subtotal",
+        "Approved Amount Subtotal",
+        "approved amount subtotal field",
+        "approved amount subtotal value",
+        "approved amt subtotal",
+        "approved montante subtotal",
+        "approved valor subtotal",
+        "Approved Valor Subtotal",
+        "approved valor subtotal valor",
+        "approvedamountsubtotal"
+      ],
+      "related": [
+        "approved_amount_total",
+        "beneficiary_date",
+        "beneficiary_rate"
+      ]
+    },
+    {
+      "canonical": "approved_amount_total",
+      "synonyms": [
+        "AAT",
+        "approved amount total",
+        "Approved Amount Total",
+        "approved amount total field",
+        "approved amount total value",
+        "approved amt total",
+        "approved montante total",
+        "approved valor total",
+        "Approved Valor Total",
+        "approved valor total valor",
+        "approvedamounttotal"
+      ],
+      "related": [
+        "approved_amount_type",
+        "beneficiary_end_date",
+        "beneficiary_start_date"
+      ]
+    },
+    {
+      "canonical": "approved_amount_type",
+      "synonyms": [
+        "AAT",
+        "approved amount type",
+        "Approved Amount Type",
+        "approved amount type field",
+        "approved amount type value",
+        "approved amt type",
+        "approved montante tipo",
+        "approved valor tipo",
+        "Approved Valor Tipo",
+        "approved valor tipo valor",
+        "approvedamounttype"
+      ],
+      "related": [
+        "approved_amount_unit",
+        "beneficiary_id",
+        "beneficiary_status"
+      ]
+    },
+    {
+      "canonical": "approved_amount_unit",
+      "synonyms": [
+        "AAU",
+        "approved amount unit",
+        "Approved Amount Unit",
+        "approved amount unit field",
+        "approved amount unit value",
+        "approved amt unit",
+        "approved montante unidade",
+        "approved valor unidade",
+        "Approved Valor Unidade",
+        "approved valor unidade valor",
+        "approvedamountunit"
+      ],
+      "related": [
+        "beneficiary_amount",
+        "beneficiary_name",
+        "beneficiary_subtotal"
+      ]
+    },
+    {
+      "canonical": "beneficiary_amount",
+      "synonyms": [
+        "BA",
+        "beneficiary amount",
+        "Beneficiary Amount",
+        "beneficiary amount field",
+        "beneficiary amount value",
+        "beneficiary amt",
+        "beneficiary montante",
+        "beneficiary valor",
+        "Beneficiary Valor",
+        "beneficiary valor valor",
+        "beneficiaryamount"
+      ],
+      "related": [
+        "beneficiary_code",
+        "beneficiary_number",
+        "beneficiary_total"
+      ]
+    },
+    {
+      "canonical": "beneficiary_code",
+      "synonyms": [
+        "BC",
+        "beneficiary code",
+        "Beneficiary Code",
+        "beneficiary code field",
+        "beneficiary code value",
+        "beneficiary codigo",
+        "Beneficiary Codigo",
+        "beneficiary codigo valor",
+        "beneficiarycode"
+      ],
+      "related": [
+        "beneficiary_count",
+        "beneficiary_quantity",
+        "beneficiary_type"
+      ]
+    },
+    {
+      "canonical": "beneficiary_count",
+      "synonyms": [
+        "BC",
+        "beneficiary count",
+        "Beneficiary Count",
+        "beneficiary count field",
+        "beneficiary count valor",
+        "beneficiary count value",
+        "beneficiarycount"
+      ],
+      "related": [
+        "beneficiary_date",
+        "beneficiary_rate",
+        "beneficiary_unit"
+      ]
+    },
+    {
+      "canonical": "beneficiary_date",
+      "synonyms": [
+        "BD",
+        "beneficiary data",
+        "Beneficiary Data",
+        "beneficiary data valor",
+        "beneficiary date",
+        "Beneficiary Date",
+        "beneficiary date field",
+        "beneficiary date value",
+        "beneficiarydate"
+      ],
+      "related": [
+        "beneficiary_end_date",
+        "beneficiary_start_date",
+        "broker_amount"
+      ]
+    },
+    {
+      "canonical": "beneficiary_end_date",
+      "synonyms": [
+        "BED",
+        "beneficiary end date",
+        "Beneficiary End Date",
+        "beneficiary end date field",
+        "beneficiary end date value",
+        "beneficiary fim data",
+        "Beneficiary Fim Data",
+        "beneficiary fim data valor",
+        "beneficiaryenddate"
+      ],
+      "related": [
+        "beneficiary_id",
+        "beneficiary_status",
+        "broker_code"
+      ]
+    },
+    {
+      "canonical": "beneficiary_id",
+      "synonyms": [
+        "beneficiary id",
+        "Beneficiary Id",
+        "beneficiary id field",
+        "beneficiary id valor",
+        "beneficiary id value",
+        "beneficiaryid",
+        "BI"
+      ],
+      "related": [
+        "beneficiary_name",
+        "beneficiary_subtotal",
+        "broker_count"
+      ]
+    },
+    {
+      "canonical": "beneficiary_name",
+      "synonyms": [
+        "beneficiary name",
+        "Beneficiary Name",
+        "beneficiary name field",
+        "beneficiary name value",
+        "beneficiary nome",
+        "Beneficiary Nome",
+        "beneficiary nome valor",
+        "beneficiaryname",
+        "BN"
+      ],
+      "related": [
+        "beneficiary_number",
+        "beneficiary_total",
+        "broker_date"
+      ]
+    },
+    {
+      "canonical": "beneficiary_number",
+      "synonyms": [
+        "beneficiary no",
+        "beneficiary number",
+        "Beneficiary Number",
+        "beneficiary number field",
+        "beneficiary number value",
+        "beneficiary numero",
+        "Beneficiary Numero",
+        "beneficiary numero valor",
+        "beneficiarynumber",
+        "BN"
+      ],
+      "related": [
+        "beneficiary_quantity",
+        "beneficiary_type",
+        "broker_end_date"
+      ]
+    },
+    {
+      "canonical": "beneficiary_quantity",
+      "synonyms": [
+        "beneficiary qty",
+        "beneficiary quantidade",
+        "Beneficiary Quantidade",
+        "beneficiary quantidade valor",
+        "beneficiary quantity",
+        "Beneficiary Quantity",
+        "beneficiary quantity field",
+        "beneficiary quantity value",
+        "beneficiaryquantity",
+        "BQ"
+      ],
+      "related": [
+        "beneficiary_rate",
+        "beneficiary_unit",
+        "broker_id"
+      ]
+    },
+    {
+      "canonical": "beneficiary_rate",
+      "synonyms": [
+        "beneficiary rate",
+        "Beneficiary Rate",
+        "beneficiary rate field",
+        "beneficiary rate value",
+        "beneficiary taxa",
+        "Beneficiary Taxa",
+        "beneficiary taxa valor",
+        "beneficiaryrate",
+        "BR"
+      ],
+      "related": [
+        "beneficiary_start_date",
+        "broker_amount",
+        "broker_name"
+      ]
+    },
+    {
+      "canonical": "beneficiary_start_date",
+      "synonyms": [
+        "beneficiary inicio data",
+        "Beneficiary Inicio Data",
+        "beneficiary inicio data valor",
+        "beneficiary start date",
+        "Beneficiary Start Date",
+        "beneficiary start date field",
+        "beneficiary start date value",
+        "beneficiarystartdate",
+        "BSD"
+      ],
+      "related": [
+        "beneficiary_status",
+        "broker_code",
+        "broker_number"
+      ]
+    },
+    {
+      "canonical": "beneficiary_status",
+      "synonyms": [
+        "beneficiary status",
+        "Beneficiary Status",
+        "beneficiary status field",
+        "beneficiary status valor",
+        "beneficiary status value",
+        "beneficiarystatus",
+        "BS"
+      ],
+      "related": [
+        "beneficiary_subtotal",
+        "broker_count",
+        "broker_quantity"
+      ]
+    },
+    {
+      "canonical": "beneficiary_subtotal",
+      "synonyms": [
+        "beneficiary subtotal",
+        "Beneficiary Subtotal",
+        "beneficiary subtotal field",
+        "beneficiary subtotal valor",
+        "beneficiary subtotal value",
+        "beneficiarysubtotal",
+        "BS"
+      ],
+      "related": [
+        "beneficiary_total",
+        "broker_date",
+        "broker_rate"
+      ]
+    },
+    {
+      "canonical": "beneficiary_total",
+      "synonyms": [
+        "beneficiary total",
+        "Beneficiary Total",
+        "beneficiary total field",
+        "beneficiary total valor",
+        "beneficiary total value",
+        "beneficiarytotal",
+        "BT"
+      ],
+      "related": [
+        "beneficiary_type",
+        "broker_end_date",
+        "broker_start_date"
+      ]
+    },
+    {
+      "canonical": "beneficiary_type",
+      "synonyms": [
+        "beneficiary tipo",
+        "Beneficiary Tipo",
+        "beneficiary tipo valor",
+        "beneficiary type",
+        "Beneficiary Type",
+        "beneficiary type field",
+        "beneficiary type value",
+        "beneficiarytype",
+        "BT"
+      ],
+      "related": [
+        "beneficiary_unit",
+        "broker_id",
+        "broker_status"
+      ]
+    },
+    {
+      "canonical": "beneficiary_unit",
+      "synonyms": [
+        "beneficiary unidade",
+        "Beneficiary Unidade",
+        "beneficiary unidade valor",
+        "beneficiary unit",
+        "Beneficiary Unit",
+        "beneficiary unit field",
+        "beneficiary unit value",
+        "beneficiaryunit",
+        "BU"
+      ],
+      "related": [
+        "broker_amount",
+        "broker_name",
+        "broker_subtotal"
+      ]
+    },
+    {
+      "canonical": "broker_amount",
+      "synonyms": [
+        "BA",
+        "broker amount",
+        "Broker Amount",
+        "broker amount field",
+        "broker amount value",
+        "broker amt",
+        "broker montante",
+        "broker valor",
+        "Broker Valor",
+        "broker valor valor",
+        "brokeramount"
+      ],
+      "related": [
+        "broker_code",
+        "broker_number",
+        "broker_total"
+      ]
+    },
+    {
+      "canonical": "broker_code",
+      "synonyms": [
+        "BC",
+        "broker code",
+        "Broker Code",
+        "broker code field",
+        "broker code value",
+        "broker codigo",
+        "Broker Codigo",
+        "broker codigo valor",
+        "brokercode"
+      ],
+      "related": [
+        "broker_count",
+        "broker_quantity",
+        "broker_type"
+      ]
+    },
+    {
+      "canonical": "broker_count",
+      "synonyms": [
+        "BC",
+        "broker count",
+        "Broker Count",
+        "broker count field",
+        "broker count valor",
+        "broker count value",
+        "brokercount"
+      ],
+      "related": [
+        "broker_date",
+        "broker_rate",
+        "broker_unit"
+      ]
+    },
+    {
+      "canonical": "broker_date",
+      "synonyms": [
+        "BD",
+        "broker data",
+        "Broker Data",
+        "broker data valor",
+        "broker date",
+        "Broker Date",
+        "broker date field",
+        "broker date value",
+        "brokerdate"
+      ],
+      "related": [
+        "broker_end_date",
+        "broker_start_date",
+        "claim_amount"
+      ]
+    },
+    {
+      "canonical": "broker_end_date",
+      "synonyms": [
+        "BED",
+        "broker end date",
+        "Broker End Date",
+        "broker end date field",
+        "broker end date value",
+        "broker fim data",
+        "Broker Fim Data",
+        "broker fim data valor",
+        "brokerenddate"
+      ],
+      "related": [
+        "broker_id",
+        "broker_status",
+        "claim_code"
+      ]
+    },
+    {
+      "canonical": "broker_id",
+      "synonyms": [
+        "BI",
+        "broker id",
+        "Broker Id",
+        "broker id field",
+        "broker id valor",
+        "broker id value",
+        "brokerid"
+      ],
+      "related": [
+        "broker_name",
+        "broker_subtotal",
+        "claim_count"
+      ]
+    },
+    {
+      "canonical": "broker_name",
+      "synonyms": [
+        "BN",
+        "broker name",
+        "Broker Name",
+        "broker name field",
+        "broker name value",
+        "broker nome",
+        "Broker Nome",
+        "broker nome valor",
+        "brokername"
+      ],
+      "related": [
+        "broker_number",
+        "broker_total",
+        "claim_date"
+      ]
+    },
+    {
+      "canonical": "broker_number",
+      "synonyms": [
+        "BN",
+        "broker no",
+        "broker number",
+        "Broker Number",
+        "broker number field",
+        "broker number value",
+        "broker numero",
+        "Broker Numero",
+        "broker numero valor",
+        "brokernumber"
+      ],
+      "related": [
+        "broker_quantity",
+        "broker_type",
+        "claim_end_date"
+      ]
+    },
+    {
+      "canonical": "broker_quantity",
+      "synonyms": [
+        "BQ",
+        "broker qty",
+        "broker quantidade",
+        "Broker Quantidade",
+        "broker quantidade valor",
+        "broker quantity",
+        "Broker Quantity",
+        "broker quantity field",
+        "broker quantity value",
+        "brokerquantity"
+      ],
+      "related": [
+        "broker_rate",
+        "broker_unit",
+        "claim_id"
+      ]
+    },
+    {
+      "canonical": "broker_rate",
+      "synonyms": [
+        "BR",
+        "broker rate",
+        "Broker Rate",
+        "broker rate field",
+        "broker rate value",
+        "broker taxa",
+        "Broker Taxa",
+        "broker taxa valor",
+        "brokerrate"
+      ],
+      "related": [
+        "broker_start_date",
+        "claim_amount",
+        "claim_name"
+      ]
+    },
+    {
+      "canonical": "broker_start_date",
+      "synonyms": [
+        "broker inicio data",
+        "Broker Inicio Data",
+        "broker inicio data valor",
+        "broker start date",
+        "Broker Start Date",
+        "broker start date field",
+        "broker start date value",
+        "brokerstartdate",
+        "BSD"
+      ],
+      "related": [
+        "broker_status",
+        "claim_code",
+        "claim_number"
+      ]
+    },
+    {
+      "canonical": "broker_status",
+      "synonyms": [
+        "broker status",
+        "Broker Status",
+        "broker status field",
+        "broker status valor",
+        "broker status value",
+        "brokerstatus",
+        "BS"
+      ],
+      "related": [
+        "broker_subtotal",
+        "claim_count",
+        "claim_quantity"
+      ]
+    },
+    {
+      "canonical": "broker_subtotal",
+      "synonyms": [
+        "broker subtotal",
+        "Broker Subtotal",
+        "broker subtotal field",
+        "broker subtotal valor",
+        "broker subtotal value",
+        "brokersubtotal",
+        "BS"
+      ],
+      "related": [
+        "broker_total",
+        "claim_date",
+        "claim_rate"
+      ]
+    },
+    {
+      "canonical": "broker_total",
+      "synonyms": [
+        "broker total",
+        "Broker Total",
+        "broker total field",
+        "broker total valor",
+        "broker total value",
+        "brokertotal",
+        "BT"
+      ],
+      "related": [
+        "broker_type",
+        "claim_end_date",
+        "claim_start_date"
+      ]
+    },
+    {
+      "canonical": "broker_type",
+      "synonyms": [
+        "broker tipo",
+        "Broker Tipo",
+        "broker tipo valor",
+        "broker type",
+        "Broker Type",
+        "broker type field",
+        "broker type value",
+        "brokertype",
+        "BT"
+      ],
+      "related": [
+        "broker_unit",
+        "claim_id",
+        "claim_status"
+      ]
+    },
+    {
+      "canonical": "broker_unit",
+      "synonyms": [
+        "broker unidade",
+        "Broker Unidade",
+        "broker unidade valor",
+        "broker unit",
+        "Broker Unit",
+        "broker unit field",
+        "broker unit value",
+        "brokerunit",
+        "BU"
+      ],
+      "related": [
+        "claim_amount",
+        "claim_name",
+        "claim_subtotal"
+      ]
+    },
+    {
+      "canonical": "claim_amount",
+      "synonyms": [
+        "CA",
+        "claim amount",
+        "Claim Amount",
+        "claim amount field",
+        "claim amount value",
+        "claim amt",
+        "claimamount",
+        "sinistro montante",
+        "sinistro valor",
+        "Sinistro Valor",
+        "sinistro valor valor"
+      ],
+      "related": [
+        "claim_code",
+        "claim_number",
+        "claim_total"
+      ]
+    },
+    {
+      "canonical": "claim_code",
+      "synonyms": [
+        "CC",
+        "claim code",
+        "Claim Code",
+        "claim code field",
+        "claim code value",
+        "claimcode",
+        "sinistro codigo",
+        "Sinistro Codigo",
+        "sinistro codigo valor"
+      ],
+      "related": [
+        "claim_count",
+        "claim_quantity",
+        "claim_type"
+      ]
+    },
+    {
+      "canonical": "claim_count",
+      "synonyms": [
+        "CC",
+        "claim count",
+        "Claim Count",
+        "claim count field",
+        "claim count value",
+        "claimcount",
+        "sinistro count",
+        "Sinistro Count",
+        "sinistro count valor"
+      ],
+      "related": [
+        "claim_date",
+        "claim_rate",
+        "claim_unit"
+      ]
+    },
+    {
+      "canonical": "claim_date",
+      "synonyms": [
+        "CD",
+        "claim date",
+        "Claim Date",
+        "claim date field",
+        "claim date value",
+        "claimdate",
+        "sinistro data",
+        "Sinistro Data",
+        "sinistro data valor"
+      ],
+      "related": [
+        "claim_end_date",
+        "claim_start_date",
+        "claimant_amount"
+      ]
+    },
+    {
+      "canonical": "claim_end_date",
+      "synonyms": [
+        "CED",
+        "claim end date",
+        "Claim End Date",
+        "claim end date field",
+        "claim end date value",
+        "claimenddate",
+        "sinistro fim data",
+        "Sinistro Fim Data",
+        "sinistro fim data valor"
+      ],
+      "related": [
+        "claim_id",
+        "claim_status",
+        "claimant_code"
+      ]
+    },
+    {
+      "canonical": "claim_id",
+      "synonyms": [
+        "CI",
+        "claim id",
+        "Claim Id",
+        "claim id field",
+        "claim id value",
+        "claimid",
+        "sinistro id",
+        "Sinistro Id",
+        "sinistro id valor"
+      ],
+      "related": [
+        "claim_name",
+        "claim_subtotal",
+        "claimant_count"
+      ]
+    },
+    {
+      "canonical": "claim_name",
+      "synonyms": [
+        "claim name",
+        "Claim Name",
+        "claim name field",
+        "claim name value",
+        "claimname",
+        "CN",
+        "sinistro nome",
+        "Sinistro Nome",
+        "sinistro nome valor"
+      ],
+      "related": [
+        "claim_number",
+        "claim_total",
+        "claimant_date"
+      ]
+    },
+    {
+      "canonical": "claim_number",
+      "synonyms": [
+        "claim no",
+        "claim number",
+        "Claim Number",
+        "claim number field",
+        "claim number value",
+        "claimnumber",
+        "CN",
+        "sinistro numero",
+        "Sinistro Numero",
+        "sinistro numero valor"
+      ],
+      "related": [
+        "claim_quantity",
+        "claim_type",
+        "claimant_end_date"
+      ]
+    },
+    {
+      "canonical": "claim_quantity",
+      "synonyms": [
+        "claim qty",
+        "claim quantity",
+        "Claim Quantity",
+        "claim quantity field",
+        "claim quantity value",
+        "claimquantity",
+        "CQ",
+        "sinistro quantidade",
+        "Sinistro Quantidade",
+        "sinistro quantidade valor"
+      ],
+      "related": [
+        "claim_rate",
+        "claim_unit",
+        "claimant_id"
+      ]
+    },
+    {
+      "canonical": "claim_rate",
+      "synonyms": [
+        "claim rate",
+        "Claim Rate",
+        "claim rate field",
+        "claim rate value",
+        "claimrate",
+        "CR",
+        "sinistro taxa",
+        "Sinistro Taxa",
+        "sinistro taxa valor"
+      ],
+      "related": [
+        "claim_start_date",
+        "claimant_amount",
+        "claimant_name"
+      ]
+    },
+    {
+      "canonical": "claim_start_date",
+      "synonyms": [
+        "claim start date",
+        "Claim Start Date",
+        "claim start date field",
+        "claim start date value",
+        "claimstartdate",
+        "CSD",
+        "sinistro inicio data",
+        "Sinistro Inicio Data",
+        "sinistro inicio data valor"
+      ],
+      "related": [
+        "claim_status",
+        "claimant_code",
+        "claimant_number"
+      ]
+    },
+    {
+      "canonical": "claim_status",
+      "synonyms": [
+        "claim status",
+        "Claim Status",
+        "claim status field",
+        "claim status value",
+        "claimstatus",
+        "CS",
+        "sinistro status",
+        "Sinistro Status",
+        "sinistro status valor"
+      ],
+      "related": [
+        "claim_subtotal",
+        "claimant_count",
+        "claimant_quantity"
+      ]
+    },
+    {
+      "canonical": "claim_subtotal",
+      "synonyms": [
+        "claim subtotal",
+        "Claim Subtotal",
+        "claim subtotal field",
+        "claim subtotal value",
+        "claimsubtotal",
+        "CS",
+        "sinistro subtotal",
+        "Sinistro Subtotal",
+        "sinistro subtotal valor"
+      ],
+      "related": [
+        "claim_total",
+        "claimant_date",
+        "claimant_rate"
+      ]
+    },
+    {
+      "canonical": "claim_total",
+      "synonyms": [
+        "claim total",
+        "Claim Total",
+        "claim total field",
+        "claim total value",
+        "claimtotal",
+        "CT",
+        "sinistro total",
+        "Sinistro Total",
+        "sinistro total valor"
+      ],
+      "related": [
+        "claim_type",
+        "claimant_end_date",
+        "claimant_start_date"
+      ]
+    },
+    {
+      "canonical": "claim_type",
+      "synonyms": [
+        "claim type",
+        "Claim Type",
+        "claim type field",
+        "claim type value",
+        "claimtype",
+        "CT",
+        "sinistro tipo",
+        "Sinistro Tipo",
+        "sinistro tipo valor"
+      ],
+      "related": [
+        "claim_unit",
+        "claimant_id",
+        "claimant_status"
+      ]
+    },
+    {
+      "canonical": "claim_unit",
+      "synonyms": [
+        "claim unit",
+        "Claim Unit",
+        "claim unit field",
+        "claim unit value",
+        "claimunit",
+        "CU",
+        "sinistro unidade",
+        "Sinistro Unidade",
+        "sinistro unidade valor"
+      ],
+      "related": [
+        "claimant_amount",
+        "claimant_name",
+        "claimant_subtotal"
+      ]
+    },
+    {
+      "canonical": "claimant_amount",
+      "synonyms": [
+        "CA",
+        "claimant amount",
+        "Claimant Amount",
+        "claimant amount field",
+        "claimant amount value",
+        "claimant amt",
+        "claimant montante",
+        "claimant valor",
+        "Claimant Valor",
+        "claimant valor valor",
+        "claimantamount"
+      ],
+      "related": [
+        "claimant_code",
+        "claimant_number",
+        "claimant_total"
+      ]
+    },
+    {
+      "canonical": "claimant_code",
+      "synonyms": [
+        "CC",
+        "claimant code",
+        "Claimant Code",
+        "claimant code field",
+        "claimant code value",
+        "claimant codigo",
+        "Claimant Codigo",
+        "claimant codigo valor",
+        "claimantcode"
+      ],
+      "related": [
+        "claimant_count",
+        "claimant_quantity",
+        "claimant_type"
+      ]
+    },
+    {
+      "canonical": "claimant_count",
+      "synonyms": [
+        "CC",
+        "claimant count",
+        "Claimant Count",
+        "claimant count field",
+        "claimant count valor",
+        "claimant count value",
+        "claimantcount"
+      ],
+      "related": [
+        "claimant_date",
+        "claimant_rate",
+        "claimant_unit"
+      ]
+    },
+    {
+      "canonical": "claimant_date",
+      "synonyms": [
+        "CD",
+        "claimant data",
+        "Claimant Data",
+        "claimant data valor",
+        "claimant date",
+        "Claimant Date",
+        "claimant date field",
+        "claimant date value",
+        "claimantdate"
+      ],
+      "related": [
+        "claimant_end_date",
+        "claimant_start_date",
+        "coinsurance_amount"
+      ]
+    },
+    {
+      "canonical": "claimant_end_date",
+      "synonyms": [
+        "CED",
+        "claimant end date",
+        "Claimant End Date",
+        "claimant end date field",
+        "claimant end date value",
+        "claimant fim data",
+        "Claimant Fim Data",
+        "claimant fim data valor",
+        "claimantenddate"
+      ],
+      "related": [
+        "claimant_id",
+        "claimant_status",
+        "coinsurance_code"
+      ]
+    },
+    {
+      "canonical": "claimant_id",
+      "synonyms": [
+        "CI",
+        "claimant id",
+        "Claimant Id",
+        "claimant id field",
+        "claimant id valor",
+        "claimant id value",
+        "claimantid"
+      ],
+      "related": [
+        "claimant_name",
+        "claimant_subtotal",
+        "coinsurance_count"
+      ]
+    },
+    {
+      "canonical": "claimant_name",
+      "synonyms": [
+        "claimant name",
+        "Claimant Name",
+        "claimant name field",
+        "claimant name value",
+        "claimant nome",
+        "Claimant Nome",
+        "claimant nome valor",
+        "claimantname",
+        "CN"
+      ],
+      "related": [
+        "claimant_number",
+        "claimant_total",
+        "coinsurance_date"
+      ]
+    },
+    {
+      "canonical": "claimant_number",
+      "synonyms": [
+        "claimant no",
+        "claimant number",
+        "Claimant Number",
+        "claimant number field",
+        "claimant number value",
+        "claimant numero",
+        "Claimant Numero",
+        "claimant numero valor",
+        "claimantnumber",
+        "CN"
+      ],
+      "related": [
+        "claimant_quantity",
+        "claimant_type",
+        "coinsurance_end_date"
+      ]
+    },
+    {
+      "canonical": "claimant_quantity",
+      "synonyms": [
+        "claimant qty",
+        "claimant quantidade",
+        "Claimant Quantidade",
+        "claimant quantidade valor",
+        "claimant quantity",
+        "Claimant Quantity",
+        "claimant quantity field",
+        "claimant quantity value",
+        "claimantquantity",
+        "CQ"
+      ],
+      "related": [
+        "claimant_rate",
+        "claimant_unit",
+        "coinsurance_id"
+      ]
+    },
+    {
+      "canonical": "claimant_rate",
+      "synonyms": [
+        "claimant rate",
+        "Claimant Rate",
+        "claimant rate field",
+        "claimant rate value",
+        "claimant taxa",
+        "Claimant Taxa",
+        "claimant taxa valor",
+        "claimantrate",
+        "CR"
+      ],
+      "related": [
+        "claimant_start_date",
+        "coinsurance_amount",
+        "coinsurance_name"
+      ]
+    },
+    {
+      "canonical": "claimant_start_date",
+      "synonyms": [
+        "claimant inicio data",
+        "Claimant Inicio Data",
+        "claimant inicio data valor",
+        "claimant start date",
+        "Claimant Start Date",
+        "claimant start date field",
+        "claimant start date value",
+        "claimantstartdate",
+        "CSD"
+      ],
+      "related": [
+        "claimant_status",
+        "coinsurance_code",
+        "coinsurance_number"
+      ]
+    },
+    {
+      "canonical": "claimant_status",
+      "synonyms": [
+        "claimant status",
+        "Claimant Status",
+        "claimant status field",
+        "claimant status valor",
+        "claimant status value",
+        "claimantstatus",
+        "CS"
+      ],
+      "related": [
+        "claimant_subtotal",
+        "coinsurance_count",
+        "coinsurance_quantity"
+      ]
+    },
+    {
+      "canonical": "claimant_subtotal",
+      "synonyms": [
+        "claimant subtotal",
+        "Claimant Subtotal",
+        "claimant subtotal field",
+        "claimant subtotal valor",
+        "claimant subtotal value",
+        "claimantsubtotal",
+        "CS"
+      ],
+      "related": [
+        "claimant_total",
+        "coinsurance_date",
+        "coinsurance_rate"
+      ]
+    },
+    {
+      "canonical": "claimant_total",
+      "synonyms": [
+        "claimant total",
+        "Claimant Total",
+        "claimant total field",
+        "claimant total valor",
+        "claimant total value",
+        "claimanttotal",
+        "CT"
+      ],
+      "related": [
+        "claimant_type",
+        "coinsurance_end_date",
+        "coinsurance_start_date"
+      ]
+    },
+    {
+      "canonical": "claimant_type",
+      "synonyms": [
+        "claimant tipo",
+        "Claimant Tipo",
+        "claimant tipo valor",
+        "claimant type",
+        "Claimant Type",
+        "claimant type field",
+        "claimant type value",
+        "claimanttype",
+        "CT"
+      ],
+      "related": [
+        "claimant_unit",
+        "coinsurance_id",
+        "coinsurance_status"
+      ]
+    },
+    {
+      "canonical": "claimant_unit",
+      "synonyms": [
+        "claimant unidade",
+        "Claimant Unidade",
+        "claimant unidade valor",
+        "claimant unit",
+        "Claimant Unit",
+        "claimant unit field",
+        "claimant unit value",
+        "claimantunit",
+        "CU"
+      ],
+      "related": [
+        "coinsurance_amount",
+        "coinsurance_name",
+        "coinsurance_subtotal"
+      ]
+    },
+    {
+      "canonical": "coinsurance_amount",
+      "synonyms": [
+        "CA",
+        "coinsurance amount",
+        "Coinsurance Amount",
+        "coinsurance amount field",
+        "coinsurance amount value",
+        "coinsurance amt",
+        "coinsurance montante",
+        "coinsurance valor",
+        "Coinsurance Valor",
+        "coinsurance valor valor",
+        "coinsuranceamount"
+      ],
+      "related": [
+        "coinsurance_code",
+        "coinsurance_number",
+        "coinsurance_total"
+      ]
+    },
+    {
+      "canonical": "coinsurance_code",
+      "synonyms": [
+        "CC",
+        "coinsurance code",
+        "Coinsurance Code",
+        "coinsurance code field",
+        "coinsurance code value",
+        "coinsurance codigo",
+        "Coinsurance Codigo",
+        "coinsurance codigo valor",
+        "coinsurancecode"
+      ],
+      "related": [
+        "coinsurance_count",
+        "coinsurance_quantity",
+        "coinsurance_type"
+      ]
+    },
+    {
+      "canonical": "coinsurance_count",
+      "synonyms": [
+        "CC",
+        "coinsurance count",
+        "Coinsurance Count",
+        "coinsurance count field",
+        "coinsurance count valor",
+        "coinsurance count value",
+        "coinsurancecount"
+      ],
+      "related": [
+        "coinsurance_date",
+        "coinsurance_rate",
+        "coinsurance_unit"
+      ]
+    },
+    {
+      "canonical": "coinsurance_date",
+      "synonyms": [
+        "CD",
+        "coinsurance data",
+        "Coinsurance Data",
+        "coinsurance data valor",
+        "coinsurance date",
+        "Coinsurance Date",
+        "coinsurance date field",
+        "coinsurance date value",
+        "coinsurancedate"
+      ],
+      "related": [
+        "coinsurance_end_date",
+        "coinsurance_start_date",
+        "copay_amount"
+      ]
+    },
+    {
+      "canonical": "coinsurance_end_date",
+      "synonyms": [
+        "CED",
+        "coinsurance end date",
+        "Coinsurance End Date",
+        "coinsurance end date field",
+        "coinsurance end date value",
+        "coinsurance fim data",
+        "Coinsurance Fim Data",
+        "coinsurance fim data valor",
+        "coinsuranceenddate"
+      ],
+      "related": [
+        "coinsurance_id",
+        "coinsurance_status",
+        "copay_code"
+      ]
+    },
+    {
+      "canonical": "coinsurance_id",
+      "synonyms": [
+        "CI",
+        "coinsurance id",
+        "Coinsurance Id",
+        "coinsurance id field",
+        "coinsurance id valor",
+        "coinsurance id value",
+        "coinsuranceid"
+      ],
+      "related": [
+        "coinsurance_name",
+        "coinsurance_subtotal",
+        "copay_count"
+      ]
+    },
+    {
+      "canonical": "coinsurance_name",
+      "synonyms": [
+        "CN",
+        "coinsurance name",
+        "Coinsurance Name",
+        "coinsurance name field",
+        "coinsurance name value",
+        "coinsurance nome",
+        "Coinsurance Nome",
+        "coinsurance nome valor",
+        "coinsurancename"
+      ],
+      "related": [
+        "coinsurance_number",
+        "coinsurance_total",
+        "copay_date"
+      ]
+    },
+    {
+      "canonical": "coinsurance_number",
+      "synonyms": [
+        "CN",
+        "coinsurance no",
+        "coinsurance number",
+        "Coinsurance Number",
+        "coinsurance number field",
+        "coinsurance number value",
+        "coinsurance numero",
+        "Coinsurance Numero",
+        "coinsurance numero valor",
+        "coinsurancenumber"
+      ],
+      "related": [
+        "coinsurance_quantity",
+        "coinsurance_type",
+        "copay_end_date"
+      ]
+    },
+    {
+      "canonical": "coinsurance_quantity",
+      "synonyms": [
+        "coinsurance qty",
+        "coinsurance quantidade",
+        "Coinsurance Quantidade",
+        "coinsurance quantidade valor",
+        "coinsurance quantity",
+        "Coinsurance Quantity",
+        "coinsurance quantity field",
+        "coinsurance quantity value",
+        "coinsurancequantity",
+        "CQ"
+      ],
+      "related": [
+        "accident_date_amount",
+        "coinsurance_rate",
+        "coinsurance_unit"
+      ]
+    },
+    {
+      "canonical": "coinsurance_rate",
+      "synonyms": [
+        "coinsurance rate",
+        "Coinsurance Rate",
+        "coinsurance rate field",
+        "coinsurance rate value",
+        "coinsurance taxa",
+        "Coinsurance Taxa",
+        "coinsurance taxa valor",
+        "coinsurancerate",
+        "CR"
+      ],
+      "related": [
+        "accident_date_code",
+        "coinsurance_start_date",
+        "copay_amount"
+      ]
+    },
+    {
+      "canonical": "coinsurance_start_date",
+      "synonyms": [
+        "coinsurance inicio data",
+        "Coinsurance Inicio Data",
+        "coinsurance inicio data valor",
+        "coinsurance start date",
+        "Coinsurance Start Date",
+        "coinsurance start date field",
+        "coinsurance start date value",
+        "coinsurancestartdate",
+        "CSD"
+      ],
+      "related": [
+        "accident_date_count",
+        "coinsurance_status",
+        "copay_code"
+      ]
+    },
+    {
+      "canonical": "coinsurance_status",
+      "synonyms": [
+        "coinsurance status",
+        "Coinsurance Status",
+        "coinsurance status field",
+        "coinsurance status valor",
+        "coinsurance status value",
+        "coinsurancestatus",
+        "CS"
+      ],
+      "related": [
+        "accident_date_end_date",
+        "coinsurance_subtotal",
+        "copay_count"
+      ]
+    },
+    {
+      "canonical": "coinsurance_subtotal",
+      "synonyms": [
+        "coinsurance subtotal",
+        "Coinsurance Subtotal",
+        "coinsurance subtotal field",
+        "coinsurance subtotal valor",
+        "coinsurance subtotal value",
+        "coinsurancesubtotal",
+        "CS"
+      ],
+      "related": [
+        "accident_date_id",
+        "coinsurance_total",
+        "copay_date"
+      ]
+    },
+    {
+      "canonical": "coinsurance_total",
+      "synonyms": [
+        "coinsurance total",
+        "Coinsurance Total",
+        "coinsurance total field",
+        "coinsurance total valor",
+        "coinsurance total value",
+        "coinsurancetotal",
+        "CT"
+      ],
+      "related": [
+        "accident_date_name",
+        "coinsurance_type",
+        "copay_end_date"
+      ]
+    },
+    {
+      "canonical": "coinsurance_type",
+      "synonyms": [
+        "coinsurance tipo",
+        "Coinsurance Tipo",
+        "coinsurance tipo valor",
+        "coinsurance type",
+        "Coinsurance Type",
+        "coinsurance type field",
+        "coinsurance type value",
+        "coinsurancetype",
+        "CT"
+      ],
+      "related": [
+        "accident_date_amount",
+        "accident_date_number",
+        "coinsurance_unit"
+      ]
+    },
+    {
+      "canonical": "coinsurance_unit",
+      "synonyms": [
+        "coinsurance unidade",
+        "Coinsurance Unidade",
+        "coinsurance unidade valor",
+        "coinsurance unit",
+        "Coinsurance Unit",
+        "coinsurance unit field",
+        "coinsurance unit value",
+        "coinsuranceunit",
+        "CU"
+      ],
+      "related": [
+        "accident_date_code",
+        "accident_date_quantity",
+        "copay_amount"
+      ]
+    },
+    {
+      "canonical": "copay_amount",
+      "synonyms": [
+        "CA",
+        "coparticipacao montante",
+        "coparticipacao valor",
+        "Coparticipacao Valor",
+        "coparticipacao valor valor",
+        "copay amount",
+        "Copay Amount",
+        "copay amount field",
+        "copay amount value",
+        "copay amt",
+        "copayamount"
+      ],
+      "related": [
+        "accident_date_count",
+        "accident_date_rate",
+        "copay_code"
+      ]
+    },
+    {
+      "canonical": "copay_code",
+      "synonyms": [
+        "CC",
+        "coparticipacao codigo",
+        "Coparticipacao Codigo",
+        "coparticipacao codigo valor",
+        "copay code",
+        "Copay Code",
+        "copay code field",
+        "copay code value",
+        "copaycode"
+      ],
+      "related": [
+        "accident_date_end_date",
+        "accident_date_start_date",
+        "copay_count"
+      ]
+    },
+    {
+      "canonical": "copay_count",
+      "synonyms": [
+        "CC",
+        "coparticipacao count",
+        "Coparticipacao Count",
+        "coparticipacao count valor",
+        "copay count",
+        "Copay Count",
+        "copay count field",
+        "copay count value",
+        "copaycount"
+      ],
+      "related": [
+        "accident_date_id",
+        "accident_date_status",
+        "copay_date"
+      ]
+    },
+    {
+      "canonical": "copay_date",
+      "synonyms": [
+        "CD",
+        "coparticipacao data",
+        "Coparticipacao Data",
+        "coparticipacao data valor",
+        "copay date",
+        "Copay Date",
+        "copay date field",
+        "copay date value",
+        "copaydate"
+      ],
+      "related": [
+        "accident_date_name",
+        "accident_date_subtotal",
+        "copay_end_date"
+      ]
+    },
+    {
+      "canonical": "copay_end_date",
+      "synonyms": [
+        "CED",
+        "coparticipacao fim data",
+        "Coparticipacao Fim Data",
+        "coparticipacao fim data valor",
+        "copay end date",
+        "Copay End Date",
+        "copay end date field",
+        "copay end date value",
+        "copayenddate"
+      ],
+      "related": [
+        "accident_date_amount",
+        "accident_date_number",
+        "accident_date_total"
+      ]
+    }
+  ]
+}

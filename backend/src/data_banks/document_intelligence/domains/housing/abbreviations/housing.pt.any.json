@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_housing_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for housing domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "language": "pt"
+  },
+  "domain": "housing",
+  "abbreviations": [
+    {
+      "abbr": "AP",
+      "expansion": "Apartamento"
+    },
+    {
+      "abbr": "CEF",
+      "expansion": "Caixa Economica Federal"
+    },
+    {
+      "abbr": "CNPJ",
+      "expansion": "Cadastro Nacional da Pessoa Juridica"
+    },
+    {
+      "abbr": "Cond",
+      "expansion": "Condominio"
+    },
+    {
+      "abbr": "CPF",
+      "expansion": "Cadastro de Pessoa Fisica"
+    },
+    {
+      "abbr": "Hab",
+      "expansion": "Habitacional"
+    },
+    {
+      "abbr": "IPTU",
+      "expansion": "Imposto Predial e Territorial Urbano"
+    },
+    {
+      "abbr": "ITBI",
+      "expansion": "Imposto de Transmissao de Bens Imoveis"
+    },
+    {
+      "abbr": "Jr",
+      "expansion": "Juros"
+    },
+    {
+      "abbr": "Loc",
+      "expansion": "Locacao"
+    },
+    {
+      "abbr": "N/A",
+      "expansion": "Nao Aplicavel"
+    },
+    {
+      "abbr": "Princ",
+      "expansion": "Principal"
+    },
+    {
+      "abbr": "Rec",
+      "expansion": "Recibo"
+    },
+    {
+      "abbr": "Ref",
+      "expansion": "Referencia"
+    },
+    {
+      "abbr": "RG",
+      "expansion": "Registro Geral"
+    },
+    {
+      "abbr": "Seg",
+      "expansion": "Seguro"
+    },
+    {
+      "abbr": "SFH",
+      "expansion": "Sistema Financeiro da Habitacao"
+    },
+    {
+      "abbr": "SFI",
+      "expansion": "Sistema de Financiamento Imobiliario"
+    },
+    {
+      "abbr": "Tx",
+      "expansion": "Taxa"
+    },
+    {
+      "abbr": "Venc",
+      "expansion": "Vencimento"
+    }
+  ]
+}

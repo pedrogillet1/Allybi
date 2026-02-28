@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "di_hr_payroll_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer policy for hr_payroll responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll"
+  },
+  "domain": "hr_payroll",
+  "disclaimers": [
+    {
+      "id": "hr_disc_001_not_hr_legal_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This output summarizes HR/payroll documents and is not legal, tax, or employment advice.",
+        "pt": "Esta saida resume documentos de RH/folha e nao constitui orientacao juridica, tributaria ou trabalhista."
+      }
+    },
+    {
+      "id": "hr_disc_002_scope_lock",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Compensation values are extracted only from the uploaded document and period.",
+        "pt": "Valores de remuneracao sao extraidos apenas do documento e periodo enviados."
+      }
+    },
+    {
+      "id": "hr_disc_003_privacy_notice",
+      "trigger": "always",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Personally identifiable payroll data should be handled under least-privilege access.",
+        "pt": "Dados pessoais de folha devem ser tratados com acesso minimo necessario."
+      }
+    }
+  ]
+}

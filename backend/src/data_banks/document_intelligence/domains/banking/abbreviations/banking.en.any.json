@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_banking_abbreviations_en",
+    "version": "1.0.0",
+    "description": "EN abbreviations for banking domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "language": "en"
+  },
+  "domain": "banking",
+  "abbreviations": [
+    {
+      "abbr": "ACH",
+      "expansion": "Automated Clearing House"
+    },
+    {
+      "abbr": "APR",
+      "expansion": "Annual Percentage Rate"
+    },
+    {
+      "abbr": "ATM",
+      "expansion": "Automated Teller Machine"
+    },
+    {
+      "abbr": "AVS",
+      "expansion": "Address Verification Service"
+    },
+    {
+      "abbr": "BIC",
+      "expansion": "Bank Identifier Code"
+    },
+    {
+      "abbr": "CVV",
+      "expansion": "Card Verification Value"
+    },
+    {
+      "abbr": "EFT",
+      "expansion": "Electronic Funds Transfer"
+    },
+    {
+      "abbr": "IBAN",
+      "expansion": "International Bank Account Number"
+    },
+    {
+      "abbr": "NSF",
+      "expansion": "Non-Sufficient Funds"
+    },
+    {
+      "abbr": "OTP",
+      "expansion": "One-Time Password"
+    },
+    {
+      "abbr": "PAN",
+      "expansion": "Primary Account Number"
+    },
+    {
+      "abbr": "POS",
+      "expansion": "Point of Sale"
+    },
+    {
+      "abbr": "SEPA",
+      "expansion": "Single Euro Payments Area"
+    },
+    {
+      "abbr": "SWIFT",
+      "expansion": "Society for Worldwide Interbank Financial Telecommunication"
+    },
+    {
+      "abbr": "TIN",
+      "expansion": "Taxpayer Identification Number"
+    },
+    {
+      "abbr": "TRN",
+      "expansion": "Transaction Reference Number"
+    },
+    {
+      "abbr": "UPI",
+      "expansion": "Unified Payments Interface"
+    },
+    {
+      "abbr": "USD",
+      "expansion": "United States Dollar"
+    },
+    {
+      "abbr": "VAT",
+      "expansion": "Value Added Tax"
+    },
+    {
+      "abbr": "YTD",
+      "expansion": "Year to Date"
+    }
+  ]
+}

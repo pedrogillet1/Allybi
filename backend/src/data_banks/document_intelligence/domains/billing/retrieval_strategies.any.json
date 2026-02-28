@@ -1,0 +1,219 @@
+{
+  "_meta": {
+    "id": "di_billing_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for billing domain documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "maxBoostRules": 15,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "billing",
+  "sectionPriority": [
+    {
+      "section": "balance_and_due",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "summary",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "compare",
+        "summarize"
+      ]
+    },
+    {
+      "section": "charges_and_fees",
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "section": "taxes",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "section": "payments_and_credits",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "validate",
+        "monitor"
+      ]
+    },
+    {
+      "section": "usage_or_activity",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "line_items",
+      "weight": 2.2,
+      "operators": [
+        "locate",
+        "extract"
+      ]
+    },
+    {
+      "section": "adjustments_and_disputes",
+      "weight": 2,
+      "operators": [
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "issuer_and_customer",
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "section": "notices_and_terms",
+      "weight": 1.7,
+      "operators": [
+        "summarize",
+        "advise"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "billing_boost_001_due_date",
+      "priority": 95,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "summarize"
+      ],
+      "condition": "query asks when or how much to pay",
+      "boostSections": [
+        "balance_and_due",
+        "summary"
+      ]
+    },
+    {
+      "id": "billing_boost_002_fee_dispute",
+      "priority": 92,
+      "weight": 2.5,
+      "operators": [
+        "compare",
+        "evaluate"
+      ],
+      "condition": "query challenges extra charges or fees",
+      "boostSections": [
+        "charges_and_fees",
+        "adjustments_and_disputes",
+        "notices_and_terms"
+      ]
+    },
+    {
+      "id": "billing_boost_003_usage_variance",
+      "priority": 90,
+      "weight": 2.4,
+      "operators": [
+        "calculate",
+        "monitor"
+      ],
+      "condition": "query asks about spike in consumption or data usage",
+      "boostSections": [
+        "usage_or_activity",
+        "summary"
+      ]
+    },
+    {
+      "id": "billing_boost_004_tax_breakdown",
+      "priority": 88,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query asks tax component",
+      "boostSections": [
+        "taxes",
+        "line_items"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bbill\\b",
+      "expansions": [
+        "invoice",
+        "statement",
+        "fatura",
+        "conta"
+      ]
+    },
+    {
+      "trigger": "\\bdue\\b",
+      "expansions": [
+        "due date",
+        "payment deadline",
+        "vencimento"
+      ]
+    },
+    {
+      "trigger": "\\bfee\\b",
+      "expansions": [
+        "service fee",
+        "late fee",
+        "tarifa",
+        "multa"
+      ]
+    },
+    {
+      "trigger": "\\busage\\b",
+      "expansions": [
+        "consumption",
+        "activity",
+        "consumo"
+      ]
+    },
+    {
+      "trigger": "\\bmobile\\b",
+      "expansions": [
+        "wireless",
+        "imei",
+        "msisdn",
+        "data plan"
+      ]
+    },
+    {
+      "trigger": "\\butility\\b",
+      "expansions": [
+        "electricity",
+        "water",
+        "sewer",
+        "energia",
+        "agua"
+      ]
+    }
+  ]
+}

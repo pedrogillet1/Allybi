@@ -1,0 +1,1022 @@
+{
+  "_meta": {
+    "id": "python_sandbox_policy",
+    "version": "1.0.0",
+    "description": "Python sandbox safety policy: allowed/blocked imports, resource limits, filesystem rules, and deterministic execution constraints.",
+    "lastUpdated": "2026-02-27",
+    "languages": ["any"]
+  },
+  "config": {
+    "enabled": true,
+    "enforcementMode": "strict",
+    "auditLog": true
+  },
+  "rules": [
+    {
+      "id": "IMPORT_ALLOW_001",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow numpy import", "pt": "Permitir importacao do numpy" },
+      "enforcement": "allow",
+      "detail": { "en": "numpy is safe for numerical computation and array operations.", "pt": "numpy e seguro para computacao numerica e operacoes com arrays." },
+      "module": "numpy"
+    },
+    {
+      "id": "IMPORT_ALLOW_002",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow pandas import", "pt": "Permitir importacao do pandas" },
+      "enforcement": "allow",
+      "detail": { "en": "pandas is safe for tabular data manipulation and analysis.", "pt": "pandas e seguro para manipulacao e analise de dados tabulares." },
+      "module": "pandas"
+    },
+    {
+      "id": "IMPORT_ALLOW_003",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow matplotlib import", "pt": "Permitir importacao do matplotlib" },
+      "enforcement": "allow",
+      "detail": { "en": "matplotlib is safe for static chart and figure generation.", "pt": "matplotlib e seguro para geracao de graficos e figuras estaticas." },
+      "module": "matplotlib"
+    },
+    {
+      "id": "IMPORT_ALLOW_004",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow matplotlib.pyplot import", "pt": "Permitir importacao do matplotlib.pyplot" },
+      "enforcement": "allow",
+      "detail": { "en": "matplotlib.pyplot provides the primary plotting API used for chart creation.", "pt": "matplotlib.pyplot fornece a API principal de plotagem usada para criacao de graficos." },
+      "module": "matplotlib.pyplot"
+    },
+    {
+      "id": "IMPORT_ALLOW_005",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow matplotlib.dates import", "pt": "Permitir importacao do matplotlib.dates" },
+      "enforcement": "allow",
+      "detail": { "en": "matplotlib.dates is safe for date axis formatting and locators.", "pt": "matplotlib.dates e seguro para formatacao de eixos de data e localizadores." },
+      "module": "matplotlib.dates"
+    },
+    {
+      "id": "IMPORT_ALLOW_006",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow matplotlib.ticker import", "pt": "Permitir importacao do matplotlib.ticker" },
+      "enforcement": "allow",
+      "detail": { "en": "matplotlib.ticker is safe for customizing axis tick formatting.", "pt": "matplotlib.ticker e seguro para personalizar a formatacao de marcas dos eixos." },
+      "module": "matplotlib.ticker"
+    },
+    {
+      "id": "IMPORT_ALLOW_007",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow matplotlib.colors import", "pt": "Permitir importacao do matplotlib.colors" },
+      "enforcement": "allow",
+      "detail": { "en": "matplotlib.colors is safe for color map and normalization utilities.", "pt": "matplotlib.colors e seguro para utilitarios de mapas de cores e normalizacao." },
+      "module": "matplotlib.colors"
+    },
+    {
+      "id": "IMPORT_ALLOW_008",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow matplotlib.patches import", "pt": "Permitir importacao do matplotlib.patches" },
+      "enforcement": "allow",
+      "detail": { "en": "matplotlib.patches is safe for drawing shapes and annotations on figures.", "pt": "matplotlib.patches e seguro para desenhar formas e anotacoes em figuras." },
+      "module": "matplotlib.patches"
+    },
+    {
+      "id": "IMPORT_ALLOW_009",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow matplotlib.gridspec import", "pt": "Permitir importacao do matplotlib.gridspec" },
+      "enforcement": "allow",
+      "detail": { "en": "matplotlib.gridspec is safe for subplot grid layout management.", "pt": "matplotlib.gridspec e seguro para gerenciamento de layout de grades de subplots." },
+      "module": "matplotlib.gridspec"
+    },
+    {
+      "id": "IMPORT_ALLOW_010",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow scipy.stats import", "pt": "Permitir importacao do scipy.stats" },
+      "enforcement": "allow",
+      "detail": { "en": "scipy.stats is safe for statistical distributions, tests, and descriptive statistics.", "pt": "scipy.stats e seguro para distribuicoes estatisticas, testes e estatisticas descritivas." },
+      "module": "scipy.stats"
+    },
+    {
+      "id": "IMPORT_ALLOW_011",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow scipy.interpolate import", "pt": "Permitir importacao do scipy.interpolate" },
+      "enforcement": "allow",
+      "detail": { "en": "scipy.interpolate is safe for data interpolation and spline fitting.", "pt": "scipy.interpolate e seguro para interpolacao de dados e ajuste de splines." },
+      "module": "scipy.interpolate"
+    },
+    {
+      "id": "IMPORT_ALLOW_012",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow statistics import", "pt": "Permitir importacao do statistics" },
+      "enforcement": "allow",
+      "detail": { "en": "statistics is a safe stdlib module for basic statistical operations.", "pt": "statistics e um modulo seguro da stdlib para operacoes estatisticas basicas." },
+      "module": "statistics"
+    },
+    {
+      "id": "IMPORT_ALLOW_013",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow math import", "pt": "Permitir importacao do math" },
+      "enforcement": "allow",
+      "detail": { "en": "math is a safe stdlib module for mathematical functions and constants.", "pt": "math e um modulo seguro da stdlib para funcoes e constantes matematicas." },
+      "module": "math"
+    },
+    {
+      "id": "IMPORT_ALLOW_014",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow decimal import", "pt": "Permitir importacao do decimal" },
+      "enforcement": "allow",
+      "detail": { "en": "decimal is safe for precise fixed-point and floating-point arithmetic.", "pt": "decimal e seguro para aritmetica precisa de ponto fixo e ponto flutuante." },
+      "module": "decimal"
+    },
+    {
+      "id": "IMPORT_ALLOW_015",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow fractions import", "pt": "Permitir importacao do fractions" },
+      "enforcement": "allow",
+      "detail": { "en": "fractions is safe for rational number arithmetic.", "pt": "fractions e seguro para aritmetica de numeros racionais." },
+      "module": "fractions"
+    },
+    {
+      "id": "IMPORT_ALLOW_016",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow datetime import", "pt": "Permitir importacao do datetime" },
+      "enforcement": "allow",
+      "detail": { "en": "datetime is safe for date and time manipulation; real-time calls are restricted separately.", "pt": "datetime e seguro para manipulacao de data e hora; chamadas em tempo real sao restritas separadamente." },
+      "module": "datetime"
+    },
+    {
+      "id": "IMPORT_ALLOW_017",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow calendar import", "pt": "Permitir importacao do calendar" },
+      "enforcement": "allow",
+      "detail": { "en": "calendar is safe for calendar-related computations and formatting.", "pt": "calendar e seguro para computacoes e formatacao relacionadas a calendario." },
+      "module": "calendar"
+    },
+    {
+      "id": "IMPORT_ALLOW_018",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow collections import", "pt": "Permitir importacao do collections" },
+      "enforcement": "allow",
+      "detail": { "en": "collections is safe for specialized container data types like Counter and defaultdict.", "pt": "collections e seguro para tipos de dados de container especializados como Counter e defaultdict." },
+      "module": "collections"
+    },
+    {
+      "id": "IMPORT_ALLOW_019",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow itertools import", "pt": "Permitir importacao do itertools" },
+      "enforcement": "allow",
+      "detail": { "en": "itertools is safe for efficient iterator building blocks.", "pt": "itertools e seguro para blocos de construcao eficientes de iteradores." },
+      "module": "itertools"
+    },
+    {
+      "id": "IMPORT_ALLOW_020",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow functools import", "pt": "Permitir importacao do functools" },
+      "enforcement": "allow",
+      "detail": { "en": "functools is safe for higher-order functions and operations on callable objects.", "pt": "functools e seguro para funcoes de ordem superior e operacoes em objetos invocaveis." },
+      "module": "functools"
+    },
+    {
+      "id": "IMPORT_ALLOW_021",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow json import", "pt": "Permitir importacao do json" },
+      "enforcement": "allow",
+      "detail": { "en": "json is safe for JSON serialization and deserialization of data.", "pt": "json e seguro para serializacao e desserializacao de dados JSON." },
+      "module": "json"
+    },
+    {
+      "id": "IMPORT_ALLOW_022",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow csv import", "pt": "Permitir importacao do csv" },
+      "enforcement": "allow",
+      "detail": { "en": "csv is safe for reading and writing CSV tabular data.", "pt": "csv e seguro para leitura e escrita de dados tabulares CSV." },
+      "module": "csv"
+    },
+    {
+      "id": "IMPORT_ALLOW_023",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow io import", "pt": "Permitir importacao do io" },
+      "enforcement": "allow",
+      "detail": { "en": "io is safe for in-memory stream operations like StringIO and BytesIO.", "pt": "io e seguro para operacoes de stream em memoria como StringIO e BytesIO." },
+      "module": "io"
+    },
+    {
+      "id": "IMPORT_ALLOW_024",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow copy import", "pt": "Permitir importacao do copy" },
+      "enforcement": "allow",
+      "detail": { "en": "copy is safe for shallow and deep copy operations on objects.", "pt": "copy e seguro para operacoes de copia superficial e profunda em objetos." },
+      "module": "copy"
+    },
+    {
+      "id": "IMPORT_ALLOW_025",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow re import", "pt": "Permitir importacao do re" },
+      "enforcement": "allow",
+      "detail": { "en": "re is safe for regular expression matching and text processing.", "pt": "re e seguro para correspondencia de expressoes regulares e processamento de texto." },
+      "module": "re"
+    },
+    {
+      "id": "IMPORT_ALLOW_026",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow squarify import", "pt": "Permitir importacao do squarify" },
+      "enforcement": "allow",
+      "detail": { "en": "squarify is safe for treemap chart generation using matplotlib.", "pt": "squarify e seguro para geracao de graficos treemap usando matplotlib." },
+      "module": "squarify"
+    },
+    {
+      "id": "IMPORT_ALLOW_027",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow textwrap import", "pt": "Permitir importacao do textwrap" },
+      "enforcement": "allow",
+      "detail": { "en": "textwrap is safe for text wrapping and indentation formatting.", "pt": "textwrap e seguro para quebra de texto e formatacao de indentacao." },
+      "module": "textwrap"
+    },
+    {
+      "id": "IMPORT_ALLOW_028",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow string import", "pt": "Permitir importacao do string" },
+      "enforcement": "allow",
+      "detail": { "en": "string is safe for string constants and template formatting.", "pt": "string e seguro para constantes de string e formatacao de templates." },
+      "module": "string"
+    },
+    {
+      "id": "IMPORT_ALLOW_029",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow typing import", "pt": "Permitir importacao do typing" },
+      "enforcement": "allow",
+      "detail": { "en": "typing is safe for type hints and has no runtime side effects.", "pt": "typing e seguro para anotacoes de tipo e nao tem efeitos colaterais em tempo de execucao." },
+      "module": "typing"
+    },
+    {
+      "id": "IMPORT_ALLOW_030",
+      "category": "imports",
+      "severity": "info",
+      "rule": { "en": "Allow warnings import", "pt": "Permitir importacao do warnings" },
+      "enforcement": "allow",
+      "detail": { "en": "warnings is safe for controlling warning message display during execution.", "pt": "warnings e seguro para controlar a exibicao de mensagens de aviso durante a execucao." },
+      "module": "warnings"
+    },
+    {
+      "id": "IMPORT_BLOCK_001",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block os import", "pt": "Bloquear importacao do os" },
+      "enforcement": "block",
+      "detail": { "en": "os provides filesystem and process access that could escape the sandbox.", "pt": "os fornece acesso ao sistema de arquivos e processos que pode escapar do sandbox." },
+      "module": "os"
+    },
+    {
+      "id": "IMPORT_BLOCK_002",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block sys import", "pt": "Bloquear importacao do sys" },
+      "enforcement": "block",
+      "detail": { "en": "sys exposes interpreter internals and allows modifying the module search path.", "pt": "sys expoe internos do interpretador e permite modificar o caminho de busca de modulos." },
+      "module": "sys"
+    },
+    {
+      "id": "IMPORT_BLOCK_003",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block subprocess import", "pt": "Bloquear importacao do subprocess" },
+      "enforcement": "block",
+      "detail": { "en": "subprocess allows arbitrary shell command execution outside the sandbox.", "pt": "subprocess permite execucao arbitraria de comandos shell fora do sandbox." },
+      "module": "subprocess"
+    },
+    {
+      "id": "IMPORT_BLOCK_004",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block shutil import", "pt": "Bloquear importacao do shutil" },
+      "enforcement": "block",
+      "detail": { "en": "shutil provides high-level file operations that can modify or delete files outside sandbox.", "pt": "shutil fornece operacoes de arquivo de alto nivel que podem modificar ou excluir arquivos fora do sandbox." },
+      "module": "shutil"
+    },
+    {
+      "id": "IMPORT_BLOCK_005",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block pathlib import", "pt": "Bloquear importacao do pathlib" },
+      "enforcement": "block",
+      "detail": { "en": "pathlib enables filesystem traversal and path manipulation beyond sandbox boundaries.", "pt": "pathlib permite travessia do sistema de arquivos e manipulacao de caminhos alem dos limites do sandbox." },
+      "module": "pathlib"
+    },
+    {
+      "id": "IMPORT_BLOCK_006",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block socket import", "pt": "Bloquear importacao do socket" },
+      "enforcement": "block",
+      "detail": { "en": "socket enables raw network connections and data exfiltration.", "pt": "socket permite conexoes de rede brutas e exfiltracao de dados." },
+      "module": "socket"
+    },
+    {
+      "id": "IMPORT_BLOCK_007",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block http import", "pt": "Bloquear importacao do http" },
+      "enforcement": "block",
+      "detail": { "en": "http enables HTTP server and client operations that bypass sandbox isolation.", "pt": "http permite operacoes de servidor e cliente HTTP que contornam o isolamento do sandbox." },
+      "module": "http"
+    },
+    {
+      "id": "IMPORT_BLOCK_008",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block urllib import", "pt": "Bloquear importacao do urllib" },
+      "enforcement": "block",
+      "detail": { "en": "urllib allows arbitrary URL fetching and network access from the sandbox.", "pt": "urllib permite busca arbitraria de URLs e acesso a rede a partir do sandbox." },
+      "module": "urllib"
+    },
+    {
+      "id": "IMPORT_BLOCK_009",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block requests import", "pt": "Bloquear importacao do requests" },
+      "enforcement": "block",
+      "detail": { "en": "requests enables outbound HTTP calls that can leak data or reach external services.", "pt": "requests permite chamadas HTTP de saida que podem vazar dados ou alcancar servicos externos." },
+      "module": "requests"
+    },
+    {
+      "id": "IMPORT_BLOCK_010",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block httpx import", "pt": "Bloquear importacao do httpx" },
+      "enforcement": "block",
+      "detail": { "en": "httpx is an async-capable HTTP client that enables network exfiltration.", "pt": "httpx e um cliente HTTP com capacidade assincrona que permite exfiltracao via rede." },
+      "module": "httpx"
+    },
+    {
+      "id": "IMPORT_BLOCK_011",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block aiohttp import", "pt": "Bloquear importacao do aiohttp" },
+      "enforcement": "block",
+      "detail": { "en": "aiohttp enables async HTTP requests and server creation outside sandbox control.", "pt": "aiohttp permite requisicoes HTTP assincronas e criacao de servidores fora do controle do sandbox." },
+      "module": "aiohttp"
+    },
+    {
+      "id": "IMPORT_BLOCK_012",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block importlib import", "pt": "Bloquear importacao do importlib" },
+      "enforcement": "block",
+      "detail": { "en": "importlib can dynamically load arbitrary modules and bypass the import allowlist.", "pt": "importlib pode carregar modulos arbitrarios dinamicamente e contornar a lista de importacoes permitidas." },
+      "module": "importlib"
+    },
+    {
+      "id": "IMPORT_BLOCK_013",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block ctypes import", "pt": "Bloquear importacao do ctypes" },
+      "enforcement": "block",
+      "detail": { "en": "ctypes provides direct access to C libraries and memory, bypassing Python safety.", "pt": "ctypes fornece acesso direto a bibliotecas C e memoria, contornando a seguranca do Python." },
+      "module": "ctypes"
+    },
+    {
+      "id": "IMPORT_BLOCK_014",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block cffi import", "pt": "Bloquear importacao do cffi" },
+      "enforcement": "block",
+      "detail": { "en": "cffi enables foreign function calls to native code outside sandbox control.", "pt": "cffi permite chamadas de funcoes externas para codigo nativo fora do controle do sandbox." },
+      "module": "cffi"
+    },
+    {
+      "id": "IMPORT_BLOCK_015",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block threading import", "pt": "Bloquear importacao do threading" },
+      "enforcement": "block",
+      "detail": { "en": "threading can create background threads that outlive the sandbox execution window.", "pt": "threading pode criar threads em segundo plano que sobrevivem a janela de execucao do sandbox." },
+      "module": "threading"
+    },
+    {
+      "id": "IMPORT_BLOCK_016",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block multiprocessing import", "pt": "Bloquear importacao do multiprocessing" },
+      "enforcement": "block",
+      "detail": { "en": "multiprocessing can spawn child processes that escape sandbox resource limits.", "pt": "multiprocessing pode gerar processos filhos que escapam dos limites de recursos do sandbox." },
+      "module": "multiprocessing"
+    },
+    {
+      "id": "IMPORT_BLOCK_017",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block pickle import", "pt": "Bloquear importacao do pickle" },
+      "enforcement": "block",
+      "detail": { "en": "pickle deserialization can execute arbitrary code during object reconstruction.", "pt": "a desserializacao do pickle pode executar codigo arbitrario durante a reconstrucao de objetos." },
+      "module": "pickle"
+    },
+    {
+      "id": "IMPORT_BLOCK_018",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block shelve import", "pt": "Bloquear importacao do shelve" },
+      "enforcement": "block",
+      "detail": { "en": "shelve uses pickle internally and persists data to disk outside sandbox control.", "pt": "shelve usa pickle internamente e persiste dados em disco fora do controle do sandbox." },
+      "module": "shelve"
+    },
+    {
+      "id": "IMPORT_BLOCK_019",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block marshal import", "pt": "Bloquear importacao do marshal" },
+      "enforcement": "block",
+      "detail": { "en": "marshal can serialize and deserialize Python bytecode, enabling code injection.", "pt": "marshal pode serializar e desserializar bytecode Python, permitindo injecao de codigo." },
+      "module": "marshal"
+    },
+    {
+      "id": "IMPORT_BLOCK_020",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block signal import", "pt": "Bloquear importacao do signal" },
+      "enforcement": "block",
+      "detail": { "en": "signal can intercept or send OS signals, interfering with sandbox process management.", "pt": "signal pode interceptar ou enviar sinais do SO, interferindo no gerenciamento de processos do sandbox." },
+      "module": "signal"
+    },
+    {
+      "id": "IMPORT_BLOCK_021",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block gc import", "pt": "Bloquear importacao do gc" },
+      "enforcement": "block",
+      "detail": { "en": "gc exposes garbage collector internals and can disable automatic memory management.", "pt": "gc expoe internos do coletor de lixo e pode desabilitar o gerenciamento automatico de memoria." },
+      "module": "gc"
+    },
+    {
+      "id": "IMPORT_BLOCK_022",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block webbrowser import", "pt": "Bloquear importacao do webbrowser" },
+      "enforcement": "block",
+      "detail": { "en": "webbrowser can launch external browser processes outside sandbox control.", "pt": "webbrowser pode lancar processos de navegador externos fora do controle do sandbox." },
+      "module": "webbrowser"
+    },
+    {
+      "id": "IMPORT_BLOCK_023",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block tkinter import", "pt": "Bloquear importacao do tkinter" },
+      "enforcement": "block",
+      "detail": { "en": "tkinter opens GUI windows and requires a display server unavailable in sandbox.", "pt": "tkinter abre janelas de GUI e requer um servidor de exibicao indisponivel no sandbox." },
+      "module": "tkinter"
+    },
+    {
+      "id": "IMPORT_BLOCK_024",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block smtplib import", "pt": "Bloquear importacao do smtplib" },
+      "enforcement": "block",
+      "detail": { "en": "smtplib enables sending emails, which is a data exfiltration vector.", "pt": "smtplib permite envio de emails, que e um vetor de exfiltracao de dados." },
+      "module": "smtplib"
+    },
+    {
+      "id": "IMPORT_BLOCK_025",
+      "category": "imports",
+      "severity": "critical",
+      "rule": { "en": "Block sqlite3 import", "pt": "Bloquear importacao do sqlite3" },
+      "enforcement": "block",
+      "detail": { "en": "sqlite3 creates database files on disk and can persist state beyond sandbox lifecycle.", "pt": "sqlite3 cria arquivos de banco de dados em disco e pode persistir estado alem do ciclo de vida do sandbox." },
+      "module": "sqlite3"
+    },
+    {
+      "id": "LIMIT_001",
+      "category": "resource_limits",
+      "severity": "error",
+      "rule": { "en": "Enforce maximum execution time of 30 seconds", "pt": "Impor tempo maximo de execucao de 30 segundos" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Scripts exceeding 30 seconds wall-clock time are terminated to prevent runaway computation.", "pt": "Scripts que excedem 30 segundos de tempo real sao encerrados para prevenir computacao descontrolada." },
+      "limit": { "key": "max_execution_time", "value": 30, "unit": "seconds" }
+    },
+    {
+      "id": "LIMIT_002",
+      "category": "resource_limits",
+      "severity": "error",
+      "rule": { "en": "Enforce maximum memory usage of 512 MB", "pt": "Impor uso maximo de memoria de 512 MB" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Memory usage is capped at 512 MB to prevent out-of-memory conditions on the host.", "pt": "O uso de memoria e limitado a 512 MB para prevenir condicoes de falta de memoria no host." },
+      "limit": { "key": "max_memory", "value": 512, "unit": "MB" }
+    },
+    {
+      "id": "LIMIT_003",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit DataFrame to 1,000,000 rows", "pt": "Limitar DataFrame a 1.000.000 de linhas" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "DataFrames exceeding one million rows are truncated to prevent memory exhaustion.", "pt": "DataFrames que excedem um milhao de linhas sao truncados para prevenir esgotamento de memoria." },
+      "limit": { "key": "max_dataframe_rows", "value": 1000000, "unit": "rows" }
+    },
+    {
+      "id": "LIMIT_004",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit DataFrame to 500 columns", "pt": "Limitar DataFrame a 500 colunas" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "DataFrames exceeding 500 columns are rejected to maintain processing performance.", "pt": "DataFrames que excedem 500 colunas sao rejeitados para manter o desempenho de processamento." },
+      "limit": { "key": "max_dataframe_columns", "value": 500, "unit": "columns" }
+    },
+    {
+      "id": "LIMIT_005",
+      "category": "resource_limits",
+      "severity": "error",
+      "rule": { "en": "Limit output file size to 10 MB", "pt": "Limitar tamanho do arquivo de saida a 10 MB" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Output files larger than 10 MB are rejected to prevent storage abuse.", "pt": "Arquivos de saida maiores que 10 MB sao rejeitados para prevenir abuso de armazenamento." },
+      "limit": { "key": "max_output_file_size", "value": 10, "unit": "MB" }
+    },
+    {
+      "id": "LIMIT_006",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit figure dimensions to 4000x4000 pixels", "pt": "Limitar dimensoes da figura a 4000x4000 pixels" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Figures exceeding 4000x4000 pixels consume excessive memory during rendering.", "pt": "Figuras que excedem 4000x4000 pixels consomem memoria excessiva durante a renderizacao." },
+      "limit": { "key": "max_figure_pixels", "value": "4000x4000", "unit": "pixels" }
+    },
+    {
+      "id": "LIMIT_007",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit subplots to 25 per figure", "pt": "Limitar subplots a 25 por figura" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "More than 25 subplots per figure degrades readability and rendering performance.", "pt": "Mais de 25 subplots por figura degrada a legibilidade e o desempenho de renderizacao." },
+      "limit": { "key": "max_subplots", "value": 25, "unit": "subplots" }
+    },
+    {
+      "id": "LIMIT_008",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit data points per series to 100,000", "pt": "Limitar pontos de dados por serie a 100.000" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Series with more than 100,000 data points should be downsampled before plotting.", "pt": "Series com mais de 100.000 pontos de dados devem ser reduzidas antes da plotagem." },
+      "limit": { "key": "max_data_points_per_series", "value": 100000, "unit": "points" }
+    },
+    {
+      "id": "LIMIT_009",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit string length to 10,000 characters", "pt": "Limitar comprimento de string a 10.000 caracteres" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Strings exceeding 10,000 characters are truncated to prevent memory bloat in output.", "pt": "Strings que excedem 10.000 caracteres sao truncadas para prevenir inchacos de memoria na saida." },
+      "limit": { "key": "max_string_length", "value": 10000, "unit": "characters" }
+    },
+    {
+      "id": "LIMIT_010",
+      "category": "resource_limits",
+      "severity": "error",
+      "rule": { "en": "Limit loop iterations to 1,000,000", "pt": "Limitar iteracoes de loop a 1.000.000" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Loops exceeding one million iterations are terminated to prevent infinite-loop hangs.", "pt": "Loops que excedem um milhao de iteracoes sao encerrados para prevenir travamentos por loops infinitos." },
+      "limit": { "key": "max_loop_iterations", "value": 1000000, "unit": "iterations" }
+    },
+    {
+      "id": "LIMIT_011",
+      "category": "resource_limits",
+      "severity": "error",
+      "rule": { "en": "Limit recursion depth to 100", "pt": "Limitar profundidade de recursao a 100" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Recursion deeper than 100 frames is terminated to prevent stack overflow.", "pt": "Recursao mais profunda que 100 quadros e encerrada para prevenir estouro de pilha." },
+      "limit": { "key": "max_recursion_depth", "value": 100, "unit": "frames" }
+    },
+    {
+      "id": "LIMIT_012",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit simultaneously open files to 5", "pt": "Limitar arquivos abertos simultaneamente a 5" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "No more than 5 file handles may be open at any time to prevent descriptor exhaustion.", "pt": "No maximo 5 descritores de arquivo podem estar abertos ao mesmo tempo para prevenir esgotamento de descritores." },
+      "limit": { "key": "max_open_files", "value": 5, "unit": "handles" }
+    },
+    {
+      "id": "LIMIT_013",
+      "category": "resource_limits",
+      "severity": "warning",
+      "rule": { "en": "Limit temporary files to 10", "pt": "Limitar arquivos temporarios a 10" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "A maximum of 10 temporary files may be created per execution to limit disk usage.", "pt": "Um maximo de 10 arquivos temporarios podem ser criados por execucao para limitar uso de disco." },
+      "limit": { "key": "max_temporary_files", "value": 10, "unit": "files" }
+    },
+    {
+      "id": "LIMIT_014",
+      "category": "resource_limits",
+      "severity": "error",
+      "rule": { "en": "Limit concurrent executions to 3", "pt": "Limitar execucoes concorrentes a 3" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "No more than 3 sandbox instances may run concurrently per tenant.", "pt": "No maximo 3 instancias de sandbox podem ser executadas concorrentemente por locatario." },
+      "limit": { "key": "max_concurrent_executions", "value": 3, "unit": "instances" }
+    },
+    {
+      "id": "LIMIT_015",
+      "category": "resource_limits",
+      "severity": "error",
+      "rule": { "en": "Enforce maximum total CPU time of 60 seconds", "pt": "Impor tempo total maximo de CPU de 60 segundos" },
+      "enforcement": "hard_limit",
+      "detail": { "en": "Total CPU time across all threads is capped at 60 seconds to prevent resource monopolization.", "pt": "O tempo total de CPU em todas as threads e limitado a 60 segundos para prevenir monopolizacao de recursos." },
+      "limit": { "key": "max_total_cpu_time", "value": 60, "unit": "seconds" }
+    },
+    {
+      "id": "FS_001",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "Write only to sandbox temporary directory", "pt": "Gravar somente no diretorio temporario do sandbox" },
+      "enforcement": "block",
+      "detail": { "en": "All file writes must target the sandbox-assigned temporary directory; writes elsewhere are rejected.", "pt": "Todas as gravacoes de arquivo devem ter como alvo o diretorio temporario atribuido ao sandbox; gravacoes em outros locais sao rejeitadas." }
+    },
+    {
+      "id": "FS_002",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No reading outside sandbox and input directories", "pt": "Proibir leitura fora dos diretorios sandbox e de entrada" },
+      "enforcement": "block",
+      "detail": { "en": "File reads are restricted to the sandbox temp directory and the designated input directory.", "pt": "Leituras de arquivo sao restritas ao diretorio temporario do sandbox e ao diretorio de entrada designado." }
+    },
+    {
+      "id": "FS_003",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No symbolic link creation", "pt": "Proibir criacao de links simbolicos" },
+      "enforcement": "block",
+      "detail": { "en": "Symbolic links can point outside the sandbox, creating an escape vector.", "pt": "Links simbolicos podem apontar para fora do sandbox, criando um vetor de escape." }
+    },
+    {
+      "id": "FS_004",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No file permission changes", "pt": "Proibir alteracoes de permissoes de arquivo" },
+      "enforcement": "block",
+      "detail": { "en": "Changing file permissions (chmod) is blocked to maintain sandbox security posture.", "pt": "Alterar permissoes de arquivo (chmod) e bloqueado para manter a postura de seguranca do sandbox." }
+    },
+    {
+      "id": "FS_005",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No directory traversal via .. or absolute paths", "pt": "Proibir travessia de diretorio via .. ou caminhos absolutos" },
+      "enforcement": "block",
+      "detail": { "en": "Paths containing '..' or absolute references outside sandbox root are rejected.", "pt": "Caminhos contendo '..' ou referencias absolutas fora da raiz do sandbox sao rejeitados." }
+    },
+    {
+      "id": "FS_006",
+      "category": "filesystem",
+      "severity": "warning",
+      "rule": { "en": "Only allow approved output file extensions", "pt": "Permitir somente extensoes de arquivo de saida aprovadas" },
+      "enforcement": "allow",
+      "detail": { "en": "Output files must use one of the approved extensions: .png, .svg, .jpg, .csv, .json.", "pt": "Arquivos de saida devem usar uma das extensoes aprovadas: .png, .svg, .jpg, .csv, .json." },
+      "allowedExtensions": [".png", ".svg", ".jpg", ".csv", ".json"]
+    },
+    {
+      "id": "FS_007",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No executable file creation", "pt": "Proibir criacao de arquivos executaveis" },
+      "enforcement": "block",
+      "detail": { "en": "Creating files with executable permissions or executable extensions is blocked.", "pt": "Criar arquivos com permissoes executaveis ou extensoes executaveis e bloqueado." }
+    },
+    {
+      "id": "FS_008",
+      "category": "filesystem",
+      "severity": "info",
+      "rule": { "en": "Temporary files auto-deleted after execution", "pt": "Arquivos temporarios excluidos automaticamente apos execucao" },
+      "enforcement": "auto",
+      "detail": { "en": "All temporary files created during execution are automatically purged when the sandbox exits.", "pt": "Todos os arquivos temporarios criados durante a execucao sao purgados automaticamente quando o sandbox encerra." }
+    },
+    {
+      "id": "FS_009",
+      "category": "filesystem",
+      "severity": "warning",
+      "rule": { "en": "No dotfile creation", "pt": "Proibir criacao de dotfiles" },
+      "enforcement": "block",
+      "detail": { "en": "Files starting with a dot are blocked to prevent hidden configuration file injection.", "pt": "Arquivos que comecam com ponto sao bloqueados para prevenir injecao de arquivos de configuracao ocultos." }
+    },
+    {
+      "id": "FS_010",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No FIFO or named pipe creation", "pt": "Proibir criacao de FIFO ou pipe nomeado" },
+      "enforcement": "block",
+      "detail": { "en": "Named pipes can be used for inter-process communication to escape sandbox isolation.", "pt": "Pipes nomeados podem ser usados para comunicacao entre processos para escapar do isolamento do sandbox." }
+    },
+    {
+      "id": "FS_011",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No device file access", "pt": "Proibir acesso a arquivos de dispositivo" },
+      "enforcement": "block",
+      "detail": { "en": "Access to device files (/dev/*) is blocked to prevent hardware and kernel interaction.", "pt": "Acesso a arquivos de dispositivo (/dev/*) e bloqueado para prevenir interacao com hardware e kernel." }
+    },
+    {
+      "id": "FS_012",
+      "category": "filesystem",
+      "severity": "info",
+      "rule": { "en": "Input files are read-only", "pt": "Arquivos de entrada sao somente leitura" },
+      "enforcement": "read_only",
+      "detail": { "en": "User-provided input files are mounted as read-only; modification attempts are rejected.", "pt": "Arquivos de entrada fornecidos pelo usuario sao montados como somente leitura; tentativas de modificacao sao rejeitadas." }
+    },
+    {
+      "id": "FS_013",
+      "category": "filesystem",
+      "severity": "info",
+      "rule": { "en": "Sandbox is isolated per execution", "pt": "Sandbox e isolado por execucao" },
+      "enforcement": "auto",
+      "detail": { "en": "Each execution receives its own isolated sandbox directory; no state persists between runs.", "pt": "Cada execucao recebe seu proprio diretorio sandbox isolado; nenhum estado persiste entre execucoes." }
+    },
+    {
+      "id": "FS_014",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No environment variable access", "pt": "Proibir acesso a variaveis de ambiente" },
+      "enforcement": "block",
+      "detail": { "en": "Reading or writing environment variables is blocked to prevent credential leakage.", "pt": "Leitura ou escrita de variaveis de ambiente e bloqueada para prevenir vazamento de credenciais." }
+    },
+    {
+      "id": "FS_015",
+      "category": "filesystem",
+      "severity": "critical",
+      "rule": { "en": "No access to /proc, /sys, or /dev", "pt": "Proibir acesso a /proc, /sys ou /dev" },
+      "enforcement": "block",
+      "detail": { "en": "Pseudo-filesystems /proc, /sys, and /dev expose kernel and hardware state and are fully blocked.", "pt": "Pseudo-sistemas de arquivos /proc, /sys e /dev expoem estado do kernel e hardware e sao totalmente bloqueados." }
+    },
+    {
+      "id": "DETERM_001",
+      "category": "determinism",
+      "severity": "warning",
+      "rule": { "en": "Set numpy random seed to 42", "pt": "Definir semente aleatoria do numpy como 42" },
+      "enforcement": "auto",
+      "detail": { "en": "numpy.random.seed(42) is injected at startup so random operations produce reproducible results.", "pt": "numpy.random.seed(42) e injetado na inicializacao para que operacoes aleatorias produzam resultados reproduziveis." },
+      "inject": "numpy.random.seed(42)"
+    },
+    {
+      "id": "DETERM_002",
+      "category": "determinism",
+      "severity": "warning",
+      "rule": { "en": "Sort pandas output for stable ordering", "pt": "Ordenar saida do pandas para ordenacao estavel" },
+      "enforcement": "recommend",
+      "detail": { "en": "DataFrames should be explicitly sorted before output to ensure deterministic row order.", "pt": "DataFrames devem ser explicitamente ordenados antes da saida para garantir ordem deterministica de linhas." }
+    },
+    {
+      "id": "DETERM_003",
+      "category": "determinism",
+      "severity": "warning",
+      "rule": { "en": "Force matplotlib Agg backend", "pt": "Forcar backend Agg do matplotlib" },
+      "enforcement": "auto",
+      "detail": { "en": "matplotlib.use('Agg') is set before any import to ensure headless, file-only rendering.", "pt": "matplotlib.use('Agg') e definido antes de qualquer importacao para garantir renderizacao headless, somente em arquivo." },
+      "inject": "matplotlib.use('Agg')"
+    },
+    {
+      "id": "DETERM_004",
+      "category": "determinism",
+      "severity": "warning",
+      "rule": { "en": "Block datetime.now and datetime.utcnow", "pt": "Bloquear datetime.now e datetime.utcnow" },
+      "enforcement": "block",
+      "detail": { "en": "Real-time clock calls produce non-deterministic output; use fixed dates or input parameters instead.", "pt": "Chamadas de relogio em tempo real produzem saida nao deterministica; use datas fixas ou parametros de entrada." }
+    },
+    {
+      "id": "DETERM_005",
+      "category": "determinism",
+      "severity": "info",
+      "rule": { "en": "Explicit sort for dictionary iteration", "pt": "Ordenacao explicita para iteracao de dicionario" },
+      "enforcement": "recommend",
+      "detail": { "en": "When iterating over dictionaries for output, sort keys explicitly to ensure stable ordering.", "pt": "Ao iterar sobre dicionarios para saida, ordene chaves explicitamente para garantir ordenacao estavel." }
+    },
+    {
+      "id": "DETERM_006",
+      "category": "determinism",
+      "severity": "info",
+      "rule": { "en": "Explicit float precision for output", "pt": "Precisao explicita de ponto flutuante para saida" },
+      "enforcement": "recommend",
+      "detail": { "en": "Use explicit rounding or format specifiers for floats to avoid platform-dependent representation.", "pt": "Use arredondamento explicito ou especificadores de formato para floats para evitar representacao dependente de plataforma." }
+    },
+    {
+      "id": "DETERM_007",
+      "category": "determinism",
+      "severity": "warning",
+      "rule": { "en": "No UUID generation", "pt": "Proibir geracao de UUID" },
+      "enforcement": "block",
+      "detail": { "en": "UUIDs are inherently non-deterministic and must not appear in sandbox output.", "pt": "UUIDs sao inerentemente nao deterministicos e nao devem aparecer na saida do sandbox." }
+    },
+    {
+      "id": "DETERM_008",
+      "category": "determinism",
+      "severity": "warning",
+      "rule": { "en": "Set PYTHONHASHSEED to 0", "pt": "Definir PYTHONHASHSEED como 0" },
+      "enforcement": "auto",
+      "detail": { "en": "PYTHONHASHSEED=0 disables hash randomization so set/dict ordering is deterministic.", "pt": "PYTHONHASHSEED=0 desabilita a aleatorizacao de hash para que a ordenacao de set/dict seja deterministica." },
+      "inject": "PYTHONHASHSEED=0"
+    },
+    {
+      "id": "DETERM_009",
+      "category": "determinism",
+      "severity": "info",
+      "rule": { "en": "Use explicit locale settings", "pt": "Usar configuracoes de locale explicitas" },
+      "enforcement": "auto",
+      "detail": { "en": "Locale is fixed to en_US.UTF-8 to prevent locale-dependent formatting differences.", "pt": "Locale e fixado em en_US.UTF-8 para prevenir diferencas de formatacao dependentes de locale." },
+      "inject": "locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')"
+    },
+    {
+      "id": "DETERM_010",
+      "category": "determinism",
+      "severity": "info",
+      "rule": { "en": "Use fixed color palette for charts", "pt": "Usar paleta de cores fixa para graficos" },
+      "enforcement": "recommend",
+      "detail": { "en": "A fixed color palette is used by default to ensure visual consistency across executions.", "pt": "Uma paleta de cores fixa e usada por padrao para garantir consistencia visual entre execucoes." },
+      "palette": ["#2196F3", "#FF9800", "#4CAF50", "#F44336", "#9C27B0", "#00BCD4", "#795548", "#607D8B", "#E91E63", "#CDDC39"]
+    },
+    {
+      "id": "CODE_001",
+      "category": "code_safety",
+      "severity": "critical",
+      "rule": { "en": "Block eval, exec, and compile builtins", "pt": "Bloquear builtins eval, exec e compile" },
+      "enforcement": "block",
+      "detail": { "en": "eval(), exec(), and compile() allow arbitrary code execution and are blocked entirely.", "pt": "eval(), exec() e compile() permitem execucao arbitraria de codigo e sao bloqueados inteiramente." },
+      "blockedCalls": ["eval", "exec", "compile"]
+    },
+    {
+      "id": "CODE_002",
+      "category": "code_safety",
+      "severity": "critical",
+      "rule": { "en": "Block __import__ function", "pt": "Bloquear funcao __import__" },
+      "enforcement": "block",
+      "detail": { "en": "__import__() bypasses the import allowlist and enables loading arbitrary modules.", "pt": "__import__() contorna a lista de importacoes permitidas e permite carregar modulos arbitrarios." },
+      "blockedCalls": ["__import__"]
+    },
+    {
+      "id": "CODE_003",
+      "category": "code_safety",
+      "severity": "critical",
+      "rule": { "en": "Block getattr on system objects", "pt": "Bloquear getattr em objetos de sistema" },
+      "enforcement": "block",
+      "detail": { "en": "getattr() on system or module objects can be used to access blocked functionality dynamically.", "pt": "getattr() em objetos de sistema ou modulo pode ser usado para acessar funcionalidades bloqueadas dinamicamente." },
+      "blockedPatterns": ["getattr(__builtins__", "getattr(sys", "getattr(os"]
+    },
+    {
+      "id": "CODE_004",
+      "category": "code_safety",
+      "severity": "critical",
+      "rule": { "en": "Block metaclass manipulation", "pt": "Bloquear manipulacao de metaclasses" },
+      "enforcement": "block",
+      "detail": { "en": "Custom metaclasses can intercept class creation and inject malicious behavior.", "pt": "Metaclasses customizadas podem interceptar a criacao de classes e injetar comportamento malicioso." },
+      "blockedPatterns": ["__metaclass__", "type.__subclasses__"]
+    },
+    {
+      "id": "CODE_005",
+      "category": "code_safety",
+      "severity": "critical",
+      "rule": { "en": "Block monkey-patching builtins", "pt": "Bloquear monkey-patching de builtins" },
+      "enforcement": "block",
+      "detail": { "en": "Overwriting builtin functions can disable security checks and alter sandbox behavior.", "pt": "Sobrescrever funcoes builtin pode desabilitar verificacoes de seguranca e alterar o comportamento do sandbox." },
+      "blockedPatterns": ["__builtins__[", "__builtins__.__dict__"]
+    },
+    {
+      "id": "CODE_006",
+      "category": "code_safety",
+      "severity": "warning",
+      "rule": { "en": "Block star imports", "pt": "Bloquear importacoes com asterisco" },
+      "enforcement": "block",
+      "detail": { "en": "Star imports (from x import *) can pull in blocked symbols and obscure dependency tracking.", "pt": "Importacoes com asterisco (from x import *) podem trazer simbolos bloqueados e obscurecer rastreamento de dependencias." },
+      "blockedPatterns": ["from * import *"]
+    },
+    {
+      "id": "CODE_007",
+      "category": "code_safety",
+      "severity": "warning",
+      "rule": { "en": "Block global state mutation", "pt": "Bloquear mutacao de estado global" },
+      "enforcement": "block",
+      "detail": { "en": "Modifying global variables outside function scope is blocked to maintain execution isolation.", "pt": "Modificar variaveis globais fora do escopo de funcao e bloqueado para manter o isolamento de execucao." },
+      "blockedPatterns": ["globals()["]
+    },
+    {
+      "id": "CODE_008",
+      "category": "code_safety",
+      "severity": "warning",
+      "rule": { "en": "Block infinite generators without limits", "pt": "Bloquear geradores infinitos sem limites" },
+      "enforcement": "block",
+      "detail": { "en": "Generators yielding infinitely without islice or takewhile bounds are terminated.", "pt": "Geradores que produzem infinitamente sem limites islice ou takewhile sao encerrados." }
+    },
+    {
+      "id": "CODE_009",
+      "category": "code_safety",
+      "severity": "critical",
+      "rule": { "en": "Block dynamic attribute access via __dict__", "pt": "Bloquear acesso dinamico a atributos via __dict__" },
+      "enforcement": "block",
+      "detail": { "en": "Direct __dict__ manipulation on modules or classes can bypass attribute-level security checks.", "pt": "Manipulacao direta de __dict__ em modulos ou classes pode contornar verificacoes de seguranca em nivel de atributo." },
+      "blockedPatterns": [".__dict__[", ".__dict__.update"]
+    },
+    {
+      "id": "CODE_010",
+      "category": "code_safety",
+      "severity": "warning",
+      "rule": { "en": "Block weakref usage", "pt": "Bloquear uso de weakref" },
+      "enforcement": "block",
+      "detail": { "en": "weakref can hold references to sandbox-internal objects and interfere with cleanup.", "pt": "weakref pode manter referencias a objetos internos do sandbox e interferir na limpeza." },
+      "blockedCalls": ["weakref"]
+    },
+    {
+      "id": "OUTPUT_001",
+      "category": "output_validation",
+      "severity": "error",
+      "rule": { "en": "Validate output image file integrity", "pt": "Validar integridade de arquivo de imagem de saida" },
+      "enforcement": "validate",
+      "detail": { "en": "Output image files must be valid and decodable by standard image libraries before delivery.", "pt": "Arquivos de imagem de saida devem ser validos e decodificaveis por bibliotecas de imagem padrao antes da entrega." }
+    },
+    {
+      "id": "OUTPUT_002",
+      "category": "output_validation",
+      "severity": "warning",
+      "rule": { "en": "Validate output dimensions within 5% tolerance", "pt": "Validar dimensoes de saida dentro de tolerancia de 5%" },
+      "enforcement": "validate",
+      "detail": { "en": "Output image dimensions must match requested dimensions within a 5% tolerance margin.", "pt": "As dimensoes da imagem de saida devem corresponder as dimensoes solicitadas dentro de uma margem de tolerancia de 5%." },
+      "tolerance": 0.05
+    },
+    {
+      "id": "OUTPUT_003",
+      "category": "output_validation",
+      "severity": "error",
+      "rule": { "en": "Enforce UTF-8 encoding for text output", "pt": "Impor codificacao UTF-8 para saida de texto" },
+      "enforcement": "validate",
+      "detail": { "en": "All text output must be valid UTF-8; non-UTF-8 bytes are rejected or replaced.", "pt": "Toda saida de texto deve ser UTF-8 valido; bytes nao-UTF-8 sao rejeitados ou substituidos." }
+    },
+    {
+      "id": "OUTPUT_004",
+      "category": "output_validation",
+      "severity": "warning",
+      "rule": { "en": "Validate chart color values", "pt": "Validar valores de cores dos graficos" },
+      "enforcement": "validate",
+      "detail": { "en": "All color values used in charts must be valid hex, RGB, or named CSS colors.", "pt": "Todos os valores de cores usados em graficos devem ser hex, RGB ou cores CSS nomeadas validas." }
+    },
+    {
+      "id": "OUTPUT_005",
+      "category": "output_validation",
+      "severity": "warning",
+      "rule": { "en": "Ensure axis labels are not truncated", "pt": "Garantir que rotulos dos eixos nao sejam truncados" },
+      "enforcement": "validate",
+      "detail": { "en": "Axis labels and tick labels must be fully visible within the figure bounding box.", "pt": "Rotulos de eixos e rotulos de marcas devem ser totalmente visiveis dentro da caixa delimitadora da figura." }
+    },
+    {
+      "id": "DATA_001",
+      "category": "data_handling",
+      "severity": "warning",
+      "rule": { "en": "Handle NaN values explicitly", "pt": "Tratar valores NaN explicitamente" },
+      "enforcement": "recommend",
+      "detail": { "en": "NaN values must be handled explicitly via dropna, fillna, or documented exclusion before computation.", "pt": "Valores NaN devem ser tratados explicitamente via dropna, fillna ou exclusao documentada antes da computacao." }
+    },
+    {
+      "id": "DATA_002",
+      "category": "data_handling",
+      "severity": "warning",
+      "rule": { "en": "Replace Inf values before plotting", "pt": "Substituir valores Inf antes da plotagem" },
+      "enforcement": "recommend",
+      "detail": { "en": "Infinite values must be replaced or removed before passing data to matplotlib to prevent rendering errors.", "pt": "Valores infinitos devem ser substituidos ou removidos antes de passar dados ao matplotlib para prevenir erros de renderizacao." }
+    },
+    {
+      "id": "DATA_003",
+      "category": "data_handling",
+      "severity": "info",
+      "rule": { "en": "Use explicit date format for parsing", "pt": "Usar formato de data explicito para analise" },
+      "enforcement": "recommend",
+      "detail": { "en": "Date parsing must use explicit format strings (e.g. '%Y-%m-%d') rather than relying on inference.", "pt": "A analise de datas deve usar strings de formato explicitas (ex: '%Y-%m-%d') em vez de depender de inferencia." }
+    },
+    {
+      "id": "DATA_004",
+      "category": "data_handling",
+      "severity": "info",
+      "rule": { "en": "Use locale-aware number parsing", "pt": "Usar analise de numeros com consciencia de locale" },
+      "enforcement": "recommend",
+      "detail": { "en": "Number parsing must account for locale differences in decimal separators (comma vs period).", "pt": "A analise de numeros deve considerar diferencas de locale em separadores decimais (virgula vs ponto)." }
+    },
+    {
+      "id": "DATA_005",
+      "category": "data_handling",
+      "severity": "warning",
+      "rule": { "en": "Distinguish empty cells from zero values", "pt": "Distinguir celulas vazias de valores zero" },
+      "enforcement": "recommend",
+      "detail": { "en": "Empty or missing cells must be represented as NaN, not as zero, to preserve data semantics.", "pt": "Celulas vazias ou ausentes devem ser representadas como NaN, nao como zero, para preservar a semantica dos dados." }
+    }
+  ]
+}

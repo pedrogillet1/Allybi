@@ -10,10 +10,7 @@ jest.mock("fs", () => ({
   existsSync: jest.fn(),
 }));
 
-import {
-  getBankLoaderInstance,
-  getOptionalBank,
-} from "./bankLoader.service";
+import { getBankLoaderInstance, getOptionalBank } from "./bankLoader.service";
 import { DocumentIntelligenceIntegrityService } from "./documentIntelligenceIntegrity.service";
 
 const mockedGetOptionalBank = getOptionalBank as jest.MockedFunction<
@@ -21,7 +18,9 @@ const mockedGetOptionalBank = getOptionalBank as jest.MockedFunction<
 >;
 const mockedGetBankLoaderInstance =
   getBankLoaderInstance as jest.MockedFunction<typeof getBankLoaderInstance>;
-const mockedExistsSync = fs.existsSync as jest.MockedFunction<typeof fs.existsSync>;
+const mockedExistsSync = fs.existsSync as jest.MockedFunction<
+  typeof fs.existsSync
+>;
 
 describe("DocumentIntelligenceIntegrityService", () => {
   beforeEach(() => {
@@ -52,8 +51,34 @@ describe("DocumentIntelligenceIntegrityService", () => {
 
     mockedGetOptionalBank.mockImplementation((id: string) => {
       if (id === "document_intelligence_bank_map") return mapBank as any;
-      if (id === "doc_taxonomy") return { _meta: { id: "doc_taxonomy" } } as any;
-      if (id === "headings_map") return { _meta: { id: "headings_map" } } as any;
+      if (id === "doc_taxonomy")
+        return { _meta: { id: "doc_taxonomy" } } as any;
+      if (id === "headings_map")
+        return { _meta: { id: "headings_map" } } as any;
+      if (id === "bank_dependencies") {
+        return {
+          banks: [{ id: "doc_taxonomy" }, { id: "headings_map" }],
+        } as any;
+      }
+      if (
+        id === "document_intelligence_schema_registry" ||
+        id === "document_intelligence_dependency_graph" ||
+        id === "document_intelligence_runtime_wiring_gates"
+      ) {
+        return { _meta: { id } } as any;
+      }
+      if (id === "document_intelligence_usage_manifest") {
+        return {
+          consumedBankIds: ["doc_taxonomy", "headings_map", "pattern_library"],
+        } as any;
+      }
+      if (id === "document_intelligence_orphan_allowlist") {
+        return {
+          allowlistedBankIds: [],
+          allowlistedIdPrefixes: [],
+          allowlistedIdPatterns: [],
+        } as any;
+      }
       return null as any;
     });
 
@@ -90,7 +115,8 @@ describe("DocumentIntelligenceIntegrityService", () => {
 
     mockedGetOptionalBank.mockImplementation((id: string) => {
       if (id === "document_intelligence_bank_map") return mapBank as any;
-      if (id === "doc_taxonomy") return { _meta: { id: "doc_taxonomy" } } as any;
+      if (id === "doc_taxonomy")
+        return { _meta: { id: "doc_taxonomy" } } as any;
       return null as any;
     });
 

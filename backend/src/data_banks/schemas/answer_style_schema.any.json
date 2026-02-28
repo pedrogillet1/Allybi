@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "id": "answer_style_schema",
+    "version": "1.0.0",
+    "description": "Schema for document intelligence answer style banks. Requires domain and style rules.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/answer_style_schema.any.json",
+    "title": "Answer Style Bank Schema",
+    "type": "object",
+    "required": ["_meta", "config", "domain"],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": ["id", "version", "description", "languages", "lastUpdated"],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": ["enabled"],
+        "additionalProperties": true
+      },
+      "domain": { "type": "string", "minLength": 2 },
+      "audienceProfiles": { "type": "array" },
+      "depthLadder": { "type": "array" },
+      "styleRules": { "type": "array" }
+    },
+    "anyOf": [
+      { "required": ["audienceProfiles"] },
+      { "required": ["styleRules"] },
+      { "required": ["depthLadder"] }
+    ]
+  }
+}

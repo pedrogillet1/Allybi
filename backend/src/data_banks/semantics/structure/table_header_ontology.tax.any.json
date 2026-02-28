@@ -1,0 +1,2528 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_tax",
+    "version": "1.0.0",
+    "description": "Table header ontology for tax documents with multilingual synonym coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax"
+  },
+  "domain": "tax",
+  "headers": [
+    {
+      "canonical": "adjusted_gross_income_amount",
+      "synonyms": [
+        "adjusted gross income amount",
+        "Adjusted Gross Income Amount",
+        "adjusted gross income amount field",
+        "adjusted gross income amount value",
+        "adjusted gross income amt",
+        "adjusted gross income montante",
+        "adjusted gross income valor",
+        "Adjusted Gross Income Valor",
+        "adjusted gross income valor valor",
+        "adjustedgrossincomeamount",
+        "AGIA"
+      ],
+      "related": [
+        "adjusted_gross_income_code",
+        "adjusted_gross_income_number",
+        "adjusted_gross_income_total"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_code",
+      "synonyms": [
+        "adjusted gross income code",
+        "Adjusted Gross Income Code",
+        "adjusted gross income code field",
+        "adjusted gross income code value",
+        "adjusted gross income codigo",
+        "Adjusted Gross Income Codigo",
+        "adjusted gross income codigo valor",
+        "adjustedgrossincomecode",
+        "AGIC"
+      ],
+      "related": [
+        "adjusted_gross_income_count",
+        "adjusted_gross_income_quantity",
+        "adjusted_gross_income_type"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_count",
+      "synonyms": [
+        "adjusted gross income count",
+        "Adjusted Gross Income Count",
+        "adjusted gross income count field",
+        "adjusted gross income count valor",
+        "adjusted gross income count value",
+        "adjustedgrossincomecount",
+        "AGIC"
+      ],
+      "related": [
+        "adjusted_gross_income_date",
+        "adjusted_gross_income_rate",
+        "adjusted_gross_income_unit"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_date",
+      "synonyms": [
+        "adjusted gross income data",
+        "Adjusted Gross Income Data",
+        "adjusted gross income data valor",
+        "adjusted gross income date",
+        "Adjusted Gross Income Date",
+        "adjusted gross income date field",
+        "adjusted gross income date value",
+        "adjustedgrossincomedate",
+        "AGID"
+      ],
+      "related": [
+        "adjusted_gross_income_end_date",
+        "adjusted_gross_income_start_date",
+        "amount_amount"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_end_date",
+      "synonyms": [
+        "adjusted gross income end date",
+        "Adjusted Gross Income End Date",
+        "adjusted gross income end date field",
+        "adjusted gross income end date value",
+        "adjusted gross income fim data",
+        "Adjusted Gross Income Fim Data",
+        "adjusted gross income fim data valor",
+        "adjustedgrossincomeenddate",
+        "AGIED"
+      ],
+      "related": [
+        "adjusted_gross_income_id",
+        "adjusted_gross_income_status",
+        "amount_code"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_id",
+      "synonyms": [
+        "adjusted gross income id",
+        "Adjusted Gross Income Id",
+        "adjusted gross income id field",
+        "adjusted gross income id valor",
+        "adjusted gross income id value",
+        "adjustedgrossincomeid",
+        "AGII"
+      ],
+      "related": [
+        "adjusted_gross_income_name",
+        "adjusted_gross_income_subtotal",
+        "amount_count"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_name",
+      "synonyms": [
+        "adjusted gross income name",
+        "Adjusted Gross Income Name",
+        "adjusted gross income name field",
+        "adjusted gross income name value",
+        "adjusted gross income nome",
+        "Adjusted Gross Income Nome",
+        "adjusted gross income nome valor",
+        "adjustedgrossincomename",
+        "AGIN"
+      ],
+      "related": [
+        "adjusted_gross_income_number",
+        "adjusted_gross_income_total",
+        "amount_date"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_number",
+      "synonyms": [
+        "adjusted gross income no",
+        "adjusted gross income number",
+        "Adjusted Gross Income Number",
+        "adjusted gross income number field",
+        "adjusted gross income number value",
+        "adjusted gross income numero",
+        "Adjusted Gross Income Numero",
+        "adjusted gross income numero valor",
+        "adjustedgrossincomenumber",
+        "AGIN"
+      ],
+      "related": [
+        "adjusted_gross_income_quantity",
+        "adjusted_gross_income_type",
+        "amount_end_date"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_quantity",
+      "synonyms": [
+        "adjusted gross income qty",
+        "adjusted gross income quantidade",
+        "Adjusted Gross Income Quantidade",
+        "adjusted gross income quantidade valor",
+        "adjusted gross income quantity",
+        "Adjusted Gross Income Quantity",
+        "adjusted gross income quantity field",
+        "adjusted gross income quantity value",
+        "adjustedgrossincomequantity",
+        "AGIQ"
+      ],
+      "related": [
+        "adjusted_gross_income_rate",
+        "adjusted_gross_income_unit",
+        "amount_id"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_rate",
+      "synonyms": [
+        "adjusted gross income rate",
+        "Adjusted Gross Income Rate",
+        "adjusted gross income rate field",
+        "adjusted gross income rate value",
+        "adjusted gross income taxa",
+        "Adjusted Gross Income Taxa",
+        "adjusted gross income taxa valor",
+        "adjustedgrossincomerate",
+        "AGIR"
+      ],
+      "related": [
+        "adjusted_gross_income_start_date",
+        "amount_amount",
+        "amount_name"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_start_date",
+      "synonyms": [
+        "adjusted gross income inicio data",
+        "Adjusted Gross Income Inicio Data",
+        "adjusted gross income inicio data valor",
+        "adjusted gross income start date",
+        "Adjusted Gross Income Start Date",
+        "adjusted gross income start date field",
+        "adjusted gross income start date value",
+        "adjustedgrossincomestartdate",
+        "AGISD"
+      ],
+      "related": [
+        "adjusted_gross_income_status",
+        "amount_code",
+        "amount_number"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_status",
+      "synonyms": [
+        "adjusted gross income status",
+        "Adjusted Gross Income Status",
+        "adjusted gross income status field",
+        "adjusted gross income status valor",
+        "adjusted gross income status value",
+        "adjustedgrossincomestatus",
+        "AGIS"
+      ],
+      "related": [
+        "adjusted_gross_income_subtotal",
+        "amount_count",
+        "amount_quantity"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_subtotal",
+      "synonyms": [
+        "adjusted gross income subtotal",
+        "Adjusted Gross Income Subtotal",
+        "adjusted gross income subtotal field",
+        "adjusted gross income subtotal valor",
+        "adjusted gross income subtotal value",
+        "adjustedgrossincomesubtotal",
+        "AGIS"
+      ],
+      "related": [
+        "adjusted_gross_income_total",
+        "amount_date",
+        "amount_rate"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_total",
+      "synonyms": [
+        "adjusted gross income total",
+        "Adjusted Gross Income Total",
+        "adjusted gross income total field",
+        "adjusted gross income total valor",
+        "adjusted gross income total value",
+        "adjustedgrossincometotal",
+        "AGIT"
+      ],
+      "related": [
+        "adjusted_gross_income_type",
+        "amount_end_date",
+        "amount_start_date"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_type",
+      "synonyms": [
+        "adjusted gross income tipo",
+        "Adjusted Gross Income Tipo",
+        "adjusted gross income tipo valor",
+        "adjusted gross income type",
+        "Adjusted Gross Income Type",
+        "adjusted gross income type field",
+        "adjusted gross income type value",
+        "adjustedgrossincometype",
+        "AGIT"
+      ],
+      "related": [
+        "adjusted_gross_income_unit",
+        "amount_id",
+        "amount_status"
+      ]
+    },
+    {
+      "canonical": "adjusted_gross_income_unit",
+      "synonyms": [
+        "adjusted gross income unidade",
+        "Adjusted Gross Income Unidade",
+        "adjusted gross income unidade valor",
+        "adjusted gross income unit",
+        "Adjusted Gross Income Unit",
+        "adjusted gross income unit field",
+        "adjusted gross income unit value",
+        "adjustedgrossincomeunit",
+        "AGIU"
+      ],
+      "related": [
+        "amount_amount",
+        "amount_name",
+        "amount_subtotal"
+      ]
+    },
+    {
+      "canonical": "amount_amount",
+      "synonyms": [
+        "AA",
+        "amount amount",
+        "Amount Amount",
+        "amount amount field",
+        "amount amount value",
+        "amountamount",
+        "amt amount",
+        "montante valor",
+        "valor valor",
+        "Valor Valor",
+        "valor valor valor"
+      ],
+      "related": [
+        "amount_code",
+        "amount_number",
+        "amount_total"
+      ]
+    },
+    {
+      "canonical": "amount_code",
+      "synonyms": [
+        "AC",
+        "amount code",
+        "Amount Code",
+        "amount code field",
+        "amount code value",
+        "amountcode",
+        "amt code",
+        "montante codigo",
+        "valor codigo",
+        "Valor Codigo",
+        "valor codigo valor"
+      ],
+      "related": [
+        "amount_count",
+        "amount_quantity",
+        "amount_type"
+      ]
+    },
+    {
+      "canonical": "amount_count",
+      "synonyms": [
+        "AC",
+        "amount count",
+        "Amount Count",
+        "amount count field",
+        "amount count value",
+        "amountcount",
+        "amt count",
+        "montante count",
+        "valor count",
+        "Valor Count",
+        "valor count valor"
+      ],
+      "related": [
+        "amount_date",
+        "amount_rate",
+        "amount_unit"
+      ]
+    },
+    {
+      "canonical": "amount_date",
+      "synonyms": [
+        "AD",
+        "amount date",
+        "Amount Date",
+        "amount date field",
+        "amount date value",
+        "amountdate",
+        "amt date",
+        "montante data",
+        "valor data",
+        "Valor Data",
+        "valor data valor"
+      ],
+      "related": [
+        "amount_end_date",
+        "amount_start_date",
+        "assessment_amount"
+      ]
+    },
+    {
+      "canonical": "amount_end_date",
+      "synonyms": [
+        "AED",
+        "amount end date",
+        "Amount End Date",
+        "amount end date field",
+        "amount end date value",
+        "amountenddate",
+        "amt end date",
+        "montante fim data",
+        "valor fim data",
+        "Valor Fim Data",
+        "valor fim data valor"
+      ],
+      "related": [
+        "amount_id",
+        "amount_status",
+        "assessment_code"
+      ]
+    },
+    {
+      "canonical": "amount_id",
+      "synonyms": [
+        "AI",
+        "amount id",
+        "Amount Id",
+        "amount id field",
+        "amount id value",
+        "amountid",
+        "amt id",
+        "montante id",
+        "valor id",
+        "Valor Id",
+        "valor id valor"
+      ],
+      "related": [
+        "amount_name",
+        "amount_subtotal",
+        "assessment_count"
+      ]
+    },
+    {
+      "canonical": "amount_name",
+      "synonyms": [
+        "amount name",
+        "Amount Name",
+        "amount name field",
+        "amount name value",
+        "amountname",
+        "amt name",
+        "AN",
+        "montante nome",
+        "valor nome",
+        "Valor Nome",
+        "valor nome valor"
+      ],
+      "related": [
+        "amount_number",
+        "amount_total",
+        "assessment_date"
+      ]
+    },
+    {
+      "canonical": "amount_number",
+      "synonyms": [
+        "amount no",
+        "amount number",
+        "Amount Number",
+        "amount number field",
+        "amount number value",
+        "amountnumber",
+        "amt number",
+        "AN",
+        "montante numero",
+        "valor numero",
+        "Valor Numero",
+        "valor numero valor"
+      ],
+      "related": [
+        "amount_quantity",
+        "amount_type",
+        "assessment_end_date"
+      ]
+    },
+    {
+      "canonical": "amount_quantity",
+      "synonyms": [
+        "amount qty",
+        "amount quantity",
+        "Amount Quantity",
+        "amount quantity field",
+        "amount quantity value",
+        "amountquantity",
+        "amt quantity",
+        "AQ",
+        "montante quantidade",
+        "valor quantidade",
+        "Valor Quantidade",
+        "valor quantidade valor"
+      ],
+      "related": [
+        "amount_rate",
+        "amount_unit",
+        "assessment_id"
+      ]
+    },
+    {
+      "canonical": "amount_rate",
+      "synonyms": [
+        "amount rate",
+        "Amount Rate",
+        "amount rate field",
+        "amount rate value",
+        "amountrate",
+        "amt rate",
+        "AR",
+        "montante taxa",
+        "valor taxa",
+        "Valor Taxa",
+        "valor taxa valor"
+      ],
+      "related": [
+        "amount_start_date",
+        "assessment_amount",
+        "assessment_name"
+      ]
+    },
+    {
+      "canonical": "amount_start_date",
+      "synonyms": [
+        "amount start date",
+        "Amount Start Date",
+        "amount start date field",
+        "amount start date value",
+        "amountstartdate",
+        "amt start date",
+        "ASD",
+        "montante inicio data",
+        "valor inicio data",
+        "Valor Inicio Data",
+        "valor inicio data valor"
+      ],
+      "related": [
+        "amount_status",
+        "assessment_code",
+        "assessment_number"
+      ]
+    },
+    {
+      "canonical": "amount_status",
+      "synonyms": [
+        "amount status",
+        "Amount Status",
+        "amount status field",
+        "amount status value",
+        "amountstatus",
+        "amt status",
+        "AS",
+        "montante status",
+        "valor status",
+        "Valor Status",
+        "valor status valor"
+      ],
+      "related": [
+        "amount_subtotal",
+        "assessment_count",
+        "assessment_quantity"
+      ]
+    },
+    {
+      "canonical": "amount_subtotal",
+      "synonyms": [
+        "amount subtotal",
+        "Amount Subtotal",
+        "amount subtotal field",
+        "amount subtotal value",
+        "amountsubtotal",
+        "amt subtotal",
+        "AS",
+        "montante subtotal",
+        "valor subtotal",
+        "Valor Subtotal",
+        "valor subtotal valor"
+      ],
+      "related": [
+        "amount_total",
+        "assessment_date",
+        "assessment_rate"
+      ]
+    },
+    {
+      "canonical": "amount_total",
+      "synonyms": [
+        "amount total",
+        "Amount Total",
+        "amount total field",
+        "amount total value",
+        "amounttotal",
+        "amt total",
+        "AT",
+        "montante total",
+        "valor total",
+        "Valor Total",
+        "valor total valor"
+      ],
+      "related": [
+        "amount_type",
+        "assessment_end_date",
+        "assessment_start_date"
+      ]
+    },
+    {
+      "canonical": "amount_type",
+      "synonyms": [
+        "amount type",
+        "Amount Type",
+        "amount type field",
+        "amount type value",
+        "amounttype",
+        "amt type",
+        "AT",
+        "montante tipo",
+        "valor tipo",
+        "Valor Tipo",
+        "valor tipo valor"
+      ],
+      "related": [
+        "amount_unit",
+        "assessment_id",
+        "assessment_status"
+      ]
+    },
+    {
+      "canonical": "amount_unit",
+      "synonyms": [
+        "amount unit",
+        "Amount Unit",
+        "amount unit field",
+        "amount unit value",
+        "amountunit",
+        "amt unit",
+        "AU",
+        "montante unidade",
+        "valor unidade",
+        "Valor Unidade",
+        "valor unidade valor"
+      ],
+      "related": [
+        "assessment_amount",
+        "assessment_name",
+        "assessment_subtotal"
+      ]
+    },
+    {
+      "canonical": "assessment_amount",
+      "synonyms": [
+        "AA",
+        "assessment amount",
+        "Assessment Amount",
+        "assessment amount field",
+        "assessment amount value",
+        "assessment amt",
+        "assessment montante",
+        "assessment valor",
+        "Assessment Valor",
+        "assessment valor valor",
+        "assessmentamount"
+      ],
+      "related": [
+        "assessment_code",
+        "assessment_number",
+        "assessment_total"
+      ]
+    },
+    {
+      "canonical": "assessment_code",
+      "synonyms": [
+        "AC",
+        "assessment code",
+        "Assessment Code",
+        "assessment code field",
+        "assessment code value",
+        "assessment codigo",
+        "Assessment Codigo",
+        "assessment codigo valor",
+        "assessmentcode"
+      ],
+      "related": [
+        "assessment_count",
+        "assessment_quantity",
+        "assessment_type"
+      ]
+    },
+    {
+      "canonical": "assessment_count",
+      "synonyms": [
+        "AC",
+        "assessment count",
+        "Assessment Count",
+        "assessment count field",
+        "assessment count valor",
+        "assessment count value",
+        "assessmentcount"
+      ],
+      "related": [
+        "assessment_date",
+        "assessment_rate",
+        "assessment_unit"
+      ]
+    },
+    {
+      "canonical": "assessment_date",
+      "synonyms": [
+        "AD",
+        "assessment data",
+        "Assessment Data",
+        "assessment data valor",
+        "assessment date",
+        "Assessment Date",
+        "assessment date field",
+        "assessment date value",
+        "assessmentdate"
+      ],
+      "related": [
+        "assessment_end_date",
+        "assessment_start_date",
+        "audit_amount"
+      ]
+    },
+    {
+      "canonical": "assessment_end_date",
+      "synonyms": [
+        "AED",
+        "assessment end date",
+        "Assessment End Date",
+        "assessment end date field",
+        "assessment end date value",
+        "assessment fim data",
+        "Assessment Fim Data",
+        "assessment fim data valor",
+        "assessmentenddate"
+      ],
+      "related": [
+        "assessment_id",
+        "assessment_status",
+        "audit_code"
+      ]
+    },
+    {
+      "canonical": "assessment_id",
+      "synonyms": [
+        "AI",
+        "assessment id",
+        "Assessment Id",
+        "assessment id field",
+        "assessment id valor",
+        "assessment id value",
+        "assessmentid"
+      ],
+      "related": [
+        "assessment_name",
+        "assessment_subtotal",
+        "audit_count"
+      ]
+    },
+    {
+      "canonical": "assessment_name",
+      "synonyms": [
+        "AN",
+        "assessment name",
+        "Assessment Name",
+        "assessment name field",
+        "assessment name value",
+        "assessment nome",
+        "Assessment Nome",
+        "assessment nome valor",
+        "assessmentname"
+      ],
+      "related": [
+        "assessment_number",
+        "assessment_total",
+        "audit_date"
+      ]
+    },
+    {
+      "canonical": "assessment_number",
+      "synonyms": [
+        "AN",
+        "assessment no",
+        "assessment number",
+        "Assessment Number",
+        "assessment number field",
+        "assessment number value",
+        "assessment numero",
+        "Assessment Numero",
+        "assessment numero valor",
+        "assessmentnumber"
+      ],
+      "related": [
+        "assessment_quantity",
+        "assessment_type",
+        "audit_end_date"
+      ]
+    },
+    {
+      "canonical": "assessment_quantity",
+      "synonyms": [
+        "AQ",
+        "assessment qty",
+        "assessment quantidade",
+        "Assessment Quantidade",
+        "assessment quantidade valor",
+        "assessment quantity",
+        "Assessment Quantity",
+        "assessment quantity field",
+        "assessment quantity value",
+        "assessmentquantity"
+      ],
+      "related": [
+        "assessment_rate",
+        "assessment_unit",
+        "audit_id"
+      ]
+    },
+    {
+      "canonical": "assessment_rate",
+      "synonyms": [
+        "AR",
+        "assessment rate",
+        "Assessment Rate",
+        "assessment rate field",
+        "assessment rate value",
+        "assessment taxa",
+        "Assessment Taxa",
+        "assessment taxa valor",
+        "assessmentrate"
+      ],
+      "related": [
+        "assessment_start_date",
+        "audit_amount",
+        "audit_name"
+      ]
+    },
+    {
+      "canonical": "assessment_start_date",
+      "synonyms": [
+        "ASD",
+        "assessment inicio data",
+        "Assessment Inicio Data",
+        "assessment inicio data valor",
+        "assessment start date",
+        "Assessment Start Date",
+        "assessment start date field",
+        "assessment start date value",
+        "assessmentstartdate"
+      ],
+      "related": [
+        "assessment_status",
+        "audit_code",
+        "audit_number"
+      ]
+    },
+    {
+      "canonical": "assessment_status",
+      "synonyms": [
+        "AS",
+        "assessment status",
+        "Assessment Status",
+        "assessment status field",
+        "assessment status valor",
+        "assessment status value",
+        "assessmentstatus"
+      ],
+      "related": [
+        "assessment_subtotal",
+        "audit_count",
+        "audit_quantity"
+      ]
+    },
+    {
+      "canonical": "assessment_subtotal",
+      "synonyms": [
+        "AS",
+        "assessment subtotal",
+        "Assessment Subtotal",
+        "assessment subtotal field",
+        "assessment subtotal valor",
+        "assessment subtotal value",
+        "assessmentsubtotal"
+      ],
+      "related": [
+        "assessment_total",
+        "audit_date",
+        "audit_rate"
+      ]
+    },
+    {
+      "canonical": "assessment_total",
+      "synonyms": [
+        "assessment total",
+        "Assessment Total",
+        "assessment total field",
+        "assessment total valor",
+        "assessment total value",
+        "assessmenttotal",
+        "AT"
+      ],
+      "related": [
+        "assessment_type",
+        "audit_end_date",
+        "audit_start_date"
+      ]
+    },
+    {
+      "canonical": "assessment_type",
+      "synonyms": [
+        "assessment tipo",
+        "Assessment Tipo",
+        "assessment tipo valor",
+        "assessment type",
+        "Assessment Type",
+        "assessment type field",
+        "assessment type value",
+        "assessmenttype",
+        "AT"
+      ],
+      "related": [
+        "assessment_unit",
+        "audit_id",
+        "audit_status"
+      ]
+    },
+    {
+      "canonical": "assessment_unit",
+      "synonyms": [
+        "assessment unidade",
+        "Assessment Unidade",
+        "assessment unidade valor",
+        "assessment unit",
+        "Assessment Unit",
+        "assessment unit field",
+        "assessment unit value",
+        "assessmentunit",
+        "AU"
+      ],
+      "related": [
+        "audit_amount",
+        "audit_name",
+        "audit_subtotal"
+      ]
+    },
+    {
+      "canonical": "audit_amount",
+      "synonyms": [
+        "AA",
+        "audit amount",
+        "Audit Amount",
+        "audit amount field",
+        "audit amount value",
+        "audit amt",
+        "audit montante",
+        "audit valor",
+        "Audit Valor",
+        "audit valor valor",
+        "auditamount"
+      ],
+      "related": [
+        "audit_code",
+        "audit_number",
+        "audit_total"
+      ]
+    },
+    {
+      "canonical": "audit_code",
+      "synonyms": [
+        "AC",
+        "audit code",
+        "Audit Code",
+        "audit code field",
+        "audit code value",
+        "audit codigo",
+        "Audit Codigo",
+        "audit codigo valor",
+        "auditcode"
+      ],
+      "related": [
+        "audit_count",
+        "audit_quantity",
+        "audit_type"
+      ]
+    },
+    {
+      "canonical": "audit_count",
+      "synonyms": [
+        "AC",
+        "audit count",
+        "Audit Count",
+        "audit count field",
+        "audit count valor",
+        "audit count value",
+        "auditcount"
+      ],
+      "related": [
+        "audit_date",
+        "audit_rate",
+        "audit_unit"
+      ]
+    },
+    {
+      "canonical": "audit_date",
+      "synonyms": [
+        "AD",
+        "audit data",
+        "Audit Data",
+        "audit data valor",
+        "audit date",
+        "Audit Date",
+        "audit date field",
+        "audit date value",
+        "auditdate"
+      ],
+      "related": [
+        "audit_end_date",
+        "audit_start_date",
+        "basis_amount"
+      ]
+    },
+    {
+      "canonical": "audit_end_date",
+      "synonyms": [
+        "AED",
+        "audit end date",
+        "Audit End Date",
+        "audit end date field",
+        "audit end date value",
+        "audit fim data",
+        "Audit Fim Data",
+        "audit fim data valor",
+        "auditenddate"
+      ],
+      "related": [
+        "audit_id",
+        "audit_status",
+        "basis_code"
+      ]
+    },
+    {
+      "canonical": "audit_id",
+      "synonyms": [
+        "AI",
+        "audit id",
+        "Audit Id",
+        "audit id field",
+        "audit id valor",
+        "audit id value",
+        "auditid"
+      ],
+      "related": [
+        "audit_name",
+        "audit_subtotal",
+        "basis_count"
+      ]
+    },
+    {
+      "canonical": "audit_name",
+      "synonyms": [
+        "AN",
+        "audit name",
+        "Audit Name",
+        "audit name field",
+        "audit name value",
+        "audit nome",
+        "Audit Nome",
+        "audit nome valor",
+        "auditname"
+      ],
+      "related": [
+        "audit_number",
+        "audit_total",
+        "basis_date"
+      ]
+    },
+    {
+      "canonical": "audit_number",
+      "synonyms": [
+        "AN",
+        "audit no",
+        "audit number",
+        "Audit Number",
+        "audit number field",
+        "audit number value",
+        "audit numero",
+        "Audit Numero",
+        "audit numero valor",
+        "auditnumber"
+      ],
+      "related": [
+        "audit_quantity",
+        "audit_type",
+        "basis_end_date"
+      ]
+    },
+    {
+      "canonical": "audit_quantity",
+      "synonyms": [
+        "AQ",
+        "audit qty",
+        "audit quantidade",
+        "Audit Quantidade",
+        "audit quantidade valor",
+        "audit quantity",
+        "Audit Quantity",
+        "audit quantity field",
+        "audit quantity value",
+        "auditquantity"
+      ],
+      "related": [
+        "audit_rate",
+        "audit_unit",
+        "basis_id"
+      ]
+    },
+    {
+      "canonical": "audit_rate",
+      "synonyms": [
+        "AR",
+        "audit rate",
+        "Audit Rate",
+        "audit rate field",
+        "audit rate value",
+        "audit taxa",
+        "Audit Taxa",
+        "audit taxa valor",
+        "auditrate"
+      ],
+      "related": [
+        "audit_start_date",
+        "basis_amount",
+        "basis_name"
+      ]
+    },
+    {
+      "canonical": "audit_start_date",
+      "synonyms": [
+        "ASD",
+        "audit inicio data",
+        "Audit Inicio Data",
+        "audit inicio data valor",
+        "audit start date",
+        "Audit Start Date",
+        "audit start date field",
+        "audit start date value",
+        "auditstartdate"
+      ],
+      "related": [
+        "audit_status",
+        "basis_code",
+        "basis_number"
+      ]
+    },
+    {
+      "canonical": "audit_status",
+      "synonyms": [
+        "AS",
+        "audit status",
+        "Audit Status",
+        "audit status field",
+        "audit status valor",
+        "audit status value",
+        "auditstatus"
+      ],
+      "related": [
+        "audit_subtotal",
+        "basis_count",
+        "basis_quantity"
+      ]
+    },
+    {
+      "canonical": "audit_subtotal",
+      "synonyms": [
+        "AS",
+        "audit subtotal",
+        "Audit Subtotal",
+        "audit subtotal field",
+        "audit subtotal valor",
+        "audit subtotal value",
+        "auditsubtotal"
+      ],
+      "related": [
+        "audit_total",
+        "basis_date",
+        "basis_rate"
+      ]
+    },
+    {
+      "canonical": "audit_total",
+      "synonyms": [
+        "AT",
+        "audit total",
+        "Audit Total",
+        "audit total field",
+        "audit total valor",
+        "audit total value",
+        "audittotal"
+      ],
+      "related": [
+        "audit_type",
+        "basis_end_date",
+        "basis_start_date"
+      ]
+    },
+    {
+      "canonical": "audit_type",
+      "synonyms": [
+        "AT",
+        "audit tipo",
+        "Audit Tipo",
+        "audit tipo valor",
+        "audit type",
+        "Audit Type",
+        "audit type field",
+        "audit type value",
+        "audittype"
+      ],
+      "related": [
+        "audit_unit",
+        "basis_id",
+        "basis_status"
+      ]
+    },
+    {
+      "canonical": "audit_unit",
+      "synonyms": [
+        "AU",
+        "audit unidade",
+        "Audit Unidade",
+        "audit unidade valor",
+        "audit unit",
+        "Audit Unit",
+        "audit unit field",
+        "audit unit value",
+        "auditunit"
+      ],
+      "related": [
+        "basis_amount",
+        "basis_name",
+        "basis_subtotal"
+      ]
+    },
+    {
+      "canonical": "basis_amount",
+      "synonyms": [
+        "BA",
+        "basis amount",
+        "Basis Amount",
+        "basis amount field",
+        "basis amount value",
+        "basis amt",
+        "basis montante",
+        "basis valor",
+        "Basis Valor",
+        "basis valor valor",
+        "basisamount"
+      ],
+      "related": [
+        "basis_code",
+        "basis_number",
+        "basis_total"
+      ]
+    },
+    {
+      "canonical": "basis_code",
+      "synonyms": [
+        "basis code",
+        "Basis Code",
+        "basis code field",
+        "basis code value",
+        "basis codigo",
+        "Basis Codigo",
+        "basis codigo valor",
+        "basiscode",
+        "BC"
+      ],
+      "related": [
+        "basis_count",
+        "basis_quantity",
+        "basis_type"
+      ]
+    },
+    {
+      "canonical": "basis_count",
+      "synonyms": [
+        "basis count",
+        "Basis Count",
+        "basis count field",
+        "basis count valor",
+        "basis count value",
+        "basiscount",
+        "BC"
+      ],
+      "related": [
+        "basis_date",
+        "basis_rate",
+        "basis_unit"
+      ]
+    },
+    {
+      "canonical": "basis_date",
+      "synonyms": [
+        "basis data",
+        "Basis Data",
+        "basis data valor",
+        "basis date",
+        "Basis Date",
+        "basis date field",
+        "basis date value",
+        "basisdate",
+        "BD"
+      ],
+      "related": [
+        "basis_end_date",
+        "basis_start_date",
+        "capital_gain_amount"
+      ]
+    },
+    {
+      "canonical": "basis_end_date",
+      "synonyms": [
+        "basis end date",
+        "Basis End Date",
+        "basis end date field",
+        "basis end date value",
+        "basis fim data",
+        "Basis Fim Data",
+        "basis fim data valor",
+        "basisenddate",
+        "BED"
+      ],
+      "related": [
+        "basis_id",
+        "basis_status",
+        "capital_gain_code"
+      ]
+    },
+    {
+      "canonical": "basis_id",
+      "synonyms": [
+        "basis id",
+        "Basis Id",
+        "basis id field",
+        "basis id valor",
+        "basis id value",
+        "basisid",
+        "BI"
+      ],
+      "related": [
+        "basis_name",
+        "basis_subtotal",
+        "capital_gain_count"
+      ]
+    },
+    {
+      "canonical": "basis_name",
+      "synonyms": [
+        "basis name",
+        "Basis Name",
+        "basis name field",
+        "basis name value",
+        "basis nome",
+        "Basis Nome",
+        "basis nome valor",
+        "basisname",
+        "BN"
+      ],
+      "related": [
+        "basis_number",
+        "basis_total",
+        "capital_gain_date"
+      ]
+    },
+    {
+      "canonical": "basis_number",
+      "synonyms": [
+        "basis no",
+        "basis number",
+        "Basis Number",
+        "basis number field",
+        "basis number value",
+        "basis numero",
+        "Basis Numero",
+        "basis numero valor",
+        "basisnumber",
+        "BN"
+      ],
+      "related": [
+        "basis_quantity",
+        "basis_type",
+        "capital_gain_end_date"
+      ]
+    },
+    {
+      "canonical": "basis_quantity",
+      "synonyms": [
+        "basis qty",
+        "basis quantidade",
+        "Basis Quantidade",
+        "basis quantidade valor",
+        "basis quantity",
+        "Basis Quantity",
+        "basis quantity field",
+        "basis quantity value",
+        "basisquantity",
+        "BQ"
+      ],
+      "related": [
+        "basis_rate",
+        "basis_unit",
+        "capital_gain_id"
+      ]
+    },
+    {
+      "canonical": "basis_rate",
+      "synonyms": [
+        "basis rate",
+        "Basis Rate",
+        "basis rate field",
+        "basis rate value",
+        "basis taxa",
+        "Basis Taxa",
+        "basis taxa valor",
+        "basisrate",
+        "BR"
+      ],
+      "related": [
+        "basis_start_date",
+        "capital_gain_amount",
+        "capital_gain_name"
+      ]
+    },
+    {
+      "canonical": "basis_start_date",
+      "synonyms": [
+        "basis inicio data",
+        "Basis Inicio Data",
+        "basis inicio data valor",
+        "basis start date",
+        "Basis Start Date",
+        "basis start date field",
+        "basis start date value",
+        "basisstartdate",
+        "BSD"
+      ],
+      "related": [
+        "basis_status",
+        "capital_gain_code",
+        "capital_gain_number"
+      ]
+    },
+    {
+      "canonical": "basis_status",
+      "synonyms": [
+        "basis status",
+        "Basis Status",
+        "basis status field",
+        "basis status valor",
+        "basis status value",
+        "basisstatus",
+        "BS"
+      ],
+      "related": [
+        "basis_subtotal",
+        "capital_gain_count",
+        "capital_gain_quantity"
+      ]
+    },
+    {
+      "canonical": "basis_subtotal",
+      "synonyms": [
+        "basis subtotal",
+        "Basis Subtotal",
+        "basis subtotal field",
+        "basis subtotal valor",
+        "basis subtotal value",
+        "basissubtotal",
+        "BS"
+      ],
+      "related": [
+        "basis_total",
+        "capital_gain_date",
+        "capital_gain_rate"
+      ]
+    },
+    {
+      "canonical": "basis_total",
+      "synonyms": [
+        "basis total",
+        "Basis Total",
+        "basis total field",
+        "basis total valor",
+        "basis total value",
+        "basistotal",
+        "BT"
+      ],
+      "related": [
+        "basis_type",
+        "capital_gain_end_date",
+        "capital_gain_start_date"
+      ]
+    },
+    {
+      "canonical": "basis_type",
+      "synonyms": [
+        "basis tipo",
+        "Basis Tipo",
+        "basis tipo valor",
+        "basis type",
+        "Basis Type",
+        "basis type field",
+        "basis type value",
+        "basistype",
+        "BT"
+      ],
+      "related": [
+        "basis_unit",
+        "capital_gain_id",
+        "capital_gain_status"
+      ]
+    },
+    {
+      "canonical": "basis_unit",
+      "synonyms": [
+        "basis unidade",
+        "Basis Unidade",
+        "basis unidade valor",
+        "basis unit",
+        "Basis Unit",
+        "basis unit field",
+        "basis unit value",
+        "basisunit",
+        "BU"
+      ],
+      "related": [
+        "capital_gain_amount",
+        "capital_gain_name",
+        "capital_gain_subtotal"
+      ]
+    },
+    {
+      "canonical": "capital_gain_amount",
+      "synonyms": [
+        "capital gain amount",
+        "Capital Gain Amount",
+        "capital gain amount field",
+        "capital gain amount value",
+        "capital gain amt",
+        "capital gain montante",
+        "capital gain valor",
+        "Capital Gain Valor",
+        "capital gain valor valor",
+        "capitalgainamount",
+        "CGA"
+      ],
+      "related": [
+        "capital_gain_code",
+        "capital_gain_number",
+        "capital_gain_total"
+      ]
+    },
+    {
+      "canonical": "capital_gain_code",
+      "synonyms": [
+        "capital gain code",
+        "Capital Gain Code",
+        "capital gain code field",
+        "capital gain code value",
+        "capital gain codigo",
+        "Capital Gain Codigo",
+        "capital gain codigo valor",
+        "capitalgaincode",
+        "CGC"
+      ],
+      "related": [
+        "capital_gain_count",
+        "capital_gain_quantity",
+        "capital_gain_type"
+      ]
+    },
+    {
+      "canonical": "capital_gain_count",
+      "synonyms": [
+        "capital gain count",
+        "Capital Gain Count",
+        "capital gain count field",
+        "capital gain count valor",
+        "capital gain count value",
+        "capitalgaincount",
+        "CGC"
+      ],
+      "related": [
+        "capital_gain_date",
+        "capital_gain_rate",
+        "capital_gain_unit"
+      ]
+    },
+    {
+      "canonical": "capital_gain_date",
+      "synonyms": [
+        "capital gain data",
+        "Capital Gain Data",
+        "capital gain data valor",
+        "capital gain date",
+        "Capital Gain Date",
+        "capital gain date field",
+        "capital gain date value",
+        "capitalgaindate",
+        "CGD"
+      ],
+      "related": [
+        "capital_gain_end_date",
+        "capital_gain_start_date",
+        "credit_amount"
+      ]
+    },
+    {
+      "canonical": "capital_gain_end_date",
+      "synonyms": [
+        "capital gain end date",
+        "Capital Gain End Date",
+        "capital gain end date field",
+        "capital gain end date value",
+        "capital gain fim data",
+        "Capital Gain Fim Data",
+        "capital gain fim data valor",
+        "capitalgainenddate",
+        "CGED"
+      ],
+      "related": [
+        "capital_gain_id",
+        "capital_gain_status",
+        "credit_code"
+      ]
+    },
+    {
+      "canonical": "capital_gain_id",
+      "synonyms": [
+        "capital gain id",
+        "Capital Gain Id",
+        "capital gain id field",
+        "capital gain id valor",
+        "capital gain id value",
+        "capitalgainid",
+        "CGI"
+      ],
+      "related": [
+        "capital_gain_name",
+        "capital_gain_subtotal",
+        "credit_count"
+      ]
+    },
+    {
+      "canonical": "capital_gain_name",
+      "synonyms": [
+        "capital gain name",
+        "Capital Gain Name",
+        "capital gain name field",
+        "capital gain name value",
+        "capital gain nome",
+        "Capital Gain Nome",
+        "capital gain nome valor",
+        "capitalgainname",
+        "CGN"
+      ],
+      "related": [
+        "capital_gain_number",
+        "capital_gain_total",
+        "credit_date"
+      ]
+    },
+    {
+      "canonical": "capital_gain_number",
+      "synonyms": [
+        "capital gain no",
+        "capital gain number",
+        "Capital Gain Number",
+        "capital gain number field",
+        "capital gain number value",
+        "capital gain numero",
+        "Capital Gain Numero",
+        "capital gain numero valor",
+        "capitalgainnumber",
+        "CGN"
+      ],
+      "related": [
+        "capital_gain_quantity",
+        "capital_gain_type",
+        "credit_end_date"
+      ]
+    },
+    {
+      "canonical": "capital_gain_quantity",
+      "synonyms": [
+        "capital gain qty",
+        "capital gain quantidade",
+        "Capital Gain Quantidade",
+        "capital gain quantidade valor",
+        "capital gain quantity",
+        "Capital Gain Quantity",
+        "capital gain quantity field",
+        "capital gain quantity value",
+        "capitalgainquantity",
+        "CGQ"
+      ],
+      "related": [
+        "capital_gain_rate",
+        "capital_gain_unit",
+        "credit_id"
+      ]
+    },
+    {
+      "canonical": "capital_gain_rate",
+      "synonyms": [
+        "capital gain rate",
+        "Capital Gain Rate",
+        "capital gain rate field",
+        "capital gain rate value",
+        "capital gain taxa",
+        "Capital Gain Taxa",
+        "capital gain taxa valor",
+        "capitalgainrate",
+        "CGR"
+      ],
+      "related": [
+        "capital_gain_start_date",
+        "credit_amount",
+        "credit_name"
+      ]
+    },
+    {
+      "canonical": "capital_gain_start_date",
+      "synonyms": [
+        "capital gain inicio data",
+        "Capital Gain Inicio Data",
+        "capital gain inicio data valor",
+        "capital gain start date",
+        "Capital Gain Start Date",
+        "capital gain start date field",
+        "capital gain start date value",
+        "capitalgainstartdate",
+        "CGSD"
+      ],
+      "related": [
+        "capital_gain_status",
+        "credit_code",
+        "credit_number"
+      ]
+    },
+    {
+      "canonical": "capital_gain_status",
+      "synonyms": [
+        "capital gain status",
+        "Capital Gain Status",
+        "capital gain status field",
+        "capital gain status valor",
+        "capital gain status value",
+        "capitalgainstatus",
+        "CGS"
+      ],
+      "related": [
+        "capital_gain_subtotal",
+        "credit_count",
+        "credit_quantity"
+      ]
+    },
+    {
+      "canonical": "capital_gain_subtotal",
+      "synonyms": [
+        "capital gain subtotal",
+        "Capital Gain Subtotal",
+        "capital gain subtotal field",
+        "capital gain subtotal valor",
+        "capital gain subtotal value",
+        "capitalgainsubtotal",
+        "CGS"
+      ],
+      "related": [
+        "capital_gain_total",
+        "credit_date",
+        "credit_rate"
+      ]
+    },
+    {
+      "canonical": "capital_gain_total",
+      "synonyms": [
+        "capital gain total",
+        "Capital Gain Total",
+        "capital gain total field",
+        "capital gain total valor",
+        "capital gain total value",
+        "capitalgaintotal",
+        "CGT"
+      ],
+      "related": [
+        "capital_gain_type",
+        "credit_end_date",
+        "credit_start_date"
+      ]
+    },
+    {
+      "canonical": "capital_gain_type",
+      "synonyms": [
+        "capital gain tipo",
+        "Capital Gain Tipo",
+        "capital gain tipo valor",
+        "capital gain type",
+        "Capital Gain Type",
+        "capital gain type field",
+        "capital gain type value",
+        "capitalgaintype",
+        "CGT"
+      ],
+      "related": [
+        "capital_gain_unit",
+        "credit_id",
+        "credit_status"
+      ]
+    },
+    {
+      "canonical": "capital_gain_unit",
+      "synonyms": [
+        "capital gain unidade",
+        "Capital Gain Unidade",
+        "capital gain unidade valor",
+        "capital gain unit",
+        "Capital Gain Unit",
+        "capital gain unit field",
+        "capital gain unit value",
+        "capitalgainunit",
+        "CGU"
+      ],
+      "related": [
+        "credit_amount",
+        "credit_name",
+        "credit_subtotal"
+      ]
+    },
+    {
+      "canonical": "credit_amount",
+      "synonyms": [
+        "CA",
+        "credit amount",
+        "Credit Amount",
+        "credit amount field",
+        "credit amount value",
+        "credit amt",
+        "creditamount",
+        "credito montante",
+        "credito valor",
+        "Credito Valor",
+        "credito valor valor"
+      ],
+      "related": [
+        "credit_code",
+        "credit_number",
+        "credit_total"
+      ]
+    },
+    {
+      "canonical": "credit_code",
+      "synonyms": [
+        "CC",
+        "credit code",
+        "Credit Code",
+        "credit code field",
+        "credit code value",
+        "creditcode",
+        "credito codigo",
+        "Credito Codigo",
+        "credito codigo valor"
+      ],
+      "related": [
+        "credit_count",
+        "credit_quantity",
+        "credit_type"
+      ]
+    },
+    {
+      "canonical": "credit_count",
+      "synonyms": [
+        "CC",
+        "credit count",
+        "Credit Count",
+        "credit count field",
+        "credit count value",
+        "creditcount",
+        "credito count",
+        "Credito Count",
+        "credito count valor"
+      ],
+      "related": [
+        "credit_date",
+        "credit_rate",
+        "credit_unit"
+      ]
+    },
+    {
+      "canonical": "credit_date",
+      "synonyms": [
+        "CD",
+        "credit date",
+        "Credit Date",
+        "credit date field",
+        "credit date value",
+        "creditdate",
+        "credito data",
+        "Credito Data",
+        "credito data valor"
+      ],
+      "related": [
+        "credit_end_date",
+        "credit_start_date",
+        "currency_amount"
+      ]
+    },
+    {
+      "canonical": "credit_end_date",
+      "synonyms": [
+        "CED",
+        "credit end date",
+        "Credit End Date",
+        "credit end date field",
+        "credit end date value",
+        "creditenddate",
+        "credito fim data",
+        "Credito Fim Data",
+        "credito fim data valor"
+      ],
+      "related": [
+        "credit_id",
+        "credit_status",
+        "currency_code"
+      ]
+    },
+    {
+      "canonical": "credit_id",
+      "synonyms": [
+        "CI",
+        "credit id",
+        "Credit Id",
+        "credit id field",
+        "credit id value",
+        "creditid",
+        "credito id",
+        "Credito Id",
+        "credito id valor"
+      ],
+      "related": [
+        "credit_name",
+        "credit_subtotal",
+        "currency_count"
+      ]
+    },
+    {
+      "canonical": "credit_name",
+      "synonyms": [
+        "CN",
+        "credit name",
+        "Credit Name",
+        "credit name field",
+        "credit name value",
+        "creditname",
+        "credito nome",
+        "Credito Nome",
+        "credito nome valor"
+      ],
+      "related": [
+        "credit_number",
+        "credit_total",
+        "currency_date"
+      ]
+    },
+    {
+      "canonical": "credit_number",
+      "synonyms": [
+        "CN",
+        "credit no",
+        "credit number",
+        "Credit Number",
+        "credit number field",
+        "credit number value",
+        "creditnumber",
+        "credito numero",
+        "Credito Numero",
+        "credito numero valor"
+      ],
+      "related": [
+        "credit_quantity",
+        "credit_type",
+        "currency_end_date"
+      ]
+    },
+    {
+      "canonical": "credit_quantity",
+      "synonyms": [
+        "CQ",
+        "credit qty",
+        "credit quantity",
+        "Credit Quantity",
+        "credit quantity field",
+        "credit quantity value",
+        "credito quantidade",
+        "Credito Quantidade",
+        "credito quantidade valor",
+        "creditquantity"
+      ],
+      "related": [
+        "credit_rate",
+        "credit_unit",
+        "currency_id"
+      ]
+    },
+    {
+      "canonical": "credit_rate",
+      "synonyms": [
+        "CR",
+        "credit rate",
+        "Credit Rate",
+        "credit rate field",
+        "credit rate value",
+        "credito taxa",
+        "Credito Taxa",
+        "credito taxa valor",
+        "creditrate"
+      ],
+      "related": [
+        "credit_start_date",
+        "currency_amount",
+        "currency_name"
+      ]
+    },
+    {
+      "canonical": "credit_start_date",
+      "synonyms": [
+        "credit start date",
+        "Credit Start Date",
+        "credit start date field",
+        "credit start date value",
+        "credito inicio data",
+        "Credito Inicio Data",
+        "credito inicio data valor",
+        "creditstartdate",
+        "CSD"
+      ],
+      "related": [
+        "credit_status",
+        "currency_code",
+        "currency_number"
+      ]
+    },
+    {
+      "canonical": "credit_status",
+      "synonyms": [
+        "credit status",
+        "Credit Status",
+        "credit status field",
+        "credit status value",
+        "credito status",
+        "Credito Status",
+        "credito status valor",
+        "creditstatus",
+        "CS"
+      ],
+      "related": [
+        "credit_subtotal",
+        "currency_count",
+        "currency_quantity"
+      ]
+    },
+    {
+      "canonical": "credit_subtotal",
+      "synonyms": [
+        "credit subtotal",
+        "Credit Subtotal",
+        "credit subtotal field",
+        "credit subtotal value",
+        "credito subtotal",
+        "Credito Subtotal",
+        "credito subtotal valor",
+        "creditsubtotal",
+        "CS"
+      ],
+      "related": [
+        "credit_total",
+        "currency_date",
+        "currency_rate"
+      ]
+    },
+    {
+      "canonical": "credit_total",
+      "synonyms": [
+        "credit total",
+        "Credit Total",
+        "credit total field",
+        "credit total value",
+        "credito total",
+        "Credito Total",
+        "credito total valor",
+        "credittotal",
+        "CT"
+      ],
+      "related": [
+        "credit_type",
+        "currency_end_date",
+        "currency_start_date"
+      ]
+    },
+    {
+      "canonical": "credit_type",
+      "synonyms": [
+        "credit type",
+        "Credit Type",
+        "credit type field",
+        "credit type value",
+        "credito tipo",
+        "Credito Tipo",
+        "credito tipo valor",
+        "credittype",
+        "CT"
+      ],
+      "related": [
+        "credit_unit",
+        "currency_id",
+        "currency_status"
+      ]
+    },
+    {
+      "canonical": "credit_unit",
+      "synonyms": [
+        "credit unit",
+        "Credit Unit",
+        "credit unit field",
+        "credit unit value",
+        "credito unidade",
+        "Credito Unidade",
+        "credito unidade valor",
+        "creditunit",
+        "CU"
+      ],
+      "related": [
+        "currency_amount",
+        "currency_name",
+        "currency_subtotal"
+      ]
+    },
+    {
+      "canonical": "currency_amount",
+      "synonyms": [
+        "CA",
+        "currency amount",
+        "Currency Amount",
+        "currency amount field",
+        "currency amount value",
+        "currency amt",
+        "currency montante",
+        "currency valor",
+        "Currency Valor",
+        "currency valor valor",
+        "currencyamount"
+      ],
+      "related": [
+        "currency_code",
+        "currency_number",
+        "currency_total"
+      ]
+    },
+    {
+      "canonical": "currency_code",
+      "synonyms": [
+        "CC",
+        "currency code",
+        "Currency Code",
+        "currency code field",
+        "currency code value",
+        "currency codigo",
+        "Currency Codigo",
+        "currency codigo valor",
+        "currencycode"
+      ],
+      "related": [
+        "currency_count",
+        "currency_quantity",
+        "currency_type"
+      ]
+    },
+    {
+      "canonical": "currency_count",
+      "synonyms": [
+        "CC",
+        "currency count",
+        "Currency Count",
+        "currency count field",
+        "currency count valor",
+        "currency count value",
+        "currencycount"
+      ],
+      "related": [
+        "currency_date",
+        "currency_rate",
+        "currency_unit"
+      ]
+    },
+    {
+      "canonical": "currency_date",
+      "synonyms": [
+        "CD",
+        "currency data",
+        "Currency Data",
+        "currency data valor",
+        "currency date",
+        "Currency Date",
+        "currency date field",
+        "currency date value",
+        "currencydate"
+      ],
+      "related": [
+        "currency_end_date",
+        "currency_start_date",
+        "deduction_amount"
+      ]
+    },
+    {
+      "canonical": "currency_end_date",
+      "synonyms": [
+        "CED",
+        "currency end date",
+        "Currency End Date",
+        "currency end date field",
+        "currency end date value",
+        "currency fim data",
+        "Currency Fim Data",
+        "currency fim data valor",
+        "currencyenddate"
+      ],
+      "related": [
+        "currency_id",
+        "currency_status",
+        "deduction_code"
+      ]
+    },
+    {
+      "canonical": "currency_id",
+      "synonyms": [
+        "CI",
+        "currency id",
+        "Currency Id",
+        "currency id field",
+        "currency id valor",
+        "currency id value",
+        "currencyid"
+      ],
+      "related": [
+        "currency_name",
+        "currency_subtotal",
+        "deduction_count"
+      ]
+    },
+    {
+      "canonical": "currency_name",
+      "synonyms": [
+        "CN",
+        "currency name",
+        "Currency Name",
+        "currency name field",
+        "currency name value",
+        "currency nome",
+        "Currency Nome",
+        "currency nome valor",
+        "currencyname"
+      ],
+      "related": [
+        "currency_number",
+        "currency_total",
+        "deduction_date"
+      ]
+    },
+    {
+      "canonical": "currency_number",
+      "synonyms": [
+        "CN",
+        "currency no",
+        "currency number",
+        "Currency Number",
+        "currency number field",
+        "currency number value",
+        "currency numero",
+        "Currency Numero",
+        "currency numero valor",
+        "currencynumber"
+      ],
+      "related": [
+        "adjusted_gross_income_amount",
+        "currency_quantity",
+        "currency_type"
+      ]
+    },
+    {
+      "canonical": "currency_quantity",
+      "synonyms": [
+        "CQ",
+        "currency qty",
+        "currency quantidade",
+        "Currency Quantidade",
+        "currency quantidade valor",
+        "currency quantity",
+        "Currency Quantity",
+        "currency quantity field",
+        "currency quantity value",
+        "currencyquantity"
+      ],
+      "related": [
+        "adjusted_gross_income_code",
+        "currency_rate",
+        "currency_unit"
+      ]
+    },
+    {
+      "canonical": "currency_rate",
+      "synonyms": [
+        "CR",
+        "currency rate",
+        "Currency Rate",
+        "currency rate field",
+        "currency rate value",
+        "currency taxa",
+        "Currency Taxa",
+        "currency taxa valor",
+        "currencyrate"
+      ],
+      "related": [
+        "adjusted_gross_income_count",
+        "currency_start_date",
+        "deduction_amount"
+      ]
+    },
+    {
+      "canonical": "currency_start_date",
+      "synonyms": [
+        "CSD",
+        "currency inicio data",
+        "Currency Inicio Data",
+        "currency inicio data valor",
+        "currency start date",
+        "Currency Start Date",
+        "currency start date field",
+        "currency start date value",
+        "currencystartdate"
+      ],
+      "related": [
+        "adjusted_gross_income_date",
+        "currency_status",
+        "deduction_code"
+      ]
+    },
+    {
+      "canonical": "currency_status",
+      "synonyms": [
+        "CS",
+        "currency status",
+        "Currency Status",
+        "currency status field",
+        "currency status valor",
+        "currency status value",
+        "currencystatus"
+      ],
+      "related": [
+        "adjusted_gross_income_end_date",
+        "currency_subtotal",
+        "deduction_count"
+      ]
+    },
+    {
+      "canonical": "currency_subtotal",
+      "synonyms": [
+        "CS",
+        "currency subtotal",
+        "Currency Subtotal",
+        "currency subtotal field",
+        "currency subtotal valor",
+        "currency subtotal value",
+        "currencysubtotal"
+      ],
+      "related": [
+        "adjusted_gross_income_id",
+        "currency_total",
+        "deduction_date"
+      ]
+    },
+    {
+      "canonical": "currency_total",
+      "synonyms": [
+        "CT",
+        "currency total",
+        "Currency Total",
+        "currency total field",
+        "currency total valor",
+        "currency total value",
+        "currencytotal"
+      ],
+      "related": [
+        "adjusted_gross_income_amount",
+        "adjusted_gross_income_name",
+        "currency_type"
+      ]
+    },
+    {
+      "canonical": "currency_type",
+      "synonyms": [
+        "CT",
+        "currency tipo",
+        "Currency Tipo",
+        "currency tipo valor",
+        "currency type",
+        "Currency Type",
+        "currency type field",
+        "currency type value",
+        "currencytype"
+      ],
+      "related": [
+        "adjusted_gross_income_code",
+        "adjusted_gross_income_number",
+        "currency_unit"
+      ]
+    },
+    {
+      "canonical": "currency_unit",
+      "synonyms": [
+        "CU",
+        "currency unidade",
+        "Currency Unidade",
+        "currency unidade valor",
+        "currency unit",
+        "Currency Unit",
+        "currency unit field",
+        "currency unit value",
+        "currencyunit"
+      ],
+      "related": [
+        "adjusted_gross_income_count",
+        "adjusted_gross_income_quantity",
+        "deduction_amount"
+      ]
+    },
+    {
+      "canonical": "deduction_amount",
+      "synonyms": [
+        "DA",
+        "deduction amount",
+        "Deduction Amount",
+        "deduction amount field",
+        "deduction amount value",
+        "deduction amt",
+        "deduction montante",
+        "deduction valor",
+        "Deduction Valor",
+        "deduction valor valor",
+        "deductionamount"
+      ],
+      "related": [
+        "adjusted_gross_income_date",
+        "adjusted_gross_income_rate",
+        "deduction_code"
+      ]
+    },
+    {
+      "canonical": "deduction_code",
+      "synonyms": [
+        "DC",
+        "deduction code",
+        "Deduction Code",
+        "deduction code field",
+        "deduction code value",
+        "deduction codigo",
+        "Deduction Codigo",
+        "deduction codigo valor",
+        "deductioncode"
+      ],
+      "related": [
+        "adjusted_gross_income_end_date",
+        "adjusted_gross_income_start_date",
+        "deduction_count"
+      ]
+    },
+    {
+      "canonical": "deduction_count",
+      "synonyms": [
+        "DC",
+        "deduction count",
+        "Deduction Count",
+        "deduction count field",
+        "deduction count valor",
+        "deduction count value",
+        "deductioncount"
+      ],
+      "related": [
+        "adjusted_gross_income_id",
+        "adjusted_gross_income_status",
+        "deduction_date"
+      ]
+    },
+    {
+      "canonical": "deduction_date",
+      "synonyms": [
+        "DD",
+        "deduction data",
+        "Deduction Data",
+        "deduction data valor",
+        "deduction date",
+        "Deduction Date",
+        "deduction date field",
+        "deduction date value",
+        "deductiondate"
+      ],
+      "related": [
+        "adjusted_gross_income_amount",
+        "adjusted_gross_income_name",
+        "adjusted_gross_income_subtotal"
+      ]
+    }
+  ]
+}

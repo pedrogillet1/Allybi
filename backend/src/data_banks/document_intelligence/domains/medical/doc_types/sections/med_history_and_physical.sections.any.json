@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "id": "medical_med_history_and_physical_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for History and Physical.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_history_and_physical"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "document id",
+        "encounter",
+        "record number",
+        "History and Physical Document Header",
+        "Historia e Exame Fisico Cabecalho do Documento"
+      ]
+    },
+    {
+      "id": "patient_identification",
+      "name": {
+        "en": "Patient Identification",
+        "pt": "Identificacao do Paciente"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Patient Identification",
+        "Identificacao do Paciente",
+        "patient name",
+        "mrn",
+        "dob",
+        "History and Physical Patient Identification",
+        "Historia e Exame Fisico Identificacao do Paciente"
+      ]
+    },
+    {
+      "id": "encounter_context",
+      "name": {
+        "en": "Encounter Context",
+        "pt": "Contexto do Atendimento"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Encounter Context",
+        "Contexto do Atendimento",
+        "admission",
+        "visit date",
+        "service line",
+        "History and Physical Encounter Context",
+        "Historia e Exame Fisico Contexto do Atendimento"
+      ]
+    },
+    {
+      "id": "chief_complaint_reason",
+      "name": {
+        "en": "Chief Complaint / Reason",
+        "pt": "Queixa Principal / Motivo"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Chief Complaint / Reason",
+        "Queixa Principal / Motivo",
+        "chief complaint",
+        "reason for visit",
+        "motivo",
+        "History and Physical Chief Complaint / Reason",
+        "Historia e Exame Fisico Queixa Principal / Motivo"
+      ]
+    },
+    {
+      "id": "history_background",
+      "name": {
+        "en": "History and Background",
+        "pt": "Historia e Contexto"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "History and Background",
+        "Historia e Contexto",
+        "history of present illness",
+        "past medical history",
+        "History and Physical History and Background",
+        "Historia e Exame Fisico Historia e Contexto"
+      ]
+    },
+    {
+      "id": "objective_findings",
+      "name": {
+        "en": "Objective Findings",
+        "pt": "Achados Objetivos"
+      },
+      "required": true,
+      "order": 6,
+      "headingAnchors": [
+        "Objective Findings",
+        "Achados Objetivos",
+        "exam",
+        "physical exam",
+        "objective",
+        "History and Physical Objective Findings",
+        "Historia e Exame Fisico Achados Objetivos"
+      ]
+    },
+    {
+      "id": "vitals_and_measurements",
+      "name": {
+        "en": "Vitals and Measurements",
+        "pt": "Sinais Vitais e Medidas"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Vitals and Measurements",
+        "Sinais Vitais e Medidas",
+        "bp",
+        "heart rate",
+        "temperature",
+        "spo2",
+        "History and Physical Vitals and Measurements",
+        "Historia e Exame Fisico Sinais Vitais e Medidas"
+      ]
+    },
+    {
+      "id": "labs_imaging",
+      "name": {
+        "en": "Laboratory and Imaging",
+        "pt": "Laboratorio e Imagem"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "Laboratory and Imaging",
+        "Laboratorio e Imagem",
+        "laboratory",
+        "impression",
+        "finding",
+        "History and Physical Laboratory and Imaging",
+        "Historia e Exame Fisico Laboratorio e Imagem"
+      ]
+    },
+    {
+      "id": "assessment_documented",
+      "name": {
+        "en": "Documented Assessment",
+        "pt": "Avaliacao Documentada"
+      },
+      "required": true,
+      "order": 9,
+      "headingAnchors": [
+        "Documented Assessment",
+        "Avaliacao Documentada",
+        "assessment",
+        "clinical impression",
+        "diagnosis documented",
+        "History and Physical Documented Assessment",
+        "Historia e Exame Fisico Avaliacao Documentada"
+      ]
+    },
+    {
+      "id": "plan_and_orders",
+      "name": {
+        "en": "Plan and Orders",
+        "pt": "Plano e Condutas"
+      },
+      "required": true,
+      "order": 10,
+      "headingAnchors": [
+        "Plan and Orders",
+        "Plano e Condutas",
+        "plan",
+        "orders",
+        "next steps",
+        "History and Physical Plan and Orders",
+        "Historia e Exame Fisico Plano e Condutas"
+      ]
+    },
+    {
+      "id": "medications_allergies",
+      "name": {
+        "en": "Medications and Allergies",
+        "pt": "Medicacoes e Alergias"
+      },
+      "required": true,
+      "order": 11,
+      "headingAnchors": [
+        "Medications and Allergies",
+        "Medicacoes e Alergias",
+        "medications",
+        "allergies",
+        "contraindication",
+        "History and Physical Medications and Allergies",
+        "Historia e Exame Fisico Medicacoes e Alergias"
+      ]
+    },
+    {
+      "id": "followup_and_disposition",
+      "name": {
+        "en": "Follow-up and Disposition",
+        "pt": "Acompanhamento e Desfecho"
+      },
+      "required": true,
+      "order": 12,
+      "headingAnchors": [
+        "Follow-up and Disposition",
+        "Acompanhamento e Desfecho",
+        "follow-up",
+        "discharge",
+        "referral",
+        "History and Physical Follow-up and Disposition",
+        "Historia e Exame Fisico Acompanhamento e Desfecho"
+      ]
+    },
+    {
+      "id": "patient_instructions",
+      "name": {
+        "en": "Patient Instructions",
+        "pt": "Instrucoes ao Paciente"
+      },
+      "required": false,
+      "order": 13,
+      "headingAnchors": [
+        "Patient Instructions",
+        "Instrucoes ao Paciente",
+        "instructions",
+        "warning signs",
+        "return precautions",
+        "History and Physical Patient Instructions",
+        "Historia e Exame Fisico Instrucoes ao Paciente"
+      ]
+    },
+    {
+      "id": "signoff_and_attestation",
+      "name": {
+        "en": "Signoff and Attestation",
+        "pt": "Assinatura e Atestacao"
+      },
+      "required": true,
+      "order": 14,
+      "headingAnchors": [
+        "Signoff and Attestation",
+        "Assinatura e Atestacao",
+        "signed by",
+        "clinician",
+        "timestamp",
+        "History and Physical Signoff and Attestation",
+        "Historia e Exame Fisico Assinatura e Atestacao"
+      ]
+    },
+    {
+      "id": "annexes_tables",
+      "name": {
+        "en": "Annexes and Tables",
+        "pt": "Anexos e Tabelas"
+      },
+      "required": false,
+      "order": 15,
+      "headingAnchors": [
+        "Annexes and Tables",
+        "Anexos e Tabelas",
+        "table",
+        "appendix",
+        "annex",
+        "History and Physical Annexes and Tables",
+        "Historia e Exame Fisico Anexos e Tabelas"
+      ]
+    }
+  ]
+}

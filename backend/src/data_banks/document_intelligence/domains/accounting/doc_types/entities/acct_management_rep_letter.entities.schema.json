@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_management_rep_letter",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for management representation letter documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_management_rep_letter"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "letterDate",
+      "type": "date",
+      "required": true,
+      "description": "Date of letter"
+    },
+    {
+      "id": "signingOfficer",
+      "type": "string",
+      "required": true,
+      "description": "Officer signing the representation letter"
+    },
+    {
+      "id": "reportingFramework",
+      "type": "string",
+      "required": false,
+      "description": "Referenced reporting framework"
+    },
+    {
+      "id": "representationCount",
+      "type": "number",
+      "required": false,
+      "description": "Count of explicit representations"
+    },
+    {
+      "id": "qualificationFlag",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether representations include qualifications"
+    }
+  ]
+}

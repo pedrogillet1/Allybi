@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "id": "di_finance_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer templates for finance domain — required legal and professional disclaimers.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance"
+  },
+  "domain": "finance",
+  "disclaimers": [
+    {
+      "id": "fin_disc_001_not_financial_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This analysis is based on the uploaded document(s) and does not constitute financial, investment, or tax advice. Consult a qualified professional before making decisions.",
+        "pt": "Esta análise é baseada no(s) documento(s) enviado(s) e não constitui consultoria financeira, de investimento ou tributária. Consulte um profissional qualificado antes de tomar decisões."
+      }
+    },
+    {
+      "id": "fin_disc_002_unaudited_warning",
+      "trigger": "source_is_unaudited",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Note: The source data is unaudited and may be subject to revision.",
+        "pt": "Nota: Os dados de origem não são auditados e podem estar sujeitos a revisão."
+      }
+    },
+    {
+      "id": "fin_disc_003_forward_looking",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "This includes forward-looking statements or projections that involve uncertainty and may differ materially from actual results.",
+        "pt": "Isto inclui declarações prospectivas ou projeções que envolvem incertezas e podem diferir materialmente dos resultados reais."
+      }
+    },
+    {
+      "id": "fin_disc_004_non_gaap",
+      "trigger": "contains_non_gaap_metric",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Non-GAAP metrics are presented as reported by the company and may not be comparable across entities.",
+        "pt": "Métricas não-GAAP são apresentadas conforme reportado pela empresa e podem não ser comparáveis entre entidades."
+      }
+    },
+    {
+      "id": "fin_disc_005_stale_data",
+      "trigger": "data_older_than_12_months",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Caution: Some figures may be outdated. Verify against the most recent filings.",
+        "pt": "Atenção: Alguns valores podem estar desatualizados. Verifique com os relatórios mais recentes."
+      }
+    }
+  ]
+}

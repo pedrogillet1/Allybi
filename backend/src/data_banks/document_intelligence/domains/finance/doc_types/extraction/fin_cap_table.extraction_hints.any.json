@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "di_finance_extraction_fin_cap_table",
+    "version": "2.0.0",
+    "description": "Extraction hints for fin_cap_table.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_cap_table"
+  },
+  "hints": [
+    {
+      "id": "hint_1_period",
+      "entity": "kpi_ownership_percent",
+      "anchors": [
+        "period",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_2_currency",
+      "entity": "kpi_fully_diluted_shares",
+      "anchors": [
+        "currency",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_3_unit",
+      "entity": "kpi_option_pool",
+      "anchors": [
+        "unit",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_4_total",
+      "entity": "kpi_share_class",
+      "anchors": [
+        "total",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_5_variance",
+      "entity": "variance",
+      "anchors": [
+        "variance",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_6_guidance",
+      "entity": "guidance",
+      "anchors": [
+        "guidance",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_7_assumption",
+      "entity": "assumption",
+      "anchors": [
+        "assumption",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_8_notes",
+      "entity": "notes",
+      "anchors": [
+        "notes",
+        "cap table",
+        "tabela de capitalizacao"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "id": "di_tax_abbreviations_en",
+    "version": "1.0.0",
+    "description": "English abbreviations for tax domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "language": "en"
+  },
+  "domain": "tax",
+  "abbreviations": [
+    {
+      "abbr": "AGI",
+      "expansion": "Adjusted Gross Income"
+    },
+    {
+      "abbr": "AMT",
+      "expansion": "Alternative Minimum Tax"
+    },
+    {
+      "abbr": "AN",
+      "expansion": "Assessment Notice"
+    },
+    {
+      "abbr": "APR",
+      "expansion": "Annual Percentage Rate"
+    },
+    {
+      "abbr": "CPA",
+      "expansion": "Certified Public Accountant"
+    },
+    {
+      "abbr": "CTC",
+      "expansion": "Child Tax Credit"
+    },
+    {
+      "abbr": "DPA",
+      "expansion": "Direct Payment Authorization"
+    },
+    {
+      "abbr": "EFT",
+      "expansion": "Electronic Funds Transfer"
+    },
+    {
+      "abbr": "EIN",
+      "expansion": "Employer Identification Number"
+    },
+    {
+      "abbr": "ETR",
+      "expansion": "Effective Tax Rate"
+    },
+    {
+      "abbr": "FICA",
+      "expansion": "Federal Insurance Contributions Act"
+    },
+    {
+      "abbr": "FSA",
+      "expansion": "Flexible Spending Account"
+    },
+    {
+      "abbr": "GAAP",
+      "expansion": "Generally Accepted Accounting Principles"
+    },
+    {
+      "abbr": "GST",
+      "expansion": "Goods and Services Tax"
+    },
+    {
+      "abbr": "HSA",
+      "expansion": "Health Savings Account"
+    },
+    {
+      "abbr": "IRS",
+      "expansion": "Internal Revenue Service"
+    },
+    {
+      "abbr": "ITIN",
+      "expansion": "Individual Taxpayer Identification Number"
+    },
+    {
+      "abbr": "MAGI",
+      "expansion": "Modified Adjusted Gross Income"
+    },
+    {
+      "abbr": "NOL",
+      "expansion": "Net Operating Loss"
+    },
+    {
+      "abbr": "PAN",
+      "expansion": "Permanent Account Number"
+    },
+    {
+      "abbr": "PAYE",
+      "expansion": "Pay As You Earn"
+    },
+    {
+      "abbr": "PIT",
+      "expansion": "Personal Income Tax"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Power of Attorney"
+    },
+    {
+      "abbr": "PTB",
+      "expansion": "Property Tax Bill"
+    },
+    {
+      "abbr": "RBA",
+      "expansion": "Return Balance Amount"
+    },
+    {
+      "abbr": "RMD",
+      "expansion": "Required Minimum Distribution"
+    },
+    {
+      "abbr": "SA",
+      "expansion": "Self Assessment"
+    },
+    {
+      "abbr": "SALT",
+      "expansion": "State and Local Tax"
+    },
+    {
+      "abbr": "SE",
+      "expansion": "Self Employment"
+    },
+    {
+      "abbr": "SUTA",
+      "expansion": "State Unemployment Tax Act"
+    },
+    {
+      "abbr": "TAN",
+      "expansion": "Tax Deduction Account Number"
+    },
+    {
+      "abbr": "TAR",
+      "expansion": "Tax Assessment Record"
+    },
+    {
+      "abbr": "TDS",
+      "expansion": "Tax Deducted at Source"
+    },
+    {
+      "abbr": "TIN",
+      "expansion": "Taxpayer Identification Number"
+    },
+    {
+      "abbr": "TPI",
+      "expansion": "Tax Payment Identifier"
+    },
+    {
+      "abbr": "VAT",
+      "expansion": "Value Added Tax"
+    },
+    {
+      "abbr": "W2",
+      "expansion": "Wage and Tax Statement"
+    },
+    {
+      "abbr": "W4",
+      "expansion": "Employee Withholding Certificate"
+    },
+    {
+      "abbr": "WHT",
+      "expansion": "Withholding Tax"
+    },
+    {
+      "abbr": "YTD",
+      "expansion": "Year to Date"
+    }
+  ]
+}

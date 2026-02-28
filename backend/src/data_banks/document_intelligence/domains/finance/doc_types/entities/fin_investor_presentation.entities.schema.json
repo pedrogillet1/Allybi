@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "id": "di_finance_entities_fin_investor_presentation",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for fin_investor_presentation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_investor_presentation"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "reporting_entity",
+      "type": "string",
+      "required": true,
+      "description": "Entity or BU covered"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": true,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": true,
+      "description": "Period end date"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "ISO currency code"
+    },
+    {
+      "id": "unit_scale",
+      "type": "string",
+      "required": true,
+      "description": "Unit scale (units, thousands, millions)"
+    },
+    {
+      "id": "revenue",
+      "type": "currency",
+      "required": false,
+      "description": "Revenue amount"
+    },
+    {
+      "id": "ebitda",
+      "type": "currency",
+      "required": false,
+      "description": "EBITDA amount"
+    },
+    {
+      "id": "net_income",
+      "type": "currency",
+      "required": false,
+      "description": "Net income amount"
+    },
+    {
+      "id": "cash_position",
+      "type": "currency",
+      "required": false,
+      "description": "Cash balance"
+    },
+    {
+      "id": "variance_percent",
+      "type": "number",
+      "required": false,
+      "description": "Variance percentage"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "kpi_growth_rate",
+      "type": "number",
+      "required": false,
+      "description": "KPI reference for growth_rate"
+    },
+    {
+      "id": "kpi_margin",
+      "type": "number",
+      "required": false,
+      "description": "KPI reference for margin"
+    },
+    {
+      "id": "kpi_guidance",
+      "type": "number",
+      "required": false,
+      "description": "KPI reference for guidance"
+    },
+    {
+      "id": "kpi_cash_burn",
+      "type": "number",
+      "required": false,
+      "description": "KPI reference for cash_burn"
+    }
+  ]
+}

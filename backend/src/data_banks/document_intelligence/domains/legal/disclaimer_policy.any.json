@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "id": "legal_disclaimer_policy",
+    "version": "2.0.0",
+    "description": "Legal-domain disclaimers and trigger policy.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "disclaimers": [
+    {
+      "id": "legal_disclaimer_001",
+      "trigger": "always",
+      "severity": "warning",
+      "position": "footer",
+      "text": {
+        "en": "This output is source-grounded document analysis and is not legal advice. Consult qualified counsel for legal decisions.",
+        "pt": "Esta saida e analise documental baseada em fonte e nao constitui aconselhamento juridico. Consulte assessoria juridica qualificada para decisoes legais."
+      }
+    },
+    {
+      "id": "legal_disclaimer_002",
+      "trigger": "ambiguity_detected",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Ambiguity detected in parties, dates, or governing law. Confirm source clauses before relying on this interpretation.",
+        "pt": "Ambiguidade detectada em partes, datas ou lei aplicavel. Confirme as clausulas-fonte antes de usar esta interpretacao."
+      }
+    },
+    {
+      "id": "legal_disclaimer_003",
+      "trigger": "policy_or_compliance_request",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Compliance mapping indicates potential gaps, not definitive legal conclusions.",
+        "pt": "O mapeamento de conformidade indica lacunas potenciais, nao conclusoes juridicas definitivas."
+      }
+    },
+    {
+      "id": "legal_disclaimer_004",
+      "trigger": "litigation_context",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Litigation timelines and risk statements are informational; validate with docket/court counsel workflows.",
+        "pt": "Prazos e riscos de litigio sao informativos; valide com fluxos do processo e equipe juridica."
+      }
+    }
+  ]
+}

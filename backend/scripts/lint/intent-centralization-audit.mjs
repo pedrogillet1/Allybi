@@ -65,8 +65,14 @@ const turnPolicyNoDynamicFallback =
   );
 const turnPolicyHasBankLoader =
   exists(turnPolicyFile) &&
-  hasPattern(turnPolicyFile, /getOptionalBank<RoutingBank>\("connectors_routing"\)/) &&
-  hasPattern(turnPolicyFile, /getOptionalBank<RoutingBank>\("email_routing"\)/);
+  hasPattern(
+    turnPolicyFile,
+    /(?:getOptionalBank<RoutingBank>|getRoutingBank)\("connectors_routing"\)/,
+  ) &&
+  hasPattern(
+    turnPolicyFile,
+    /(?:getOptionalBank<RoutingBank>|getRoutingBank)\("email_routing"\)/,
+  );
 const bankOnlyPolicyOk = turnPolicyNoDynamicFallback && turnPolicyHasBankLoader;
 
 const containerFile = "src/bootstrap/container.ts";

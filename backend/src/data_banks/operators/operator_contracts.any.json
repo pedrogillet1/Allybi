@@ -1047,6 +1047,27 @@
       }
     },
     {
+      "id": "CONNECTOR_SEARCH",
+      "family": "connectors",
+      "description": "Search connector-indexed provider content (Gmail/Outlook/Slack).",
+      "requires": {
+        "docIndexAvailable": false,
+        "retrieval": true,
+        "explicitDocRefAllowed": false
+      },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": [
+          "paragraph",
+          "bullets"
+        ],
+        "sources": {
+          "required": true
+        }
+      }
+    },
+    {
       "id": "CONNECTOR_STATUS",
       "family": "connectors",
       "description": "Show connector connection status and indexing metadata.",

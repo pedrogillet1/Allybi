@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "id": "di_accounting_extraction_acct_chart_of_accounts",
+    "version": "1.1.0",
+    "description": "Extraction hints for chart of accounts documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_chart_of_accounts"
+  },
+  "hints": [
+    {
+      "id": "hint_period",
+      "entity": "period",
+      "anchors": [
+        "period",
+        "reporting period",
+        "competencia",
+        "periodo"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_entity",
+      "entity": "entity",
+      "anchors": [
+        "entity",
+        "company",
+        "legal entity",
+        "empresa"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_currency",
+      "entity": "currency",
+      "anchors": [
+        "currency",
+        "moeda",
+        "curr",
+        "reporting currency"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_basis",
+      "entity": "basis",
+      "anchors": [
+        "basis",
+        "accounting basis",
+        "base contabil",
+        "regime"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_source_system",
+      "entity": "sourceSystem",
+      "anchors": [
+        "source system",
+        "erp",
+        "sistema origem",
+        "origem"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_effectiveDate",
+      "entity": "effectiveDate",
+      "anchors": [
+        "effective date",
+        "effective Date",
+        "effectiveDate"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_accountCount",
+      "entity": "accountCount",
+      "anchors": [
+        "account count",
+        "account Count",
+        "accountCount"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_activeAccountCount",
+      "entity": "activeAccountCount",
+      "anchors": [
+        "active account count",
+        "active Account Count",
+        "activeAccountCount"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_lowestAccountCode",
+      "entity": "lowestAccountCode",
+      "anchors": [
+        "lowest account code",
+        "lowest Account Code",
+        "lowestAccountCode"
+      ],
+      "location": "summary",
+      "extractionMethod": "table_row_match"
+    }
+  ]
+}

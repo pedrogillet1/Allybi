@@ -1,10 +1,8 @@
 import type { Request, Response } from "express";
 import { createHmac } from "crypto";
-import { promises as fs } from "fs";
-import path from "path";
 
+import ConnectorIdentityMapService from "../connectorIdentityMap.service";
 import { ConnectorsIngestionService } from "../connectorsIngestion.service";
-import { TokenVaultService } from "../tokenVault.service";
 
 function asString(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0
@@ -50,21 +48,13 @@ interface SlackEventPayload {
 }
 
 export class SlackEventsController {
-  private readonly vault: TokenVaultService;
-  private readonly tokenRoot: string;
+  private readonly identityMap: ConnectorIdentityMapService;
 
   constructor(
     private readonly ingestion: ConnectorsIngestionService = new ConnectorsIngestionService(),
-    vault: TokenVaultService = new TokenVaultService(),
-    tokenRoot: string = path.resolve(
-      process.cwd(),
-      "storage",
-      "connectors",
-      "tokens",
-    ),
+    identityMap: ConnectorIdentityMapService = new ConnectorIdentityMapService(),
   ) {
-    this.vault = vault;
-    this.tokenRoot = tokenRoot;
+    this.identityMap = identityMap;
   }
 
   handle = async (req: Request, res: Response): Promise<Response> => {
@@ -199,45 +189,15 @@ export class SlackEventsController {
     const bodyUserId = asString((req.body as Record<string, unknown>)?.userId);
     if (bodyUserId) return [bodyUserId];
 
-    // Slack doesn't know Koda user IDs. Try to map by team_id using the encrypted TokenVault.
     const teamId = asString(payload.team_id);
     if (teamId) {
-      const mapped = await this.findKodaUsersBySlackTeam(teamId);
+      const mapped = await this.identityMap
+        .findUserIdsByWorkspace("slack", teamId)
+        .catch(() => []);
       if (mapped.length) return mapped;
     }
 
     return [];
-  }
-
-  private async findKodaUsersBySlackTeam(teamId: string): Promise<string[]> {
-    await fs.mkdir(this.tokenRoot, { recursive: true });
-    let entries: string[] = [];
-    try {
-      entries = await fs.readdir(this.tokenRoot);
-    } catch {
-      return [];
-    }
-
-    const userIds = entries
-      .filter((name) => name.endsWith(".json"))
-      .map((name) => name.replace(/\.json$/, ""))
-      .filter(Boolean)
-      .slice(0, 2000); // safety cap
-
-    const matches: string[] = [];
-    for (const userId of userIds) {
-      const payload = await this.vault
-        .getDecryptedPayload(userId, "slack")
-        .catch(() => null);
-      const meta = payload?.metadata as any;
-      const tokenTeamId =
-        asString(meta?.teamId) || asString(meta?.team_id) || null;
-      if (tokenTeamId && tokenTeamId === teamId) {
-        matches.push(userId);
-      }
-    }
-
-    return matches;
   }
 }
 

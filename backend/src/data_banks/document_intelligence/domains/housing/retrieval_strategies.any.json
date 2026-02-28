@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "id": "di_housing_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for housing domain documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "maxBoostRules": 15,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "housing",
+  "sectionPriority": [
+    {
+      "section": "property_and_parties",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "term_and_schedule",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "charges_and_fees",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "tax_and_assessment",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "mortgage_breakdown",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "payment_history",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "inspection_findings",
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "hoa_breakdown",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "notices_and_disclosures",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "signatures",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "housing_boost_001_core_fields",
+      "priority": 95,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query asks key dates, amounts, status, or identifiers",
+      "boostSections": [
+        "property_and_parties",
+        "term_and_schedule",
+        "charges_and_fees"
+      ]
+    },
+    {
+      "id": "housing_boost_002_reconciliation",
+      "priority": 91,
+      "weight": 2.5,
+      "operators": [
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "condition": "query asks totals tie-out, variance, or mismatch reasons",
+      "boostSections": [
+        "charges_and_fees",
+        "tax_and_assessment",
+        "mortgage_breakdown",
+        "payment_history",
+        "inspection_findings"
+      ]
+    },
+    {
+      "id": "housing_boost_003_terms",
+      "priority": 86,
+      "weight": 2,
+      "operators": [
+        "summarize",
+        "advise",
+        "evaluate"
+      ],
+      "condition": "query asks policy, terms, or constraints",
+      "boostSections": [
+        "terms_and_notes",
+        "inspection_findings",
+        "hoa_breakdown"
+      ]
+    },
+    {
+      "id": "housing_boost_004_identity",
+      "priority": 84,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks who/which account/which traveler/student/employee/property",
+      "boostSections": [
+        "issuer_profile",
+        "recipient_profile",
+        "property_and_parties"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bstatement\\b",
+      "expansions": [
+        "document",
+        "record",
+        "extrato",
+        "relatorio"
+      ]
+    },
+    {
+      "trigger": "\\breceipt\\b",
+      "expansions": [
+        "proof of payment",
+        "comprovante",
+        "recibo"
+      ]
+    },
+    {
+      "trigger": "\\btotal\\b",
+      "expansions": [
+        "amount",
+        "sum",
+        "valor total"
+      ]
+    },
+    {
+      "trigger": "\\bdue\\b",
+      "expansions": [
+        "deadline",
+        "due date",
+        "vencimento"
+      ]
+    },
+    {
+      "trigger": "\\breference\\b",
+      "expansions": [
+        "id",
+        "number",
+        "codigo",
+        "referencia"
+      ]
+    },
+    {
+      "trigger": "\\bperiod\\b",
+      "expansions": [
+        "date range",
+        "cycle",
+        "competencia"
+      ]
+    }
+  ]
+}

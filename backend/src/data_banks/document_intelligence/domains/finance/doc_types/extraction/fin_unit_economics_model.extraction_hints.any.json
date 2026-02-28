@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "di_finance_extraction_fin_unit_economics_model",
+    "version": "2.0.0",
+    "description": "Extraction hints for fin_unit_economics_model.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_unit_economics_model"
+  },
+  "hints": [
+    {
+      "id": "hint_1_period",
+      "entity": "kpi_cac",
+      "anchors": [
+        "period",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_2_currency",
+      "entity": "kpi_ltv",
+      "anchors": [
+        "currency",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_3_unit",
+      "entity": "kpi_contribution_margin",
+      "anchors": [
+        "unit",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_4_total",
+      "entity": "kpi_payback_months",
+      "anchors": [
+        "total",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_5_variance",
+      "entity": "variance",
+      "anchors": [
+        "variance",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_6_guidance",
+      "entity": "guidance",
+      "anchors": [
+        "guidance",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_7_assumption",
+      "entity": "assumption",
+      "anchors": [
+        "assumption",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_8_notes",
+      "entity": "notes",
+      "anchors": [
+        "notes",
+        "unit economics model",
+        "modelo de unit economics"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    }
+  ]
+}

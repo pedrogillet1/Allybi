@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "medical_disclaimer_policy",
+    "version": "2.0.0",
+    "description": "Medical disclaimers requiring clinician follow-up for diagnosis/treatment decisions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical"
+  },
+  "domain": "medical",
+  "disclaimers": [
+    {
+      "id": "medical_disclaimer_001",
+      "trigger": "always",
+      "severity": "warning",
+      "position": "footer",
+      "text": {
+        "en": "This is document-grounded information, not medical diagnosis or treatment advice. Please see a licensed clinician for medical decisions.",
+        "pt": "Isto e informacao baseada no documento, nao diagnostico nem orientacao de tratamento. Procure um profissional de saude habilitado para decisoes medicas."
+      }
+    },
+    {
+      "id": "medical_disclaimer_002",
+      "trigger": "critical_value_detected",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "A potentially critical value is documented. Seek clinician review promptly.",
+        "pt": "Ha um valor potencialmente critico documentado. Procure avaliacao clinica rapidamente."
+      }
+    },
+    {
+      "id": "medical_disclaimer_003",
+      "trigger": "diagnosis_or_treatment_request",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "I can explain what the document states, but I cannot provide diagnosis or treatment advice. Please consult your clinician.",
+        "pt": "Posso explicar o que o documento informa, mas nao posso fornecer diagnostico ou orientacao de tratamento. Consulte seu medico."
+      }
+    }
+  ]
+}

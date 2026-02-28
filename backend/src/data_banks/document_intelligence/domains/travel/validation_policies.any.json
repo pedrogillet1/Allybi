@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "di_travel_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for travel extraction and reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel"
+  },
+  "domain": "travel",
+  "policies": [
+    {
+      "id": "travel_val_001_date_order",
+      "severity": "error",
+      "description": "Travel dates must follow chronological order (issue <= departure <= arrival <= return/check-out when present).",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "travel_date_sequence",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "travel_val_002_hotel_stay_order",
+      "severity": "error",
+      "description": "Hotel check-in date must be on/before check-out date.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "travel_hotel_date_order",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "travel_val_003_ticket_trip_match",
+      "severity": "warning",
+      "description": "Ticket/PNR references should align with itinerary segment references.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "travel_ticket_itinerary_consistency",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "travel_val_004_currency_consistency",
+      "severity": "warning",
+      "description": "Fare, tax, and total should share a consistent currency unless clearly multi-currency.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "currency_consistency",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "travel_val_005_scope_lock",
+      "severity": "error",
+      "description": "Do not merge legs or travelers across different attached travel documents.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "single_document_scope_lock",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "id": "di_education_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Document type catalog for education domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education"
+  },
+  "domain": "education",
+  "docTypes": [
+    {
+      "id": "edu_course_syllabus",
+      "name": {
+        "en": "Course Syllabus",
+        "pt": "Plano de Ensino"
+      },
+      "description": "Course Syllabus detection profile for education extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bcourse\\s+syllabus\\b",
+        "\\bedu\\s+course\\s+syllabus\\b",
+        "\\bplano\\s+de\\s+ensino\\b"
+      ],
+      "priority": 116
+    },
+    {
+      "id": "edu_diploma_certificate",
+      "name": {
+        "en": "Diploma Certificate",
+        "pt": "Certificado de Diploma"
+      },
+      "description": "Diploma Certificate detection profile for education extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bdiploma\\s+certificate\\b",
+        "\\bedu\\s+diploma\\s+certificate\\b",
+        "\\bcertificado\\s+de\\s+diploma\\b"
+      ],
+      "priority": 119
+    },
+    {
+      "id": "edu_enrollment_letter",
+      "name": {
+        "en": "Enrollment Letter",
+        "pt": "Carta de Matricula"
+      },
+      "description": "Enrollment Letter detection profile for education extraction and interpretation.",
+      "detectionPatterns": [
+        "\\benrollment\\s+letter\\b",
+        "\\bedu\\s+enrollment\\s+letter\\b",
+        "\\bcarta\\s+de\\s+matricula\\b"
+      ],
+      "priority": 118
+    },
+    {
+      "id": "edu_student_financial_aid_award",
+      "name": {
+        "en": "Financial Aid Award Letter",
+        "pt": "Carta de Bolsa e Auxilio"
+      },
+      "description": "Financial Aid Award Letter detection profile for education extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bfinancial\\s+aid\\s+award\\s+letter\\b",
+        "\\bedu\\s+student\\s+financial\\s+aid\\s+award\\b",
+        "\\bcarta\\s+de\\s+bolsa\\s+e\\s+auxilio\\b"
+      ],
+      "priority": 115
+    },
+    {
+      "id": "edu_student_schedule",
+      "name": {
+        "en": "Student Schedule",
+        "pt": "Grade Horaria do Estudante"
+      },
+      "description": "Student Schedule detection profile for education extraction and interpretation.",
+      "detectionPatterns": [
+        "\\bstudent\\s+schedule\\b",
+        "\\bedu\\s+student\\s+schedule\\b",
+        "\\bgrade\\s+horaria\\s+do\\s+estudante\\b"
+      ],
+      "priority": 117
+    },
+    {
+      "id": "edu_transcript",
+      "name": {
+        "en": "Transcript",
+        "pt": "Historico Escolar"
+      },
+      "description": "Transcript detection profile for education extraction and interpretation.",
+      "detectionPatterns": [
+        "\\btranscript\\b",
+        "\\bedu\\s+transcript\\b",
+        "\\bhistorico\\s+escolar\\b"
+      ],
+      "priority": 120
+    }
+  ]
+}

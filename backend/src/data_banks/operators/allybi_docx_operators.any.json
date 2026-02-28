@@ -218,6 +218,92 @@
       "undo_strategy": "restore_previous_toc",
       "schema": { "type": "object", "properties": {} }
     },
+    "DOCX_CREATE_TABLE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_table",
+      "schema": {
+        "type": "object",
+        "required": ["rows", "cols"],
+        "properties": {
+          "rows": { "type": "number", "minimum": 1 },
+          "cols": { "type": "number", "minimum": 1 },
+          "afterTargetId": { "type": "string" },
+          "styleName": { "type": "string" }
+        }
+      }
+    },
+    "DOCX_ADD_TABLE_ROW": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_table",
+      "schema": {
+        "type": "object",
+        "required": ["tableTargetId"],
+        "properties": {
+          "tableTargetId": { "type": "string" },
+          "position": { "type": "string", "enum": ["before", "after", "end"] },
+          "rowIndex": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "DOCX_DELETE_TABLE_ROW": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_table",
+      "schema": {
+        "type": "object",
+        "required": ["tableTargetId", "rowIndex"],
+        "properties": {
+          "tableTargetId": { "type": "string" },
+          "rowIndex": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "DOCX_SET_TABLE_CELL": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_table",
+      "schema": {
+        "type": "object",
+        "required": ["tableTargetId", "rowIndex", "colIndex", "afterText"],
+        "properties": {
+          "tableTargetId": { "type": "string" },
+          "rowIndex": { "type": "number", "minimum": 0 },
+          "colIndex": { "type": "number", "minimum": 0 },
+          "afterText": { "type": "string" }
+        }
+      }
+    },
+    "DOCX_PAGE_BREAK": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_scope",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "afterTargetId": { "type": "string" }
+        }
+      }
+    },
+    "DOCX_SECTION_BREAK": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_scope",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "afterTargetId": { "type": "string" },
+          "breakType": { "type": "string", "enum": ["next_page", "continuous"] }
+        }
+      }
+    },
     "DOCX_ENRICH_FROM_SOURCES": {
       "runtimeOperator": "EDIT_DOCX_BUNDLE",
       "preview_render_type": "text_diff",

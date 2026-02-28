@@ -1,0 +1,1396 @@
+{
+  "_meta": {
+    "id": "query_rewrites_medical",
+    "version": "1.0.0",
+    "description": "Domain query rewrite rules for medical retrieval with tight synonym expansion and phrase normalization.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "maxRewriteTerms": 12,
+    "avoidGenericExplosions": true
+  },
+  "domain": "medical",
+  "rules": [
+    {
+      "id": "medical_rewrite_001",
+      "priority": 90,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bwbc\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "white blood cell count",
+          "weight": 1
+        },
+        {
+          "value": "leucocitos",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_002",
+      "priority": 88,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bleucocitos\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "wbc",
+          "weight": 1
+        },
+        {
+          "value": "white blood cell count",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_003",
+      "priority": 87,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcbc\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "complete blood count",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_004",
+      "priority": 86,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmp\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "metabolic panel",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_005",
+      "priority": 84,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bglucose\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "blood sugar",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_006",
+      "priority": 83,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bhemoglobin\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "hgb",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_007",
+      "priority": 82,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bhematocrit\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "hct",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_008",
+      "priority": 80,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bplatelets\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "plt",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_009",
+      "priority": 79,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcreatinine\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "serum creatinine",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_010",
+      "priority": 78,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\begfr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "estimated glomerular filtration rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_011",
+      "priority": 76,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\btroponin\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "cardiac troponin",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_012",
+      "priority": 75,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bspo2\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "oxygen saturation",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_013",
+      "priority": 74,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bbp\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "blood pressure",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_014",
+      "priority": 72,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bhr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "heart rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_015",
+      "priority": 71,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "respiratory rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_016",
+      "priority": 70,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bfever\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "elevated temperature",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_017",
+      "priority": 68,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bhigh potassium\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "hyperkalemia",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_018",
+      "priority": 67,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\blow sodium\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "hyponatremia",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_019",
+      "priority": 66,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bhigh sodium\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "hypernatremia",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_020",
+      "priority": 64,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\banemia\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "low hemoglobin",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_021",
+      "priority": 63,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\binfection marker\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "inflammatory marker",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_022",
+      "priority": 62,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcrp\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "c reactive protein",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_023",
+      "priority": 60,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\besr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "erythrocyte sedimentation rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_024",
+      "priority": 59,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bnormal range\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "reference range",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_025",
+      "priority": 58,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcritical range\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "critical value threshold",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_026",
+      "priority": 56,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdischarge summary\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "hospital discharge note",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_027",
+      "priority": 55,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmed list\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "medication list",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_028",
+      "priority": 54,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdrug interactions\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "medication interaction check",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_029",
+      "priority": 52,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bfollow up\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "followup recommendations",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_030",
+      "priority": 51,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bred flag\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "warning signs",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_031",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bconsult doctor\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "consult professional",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_032",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\ber\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "emergency department",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_033",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bsymptom progression\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "symptom trend",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_034",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bimaging impression\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "radiology impression",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_035",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\ballergy\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "allergic reaction history",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "medical_rewrite_036",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "medical"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdiagnosis code\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "icd code",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "medical"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    }
+  ]
+}

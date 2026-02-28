@@ -1,0 +1,87 @@
+{
+  "_meta": {
+    "id": "di_tax_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for tax domain analysis and extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax"
+  },
+  "domain": "tax",
+  "scaffolds": [
+    {
+      "id": "tax_scaffold_001_return_summary",
+      "name": "Tax Return Summary",
+      "operators": [
+        "summarize",
+        "extract",
+        "validate"
+      ],
+      "steps": [
+        "Identify return type, tax period, and issuing authority",
+        "Extract taxpayer identifiers with redaction safeguards",
+        "Extract taxable income, deductions, credits, and net liability",
+        "Check filing status and receipt/protocol references",
+        "Cite exact section and table for each critical claim",
+        "Mark missing critical fields as unverified without inference"
+      ]
+    },
+    {
+      "id": "tax_scaffold_002_payment_reconciliation",
+      "name": "Tax Payment Reconciliation",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "steps": [
+        "Identify amount assessed versus amount paid",
+        "Extract payment reference, channel, and settlement date",
+        "Compute residual balance, penalty, and interest where documented",
+        "Validate currency and period alignment",
+        "Flag mismatch between notice and payment slip",
+        "Report unresolved gaps with citations"
+      ]
+    },
+    {
+      "id": "tax_scaffold_003_assessment_notice_review",
+      "name": "Assessment Notice Review",
+      "operators": [
+        "evaluate",
+        "summarize",
+        "locate"
+      ],
+      "steps": [
+        "Locate notice id, issue date, and legal basis",
+        "Extract assessed base, rate, penalties, and due date",
+        "Identify objection window and procedural instructions",
+        "Cross-check referenced annexes and footnotes",
+        "Surface ambiguities and missing fields",
+        "Present document-grounded next actions without legal/tax advice"
+      ]
+    },
+    {
+      "id": "tax_scaffold_004_property_tax_bill_analysis",
+      "name": "Property Tax Bill Analysis",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Extract property identifier, assessed value, and jurisdiction",
+        "Extract principal tax, fees, penalties, and installment options",
+        "Compare current versus prior period values when available",
+        "Verify payment instructions and due dates",
+        "Highlight disputed or missing valuation components",
+        "Cite annex references where valuation methodology is defined"
+      ]
+    }
+  ]
+}

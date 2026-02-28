@@ -1,0 +1,213 @@
+{
+  "_meta": {
+    "id": "document_intelligence_schema_registry",
+    "version": "1.1.0",
+    "description": "Schema registry for document intelligence banks. Provides family-level and explicit bank-to-schema mappings for strict loader validation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "enforceAtBoot": true,
+    "failOnMissingAssignmentsInStrict": true,
+    "failOnSchemaMismatchInStrict": true
+  },
+  "schemaFamilies": [
+    {
+      "id": "doc_domain_semantics",
+      "pathPrefix": "semantics/domain/",
+      "schemaId": "bank_schema"
+    },
+    {
+      "id": "doc_entity_semantics",
+      "pathPrefix": "semantics/entities/",
+      "schemaId": "bank_schema"
+    },
+    {
+      "id": "doc_identity_aliases",
+      "pathPrefix": "normalizers/doc_aliases/",
+      "schemaId": "doc_identity_schema"
+    },
+    {
+      "id": "doc_identity_taxonomy",
+      "pathPrefix": "semantics/taxonomy/",
+      "schemaId": "doc_identity_schema"
+    },
+    {
+      "id": "doc_structure_semantics",
+      "pathPrefix": "semantics/structure/",
+      "schemaId": "bank_schema"
+    },
+    {
+      "id": "docint_manifest_family",
+      "pathPrefix": "document_intelligence/manifest/",
+      "schemaId": "document_intelligence_manifest_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/legal/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/legal/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/legal/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/legal/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/legal/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_domain_packs",
+      "pathPrefix": "document_intelligence/domains/legal/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "marketing_probes",
+      "pathPrefix": "probes/marketing/",
+      "schemaId": "marketing_probe_schema"
+    },
+    {
+      "id": "medical_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/medical/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/medical/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/medical/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/medical/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/medical/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_domain_packs",
+      "pathPrefix": "document_intelligence/domains/medical/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "operator_playbooks",
+      "pathPrefix": "operators/playbooks/",
+      "schemaId": "operator_playbook_schema"
+    },
+    {
+      "id": "quality_docint",
+      "pathPrefix": "quality/document_intelligence/",
+      "schemaId": "quality_document_intelligence_schema"
+    },
+    {
+      "id": "reasoning_policies",
+      "pathPrefix": "policies/reasoning/",
+      "schemaId": "reasoning_policy_schema"
+    },
+    {
+      "id": "retrieval_boost_rules",
+      "pathPrefix": "retrieval/boost_rules.",
+      "schemaId": "retrieval_document_intelligence_schema"
+    },
+    {
+      "id": "retrieval_query_rewrites",
+      "pathPrefix": "retrieval/query_rewrites.",
+      "schemaId": "query_rewrites_schema"
+    },
+    {
+      "id": "retrieval_section_priority",
+      "pathPrefix": "retrieval/section_priority.",
+      "schemaId": "retrieval_document_intelligence_schema"
+    }
+  ],
+  "schemaAssignments": [
+    {
+      "bankId": "document_intelligence_bank_map",
+      "schemaId": "bank_schema"
+    },
+    {
+      "bankId": "document_intelligence_dependency_graph",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "document_intelligence_manifest_schema",
+      "schemaId": "bank_schema"
+    },
+    {
+      "bankId": "document_intelligence_orphan_allowlist",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "document_intelligence_runtime_wiring_gates",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "document_intelligence_schema_registry",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "document_intelligence_usage_manifest",
+      "schemaId": "document_intelligence_manifest_schema"
+    }
+  ]
+}

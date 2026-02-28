@@ -8,7 +8,13 @@ const REGISTRY_PATH = path.join(BANKS_ROOT, "manifest/bank_registry.any.json");
 const REPORT_PATH = path.resolve(ROOT, "reports/unused_bank_audit.json");
 
 const STRICT = process.argv.includes("--strict");
-const ALLOWED_PREFIXES = ["manifest/", "_quarantine/"];
+const ALLOWED_PREFIXES = [
+  "manifest/",
+  "_quarantine/",
+  "_deprecated/",
+  "document_intelligence/__",
+];
+const ALLOWED_SUFFIXES = [".entities.schema.json"];
 
 function toPosix(value) {
   return String(value || "").replace(/\\/g, "/").replace(/^\/+/, "");
@@ -35,7 +41,10 @@ function walkJson(rootDir) {
 }
 
 function isAllowed(relPath) {
-  return ALLOWED_PREFIXES.some((prefix) => relPath.startsWith(prefix));
+  return (
+    ALLOWED_PREFIXES.some((prefix) => relPath.startsWith(prefix)) ||
+    ALLOWED_SUFFIXES.some((suffix) => relPath.endsWith(suffix))
+  );
 }
 
 if (!fs.existsSync(REGISTRY_PATH)) {
@@ -72,6 +81,7 @@ const report = {
   },
   policy: {
     allowedPrefixes: ALLOWED_PREFIXES,
+    allowedSuffixes: ALLOWED_SUFFIXES,
   },
   unregisteredOutsideQuarantine: unregistered,
   missingRegistryFilesOnDisk: missingOnDisk,

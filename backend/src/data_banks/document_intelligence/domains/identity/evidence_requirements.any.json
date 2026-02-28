@@ -1,0 +1,198 @@
+{
+  "_meta": {
+    "id": "di_identity_evidence_requirements",
+    "version": "2.0.0",
+    "description": "Identity evidence requirements enforcing citation quality and no-missing-field inference boundaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "identity",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "government_issued_identity_document",
+      "label": {
+        "en": "Government-issued identity document",
+        "pt": "Documento oficial de identidade"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "certified_registry_record",
+      "label": {
+        "en": "Certified registry record",
+        "pt": "Registro certificado"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "utility_or_bank_address_proof",
+      "label": {
+        "en": "Utility/bank address proof",
+        "pt": "Comprovante de endereco utilitario/bancario"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 4,
+      "type": "supporting_attachment",
+      "label": {
+        "en": "Supporting attachment",
+        "pt": "Anexo de suporte"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "low_quality_scan",
+      "label": {
+        "en": "Low-quality scan",
+        "pt": "Scan de baixa qualidade"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "id_ev_identity_fields_require_visual_anchor",
+      "description": "Identity fields require visual anchor and field label proximity.",
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "requiredDimensions": [
+        "field_label",
+        "field_value",
+        "source_location",
+        "page"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "id_ev_document_number_requires_authority_context",
+      "description": "Document number claims require issuing authority and document type context.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "document_number",
+        "issuing_authority",
+        "doc_type",
+        "source_location"
+      ],
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "id_ev_validity_requires_issue_expiry_pair",
+      "description": "Validity claims require both issue and expiry date when present.",
+      "applies": [
+        "extract",
+        "monitor",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "issue_date",
+        "expiry_date",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "id_ev_no_inference_missing_critical_fields",
+      "description": "Forbid inference of missing critical fields such as name, document number, issuer, or expiry.",
+      "applies": [
+        "extract",
+        "summarize",
+        "evaluate",
+        "advise",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "critical_field_presence",
+        "source_location"
+      ],
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "id_ev_address_proof_requires_address_and_date",
+      "description": "Proof-of-address claims require full address and statement/issue date.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "address",
+        "issue_date",
+        "issuer_name",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "id_ev_annex_reference_required",
+      "description": "Values extracted from annexes/attachments need annex citation.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "annex_id",
+        "page",
+        "source_location"
+      ],
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "id_req_primary_identity",
+      "field": "primary identity fields",
+      "minSources": 1,
+      "sourceTypes": [
+        "government_issued_identity_document",
+        "certified_registry_record"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "id_req_document_validity",
+      "field": "document validity",
+      "minSources": 1,
+      "sourceTypes": [
+        "government_issued_identity_document",
+        "certified_registry_record"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "id_req_address_fields",
+      "field": "address proof fields",
+      "minSources": 1,
+      "sourceTypes": [
+        "utility_or_bank_address_proof"
+      ],
+      "failureBehavior": "mark_as_unverified"
+    },
+    {
+      "id": "id_req_business_registration",
+      "field": "business registration fields",
+      "minSources": 1,
+      "sourceTypes": [
+        "certified_registry_record"
+      ],
+      "failureBehavior": "ask_clarifying_question"
+    }
+  ]
+}

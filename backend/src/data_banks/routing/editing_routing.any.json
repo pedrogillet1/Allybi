@@ -1,0 +1,232 @@
+{
+  "_meta": {
+    "id": "editing_routing",
+    "version": "1.0.0",
+    "description": "Data-driven guardrails and tiebreaker rules for editing operator routing. Each rule has a unique id, match conditions, and an enforcement action. Consumed by operatorPlanner (pre-filters) and operatorValidator (post-guards).",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "failOpen": false
+  },
+  "guardrails": [
+    {
+      "id": "selection_first_precedence",
+      "phase": "pre",
+      "description": "In editor mode, a frozen/live selection takes precedence over structural resolvers for targeting the edit scope.",
+      "condition": {
+        "hasSelection": true,
+        "scopeSource_not": "explicit_anchor"
+      },
+      "action": "prefer_selection_scope",
+      "examples": [
+        {
+          "input": "make this bold",
+          "selection": "para_3",
+          "expected": "scope targets para_3 via selection, not structural_resolver"
+        },
+        {
+          "input": "change font to Arial",
+          "selection": "A1:A10",
+          "expected": "scope targets A1:A10 via selection"
+        }
+      ]
+    },
+    {
+      "id": "no_bulk_override_selection",
+      "phase": "pre",
+      "description": "Heading/bulk resolvers must not override an explicit selection unless the user says 'entire document', 'todo o documento', or equivalent whole-doc phrase.",
+      "condition": {
+        "hasSelection": true,
+        "resolvedScopeKind_in": ["document", "all_headings", "all_paragraphs"],
+        "userSaysEntireDocument": false
+      },
+      "action": "block",
+      "blockCode": "ROUTING_BULK_OVERRIDE_BLOCKED",
+      "blockMessage": {
+        "en": "You have an active selection. To apply this change to the entire document, please say 'entire document'.",
+        "pt": "Você tem uma seleção ativa. Para aplicar ao documento inteiro, diga 'documento inteiro'."
+      },
+      "examples": [
+        {
+          "input": "change all headings to Arial",
+          "selection": "para_5",
+          "expected": "blocked — selection active but user didn't say 'entire document'"
+        },
+        {
+          "input": "change all headings in the entire document to Arial",
+          "selection": "para_5",
+          "expected": "allowed — user explicitly said 'entire document'"
+        }
+      ]
+    },
+    {
+      "id": "formatting_never_rewrite",
+      "phase": "post",
+      "description": "Formatting intents (bold, italic, font, color, size, alignment) must never be routed to rewrite operators (REWRITE_PARAGRAPH, REWRITE_SECTION, REPLACE_SPAN). They must go to SET_RUN_STYLE / FORMAT_RANGE.",
+      "condition": {
+        "isFormattingIntent": true,
+        "operatorMatches": ["REWRITE", "REPLACE_SPAN"]
+      },
+      "action": "block",
+      "blockCode": "ROUTING_FORMATTING_REWRITE_BLOCKED",
+      "blockMessage": {
+        "en": "Formatting changes cannot be processed by a text rewrite operator.",
+        "pt": "Alterações de formatação não podem ser processadas por um operador de reescrita."
+      },
+      "examples": [
+        {
+          "input": "make this bold",
+          "operator": "DOCX_REWRITE_PARAGRAPH",
+          "expected": "blocked — formatting intent routed to rewrite"
+        }
+      ]
+    },
+    {
+      "id": "structural_never_paragraph_rewrite",
+      "phase": "post",
+      "description": "Structural intents (insert, delete, merge, split, list operations, TOC) must never fall back to DOCX_REWRITE_PARAGRAPH or DOCX_REPLACE_SPAN.",
+      "condition": {
+        "operatorClassIn": ["doc_feature", "list_numbering", "table", "xlsx_structural"],
+        "operatorMatches": ["REWRITE_PARAGRAPH", "REPLACE_SPAN"]
+      },
+      "action": "block",
+      "blockCode": "ROUTING_STRUCTURAL_REWRITE_BLOCKED",
+      "blockMessage": {
+        "en": "Structural operations cannot fall back to paragraph rewrite.",
+        "pt": "Operações estruturais não podem usar reescrita de parágrafo como fallback."
+      },
+      "examples": [
+        {
+          "input": "add a table of contents",
+          "operator": "DOCX_REWRITE_PARAGRAPH",
+          "expected": "blocked — structural intent on rewrite fallback"
+        }
+      ]
+    },
+    {
+      "id": "rewrite_translate_conflict",
+      "phase": "post",
+      "description": "When multi-intent produces both a rewrite and a translate on the same target, require user confirmation before proceeding.",
+      "condition": {
+        "multiIntent": true,
+        "sameTarget": true,
+        "operatorPairIncludes": ["REWRITE", "TRANSLATE"]
+      },
+      "action": "require_confirmation",
+      "confirmCode": "ROUTING_REWRITE_TRANSLATE_CONFLICT",
+      "confirmMessage": {
+        "en": "You asked to both rewrite and translate the same content. Should I proceed with both?",
+        "pt": "Você pediu para reescrever e traduzir o mesmo conteúdo. Devo prosseguir com ambos?"
+      },
+      "examples": [
+        {
+          "input": "rewrite this paragraph and translate to English",
+          "target": "para_3",
+          "expected": "confirmation required"
+        }
+      ]
+    },
+    {
+      "id": "destructive_ops_confirm",
+      "phase": "post",
+      "description": "Destructive operations always require explicit user confirmation before execution.",
+      "condition": {
+        "operatorMatchesAny": [
+          "DELETE_ROW", "DELETE_COLUMN", "DELETE_PARAGRAPH", "DELETE_SECTION",
+          "DELETE_SHEET", "DELETE_TABLE", "DELETE_COMMENT", "REMOVE_COMMENT",
+          "CLEAR_RANGE", "DELETE_RANGE", "REMOVE_ALL_COMMENTS"
+        ]
+      },
+      "action": "require_confirmation",
+      "confirmCode": "ROUTING_DESTRUCTIVE_CONFIRM",
+      "confirmMessage": {
+        "en": "This is a destructive operation that cannot be undone. Are you sure?",
+        "pt": "Esta é uma operação destrutiva que não pode ser desfeita. Tem certeza?"
+      },
+      "examples": [
+        {
+          "input": "delete this row",
+          "operator": "XLSX_DELETE_ROW",
+          "expected": "confirmation required"
+        },
+        {
+          "input": "remove all comments",
+          "operator": "DOCX_REMOVE_ALL_COMMENTS",
+          "expected": "confirmation required"
+        }
+      ]
+    },
+    {
+      "id": "noop_prevention",
+      "phase": "post",
+      "description": "If the proposed edit would result in no change (changed=false), return NOOP with a specific reason instead of silently succeeding.",
+      "condition": {
+        "resultChanged": false
+      },
+      "action": "noop",
+      "noopCode": "ROUTING_NOOP_NO_CHANGE",
+      "noopMessage": {
+        "en": "No changes were needed — the content already matches your request.",
+        "pt": "Nenhuma alteração necessária — o conteúdo já corresponde à sua solicitação."
+      },
+      "examples": [
+        {
+          "input": "make this bold",
+          "currentState": "already bold",
+          "expected": "NOOP with reason 'already_matches'"
+        }
+      ]
+    },
+    {
+      "id": "engine_capability_gate",
+      "phase": "pre",
+      "description": "Operator is only allowed if the document engine supports it. Chart insert requires sheets engine; DOCX structural ops require DOCX engine.",
+      "condition": {
+        "operatorRequiresCapability": true
+      },
+      "action": "block",
+      "blockCode": "ROUTING_ENGINE_UNSUPPORTED",
+      "blockMessage": {
+        "en": "This operation is not supported by the current document engine.",
+        "pt": "Esta operação não é suportada pelo mecanismo de documento atual."
+      },
+      "capabilityMap": {
+        "XLSX_CHART_CREATE": { "requiresDomain": "sheets", "requiresEngine": "xlsx" },
+        "XLSX_CHART_UPDATE": { "requiresDomain": "sheets", "requiresEngine": "xlsx" },
+        "XLSX_PIVOT_CREATE": { "requiresDomain": "sheets", "requiresEngine": "xlsx" },
+        "DOCX_UPDATE_TOC": { "requiresDomain": "docx", "requiresEngine": "docx" },
+        "DOCX_INSERT_COVER_PAGE": { "requiresDomain": "docx", "requiresEngine": "docx" },
+        "DOCX_ADD_WATERMARK": { "requiresDomain": "docx", "requiresEngine": "docx" },
+        "DOCX_INSERT_HEADER": { "requiresDomain": "docx", "requiresEngine": "docx" },
+        "DOCX_INSERT_FOOTER": { "requiresDomain": "docx", "requiresEngine": "docx" }
+      },
+      "examples": [
+        {
+          "input": "create a bar chart",
+          "domain": "docx",
+          "expected": "blocked — chart creation requires sheets engine"
+        }
+      ]
+    }
+  ],
+  "tiebreakers": [
+    {
+      "id": "explicit_selection_over_structural",
+      "description": "When both selection and structural resolver propose a target, prefer the explicit selection.",
+      "weight": 100
+    },
+    {
+      "id": "formatting_class_affinity",
+      "description": "When intent is formatting, prefer operators in the formatting class over rewrite class.",
+      "weight": 95
+    },
+    {
+      "id": "domain_specificity",
+      "description": "Prefer domain-specific operators over generic ones (DOCX_SET_RUN_STYLE over generic EDIT_PARAGRAPH).",
+      "weight": 90
+    }
+  ]
+}

@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -17,14 +17,348 @@
       "id": "ASSUME_001",
       "whenAllowed": [
         "low_risk_context",
-        "explicit_user_permission"
+        "missing_timezone"
       ],
       "whenForbidden": [
-        "legal_high_risk",
-        "medical_high_risk",
-        "financial_commitment"
+        "legal_deadline",
+        "market_close_sensitive",
+        "medical_dosing"
       ],
-      "labelFormat": "Assumption: {text}"
+      "labelFormat": "Assumption/Pressuposto [timezone_default]: {text}"
+    },
+    {
+      "id": "ASSUME_002",
+      "whenAllowed": [
+        "low_risk_context",
+        "missing_date_format"
+      ],
+      "whenForbidden": [
+        "court_deadline",
+        "medication_schedule",
+        "regulatory_filing"
+      ],
+      "labelFormat": "Assumption/Pressuposto [date_format_default]: {text}"
+    },
+    {
+      "id": "ASSUME_003",
+      "whenAllowed": [
+        "explicit_region_context",
+        "single_currency_workspace"
+      ],
+      "whenForbidden": [
+        "cross_border_settlement",
+        "hedging_decision",
+        "investment_order"
+      ],
+      "labelFormat": "Assumption/Pressuposto [currency_default]: {text}"
+    },
+    {
+      "id": "ASSUME_004",
+      "whenAllowed": [
+        "single_unit_document",
+        "technical_low_risk"
+      ],
+      "whenForbidden": [
+        "dosage_calculation",
+        "engineering_safety_limit",
+        "financial_pricing_commitment"
+      ],
+      "labelFormat": "Assumption/Pressuposto [unit_default]: {text}"
+    },
+    {
+      "id": "ASSUME_005",
+      "whenAllowed": [
+        "conversation_history_consistent",
+        "user_locale_detected"
+      ],
+      "whenForbidden": [
+        "binding_contract_clause",
+        "compliance_notice",
+        "informed_consent"
+      ],
+      "labelFormat": "Assumption/Pressuposto [language_default]: {text}"
+    },
+    {
+      "id": "ASSUME_006",
+      "whenAllowed": [
+        "recent_reference_in_context",
+        "single_clear_entity"
+      ],
+      "whenForbidden": [
+        "multi_issuer_financials",
+        "multi_party_contract",
+        "multi_patient_record"
+      ],
+      "labelFormat": "Assumption/Pressuposto [pronoun_resolution]: {text}"
+    },
+    {
+      "id": "ASSUME_007",
+      "whenAllowed": [
+        "document_contains_definition",
+        "domain_standard_abbreviation"
+      ],
+      "whenForbidden": [
+        "ambiguous_legal_abbreviation",
+        "ambiguous_medical_abbreviation",
+        "ticker_symbol_conflict"
+      ],
+      "labelFormat": "Assumption/Pressuposto [abbreviation_expansion]: {text}"
+    },
+    {
+      "id": "ASSUME_008",
+      "whenAllowed": [
+        "high_token_overlap",
+        "repeatable_tabular_pattern"
+      ],
+      "whenForbidden": [
+        "clinical_lab_unit_mismatch",
+        "regulatory_tax_table",
+        "signed_legal_schedule"
+      ],
+      "labelFormat": "Assumption/Pressuposto [table_header_guess]: {text}"
+    },
+    {
+      "id": "ASSUME_009",
+      "whenAllowed": [
+        "prior_turn_mentions_period",
+        "single_period_candidates"
+      ],
+      "whenForbidden": [
+        "audit_opinion",
+        "earnings_release",
+        "prescription_validity"
+      ],
+      "labelFormat": "Assumption/Pressuposto [missing_period_fill]: {text}"
+    },
+    {
+      "id": "ASSUME_010",
+      "whenAllowed": [
+        "known_alias_dictionary",
+        "single_counterparty_match"
+      ],
+      "whenForbidden": [
+        "identity_verification",
+        "litigation_party_dispute",
+        "sanctions_screening"
+      ],
+      "labelFormat": "Assumption/Pressuposto [entity_alias_mapping]: {text}"
+    },
+    {
+      "id": "ASSUME_011",
+      "whenAllowed": [
+        "document_jurisdiction_hint",
+        "ip_or_profile_signal"
+      ],
+      "whenForbidden": [
+        "clinical_protocol_decision",
+        "employment_law_advice",
+        "tax_filing_advice"
+      ],
+      "labelFormat": "Assumption/Pressuposto [country_context]: {text}"
+    },
+    {
+      "id": "ASSUME_012",
+      "whenAllowed": [
+        "clear_timestamp_order",
+        "user_asks_latest"
+      ],
+      "whenForbidden": [
+        "board_approved_only",
+        "dosage_plan_revision",
+        "legal_redline_review"
+      ],
+      "labelFormat": "Assumption/Pressuposto [version_pick_latest]: {text}"
+    },
+    {
+      "id": "ASSUME_013",
+      "whenAllowed": [
+        "high_confidence_typo",
+        "no_semantic_change"
+      ],
+      "whenForbidden": [
+        "drug_name",
+        "party_name",
+        "security_ticker"
+      ],
+      "labelFormat": "Assumption/Pressuposto [minor_typo_correction]: {text}"
+    },
+    {
+      "id": "ASSUME_014",
+      "whenAllowed": [
+        "no_explicit_horizon",
+        "planning_request"
+      ],
+      "whenForbidden": [
+        "cash_runway_commitment",
+        "contract_term",
+        "treatment_timeline"
+      ],
+      "labelFormat": "Assumption/Pressuposto [time_horizon_default]: {text}"
+    },
+    {
+      "id": "ASSUME_015",
+      "whenAllowed": [
+        "docs_attached",
+        "scope_unspecified"
+      ],
+      "whenForbidden": [
+        "missing_required_evidence",
+        "user_requests_external_law",
+        "user_requests_market_price"
+      ],
+      "labelFormat": "Assumption/Pressuposto [scope_default_local_docs]: {text}"
+    },
+    {
+      "id": "ASSUME_016",
+      "whenAllowed": [
+        "display_only_summary",
+        "non_binding_calculation"
+      ],
+      "whenForbidden": [
+        "clinical_dose",
+        "covenant_ratio_test",
+        "invoice_total"
+      ],
+      "labelFormat": "Assumption/Pressuposto [numeric_rounding]: {text}"
+    },
+    {
+      "id": "ASSUME_017",
+      "whenAllowed": [
+        "decision_support_mode",
+        "single_base_case_available"
+      ],
+      "whenForbidden": [
+        "capital_allocation_order",
+        "legal_liability_exposure",
+        "safety_critical_decision"
+      ],
+      "labelFormat": "Assumption/Pressuposto [scenario_baseline]: {text}"
+    },
+    {
+      "id": "ASSUME_018",
+      "whenAllowed": [
+        "explicitly_labeled_proxy",
+        "industry_baseline_available"
+      ],
+      "whenForbidden": [
+        "clinical_guideline_required",
+        "contractual_sla_required",
+        "regulatory_benchmark_required"
+      ],
+      "labelFormat": "Assumption/Pressuposto [missing_benchmark_proxy]: {text}"
+    },
+    {
+      "id": "ASSUME_019",
+      "whenAllowed": [
+        "high_keyword_overlap",
+        "single_doc_type_candidate"
+      ],
+      "whenForbidden": [
+        "billing_code_assignment",
+        "diagnosis_coding",
+        "legal_classification_filing"
+      ],
+      "labelFormat": "Assumption/Pressuposto [document_type_guess]: {text}"
+    },
+    {
+      "id": "ASSUME_020",
+      "whenAllowed": [
+        "clear_thread_context",
+        "single_active_counterparty"
+      ],
+      "whenForbidden": [
+        "conflict_of_interest_review",
+        "multi_counterparty_deal",
+        "sanctions_risk"
+      ],
+      "labelFormat": "Assumption/Pressuposto [counterparty_default_primary]: {text}"
+    },
+    {
+      "id": "ASSUME_021",
+      "whenAllowed": [
+        "insufficient_evidence",
+        "uncertainty_detected"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [sensitivity_labeling]: {text}"
+    },
+    {
+      "id": "ASSUME_022",
+      "whenAllowed": [
+        "decision_irreversible",
+        "impact_unknown"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [ask_when_high_impact]: {text}"
+    },
+    {
+      "id": "ASSUME_023",
+      "whenAllowed": [
+        "always"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [forbid_fabricated_source]: {text}"
+    },
+    {
+      "id": "ASSUME_024",
+      "whenAllowed": [
+        "both_terms_present",
+        "finance_compare_intent"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [assumption_budget_vs_actual_disambiguation]: {text}"
+    },
+    {
+      "id": "ASSUME_025",
+      "whenAllowed": [
+        "multiple_periods_found",
+        "time_period_ambiguous"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [assumption_year_quarter_disambiguation]: {text}"
+    },
+    {
+      "id": "ASSUME_026",
+      "whenAllowed": [
+        "entity_conflict",
+        "multiple_entities_possible"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [assumption_counterparty_disambiguation]: {text}"
+    },
+    {
+      "id": "ASSUME_027",
+      "whenAllowed": [
+        "clinical_decision_requested",
+        "medical_domain_detected"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [assumption_medical_escalation]: {text}"
+    },
+    {
+      "id": "ASSUME_028",
+      "whenAllowed": [
+        "jurisdiction_sensitive_question",
+        "legal_domain_detected"
+      ],
+      "whenForbidden": [
+        "none"
+      ],
+      "labelFormat": "Assumption/Pressuposto [assumption_legal_escalation]: {text}"
     }
   ]
 }

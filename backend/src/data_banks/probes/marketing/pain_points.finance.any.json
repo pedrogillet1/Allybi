@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -14,5 +14,2766 @@
     "telemetryOnly": true
   },
   "domain": "finance",
-  "signals": []
+  "signals": [
+    {
+      "id": "finance_signal_abandonment_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "abandonment_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_abandonment_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "abandonment_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_abandonment_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.15,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "abandonment_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_abandonment_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "abandonment_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_abandonment_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "abandonment_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "abandonment_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce abandonment_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir abandonment_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_calc_revision_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "calc_revision_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "calc_revision_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce calc_revision_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir calc_revision_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_calc_revision_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "calc_revision_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "calc_revision_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce calc_revision_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir calc_revision_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_calc_revision_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "calc_revision_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.17,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "calc_revision_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce calc_revision_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir calc_revision_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_calc_revision_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "calc_revision_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "calc_revision_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce calc_revision_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir calc_revision_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_calc_revision_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "calc_revision_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "calc_revision_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce calc_revision_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir calc_revision_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_doc_switch_after_answer_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "doc_switch_after_answer",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "doc_switch_after_answer",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce doc_switch_after_answer for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir doc_switch_after_answer em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_doc_switch_after_answer_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "doc_switch_after_answer",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.15,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "doc_switch_after_answer",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce doc_switch_after_answer for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir doc_switch_after_answer em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_doc_switch_after_answer_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "doc_switch_after_answer",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "doc_switch_after_answer",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce doc_switch_after_answer for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir doc_switch_after_answer em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_doc_switch_after_answer_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "doc_switch_after_answer",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "doc_switch_after_answer",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce doc_switch_after_answer for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir doc_switch_after_answer em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_doc_switch_after_answer_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "doc_switch_after_answer",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.16,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "doc_switch_after_answer",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce doc_switch_after_answer for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir doc_switch_after_answer em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_export_retry_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "export_retry_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "export_retry_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce export_retry_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir export_retry_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_export_retry_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "export_retry_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "export_retry_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce export_retry_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir export_retry_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_export_retry_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "export_retry_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "export_retry_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce export_retry_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir export_retry_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_export_retry_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "export_retry_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "export_retry_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce export_retry_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir export_retry_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_export_retry_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "export_retry_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "export_retry_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce export_retry_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir export_retry_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_fallback_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.18,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "fallback_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_fallback_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.21,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "fallback_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_fallback_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.19,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "fallback_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_fallback_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.2,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "fallback_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_fallback_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "fallback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "fallback_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce fallback_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir fallback_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_followup_turns_p95_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "followup_turns_p95",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_followup_turns_p95_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4.03,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "followup_turns_p95",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_followup_turns_p95_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4.01,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "followup_turns_p95",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_followup_turns_p95_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4.02,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "followup_turns_p95",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_followup_turns_p95_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "followup_turns_p95",
+        "unit": "count",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4.04,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "followup_turns_p95",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce followup_turns_p95 for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir followup_turns_p95 em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_latency_p95_ms_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4335,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "latency_p95_ms",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_latency_p95_ms_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 4329,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "latency_p95_ms",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_latency_p95_ms_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4323,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "latency_p95_ms",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_latency_p95_ms_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 4326,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "latency_p95_ms",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_latency_p95_ms_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "latency_p95_ms",
+        "unit": "ms",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 4332,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "latency_p95_ms",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce latency_p95_ms for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir latency_p95_ms em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_negative_feedback_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.08,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "negative_feedback_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_negative_feedback_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "negative_feedback_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_negative_feedback_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.09,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "negative_feedback_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_negative_feedback_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "negative_feedback_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_negative_feedback_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "negative_feedback_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "negative_feedback_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce negative_feedback_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir negative_feedback_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_no_quote_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.3,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "no_quote_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_no_quote_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.33,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "no_quote_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_no_quote_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.31,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "no_quote_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_no_quote_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.32,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "no_quote_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_no_quote_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "no_quote_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.34,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "no_quote_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce no_quote_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir no_quote_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_reask_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "reask_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_reask_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.27,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "reask_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_reask_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.25,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "reask_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_reask_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.26,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "reask_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_reask_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "reask_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.28,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "reask_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce reask_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir reask_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_table_parse_error_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "table_parse_error_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.1,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "table_parse_error_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce table_parse_error_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir table_parse_error_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_table_parse_error_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "table_parse_error_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.13,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "table_parse_error_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce table_parse_error_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir table_parse_error_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_table_parse_error_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "table_parse_error_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.11,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "table_parse_error_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce table_parse_error_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir table_parse_error_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_table_parse_error_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "table_parse_error_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.12,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "table_parse_error_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce table_parse_error_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir table_parse_error_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_table_parse_error_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "table_parse_error_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.14,
+        "minimumSampleSize": 80,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "table_parse_error_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce table_parse_error_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir table_parse_error_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_weak_evidence_rate_approval_trace_missing",
+      "domain": "finance",
+      "symptomEn": "Approval trail context is missing",
+      "symptomPt": "Contexto de trilha de aprovação está ausente",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.22,
+        "minimumSampleSize": 70,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify approval trace missing.",
+        "Usuários fazem perguntas adicionais para esclarecer approval trace missing."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "weak_evidence_rate",
+        "approval_trace_missing",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for approval trace missing.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em approval trace missing.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_weak_evidence_rate_entity_scope_confusion",
+      "domain": "finance",
+      "symptomEn": "Entity scope is unclear",
+      "symptomPt": "Escopo da entidade está confuso",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "7d",
+        "comparator": "gt",
+        "threshold": 0.25,
+        "minimumSampleSize": 50,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.82
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify entity scope confusion.",
+        "Usuários fazem perguntas adicionais para esclarecer entity scope confusion."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "weak_evidence_rate",
+        "entity_scope_confusion",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for entity scope confusion.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em entity scope confusion.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_weak_evidence_rate_kpi_clarity_gap",
+      "domain": "finance",
+      "symptomEn": "Users cannot map answers to finance KPIs",
+      "symptomPt": "Usuários não conseguem mapear respostas para KPIs financeiros",
+      "severity": "high",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.23,
+        "minimumSampleSize": 90,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.72
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify kpi clarity gap.",
+        "Usuários fazem perguntas adicionais para esclarecer kpi clarity gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "weak_evidence_rate",
+        "kpi_clarity_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for kpi clarity gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em kpi clarity gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_weak_evidence_rate_period_mismatch",
+      "domain": "finance",
+      "symptomEn": "Answers mix reporting periods",
+      "symptomPt": "Respostas misturam períodos de reporte",
+      "severity": "medium",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "30d",
+        "comparator": "gt",
+        "threshold": 0.24,
+        "minimumSampleSize": 100,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.77
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify period mismatch.",
+        "Usuários fazem perguntas adicionais para esclarecer period mismatch."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "weak_evidence_rate",
+        "period_mismatch",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for period mismatch.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em period mismatch.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    },
+    {
+      "id": "finance_signal_weak_evidence_rate_variance_explanation_gap",
+      "domain": "finance",
+      "symptomEn": "Variance drivers are not actionable",
+      "symptomPt": "Drivers de variação não são acionáveis",
+      "severity": "elevated",
+      "measurableTrigger": {
+        "metric": "weak_evidence_rate",
+        "unit": "%",
+        "window": "14d",
+        "comparator": "gt",
+        "threshold": 0.26,
+        "minimumSampleSize": 60,
+        "baselineWindow": "previous_30d",
+        "sustainedForConsecutiveWindows": 2,
+        "confidenceFloor": 0.87
+      },
+      "customerSignalExamples": [
+        "Users ask follow-ups to clarify variance explanation gap.",
+        "Usuários fazem perguntas adicionais para esclarecer variance explanation gap."
+      ],
+      "operatorHints": [
+        "summarize",
+        "extract",
+        "compare",
+        "calculate",
+        "locate",
+        "advise"
+      ],
+      "tags": [
+        "finance",
+        "weak_evidence_rate",
+        "variance_explanation_gap",
+        "pain_point",
+        "telemetry"
+      ],
+      "recommendedAction": {
+        "productEn": "Prioritize experiment to reduce weak_evidence_rate for variance explanation gap.",
+        "productPt": "Priorizar experimento para reduzir weak_evidence_rate em variance explanation gap.",
+        "analytics": [
+          "segment_by_operator",
+          "segment_by_doc_type",
+          "cohort_by_tenure"
+        ]
+      }
+    }
+  ]
 }

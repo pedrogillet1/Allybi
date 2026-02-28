@@ -1,0 +1,675 @@
+{
+  "_meta": {
+    "id": "excel_number_formats_structure",
+    "version": "1.0.0",
+    "description": "Excel number format code patterns for structural column-type inference during document intelligence.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-27"
+  },
+  "config": { "enabled": true },
+  "formatFamilies": [
+    { "id": "accounting", "label": "Accounting", "labelPt": "Contábil", "semanticType": "currency" },
+    { "id": "currency", "label": "Currency", "labelPt": "Moeda", "semanticType": "currency" },
+    { "id": "custom", "label": "Custom", "labelPt": "Personalizado", "semanticType": "varies" },
+    { "id": "date", "label": "Date", "labelPt": "Data", "semanticType": "temporal" },
+    { "id": "fraction", "label": "Fraction", "labelPt": "Fração", "semanticType": "numeric" },
+    { "id": "general", "label": "General", "labelPt": "Geral", "semanticType": "text_or_numeric" },
+    { "id": "number", "label": "Number", "labelPt": "Número", "semanticType": "numeric" },
+    { "id": "percentage", "label": "Percentage", "labelPt": "Percentual", "semanticType": "ratio" },
+    { "id": "scientific", "label": "Scientific", "labelPt": "Científico", "semanticType": "numeric" },
+    { "id": "text", "label": "Text", "labelPt": "Texto", "semanticType": "text" },
+    { "id": "time", "label": "Time", "labelPt": "Hora", "semanticType": "temporal" }
+  ],
+  "formats": [
+    {
+      "id": "general_default",
+      "familyId": "general",
+      "formatCode": "General",
+      "excelBuiltinId": 0,
+      "inferredType": "general",
+      "locale": "any",
+      "examples": ["123", "Hello", "1.5"],
+      "notes": "Default format — Excel auto-detects type"
+    },
+    {
+      "id": "general_text_at",
+      "familyId": "general",
+      "formatCode": "@",
+      "excelBuiltinId": 49,
+      "inferredType": "text",
+      "locale": "any",
+      "examples": ["Hello", "00123"],
+      "notes": "Explicit text format — preserves leading zeros"
+    },
+    {
+      "id": "number_thousands",
+      "familyId": "number",
+      "formatCode": "#,##0",
+      "excelBuiltinId": 3,
+      "inferredType": "integer",
+      "locale": "any",
+      "examples": ["1,234", "0"],
+      "notes": "Integer with thousands separator"
+    },
+    {
+      "id": "number_thousands_2dp",
+      "familyId": "number",
+      "formatCode": "#,##0.00",
+      "excelBuiltinId": 4,
+      "inferredType": "decimal",
+      "locale": "any",
+      "examples": ["1,234.56", "0.00"],
+      "notes": "Decimal with thousands separator and 2 decimal places"
+    },
+    {
+      "id": "number_integer",
+      "familyId": "number",
+      "formatCode": "0",
+      "excelBuiltinId": 1,
+      "inferredType": "integer",
+      "locale": "any",
+      "examples": ["1234", "0"],
+      "notes": "Plain integer, no thousands separator"
+    },
+    {
+      "id": "number_2dp",
+      "familyId": "number",
+      "formatCode": "0.00",
+      "excelBuiltinId": 2,
+      "inferredType": "decimal",
+      "locale": "any",
+      "examples": ["1234.56", "0.00"],
+      "notes": "Decimal with 2 places, no thousands separator"
+    },
+    {
+      "id": "number_neg_parens",
+      "familyId": "number",
+      "formatCode": "#,##0_);(#,##0)",
+      "excelBuiltinId": 37,
+      "inferredType": "integer",
+      "locale": "any",
+      "examples": ["1,234", "(1,234)"],
+      "notes": "Integer with parentheses for negatives — common in finance"
+    },
+    {
+      "id": "number_neg_parens_2dp",
+      "familyId": "number",
+      "formatCode": "#,##0.00_);(#,##0.00)",
+      "excelBuiltinId": 38,
+      "inferredType": "decimal",
+      "locale": "any",
+      "examples": ["1,234.56", "(1,234.56)"],
+      "notes": "Decimal with parentheses for negatives"
+    },
+    {
+      "id": "number_dash_zero",
+      "familyId": "number",
+      "formatCode": "#,##0;(#,##0);\"-\"",
+      "excelBuiltinId": null,
+      "inferredType": "integer",
+      "locale": "any",
+      "examples": ["1,234", "(1,234)", "-"],
+      "notes": "Integer with dash for zero values — financial reporting convention"
+    },
+    {
+      "id": "number_1dp",
+      "familyId": "number",
+      "formatCode": "0.0",
+      "excelBuiltinId": null,
+      "inferredType": "decimal",
+      "locale": "any",
+      "examples": ["1234.5", "0.0"],
+      "notes": "Decimal with 1 decimal place"
+    },
+    {
+      "id": "currency_usd_2dp",
+      "familyId": "currency",
+      "formatCode": "$#,##0.00",
+      "excelBuiltinId": 44,
+      "inferredType": "currency_usd",
+      "locale": "en-US",
+      "examples": ["$1,234.56", "$0.00"],
+      "notes": "US dollar with 2 decimal places"
+    },
+    {
+      "id": "currency_usd_0dp",
+      "familyId": "currency",
+      "formatCode": "$#,##0",
+      "excelBuiltinId": 5,
+      "inferredType": "currency_usd",
+      "locale": "en-US",
+      "examples": ["$1,234", "$0"],
+      "notes": "US dollar with no decimal places"
+    },
+    {
+      "id": "currency_eur_2dp",
+      "familyId": "currency",
+      "formatCode": "€#,##0.00",
+      "excelBuiltinId": null,
+      "inferredType": "currency_eur",
+      "locale": "eu",
+      "examples": ["€1,234.56", "€0.00"],
+      "notes": "Euro with 2 decimal places"
+    },
+    {
+      "id": "currency_gbp_2dp",
+      "familyId": "currency",
+      "formatCode": "£#,##0.00",
+      "excelBuiltinId": null,
+      "inferredType": "currency_gbp",
+      "locale": "en-GB",
+      "examples": ["£1,234.56", "£0.00"],
+      "notes": "British pound with 2 decimal places"
+    },
+    {
+      "id": "currency_jpy_0dp",
+      "familyId": "currency",
+      "formatCode": "¥#,##0",
+      "excelBuiltinId": null,
+      "inferredType": "currency_jpy",
+      "locale": "ja-JP",
+      "examples": ["¥1,234", "¥0"],
+      "notes": "Japanese yen — no decimal places by convention"
+    },
+    {
+      "id": "currency_brl_2dp",
+      "familyId": "currency",
+      "formatCode": "R$#.##0,00",
+      "excelBuiltinId": null,
+      "inferredType": "currency_brl",
+      "locale": "pt-BR",
+      "examples": ["R$1.234,56", "R$0,00"],
+      "notes": "Brazilian real with 2 decimal places — dot thousands, comma decimal"
+    },
+    {
+      "id": "currency_brl_0dp",
+      "familyId": "currency",
+      "formatCode": "R$#.##0",
+      "excelBuiltinId": null,
+      "inferredType": "currency_brl",
+      "locale": "pt-BR",
+      "examples": ["R$1.234", "R$0"],
+      "notes": "Brazilian real with no decimal places"
+    },
+    {
+      "id": "currency_cad_2dp",
+      "familyId": "currency",
+      "formatCode": "C$#,##0.00",
+      "excelBuiltinId": null,
+      "inferredType": "currency_cad",
+      "locale": "en-CA",
+      "examples": ["C$1,234.56", "C$0.00"],
+      "notes": "Canadian dollar with 2 decimal places"
+    },
+    {
+      "id": "currency_aud_2dp",
+      "familyId": "currency",
+      "formatCode": "A$#,##0.00",
+      "excelBuiltinId": null,
+      "inferredType": "currency_aud",
+      "locale": "en-AU",
+      "examples": ["A$1,234.56", "A$0.00"],
+      "notes": "Australian dollar with 2 decimal places"
+    },
+    {
+      "id": "currency_chf_2dp",
+      "familyId": "currency",
+      "formatCode": "CHF#'##0.00",
+      "excelBuiltinId": null,
+      "inferredType": "currency_chf",
+      "locale": "de-CH",
+      "examples": ["CHF1'234.56", "CHF0.00"],
+      "notes": "Swiss franc with 2 decimal places — apostrophe thousands separator"
+    },
+    {
+      "id": "accounting_usd_2dp",
+      "familyId": "accounting",
+      "formatCode": "_($*#,##0.00_)",
+      "excelBuiltinId": 44,
+      "inferredType": "currency_usd",
+      "locale": "en-US",
+      "examples": ["$ 1,234.56", "$ (1,234.56)"],
+      "notes": "US dollar accounting format — aligned symbols and parentheses for negatives"
+    },
+    {
+      "id": "accounting_eur_2dp",
+      "familyId": "accounting",
+      "formatCode": "_(€*#,##0.00_)",
+      "excelBuiltinId": null,
+      "inferredType": "currency_eur",
+      "locale": "eu",
+      "examples": ["€ 1,234.56", "€ (1,234.56)"],
+      "notes": "Euro accounting format"
+    },
+    {
+      "id": "accounting_gbp_2dp",
+      "familyId": "accounting",
+      "formatCode": "_(£*#,##0.00_)",
+      "excelBuiltinId": null,
+      "inferredType": "currency_gbp",
+      "locale": "en-GB",
+      "examples": ["£ 1,234.56", "£ (1,234.56)"],
+      "notes": "British pound accounting format"
+    },
+    {
+      "id": "accounting_brl_2dp",
+      "familyId": "accounting",
+      "formatCode": "_(R$*#.##0,00_)",
+      "excelBuiltinId": null,
+      "inferredType": "currency_brl",
+      "locale": "pt-BR",
+      "examples": ["R$ 1.234,56", "R$ (1.234,56)"],
+      "notes": "Brazilian real accounting format"
+    },
+    {
+      "id": "accounting_generic_2dp",
+      "familyId": "accounting",
+      "formatCode": "_(*#,##0.00_)",
+      "excelBuiltinId": null,
+      "inferredType": "currency_generic",
+      "locale": "any",
+      "examples": [" 1,234.56", " (1,234.56)"],
+      "notes": "Generic accounting format without currency symbol"
+    },
+    {
+      "id": "accounting_generic_0dp",
+      "familyId": "accounting",
+      "formatCode": "_(*#,##0_)",
+      "excelBuiltinId": null,
+      "inferredType": "currency_generic",
+      "locale": "any",
+      "examples": [" 1,234", " (1,234)"],
+      "notes": "Generic accounting format without currency symbol, no decimals"
+    },
+    {
+      "id": "percentage_0dp",
+      "familyId": "percentage",
+      "formatCode": "0%",
+      "excelBuiltinId": 9,
+      "inferredType": "percentage",
+      "locale": "any",
+      "examples": ["50%", "0%", "100%"],
+      "notes": "Percentage with no decimal places"
+    },
+    {
+      "id": "percentage_2dp",
+      "familyId": "percentage",
+      "formatCode": "0.00%",
+      "excelBuiltinId": 10,
+      "inferredType": "percentage",
+      "locale": "any",
+      "examples": ["50.00%", "0.25%", "99.99%"],
+      "notes": "Percentage with 2 decimal places"
+    },
+    {
+      "id": "percentage_1dp",
+      "familyId": "percentage",
+      "formatCode": "0.0%",
+      "excelBuiltinId": null,
+      "inferredType": "percentage",
+      "locale": "any",
+      "examples": ["50.0%", "0.5%"],
+      "notes": "Percentage with 1 decimal place"
+    },
+    {
+      "id": "percentage_3dp",
+      "familyId": "percentage",
+      "formatCode": "0.000%",
+      "excelBuiltinId": null,
+      "inferredType": "percentage",
+      "locale": "any",
+      "examples": ["50.000%", "0.125%"],
+      "notes": "Percentage with 3 decimal places — used in interest rates"
+    },
+    {
+      "id": "date_us",
+      "familyId": "date",
+      "formatCode": "MM/DD/YYYY",
+      "excelBuiltinId": 14,
+      "inferredType": "date",
+      "locale": "en-US",
+      "examples": ["01/15/2026", "12/31/2025"],
+      "notes": "US date format — month/day/year"
+    },
+    {
+      "id": "date_eu",
+      "familyId": "date",
+      "formatCode": "DD/MM/YYYY",
+      "excelBuiltinId": null,
+      "inferredType": "date",
+      "locale": "eu",
+      "examples": ["15/01/2026", "31/12/2025"],
+      "notes": "European date format — day/month/year"
+    },
+    {
+      "id": "date_iso",
+      "familyId": "date",
+      "formatCode": "YYYY-MM-DD",
+      "excelBuiltinId": null,
+      "inferredType": "date",
+      "locale": "any",
+      "examples": ["2026-01-15", "2025-12-31"],
+      "notes": "ISO 8601 date format"
+    },
+    {
+      "id": "date_us_short",
+      "familyId": "date",
+      "formatCode": "M/D/YY",
+      "excelBuiltinId": 15,
+      "inferredType": "date",
+      "locale": "en-US",
+      "examples": ["1/15/26", "12/1/25"],
+      "notes": "Short US date — no leading zeros, 2-digit year"
+    },
+    {
+      "id": "date_eu_short",
+      "familyId": "date",
+      "formatCode": "D/M/YY",
+      "excelBuiltinId": null,
+      "inferredType": "date",
+      "locale": "eu",
+      "examples": ["15/1/26", "1/12/25"],
+      "notes": "Short European date — no leading zeros, 2-digit year"
+    },
+    {
+      "id": "date_abbrev_month_year",
+      "familyId": "date",
+      "formatCode": "MMM-YY",
+      "excelBuiltinId": 17,
+      "inferredType": "date_month_year",
+      "locale": "en",
+      "examples": ["Jan-26", "Dec-25"],
+      "notes": "Abbreviated month and 2-digit year"
+    },
+    {
+      "id": "date_long",
+      "familyId": "date",
+      "formatCode": "MMMM D, YYYY",
+      "excelBuiltinId": null,
+      "inferredType": "date",
+      "locale": "en-US",
+      "examples": ["January 15, 2026", "December 31, 2025"],
+      "notes": "Long-form US date"
+    },
+    {
+      "id": "date_dd_mmm_yyyy",
+      "familyId": "date",
+      "formatCode": "DD MMM YYYY",
+      "excelBuiltinId": null,
+      "inferredType": "date",
+      "locale": "en-GB",
+      "examples": ["15 Jan 2026", "31 Dec 2025"],
+      "notes": "Day abbreviated-month year — common in UK/military"
+    },
+    {
+      "id": "date_month_year",
+      "familyId": "date",
+      "formatCode": "MM/YYYY",
+      "excelBuiltinId": null,
+      "inferredType": "date_month_year",
+      "locale": "any",
+      "examples": ["01/2026", "12/2025"],
+      "notes": "Month and year only"
+    },
+    {
+      "id": "date_year_only",
+      "familyId": "date",
+      "formatCode": "YYYY",
+      "excelBuiltinId": null,
+      "inferredType": "date_year",
+      "locale": "any",
+      "examples": ["2026", "2025"],
+      "notes": "Year only"
+    },
+    {
+      "id": "date_quarter",
+      "familyId": "date",
+      "formatCode": "Q[1-4] YYYY",
+      "excelBuiltinId": null,
+      "inferredType": "date_quarter",
+      "locale": "any",
+      "examples": ["Q1 2026", "Q4 2025"],
+      "notes": "Fiscal quarter notation"
+    },
+    {
+      "id": "date_dot_eu",
+      "familyId": "date",
+      "formatCode": "DD.MM.YYYY",
+      "excelBuiltinId": null,
+      "inferredType": "date",
+      "locale": "de",
+      "examples": ["15.01.2026", "31.12.2025"],
+      "notes": "Dot-separated European date — common in German, Brazilian Portuguese"
+    },
+    {
+      "id": "time_full",
+      "familyId": "time",
+      "formatCode": "HH:MM:SS",
+      "excelBuiltinId": 21,
+      "inferredType": "time",
+      "locale": "any",
+      "examples": ["14:30:00", "09:05:12"],
+      "notes": "24-hour time with seconds"
+    },
+    {
+      "id": "time_short",
+      "familyId": "time",
+      "formatCode": "HH:MM",
+      "excelBuiltinId": 20,
+      "inferredType": "time",
+      "locale": "any",
+      "examples": ["14:30", "09:05"],
+      "notes": "24-hour time without seconds"
+    },
+    {
+      "id": "time_ampm",
+      "familyId": "time",
+      "formatCode": "H:MM AM/PM",
+      "excelBuiltinId": 18,
+      "inferredType": "time",
+      "locale": "en-US",
+      "examples": ["2:30 PM", "9:05 AM"],
+      "notes": "12-hour time with AM/PM"
+    },
+    {
+      "id": "time_milliseconds",
+      "familyId": "time",
+      "formatCode": "HH:MM:SS.000",
+      "excelBuiltinId": null,
+      "inferredType": "time_precise",
+      "locale": "any",
+      "examples": ["14:30:00.123", "09:05:12.456"],
+      "notes": "Time with milliseconds — used in scientific/logging contexts"
+    },
+    {
+      "id": "time_elapsed",
+      "familyId": "time",
+      "formatCode": "[H]:MM:SS",
+      "excelBuiltinId": 46,
+      "inferredType": "duration",
+      "locale": "any",
+      "examples": ["25:30:00", "100:00:00"],
+      "notes": "Elapsed time — hours can exceed 24"
+    },
+    {
+      "id": "datetime_us",
+      "familyId": "date",
+      "formatCode": "MM/DD/YYYY HH:MM",
+      "excelBuiltinId": 22,
+      "inferredType": "datetime",
+      "locale": "en-US",
+      "examples": ["01/15/2026 14:30", "12/31/2025 09:00"],
+      "notes": "US date with 24-hour time"
+    },
+    {
+      "id": "datetime_iso",
+      "familyId": "date",
+      "formatCode": "YYYY-MM-DD HH:MM:SS",
+      "excelBuiltinId": null,
+      "inferredType": "datetime",
+      "locale": "any",
+      "examples": ["2026-01-15 14:30:00", "2025-12-31 09:00:00"],
+      "notes": "ISO 8601 datetime"
+    },
+    {
+      "id": "datetime_eu",
+      "familyId": "date",
+      "formatCode": "DD/MM/YYYY HH:MM",
+      "excelBuiltinId": null,
+      "inferredType": "datetime",
+      "locale": "eu",
+      "examples": ["15/01/2026 14:30", "31/12/2025 09:00"],
+      "notes": "European date with 24-hour time"
+    },
+    {
+      "id": "fraction_single",
+      "familyId": "fraction",
+      "formatCode": "# ?/?",
+      "excelBuiltinId": 12,
+      "inferredType": "fraction",
+      "locale": "any",
+      "examples": ["1 1/2", "3/4"],
+      "notes": "Fraction with up to 1-digit denominator"
+    },
+    {
+      "id": "fraction_double",
+      "familyId": "fraction",
+      "formatCode": "# ??/??",
+      "excelBuiltinId": 13,
+      "inferredType": "fraction",
+      "locale": "any",
+      "examples": ["1 23/45", "7/16"],
+      "notes": "Fraction with up to 2-digit denominator"
+    },
+    {
+      "id": "fraction_triple",
+      "familyId": "fraction",
+      "formatCode": "# ???/???",
+      "excelBuiltinId": null,
+      "inferredType": "fraction",
+      "locale": "any",
+      "examples": ["1 123/456", "355/113"],
+      "notes": "Fraction with up to 3-digit denominator — high precision"
+    },
+    {
+      "id": "scientific_2dp",
+      "familyId": "scientific",
+      "formatCode": "0.00E+00",
+      "excelBuiltinId": 11,
+      "inferredType": "scientific",
+      "locale": "any",
+      "examples": ["1.23E+04", "5.67E-03"],
+      "notes": "Scientific notation with 2 decimal places"
+    },
+    {
+      "id": "scientific_engineering",
+      "familyId": "scientific",
+      "formatCode": "##0.0E+0",
+      "excelBuiltinId": 48,
+      "inferredType": "scientific",
+      "locale": "any",
+      "examples": ["12.3E+3", "567.0E-3"],
+      "notes": "Engineering notation — exponent is multiple of 3"
+    },
+    {
+      "id": "custom_phone_us",
+      "familyId": "custom",
+      "formatCode": "(###) ###-####",
+      "excelBuiltinId": null,
+      "inferredType": "phone",
+      "locale": "en-US",
+      "examples": ["(555) 123-4567"],
+      "notes": "US phone number format"
+    },
+    {
+      "id": "custom_ssn",
+      "familyId": "custom",
+      "formatCode": "###-##-####",
+      "excelBuiltinId": null,
+      "inferredType": "ssn",
+      "locale": "en-US",
+      "examples": ["123-45-6789"],
+      "notes": "US Social Security Number"
+    },
+    {
+      "id": "custom_zip",
+      "familyId": "custom",
+      "formatCode": "00000",
+      "excelBuiltinId": null,
+      "inferredType": "zip_code",
+      "locale": "en-US",
+      "examples": ["01234", "90210"],
+      "notes": "US ZIP code — preserves leading zeros"
+    },
+    {
+      "id": "custom_cep",
+      "familyId": "custom",
+      "formatCode": "00000-000",
+      "excelBuiltinId": null,
+      "inferredType": "cep",
+      "locale": "pt-BR",
+      "examples": ["01001-000", "04538-133"],
+      "notes": "Brazilian CEP (postal code)"
+    },
+    {
+      "id": "custom_cpf",
+      "familyId": "custom",
+      "formatCode": "000.000.000-00",
+      "excelBuiltinId": null,
+      "inferredType": "cpf",
+      "locale": "pt-BR",
+      "examples": ["123.456.789-09"],
+      "notes": "Brazilian CPF (individual tax ID)"
+    },
+    {
+      "id": "custom_cnpj",
+      "familyId": "custom",
+      "formatCode": "00.000.000/0000-00",
+      "excelBuiltinId": null,
+      "inferredType": "cnpj",
+      "locale": "pt-BR",
+      "examples": ["12.345.678/0001-95"],
+      "notes": "Brazilian CNPJ (company tax ID)"
+    },
+    {
+      "id": "custom_thousands",
+      "familyId": "custom",
+      "formatCode": "#,##0,",
+      "excelBuiltinId": null,
+      "inferredType": "numeric_thousands",
+      "locale": "any",
+      "examples": ["1,234 (represents 1,234,000)"],
+      "notes": "Displays number divided by 1000 — trailing comma convention"
+    },
+    {
+      "id": "custom_negative_red",
+      "familyId": "custom",
+      "formatCode": "#,##0.00;[Red]-#,##0.00",
+      "excelBuiltinId": null,
+      "inferredType": "decimal",
+      "locale": "any",
+      "examples": ["1,234.56", "-1,234.56 (in red)"],
+      "notes": "Negatives displayed in red — common in financial reports"
+    },
+    {
+      "id": "custom_negative_parentheses",
+      "familyId": "custom",
+      "formatCode": "#,##0.00_);[Red](#,##0.00)",
+      "excelBuiltinId": null,
+      "inferredType": "decimal",
+      "locale": "any",
+      "examples": ["1,234.56", "(1,234.56) (in red)"],
+      "notes": "Negatives in red parentheses — standard accounting visual"
+    },
+    {
+      "id": "custom_boolean_yes_no",
+      "familyId": "custom",
+      "formatCode": "\"Yes\";;\"No\"",
+      "excelBuiltinId": null,
+      "inferredType": "boolean",
+      "locale": "en",
+      "examples": ["Yes", "No"],
+      "notes": "Boolean display — non-zero shows Yes, zero shows No"
+    }
+  ]
+}

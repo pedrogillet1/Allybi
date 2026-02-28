@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "id": "di_insurance_entities_ins_explanation_of_benefits",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for ins_explanation_of_benefits.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_explanation_of_benefits"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Document issuer or authority"
+    },
+    {
+      "id": "subject_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary subject referenced by the document"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": false,
+      "description": "Official document number"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": false,
+      "description": "Document effective date"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Jurisdiction or governing authority"
+    },
+    {
+      "id": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current processing or legal status"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code when monetary values are present"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total document amount when applicable"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date for payment or action"
+    },
+    {
+      "id": "reference_id",
+      "type": "string",
+      "required": false,
+      "description": "External reference id"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "eob_number",
+      "type": "string",
+      "required": false,
+      "description": "EOB reference number"
+    },
+    {
+      "id": "claim_number",
+      "type": "string",
+      "required": true,
+      "description": "Claim number"
+    },
+    {
+      "id": "member_id",
+      "type": "string",
+      "required": true,
+      "description": "Member/subscriber id"
+    },
+    {
+      "id": "provider_name",
+      "type": "string",
+      "required": false,
+      "description": "Provider name"
+    },
+    {
+      "id": "service_date",
+      "type": "date",
+      "required": false,
+      "description": "Date of service"
+    },
+    {
+      "id": "billed_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Billed amount"
+    },
+    {
+      "id": "allowed_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Allowed amount"
+    },
+    {
+      "id": "paid_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Paid amount"
+    },
+    {
+      "id": "member_responsibility",
+      "type": "currency",
+      "required": false,
+      "description": "Member responsibility"
+    },
+    {
+      "id": "denial_reason",
+      "type": "string",
+      "required": false,
+      "description": "Denial/adjustment reason"
+    },
+    {
+      "id": "appeal_deadline",
+      "type": "date",
+      "required": false,
+      "description": "Appeal deadline if provided"
+    },
+    {
+      "id": "insurance_doc_type",
+      "type": "string",
+      "required": true,
+      "description": "Resolved doc type: ins_explanation_of_benefits"
+    }
+  ]
+}

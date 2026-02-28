@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "id": "di_banking_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for banking analysis tasks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "scaffolds": [
+    {
+      "id": "banking_scaffold_001_balance_reconciliation",
+      "name": "Statement Balance Reconciliation",
+      "operators": [
+        "validate",
+        "calculate",
+        "compare"
+      ],
+      "steps": [
+        "Capture opening and closing balances with dates",
+        "Sum debits, credits, and adjustments for the period",
+        "Check whether computed ending balance matches reported closing balance",
+        "Identify missing or pending transactions affecting tie-out",
+        "Return discrepancy details with cited evidence"
+      ]
+    },
+    {
+      "id": "banking_scaffold_002_transaction_lookup",
+      "name": "Transaction Lookup",
+      "operators": [
+        "locate",
+        "extract"
+      ],
+      "steps": [
+        "Normalize query entities (merchant, amount, date, channel)",
+        "Search transaction table using exact and fuzzy anchors",
+        "Resolve duplicate or near-match rows",
+        "Return matched row(s) with confidence and references",
+        "List follow-up checks if multiple candidates remain"
+      ]
+    },
+    {
+      "id": "banking_scaffold_003_card_statement_analysis",
+      "name": "Card Statement Charge Analysis",
+      "operators": [
+        "extract",
+        "evaluate",
+        "advise"
+      ],
+      "steps": [
+        "Separate purchases, fees, interest, and credits",
+        "Identify minimum payment, due date, and grace indicators",
+        "Highlight unusual recurring or high-risk charges",
+        "Check for refunds or charge reversals",
+        "Provide neutral next-step guidance for disputes"
+      ]
+    },
+    {
+      "id": "banking_scaffold_004_loan_split",
+      "name": "Loan Installment Split",
+      "operators": [
+        "extract",
+        "calculate",
+        "summarize"
+      ],
+      "steps": [
+        "Extract installment amount and due date",
+        "Split installment into principal, interest, and fees",
+        "Track resulting principal balance trend",
+        "Check for late fees or capitalization events",
+        "Summarize payoff trajectory and caveats"
+      ]
+    }
+  ]
+}

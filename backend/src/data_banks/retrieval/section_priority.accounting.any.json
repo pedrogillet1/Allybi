@@ -1,0 +1,1887 @@
+{
+  "_meta": {
+    "id": "section_priority_accounting",
+    "version": "1.0.0",
+    "description": "Section-priority rules for accounting retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "mode": "deterministic_scan_order"
+  },
+  "domain": "accounting",
+  "rules": [
+    {
+      "id": "accounting_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "reconciliation_summary",
+        "close_timeline",
+        "control_exceptions",
+        "adjusting_entries",
+        "open_items"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "control_exceptions",
+        "adjusting_entries",
+        "open_items",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "reconciliation_summary",
+        "close_timeline",
+        "control_exceptions",
+        "adjusting_entries"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table",
+        "aging_buckets",
+        "accounting_policies"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bank_recon_table",
+        "aging_buckets",
+        "accounting_policies",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table",
+        "aging_buckets"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "variance_reconciliation",
+        "rollforward_bridge",
+        "accounting_policies",
+        "supporting_notes"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "rollforward_bridge",
+        "accounting_policies",
+        "supporting_notes",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "variance_reconciliation",
+        "rollforward_bridge",
+        "accounting_policies"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule",
+        "reconciliation_summary"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liquidity",
+        "debt_schedule",
+        "reconciliation_summary",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "material_variances",
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table",
+        "rent_roll_table"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "ledger_entries",
+        "bank_recon_table",
+        "rent_roll_table",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "material_variances",
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks",
+        "appendix_index"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sheet_index",
+        "bookmarks",
+        "appendix_index",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log",
+        "sla_report"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "alerts",
+        "incident_log",
+        "sla_report",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "reconciliation_summary",
+        "material_variances",
+        "risk_factors",
+        "outlook"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "material_variances",
+        "risk_factors",
+        "outlook",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "reconciliation_summary",
+        "material_variances",
+        "risk_factors"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "supporting_notes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings",
+        "accounting_policies"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "notes_to_accounts",
+        "audit_findings",
+        "accounting_policies",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "supporting_notes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_calculate_metrics_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "general_ledger_export",
+        "close_checklist",
+        "audit_workpaper"
+      ],
+      "sections": [
+        "trial_balance_table",
+        "aging_buckets",
+        "variance_reconciliation",
+        "accounting_policies",
+        "supporting_notes"
+      ]
+    },
+    {
+      "id": "accounting_compare_budget_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "trial_balance",
+        "journal_entry_support"
+      ],
+      "sections": [
+        "close_summary",
+        "variance_reconciliation",
+        "rollforward_bridge",
+        "accounting_policies",
+        "supporting_notes"
+      ]
+    }
+  ],
+  "priorities": [
+    {
+      "id": "accounting_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "reconciliation_summary",
+        "close_timeline",
+        "control_exceptions",
+        "adjusting_entries",
+        "open_items"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_advise_secondary_sections",
+      "enabled": true,
+      "priority": 94,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "control_exceptions",
+        "adjusting_entries",
+        "open_items",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_advise_locked_scan",
+      "enabled": true,
+      "priority": 93,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "reconciliation_summary",
+        "close_timeline",
+        "control_exceptions",
+        "adjusting_entries"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table",
+        "aging_buckets",
+        "accounting_policies"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_calculate_secondary_sections",
+      "enabled": true,
+      "priority": 91,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bank_recon_table",
+        "aging_buckets",
+        "accounting_policies",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_calculate_locked_scan",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table",
+        "aging_buckets"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_compare_primary_sections",
+      "enabled": true,
+      "priority": 89,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "variance_reconciliation",
+        "rollforward_bridge",
+        "accounting_policies",
+        "supporting_notes"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_compare_secondary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "rollforward_bridge",
+        "accounting_policies",
+        "supporting_notes",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_compare_locked_scan",
+      "enabled": true,
+      "priority": 87,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "variance_reconciliation",
+        "rollforward_bridge",
+        "accounting_policies"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_evaluate_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule",
+        "reconciliation_summary"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_evaluate_secondary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "liquidity",
+        "debt_schedule",
+        "reconciliation_summary",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_evaluate_locked_scan",
+      "enabled": true,
+      "priority": 84,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "risk_factors",
+        "covenants",
+        "liquidity",
+        "debt_schedule"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_extract_primary_sections",
+      "enabled": true,
+      "priority": 83,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "material_variances",
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table",
+        "rent_roll_table"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_extract_secondary_sections",
+      "enabled": true,
+      "priority": 82,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "ledger_entries",
+        "bank_recon_table",
+        "rent_roll_table",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_extract_locked_scan",
+      "enabled": true,
+      "priority": 81,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "material_variances",
+        "trial_balance_table",
+        "ledger_entries",
+        "bank_recon_table"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_locate_primary_sections",
+      "enabled": true,
+      "priority": 80,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks",
+        "appendix_index"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_locate_secondary_sections",
+      "enabled": true,
+      "priority": 79,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "sheet_index",
+        "bookmarks",
+        "appendix_index",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_locate_locked_scan",
+      "enabled": true,
+      "priority": 78,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "section_index",
+        "sheet_index",
+        "bookmarks"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_monitor_primary_sections",
+      "enabled": true,
+      "priority": 77,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log",
+        "sla_report"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_monitor_secondary_sections",
+      "enabled": true,
+      "priority": 76,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "alerts",
+        "incident_log",
+        "sla_report",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_monitor_locked_scan",
+      "enabled": true,
+      "priority": 75,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "kpi_dashboard",
+        "trend_analysis",
+        "alerts",
+        "incident_log"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_navigate_primary_sections",
+      "enabled": true,
+      "priority": 74,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_navigate_secondary_sections",
+      "enabled": true,
+      "priority": 73,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_navigate_locked_scan",
+      "enabled": true,
+      "priority": 72,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_open_primary_sections",
+      "enabled": true,
+      "priority": 71,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation",
+        "section_index"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_open_secondary_sections",
+      "enabled": true,
+      "priority": 70,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "bookmarks",
+        "tab_navigation",
+        "section_index",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_open_locked_scan",
+      "enabled": true,
+      "priority": 69,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "table_of_contents",
+        "sheet_index",
+        "bookmarks",
+        "tab_navigation"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_summarize_primary_sections",
+      "enabled": true,
+      "priority": 68,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "reconciliation_summary",
+        "material_variances",
+        "risk_factors",
+        "outlook"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_summarize_secondary_sections",
+      "enabled": true,
+      "priority": 67,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "material_variances",
+        "risk_factors",
+        "outlook",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_summarize_locked_scan",
+      "enabled": true,
+      "priority": 66,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "close_summary",
+        "reconciliation_summary",
+        "material_variances",
+        "risk_factors"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_validate_primary_sections",
+      "enabled": true,
+      "priority": 65,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "supporting_notes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings",
+        "accounting_policies"
+      ],
+      "docTypes": [
+        "trial_balance",
+        "general_ledger_export",
+        "bank_reconciliation"
+      ]
+    },
+    {
+      "id": "accounting_validate_secondary_sections",
+      "enabled": true,
+      "priority": 64,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "notes_to_accounts",
+        "audit_findings",
+        "accounting_policies",
+        "close_summary",
+        "material_variances"
+      ],
+      "docTypes": [
+        "ar_aging_report",
+        "ap_aging_report",
+        "journal_entry_support"
+      ]
+    },
+    {
+      "id": "accounting_validate_locked_scan",
+      "enabled": true,
+      "priority": 63,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "supporting_notes",
+        "reconciliation",
+        "notes_to_accounts",
+        "audit_findings"
+      ],
+      "docTypes": [
+        "audit_workpaper",
+        "internal_controls_narrative",
+        "close_checklist"
+      ]
+    },
+    {
+      "id": "accounting_calculate_metrics_order",
+      "enabled": true,
+      "priority": 97,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "general_ledger_export",
+        "close_checklist",
+        "audit_workpaper"
+      ],
+      "sections": [
+        "trial_balance_table",
+        "aging_buckets",
+        "variance_reconciliation",
+        "accounting_policies",
+        "supporting_notes"
+      ]
+    },
+    {
+      "id": "accounting_compare_budget_order",
+      "enabled": true,
+      "priority": 96,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "requireDomainMatch": true,
+      "docTypes": [
+        "trial_balance",
+        "journal_entry_support"
+      ],
+      "sections": [
+        "close_summary",
+        "variance_reconciliation",
+        "rollforward_bridge",
+        "accounting_policies",
+        "supporting_notes"
+      ]
+    }
+  ]
+}

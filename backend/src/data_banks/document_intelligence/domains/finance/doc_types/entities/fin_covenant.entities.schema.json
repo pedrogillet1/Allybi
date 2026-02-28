@@ -1,0 +1,17 @@
+{
+  "_meta": { "id": "di_finance_entities_fin_covenant", "version": "1.0.0", "description": "Entity extraction schema for covenant compliance reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "finance", "docType": "fin_covenant" },
+  "entities": [
+    { "id": "agreement_date", "type": "date", "required": false, "description": "Credit agreement date" },
+    { "id": "borrower_name", "type": "string", "required": true, "description": "Borrower / company name" },
+    { "id": "dscr_actual", "type": "number", "required": false, "description": "Actual debt service coverage ratio" },
+    { "id": "dscr_threshold", "type": "number", "required": false, "description": "Minimum required DSCR" },
+    { "id": "interest_coverage_actual", "type": "number", "required": false, "description": "Actual interest coverage ratio" },
+    { "id": "interest_coverage_threshold", "type": "number", "required": false, "description": "Minimum required interest coverage" },
+    { "id": "lender_name", "type": "string", "required": false, "description": "Lender or agent bank name" },
+    { "id": "leverage_ratio_actual", "type": "number", "required": false, "description": "Actual leverage ratio" },
+    { "id": "leverage_ratio_threshold", "type": "number", "required": false, "description": "Maximum allowed leverage ratio" },
+    { "id": "measurement_period", "type": "string", "required": true, "description": "Covenant measurement period" },
+    { "id": "overall_compliance", "type": "enum", "required": true, "description": "Overall compliance status", "values": ["compliant", "non_compliant", "waiver_obtained"] }
+  ]
+}

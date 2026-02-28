@@ -168,6 +168,56 @@ export function buildAttachmentDocScopeSignals(
   };
 }
 
+export function applyConversationHistoryDocScopeFallback(params: {
+  signals: Pick<
+    RetrievalRequest["signals"],
+    | "docScopeLock"
+    | "explicitDocLock"
+    | "activeDocId"
+    | "explicitDocRef"
+    | "resolvedDocId"
+    | "hardScopeActive"
+    | "singleDocIntent"
+  >;
+  attachedDocumentIds: string[];
+  lastDocumentId?: string | null;
+}): Pick<
+  RetrievalRequest["signals"],
+  | "docScopeLock"
+  | "explicitDocLock"
+  | "activeDocId"
+  | "explicitDocRef"
+  | "resolvedDocId"
+  | "hardScopeActive"
+  | "singleDocIntent"
+> {
+  const signals = { ...params.signals };
+  const lastDocumentId = String(params.lastDocumentId || "").trim();
+  if (!lastDocumentId) return signals;
+  if (signals.resolvedDocId || signals.singleDocIntent) return signals;
+  if (!params.attachedDocumentIds.includes(lastDocumentId)) return signals;
+
+  // With multi-attachment turns, keep docset lock strict; do not narrow to a
+  // single history doc unless the user explicitly referenced a single document.
+  if (params.attachedDocumentIds.length !== 1) {
+    return signals;
+  }
+
+  signals.docScopeLock = createDocScopeLock({
+    mode: "single_doc",
+    allowedDocumentIds: [lastDocumentId],
+    activeDocumentId: lastDocumentId,
+    source: "system",
+  });
+  signals.explicitDocLock = true;
+  signals.activeDocId = lastDocumentId;
+  signals.explicitDocRef = true;
+  signals.resolvedDocId = lastDocumentId;
+  signals.hardScopeActive = true;
+  signals.singleDocIntent = true;
+  return signals;
+}
+
 function fallbackSourceLabel(docId: string): string {
   const shortId = String(docId || "")
     .trim()
@@ -298,6 +348,25 @@ function sanitizeSnippet(value: string, maxChars: number): string {
 
 type ChatSourceEntry = NonNullable<ChatResult["sources"]>[number];
 
+type SourceGroundingOptions = {
+  enforceScopedSources?: boolean;
+};
+
+function isDocGroundedAnswerMode(answerMode: AnswerMode): boolean {
+  return String(answerMode || "").startsWith("doc_grounded");
+}
+
+export function resolveSourceInvariantFailureCode(params: {
+  answerMode: AnswerMode;
+  filteredSources: Array<{ documentId?: string | null }>;
+}): "missing_provenance" | null {
+  if (!isDocGroundedAnswerMode(params.answerMode)) return null;
+  return Array.isArray(params.filteredSources) &&
+    params.filteredSources.length === 0
+    ? "missing_provenance"
+    : null;
+}
+
 type SemanticSignalKey =
   | "hasQuotedText"
   | "hasFilename"
@@ -370,14 +439,18 @@ function filterSourcesByProvenance(
   provenance: ChatProvenanceDTO | undefined,
   answerText: string,
   evidence: EvidenceItem[],
+  options: SourceGroundingOptions = {},
 ): ChatSourceEntry[] {
-  if (!provenance || sources.length === 0) return sources;
+  if (!provenance || sources.length === 0) {
+    return options.enforceScopedSources ? [] : sources;
+  }
 
   // Primary: use provenance sourceDocumentIds
   if (provenance.sourceDocumentIds.length > 0) {
     const allowed = new Set(provenance.sourceDocumentIds);
     const filtered = sources.filter((s) => allowed.has(s.documentId));
-    return filtered.length > 0 ? filtered : sources.slice(0, 1);
+    if (filtered.length > 0) return filtered;
+    return options.enforceScopedSources ? [] : sources.slice(0, 1);
   }
 
   // Fallback: text-matching via extractUsedDocuments
@@ -393,10 +466,11 @@ function filterSourcesByProvenance(
   const usedDocIds = extractUsedDocuments(answerText, chunks);
   if (usedDocIds.size > 0) {
     const filtered = sources.filter((s) => usedDocIds.has(s.documentId));
-    return filtered.length > 0 ? filtered : sources.slice(0, 1);
+    if (filtered.length > 0) return filtered;
+    return options.enforceScopedSources ? [] : sources.slice(0, 1);
   }
 
-  return sources;
+  return options.enforceScopedSources ? [] : sources;
 }
 
 function filterAttachmentByProvenance(
@@ -404,8 +478,11 @@ function filterAttachmentByProvenance(
   provenance: ChatProvenanceDTO | undefined,
   answerText: string,
   evidence: EvidenceItem[],
+  options: SourceGroundingOptions = {},
 ): unknown | null {
-  if (!attachment || !provenance) return attachment;
+  if (!attachment || !provenance) {
+    return options.enforceScopedSources ? null : attachment;
+  }
 
   let allowedDocIds: Set<string>;
   if (provenance.sourceDocumentIds.length > 0) {
@@ -419,7 +496,9 @@ function filterAttachmentByProvenance(
     }));
     allowedDocIds = extractUsedDocuments(answerText, chunks);
   }
-  if (allowedDocIds.size === 0) return attachment;
+  if (allowedDocIds.size === 0) {
+    return options.enforceScopedSources ? null : attachment;
+  }
   return filterSourceButtonsByUsage(
     attachment as SourceButtonsAttachment,
     allowedDocIds,
@@ -503,6 +582,83 @@ function normalizeChatLanguage(value: unknown): "en" | "pt" | "es" {
     .toLowerCase();
   if (lang === "pt" || lang === "es") return lang;
   return "en";
+}
+
+function countRegexMatches(text: string, pattern: RegExp): number {
+  const matches = text.match(pattern);
+  return matches ? matches.length : 0;
+}
+
+function looksLikelyPortuguese(text: string): boolean {
+  const value = ` ${String(text || "").toLowerCase()} `;
+  const ptWords =
+    countRegexMatches(
+      value,
+      /\b(de|para|com|nao|voce|qual|quais|como|onde|porque|obrigado|resumo|tabela|evidencia|documento|documentos)\b/g,
+    ) +
+    countRegexMatches(value, /[ãõçáàâéêíóôú]/g) * 2;
+  const enWords = countRegexMatches(
+    value,
+    /\b(the|with|this|that|for|from|please|summary|table|evidence|document|documents)\b/g,
+  );
+  return ptWords >= enWords + 2;
+}
+
+function looksLikelySpanish(text: string): boolean {
+  const value = ` ${String(text || "").toLowerCase()} `;
+  const esWords =
+    countRegexMatches(
+      value,
+      /\b(de|para|con|donde|cual|cuales|gracias|resumen|tabla|evidencia|documento|documentos)\b/g,
+    ) +
+    countRegexMatches(value, /[ñ¿¡]/g) * 2;
+  const enWords = countRegexMatches(
+    value,
+    /\b(the|with|this|that|for|from|please|summary|table|evidence|document|documents)\b/g,
+  );
+  return esWords >= enWords + 2;
+}
+
+function looksLikelyEnglish(text: string): boolean {
+  const value = ` ${String(text || "").toLowerCase()} `;
+  const enWords = countRegexMatches(
+    value,
+    /\b(the|with|this|that|for|from|please|summary|table|evidence|document|documents|according|based)\b/g,
+  );
+  const ptWords = countRegexMatches(
+    value,
+    /\b(de|para|com|nao|voce|qual|quais|como|onde|porque|obrigado|resumo|tabela|evidencia|documento|documentos)\b/g,
+  );
+  const esWords = countRegexMatches(
+    value,
+    /\b(de|para|con|donde|cual|cuales|gracias|resumen|tabla|evidencia|documento|documentos)\b/g,
+  );
+  return enWords >= Math.max(ptWords, esWords) + 2;
+}
+
+function buildLanguageContractFallback(language: "en" | "pt" | "es"): string {
+  if (language === "pt") {
+    return "Nao consegui finalizar a resposta no idioma solicitado com seguranca. Reenvie e eu respondo somente em portugues.";
+  }
+  if (language === "es") {
+    return "No pude finalizar la respuesta en el idioma solicitado de forma segura. Reenvia y respondere solo en espanol.";
+  }
+  return "I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.";
+}
+
+function enforceLanguageContract(params: {
+  text: string;
+  preferredLanguage?: string | null;
+}): { text: string; adjusted: boolean } {
+  const normalized = String(params.text || "").trim();
+  if (!normalized) return { text: normalized, adjusted: false };
+  const lang = normalizeChatLanguage(params.preferredLanguage);
+  const mismatch =
+    (lang === "en" && !looksLikelyEnglish(normalized)) ||
+    (lang === "pt" && !looksLikelyPortuguese(normalized)) ||
+    (lang === "es" && !looksLikelySpanish(normalized));
+  if (!mismatch) return { text: normalized, adjusted: false };
+  return { text: buildLanguageContractFallback(lang), adjusted: true };
 }
 
 function toPositiveInt(value: unknown): number | null {
@@ -876,6 +1032,24 @@ export class CentralizedChatRuntimeDelegate {
     const fallbackReason =
       params.failureCode || params.fallbackReasonCode || null;
     const retrievalAdequate = (params.retrievalPack?.evidence.length ?? 0) > 0;
+    const resolvedOperator =
+      typeof meta.operator === "string"
+        ? String(meta.operator)
+        : retrievalAdequate
+          ? "answer_with_sources"
+          : "answer";
+    const resolvedIntent =
+      typeof meta.intentFamily === "string"
+        ? String(meta.intentFamily)
+        : retrievalAdequate
+          ? "documents"
+          : "general";
+    const resolvedDomain =
+      typeof meta.domain === "string"
+        ? String(meta.domain)
+        : retrievalAdequate
+          ? "documents"
+          : "general";
     const derivedTruncation = resolveTruncationState({
       telemetry: params.telemetry,
       finalText: params.assistantText,
@@ -936,6 +1110,73 @@ export class CentralizedChatRuntimeDelegate {
         truncation,
       }),
     );
+    const ruleEvents = Array.isArray(
+      params.retrievalPack?.telemetry?.ruleEvents,
+    )
+      ? params.retrievalPack?.telemetry?.ruleEvents
+      : [];
+    const retrievalRuleEventWrites = ruleEvents.map((event) => {
+      const payload = asObject(event?.payload);
+      const eventName = String(event?.event || "").trim();
+      const scoreDeltaSummaryRaw = asObject(payload.scoreDeltaSummary);
+      const toFiniteNumberOrNull = (value: unknown): number | null => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : null;
+      };
+      const scoreDeltaSummary =
+        Object.keys(scoreDeltaSummaryRaw).length > 0
+          ? {
+              candidateHits: toPositiveInt(scoreDeltaSummaryRaw.candidateHits),
+              totalDelta: toFiniteNumberOrNull(scoreDeltaSummaryRaw.totalDelta),
+              averageDelta: toFiniteNumberOrNull(
+                scoreDeltaSummaryRaw.averageDelta,
+              ),
+              maxDelta: toFiniteNumberOrNull(scoreDeltaSummaryRaw.maxDelta),
+            }
+          : null;
+      return this.traceWriter.writeRetrievalEvent({
+        traceId: params.traceId,
+        userId: params.req.userId,
+        conversationId: params.conversationId,
+        operator:
+          typeof payload.operator === "string"
+            ? String(payload.operator)
+            : resolvedOperator,
+        intent:
+          typeof payload.intent === "string"
+            ? String(payload.intent)
+            : resolvedIntent,
+        domain:
+          typeof payload.domain === "string"
+            ? String(payload.domain)
+            : resolvedDomain,
+        docLockEnabled:
+          Boolean(params.retrievalPack?.scope.explicitDocLock) ||
+          (params.req.attachedDocumentIds || []).length > 0,
+        strategy: "document_intelligence_rule_event",
+        candidates: null,
+        selected: null,
+        evidenceStrength: null,
+        refined: undefined,
+        wrongDocPrevented: undefined,
+        sourcesCount: null,
+        navPillsUsed: undefined,
+        fallbackReasonCode: null,
+        at: new Date(),
+        meta: {
+          eventType: eventName,
+          ruleId:
+            typeof payload.ruleId === "string" ? String(payload.ruleId) : null,
+          reason:
+            typeof payload.reason === "string" ? String(payload.reason) : null,
+          variantCount: toPositiveInt(payload.variantCount),
+          anchorsCount: toPositiveInt(payload.anchorsCount),
+          requiredExplicitDocs: toPositiveInt(payload.requiredExplicitDocs),
+          actualExplicitDocs: toPositiveInt(payload.actualExplicitDocs),
+          scoreDeltaSummary,
+        },
+      });
+    });
 
     await Promise.all([
       this.traceWriter.upsertQueryTelemetry({
@@ -944,19 +1185,9 @@ export class CentralizedChatRuntimeDelegate {
         conversationId: params.conversationId,
         messageId: params.assistantMessageId || params.userMessageId || null,
         queryText: params.req.message,
-        intent:
-          typeof meta.intentFamily === "string"
-            ? String(meta.intentFamily)
-            : retrievalAdequate
-              ? "documents"
-              : "general",
+        intent: resolvedIntent,
         intentConfidence: retrievalAdequate ? 0.92 : 0.72,
-        domain:
-          typeof meta.domain === "string"
-            ? String(meta.domain)
-            : retrievalAdequate
-              ? "documents"
-              : "general",
+        domain: resolvedDomain,
         answerMode: params.answerMode,
         operatorFamily:
           typeof meta.operatorFamily === "string"
@@ -1006,24 +1237,9 @@ export class CentralizedChatRuntimeDelegate {
         traceId: params.traceId,
         userId: params.req.userId,
         conversationId: params.conversationId,
-        operator:
-          typeof meta.operator === "string"
-            ? String(meta.operator)
-            : retrievalAdequate
-              ? "answer_with_sources"
-              : "answer",
-        intent:
-          typeof meta.intentFamily === "string"
-            ? String(meta.intentFamily)
-            : retrievalAdequate
-              ? "documents"
-              : "general",
-        domain:
-          typeof meta.domain === "string"
-            ? String(meta.domain)
-            : retrievalAdequate
-              ? "documents"
-              : "general",
+        operator: resolvedOperator,
+        intent: resolvedIntent,
+        domain: resolvedDomain,
         docLockEnabled:
           Boolean(params.retrievalPack?.scope.explicitDocLock) ||
           (params.req.attachedDocumentIds || []).length > 0,
@@ -1043,8 +1259,11 @@ export class CentralizedChatRuntimeDelegate {
             typeof meta.requestId === "string" ? String(meta.requestId) : null,
           evidenceGateAction: evidenceAction,
           retrievalStats: params.retrievalPack?.stats || null,
+          retrievalRuleSummary:
+            params.retrievalPack?.telemetry?.summary || null,
         },
       }),
+      ...retrievalRuleEventWrites,
     ]);
 
     await this.traceWriter.flush(params.traceId, {
@@ -1071,7 +1290,7 @@ export class CentralizedChatRuntimeDelegate {
     let evidenceGateDecision: EvidenceCheckResult | null = null;
     let answerMode: AnswerMode =
       (req.attachedDocumentIds || []).length > 0
-        ? "fallback"
+        ? "help_steps"
         : "general_answer";
     let retrievalMs: number | null = null;
     let llmMs: number | null = null;
@@ -1327,23 +1546,37 @@ export class CentralizedChatRuntimeDelegate {
         },
       });
 
-      const assistantText = finalized.assistantText;
+      const enforceScopedSources = isDocGroundedAnswerMode(answerMode);
+      let assistantText = finalized.assistantText;
       const filteredSources = filterSourcesByProvenance(
         sources,
         finalized.provenance,
         assistantText,
         retrievalPack?.evidence ?? [],
+        { enforceScopedSources },
       );
       const filteredAttachment = filterAttachmentByProvenance(
         sourceButtonsAttachment,
         finalized.provenance,
         assistantText,
         retrievalPack?.evidence ?? [],
+        { enforceScopedSources },
       );
       const attachmentsPayload = mergeAttachments(
         generated.attachmentsPayload,
         filteredAttachment,
       );
+      const sourceInvariantFailureCode = resolveSourceInvariantFailureCode({
+        answerMode,
+        filteredSources,
+      });
+      if (sourceInvariantFailureCode) {
+        assistantText = buildEmptyAssistantText({
+          language: req.preferredLanguage,
+          reasonCode: sourceInvariantFailureCode,
+          seed: `${req.userId}:sources:${sourceInvariantFailureCode}`,
+        });
+      }
 
       const outputSpanId = this.traceWriter.startSpan(
         traceId,
@@ -1394,9 +1627,12 @@ export class CentralizedChatRuntimeDelegate {
         detectorVersion: resolvedTruncation.detectorVersion,
       };
       const status =
-        finalized.failureCode || !assistantTextRaw ? "partial" : "success";
+        finalized.failureCode || sourceInvariantFailureCode || !assistantTextRaw
+          ? "partial"
+          : "success";
       const failureCode =
         finalized.failureCode ||
+        sourceInvariantFailureCode ||
         (assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE");
 
       const result: ChatResult = {
@@ -1556,7 +1792,7 @@ export class CentralizedChatRuntimeDelegate {
     let evidenceGateDecision: EvidenceCheckResult | null = null;
     let answerMode: AnswerMode =
       (req.attachedDocumentIds || []).length > 0
-        ? "fallback"
+        ? "help_steps"
         : "general_answer";
     let retrievalMs: number | null = null;
     let llmMs: number | null = null;
@@ -1863,23 +2099,37 @@ export class CentralizedChatRuntimeDelegate {
         },
       });
 
-      const assistantText = finalized.assistantText;
+      const enforceScopedSources = isDocGroundedAnswerMode(answerMode);
+      let assistantText = finalized.assistantText;
       const filteredSources = filterSourcesByProvenance(
         sources,
         finalized.provenance,
         assistantText,
         retrievalPack?.evidence ?? [],
+        { enforceScopedSources },
       );
       const filteredAttachment = filterAttachmentByProvenance(
         sourceButtonsAttachment,
         finalized.provenance,
         assistantText,
         retrievalPack?.evidence ?? [],
+        { enforceScopedSources },
       );
       const attachmentsPayload = mergeAttachments(
         streamed.attachmentsPayload,
         filteredAttachment,
       );
+      const sourceInvariantFailureCode = resolveSourceInvariantFailureCode({
+        answerMode,
+        filteredSources,
+      });
+      if (sourceInvariantFailureCode) {
+        assistantText = buildEmptyAssistantText({
+          language: req.preferredLanguage,
+          reasonCode: sourceInvariantFailureCode,
+          seed: `${req.userId}:sources:${sourceInvariantFailureCode}`,
+        });
+      }
 
       const outputSpanId = this.traceWriter.startSpan(
         traceId,
@@ -1933,9 +2183,12 @@ export class CentralizedChatRuntimeDelegate {
         detectorVersion: resolvedTruncation.detectorVersion,
       };
       const status =
-        finalized.failureCode || !assistantTextRaw ? "partial" : "success";
+        finalized.failureCode || sourceInvariantFailureCode || !assistantTextRaw
+          ? "partial"
+          : "success";
       const failureCode =
         finalized.failureCode ||
+        sourceInvariantFailureCode ||
         (assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE");
 
       const result: ChatResult = {
@@ -2439,7 +2692,9 @@ export class CentralizedChatRuntimeDelegate {
     preferredLanguage?: string | null,
   ): string {
     const finishReason = normalizeFinishReason(
-      telemetry && typeof telemetry === "object" ? telemetry.finishReason : null,
+      telemetry && typeof telemetry === "object"
+        ? telemetry.finishReason
+        : null,
     );
     const overflow = new Set(["length", "max_tokens", "max_output_tokens"]);
     if (!overflow.has(finishReason)) return text;
@@ -2487,7 +2742,10 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     const lang = normalizeChatLanguage(preferredLanguage);
-    const narrative = lines.filter((line) => !line.includes("|")).join(" ").trim();
+    const narrative = lines
+      .filter((line) => !line.includes("|"))
+      .join(" ")
+      .trim();
     const fallback =
       lang === "pt"
         ? "A tabela foi interrompida antes de concluir. Posso reenviar em bullets para evitar corte."
@@ -2511,7 +2769,8 @@ export class CentralizedChatRuntimeDelegate {
     const isDocGrounded =
       answerMode === "doc_grounded_single" ||
       answerMode === "doc_grounded_multi" ||
-      answerMode === "doc_grounded_quote";
+      answerMode === "doc_grounded_quote" ||
+      answerMode === "doc_grounded_table";
 
     if (!isDocGrounded || !retrievalPack) return [];
 
@@ -2622,7 +2881,6 @@ export class CentralizedChatRuntimeDelegate {
           .filter(Boolean),
       ),
     );
-    const hasSourceEntries = sourceDocumentIdsFromSources.length > 0;
     const requestedMaxOutputTokens = toPositiveInt(
       params.telemetry &&
         typeof params.telemetry === "object" &&
@@ -2672,29 +2930,15 @@ export class CentralizedChatRuntimeDelegate {
       answerClass: params.answerClass,
       allowedDocumentIds: params.req.attachedDocumentIds || [],
     });
-    {
-      const hasAttachedDocs =
-        Array.isArray(params.req.attachedDocumentIds) &&
-        params.req.attachedDocumentIds.length > 0;
-      const hasEvidence = (params.retrievalPack?.evidence?.length ?? 0) > 0;
-      const hardScopeActive = Boolean(
-        params.retrievalPack?.scope?.hardScopeActive,
-      );
-      const softPassEligible =
-        hasEvidence && (hasAttachedDocs || hasSourceEntries || hardScopeActive);
-      // Soft-pass provenance when user explicitly attached docs and evidence
-      // exists. Lexical-overlap metric is unreliable with keyword retrieval.
-      const softPass = !provenanceValidation.ok && softPassEligible;
-      provenance = {
-        ...provenance,
-        validated: provenanceValidation.ok || softPass,
-        failureCode: softPass ? null : provenanceValidation.failureCode,
-        sourceDocumentIds:
-          provenance.sourceDocumentIds.length > 0
-            ? provenance.sourceDocumentIds
-            : sourceDocumentIdsFromSources,
-      };
-    }
+    provenance = {
+      ...provenance,
+      validated: provenanceValidation.ok,
+      failureCode: provenanceValidation.failureCode,
+      sourceDocumentIds:
+        provenance.sourceDocumentIds.length > 0
+          ? provenance.sourceDocumentIds
+          : sourceDocumentIdsFromSources,
+    };
 
     // 2. Run quality gates (format checks, brevity, markdown sanity)
     try {
@@ -2812,56 +3056,41 @@ export class CentralizedChatRuntimeDelegate {
         answerClass: params.answerClass,
         allowedDocumentIds: params.req.attachedDocumentIds || [],
       });
-      const hasAttachedDocs =
-        Array.isArray(params.req.attachedDocumentIds) &&
-        params.req.attachedDocumentIds.length > 0;
-      const hasEvidence = (params.retrievalPack?.evidence?.length ?? 0) > 0;
-      const hardScopeActive = Boolean(
-        params.retrievalPack?.scope?.hardScopeActive,
-      );
-      const softPassEligible =
-        hasEvidence && (hasAttachedDocs || hasSourceEntries || hardScopeActive);
-      if (!revalidated.ok && softPassEligible) {
-        // Soft-pass: provenance lexical-overlap metric is unreliable with
-        // keyword retrieval. Preserve the generated answer and mark validated.
-        provenance = {
-          ...provenance,
-          validated: true,
-          failureCode: null,
-          sourceDocumentIds:
-            revalidatedProvenance.sourceDocumentIds.length > 0
-              ? revalidatedProvenance.sourceDocumentIds
-              : provenance.sourceDocumentIds.length > 0
-                ? provenance.sourceDocumentIds
-                : sourceDocumentIdsFromSources,
-          snippetRefs:
-            revalidatedProvenance.snippetRefs.length > 0
-              ? revalidatedProvenance.snippetRefs
-              : provenance.snippetRefs,
-        };
-      } else {
-        provenance = {
-          ...provenance,
-          validated: revalidated.ok,
-          failureCode: revalidated.failureCode,
-          sourceDocumentIds:
-            revalidatedProvenance.sourceDocumentIds.length > 0
-              ? revalidatedProvenance.sourceDocumentIds
-              : provenance.sourceDocumentIds,
-          snippetRefs:
-            revalidatedProvenance.snippetRefs.length > 0
-              ? revalidatedProvenance.snippetRefs
-              : provenance.snippetRefs,
-        };
-        if (!revalidated.ok) {
-          failureCode = revalidated.failureCode;
-          text = buildEmptyAssistantText({
-            language: params.req.preferredLanguage,
-            reasonCode: revalidated.failureCode,
-            seed: `${params.req.userId}:provenance:${revalidated.failureCode}`,
-          });
-        }
+      provenance = {
+        ...provenance,
+        validated: revalidated.ok,
+        failureCode: revalidated.failureCode,
+        sourceDocumentIds:
+          revalidatedProvenance.sourceDocumentIds.length > 0
+            ? revalidatedProvenance.sourceDocumentIds
+            : provenance.sourceDocumentIds.length > 0
+              ? provenance.sourceDocumentIds
+              : sourceDocumentIdsFromSources,
+        snippetRefs:
+          revalidatedProvenance.snippetRefs.length > 0
+            ? revalidatedProvenance.snippetRefs
+            : provenance.snippetRefs,
+      };
+      if (!revalidated.ok) {
+        failureCode = revalidated.failureCode;
+        text = buildEmptyAssistantText({
+          language: params.req.preferredLanguage,
+          reasonCode: revalidated.failureCode,
+          seed: `${params.req.userId}:provenance:${revalidated.failureCode}`,
+        });
       }
+    }
+
+    const languageContract = enforceLanguageContract({
+      text,
+      preferredLanguage: params.req.preferredLanguage,
+    });
+    if (languageContract.adjusted) {
+      appLogger.warn("[finalizeChatTurn] language_contract_fail_closed", {
+        requestId: this.resolveTraceId(params.req),
+        preferredLanguage: normalizeChatLanguage(params.req.preferredLanguage),
+      });
+      text = languageContract.text;
     }
 
     // 4. Generate followups for doc-grounded answers
@@ -2932,10 +3161,12 @@ export class CentralizedChatRuntimeDelegate {
     });
     const answerMode: AnswerMode =
       (req.attachedDocumentIds || []).length > 0
-        ? "fallback"
+        ? "help_steps"
         : "general_answer";
     const answerClass: AnswerClass =
-      answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
+      answerMode === "general_answer" || answerMode === "help_steps"
+        ? "GENERAL"
+        : "DOCUMENT";
 
     const assistantMessage = await this.createMessage({
       conversationId,
@@ -3704,28 +3935,14 @@ export class CentralizedChatRuntimeDelegate {
       docScopeSignals.singleDocIntent = false;
     }
 
-    // Conversation-history fallback: if the resolver didn't match any doc,
-    // but the previous turn resolved a doc that's still in the attachment set,
-    // carry it forward as the active doc scope.
-    if (
-      !docScopeSignals.resolvedDocId &&
-      !docScopeSignals.singleDocIntent &&
-      lastDocumentId &&
-      attached.includes(lastDocumentId)
-    ) {
-      docScopeSignals.docScopeLock = createDocScopeLock({
-        mode: "single_doc",
-        allowedDocumentIds: [lastDocumentId],
-        activeDocumentId: lastDocumentId,
-        source: "conversation_history",
-      });
-      docScopeSignals.explicitDocLock = true;
-      docScopeSignals.activeDocId = lastDocumentId;
-      docScopeSignals.explicitDocRef = true;
-      docScopeSignals.resolvedDocId = lastDocumentId;
-      docScopeSignals.hardScopeActive = true;
-      docScopeSignals.singleDocIntent = true;
-    }
+    Object.assign(
+      docScopeSignals,
+      applyConversationHistoryDocScopeFallback({
+        signals: docScopeSignals,
+        attachedDocumentIds: attached,
+        lastDocumentId,
+      }),
+    );
 
     const retrievalReq: RetrievalRequest = {
       query: req.message,
@@ -3999,12 +4216,18 @@ export class CentralizedChatRuntimeDelegate {
     retrievalPack: EvidencePack | null,
   ): AnswerMode {
     const docsAttached = (req.attachedDocumentIds || []).length > 0;
+    const operator = String((req.meta as any)?.operator || "")
+      .trim()
+      .toLowerCase();
     const evidenceCount = retrievalPack?.evidence.length ?? 0;
     const contextSignals = asObject((req.context as any)?.signals || {});
     const semanticSignals = this.collectSemanticSignals(
       req.message,
       contextSignals,
     );
+    if (operator === "open" || operator === "navigate") {
+      return "nav_pills";
+    }
     const askForTable =
       semanticSignals.userAskedForTable || semanticSignals.tableExpected;
     const askForQuote = semanticSignals.userAskedForQuote;
@@ -4012,7 +4235,9 @@ export class CentralizedChatRuntimeDelegate {
     if (evidenceCount > 0 && askForTable) return "doc_grounded_table";
     if (evidenceCount > 1) return "doc_grounded_multi";
     if (evidenceCount === 1) return "doc_grounded_single";
-    if (docsAttached) return "fallback";
+    // Attached docs with zero evidence must fail closed as a scoped-not-found
+    // guidance turn, not a generic fallback answer.
+    if (docsAttached) return "help_steps";
     return "general_answer";
   }
 

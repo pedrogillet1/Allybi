@@ -1,0 +1,888 @@
+{
+  "_meta": {
+    "id": "legal_doc_type_catalog",
+    "version": "2.0.0",
+    "description": "Catalog of legal document types with bilingual detection fingerprints and routing cues.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal"
+  },
+  "domain": "legal",
+  "docTypes": [
+    {
+      "id": "legal_nda",
+      "name": {
+        "en": "Non-Disclosure Agreement",
+        "pt": "Acordo de Confidencialidade"
+      },
+      "description": "Non-Disclosure Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bnon\\s+disclosure\\s+agreement\\b",
+        "\\bnda\\b",
+        "\\bacordo\\s+de\\s+confidencialidade\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 100,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_msa",
+      "name": {
+        "en": "Master Services Agreement",
+        "pt": "Acordo Mestre de Servicos"
+      },
+      "description": "Master Services Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bmaster\\s+services\\s+agreement\\b",
+        "\\bmsa\\b",
+        "\\bacordo\\s+mestre\\s+de\\s+servicos\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 99,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_sow",
+      "name": {
+        "en": "Statement of Work",
+        "pt": "Declaracao de Trabalho"
+      },
+      "description": "Statement of Work detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bstatement\\s+of\\s+work\\b",
+        "\\bsow\\b",
+        "\\bdeclaracao\\s+de\\s+trabalho\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 98,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_dpa",
+      "name": {
+        "en": "Data Processing Agreement",
+        "pt": "Acordo de Tratamento de Dados"
+      },
+      "description": "Data Processing Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bdata\\s+processing\\s+agreement\\b",
+        "\\bdpa\\b",
+        "\\bacordo\\s+de\\s+tratamento\\s+de\\s+dados\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 97,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_sla",
+      "name": {
+        "en": "Service Level Agreement",
+        "pt": "Acordo de Nivel de Servico"
+      },
+      "description": "Service Level Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bservice\\s+level\\s+agreement\\b",
+        "\\bsla\\b",
+        "\\bacordo\\s+de\\s+nivel\\s+de\\s+servico\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 96,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_baa",
+      "name": {
+        "en": "Business Associate Agreement",
+        "pt": "Acordo de Associado Comercial"
+      },
+      "description": "Business Associate Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bbusiness\\s+associate\\s+agreement\\b",
+        "\\bbaa\\b",
+        "\\bacordo\\s+de\\s+associado\\s+comercial\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 95,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_employment_agreement",
+      "name": {
+        "en": "Employment Agreement",
+        "pt": "Contrato de Trabalho"
+      },
+      "description": "Employment Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bemployment\\s+agreement\\b",
+        "\\bemployment[ -]?agreement\\b",
+        "\\bcontrato\\s+de\\s+trabalho\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 94,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_offer_letter",
+      "name": {
+        "en": "Offer Letter",
+        "pt": "Carta Proposta de Emprego"
+      },
+      "description": "Offer Letter detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\boffer\\s+letter\\b",
+        "\\boffer[ -]?letter\\b",
+        "\\bcarta\\s+proposta\\s+de\\s+emprego\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 93,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_contractor_agreement",
+      "name": {
+        "en": "Independent Contractor Agreement",
+        "pt": "Contrato de Prestador Independente"
+      },
+      "description": "Independent Contractor Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bindependent\\s+contractor\\s+agreement\\b",
+        "\\bcontractor[ -]?agreement\\b",
+        "\\bcontrato\\s+de\\s+prestador\\s+independente\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 92,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_consulting_agreement",
+      "name": {
+        "en": "Consulting Agreement",
+        "pt": "Contrato de Consultoria"
+      },
+      "description": "Consulting Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bconsulting\\s+agreement\\b",
+        "\\bconsulting[ -]?agreement\\b",
+        "\\bcontrato\\s+de\\s+consultoria\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 91,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_ip_assignment",
+      "name": {
+        "en": "IP Assignment Agreement",
+        "pt": "Acordo de Cessao de Propriedade Intelectual"
+      },
+      "description": "IP Assignment Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bip\\s+assignment\\s+agreement\\b",
+        "\\bip[ -]?assignment\\b",
+        "\\bacordo\\s+de\\s+cessao\\s+de\\s+propriedade\\s+intelectual\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 90,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_license_agreement",
+      "name": {
+        "en": "License Agreement",
+        "pt": "Contrato de Licenca"
+      },
+      "description": "License Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\blicense\\s+agreement\\b",
+        "\\blicense[ -]?agreement\\b",
+        "\\bcontrato\\s+de\\s+licenca\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 89,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_eula",
+      "name": {
+        "en": "End User License Agreement",
+        "pt": "Licenca de Usuario Final"
+      },
+      "description": "End User License Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bend\\s+user\\s+license\\s+agreement\\b",
+        "\\beula\\b",
+        "\\blicenca\\s+de\\s+usuario\\s+final\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 88,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_reseller_distribution",
+      "name": {
+        "en": "Reseller and Distribution Agreement",
+        "pt": "Acordo de Revenda e Distribuicao"
+      },
+      "description": "Reseller and Distribution Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\breseller\\s+and\\s+distribution\\s+agreement\\b",
+        "\\breseller[ -]?distribution\\b",
+        "\\bacordo\\s+de\\s+revenda\\s+e\\s+distribuicao\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 87,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_partnership_jv",
+      "name": {
+        "en": "Partnership / Joint Venture Agreement",
+        "pt": "Acordo de Parceria ou Joint Venture"
+      },
+      "description": "Partnership / Joint Venture Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bpartnership\\s+joint\\s+venture\\s+agreement\\b",
+        "\\bpartnership[ -]?jv\\b",
+        "\\bacordo\\s+de\\s+parceria\\s+ou\\s+joint\\s+venture\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 86,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_board_minutes",
+      "name": {
+        "en": "Board Meeting Minutes",
+        "pt": "Ata de Reuniao do Conselho"
+      },
+      "description": "Board Meeting Minutes detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bboard\\s+meeting\\s+minutes\\b",
+        "\\bboard[ -]?minutes\\b",
+        "\\bata\\s+de\\s+reuniao\\s+do\\s+conselho\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_board_resolution",
+      "name": {
+        "en": "Board Resolution",
+        "pt": "Resolucao do Conselho"
+      },
+      "description": "Board Resolution detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bboard\\s+resolution\\b",
+        "\\bboard[ -]?resolution\\b",
+        "\\bresolucao\\s+do\\s+conselho\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 84,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_written_consent",
+      "name": {
+        "en": "Written Consent",
+        "pt": "Consentimento por Escrito"
+      },
+      "description": "Written Consent detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bwritten\\s+consent\\b",
+        "\\bwritten[ -]?consent\\b",
+        "\\bconsentimento\\s+por\\s+escrito\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 83,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_bylaws_charter",
+      "name": {
+        "en": "Bylaws / Corporate Charter",
+        "pt": "Estatuto ou Contrato Social"
+      },
+      "description": "Bylaws / Corporate Charter detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bbylaws\\s+corporate\\s+charter\\b",
+        "\\bbylaws[ -]?charter\\b",
+        "\\bestatuto\\s+ou\\s+contrato\\s+social\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 82,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_privacy_policy",
+      "name": {
+        "en": "Privacy Policy",
+        "pt": "Politica de Privacidade"
+      },
+      "description": "Privacy Policy detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bprivacy\\s+policy\\b",
+        "\\bprivacy[ -]?policy\\b",
+        "\\bpolitica\\s+de\\s+privacidade\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 81,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_terms_of_service",
+      "name": {
+        "en": "Terms of Service",
+        "pt": "Termos de Servico"
+      },
+      "description": "Terms of Service detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bterms\\s+of\\s+service\\b",
+        "\\bterms[ -]?of[ -]?service\\b",
+        "\\btermos\\s+de\\s+servico\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 80,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_cookie_policy",
+      "name": {
+        "en": "Cookie Policy",
+        "pt": "Politica de Cookies"
+      },
+      "description": "Cookie Policy detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bcookie\\s+policy\\b",
+        "\\bcookie[ -]?policy\\b",
+        "\\bpolitica\\s+de\\s+cookies\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 79,
+      "riskTier": "medium"
+    },
+    {
+      "id": "legal_acceptable_use_policy",
+      "name": {
+        "en": "Acceptable Use Policy",
+        "pt": "Politica de Uso Aceitavel"
+      },
+      "description": "Acceptable Use Policy detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bacceptable\\s+use\\s+policy\\b",
+        "\\bacceptable[ -]?use[ -]?policy\\b",
+        "\\bpolitica\\s+de\\s+uso\\s+aceitavel\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 78,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_data_retention_policy",
+      "name": {
+        "en": "Data Retention Policy",
+        "pt": "Politica de Retencao de Dados"
+      },
+      "description": "Data Retention Policy detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bdata\\s+retention\\s+policy\\b",
+        "\\bdata[ -]?retention[ -]?policy\\b",
+        "\\bpolitica\\s+de\\s+retencao\\s+de\\s+dados\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 77,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_code_of_conduct",
+      "name": {
+        "en": "Code of Conduct",
+        "pt": "Codigo de Conduta"
+      },
+      "description": "Code of Conduct detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bcode\\s+of\\s+conduct\\b",
+        "\\bcode[ -]?of[ -]?conduct\\b",
+        "\\bcodigo\\s+de\\s+conduta\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 76,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_security_policy",
+      "name": {
+        "en": "Security Policy",
+        "pt": "Politica de Seguranca"
+      },
+      "description": "Security Policy detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bsecurity\\s+policy\\b",
+        "\\bsecurity[ -]?policy\\b",
+        "\\bpolitica\\s+de\\s+seguranca\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 75,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_complaint",
+      "name": {
+        "en": "Legal Complaint",
+        "pt": "Peticao Inicial"
+      },
+      "description": "Legal Complaint detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\blegal\\s+complaint\\b",
+        "\\bcomplaint\\b",
+        "\\bpeticao\\s+inicial\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 74,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_motion_brief",
+      "name": {
+        "en": "Motion or Brief",
+        "pt": "Peticao Intermediaria ou Memorial"
+      },
+      "description": "Motion or Brief detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bmotion\\s+or\\s+brief\\b",
+        "\\bmotion[ -]?brief\\b",
+        "\\bpeticao\\s+intermediaria\\s+ou\\s+memorial\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 73,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_court_order",
+      "name": {
+        "en": "Court Order",
+        "pt": "Ordem Judicial"
+      },
+      "description": "Court Order detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bcourt\\s+order\\b",
+        "\\bcourt[ -]?order\\b",
+        "\\bordem\\s+judicial\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 72,
+      "riskTier": "high"
+    },
+    {
+      "id": "legal_settlement_agreement",
+      "name": {
+        "en": "Settlement Agreement",
+        "pt": "Acordo de Transacao"
+      },
+      "description": "Settlement Agreement detection profile for legal interpretation and extraction.",
+      "detectionPatterns": [
+        "\\bsettlement\\s+agreement\\b",
+        "\\bsettlement[ -]?agreement\\b",
+        "\\bacordo\\s+de\\s+transacao\\b"
+      ],
+      "commonSections": [
+        "document_header",
+        "parties",
+        "recitals_background",
+        "definitions",
+        "scope_of_services",
+        "fees_and_payment",
+        "term_and_renewal",
+        "termination",
+        "confidentiality_privacy",
+        "security_compliance",
+        "ip_and_license",
+        "liability_and_indemnity"
+      ],
+      "extractionPriority": 71,
+      "riskTier": "high"
+    }
+  ]
+}

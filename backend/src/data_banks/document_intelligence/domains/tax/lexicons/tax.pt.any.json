@@ -1,0 +1,679 @@
+{
+  "_meta": {
+    "id": "di_tax_lexicon_pt",
+    "version": "1.0.0",
+    "description": "Portuguese lexicon for tax domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "language": "pt"
+  },
+  "domain": "tax",
+  "terms": [
+    {
+      "id": "tax_lex_pt_adjusted_gross_income",
+      "canonical": "renda bruta ajustada",
+      "synonyms": [
+        "rba",
+        "renda ajustada"
+      ],
+      "display": "Renda Bruta Ajustada",
+      "enRef": "tax_lex_adjusted_gross_income"
+    },
+    {
+      "id": "tax_lex_pt_advance_tax",
+      "canonical": "pagamento antecipado de imposto",
+      "synonyms": [
+        "estimativa",
+        "antecipacao"
+      ],
+      "display": "Pagamento Antecipado",
+      "enRef": "tax_lex_advance_tax"
+    },
+    {
+      "id": "tax_lex_pt_assessment",
+      "canonical": "lancamento tributario",
+      "synonyms": [
+        "notificacao de lancamento",
+        "apuracao"
+      ],
+      "display": "Lancamento Tributario",
+      "enRef": "tax_lex_assessment"
+    },
+    {
+      "id": "tax_lex_pt_assessment_year",
+      "canonical": "ano-base de lancamento",
+      "synonyms": [
+        "ano de apuracao",
+        "exercicio"
+      ],
+      "display": "Ano de Lancamento",
+      "enRef": "tax_lex_assessment_year"
+    },
+    {
+      "id": "tax_lex_pt_audit_flag",
+      "canonical": "indicador de fiscalizacao",
+      "synonyms": [
+        "sinal de auditoria",
+        "alerta fiscal"
+      ],
+      "display": "Indicador de Fiscalizacao",
+      "enRef": "tax_lex_audit_flag"
+    },
+    {
+      "id": "tax_lex_pt_balance_due",
+      "canonical": "saldo a pagar",
+      "synonyms": [
+        "imposto devido",
+        "valor devido"
+      ],
+      "display": "Saldo a Pagar",
+      "enRef": "tax_lex_balance_due"
+    },
+    {
+      "id": "tax_lex_pt_capital_gain",
+      "canonical": "ganho de capital",
+      "synonyms": [
+        "lucro na alienacao",
+        "ganho patrimonial"
+      ],
+      "display": "Ganho de Capital",
+      "enRef": "tax_lex_capital_gain"
+    },
+    {
+      "id": "tax_lex_pt_carryforward",
+      "canonical": "compensacao futura",
+      "synonyms": [
+        "saldo para compensar",
+        "carrego"
+      ],
+      "display": "Compensacao Futura",
+      "enRef": "tax_lex_carryforward"
+    },
+    {
+      "id": "tax_lex_pt_credit",
+      "canonical": "credito tributario",
+      "synonyms": [
+        "credito",
+        "beneficio fiscal"
+      ],
+      "display": "Credito Tributario",
+      "enRef": "tax_lex_credit"
+    },
+    {
+      "id": "tax_lex_pt_declaration",
+      "canonical": "declaracao fiscal",
+      "synonyms": [
+        "declaracao de imposto",
+        "entrega"
+      ],
+      "display": "Declaracao Fiscal",
+      "enRef": "tax_lex_declaration"
+    },
+    {
+      "id": "tax_lex_pt_deduction",
+      "canonical": "deducao",
+      "synonyms": [
+        "valor dedutivel",
+        "abatimento"
+      ],
+      "display": "Deducao",
+      "enRef": "tax_lex_deduction"
+    },
+    {
+      "id": "tax_lex_pt_dependent",
+      "canonical": "dependente",
+      "synonyms": [
+        "dependente fiscal",
+        "membro dependente"
+      ],
+      "display": "Dependente",
+      "enRef": "tax_lex_dependent"
+    },
+    {
+      "id": "tax_lex_pt_digital_signature",
+      "canonical": "assinatura digital",
+      "synonyms": [
+        "assinatura eletronica",
+        "e-assinatura"
+      ],
+      "display": "Assinatura Digital",
+      "enRef": "tax_lex_digital_signature"
+    },
+    {
+      "id": "tax_lex_pt_document_reference",
+      "canonical": "referencia do documento",
+      "synonyms": [
+        "numero de referencia",
+        "protocolo"
+      ],
+      "display": "Referencia do Documento",
+      "enRef": "tax_lex_document_reference"
+    },
+    {
+      "id": "tax_lex_pt_effective_rate",
+      "canonical": "aliquota efetiva",
+      "synonyms": [
+        "taxa efetiva",
+        "etr"
+      ],
+      "display": "Aliquota Efetiva",
+      "enRef": "tax_lex_effective_rate"
+    },
+    {
+      "id": "tax_lex_pt_employer_withholding",
+      "canonical": "retencao pelo empregador",
+      "synonyms": [
+        "retencao em folha",
+        "retencao na fonte"
+      ],
+      "display": "Retencao do Empregador",
+      "enRef": "tax_lex_employer_withholding"
+    },
+    {
+      "id": "tax_lex_pt_estimated_tax",
+      "canonical": "imposto estimado",
+      "synonyms": [
+        "estimativa trimestral",
+        "estimativa"
+      ],
+      "display": "Imposto Estimado",
+      "enRef": "tax_lex_estimated_tax"
+    },
+    {
+      "id": "tax_lex_pt_filing_date",
+      "canonical": "data de entrega",
+      "synonyms": [
+        "data de envio",
+        "protocolo em"
+      ],
+      "display": "Data de Entrega",
+      "enRef": "tax_lex_filing_date"
+    },
+    {
+      "id": "tax_lex_pt_filing_status",
+      "canonical": "situacao da declaracao",
+      "synonyms": [
+        "status da declaracao",
+        "situacao"
+      ],
+      "display": "Situacao da Declaracao",
+      "enRef": "tax_lex_filing_status"
+    },
+    {
+      "id": "tax_lex_pt_gross_income",
+      "canonical": "renda bruta",
+      "synonyms": [
+        "rendimento bruto",
+        "total de rendimentos"
+      ],
+      "display": "Renda Bruta",
+      "enRef": "tax_lex_gross_income"
+    },
+    {
+      "id": "tax_lex_pt_income_tax",
+      "canonical": "imposto de renda",
+      "synonyms": [
+        "ir",
+        "tributo sobre renda"
+      ],
+      "display": "Imposto de Renda",
+      "enRef": "tax_lex_income_tax"
+    },
+    {
+      "id": "tax_lex_pt_installment",
+      "canonical": "parcela",
+      "synonyms": [
+        "pagamento parcelado",
+        "cota"
+      ],
+      "display": "Parcela",
+      "enRef": "tax_lex_installment"
+    },
+    {
+      "id": "tax_lex_pt_interest",
+      "canonical": "juros",
+      "synonyms": [
+        "juros por atraso",
+        "encargos"
+      ],
+      "display": "Juros",
+      "enRef": "tax_lex_interest"
+    },
+    {
+      "id": "tax_lex_pt_itemized_deduction",
+      "canonical": "deducao detalhada",
+      "synonyms": [
+        "deducao discriminada",
+        "despesas dedutiveis"
+      ],
+      "display": "Deducao Detalhada",
+      "enRef": "tax_lex_itemized_deduction"
+    },
+    {
+      "id": "tax_lex_pt_jurisdiction",
+      "canonical": "jurisdicao tributaria",
+      "synonyms": [
+        "ente tributante",
+        "autoridade fiscal"
+      ],
+      "display": "Jurisdicao Tributaria",
+      "enRef": "tax_lex_jurisdiction"
+    },
+    {
+      "id": "tax_lex_pt_late_fee",
+      "canonical": "multa por atraso",
+      "synonyms": [
+        "multa de mora",
+        "encargo por atraso"
+      ],
+      "display": "Multa por Atraso",
+      "enRef": "tax_lex_late_fee"
+    },
+    {
+      "id": "tax_lex_pt_liability",
+      "canonical": "obrigacao tributaria",
+      "synonyms": [
+        "passivo tributario",
+        "valor devido"
+      ],
+      "display": "Obrigacao Tributaria",
+      "enRef": "tax_lex_liability"
+    },
+    {
+      "id": "tax_lex_pt_notice",
+      "canonical": "notificacao fiscal",
+      "synonyms": [
+        "aviso fiscal",
+        "intimacao"
+      ],
+      "display": "Notificacao Fiscal",
+      "enRef": "tax_lex_notice"
+    },
+    {
+      "id": "tax_lex_pt_notice_date",
+      "canonical": "data da notificacao",
+      "synonyms": [
+        "data do aviso",
+        "emitido em"
+      ],
+      "display": "Data da Notificacao",
+      "enRef": "tax_lex_notice_date"
+    },
+    {
+      "id": "tax_lex_pt_objection",
+      "canonical": "impugnacao",
+      "synonyms": [
+        "contestacao",
+        "recurso"
+      ],
+      "display": "Impugnacao",
+      "enRef": "tax_lex_objection"
+    },
+    {
+      "id": "tax_lex_pt_paid_amount",
+      "canonical": "valor pago",
+      "synonyms": [
+        "montante pago",
+        "pagamento efetuado"
+      ],
+      "display": "Valor Pago",
+      "enRef": "tax_lex_paid_amount"
+    },
+    {
+      "id": "tax_lex_pt_payment_channel",
+      "canonical": "canal de pagamento",
+      "synonyms": [
+        "meio de pagamento",
+        "banco arrecadador"
+      ],
+      "display": "Canal de Pagamento",
+      "enRef": "tax_lex_payment_channel"
+    },
+    {
+      "id": "tax_lex_pt_payment_deadline",
+      "canonical": "prazo de pagamento",
+      "synonyms": [
+        "vencimento",
+        "data limite"
+      ],
+      "display": "Prazo de Pagamento",
+      "enRef": "tax_lex_payment_deadline"
+    },
+    {
+      "id": "tax_lex_pt_payment_reference",
+      "canonical": "codigo de pagamento",
+      "synonyms": [
+        "referencia de pagamento",
+        "linha digitavel"
+      ],
+      "display": "Codigo de Pagamento",
+      "enRef": "tax_lex_payment_reference"
+    },
+    {
+      "id": "tax_lex_pt_payment_slip",
+      "canonical": "guia de pagamento",
+      "synonyms": [
+        "boleto de imposto",
+        "darf"
+      ],
+      "display": "Guia de Pagamento",
+      "enRef": "tax_lex_payment_slip"
+    },
+    {
+      "id": "tax_lex_pt_penalty",
+      "canonical": "penalidade",
+      "synonyms": [
+        "multa",
+        "sancao"
+      ],
+      "display": "Penalidade",
+      "enRef": "tax_lex_penalty"
+    },
+    {
+      "id": "tax_lex_pt_period",
+      "canonical": "periodo de apuracao",
+      "synonyms": [
+        "competencia",
+        "periodo fiscal"
+      ],
+      "display": "Periodo de Apuracao",
+      "enRef": "tax_lex_period"
+    },
+    {
+      "id": "tax_lex_pt_property_assessment",
+      "canonical": "valor venal",
+      "synonyms": [
+        "valor avaliado",
+        "base venal"
+      ],
+      "display": "Valor Venal",
+      "enRef": "tax_lex_property_assessment"
+    },
+    {
+      "id": "tax_lex_pt_property_tax",
+      "canonical": "imposto predial",
+      "synonyms": [
+        "iptu",
+        "imposto imobiliario"
+      ],
+      "display": "Imposto Predial",
+      "enRef": "tax_lex_property_tax"
+    },
+    {
+      "id": "tax_lex_pt_property_tax_bill",
+      "canonical": "cobranca de imposto predial",
+      "synonyms": [
+        "boleto iptu",
+        "carne iptu"
+      ],
+      "display": "Cobranca de Imposto Predial",
+      "enRef": "tax_lex_property_tax_bill"
+    },
+    {
+      "id": "tax_lex_pt_receipt_number",
+      "canonical": "numero de comprovante",
+      "synonyms": [
+        "numero do recibo",
+        "comprovante"
+      ],
+      "display": "Numero de Comprovante",
+      "enRef": "tax_lex_receipt_number"
+    },
+    {
+      "id": "tax_lex_pt_refund",
+      "canonical": "restituicao",
+      "synonyms": [
+        "valor a restituir",
+        "devolucao de imposto"
+      ],
+      "display": "Restituicao",
+      "enRef": "tax_lex_refund"
+    },
+    {
+      "id": "tax_lex_pt_residency_status",
+      "canonical": "situacao de residencia",
+      "synonyms": [
+        "residencia fiscal",
+        "status de residencia"
+      ],
+      "display": "Situacao de Residencia",
+      "enRef": "tax_lex_residency_status"
+    },
+    {
+      "id": "tax_lex_pt_return_copy",
+      "canonical": "copia da declaracao",
+      "synonyms": [
+        "arquivo da declaracao",
+        "recibo da declaracao"
+      ],
+      "display": "Copia da Declaracao",
+      "enRef": "tax_lex_return_copy"
+    },
+    {
+      "id": "tax_lex_pt_return_type",
+      "canonical": "tipo de declaracao",
+      "synonyms": [
+        "modelo de declaracao",
+        "categoria"
+      ],
+      "display": "Tipo de Declaracao",
+      "enRef": "tax_lex_return_type"
+    },
+    {
+      "id": "tax_lex_pt_self_employment_tax",
+      "canonical": "imposto de autonomo",
+      "synonyms": [
+        "tributacao de autonomo",
+        "contribuicao de autonomo"
+      ],
+      "display": "Imposto de Autonomo",
+      "enRef": "tax_lex_self_employment_tax"
+    },
+    {
+      "id": "tax_lex_pt_social_contribution",
+      "canonical": "contribuicao social",
+      "synonyms": [
+        "cs",
+        "encargo social"
+      ],
+      "display": "Contribuicao Social",
+      "enRef": "tax_lex_social_contribution"
+    },
+    {
+      "id": "tax_lex_pt_standard_deduction",
+      "canonical": "deducao padrao",
+      "synonyms": [
+        "abatimento padrao",
+        "deducao fixa"
+      ],
+      "display": "Deducao Padrao",
+      "enRef": "tax_lex_standard_deduction"
+    },
+    {
+      "id": "tax_lex_pt_state_tax",
+      "canonical": "imposto estadual",
+      "synonyms": [
+        "tributo estadual",
+        "icms estadual"
+      ],
+      "display": "Imposto Estadual",
+      "enRef": "tax_lex_state_tax"
+    },
+    {
+      "id": "tax_lex_pt_surcharge",
+      "canonical": "adicional",
+      "synonyms": [
+        "sobretaxa",
+        "acrescimo"
+      ],
+      "display": "Adicional",
+      "enRef": "tax_lex_surcharge"
+    },
+    {
+      "id": "tax_lex_pt_tax_base",
+      "canonical": "base de calculo",
+      "synonyms": [
+        "base tributavel",
+        "base fiscal"
+      ],
+      "display": "Base de Calculo",
+      "enRef": "tax_lex_tax_base"
+    },
+    {
+      "id": "tax_lex_pt_tax_code",
+      "canonical": "codigo tributario",
+      "synonyms": [
+        "codigo fiscal",
+        "fundamento legal"
+      ],
+      "display": "Codigo Tributario",
+      "enRef": "tax_lex_tax_code"
+    },
+    {
+      "id": "tax_lex_pt_tax_credit_limit",
+      "canonical": "limite de credito tributario",
+      "synonyms": [
+        "teto de credito",
+        "limite de compensacao"
+      ],
+      "display": "Limite de Credito Tributario",
+      "enRef": "tax_lex_tax_credit_limit"
+    },
+    {
+      "id": "tax_lex_pt_tax_form",
+      "canonical": "formulario fiscal",
+      "synonyms": [
+        "formulario de imposto",
+        "declaracao"
+      ],
+      "display": "Formulario Fiscal",
+      "enRef": "tax_lex_tax_form"
+    },
+    {
+      "id": "tax_lex_pt_tax_id",
+      "canonical": "numero de identificacao fiscal",
+      "synonyms": [
+        "cpf/cnpj",
+        "id fiscal"
+      ],
+      "display": "Identificacao Fiscal",
+      "enRef": "tax_lex_tax_id"
+    },
+    {
+      "id": "tax_lex_pt_tax_office",
+      "canonical": "reparticao fiscal",
+      "synonyms": [
+        "posto fiscal",
+        "receita"
+      ],
+      "display": "Reparticao Fiscal",
+      "enRef": "tax_lex_tax_office"
+    },
+    {
+      "id": "tax_lex_pt_taxable_income",
+      "canonical": "renda tributavel",
+      "synonyms": [
+        "base tributavel",
+        "rendimento tributavel"
+      ],
+      "display": "Renda Tributavel",
+      "enRef": "tax_lex_taxable_income"
+    },
+    {
+      "id": "tax_lex_pt_taxpayer",
+      "canonical": "contribuinte",
+      "synonyms": [
+        "declarante",
+        "sujeito passivo"
+      ],
+      "display": "Contribuinte",
+      "enRef": "tax_lex_taxpayer"
+    },
+    {
+      "id": "tax_lex_pt_taxpayer_address",
+      "canonical": "endereco do contribuinte",
+      "synonyms": [
+        "domicilio fiscal",
+        "endereco cadastral"
+      ],
+      "display": "Endereco do Contribuinte",
+      "enRef": "tax_lex_taxpayer_address"
+    },
+    {
+      "id": "tax_lex_pt_taxpayer_name",
+      "canonical": "nome do contribuinte",
+      "synonyms": [
+        "nome do declarante",
+        "titular"
+      ],
+      "display": "Nome do Contribuinte",
+      "enRef": "tax_lex_taxpayer_name"
+    },
+    {
+      "id": "tax_lex_pt_taxpayer_signature",
+      "canonical": "assinatura do contribuinte",
+      "synonyms": [
+        "assinatura do declarante",
+        "assinatura"
+      ],
+      "display": "Assinatura do Contribuinte",
+      "enRef": "tax_lex_taxpayer_signature"
+    },
+    {
+      "id": "tax_lex_pt_third_party_withholding",
+      "canonical": "retencao de terceiros",
+      "synonyms": [
+        "retencao na fonte",
+        "retido por fonte"
+      ],
+      "display": "Retencao de Terceiros",
+      "enRef": "tax_lex_third_party_withholding"
+    },
+    {
+      "id": "tax_lex_pt_underpayment",
+      "canonical": "insuficiencia de pagamento",
+      "synonyms": [
+        "pagamento a menor",
+        "saldo insuficiente"
+      ],
+      "display": "Insuficiencia de Pagamento",
+      "enRef": "tax_lex_underpayment"
+    },
+    {
+      "id": "tax_lex_pt_valuation_date",
+      "canonical": "data de avaliacao",
+      "synonyms": [
+        "data base",
+        "data da apuracao"
+      ],
+      "display": "Data de Avaliacao",
+      "enRef": "tax_lex_valuation_date"
+    },
+    {
+      "id": "tax_lex_pt_withholding",
+      "canonical": "retencao",
+      "synonyms": [
+        "imposto retido",
+        "retido na fonte"
+      ],
+      "display": "Retencao",
+      "enRef": "tax_lex_withholding"
+    },
+    {
+      "id": "tax_lex_pt_year_to_date_tax",
+      "canonical": "imposto acumulado no ano",
+      "synonyms": [
+        "ytd imposto",
+        "acumulado anual"
+      ],
+      "display": "Imposto Acumulado no Ano",
+      "enRef": "tax_lex_year_to_date_tax"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "di_finance_extraction_fin_rolling_forecast",
+    "version": "2.0.0",
+    "description": "Extraction hints for fin_rolling_forecast.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_rolling_forecast"
+  },
+  "hints": [
+    {
+      "id": "hint_1_period",
+      "entity": "kpi_rolling_revenue",
+      "anchors": [
+        "period",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_2_currency",
+      "entity": "kpi_rolling_opex",
+      "anchors": [
+        "currency",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_3_unit",
+      "entity": "kpi_rolling_cash",
+      "anchors": [
+        "unit",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_4_total",
+      "entity": "kpi_run_rate",
+      "anchors": [
+        "total",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_5_variance",
+      "entity": "variance",
+      "anchors": [
+        "variance",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_6_guidance",
+      "entity": "guidance",
+      "anchors": [
+        "guidance",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    },
+    {
+      "id": "hint_7_assumption",
+      "entity": "assumption",
+      "anchors": [
+        "assumption",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_8_notes",
+      "entity": "notes",
+      "anchors": [
+        "notes",
+        "rolling forecast",
+        "forecast rolling"
+      ],
+      "location": "tables_primary",
+      "extractionMethod": "table_header_row_context"
+    }
+  ]
+}

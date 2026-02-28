@@ -487,25 +487,12 @@ export function computeOpsToPatchPlan(input: {
 
       if (kind === "fill_down") {
         if (!rangeA1) throw new Error("fill_down requires rangeA1");
-        const parsed = parseA1Range(
-          rangeA1,
-          activeSheetName || undefined,
-        );
+        const parsed = parseA1Range(rangeA1, activeSheetName || undefined);
         const sourceRow =
-          typeof op.sourceRow === "number"
-            ? op.sourceRow
-            : parsed.start.row;
+          typeof op.sourceRow === "number" ? op.sourceRow : parsed.start.row;
         const formula = normalizeString(op.sourceFormula ?? op.formula);
-        for (
-          let c = parsed.start.col;
-          c <= parsed.end.col;
-          c += 1
-        ) {
-          for (
-            let r = parsed.start.row;
-            r <= parsed.end.row;
-            r += 1
-          ) {
+        for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
+          for (let r = parsed.start.row; r <= parsed.end.row; r += 1) {
             if (r === sourceRow) continue;
             const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
             if (formula) {
@@ -513,7 +500,8 @@ export function computeOpsToPatchPlan(input: {
               const adjusted = formula.replace(
                 /(\$?)([A-Z]{1,3})(\$?)(\d+)/g,
                 (_m, dollarCol, col, dollarRow, row) => {
-                  if (dollarRow === "$") return `${dollarCol}${col}${dollarRow}${row}`;
+                  if (dollarRow === "$")
+                    return `${dollarCol}${col}${dollarRow}${row}`;
                   return `${dollarCol}${col}${dollarRow}${Number(row) + rowDelta}`;
                 },
               );
@@ -539,25 +527,12 @@ export function computeOpsToPatchPlan(input: {
 
       if (kind === "fill_right") {
         if (!rangeA1) throw new Error("fill_right requires rangeA1");
-        const parsed = parseA1Range(
-          rangeA1,
-          activeSheetName || undefined,
-        );
+        const parsed = parseA1Range(rangeA1, activeSheetName || undefined);
         const sourceCol =
-          typeof op.sourceCol === "number"
-            ? op.sourceCol
-            : parsed.start.col;
+          typeof op.sourceCol === "number" ? op.sourceCol : parsed.start.col;
         const formula = normalizeString(op.sourceFormula ?? op.formula);
-        for (
-          let r = parsed.start.row;
-          r <= parsed.end.row;
-          r += 1
-        ) {
-          for (
-            let c = parsed.start.col;
-            c <= parsed.end.col;
-            c += 1
-          ) {
+        for (let r = parsed.start.row; r <= parsed.end.row; r += 1) {
+          for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
             if (c === sourceCol) continue;
             const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
             if (formula) {
@@ -565,9 +540,11 @@ export function computeOpsToPatchPlan(input: {
               const adjusted = formula.replace(
                 /(\$?)([A-Z]{1,3})(\$?)(\d+)/g,
                 (_m, dollarCol, col, dollarRow, row) => {
-                  if (dollarCol === "$") return `${dollarCol}${col}${dollarRow}${row}`;
+                  if (dollarCol === "$")
+                    return `${dollarCol}${col}${dollarRow}${row}`;
                   let colNum = 0;
-                  for (const ch of col) colNum = colNum * 26 + (ch.charCodeAt(0) - 64);
+                  for (const ch of col)
+                    colNum = colNum * 26 + (ch.charCodeAt(0) - 64);
                   const newCol = numberToCol(colNum + colDelta);
                   return `${dollarCol}${newCol}${dollarRow}${row}`;
                 },
@@ -594,10 +571,7 @@ export function computeOpsToPatchPlan(input: {
 
       if (kind === "fill_series") {
         if (!rangeA1) throw new Error("fill_series requires rangeA1");
-        const parsed = parseA1Range(
-          rangeA1,
-          activeSheetName || undefined,
-        );
+        const parsed = parseA1Range(rangeA1, activeSheetName || undefined);
         const step = typeof op.step === "number" ? op.step : 1;
         const seriesType = normalizeString(op.type).toLowerCase() || "linear";
         const startValue =
@@ -607,16 +581,8 @@ export function computeOpsToPatchPlan(input: {
         const vertical = height >= width;
         let idx = 0;
         if (vertical) {
-          for (
-            let r = parsed.start.row;
-            r <= parsed.end.row;
-            r += 1
-          ) {
-            for (
-              let c = parsed.start.col;
-              c <= parsed.end.col;
-              c += 1
-            ) {
+          for (let r = parsed.start.row; r <= parsed.end.row; r += 1) {
+            for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
               const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
               let value: string | number;
               if (seriesType === "date") {
@@ -641,16 +607,8 @@ export function computeOpsToPatchPlan(input: {
             }
           }
         } else {
-          for (
-            let c = parsed.start.col;
-            c <= parsed.end.col;
-            c += 1
-          ) {
-            for (
-              let r = parsed.start.row;
-              r <= parsed.end.row;
-              r += 1
-            ) {
+          for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
+            for (let r = parsed.start.row; r <= parsed.end.row; r += 1) {
               const cellRange = `${parsed.sheetName}!${numberToCol(c)}${r}`;
               let value: string | number;
               if (seriesType === "date") {
@@ -708,15 +666,13 @@ export function computeOpsToPatchPlan(input: {
             if (Number.isFinite(n)) cols.push(Math.max(1, Math.trunc(n)));
           }
         } else if (rangeA1) {
-          const parsed = parseA1Range(
-            rangeA1,
-            activeSheetName || undefined,
-          );
+          const parsed = parseA1Range(rangeA1, activeSheetName || undefined);
           for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
             cols.push(c);
           }
         }
-        if (!cols.length) throw new Error("auto_fit requires columns or rangeA1");
+        if (!cols.length)
+          throw new Error("auto_fit requires columns or rangeA1");
         patchOps.push({
           op: "SET_COL_WIDTH",
           sheet: sheetName || "Sheet1",
@@ -727,8 +683,7 @@ export function computeOpsToPatchPlan(input: {
       }
 
       if (kind === "cond_format_data_bars") {
-        if (!rangeA1)
-          throw new Error("cond_format_data_bars requires rangeA1");
+        if (!rangeA1) throw new Error("cond_format_data_bars requires rangeA1");
         patchOps.push({
           op: "SET_CONDITIONAL_FORMAT",
           range: rangeA1,
@@ -761,8 +716,7 @@ export function computeOpsToPatchPlan(input: {
       }
 
       if (kind === "cond_format_top_n") {
-        if (!rangeA1)
-          throw new Error("cond_format_top_n requires rangeA1");
+        if (!rangeA1) throw new Error("cond_format_top_n requires rangeA1");
         const styleObj =
           op.style && typeof op.style === "object"
             ? (op.style as Record<string, unknown>)
@@ -776,9 +730,7 @@ export function computeOpsToPatchPlan(input: {
           rule: {
             type: "TOP_N",
             n: typeof op.n === "number" ? op.n : 10,
-            ...(typeof op.percent === "boolean"
-              ? { percent: op.percent }
-              : {}),
+            ...(typeof op.percent === "boolean" ? { percent: op.percent } : {}),
             backgroundHex: bgHex,
           },
         });
@@ -857,6 +809,90 @@ export function computeOpsToPatchPlan(input: {
         return;
       }
 
+      if (kind === "remove_duplicates") {
+        if (!rangeA1) throw new Error("remove_duplicates requires rangeA1");
+        const keyColumns = Array.isArray(op.keyColumns)
+          ? (op.keyColumns as number[]).map((n) =>
+              Math.max(1, Math.trunc(Number(n))),
+            )
+          : undefined;
+        patchOps.push({
+          op: "REMOVE_DUPLICATES",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          ...(keyColumns ? { keyColumns } : {}),
+          hasHeader: op.hasHeader !== false,
+        });
+        return;
+      }
+
+      if (kind === "trim_whitespace") {
+        if (!rangeA1) throw new Error("trim_whitespace requires rangeA1");
+        patchOps.push({
+          op: "TRIM_WHITESPACE",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+        });
+        return;
+      }
+
+      if (kind === "normalize_values") {
+        if (!rangeA1) throw new Error("normalize_values requires rangeA1");
+        const normalization = normalizeString(
+          op.normalization,
+        ).toLowerCase() as "dates" | "numbers" | "text_case";
+        if (!["dates", "numbers", "text_case"].includes(normalization))
+          throw new Error(
+            "normalize_values requires normalization: dates|numbers|text_case",
+          );
+        patchOps.push({
+          op: "NORMALIZE_VALUES",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          normalization,
+          ...(normalizeString(op.textCase)
+            ? {
+                textCase: normalizeString(op.textCase) as
+                  | "upper"
+                  | "lower"
+                  | "title",
+              }
+            : {}),
+          ...(normalizeString(op.dateFormat)
+            ? { dateFormat: normalizeString(op.dateFormat) }
+            : {}),
+        });
+        return;
+      }
+
+      if (kind === "set_protection") {
+        const sheet = sheetName || normalizeString(op.sheet);
+        if (!sheet) throw new Error("set_protection requires sheetName");
+        patchOps.push({
+          op: "SET_SHEET_PROTECTION",
+          sheet,
+          ...(normalizeString(op.password)
+            ? { password: normalizeString(op.password) }
+            : {}),
+          ...(op.options && typeof op.options === "object"
+            ? { options: op.options as Record<string, boolean> }
+            : {}),
+        });
+        return;
+      }
+
+      if (kind === "lock_cells") {
+        if (!rangeA1) throw new Error("lock_cells requires rangeA1");
+        patchOps.push({
+          op: "SET_CELL_PROTECTION",
+          range: rangeA1,
+          ...(sheetName ? { sheet: sheetName } : {}),
+          locked: op.locked !== false,
+          ...(typeof op.hidden === "boolean" ? { hidden: op.hidden } : {}),
+        });
+        return;
+      }
+
       if (kind === "aggregation") {
         const fn = normalizeString(op.function).toUpperCase() || "SUM";
         const sourceRange = normalizeRange(
@@ -874,7 +910,10 @@ export function computeOpsToPatchPlan(input: {
 
         let formulaRef = sourceRange;
         if (sourceRange.includes("!")) {
-          const srcSheet = sourceRange.split("!")[0].replace(/^'/, "").replace(/'$/, "");
+          const srcSheet = sourceRange
+            .split("!")[0]
+            .replace(/^'/, "")
+            .replace(/'$/, "");
           const tgtSheet = targetCell.includes("!")
             ? targetCell.split("!")[0].replace(/^'/, "").replace(/'$/, "")
             : sheetName;

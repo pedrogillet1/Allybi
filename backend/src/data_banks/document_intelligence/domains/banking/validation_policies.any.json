@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "di_banking_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for banking extraction and reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "policies": [
+    {
+      "id": "banking_val_001_running_balance",
+      "severity": "error",
+      "description": "Running balance should reconcile sequentially across transaction rows.",
+      "applies": [
+        "extract",
+        "validate",
+        "calculate"
+      ],
+      "check": "running_balance_reconciliation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "banking_val_002_open_close_consistency",
+      "severity": "error",
+      "description": "Opening balance plus net movement should equal closing balance for the same period.",
+      "applies": [
+        "validate",
+        "calculate"
+      ],
+      "check": "open_close_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "banking_val_003_reference_presence",
+      "severity": "warning",
+      "description": "High-value transfers should include reference/auth code for strong confidence.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "reference_presence",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "banking_val_004_currency_consistency",
+      "severity": "error",
+      "description": "Document monetary values should remain currency-consistent unless explicitly multi-currency.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "currency_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "banking_val_005_loan_split",
+      "severity": "warning",
+      "description": "Loan statements should separate principal and interest when installment is present.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "loan_principal_interest_split",
+      "failureAction": "WARN_AND_EXPLAIN"
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "id": "di_tax_entities_tax_assessment_notice",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for tax_assessment_notice.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "docType": "tax_assessment_notice"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Document issuer or authority"
+    },
+    {
+      "id": "subject_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary subject referenced by the document"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": false,
+      "description": "Official document number"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": false,
+      "description": "Document effective date"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Jurisdiction or governing authority"
+    },
+    {
+      "id": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current processing or legal status"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code when monetary values are present"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total document amount when applicable"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date for payment or action"
+    },
+    {
+      "id": "reference_id",
+      "type": "string",
+      "required": false,
+      "description": "External reference id"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "notice_id",
+      "type": "string",
+      "required": true,
+      "description": "Notice identifier"
+    },
+    {
+      "id": "assessment_period",
+      "type": "string",
+      "required": true,
+      "description": "Assessment period"
+    },
+    {
+      "id": "assessed_base",
+      "type": "currency",
+      "required": true,
+      "description": "Assessed taxable base"
+    },
+    {
+      "id": "assessed_tax",
+      "type": "currency",
+      "required": true,
+      "description": "Assessed tax amount"
+    },
+    {
+      "id": "penalty_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Penalty amount assessed"
+    },
+    {
+      "id": "interest_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Interest amount assessed"
+    },
+    {
+      "id": "total_assessed",
+      "type": "currency",
+      "required": true,
+      "description": "Total amount assessed"
+    },
+    {
+      "id": "objection_deadline",
+      "type": "date",
+      "required": true,
+      "description": "Deadline for objection/appeal"
+    },
+    {
+      "id": "legal_basis",
+      "type": "string",
+      "required": false,
+      "description": "Legal basis reference"
+    },
+    {
+      "id": "collection_status",
+      "type": "string",
+      "required": true,
+      "description": "Collection or enforcement status"
+    },
+    {
+      "id": "tax_doc_type",
+      "type": "string",
+      "required": true,
+      "description": "Resolved doc type: tax_assessment_notice"
+    }
+  ]
+}

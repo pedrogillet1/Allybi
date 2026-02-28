@@ -1,4 +1,5 @@
 import { getBankLoaderInstance } from "../banks/bankLoader.service";
+import { getDocumentIntelligenceBanksInstance } from "../banks/documentIntelligenceBanks.service";
 
 export interface DocumentReferenceDoc {
   docId: string;
@@ -147,19 +148,26 @@ function parseRegexList(patterns: unknown, fallback: string[]): RegExp[] {
 
 function resolveConfig(): ResolverConfig {
   const loader = getBankLoaderInstance();
+  const documentIntelligenceBanks = getDocumentIntelligenceBanksInstance();
   const memoryPolicy = loader.getBank<any>("memory_policy");
-  const docAliases = loader.getBank<any>("doc_aliases");
+  const docAliases = documentIntelligenceBanks.getMergedDocAliasesBank();
+  const aliasThresholds = documentIntelligenceBanks.getDocAliasThresholds();
   const runtime = memoryPolicy?.config?.runtimeTuning?.scopeRuntime || {};
 
   const tokenMinLength = Number(runtime.tokenMinLength);
   const docNameMinLength = Number(runtime.docNameMinLength);
   const tokenOverlapThreshold = Number(runtime.tokenOverlapThreshold);
-  const minAliasConfidence = Number(docAliases?.config?.minAliasConfidence);
+  const minAliasConfidence = Number(
+    aliasThresholds.minAliasConfidence ??
+      docAliases?.config?.minAliasConfidence,
+  );
   const autopickConfidence = Number(
-    docAliases?.config?.actionsContract?.thresholds?.autopickConfidence,
+    aliasThresholds.autopickConfidence ??
+      docAliases?.config?.actionsContract?.thresholds?.autopickConfidence,
   );
   const autopickGap = Number(
-    docAliases?.config?.actionsContract?.thresholds?.autopickGap,
+    aliasThresholds.autopickGap ??
+      docAliases?.config?.actionsContract?.thresholds?.autopickGap,
   );
 
   const filenamePatterns = parseRegexList(

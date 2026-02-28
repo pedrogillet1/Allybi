@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "id": "di_tax_doc_type_catalog",
+    "version": "2.0.0",
+    "description": "Tax doc-type catalog with complete pack references.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "tax",
+    "enforcePackRefs": true
+  },
+  "domain": "tax",
+  "docTypes": [
+    {
+      "id": "tax_assessment_notice",
+      "name": {
+        "en": "Tax Assessment Notice",
+        "pt": "Notificacao de Lancamento Tributario"
+      },
+      "description": "Official tax assessment notice including assessed base, penalties, and objection deadlines.",
+      "archetypeId": "tax_authority_notice",
+      "detectionPatterns": [
+        "\\btax\\s+assessment\\s+notice\\b",
+        "\\bnotice\\s+of\\s+assessment\\b",
+        "\\bnotificacao\\s+de\\s+lancamento\\s+tributario\\b"
+      ],
+      "priority": 130,
+      "detectionHintsRefs": [
+        "di_tax_domain_detection_rules",
+        "doc_aliases_tax"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_tax_sections_tax_assessment_notice"
+        ],
+        "entities": [
+          "di_tax_entities_tax_assessment_notice"
+        ],
+        "tables": [
+          "di_tax_tables_tax_assessment_notice"
+        ],
+        "extraction": [
+          "di_tax_extraction_tax_assessment_notice"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "assessed_base",
+        "tax_assessed",
+        "penalty",
+        "objection_deadline"
+      ]
+    },
+    {
+      "id": "tax_individual_income_return",
+      "name": {
+        "en": "Individual Income Tax Return",
+        "pt": "Declaracao de Imposto de Renda Pessoa Fisica"
+      },
+      "description": "Individual income tax return with filing, income, deduction, and liability details.",
+      "archetypeId": "tax_return_filing",
+      "detectionPatterns": [
+        "\\btax\\s+individual\\s+income\\s+return\\b",
+        "\\bindividual\\s+income\\s+tax\\s+return\\b",
+        "\\bdeclaracao\\s+de\\s+imposto\\s+de\\s+renda\\s+pessoa\\s+fisica\\b"
+      ],
+      "priority": 129,
+      "detectionHintsRefs": [
+        "di_tax_domain_detection_rules",
+        "doc_aliases_tax"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_tax_sections_tax_individual_income_return"
+        ],
+        "entities": [
+          "di_tax_entities_tax_individual_income_return"
+        ],
+        "tables": [
+          "di_tax_tables_tax_individual_income_return"
+        ],
+        "extraction": [
+          "di_tax_extraction_tax_individual_income_return"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "taxable_income",
+        "tax_liability",
+        "refund",
+        "withholding"
+      ]
+    },
+    {
+      "id": "tax_payment_slip",
+      "name": {
+        "en": "Tax Payment Slip",
+        "pt": "Guia de Pagamento de Tributo"
+      },
+      "description": "Tax payment slip with reference codes, due date, and settlement information.",
+      "archetypeId": "tax_payment_instrument",
+      "detectionPatterns": [
+        "\\btax\\s+payment\\s+slip\\b",
+        "\\btax\\s+payment\\s+voucher\\b",
+        "\\bguia\\s+de\\s+pagamento\\s+de\\s+tributo\\b|\\bdarf\\b"
+      ],
+      "priority": 128,
+      "detectionHintsRefs": [
+        "di_tax_domain_detection_rules",
+        "doc_aliases_tax"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_tax_sections_tax_payment_slip"
+        ],
+        "entities": [
+          "di_tax_entities_tax_payment_slip"
+        ],
+        "tables": [
+          "di_tax_tables_tax_payment_slip"
+        ],
+        "extraction": [
+          "di_tax_extraction_tax_payment_slip"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "amount_due",
+        "penalty",
+        "interest",
+        "settlement_status"
+      ]
+    },
+    {
+      "id": "tax_property_tax_bill",
+      "name": {
+        "en": "Property Tax Bill",
+        "pt": "Cobranca de Imposto Predial"
+      },
+      "description": "Property tax bill with valuation, municipal rates, installments, and due dates.",
+      "archetypeId": "tax_property_bill",
+      "detectionPatterns": [
+        "\\btax\\s+property\\s+tax\\s+bill\\b",
+        "\\bproperty\\s+tax\\s+bill\\b",
+        "\\bcobranca\\s+de\\s+imposto\\s+predial\\b|\\biptu\\b"
+      ],
+      "priority": 127,
+      "detectionHintsRefs": [
+        "di_tax_domain_detection_rules",
+        "doc_aliases_tax"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_tax_sections_tax_property_tax_bill"
+        ],
+        "entities": [
+          "di_tax_entities_tax_property_tax_bill"
+        ],
+        "tables": [
+          "di_tax_tables_tax_property_tax_bill"
+        ],
+        "extraction": [
+          "di_tax_extraction_tax_property_tax_bill"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "assessed_value",
+        "property_tax",
+        "installment_amount",
+        "due_date"
+      ]
+    }
+  ]
+}

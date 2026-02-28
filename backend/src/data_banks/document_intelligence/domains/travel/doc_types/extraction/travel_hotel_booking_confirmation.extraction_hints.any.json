@@ -1,0 +1,348 @@
+{
+  "_meta": {
+    "id": "di_travel_extraction_travel_hotel_booking_confirmation",
+    "version": "1.0.0",
+    "description": "Extraction hints for travel_hotel_booking_confirmation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "docType": "travel_hotel_booking_confirmation"
+  },
+  "hints": [
+    {
+      "id": "hint_001_document_id",
+      "entity": "document_id",
+      "anchors": [
+        "document id",
+        "document id value",
+        "document id field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_002_document_title",
+      "entity": "document_title",
+      "anchors": [
+        "document title",
+        "document title value",
+        "document title field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_003_document_date",
+      "entity": "document_date",
+      "anchors": [
+        "document date",
+        "document date value",
+        "document date field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_004_issuer_name",
+      "entity": "issuer_name",
+      "anchors": [
+        "issuer name",
+        "issuer name value",
+        "issuer name field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_005_issuer_tax_id",
+      "entity": "issuer_tax_id",
+      "anchors": [
+        "issuer tax id",
+        "issuer tax id value",
+        "issuer tax id field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_006_recipient_name",
+      "entity": "recipient_name",
+      "anchors": [
+        "recipient name",
+        "recipient name value",
+        "recipient name field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_007_recipient_id",
+      "entity": "recipient_id",
+      "anchors": [
+        "recipient id",
+        "recipient id value",
+        "recipient id field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_008_account_reference",
+      "entity": "account_reference",
+      "anchors": [
+        "account reference",
+        "account reference value",
+        "account reference field"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_009_statement_number",
+      "entity": "statement_number",
+      "anchors": [
+        "statement number",
+        "statement number value",
+        "statement number field"
+      ],
+      "location": "period_or_schedule",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_010_period_start",
+      "entity": "period_start",
+      "anchors": [
+        "period start",
+        "period start value",
+        "period start field"
+      ],
+      "location": "period_or_schedule",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_011_period_end",
+      "entity": "period_end",
+      "anchors": [
+        "period end",
+        "period end value",
+        "period end field"
+      ],
+      "location": "period_or_schedule",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_012_due_date",
+      "entity": "due_date",
+      "anchors": [
+        "due date",
+        "due date value",
+        "due date field"
+      ],
+      "location": "period_or_schedule",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_013_currency",
+      "entity": "currency",
+      "anchors": [
+        "currency",
+        "currency value",
+        "currency field"
+      ],
+      "location": "period_or_schedule",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_014_unit_scale",
+      "entity": "unit_scale",
+      "anchors": [
+        "unit scale",
+        "unit scale value",
+        "unit scale field"
+      ],
+      "location": "period_or_schedule",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_015_subtotal_amount",
+      "entity": "subtotal_amount",
+      "anchors": [
+        "subtotal amount",
+        "subtotal amount value",
+        "subtotal amount field"
+      ],
+      "location": "charges_or_amounts",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_016_tax_amount",
+      "entity": "tax_amount",
+      "anchors": [
+        "tax amount",
+        "tax amount value",
+        "tax amount field"
+      ],
+      "location": "charges_or_amounts",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_017_fee_amount",
+      "entity": "fee_amount",
+      "anchors": [
+        "fee amount",
+        "fee amount value",
+        "fee amount field"
+      ],
+      "location": "charges_or_amounts",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_018_discount_amount",
+      "entity": "discount_amount",
+      "anchors": [
+        "discount amount",
+        "discount amount value",
+        "discount amount field"
+      ],
+      "location": "charges_or_amounts",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_019_credit_amount",
+      "entity": "credit_amount",
+      "anchors": [
+        "credit amount",
+        "credit amount value",
+        "credit amount field"
+      ],
+      "location": "charges_or_amounts",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_020_debit_amount",
+      "entity": "debit_amount",
+      "anchors": [
+        "debit amount",
+        "debit amount value",
+        "debit amount field"
+      ],
+      "location": "charges_or_amounts",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_021_table_05_line_items",
+      "entity": "line_item_count",
+      "anchors": [
+        "line items",
+        "entries",
+        "itens"
+      ],
+      "location": "table_05_line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_022_table_06_charges",
+      "entity": "subtotal_amount",
+      "anchors": [
+        "charges",
+        "amounts",
+        "cobrancas"
+      ],
+      "location": "table_06_charges",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_023_table_07_taxes",
+      "entity": "tax_amount",
+      "anchors": [
+        "taxes",
+        "impostos",
+        "tax"
+      ],
+      "location": "table_07_taxes",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_024_table_08_adjustments",
+      "entity": "discount_amount",
+      "anchors": [
+        "adjustments",
+        "discount",
+        "ajustes"
+      ],
+      "location": "table_08_adjustments",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_025_table_09_payments",
+      "entity": "paid_amount",
+      "anchors": [
+        "payments",
+        "pagamentos",
+        "paid"
+      ],
+      "location": "table_09_payments",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_026_table_10_status",
+      "entity": "payment_status",
+      "anchors": [
+        "status",
+        "situacao",
+        "status and due"
+      ],
+      "location": "table_10_status",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_027_table_11_totals",
+      "entity": "total_amount",
+      "anchors": [
+        "total",
+        "grand total",
+        "valor total"
+      ],
+      "location": "table_11_totals",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_028_table_12_metadata",
+      "entity": "source_system",
+      "anchors": [
+        "metadata",
+        "source system",
+        "origem"
+      ],
+      "location": "table_12_metadata",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_029_table_04_period",
+      "entity": "period_start",
+      "anchors": [
+        "period start",
+        "from date",
+        "inicio"
+      ],
+      "location": "table_04_period",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_030_table_04_period",
+      "entity": "period_end",
+      "anchors": [
+        "period end",
+        "to date",
+        "fim"
+      ],
+      "location": "table_04_period",
+      "extractionMethod": "table_row_match"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "_meta": {
+    "id": "di_billing_evidence_requirements",
+    "version": "1.0.0",
+    "description": "Evidence requirements and citation policy for billing documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "billing",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "issuer_document_header",
+      "label": {
+        "en": "Issuer document header",
+        "pt": "Cabecalho emissor"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "statement_summary_table",
+      "label": {
+        "en": "Statement summary table",
+        "pt": "Tabela de resumo"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "line_item_table",
+      "label": {
+        "en": "Line-item table",
+        "pt": "Tabela de itens"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 4,
+      "type": "payment_confirmation",
+      "label": {
+        "en": "Payment confirmation row",
+        "pt": "Linha de confirmacao de pagamento"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "tax_breakdown",
+      "label": {
+        "en": "Tax breakdown",
+        "pt": "Detalhamento de impostos"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 6,
+      "type": "barcode_or_reference",
+      "label": {
+        "en": "Barcode/reference payload",
+        "pt": "Codigo de barras/referencia"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 7,
+      "type": "footnote_or_notice",
+      "label": {
+        "en": "Notice/footnote text",
+        "pt": "Aviso/rodape"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "billing_ev_001_amount_due",
+      "description": "Any amount-due answer must cite amount and due date from the same document version.",
+      "applies": [
+        "extract",
+        "summarize"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "statement_summary_table",
+        "issuer_document_header"
+      ]
+    },
+    {
+      "id": "billing_ev_002_fee_claim",
+      "description": "Fee-related claims must cite the exact line item or fee section.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "line_item_table"
+      ]
+    },
+    {
+      "id": "billing_ev_003_payment_status",
+      "description": "Payment status claims require payment date or receipt reference.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "payment_confirmation",
+        "barcode_or_reference"
+      ]
+    },
+    {
+      "id": "billing_ev_004_tax_components",
+      "description": "Tax breakdown claims require explicit tax lines, rates, or totals.",
+      "applies": [
+        "extract",
+        "calculate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "tax_breakdown"
+      ]
+    },
+    {
+      "id": "billing_ev_005_dispute_language",
+      "description": "Escalation or dispute recommendations must cite the notice/terms section.",
+      "applies": [
+        "advise",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "footnote_or_notice"
+      ]
+    }
+  ]
+}

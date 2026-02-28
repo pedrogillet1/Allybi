@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "di_billing_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for billing extraction and reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "billing"
+  },
+  "domain": "billing",
+  "policies": [
+    {
+      "id": "billing_val_001_total_math",
+      "severity": "error",
+      "description": "Subtotal plus taxes plus fees minus discounts plus adjustments should reconcile to amount due.",
+      "applies": [
+        "extract",
+        "validate",
+        "calculate"
+      ],
+      "check": "billing_total_reconciliation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "billing_val_002_due_date_presence",
+      "severity": "warning",
+      "description": "If amount due exists, due date should be present unless marked paid in full.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "due_date_presence",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "billing_val_003_currency_consistency",
+      "severity": "error",
+      "description": "All monetary fields in a document should use a consistent currency unless clearly multi-currency.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "currency_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "billing_val_004_negative_lab_report_lockout",
+      "severity": "error",
+      "description": "When lab-report markers are present, block billing_phone_bill_mobile classification and request reclassification.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "phone_bill_vs_lab_report_disambiguation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "billing_val_005_receipt_payment_tie",
+      "severity": "warning",
+      "description": "Retail receipts should include amount paid and payment method for strong confidence.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "receipt_payment_completeness",
+      "failureAction": "WARN_AND_EXPLAIN"
+    }
+  ]
+}

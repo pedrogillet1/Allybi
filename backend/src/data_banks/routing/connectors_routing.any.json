@@ -1,17 +1,17 @@
 {
   "bankId": "connectors_routing",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "localeSupport": ["en", "pt"],
-  "description": "High-coverage routing rules for connector lifecycle (Gmail/Outlook/Slack). Enforces connect-before-sync and permission gates.",
-  "updatedAt": "2026-02-07T00:00:00.000Z",
+  "description": "High-coverage routing rules for connector lifecycle (Gmail/Outlook/Slack). Enforces connect-before-sync/search and permission gates.",
+  "updatedAt": "2026-02-28T00:00:00.000Z",
   "schemaVersion": 1,
 
   "_meta": {
     "id": "connectors_routing",
-    "version": "1.1.0",
-    "description": "Routing rules for connector lifecycle (Gmail, Outlook, Slack). Handles connect, sync, status, and disconnect intents in EN/PT.",
+    "version": "1.2.0",
+    "description": "Routing rules for connector lifecycle (Gmail, Outlook, Slack). Handles connect, sync, search, status, and disconnect intents in EN/PT.",
     "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-02-07"
+    "lastUpdated": "2026-02-28"
   },
 
   "config": {
@@ -62,6 +62,7 @@
     "canonical": [
       "CONNECT_START",
       "CONNECTOR_SYNC",
+      "CONNECTOR_SEARCH",
       "CONNECTOR_STATUS",
       "CONNECTOR_DISCONNECT"
     ],
@@ -199,6 +200,59 @@
     },
 
     {
+      "ruleId": "CR_080_search",
+      "priority": 80,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(search|find|look for|lookup|query)\\b.{0,40}\\b(gmail|outlook|slack|emails|messages|inbox|channels)\\b",
+              "\\b(search)\\b.{0,20}\\b(in|on)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bfind\\b.{0,40}\\bemail\\b.{0,40}\\b(in|on|from)\\b.{0,20}\\b(gmail|outlook)\\b",
+              "\\bsearch slack\\b",
+              "\\bsearch outlook\\b",
+              "\\bsearch gmail\\b",
+              "\\bfind messages in slack\\b",
+              "\\bsearch my inbox\\b",
+              "\\bfind emails about\\b",
+              "\\blook up messages\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(pesquisar|procurar|buscar|encontrar)\\b.{0,40}\\b(gmail|outlook|slack|emails|mensagens|caixa|canais)\\b",
+              "\\b(pesquisar)\\b.{0,20}\\b(no|na|em)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bencontrar\\b.{0,40}\\bemail\\b.{0,40}\\b(no|na|em)\\b.{0,20}\\b(gmail|outlook)\\b",
+              "\\bpesquisar no slack\\b",
+              "\\bpesquisar no outlook\\b",
+              "\\bpesquisar no gmail\\b",
+              "\\bencontrar mensagens no slack\\b",
+              "\\bpesquisar minha caixa\\b",
+              "\\bencontrar emails sobre\\b",
+              "\\bbuscar mensagens\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CONNECTORS",
+        "operator": "CONNECTOR_SEARCH",
+        "domain": "connectors",
+        "scope": "connectors",
+        "defaultEntities": {
+          "provider": null
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "connector_search_requested"
+    },
+
+    {
       "ruleId": "CR_070_status",
       "priority": 70,
       "supportedLocales": ["en", "pt"],
@@ -325,7 +379,7 @@
 
   "disambiguation": {
     "requiredWhen": {
-      "missingProviderForOperators": ["CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_DISCONNECT"],
+      "missingProviderForOperators": ["CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_SEARCH", "CONNECTOR_DISCONNECT"],
       "confidenceBelow": 0.64,
       "decisionMarginBelow": 0.06
     },
@@ -336,7 +390,7 @@
   "outputContract": {
     "shape": {
       "intent": "CONNECTORS",
-      "operator": "CONNECT_START|CONNECTOR_SYNC|CONNECTOR_STATUS|CONNECTOR_DISCONNECT",
+      "operator": "CONNECT_START|CONNECTOR_SYNC|CONNECTOR_SEARCH|CONNECTOR_STATUS|CONNECTOR_DISCONNECT",
       "domain": "connectors",
       "scope": "connectors",
       "provider": "gmail|outlook|slack|null",
@@ -359,10 +413,9 @@
         "expect": { "operator": "CONNECTOR_SYNC" }
       },
       {
-        "id": "CR_T_0003_search_email_en",
+        "id": "CR_T_0003_search_outlook_en",
         "input": { "text": "find the latest invoice email in outlook", "language": "en" },
-        "_comment": "search_connector removed — email queries now fall through to documents family for semantic vector search",
-        "expect": { "operator": null }
+        "expect": { "operator": "CONNECTOR_SEARCH" }
       }
     ]
   }

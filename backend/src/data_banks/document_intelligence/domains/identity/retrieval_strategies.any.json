@@ -1,0 +1,226 @@
+{
+  "_meta": {
+    "id": "di_identity_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for identity domain including section weighting and query expansion.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "maxBoostRules": 16,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "identity",
+  "sectionPriority": [
+    {
+      "section": "document_identification",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ]
+    },
+    {
+      "section": "party_identification",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ]
+    },
+    {
+      "section": "period_and_jurisdiction",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "validate",
+        "monitor"
+      ]
+    },
+    {
+      "section": "status_and_summary",
+      "weight": 2.3,
+      "operators": [
+        "summarize",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "line_items",
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "compare"
+      ]
+    },
+    {
+      "section": "critical_dates",
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ]
+    },
+    {
+      "section": "obligations_and_conditions",
+      "weight": 2,
+      "operators": [
+        "evaluate",
+        "validate"
+      ]
+    },
+    {
+      "section": "supporting_documents",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ]
+    },
+    {
+      "section": "annexes_exhibits",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "section": "footnotes",
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "id_boost_identity_fields",
+      "priority": 96,
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "condition": "query references name, document number, birth date, or issuing authority",
+      "boostSections": [
+        "document_identification",
+        "party_identification",
+        "critical_dates"
+      ]
+    },
+    {
+      "id": "id_boost_validity_checks",
+      "priority": 94,
+      "weight": 2.6,
+      "operators": [
+        "validate",
+        "monitor",
+        "locate"
+      ],
+      "condition": "query references expiration, validity, or issue dates",
+      "boostSections": [
+        "critical_dates",
+        "period_and_jurisdiction",
+        "status_and_summary"
+      ]
+    },
+    {
+      "id": "id_boost_security_features",
+      "priority": 92,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "evaluate"
+      ],
+      "condition": "query references barcode, qr, mrz, or security markers",
+      "boostSections": [
+        "line_items",
+        "supporting_documents",
+        "annexes_exhibits"
+      ]
+    },
+    {
+      "id": "id_boost_business_registration",
+      "priority": 90,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "compare",
+        "validate"
+      ],
+      "condition": "query references business registration or company details",
+      "boostSections": [
+        "party_identification",
+        "status_and_summary",
+        "supporting_documents"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bpassport\\b",
+      "expansions": [
+        "passport number",
+        "mrz",
+        "passaporte",
+        "zona de leitura mecanica"
+      ]
+    },
+    {
+      "trigger": "\\bdriver\\s+license\\b",
+      "expansions": [
+        "license number",
+        "class",
+        "cnh",
+        "habilitacao"
+      ]
+    },
+    {
+      "trigger": "\\bproof\\s+of\\s+address\\b",
+      "expansions": [
+        "utility bill",
+        "residential address",
+        "comprovante de endereco",
+        "conta de consumo"
+      ]
+    },
+    {
+      "trigger": "\\bbusiness\\s+registration\\b",
+      "expansions": [
+        "incorporation number",
+        "registry office",
+        "registro empresarial",
+        "junta comercial"
+      ]
+    },
+    {
+      "trigger": "\\bexpiry\\b|\\bvalidity\\b",
+      "expansions": [
+        "expiration date",
+        "valid thru",
+        "validade",
+        "vencimento"
+      ]
+    },
+    {
+      "trigger": "\\bid\\b|\\bidentity\\b",
+      "expansions": [
+        "document number",
+        "issuing authority",
+        "numero do documento",
+        "orgao emissor"
+      ]
+    }
+  ]
+}

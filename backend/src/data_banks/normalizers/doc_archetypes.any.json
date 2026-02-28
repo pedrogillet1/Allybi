@@ -1,0 +1,347 @@
+{
+  "_meta": {
+    "id": "doc_archetypes",
+    "version": "2.0.0",
+    "description": "SSOT archetype definitions with default required sections, core entity types, and typical formats.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "enforceDeterministicSort": true,
+    "dedupeCaseInsensitive": true
+  },
+  "archetypes": [
+    {
+      "id": "accounting_close_control",
+      "domainId": "accounting",
+      "displayName": "Accounting Close & Control",
+      "defaultRequiredSections": [
+        "close calendar",
+        "control owners",
+        "review evidence",
+        "exceptions"
+      ],
+      "coreEntityTypes": [
+        "close_period",
+        "control_owner",
+        "exception_count",
+        "approval_timestamp"
+      ],
+      "typicalFormats": [
+        "xlsx",
+        "csv",
+        "pdf"
+      ]
+    },
+    {
+      "id": "accounting_ledger_journal",
+      "domainId": "accounting",
+      "displayName": "Accounting Ledger & Journal",
+      "defaultRequiredSections": [
+        "account headers",
+        "journal lines",
+        "supporting references",
+        "totals"
+      ],
+      "coreEntityTypes": [
+        "account_code",
+        "debit_amount",
+        "credit_amount",
+        "posting_date"
+      ],
+      "typicalFormats": [
+        "xlsx",
+        "csv",
+        "pdf"
+      ]
+    },
+    {
+      "id": "accounting_reconciliation_aging",
+      "domainId": "accounting",
+      "displayName": "Accounting Reconciliation & Aging",
+      "defaultRequiredSections": [
+        "book balance",
+        "external balance",
+        "reconciling items",
+        "aging buckets"
+      ],
+      "coreEntityTypes": [
+        "counterparty",
+        "aging_bucket",
+        "open_amount",
+        "reconciling_item"
+      ],
+      "typicalFormats": [
+        "xlsx",
+        "csv",
+        "pdf"
+      ]
+    },
+    {
+      "id": "accounting_reporting_tax",
+      "domainId": "accounting",
+      "displayName": "Accounting Reporting & Tax",
+      "defaultRequiredSections": [
+        "tax basis",
+        "reconciliation summary",
+        "jurisdiction notes",
+        "filing status"
+      ],
+      "coreEntityTypes": [
+        "tax_period",
+        "tax_jurisdiction",
+        "tax_amount",
+        "filing_deadline"
+      ],
+      "typicalFormats": [
+        "xlsx",
+        "pdf",
+        "docx"
+      ]
+    },
+    {
+      "id": "finance_capital_compliance",
+      "domainId": "finance",
+      "displayName": "Finance Capital & Compliance",
+      "defaultRequiredSections": [
+        "capital structure",
+        "covenants",
+        "thresholds",
+        "breach status"
+      ],
+      "coreEntityTypes": [
+        "share_class",
+        "ownership_percent",
+        "covenant_ratio",
+        "breach_flag"
+      ],
+      "typicalFormats": [
+        "xlsx",
+        "pdf",
+        "pptx"
+      ]
+    },
+    {
+      "id": "finance_filings_disclosure",
+      "domainId": "finance",
+      "displayName": "Finance Filings & Disclosures",
+      "defaultRequiredSections": [
+        "cover",
+        "risk factors",
+        "mda",
+        "notes"
+      ],
+      "coreEntityTypes": [
+        "issuer",
+        "fiscal_period",
+        "filing_date",
+        "material_event"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "docx",
+        "html"
+      ]
+    },
+    {
+      "id": "finance_planning_forecast",
+      "domainId": "finance",
+      "displayName": "Finance Planning & Forecast",
+      "defaultRequiredSections": [
+        "assumptions",
+        "scenario drivers",
+        "planned values",
+        "variance commentary"
+      ],
+      "coreEntityTypes": [
+        "scenario_name",
+        "plan_period",
+        "assumption",
+        "variance_percent"
+      ],
+      "typicalFormats": [
+        "xlsx",
+        "csv",
+        "pdf"
+      ]
+    },
+    {
+      "id": "finance_statements_performance",
+      "domainId": "finance",
+      "displayName": "Finance Statements & Performance",
+      "defaultRequiredSections": [
+        "income statement",
+        "balance sheet",
+        "cash flow",
+        "kpi summary"
+      ],
+      "coreEntityTypes": [
+        "revenue",
+        "ebitda",
+        "assets",
+        "operating_cash_flow"
+      ],
+      "typicalFormats": [
+        "xlsx",
+        "pdf",
+        "csv"
+      ]
+    },
+    {
+      "id": "legal_contract_agreement",
+      "domainId": "legal",
+      "displayName": "Legal Contract & Agreement",
+      "defaultRequiredSections": [
+        "definitions",
+        "term",
+        "payment",
+        "termination"
+      ],
+      "coreEntityTypes": [
+        "party",
+        "effective_date",
+        "governing_law",
+        "liability_cap"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "docx"
+      ]
+    },
+    {
+      "id": "legal_dispute_regulatory",
+      "domainId": "legal",
+      "displayName": "Legal Dispute & Regulatory",
+      "defaultRequiredSections": [
+        "background",
+        "issues",
+        "position",
+        "actions"
+      ],
+      "coreEntityTypes": [
+        "claim_type",
+        "forum",
+        "deadline",
+        "exposure_band"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "docx",
+        "eml"
+      ]
+    },
+    {
+      "id": "legal_policy_governance",
+      "domainId": "legal",
+      "displayName": "Legal Policy & Governance",
+      "defaultRequiredSections": [
+        "scope",
+        "policy statements",
+        "roles",
+        "exceptions"
+      ],
+      "coreEntityTypes": [
+        "policy_owner",
+        "policy_version",
+        "effective_date",
+        "review_cycle"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "docx",
+        "html"
+      ]
+    },
+    {
+      "id": "medical_admin_claims",
+      "domainId": "medical",
+      "displayName": "Medical Administrative & Claims",
+      "defaultRequiredSections": [
+        "member details",
+        "provider details",
+        "claim lines",
+        "adjudication status"
+      ],
+      "coreEntityTypes": [
+        "patient_id",
+        "claim_id",
+        "payer",
+        "claim_status"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "csv",
+        "x12"
+      ]
+    },
+    {
+      "id": "medical_clinical_notes",
+      "domainId": "medical",
+      "displayName": "Medical Clinical Notes",
+      "defaultRequiredSections": [
+        "history",
+        "assessment",
+        "plan",
+        "follow-up"
+      ],
+      "coreEntityTypes": [
+        "patient_id",
+        "encounter_date",
+        "provider",
+        "diagnosis_code"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "docx",
+        "txt"
+      ]
+    },
+    {
+      "id": "medical_diagnostics_results",
+      "domainId": "medical",
+      "displayName": "Medical Diagnostics & Results",
+      "defaultRequiredSections": [
+        "indication",
+        "findings",
+        "impression",
+        "reference ranges"
+      ],
+      "coreEntityTypes": [
+        "test_name",
+        "result_value",
+        "unit",
+        "abnormal_flag"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "hl7",
+        "csv"
+      ]
+    },
+    {
+      "id": "medical_medication_care",
+      "domainId": "medical",
+      "displayName": "Medical Medication & Care Management",
+      "defaultRequiredSections": [
+        "medications",
+        "dosage",
+        "care goals",
+        "care actions"
+      ],
+      "coreEntityTypes": [
+        "medication_name",
+        "dose",
+        "frequency",
+        "care_goal"
+      ],
+      "typicalFormats": [
+        "pdf",
+        "docx",
+        "csv"
+      ]
+    }
+  ]
+}

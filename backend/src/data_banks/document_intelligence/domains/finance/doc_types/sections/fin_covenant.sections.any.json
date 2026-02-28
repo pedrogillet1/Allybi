@@ -1,0 +1,12 @@
+{
+  "_meta": { "id": "di_finance_sections_fin_covenant", "version": "1.0.0", "description": "Section map for covenant compliance reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
+  "config": { "enabled": true, "domain": "finance", "docType": "fin_covenant" },
+  "sections": [
+    { "id": "calculations", "name": { "en": "Covenant Calculations", "pt": "Cálculos de Covenants" }, "required": true, "order": 3, "headingAnchors": ["Calculations", "Computation", "Derivation"] },
+    { "id": "compliance_matrix", "name": { "en": "Compliance Matrix", "pt": "Matriz de Compliance" }, "required": true, "order": 4, "headingAnchors": ["Compliance Matrix", "Status", "Pass/Fail"] },
+    { "id": "compliance_summary", "name": { "en": "Compliance Summary", "pt": "Resumo de Compliance" }, "required": true, "order": 1, "headingAnchors": ["Compliance Summary", "Covenant Status", "Overview"] },
+    { "id": "covenant_definitions", "name": { "en": "Covenant Definitions", "pt": "Definições de Covenants" }, "required": true, "order": 2, "headingAnchors": ["Definitions", "Covenant Terms", "Financial Covenants"] },
+    { "id": "officer_certification", "name": { "en": "Officer Certification", "pt": "Certificação do Diretor" }, "required": false, "order": 6, "headingAnchors": ["Certification", "Certify", "Officer"] },
+    { "id": "remedies", "name": { "en": "Remedies and Waivers", "pt": "Remédios e Isenções" }, "required": false, "order": 5, "headingAnchors": ["Remedies", "Waivers", "Cure Period"] }
+  ]
+}

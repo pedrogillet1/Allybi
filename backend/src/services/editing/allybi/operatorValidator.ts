@@ -192,3 +192,81 @@ export function validateAllybiOperatorPayload(
 
   return { ok: true };
 }
+
+/**
+ * Bank-driven noop validation: returns a NOOP result if the edit produced no changes.
+ * Reads the noop_prevention guardrail from editing_routing bank.
+ */
+export function validateNoopResult(
+  changed: boolean,
+  language: "en" | "pt",
+): AllybiValidationResult {
+  if (changed) return { ok: true };
+
+  const banks = loadAllybiBanks();
+  const guardrails = Array.isArray(banks.editingRouting?.guardrails)
+    ? banks.editingRouting.guardrails
+    : [];
+  const rule = guardrails.find((r: any) => r.id === "noop_prevention");
+  if (!rule) {
+    // Bank not loaded — hard-coded fallback
+    return {
+      ok: false,
+      code: "ROUTING_NOOP_NO_CHANGE",
+      message: "No changes were needed.",
+    };
+  }
+  const msg =
+    rule.noopMessage?.[language] ||
+    rule.noopMessage?.en ||
+    "No changes were needed.";
+  return {
+    ok: false,
+    code: rule.noopCode || "ROUTING_NOOP_NO_CHANGE",
+    message: msg,
+  };
+}
+
+/**
+ * Bank-driven multi-intent conflict detection: checks if rewrite+translate on the same
+ * target requires confirmation.
+ */
+export function validateMultiIntentConflict(
+  steps: Array<{ canonicalOperator: string; targetHint?: string }>,
+  language: "en" | "pt",
+): AllybiValidationResult {
+  const banks = loadAllybiBanks();
+  const guardrails = Array.isArray(banks.editingRouting?.guardrails)
+    ? banks.editingRouting.guardrails
+    : [];
+  const rule = guardrails.find(
+    (r: any) => r.id === "rewrite_translate_conflict",
+  );
+  if (!rule) return { ok: true };
+
+  // Group by target
+  const byTarget = new Map<string, string[]>();
+  for (const step of steps) {
+    const key = step.targetHint || "__global__";
+    const ops = byTarget.get(key) || [];
+    ops.push(step.canonicalOperator);
+    byTarget.set(key, ops);
+  }
+
+  for (const [, ops] of byTarget.entries()) {
+    const hasRewrite = ops.some((op) => /REWRITE/i.test(op));
+    const hasTranslate = ops.some((op) => /TRANSLATE/i.test(op));
+    if (hasRewrite && hasTranslate) {
+      const msg =
+        rule.confirmMessage?.[language] ||
+        rule.confirmMessage?.en ||
+        "Rewrite + translate conflict requires confirmation.";
+      return {
+        ok: false,
+        code: rule.confirmCode || "ROUTING_REWRITE_TRANSLATE_CONFLICT",
+        message: msg,
+      };
+    }
+  }
+  return { ok: true };
+}

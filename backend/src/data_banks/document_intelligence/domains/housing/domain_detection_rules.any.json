@@ -1,0 +1,105 @@
+{
+  "_meta": {
+    "id": "di_housing_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting housing documents from headings, content, and table structure.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 32
+  },
+  "domain": "housing",
+  "rules": [
+    {
+      "id": "housing_detect_001_lease_summary",
+      "priority": 100,
+      "weight": 3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\blease summary\\b",
+        "\\brental term\\b",
+        "\\bresumo de locacao\\b"
+      ],
+      "description": "Lease summary markers"
+    },
+    {
+      "id": "housing_detect_002_rent_receipt",
+      "priority": 98,
+      "weight": 2.8,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\brent receipt\\b",
+        "\\bproof of rent payment\\b",
+        "\\brecibo de aluguel\\b"
+      ],
+      "description": "Rent receipt markers"
+    },
+    {
+      "id": "housing_detect_003_mortgage_statement",
+      "priority": 97,
+      "weight": 2.7,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bmortgage statement\\b",
+        "\\bprincipal\\b",
+        "\\bescrow\\b",
+        "\\bextrato de hipoteca\\b"
+      ],
+      "description": "Mortgage markers"
+    },
+    {
+      "id": "housing_detect_004_property_tax_bill",
+      "priority": 96,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bproperty tax bill\\b",
+        "\\bassessment\\b",
+        "\\biptu\\b"
+      ],
+      "description": "Property tax markers"
+    },
+    {
+      "id": "housing_detect_005_home_inspection",
+      "priority": 95,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bhome inspection report\\b",
+        "\\binspection findings\\b",
+        "\\brelatorio de inspecao\\b"
+      ],
+      "description": "Inspection markers"
+    },
+    {
+      "id": "housing_detect_006_hoa_statement",
+      "priority": 94,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bhoa statement\\b",
+        "\\bcondominium fee\\b",
+        "\\bextrato de condominio\\b"
+      ],
+      "description": "HOA markers"
+    },
+    {
+      "id": "housing_detect_999_scope_lock",
+      "priority": 70,
+      "weight": 1.4,
+      "signal": "content",
+      "patterns": [
+        "\\bdocument\\s+number\\b",
+        "\\breference\\b",
+        "\\bpage\\s+\\d+\\b"
+      ],
+      "description": "Generic structural markers for scoped document extraction"
+    }
+  ]
+}

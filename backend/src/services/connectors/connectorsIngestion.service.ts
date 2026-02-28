@@ -34,16 +34,20 @@ export interface ConnectorIngestionResultItem {
  * Ingest connector payloads as first-class Documents and push to existing chunk/embed pipeline.
  */
 export class ConnectorsIngestionService {
+  isIngestionEnabled(): boolean {
+    return (
+      String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
+      "true"
+    );
+  }
+
   async ingestDocuments(
     ctx: ConnectorIngestionContext,
     items: ConnectorDocument[],
   ): Promise<ConnectorIngestionResultItem[]> {
     // Product behavior: connectors should enable read/send in-chat without polluting the user's document library.
     // Keep ingestion behind an explicit flag for optional "index my inbox" style features.
-    const ingestEnabled =
-      String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
-      "true";
-    if (!ingestEnabled) return [];
+    if (!this.isIngestionEnabled()) return [];
     if (documentContentVault.isStrict() && !documentContentVault.isEnabled()) {
       throw new Error(
         "SECURITY_REQUIRE_DOC_ENCRYPTION is enabled but document encryption runtime is not configured.",

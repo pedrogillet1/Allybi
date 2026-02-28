@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "id": "di_insurance_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for insurance domain including section weighting and query expansion.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "maxBoostRules": 16,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "insurance",
+  "sectionPriority": [
+    {
+      "section": "document_identification",
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ]
+    },
+    {
+      "section": "party_identification",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ]
+    },
+    {
+      "section": "period_and_jurisdiction",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "section": "status_and_summary",
+      "weight": 2.7,
+      "operators": [
+        "summarize",
+        "evaluate",
+        "monitor"
+      ]
+    },
+    {
+      "section": "line_items",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "section": "critical_dates",
+      "weight": 2.5,
+      "operators": [
+        "locate",
+        "monitor",
+        "validate"
+      ]
+    },
+    {
+      "section": "obligations_and_conditions",
+      "weight": 2.4,
+      "operators": [
+        "evaluate",
+        "validate",
+        "advise"
+      ]
+    },
+    {
+      "section": "supporting_documents",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "section": "annexes_exhibits",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "section": "footnotes",
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "ins_boost_claim_amounts",
+      "priority": 96,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "condition": "query references claim amounts, paid amounts, patient responsibility, or premium values",
+      "boostSections": [
+        "line_items",
+        "status_and_summary",
+        "footnotes"
+      ]
+    },
+    {
+      "id": "ins_boost_coverage_terms",
+      "priority": 94,
+      "weight": 2.6,
+      "operators": [
+        "evaluate",
+        "summarize",
+        "locate"
+      ],
+      "condition": "query references coverage limits, exclusions, deductibles, or waiting period",
+      "boostSections": [
+        "obligations_and_conditions",
+        "status_and_summary",
+        "annexes_exhibits"
+      ]
+    },
+    {
+      "id": "ins_boost_policy_identity",
+      "priority": 92,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query references policy number, member id, or insured identity",
+      "boostSections": [
+        "document_identification",
+        "party_identification",
+        "supporting_documents"
+      ]
+    },
+    {
+      "id": "ins_boost_timeline",
+      "priority": 90,
+      "weight": 2.3,
+      "operators": [
+        "locate",
+        "monitor",
+        "validate"
+      ],
+      "condition": "query references effective date, expiry, due date, or renewal",
+      "boostSections": [
+        "critical_dates",
+        "period_and_jurisdiction",
+        "status_and_summary"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bclaim\\b",
+      "expansions": [
+        "claim submission",
+        "claim status",
+        "sinistro",
+        "protocolo de sinistro"
+      ]
+    },
+    {
+      "trigger": "\\bpolicy\\b",
+      "expansions": [
+        "policy number",
+        "coverage terms",
+        "apolice",
+        "clausulas de cobertura"
+      ]
+    },
+    {
+      "trigger": "\\bpremium\\b",
+      "expansions": [
+        "premium invoice",
+        "premium due date",
+        "premio",
+        "fatura de premio"
+      ]
+    },
+    {
+      "trigger": "\\beob\\b|\\bbenefits\\b",
+      "expansions": [
+        "explanation of benefits",
+        "allowed amount",
+        "demonstrativo de beneficios",
+        "valor elegivel"
+      ]
+    },
+    {
+      "trigger": "\\bdeductible\\b",
+      "expansions": [
+        "coinsurance",
+        "copay",
+        "franquia",
+        "coparticipacao"
+      ]
+    },
+    {
+      "trigger": "\\bdenial\\b",
+      "expansions": [
+        "denial reason",
+        "appeal window",
+        "motivo da negativa",
+        "prazo de recurso"
+      ]
+    }
+  ]
+}

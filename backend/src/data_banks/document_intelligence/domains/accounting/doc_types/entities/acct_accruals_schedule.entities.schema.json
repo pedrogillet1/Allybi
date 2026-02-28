@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_accruals_schedule",
+    "version": "1.1.0",
+    "description": "Entity extraction schema for accruals schedule documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_accruals_schedule"
+  },
+  "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
+    {
+      "id": "scheduleDate",
+      "type": "date",
+      "required": true,
+      "description": "Schedule date"
+    },
+    {
+      "id": "accrualBalance",
+      "type": "currency",
+      "required": true,
+      "description": "Ending accrual balance"
+    },
+    {
+      "id": "reversalAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Reversal amount in subsequent period"
+    },
+    {
+      "id": "netAccrual",
+      "type": "currency",
+      "required": false,
+      "description": "Net accrual impact"
+    },
+    {
+      "id": "accrualCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of accrual entries"
+    }
+  ]
+}

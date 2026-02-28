@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "di_housing_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer policy for housing responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing"
+  },
+  "domain": "housing",
+  "disclaimers": [
+    {
+      "id": "housing_disc_001_not_legal_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This output summarizes housing documents and is not legal, lending, or tax advice.",
+        "pt": "Esta saida resume documentos de moradia e nao constitui orientacao juridica, de credito ou tributaria."
+      }
+    },
+    {
+      "id": "housing_disc_002_scope_lock",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Amounts and dates are extracted from the uploaded document version only.",
+        "pt": "Valores e datas sao extraidos apenas da versao do documento enviado."
+      }
+    },
+    {
+      "id": "housing_disc_003_verification",
+      "trigger": "analysis_involves_obligations",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "For enforceable obligations, confirm terms with the signed contract and issuer records.",
+        "pt": "Para obrigacoes executaveis, confirme termos com contrato assinado e registros do emissor."
+      }
+    }
+  ]
+}

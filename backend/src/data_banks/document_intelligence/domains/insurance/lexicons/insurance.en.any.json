@@ -1,0 +1,586 @@
+{
+  "_meta": {
+    "id": "di_insurance_lexicon_en",
+    "version": "1.0.0",
+    "description": "English lexicon for insurance domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "language": "en"
+  },
+  "domain": "insurance",
+  "terms": [
+    {
+      "id": "insurance_lex_accident_date",
+      "canonical": "accident date",
+      "synonyms": [
+        "date of loss",
+        "incident date"
+      ],
+      "display": "Accident Date"
+    },
+    {
+      "id": "insurance_lex_adjuster",
+      "canonical": "claim adjuster",
+      "synonyms": [
+        "loss adjuster",
+        "claims examiner"
+      ],
+      "display": "Claim Adjuster"
+    },
+    {
+      "id": "insurance_lex_allowed_amount",
+      "canonical": "allowed amount",
+      "synonyms": [
+        "eligible amount",
+        "approved amount"
+      ],
+      "display": "Allowed Amount"
+    },
+    {
+      "id": "insurance_lex_appeal_window",
+      "canonical": "appeal window",
+      "synonyms": [
+        "appeal period",
+        "reconsideration window"
+      ],
+      "display": "Appeal Window"
+    },
+    {
+      "id": "insurance_lex_approved_amount",
+      "canonical": "approved amount",
+      "synonyms": [
+        "allowed payment",
+        "approved value"
+      ],
+      "display": "Approved Amount"
+    },
+    {
+      "id": "insurance_lex_authorization",
+      "canonical": "authorization",
+      "synonyms": [
+        "prior authorization",
+        "pre-authorization"
+      ],
+      "display": "Authorization"
+    },
+    {
+      "id": "insurance_lex_beneficiary",
+      "canonical": "beneficiary",
+      "synonyms": [
+        "covered person",
+        "insured beneficiary"
+      ],
+      "display": "Beneficiary"
+    },
+    {
+      "id": "insurance_lex_benefit_limit",
+      "canonical": "benefit limit",
+      "synonyms": [
+        "coverage cap",
+        "benefit maximum"
+      ],
+      "display": "Benefit Limit"
+    },
+    {
+      "id": "insurance_lex_benefit_period",
+      "canonical": "benefit period",
+      "synonyms": [
+        "coverage period",
+        "benefit year"
+      ],
+      "display": "Benefit Period"
+    },
+    {
+      "id": "insurance_lex_billing_period",
+      "canonical": "billing period",
+      "synonyms": [
+        "premium period",
+        "invoice period"
+      ],
+      "display": "Billing Period"
+    },
+    {
+      "id": "insurance_lex_broker",
+      "canonical": "insurance broker",
+      "synonyms": [
+        "agent",
+        "intermediary"
+      ],
+      "display": "Insurance Broker"
+    },
+    {
+      "id": "insurance_lex_claim",
+      "canonical": "insurance claim",
+      "synonyms": [
+        "claim request",
+        "claim filing"
+      ],
+      "display": "Insurance Claim"
+    },
+    {
+      "id": "insurance_lex_claim_amount",
+      "canonical": "claim amount",
+      "synonyms": [
+        "amount claimed",
+        "submitted amount"
+      ],
+      "display": "Claim Amount"
+    },
+    {
+      "id": "insurance_lex_claim_number",
+      "canonical": "claim number",
+      "synonyms": [
+        "claim id",
+        "case number"
+      ],
+      "display": "Claim Number"
+    },
+    {
+      "id": "insurance_lex_claim_status",
+      "canonical": "claim status",
+      "synonyms": [
+        "status",
+        "claim outcome"
+      ],
+      "display": "Claim Status"
+    },
+    {
+      "id": "insurance_lex_claimant",
+      "canonical": "claimant",
+      "synonyms": [
+        "requester",
+        "insured claimant"
+      ],
+      "display": "Claimant"
+    },
+    {
+      "id": "insurance_lex_coinsurance",
+      "canonical": "coinsurance",
+      "synonyms": [
+        "co-insurance",
+        "cost share"
+      ],
+      "display": "Coinsurance"
+    },
+    {
+      "id": "insurance_lex_coordination_of_benefits",
+      "canonical": "coordination of benefits",
+      "synonyms": [
+        "cob",
+        "benefit coordination"
+      ],
+      "display": "Coordination of Benefits"
+    },
+    {
+      "id": "insurance_lex_copay",
+      "canonical": "copay",
+      "synonyms": [
+        "co-payment",
+        "fixed copay"
+      ],
+      "display": "Copay"
+    },
+    {
+      "id": "insurance_lex_coverage",
+      "canonical": "coverage",
+      "synonyms": [
+        "covered services",
+        "covered risk"
+      ],
+      "display": "Coverage"
+    },
+    {
+      "id": "insurance_lex_coverage_end",
+      "canonical": "coverage end date",
+      "synonyms": [
+        "policy expiration",
+        "coverage expiration"
+      ],
+      "display": "Coverage End Date"
+    },
+    {
+      "id": "insurance_lex_coverage_start",
+      "canonical": "coverage start date",
+      "synonyms": [
+        "policy effective date",
+        "coverage effective"
+      ],
+      "display": "Coverage Start Date"
+    },
+    {
+      "id": "insurance_lex_coverage_type",
+      "canonical": "coverage type",
+      "synonyms": [
+        "plan type",
+        "benefit type"
+      ],
+      "display": "Coverage Type"
+    },
+    {
+      "id": "insurance_lex_deductible",
+      "canonical": "deductible",
+      "synonyms": [
+        "out-of-pocket deductible",
+        "annual deductible"
+      ],
+      "display": "Deductible"
+    },
+    {
+      "id": "insurance_lex_denial_reason",
+      "canonical": "denial reason",
+      "synonyms": [
+        "reason code",
+        "adverse determination"
+      ],
+      "display": "Denial Reason"
+    },
+    {
+      "id": "insurance_lex_dependent",
+      "canonical": "dependent",
+      "synonyms": [
+        "covered dependent",
+        "family member"
+      ],
+      "display": "Dependent"
+    },
+    {
+      "id": "insurance_lex_endorsement",
+      "canonical": "policy endorsement",
+      "synonyms": [
+        "rider",
+        "endorsement addendum"
+      ],
+      "display": "Policy Endorsement"
+    },
+    {
+      "id": "insurance_lex_eob",
+      "canonical": "explanation of benefits",
+      "synonyms": [
+        "eob",
+        "benefits statement"
+      ],
+      "display": "Explanation of Benefits"
+    },
+    {
+      "id": "insurance_lex_exclusion",
+      "canonical": "policy exclusion",
+      "synonyms": [
+        "excluded service",
+        "coverage exclusion"
+      ],
+      "display": "Policy Exclusion"
+    },
+    {
+      "id": "insurance_lex_fraud_alert",
+      "canonical": "fraud alert",
+      "synonyms": [
+        "fraud indicator",
+        "siu alert"
+      ],
+      "display": "Fraud Alert"
+    },
+    {
+      "id": "insurance_lex_grace_period",
+      "canonical": "grace period",
+      "synonyms": [
+        "payment grace",
+        "late payment window"
+      ],
+      "display": "Grace Period"
+    },
+    {
+      "id": "insurance_lex_in_network",
+      "canonical": "in-network",
+      "synonyms": [
+        "preferred provider",
+        "network provider"
+      ],
+      "display": "In-Network"
+    },
+    {
+      "id": "insurance_lex_incident_description",
+      "canonical": "incident description",
+      "synonyms": [
+        "loss description",
+        "event narrative"
+      ],
+      "display": "Incident Description"
+    },
+    {
+      "id": "insurance_lex_invoice",
+      "canonical": "premium invoice",
+      "synonyms": [
+        "billing invoice",
+        "payment invoice"
+      ],
+      "display": "Premium Invoice"
+    },
+    {
+      "id": "insurance_lex_invoice_number",
+      "canonical": "invoice number",
+      "synonyms": [
+        "bill number",
+        "invoice id"
+      ],
+      "display": "Invoice Number"
+    },
+    {
+      "id": "insurance_lex_itemized_charge",
+      "canonical": "itemized charge",
+      "synonyms": [
+        "line charge",
+        "service charge"
+      ],
+      "display": "Itemized Charge"
+    },
+    {
+      "id": "insurance_lex_member_id",
+      "canonical": "member id",
+      "synonyms": [
+        "subscriber id",
+        "insured id"
+      ],
+      "display": "Member ID"
+    },
+    {
+      "id": "insurance_lex_noncovered_amount",
+      "canonical": "non-covered amount",
+      "synonyms": [
+        "excluded amount",
+        "non-payable amount"
+      ],
+      "display": "Non-Covered Amount"
+    },
+    {
+      "id": "insurance_lex_notice",
+      "canonical": "policy notice",
+      "synonyms": [
+        "coverage notice",
+        "insurer notice"
+      ],
+      "display": "Policy Notice"
+    },
+    {
+      "id": "insurance_lex_out_of_network",
+      "canonical": "out-of-network",
+      "synonyms": [
+        "non-network",
+        "external provider"
+      ],
+      "display": "Out-of-Network"
+    },
+    {
+      "id": "insurance_lex_out_of_pocket_max",
+      "canonical": "out of pocket maximum",
+      "synonyms": [
+        "oop max",
+        "annual oop maximum"
+      ],
+      "display": "Out-of-Pocket Maximum"
+    },
+    {
+      "id": "insurance_lex_paid_amount",
+      "canonical": "paid amount",
+      "synonyms": [
+        "amount paid",
+        "benefit paid"
+      ],
+      "display": "Paid Amount"
+    },
+    {
+      "id": "insurance_lex_patient_responsibility",
+      "canonical": "patient responsibility",
+      "synonyms": [
+        "member responsibility",
+        "insured responsibility"
+      ],
+      "display": "Patient Responsibility"
+    },
+    {
+      "id": "insurance_lex_payer",
+      "canonical": "payer",
+      "synonyms": [
+        "insurance company",
+        "carrier"
+      ],
+      "display": "Payer"
+    },
+    {
+      "id": "insurance_lex_payment_reference",
+      "canonical": "payment reference",
+      "synonyms": [
+        "reference code",
+        "payment code"
+      ],
+      "display": "Payment Reference"
+    },
+    {
+      "id": "insurance_lex_policy_holder",
+      "canonical": "policy holder",
+      "synonyms": [
+        "insured",
+        "subscriber"
+      ],
+      "display": "Policy Holder"
+    },
+    {
+      "id": "insurance_lex_policy_number",
+      "canonical": "policy number",
+      "synonyms": [
+        "policy id",
+        "contract number"
+      ],
+      "display": "Policy Number"
+    },
+    {
+      "id": "insurance_lex_policy_term",
+      "canonical": "policy term",
+      "synonyms": [
+        "coverage term",
+        "contract term"
+      ],
+      "display": "Policy Term"
+    },
+    {
+      "id": "insurance_lex_premium",
+      "canonical": "premium",
+      "synonyms": [
+        "insurance premium",
+        "monthly premium"
+      ],
+      "display": "Premium"
+    },
+    {
+      "id": "insurance_lex_premium_due_date",
+      "canonical": "premium due date",
+      "synonyms": [
+        "invoice due date",
+        "payment due"
+      ],
+      "display": "Premium Due Date"
+    },
+    {
+      "id": "insurance_lex_prior_authorization",
+      "canonical": "prior authorization",
+      "synonyms": [
+        "pa",
+        "preauth"
+      ],
+      "display": "Prior Authorization"
+    },
+    {
+      "id": "insurance_lex_provider",
+      "canonical": "provider",
+      "synonyms": [
+        "service provider",
+        "care provider"
+      ],
+      "display": "Provider"
+    },
+    {
+      "id": "insurance_lex_reimbursement",
+      "canonical": "reimbursement",
+      "synonyms": [
+        "claim payment",
+        "repayment"
+      ],
+      "display": "Reimbursement"
+    },
+    {
+      "id": "insurance_lex_renewal",
+      "canonical": "policy renewal",
+      "synonyms": [
+        "renewal date",
+        "renewal term"
+      ],
+      "display": "Policy Renewal"
+    },
+    {
+      "id": "insurance_lex_risk_class",
+      "canonical": "risk class",
+      "synonyms": [
+        "underwriting class",
+        "risk tier"
+      ],
+      "display": "Risk Class"
+    },
+    {
+      "id": "insurance_lex_service_date",
+      "canonical": "service date",
+      "synonyms": [
+        "date of service",
+        "dos"
+      ],
+      "display": "Service Date"
+    },
+    {
+      "id": "insurance_lex_subrogation",
+      "canonical": "subrogation",
+      "synonyms": [
+        "recovery rights",
+        "subrogation rights"
+      ],
+      "display": "Subrogation"
+    },
+    {
+      "id": "insurance_lex_subscriber",
+      "canonical": "subscriber",
+      "synonyms": [
+        "primary insured",
+        "member"
+      ],
+      "display": "Subscriber"
+    },
+    {
+      "id": "insurance_lex_sum_insured",
+      "canonical": "sum insured",
+      "synonyms": [
+        "coverage amount",
+        "insured limit"
+      ],
+      "display": "Sum Insured"
+    },
+    {
+      "id": "insurance_lex_third_party_admin",
+      "canonical": "third-party administrator",
+      "synonyms": [
+        "tpa",
+        "administrator"
+      ],
+      "display": "Third-Party Administrator"
+    },
+    {
+      "id": "insurance_lex_underwriting",
+      "canonical": "underwriting",
+      "synonyms": [
+        "risk underwriting",
+        "underwriting decision"
+      ],
+      "display": "Underwriting"
+    },
+    {
+      "id": "insurance_lex_waiting_period",
+      "canonical": "waiting period",
+      "synonyms": [
+        "coverage waiting period",
+        "eligibility waiting period"
+      ],
+      "display": "Waiting Period"
+    },
+    {
+      "id": "insurance_lex_writeoff",
+      "canonical": "write-off",
+      "synonyms": [
+        "discount adjustment",
+        "contractual adjustment"
+      ],
+      "display": "Write-off"
+    }
+  ]
+}

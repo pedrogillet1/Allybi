@@ -1,0 +1,1483 @@
+{
+  "_meta": {
+    "id": "query_rewrites_accounting",
+    "version": "1.0.0",
+    "description": "Domain query rewrite rules for accounting retrieval with tight synonym expansion and phrase normalization.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "maxRewriteTerms": 12,
+    "avoidGenericExplosions": true
+  },
+  "domain": "accounting",
+  "rules": [
+    {
+      "id": "accounting_rewrite_ap_guarded",
+      "priority": 96,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "locate",
+        "monitor",
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bap\\b"
+      ],
+      "negativePatterns": [
+        "\\bemployee review\\b",
+        "\\bperformance review\\b",
+        "\\badvanced placement\\b"
+      ],
+      "requireContextAny": [
+        "accounts payable",
+        "ap aging",
+        "aging report",
+        "vendor invoice",
+        "invoice aging",
+        "fornecedores",
+        "contas a pagar"
+      ],
+      "requireContextAll": [],
+      "forbidContextAny": [
+        "athletic performance",
+        "class placement"
+      ],
+      "rewrites": [
+        {
+          "value": "accounts payable",
+          "weight": 1
+        },
+        {
+          "value": "ap aging report",
+          "weight": 0.92
+        },
+        {
+          "value": "vendor invoice payables",
+          "weight": 0.86
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      }
+    },
+    {
+      "id": "accounting_rewrite_001",
+      "priority": 90,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brevenue\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "sales",
+          "weight": 1
+        },
+        {
+          "value": "top line",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_002",
+      "priority": 88,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bsales\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "revenue",
+          "weight": 1
+        },
+        {
+          "value": "top line",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_003",
+      "priority": 87,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bgross margin\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "gross profit margin",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_004",
+      "priority": 86,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\boperating margin\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "operating income margin",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_005",
+      "priority": 84,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bebitda\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "earnings before interest taxes depreciation and amortization",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_006",
+      "priority": 83,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bnoi\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "net operating income",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_007",
+      "priority": 82,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brevpar\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "revenue per available room",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_008",
+      "priority": 80,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\byoy\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "year over year",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_009",
+      "priority": 79,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bqoq\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "quarter over quarter",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_010",
+      "priority": 78,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bvariance\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "delta",
+          "weight": 1
+        },
+        {
+          "value": "difference",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_011",
+      "priority": 76,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bbudget\\s+vs\\s+actual\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "plan versus actual",
+          "weight": 1
+        },
+        {
+          "value": "budget actual variance",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_012",
+      "priority": 75,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bforecast\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "projection",
+          "weight": 1
+        },
+        {
+          "value": "outlook",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_013",
+      "priority": 74,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bopex\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "operating expenses",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_014",
+      "priority": 72,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcapex\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "capital expenditures",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_015",
+      "priority": 71,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdscr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "debt service coverage ratio",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_016",
+      "priority": 70,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\barr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "annual recurring revenue",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_017",
+      "priority": 68,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmr\\s?m\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "monthly recurring revenue",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_018",
+      "priority": 67,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bfree cash flow\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "fcf",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_019",
+      "priority": 66,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bnet income\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "profit after tax",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_020",
+      "priority": 64,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bgross profit\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "gross margin dollars",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_021",
+      "priority": 63,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\boccupancy\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "occupancy rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_022",
+      "priority": 62,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\badr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "average daily rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_023",
+      "priority": 60,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\brun rate\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "annualized run rate",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_024",
+      "priority": 59,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bcovenant\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "loan covenant",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_025",
+      "priority": 58,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\breceita\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "revenue",
+          "weight": 1
+        },
+        {
+          "value": "sales",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_026",
+      "priority": 56,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "evaluate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bmargem\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "margin",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_027",
+      "priority": 55,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bvariancia\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "variance",
+          "weight": 1
+        },
+        {
+          "value": "difference",
+          "weight": 0.9
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_028",
+      "priority": 54,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\byoy\\s+growth\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "year over year growth",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_029",
+      "priority": 52,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "monitor"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bebit\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "earnings before interest and tax",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_030",
+      "priority": 51,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "navigate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bgross\\s+bookings\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "total bookings",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_031",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "open"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bgm\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "gross margin",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_032",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bnpv\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "net present value",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_033",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "validate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\birr\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "internal rate of return",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_034",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bpayback\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "payback period",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_035",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bworking capital\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "net working capital",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_036",
+      "priority": 50,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bbreak even\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "breakeven",
+          "weight": 1
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    }
+  ]
+}

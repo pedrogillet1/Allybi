@@ -37,6 +37,11 @@ export interface OutlookSyncInput {
 export interface OutlookSyncResult {
   provider: "outlook";
   syncedCount: number;
+  fetchedCount: number;
+  ingestedCount: number;
+  createdCount: number;
+  existingCount: number;
+  skippedCount: number;
   mode: "initial" | "incremental";
   lastSyncAt: string;
   foldersScanned: number;
@@ -98,7 +103,10 @@ export class OutlookSyncService {
     const folderCursors: Record<string, { lastReceivedDateTime?: string }> = {
       ...(prior.folders ?? {}),
     };
-    let totalSynced = 0;
+    let totalFetched = 0;
+    let totalIngested = 0;
+    let totalCreated = 0;
+    let totalExisting = 0;
 
     for (const folder of folders) {
       // For incremental sync, use the per-folder cursor.
@@ -132,8 +140,12 @@ export class OutlookSyncService {
       }
 
       const docs = this.mapMessages(messages, folder.displayName);
+      totalFetched += docs.length;
+      let ingested: Awaited<
+        ReturnType<ConnectorsIngestionService["ingestDocuments"]>
+      > = [];
       if (docs.length > 0) {
-        await this.ingestion.ingestDocuments(
+        ingested = await this.ingestion.ingestDocuments(
           {
             userId: input.userId,
             correlationId: input.correlationId,
@@ -144,7 +156,13 @@ export class OutlookSyncService {
         );
       }
 
-      totalSynced += docs.length;
+      totalIngested += ingested.length;
+      totalCreated += ingested.filter(
+        (item) => item.status === "created",
+      ).length;
+      totalExisting += ingested.filter(
+        (item) => item.status === "existing",
+      ).length;
 
       // Track per-folder high-water mark.
       const latestReceived = messages
@@ -171,7 +189,12 @@ export class OutlookSyncService {
 
     return {
       provider: "outlook",
-      syncedCount: totalSynced,
+      syncedCount: totalIngested,
+      fetchedCount: totalFetched,
+      ingestedCount: totalIngested,
+      createdCount: totalCreated,
+      existingCount: totalExisting,
+      skippedCount: Math.max(0, totalFetched - totalIngested),
       mode,
       lastSyncAt,
       foldersScanned: folders.length,

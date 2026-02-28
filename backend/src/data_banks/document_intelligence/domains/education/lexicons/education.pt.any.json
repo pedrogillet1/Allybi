@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_education_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for education domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education",
+    "language": "pt"
+  },
+  "domain": "education",
+  "terms": [
+    {
+      "id": "education_lex_aluno",
+      "canonical": "aluno",
+      "synonyms": [
+        "estudante",
+        "discente"
+      ],
+      "display": "Aluno"
+    },
+    {
+      "id": "education_lex_auxilio_financeiro",
+      "canonical": "auxilio financeiro",
+      "synonyms": [
+        "bolsa",
+        "apoio financeiro"
+      ],
+      "display": "Auxilio Financeiro"
+    },
+    {
+      "id": "education_lex_campus",
+      "canonical": "campus",
+      "synonyms": [
+        "unidade",
+        "polo"
+      ],
+      "display": "Campus"
+    },
+    {
+      "id": "education_lex_carga_horaria",
+      "canonical": "carga horaria",
+      "synonyms": [
+        "horas",
+        "creditos"
+      ],
+      "display": "Carga Horaria"
+    },
+    {
+      "id": "education_lex_coeficiente",
+      "canonical": "coeficiente",
+      "synonyms": [
+        "gpa",
+        "media"
+      ],
+      "display": "Coeficiente"
+    },
+    {
+      "id": "education_lex_curso",
+      "canonical": "curso",
+      "synonyms": [
+        "programa",
+        "graduacao"
+      ],
+      "display": "Curso"
+    },
+    {
+      "id": "education_lex_diploma",
+      "canonical": "diploma",
+      "synonyms": [
+        "certificado",
+        "titulo"
+      ],
+      "display": "Diploma"
+    },
+    {
+      "id": "education_lex_disciplina",
+      "canonical": "disciplina",
+      "synonyms": [
+        "materia",
+        "unidade curricular"
+      ],
+      "display": "Disciplina"
+    },
+    {
+      "id": "education_lex_historico_escolar",
+      "canonical": "historico escolar",
+      "synonyms": [
+        "boletim",
+        "registro academico"
+      ],
+      "display": "Historico Escolar"
+    },
+    {
+      "id": "education_lex_instituicao",
+      "canonical": "instituicao",
+      "synonyms": [
+        "faculdade",
+        "universidade"
+      ],
+      "display": "Instituicao"
+    },
+    {
+      "id": "education_lex_matricula",
+      "canonical": "matricula",
+      "synonyms": [
+        "inscricao",
+        "registro"
+      ],
+      "display": "Matricula"
+    },
+    {
+      "id": "education_lex_nota",
+      "canonical": "nota",
+      "synonyms": [
+        "conceito",
+        "avaliacao"
+      ],
+      "display": "Nota"
+    },
+    {
+      "id": "education_lex_periodo_letivo",
+      "canonical": "periodo letivo",
+      "synonyms": [
+        "semestre",
+        "trimestre"
+      ],
+      "display": "Periodo Letivo"
+    },
+    {
+      "id": "education_lex_plano_de_ensino",
+      "canonical": "plano de ensino",
+      "synonyms": [
+        "ementa",
+        "syllabus"
+      ],
+      "display": "Plano De Ensino"
+    },
+    {
+      "id": "education_lex_registro_academico",
+      "canonical": "registro academico",
+      "synonyms": [
+        "secretaria academica",
+        "registro escolar"
+      ],
+      "display": "Registro Academico"
+    },
+    {
+      "id": "education_lex_situacao_academica",
+      "canonical": "situacao academica",
+      "synonyms": [
+        "status academico",
+        "situacao do aluno"
+      ],
+      "display": "Situacao Academica"
+    },
+    {
+      "id": "education_lex_turma",
+      "canonical": "turma",
+      "synonyms": [
+        "classe",
+        "grupo"
+      ],
+      "display": "Turma"
+    },
+    {
+      "id": "education_lex_turno",
+      "canonical": "turno",
+      "synonyms": [
+        "manha",
+        "noite"
+      ],
+      "display": "Turno"
+    },
+    {
+      "id": "education_lex_validacao",
+      "canonical": "validacao",
+      "synonyms": [
+        "autenticacao",
+        "verificacao"
+      ],
+      "display": "Validacao"
+    },
+    {
+      "id": "education_lex_valor_da_mensalidade",
+      "canonical": "valor da mensalidade",
+      "synonyms": [
+        "mensalidade",
+        "anuidade"
+      ],
+      "display": "Valor Da Mensalidade"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 // src/components/attachments/inline/InlineDocumentButton.jsx
 import React, { useMemo } from "react";
-import FileIcons from "../../FileIcons";
+import FileIcons from "../../shared/FileIcons";
 import cleanDocumentName from "../../../utils/cleanDocumentName";
 
 /**
