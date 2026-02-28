@@ -166,7 +166,8 @@ describe("Certification: truncation and output formatting", () => {
   });
 
   test("enforcer + overflow repair interaction: no false-positive replacement of clean text", () => {
-    const cleanText = "The quarterly results show strong performance across all divisions.";
+    const cleanText =
+      "The quarterly results show strong performance across all divisions.";
     const result = classifyVisibleTruncation({
       finalText: cleanText,
       enforcementRepairs: ["SOFT_MAX_TOKENS_TRIMMED"],
@@ -174,7 +175,8 @@ describe("Certification: truncation and output formatting", () => {
     });
 
     const failures: string[] = [];
-    if (result.occurred) failures.push("FALSE_POSITIVE_TRUNCATION_ON_CLEAN_TEXT");
+    if (result.occurred)
+      failures.push("FALSE_POSITIVE_TRUNCATION_ON_CLEAN_TEXT");
 
     writeCertificationGateReport("truncation_false_positive_guard", {
       passed: failures.length === 0,

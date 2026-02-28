@@ -54,7 +54,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "service",
+        "level",
+        "agreement",
+        "target",
+        "incident",
+        "runbook",
+        "timeline",
+        "operations",
+        "uptime",
+        "root cause"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -260,6 +271,10 @@
         "documents"
       ],
       "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare",
         "monitor"
       ],
       "domains": [
@@ -283,7 +298,9 @@
         "requireDomainMatch": true,
         "domains": [
           "ops"
-        ]
+        ],
+        "requireNoExplicitDocTypes": true,
+        "requireNoExplicitDocIds": true
       },
       "negativePatterns": [],
       "requireContextAny": [],
@@ -324,7 +341,16 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "severity",
+        "incident",
+        "service",
+        "runbook",
+        "timeline",
+        "operations",
+        "uptime",
+        "root cause"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -362,7 +388,16 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "severity",
+        "incident",
+        "service",
+        "runbook",
+        "timeline",
+        "operations",
+        "uptime",
+        "root cause"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -400,7 +435,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "mean",
+        "time",
+        "recovery",
+        "incident",
+        "service",
+        "runbook",
+        "timeline",
+        "operations",
+        "uptime",
+        "root cause"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -438,7 +484,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "mean",
+        "time",
+        "between",
+        "failures",
+        "incident",
+        "service",
+        "runbook",
+        "timeline",
+        "operations",
+        "uptime"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -549,7 +606,9 @@
         "requireDomainMatch": true,
         "domains": [
           "ops"
-        ]
+        ],
+        "requireNoExplicitDocTypes": true,
+        "requireNoExplicitDocIds": true
       },
       "negativePatterns": [],
       "requireContextAny": [],
@@ -1142,6 +1201,11 @@
         "documents"
       ],
       "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare",
+        "monitor",
         "navigate"
       ],
       "domains": [
@@ -1168,7 +1232,21 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "root",
+        "cause",
+        "analysis",
+        "incident",
+        "service",
+        "runbook",
+        "timeline",
+        "operations",
+        "uptime",
+        "root cause",
+        "rca",
+        "chronology",
+        "postmortem"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },

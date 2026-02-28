@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "id": "unused_bank_lifecycle",
+    "version": "1.1.0",
+    "description": "Lifecycle policy for banks that static code scanning marks as unused. Used by governance audits to classify keep/deprecate/remove intent without mutating runtime loading behavior.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-28"
+  },
+  "defaultStatus": "deprecated_keep",
+  "allowCandidateInStrict": false,
+  "allowedStatuses": [
+    "active",
+    "candidate_deprecate",
+    "deprecated_keep",
+    "remove_approved"
+  ],
+  "pathPrefixRules": [
+    {
+      "prefix": "_deprecated/",
+      "status": "deprecated_keep",
+      "reason": "Archived packs intentionally retained for migration traceability."
+    },
+    {
+      "prefix": "document_intelligence/",
+      "status": "active",
+      "reason": "Doc-int packs are runtime/eval assets; static call-site scans undercount their usage."
+    },
+    {
+      "prefix": "operators/playbooks/",
+      "status": "active",
+      "reason": "Operator playbooks are selected by policy/runtime composition, not always by direct ID literals."
+    },
+    {
+      "prefix": "semantics/domain/",
+      "status": "active",
+      "reason": "Domain semantics are loaded via indirection and should not be auto-pruned from static audit output."
+    },
+    {
+      "prefix": "semantics/structure/",
+      "status": "active",
+      "reason": "Structure ontologies are shared extraction assets with indirect lookups."
+    },
+    {
+      "prefix": "semantics/taxonomy/",
+      "status": "active",
+      "reason": "Taxonomy banks back document intelligence and retrieval routing as indirect dependencies."
+    }
+  ],
+  "categoryRules": [
+    {
+      "category": "manifest",
+      "status": "active",
+      "reason": "Manifest/control-plane banks are foundational and should remain active."
+    },
+    {
+      "category": "probes",
+      "status": "active",
+      "reason": "Probe banks are CI assets and may not appear in production codepaths."
+    },
+    {
+      "category": "schemas",
+      "status": "deprecated_keep",
+      "reason": "Schema banks may be loaded indirectly by validators and remain intentionally retained."
+    },
+    {
+      "category": "tests",
+      "status": "deprecated_keep",
+      "reason": "Test-only banks are retained for CI certification coverage."
+    }
+  ],
+  "idOverrides": [
+    {
+      "id": "docint_eval_suite_registry",
+      "status": "deprecated_keep",
+      "reason": "Eval registry is CI support data with indirect loading paths."
+    },
+    {
+      "id": "excel_number_formats_structure",
+      "status": "deprecated_keep",
+      "reason": "Structure fallback dictionary retained for extraction compatibility."
+    }
+  ]
+}

@@ -56,6 +56,22 @@
       "emitGateTrace": false,
       "traceKey": "qualityGateTrace",
       "maxTraceItems": 140
+    },
+    "gateSeverityByName": {
+      "requested_slot_covered": "block",
+      "forbidden_adjacent_role_absent": "block",
+      "entity_role_consistency": "block",
+      "wrong_doc_lock_enforcement": "block",
+      "source_policy_navigation_mode": "block",
+      "numeric_integrity_totals_reconciliation": "block",
+      "numeric_integrity_domain_unit_required": "warn",
+      "numeric_integrity_currency_consistency": "warn",
+      "ambiguity_single_question_policy": "warn",
+      "redaction_default_pii_identity_tax_banking": "block",
+      "medical_safety_boundaries": "block",
+      "brevity_and_constraints": "warn",
+      "markdown_sanity": "warn",
+      "no_raw_json": "block"
     }
   },
   "gateOrder": [

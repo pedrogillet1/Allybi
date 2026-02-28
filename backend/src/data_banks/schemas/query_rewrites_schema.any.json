@@ -139,6 +139,35 @@
                 "requireDomainMatch": {
                   "type": "boolean"
                 },
+                "docLock": {
+                  "type": "boolean"
+                },
+                "minExplicitResolvedDocs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "maxExplicitResolvedDocs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "explicitDocTypes": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "explicitDocIds": {
+                  "$ref": "#/$defs/stringArray"
+                },
+                "requireNoExplicitDocTypes": {
+                  "type": "boolean"
+                },
+                "requireNoExplicitDocIds": {
+                  "type": "boolean"
+                },
+                "allowWhenExplicitDocTypes": {
+                  "type": "boolean"
+                },
+                "allowWhenExplicitDocIds": {
+                  "type": "boolean"
+                },
                 "intents": {
                   "$ref": "#/$defs/stringArray"
                 },

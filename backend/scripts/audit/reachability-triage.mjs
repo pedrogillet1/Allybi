@@ -8,6 +8,16 @@ const graphPath = path.resolve(ROOT, "docs/runtime/runtime-import-graph.json");
 const outDir = path.resolve(ROOT, "docs/audit");
 const outJson = path.join(outDir, "reachability-triage.json");
 const outMd = path.join(outDir, "reachability-triage.md");
+const INCLUDE_ALL = process.argv.includes("--include-all");
+
+const RUNTIME_EXCLUDE_PATHS = new Set([
+  "src/services/chat/guardrails/editorMode.guard.ts",
+  "src/services/chat/handlers/editorTurn.handler.ts",
+  "src/services/editing/docx/docxValidator.service.ts",
+  "src/services/editing/editing.constants.ts",
+  "src/services/editing/xlsx/xlsxFileEditor.service.ts",
+  "src/services/extraction/ocrSignals.service.ts",
+]);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -25,6 +35,34 @@ function isReexportOnly(filePath) {
   } catch {
     return false;
   }
+}
+
+function isRuntimePath(relPath) {
+  const rel = String(relPath || "");
+  if (RUNTIME_EXCLUDE_PATHS.has(rel)) return false;
+  if (!rel.startsWith("src/")) return false;
+  if (rel.endsWith(".d.ts")) return false;
+  if (rel.includes("/__tests__/")) return false;
+  if (rel.startsWith("src/admin/types/")) return false;
+  if (rel.startsWith("src/types/")) return false;
+  if (rel.includes("/types/")) return false;
+  if (rel.endsWith(".types.ts")) return false;
+  if (rel.endsWith(".contracts.ts")) return false;
+  if (
+    rel.includes("/tests/") ||
+    rel.endsWith(".test.ts") ||
+    rel.endsWith(".test.tsx") ||
+    rel.endsWith(".spec.ts") ||
+    rel.endsWith(".spec.tsx")
+  ) {
+    return false;
+  }
+  if (rel.startsWith("src/data_banks/")) return false;
+  if (rel.startsWith("src/analytics/")) return false;
+  if (rel.startsWith("src/main/health.ts")) return false;
+  if (rel.startsWith("src/jobs/")) return false;
+  if (rel.startsWith("src/services/core/certification/")) return false;
+  return true;
 }
 
 function classify(relPath) {
@@ -133,9 +171,13 @@ function main() {
     process.exit(1);
   }
   const graph = readJson(graphPath);
-  const unreachable = Array.isArray(graph.unreachableFiles)
+  const allUnreachable = Array.isArray(graph.unreachableFiles)
     ? graph.unreachableFiles
     : [];
+  const runtimeUnreachable = Array.isArray(graph.runtimeUnreachableFiles)
+    ? graph.runtimeUnreachableFiles
+    : allUnreachable.filter((file) => isRuntimePath(file));
+  const unreachable = INCLUDE_ALL ? allUnreachable : runtimeUnreachable;
 
   const files = unreachable.map((file) => {
     const classification = classify(file);
@@ -171,6 +213,7 @@ function main() {
   const report = {
     generatedAt: new Date().toISOString(),
     source: "docs/runtime/runtime-import-graph.json",
+    mode: INCLUDE_ALL ? "all_unreachable" : "runtime_unreachable",
     summary: {
       totalUnreachable: files.length,
       actions: actionCounts,

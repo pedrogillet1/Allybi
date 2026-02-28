@@ -2,6 +2,8 @@ import "reflect-metadata";
 import { describe, expect, test } from "@jest/globals";
 import {
   CentralizedChatRuntimeDelegate,
+  enforceLanguageContract,
+  ensureFallbackSourceCoverage,
   resolveSourceInvariantFailureCode,
   shouldApplyPreEnforcerTrim,
 } from "./CentralizedChatRuntimeDelegate";
@@ -209,5 +211,115 @@ describe("CentralizedChatRuntimeDelegate source invariants", () => {
       filteredSources: [{ documentId: "doc-1" }],
     });
     expect(failure).toBeNull();
+  });
+});
+
+describe("CentralizedChatRuntimeDelegate language contract", () => {
+  test("does not adjust short neutral english responses", () => {
+    const result = enforceLanguageContract({
+      text: "Yes.",
+      preferredLanguage: "en",
+    });
+    expect(result.adjusted).toBe(false);
+    expect(result.text).toBe("Yes.");
+  });
+
+  test("does not adjust short neutral portuguese responses", () => {
+    const result = enforceLanguageContract({
+      text: "Sim.",
+      preferredLanguage: "pt",
+    });
+    expect(result.adjusted).toBe(false);
+    expect(result.text).toBe("Sim.");
+  });
+
+  test("adjusts clear language mismatch", () => {
+    const result = enforceLanguageContract({
+      text: "Obrigado pelo envio do documento.",
+      preferredLanguage: "en",
+    });
+    expect(result.adjusted).toBe(true);
+    expect(result.text).toContain("requested language");
+  });
+
+  test("adjusts mixed portuguese output when preferred language is english", () => {
+    const result = enforceLanguageContract({
+      text:
+        "The monthly amount was billed correctly for the selected period, and the detailed breakdown confirms each charge. Obrigado pelo envio do documento e pela confirmacao dos valores na tabela.",
+      preferredLanguage: "en",
+    });
+    expect(result.adjusted).toBe(true);
+    expect(result.text).toContain("requested language");
+  });
+
+  test("does not adjust mostly english output with a short portuguese phrase", () => {
+    const result = enforceLanguageContract({
+      text:
+        "The invoice is complete, includes all charges, and the totals reconcile with the statement. Obrigado.",
+      preferredLanguage: "en",
+    });
+    expect(result.adjusted).toBe(false);
+    expect(result.text).toContain("invoice is complete");
+  });
+
+  test("can disable language contract v2 via feature flag", () => {
+    const prev = process.env.LANGUAGE_CONTRACT_V2;
+    process.env.LANGUAGE_CONTRACT_V2 = "0";
+    try {
+      const result = enforceLanguageContract({
+        text: "Obrigado pelo envio do documento.",
+        preferredLanguage: "en",
+      });
+      expect(result.adjusted).toBe(false);
+      expect(result.text).toBe("Obrigado pelo envio do documento.");
+    } finally {
+      if (prev === undefined) delete process.env.LANGUAGE_CONTRACT_V2;
+      else process.env.LANGUAGE_CONTRACT_V2 = prev;
+    }
+  });
+});
+
+describe("CentralizedChatRuntimeDelegate fallback source coverage", () => {
+  test("injects scoped source for fallback turns with attached docs and zero evidence sources", () => {
+    const sources = ensureFallbackSourceCoverage({
+      sources: [],
+      answerMode: "fallback",
+      attachedDocumentIds: ["doc-1", "doc-2"],
+      retrievalPack: {
+        query: { original: "q", normalized: "q" },
+        scope: {
+          activeDocId: "doc-2",
+          explicitDocLock: true,
+          candidateDocIds: ["doc-2"],
+        },
+        stats: {
+          candidatesConsidered: 0,
+          candidatesAfterNegatives: 0,
+          candidatesAfterBoosts: 0,
+          candidatesAfterDiversification: 0,
+          scopeCandidatesDropped: 0,
+          scopeViolationsDetected: 0,
+          scopeViolationsThrown: 0,
+          evidenceItems: 0,
+          uniqueDocsInEvidence: 0,
+          topScore: null,
+          scoreGap: null,
+        },
+        evidence: [],
+      },
+    });
+
+    expect(sources).toHaveLength(1);
+    expect(sources[0]?.documentId).toBe("doc-2");
+  });
+
+  test("does not inject sources for non-fallback turns", () => {
+    const sources = ensureFallbackSourceCoverage({
+      sources: [],
+      answerMode: "general_answer",
+      attachedDocumentIds: ["doc-1"],
+      retrievalPack: null,
+    });
+    expect(sources).toEqual([]);
   });
 });

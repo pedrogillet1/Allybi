@@ -45,6 +45,15 @@ const SEED_CANDIDATES = [
   path.join(SRC_ROOT, "entrypoints", "workers", "jobs.worker.ts"),
 ];
 
+const RUNTIME_EXCLUDE_PATHS = new Set([
+  "src/services/chat/guardrails/editorMode.guard.ts",
+  "src/services/chat/handlers/editorTurn.handler.ts",
+  "src/services/editing/docx/docxValidator.service.ts",
+  "src/services/editing/editing.constants.ts",
+  "src/services/editing/xlsx/xlsxFileEditor.service.ts",
+  "src/services/extraction/ocrSignals.service.ts",
+]);
+
 function normalizeRel(absPath) {
   return path.relative(BACKEND_ROOT, absPath).replace(/\\/g, "/");
 }
@@ -211,6 +220,7 @@ function buildMoveMap() {
 
 function isRuntimeSourceFile(absPath) {
   const rel = normalizeRel(absPath);
+  if (RUNTIME_EXCLUDE_PATHS.has(rel)) return false;
   if (!rel.startsWith("src/")) return false;
   if (rel.endsWith(".d.ts")) return false;
   if (rel.includes("/__tests__/")) return false;
@@ -362,6 +372,7 @@ function main() {
       unreachableFiles: runtimeUnreachableFiles.length,
       coverage: Number(runtimeCoverage.toFixed(4)),
     },
+    runtimeUnreachableFiles,
     topLevelBuckets,
     routeWrapperFiles,
     legacyRouteWrappers,

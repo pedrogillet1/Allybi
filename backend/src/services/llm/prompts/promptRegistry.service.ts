@@ -88,6 +88,14 @@ function isProd(env: EnvName): boolean {
   return env === "production";
 }
 
+function isPromptCoverageStrictEnabled(): boolean {
+  const raw = String(process.env.PROMPT_MODE_COVERAGE_STRICT || "")
+    .trim()
+    .toLowerCase();
+  if (!raw) return true;
+  return !["0", "false", "off", "no"].includes(raw);
+}
+
 function clampInt(n: any, min: number, max: number, fallback: number): number {
   const x = Number(n);
   if (!Number.isFinite(x)) return fallback;
@@ -179,6 +187,13 @@ function sha256(input: string): string {
 
 export class PromptRegistryService {
   private registryValidated = false;
+  private static readonly STRICT_COMPOSE_MODES = new Set([
+    "doc_grounded_single",
+    "doc_grounded_multi",
+    "doc_grounded_quote",
+    "doc_grounded_table",
+    "help_steps",
+  ]);
 
   constructor(private readonly bankLoader: BankLoader) {}
 
@@ -209,6 +224,19 @@ export class PromptRegistryService {
       usedBankIds.push(bankId);
 
       const selection = this.selectTemplate(bank, kind, ctx);
+      if (
+        kind === "compose_answer" &&
+        bankId === "task_answer_with_sources" &&
+        isPromptCoverageStrictEnabled() &&
+        PromptRegistryService.STRICT_COMPOSE_MODES.has(
+          safeStr(ctx.answerMode || ""),
+        ) &&
+        selection.templateId.endsWith(":meta.description")
+      ) {
+        throw new Error(
+          `prompt_contract_uncovered_mode:${safeStr(ctx.answerMode || "unknown")}`,
+        );
+      }
       selectedTemplateIds.push(selection.templateId);
 
       const compiled = selection.messages

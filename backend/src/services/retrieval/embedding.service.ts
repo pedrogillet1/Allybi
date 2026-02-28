@@ -79,6 +79,16 @@ function isRetryable(err: any) {
   return false;
 }
 
+function isFlagEnabled(flagName: string, defaultValue: boolean): boolean {
+  const raw = String(process.env[flagName] || "")
+    .trim()
+    .toLowerCase();
+  if (!raw) return defaultValue;
+  if (["1", "true", "yes", "on"].includes(raw)) return true;
+  if (["0", "false", "no", "off"].includes(raw)) return false;
+  return defaultValue;
+}
+
 function preprocess(text: string, maxChars: number): string {
   let t = (text || "").replace(/\s+/g, " ").trim();
   if (t.length > maxChars) t = t.slice(0, maxChars);
@@ -308,6 +318,13 @@ export class EmbeddingsService {
       if (cachePromises.length > 0) {
         Promise.all(cachePromises).catch(() => {});
       }
+    }
+
+    const failClose = isFlagEnabled("EMBEDDING_FAILCLOSE_V1", true);
+    if (failClose && failedCount > 0) {
+      throw new Error(
+        `Embedding generation failed for ${failedCount}/${texts.length} texts.`,
+      );
     }
 
     const embeddings = out.filter((x): x is EmbeddingResult => !!x);

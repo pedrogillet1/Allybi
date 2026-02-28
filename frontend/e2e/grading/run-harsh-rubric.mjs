@@ -46,6 +46,130 @@ function parseArgs(argv) {
   return out;
 }
 
+function readJsonFileSafe(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function countDatasetRows(dataset) {
+  if (Array.isArray(dataset)) return dataset.length;
+  if (dataset && typeof dataset === 'object' && Array.isArray(dataset.results)) {
+    return dataset.results.length;
+  }
+  return 0;
+}
+
+function expectedRowsForPack(pack) {
+  const n = Number(String(pack || '').trim());
+  if (!Number.isFinite(n) || n <= 0) return 1;
+  return Math.floor(n);
+}
+
+function packInputBasenames(pack) {
+  const names = new Set();
+  const defaultPath = DEFAULT_INPUT_BY_PACK[String(pack)] || '';
+  const defaultBase = path.basename(defaultPath);
+  if (defaultBase) names.add(defaultBase);
+  names.add(`queries-${pack}-run.json`);
+  names.add(`query-test-${pack}-results.json`);
+  names.add(`query-test-${pack}-gate-results.json`);
+  return [...names];
+}
+
+function collectArchiveCandidates(pack) {
+  const out = [];
+  const archiveRoot = path.join(REPORTS_DIR, 'archive');
+  if (!fs.existsSync(archiveRoot)) return out;
+  const archiveDirs = fs
+    .readdirSync(archiveRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((a, b) => a.localeCompare(b));
+  const basenames = packInputBasenames(pack);
+  for (const dirName of archiveDirs) {
+    for (const baseName of basenames) {
+      const candidate = path.join(archiveRoot, dirName, baseName);
+      if (fs.existsSync(candidate)) out.push(candidate);
+    }
+  }
+  return out;
+}
+
+function uniquePaths(values) {
+  const seen = new Set();
+  const out = [];
+  for (const value of values) {
+    const normalized = path.resolve(value);
+    if (seen.has(normalized)) continue;
+    seen.add(normalized);
+    out.push(normalized);
+  }
+  return out;
+}
+
+function resolveInputDataset(opts) {
+  const pack = String(opts.pack || '40');
+  const explicitInput = opts.input ? path.resolve(opts.input) : null;
+  const requiredRows = expectedRowsForPack(pack);
+  const defaultInput = path.resolve(
+    DEFAULT_INPUT_BY_PACK[pack] || DEFAULT_INPUT_BY_PACK['40'],
+  );
+  const latestCandidates = packInputBasenames(pack).map((baseName) =>
+    path.join(LATEST_DIR, baseName),
+  );
+  const candidates = uniquePaths([
+    ...(explicitInput ? [explicitInput] : []),
+    defaultInput,
+    ...latestCandidates,
+    ...collectArchiveCandidates(pack),
+  ]);
+
+  const invalid = [];
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate)) {
+      invalid.push({ file: candidate, reason: 'missing' });
+      continue;
+    }
+    const dataset = readJsonFileSafe(candidate);
+    if (!dataset) {
+      invalid.push({ file: candidate, reason: 'invalid_json' });
+      continue;
+    }
+    const rowCount = countDatasetRows(dataset);
+    if (rowCount < requiredRows) {
+      invalid.push({
+        file: candidate,
+        reason: `insufficient_rows_${rowCount}_lt_${requiredRows}`,
+      });
+      continue;
+    }
+    return { inputFile: candidate, dataset, rowCount };
+  }
+
+  if (explicitInput) {
+    const detail = invalid.find((entry) => entry.file === explicitInput)?.reason || 'unusable';
+    throw new Error(
+      `[harsh-rubric] explicit input is not usable (${detail}): ${explicitInput}`,
+    );
+  }
+
+  const sampledReasons = invalid
+    .slice(0, 6)
+    .map((entry) => `${entry.file} [${entry.reason}]`)
+    .join('\n');
+  throw new Error(
+    [
+      `[harsh-rubric] no valid input artifact found for pack ${pack}.`,
+      `Expected at least ${requiredRows} rows.`,
+      sampledReasons ? `Checked candidates:\n${sampledReasons}` : 'No candidates were discovered.',
+    ].join('\n'),
+  );
+}
+
 function normalizeText(value) {
   return String(value || '')
     .normalize('NFKD')
@@ -505,14 +629,23 @@ function renderMarkdown(result) {
 
 function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const inputFile = path.resolve(opts.input || DEFAULT_INPUT_BY_PACK[opts.pack] || DEFAULT_INPUT_BY_PACK['40']);
-
-  if (!fs.existsSync(inputFile)) {
-    console.error(`[harsh-rubric] input not found: ${inputFile}`);
+  let resolved = null;
+  try {
+    resolved = resolveInputDataset(opts);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(message);
     process.exit(1);
   }
 
-  const dataset = JSON.parse(fs.readFileSync(inputFile, 'utf8'));
+  const inputFile = resolved.inputFile;
+  const dataset = resolved.dataset;
+  if (!opts.input) {
+    console.log(
+      `[harsh-rubric] using input artifact: ${inputFile} (${resolved.rowCount} rows)`,
+    );
+  }
+
   const normalized = normalizeResults(dataset);
   const requiresAttachedDocset = ['40', '50', '100'].includes(String(opts.pack));
   if (

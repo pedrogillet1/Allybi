@@ -192,7 +192,8 @@ async function sendChat(token, message, conversationId) {
   }
 
   const json = JSON.parse(res.body);
-  if (!json.ok) throw new Error(`API error: ${JSON.stringify(json).slice(0, 200)}`);
+  if (!json.ok)
+    throw new Error(`API error: ${JSON.stringify(json).slice(0, 200)}`);
   return json.data;
 }
 
@@ -216,7 +217,9 @@ function normalizeText(value) {
 function extractExplicitDocCountHint(query) {
   const q = normalizeText(query);
   if (!q) return null;
-  if (/\b(?:3|tres|três)\s+(?:docs?|documentos?|arquivos?|materiais?)\b/.test(q)) {
+  if (
+    /\b(?:3|tres|três)\s+(?:docs?|documentos?|arquivos?|materiais?)\b/.test(q)
+  ) {
     return 3;
   }
   if (/\b(?:2|dois)\s+(?:docs?|documentos?|arquivos?|materiais?)\b/.test(q)) {
@@ -237,11 +240,13 @@ function resolveRequiredDocGroups(query, expectedDocGroups) {
 
   const explicitCount = extractExplicitDocCountHint(q);
   if (explicitCount !== null) {
-    return expectedDocGroups.slice(0, Math.min(expectedDocGroups.length, explicitCount));
+    return expectedDocGroups.slice(
+      0,
+      Math.min(expectedDocGroups.length, explicitCount),
+    );
   }
 
-  const crossDocIntentRe =
-    /\b(cruz|integr|unind|junt|compar|combina|cross)\w*/;
+  const crossDocIntentRe = /\b(cruz|integr|unind|junt|compar|combina|cross)\w*/;
   if (crossDocIntentRe.test(q)) {
     return expectedDocGroups;
   }
@@ -280,10 +285,13 @@ function evaluateSourceCoverage({
 }
 
 function checkSourcesConsistency(content, sourceFilenames) {
-  if (!sourceFilenames || sourceFilenames.length === 0) return { ok: true, issue: null };
+  if (!sourceFilenames || sourceFilenames.length === 0)
+    return { ok: true, issue: null };
 
-  const notProvidedRe = /(?:não foi fornecid|not (?:been )?provided|wasn't provided|not available in the context|não (?:foi )?(?:disponibilizad|encontrad))/gi;
-  const refusalRe = /(?:não (?:inclui|contém|oferece|possui) (?:detalhes|informaç|conteúdo|dados)|não é possível (?:criar|gerar|produzir)|(?:it.?s )?not (?:possible|in the doc)|(?:não|nao) (?:pôde|pode) ser utilizad)/gi;
+  const notProvidedRe =
+    /(?:não foi fornecid|not (?:been )?provided|wasn't provided|not available in the context|não (?:foi )?(?:disponibilizad|encontrad))/gi;
+  const refusalRe =
+    /(?:não (?:inclui|contém|oferece|possui) (?:detalhes|informaç|conteúdo|dados)|não é possível (?:criar|gerar|produzir)|(?:it.?s )?not (?:possible|in the doc)|(?:não|nao) (?:pôde|pode) ser utilizad)/gi;
 
   const hasNotProvided = notProvidedRe.test(content);
   const hasRefusal = refusalRe.test(content);
@@ -294,29 +302,42 @@ function checkSourcesConsistency(content, sourceFilenames) {
   for (const fn of sourceFilenames) {
     const shortName = fn.replace(/\.[a-z]+$/i, "").replace(/_/g, " ");
     if (content.toLowerCase().includes(shortName.toLowerCase())) {
-      return { ok: false, issue: `Claims "${shortName}" not provided but it's in sources` };
+      return {
+        ok: false,
+        issue: `Claims "${shortName}" not provided but it's in sources`,
+      };
     }
   }
 
   // If refusal pattern found + sources exist → generic contradiction
   if (hasRefusal && sourceFilenames.length > 0) {
-    return { ok: false, issue: "Generic refusal despite having sources attached" };
+    return {
+      ok: false,
+      issue: "Generic refusal despite having sources attached",
+    };
   }
 
   return { ok: true, issue: null };
 }
 
 // Detects grounded refusals: LLM says document doesn't contain the requested info
-const groundedRefusalRe = /(?:o\s+documento\s+não\s+(?:contém|possui|inclui|apresenta|traz)|(?:não\s+(?:há|existe[m]?|consta[m]?|foi\s+(?:encontrad|identificad)))\s+.*?\b(?:no|nos|nesse|nesses|neste|nestes|no\s+(?:documento|arquivo|material))|(?:the\s+document\s+does\s+not\s+(?:contain|include|have|provide|mention))|(?:(?:this|that)\s+(?:information|data|content)\s+(?:is\s+not|isn't)\s+(?:available|present|included)\s+in)|(?:não\s+(?:é\s+possível|foi\s+possível)\s+(?:extrair|identificar|encontrar).*?(?:com\s+base|a\s+partir))|(?:(?:not\s+enough|insufficient)\s+(?:information|data|evidence)\s+in\s+the\s+doc)|(?:não\s+há\s+informaç[õo]es?\s+(?:detalhad|explícit|específic|suficient))|(?:com\s+base\s+nos\s+documentos\s+fornecidos,?\s+não\s+há)|(?:based\s+on\s+the\s+(?:provided|available)\s+documents?,?\s+there\s+(?:is|are)\s+no))/i;
+const groundedRefusalRe =
+  /(?:o\s+documento\s+não\s+(?:contém|possui|inclui|apresenta|traz)|(?:não\s+(?:há|existe[m]?|consta[m]?|foi\s+(?:encontrad|identificad)))\s+.*?\b(?:no|nos|nesse|nesses|neste|nestes|no\s+(?:documento|arquivo|material))|(?:the\s+document\s+does\s+not\s+(?:contain|include|have|provide|mention))|(?:(?:this|that)\s+(?:information|data|content)\s+(?:is\s+not|isn't)\s+(?:available|present|included)\s+in)|(?:não\s+(?:é\s+possível|foi\s+possível)\s+(?:extrair|identificar|encontrar).*?(?:com\s+base|a\s+partir))|(?:(?:not\s+enough|insufficient)\s+(?:information|data|evidence)\s+in\s+the\s+doc)|(?:não\s+há\s+informaç[õo]es?\s+(?:detalhad|explícit|específic|suficient))|(?:com\s+base\s+nos\s+documentos\s+fornecidos,?\s+não\s+há)|(?:based\s+on\s+the\s+(?:provided|available)\s+documents?,?\s+there\s+(?:is|are)\s+no))/i;
 
 function checkFormatCompliance(query, content, attachments) {
-  const wantsTable = /\b(tabela|tabla|table|comparativ[ao]|matriz)\b/i.test(query);
+  const wantsTable = /\b(tabela|tabla|table|comparativ[ao]|matriz)\b/i.test(
+    query,
+  );
   if (!wantsTable) return { ok: true, issue: null };
 
   // Check for table_data attachment
   if (Array.isArray(attachments)) {
     const hasTableAttachment = attachments.some(
-      (a) => a && a.type === "table_data" && Array.isArray(a.columns) && a.rows?.length > 0,
+      (a) =>
+        a &&
+        a.type === "table_data" &&
+        Array.isArray(a.columns) &&
+        a.rows?.length > 0,
     );
     if (hasTableAttachment) return { ok: true, issue: null };
   }
@@ -328,9 +349,9 @@ function checkFormatCompliance(query, content, attachments) {
     const l1 = lines[i + 1].trim();
     const l2 = lines[i + 2].trim();
     if (
-      /^\|.+\|$/.test(l0) &&           // header row
-      /^\|[\s|:\-]+\|$/.test(l1) &&     // separator row
-      /^\|.+\|$/.test(l2)               // at least 1 data row
+      /^\|.+\|$/.test(l0) && // header row
+      /^\|[\s|:\-]+\|$/.test(l1) && // separator row
+      /^\|.+\|$/.test(l2) // at least 1 data row
     ) {
       return { ok: true, issue: null };
     }
@@ -338,14 +359,24 @@ function checkFormatCompliance(query, content, attachments) {
 
   // Grounded refusal: LLM says document doesn't have the info → warning, not failure
   if (groundedRefusalRe.test(content)) {
-    return { ok: true, issue: "Table requested but LLM gave grounded refusal (doc lacks data)", warning: true, refusal: true };
+    return {
+      ok: true,
+      issue: "Table requested but LLM gave grounded refusal (doc lacks data)",
+      warning: true,
+      refusal: true,
+    };
   }
 
-  return { ok: false, issue: "Table requested but no valid GFM table (header+separator+data) in response" };
+  return {
+    ok: false,
+    issue:
+      "Table requested but no valid GFM table (header+separator+data) in response",
+  };
 }
 
 function checkCompleteness(content) {
-  if (!content || content.length < 20) return { ok: false, issue: "Response too short" };
+  if (!content || content.length < 20)
+    return { ok: false, issue: "Response too short" };
   const trimmed = content.trim();
   // Reject ellipsis endings (mid-thought truncation)
   if (/[.…]{3,}$|…$/.test(trimmed))
@@ -361,23 +392,28 @@ function checkCompleteness(content) {
 }
 
 function checkSourceLeakage(content) {
-  const re = /^\s*[-*•]\s+(?:\*{1,2})?(?:Sources?|Fontes?|Fuentes?|References?|Refer[eê]ncias?):?(?:\*{1,2})?\s*:?\s+.*\.(pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g)\b/gim;
+  const re =
+    /^\s*[-*•]\s+(?:\*{1,2})?(?:Sources?|Fontes?|Fuentes?|References?|Refer[eê]ncias?):?(?:\*{1,2})?\s*:?\s+.*\.(pdf|xlsx?|docx?|pptx?|csv|txt|png|jpe?g)\b/gim;
   const matches = content.match(re) || [];
   if (matches.length === 0) return { ok: true, issue: null };
-  return { ok: false, issue: `${matches.length} inline source citation(s) leaked` };
+  return {
+    ok: false,
+    issue: `${matches.length} inline source citation(s) leaked`,
+  };
 }
 
 function extractKeyPhrases(text) {
-  return text.toLowerCase()
+  return text
+    .toLowerCase()
     .replace(/[^\w\s\u00C0-\u024F]/g, " ")
     .split(/\s+/)
-    .filter(w => w.length > 3);
+    .filter((w) => w.length > 3);
 }
 
 function jaccardSimilarity(a, b) {
   const setA = new Set(extractKeyPhrases(a));
   const setB = new Set(extractKeyPhrases(b));
-  const intersection = new Set([...setA].filter(x => setB.has(x)));
+  const intersection = new Set([...setA].filter((x) => setB.has(x)));
   const union = new Set([...setA, ...setB]);
   return union.size > 0 ? intersection.size / union.size : 0;
 }
@@ -392,7 +428,10 @@ function checkAnswerRelevance(content, query, allPreviousResults) {
         content.slice(0, 500),
       );
       if (similarity > 0.7) {
-        return { ok: false, issue: `Response too similar to Turn ${prev.globalTurn} (${(similarity * 100).toFixed(0)}% overlap)` };
+        return {
+          ok: false,
+          issue: `Response too similar to Turn ${prev.globalTurn} (${(similarity * 100).toFixed(0)}% overlap)`,
+        };
       }
     }
   }
@@ -401,13 +440,20 @@ function checkAnswerRelevance(content, query, allPreviousResults) {
 }
 
 function checkThematicDrift(query, content) {
-  const deliverableRe = /\b(tabela|table|resumo|summary|plano|plan|perguntas|questions|backlog|glossário|glossary|checklist|roteiro|guia|guide|pitch|proposta|fluxo|flow|matriz|bullets?|comparativ[ao])\b/i;
-  const vaguenessCritiqueRe = /\b((?:mais\s+)?vago|faltou\s+detalhar|o\s+que\s+faltou|ponto\s+vago|pontos?\s+onde.*vag|where.*vague|lacks?\s+detail)\b/i;
+  const deliverableRe =
+    /\b(tabela|table|resumo|summary|plano|plan|perguntas|questions|backlog|glossário|glossary|checklist|roteiro|guia|guide|pitch|proposta|fluxo|flow|matriz|bullets?|comparativ[ao])\b/i;
+  const vaguenessCritiqueRe =
+    /\b((?:mais\s+)?vago|faltou\s+detalhar|o\s+que\s+faltou|ponto\s+vago|pontos?\s+onde.*vag|where.*vague|lacks?\s+detail)\b/i;
 
   if (!deliverableRe.test(query)) return { ok: true, issue: null };
-  if (!vaguenessCritiqueRe.test(content.slice(0, 300))) return { ok: true, issue: null };
+  if (!vaguenessCritiqueRe.test(content.slice(0, 300)))
+    return { ok: true, issue: null };
 
-  return { ok: false, issue: "Response discusses document gaps/vagueness instead of producing the requested deliverable" };
+  return {
+    ok: false,
+    issue:
+      "Response discusses document gaps/vagueness instead of producing the requested deliverable",
+  };
 }
 
 function truncate(text, n = 4000) {
@@ -490,7 +536,10 @@ async function main() {
           } else {
             sourceCheck = "✅ all sources match expected docs";
           }
-        } else if (missingRequiredGroups.length > 0 && unexpectedSources.length > 0) {
+        } else if (
+          missingRequiredGroups.length > 0 &&
+          unexpectedSources.length > 0
+        ) {
           sourceCheck = `❌ missing expected docs: ${missingRequiredGroups.join(", ")}; unexpected source(s): ${unexpectedSources.join(", ")}`;
         } else if (missingRequiredGroups.length > 0) {
           sourceCheck = `❌ missing expected docs: ${missingRequiredGroups.join(", ")}`;
@@ -522,7 +571,9 @@ async function main() {
           !qcLeakage.ok ? "LEAK" : "",
           !qcRelevance.ok ? "STUCK" : "",
           !qcDrift.ok ? "DRIFT" : "",
-        ].filter(Boolean).join(",");
+        ]
+          .filter(Boolean)
+          .join(",");
         const icon = allMatch ? "✅" : sources.length === 0 ? "⚠️" : "❌";
         console.log(
           `${icon} ${elapsed}s | ${answerMode} | ${sources.length} src${truncBadge}${qcBadges ? " " + qcBadges : ""}`,
@@ -591,17 +642,25 @@ async function main() {
   ).length;
   const errors = allResults.filter((t) => t.error).length;
   const truncated = allResults.filter((t) => t.truncation?.occurred).length;
-  const providerTruncated = allResults.filter((t) => t.providerTruncation).length;
+  const providerTruncated = allResults.filter(
+    (t) => t.providerTruncation,
+  ).length;
   const totalTime = phaseTimings
     .reduce((s, p) => s + parseFloat(p.elapsed), 0)
     .toFixed(1);
 
   // Quality check aggregates
   const successResults = allResults.filter((t) => !t.error);
-  const consistencyOk = successResults.filter((t) => t.qcConsistency?.ok).length;
+  const consistencyOk = successResults.filter(
+    (t) => t.qcConsistency?.ok,
+  ).length;
   const formatOk = successResults.filter((t) => t.qcFormat?.ok).length;
-  const formatRefusals = successResults.filter((t) => t.qcFormat?.refusal).length;
-  const completenessOk = successResults.filter((t) => t.qcCompleteness?.ok).length;
+  const formatRefusals = successResults.filter(
+    (t) => t.qcFormat?.refusal,
+  ).length;
+  const completenessOk = successResults.filter(
+    (t) => t.qcCompleteness?.ok,
+  ).length;
   const leakageOk = successResults.filter((t) => t.qcLeakage?.ok).length;
   const relevanceOk = successResults.filter((t) => t.qcRelevance?.ok).length;
   const driftOk = successResults.filter((t) => t.qcDrift?.ok !== false).length;
@@ -617,11 +676,19 @@ async function main() {
   console.log(`  🧭 Provider truncation: ${providerTruncated}/${totalQueries}`);
 
   console.log(`\n  Quality checks:`);
-  console.log(`    Sources consistency: ${consistencyOk}/${successResults.length}`);
-  console.log(`    Format compliance:   ${formatOk}/${successResults.length}${formatRefusals > 0 ? ` (${formatRefusals} grounded refusal${formatRefusals > 1 ? "s" : ""})` : ""}`);
-  console.log(`    Completeness:        ${completenessOk}/${successResults.length}`);
+  console.log(
+    `    Sources consistency: ${consistencyOk}/${successResults.length}`,
+  );
+  console.log(
+    `    Format compliance:   ${formatOk}/${successResults.length}${formatRefusals > 0 ? ` (${formatRefusals} grounded refusal${formatRefusals > 1 ? "s" : ""})` : ""}`,
+  );
+  console.log(
+    `    Completeness:        ${completenessOk}/${successResults.length}`,
+  );
   console.log(`    Source leakage:      ${leakageOk}/${successResults.length}`);
-  console.log(`    Answer relevance:    ${relevanceOk}/${successResults.length}`);
+  console.log(
+    `    Answer relevance:    ${relevanceOk}/${successResults.length}`,
+  );
   console.log(`    Thematic drift:      ${driftOk}/${successResults.length}`);
 
   // Per-phase breakdown
@@ -671,21 +738,23 @@ async function main() {
   }
 
   // Truncation rate gates
-  const totalQueries = allResults.length;
-  if (totalQueries > 0) {
-    const truncationRate = truncated / totalQueries;
+  const totalExecutedQueries = allResults.length;
+  if (totalExecutedQueries > 0) {
+    const truncationRate = truncated / totalExecutedQueries;
     if (truncationRate > 0.05) {
       console.log(
-        `\n❌ FAIL: Truncation rate ${(truncationRate * 100).toFixed(1)}% exceeds 5% threshold (${truncated}/${totalQueries}).`,
+        `\n❌ FAIL: Truncation rate ${(truncationRate * 100).toFixed(1)}% exceeds 5% threshold (${truncated}/${totalExecutedQueries}).`,
       );
       process.exit(1);
     }
 
-    const providerTruncated = allResults.filter((r) => r.providerTruncation).length;
-    const providerTruncationRate = providerTruncated / totalQueries;
-    if (providerTruncationRate > 0.10) {
+    const providerTruncated = allResults.filter(
+      (r) => r.providerTruncation,
+    ).length;
+    const providerTruncationRate = providerTruncated / totalExecutedQueries;
+    if (providerTruncationRate > 0.1) {
       console.log(
-        `\n❌ FAIL: Provider truncation rate ${(providerTruncationRate * 100).toFixed(1)}% exceeds 10% threshold (${providerTruncated}/${totalQueries}).`,
+        `\n❌ FAIL: Provider truncation rate ${(providerTruncationRate * 100).toFixed(1)}% exceeds 10% threshold (${providerTruncated}/${totalExecutedQueries}).`,
       );
       process.exit(1);
     }
@@ -777,11 +846,16 @@ function generateReport(allResults, conversationId, phaseTimings) {
 
     // Quality checks per turn
     const qcItems = [];
-    if (t.qcConsistency && !t.qcConsistency.ok) qcItems.push(`Consistency: ${t.qcConsistency.issue}`);
-    if (t.qcFormat && !t.qcFormat.ok) qcItems.push(`Format: ${t.qcFormat.issue}`);
-    if (t.qcCompleteness && !t.qcCompleteness.ok) qcItems.push(`Completeness: ${t.qcCompleteness.issue}`);
-    if (t.qcLeakage && !t.qcLeakage.ok) qcItems.push(`Leakage: ${t.qcLeakage.issue}`);
-    if (t.qcRelevance && !t.qcRelevance.ok) qcItems.push(`Relevance: ${t.qcRelevance.issue}`);
+    if (t.qcConsistency && !t.qcConsistency.ok)
+      qcItems.push(`Consistency: ${t.qcConsistency.issue}`);
+    if (t.qcFormat && !t.qcFormat.ok)
+      qcItems.push(`Format: ${t.qcFormat.issue}`);
+    if (t.qcCompleteness && !t.qcCompleteness.ok)
+      qcItems.push(`Completeness: ${t.qcCompleteness.issue}`);
+    if (t.qcLeakage && !t.qcLeakage.ok)
+      qcItems.push(`Leakage: ${t.qcLeakage.issue}`);
+    if (t.qcRelevance && !t.qcRelevance.ok)
+      qcItems.push(`Relevance: ${t.qcRelevance.issue}`);
     if (t.qcDrift && !t.qcDrift.ok) qcItems.push(`Drift: ${t.qcDrift.issue}`);
     if (qcItems.length > 0) {
       md += `**Quality issues:** ${qcItems.join(" | ")}\n\n`;
@@ -818,24 +892,52 @@ function generateReport(allResults, conversationId, phaseTimings) {
       });
     }
     if (t.qcConsistency && !t.qcConsistency.ok) {
-      issueRows.push({ turn: t.globalTurn, phase: t.phase.slice(0, 20), issue: `CONTRADICTION: ${t.qcConsistency.issue}` });
+      issueRows.push({
+        turn: t.globalTurn,
+        phase: t.phase.slice(0, 20),
+        issue: `CONTRADICTION: ${t.qcConsistency.issue}`,
+      });
     }
     if (t.qcFormat && t.qcFormat.refusal) {
-      issueRows.push({ turn: t.globalTurn, phase: t.phase.slice(0, 20), issue: `REFUSAL (warning): ${t.qcFormat.issue}` });
+      issueRows.push({
+        turn: t.globalTurn,
+        phase: t.phase.slice(0, 20),
+        issue: `REFUSAL (warning): ${t.qcFormat.issue}`,
+      });
     } else if (t.qcFormat && !t.qcFormat.ok) {
-      issueRows.push({ turn: t.globalTurn, phase: t.phase.slice(0, 20), issue: `FORMAT: ${t.qcFormat.issue}` });
+      issueRows.push({
+        turn: t.globalTurn,
+        phase: t.phase.slice(0, 20),
+        issue: `FORMAT: ${t.qcFormat.issue}`,
+      });
     }
     if (t.qcCompleteness && !t.qcCompleteness.ok) {
-      issueRows.push({ turn: t.globalTurn, phase: t.phase.slice(0, 20), issue: `INCOMPLETE: ${t.qcCompleteness.issue}` });
+      issueRows.push({
+        turn: t.globalTurn,
+        phase: t.phase.slice(0, 20),
+        issue: `INCOMPLETE: ${t.qcCompleteness.issue}`,
+      });
     }
     if (t.qcLeakage && !t.qcLeakage.ok) {
-      issueRows.push({ turn: t.globalTurn, phase: t.phase.slice(0, 20), issue: `LEAKAGE: ${t.qcLeakage.issue}` });
+      issueRows.push({
+        turn: t.globalTurn,
+        phase: t.phase.slice(0, 20),
+        issue: `LEAKAGE: ${t.qcLeakage.issue}`,
+      });
     }
     if (t.qcRelevance && !t.qcRelevance.ok) {
-      issueRows.push({ turn: t.globalTurn, phase: t.phase.slice(0, 20), issue: `STUCK: ${t.qcRelevance.issue}` });
+      issueRows.push({
+        turn: t.globalTurn,
+        phase: t.phase.slice(0, 20),
+        issue: `STUCK: ${t.qcRelevance.issue}`,
+      });
     }
     if (t.qcDrift && !t.qcDrift.ok) {
-      issueRows.push({ turn: t.globalTurn, phase: t.phase.slice(0, 20), issue: `DRIFT: ${t.qcDrift.issue}` });
+      issueRows.push({
+        turn: t.globalTurn,
+        phase: t.phase.slice(0, 20),
+        issue: `DRIFT: ${t.qcDrift.issue}`,
+      });
     }
   }
 

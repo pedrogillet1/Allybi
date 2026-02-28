@@ -71,7 +71,16 @@ export interface RewriteRule {
     string | { value?: string; query?: string; weight?: number }
   >;
   conditions?: {
+    docLock?: boolean;
     requireDomainMatch?: boolean;
+    minExplicitResolvedDocs?: number;
+    maxExplicitResolvedDocs?: number;
+    explicitDocTypes?: string[];
+    explicitDocIds?: string[];
+    requireNoExplicitDocTypes?: boolean;
+    requireNoExplicitDocIds?: boolean;
+    allowWhenExplicitDocTypes?: boolean;
+    allowWhenExplicitDocIds?: boolean;
     operators?: string[];
     intents?: string[];
     domains?: string[];
@@ -303,6 +312,89 @@ function includesContextTerm(context: string, term: string): boolean {
   const normalizedTerm = normalizeToken(term);
   if (!normalizedTerm) return false;
   return context.includes(normalizedTerm);
+}
+
+function isShortAcronymPattern(pattern: string): boolean {
+  const token = String(pattern || "").trim().toLowerCase();
+  if (!token) return false;
+  if (/^[a-z0-9]{1,4}$/i.test(token)) return true;
+  return /^\\b[a-z0-9]{1,4}\\b$/i.test(token);
+}
+
+function tokenizeRewriteTerm(value: string): string[] {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 4);
+}
+
+function deriveImplicitAcronymContextTerms(
+  rewrites: RewriteRule["rewrites"],
+  domain: string,
+): string[] {
+  const domainDefaults: Record<string, string[]> = {
+    accounting: [
+      "ledger",
+      "invoice",
+      "aging",
+      "statement",
+      "journal",
+      "balance",
+      "fiscal",
+    ],
+    finance: [
+      "revenue",
+      "margin",
+      "statement",
+      "budget",
+      "forecast",
+      "cash",
+      "fiscal",
+    ],
+    legal: [
+      "agreement",
+      "contract",
+      "clause",
+      "liability",
+      "obligation",
+      "termination",
+    ],
+    medical: [
+      "patient",
+      "result",
+      "laboratory",
+      "clinical",
+      "diagnostic",
+      "medication",
+      "reference range",
+    ],
+    ops: [
+      "incident",
+      "service",
+      "runbook",
+      "timeline",
+      "operations",
+      "uptime",
+      "root cause",
+    ],
+  };
+
+  const rewriteTerms: string[] = [];
+  for (const rewrite of rewrites || []) {
+    const raw =
+      typeof rewrite === "string"
+        ? rewrite
+        : String((rewrite as any)?.value ?? (rewrite as any)?.query ?? "");
+    if (!raw) continue;
+    rewriteTerms.push(...tokenizeRewriteTerm(raw));
+  }
+
+  return dedupeKeepOrder([
+    ...rewriteTerms,
+    ...(domainDefaults[normalizeToken(domain)] || []),
+  ]).slice(0, 12);
 }
 
 function buildRewriteVariantText(
@@ -697,6 +789,13 @@ export function applyQueryRewrites(
   const operator = normalizeToken(ctx.operator);
   const domain = normalizeToken(ctx.domain);
   const language = normalizeToken(ctx.language || "any");
+  const explicitDocIds = normalizeStringList(ctx.explicitDocIds || []);
+  const explicitDocTypes = normalizeStringList(ctx.explicitDocTypes || []);
+  const explicitDocsCount = Math.max(
+    Number(ctx.explicitDocsCount || 0),
+    explicitDocIds.length,
+  );
+  const compareIntent = isCompareIntent(ctx);
   const maxVariants = Math.max(
     1,
     Math.floor(Number(ctx.maxQueryVariants ?? 12)),
@@ -710,6 +809,33 @@ export function applyQueryRewrites(
     .map((rule) => {
       const conditions = rule.conditions || {};
 
+      if (
+        typeof (conditions as any).docLock === "boolean" &&
+        (conditions as any).docLock !== Boolean(ctx.docLock)
+      ) {
+        return null;
+      }
+
+      const minExplicitResolvedDocs = Number(
+        (conditions as any).minExplicitResolvedDocs ?? 0,
+      );
+      if (
+        Number.isFinite(minExplicitResolvedDocs) &&
+        explicitDocsCount < minExplicitResolvedDocs
+      ) {
+        return null;
+      }
+
+      const maxExplicitResolvedDocs = Number(
+        (conditions as any).maxExplicitResolvedDocs,
+      );
+      if (
+        Number.isFinite(maxExplicitResolvedDocs) &&
+        explicitDocsCount > maxExplicitResolvedDocs
+      ) {
+        return null;
+      }
+
       const intents = dedupeKeepOrder([
         ...normalizeStringList(rule.intents || []),
         ...normalizeStringList((conditions as any).intents || []),
@@ -721,6 +847,55 @@ export function applyQueryRewrites(
         ...normalizeStringList((conditions as any).operators || []),
       ]);
       if (!matchesAny(operators, operator)) return null;
+
+      const gatedDocTypes = normalizeStringList(
+        (conditions as any).explicitDocTypes || [],
+      );
+      if (
+        gatedDocTypes.length > 0 &&
+        !intersects(gatedDocTypes, explicitDocTypes)
+      ) {
+        return null;
+      }
+
+      const gatedDocIds = normalizeStringList(
+        (conditions as any).explicitDocIds || [],
+      );
+      if (gatedDocIds.length > 0 && !intersects(gatedDocIds, explicitDocIds)) {
+        return null;
+      }
+
+      if (
+        (conditions as any).requireNoExplicitDocTypes === true &&
+        explicitDocTypes.length > 0
+      ) {
+        return null;
+      }
+
+      if (
+        (conditions as any).requireNoExplicitDocIds === true &&
+        explicitDocIds.length > 0
+      ) {
+        return null;
+      }
+
+      if (
+        !compareIntent &&
+        explicitDocTypes.length > 0 &&
+        (conditions as any).allowWhenExplicitDocTypes !== true &&
+        gatedDocTypes.length === 0 &&
+        isShortAcronymPattern((rule.patterns || [])[0] || "") === false
+      ) {
+        return null;
+      }
+
+      if (
+        explicitDocIds.length > 0 &&
+        (conditions as any).allowWhenExplicitDocIds !== true &&
+        gatedDocIds.length === 0
+      ) {
+        return null;
+      }
 
       const domains = dedupeKeepOrder([
         ...normalizeStringList(rule.domains || []),
@@ -781,6 +956,25 @@ export function applyQueryRewrites(
         forbidContextAny.some((term) => includesContextTerm(context, term))
       ) {
         return null;
+      }
+
+      const hasShortAcronym = patterns.some(isShortAcronymPattern);
+      const hasExplicitGuardrails =
+        negativePatterns.length > 0 ||
+        requireContextAny.length > 0 ||
+        requireContextAll.length > 0 ||
+        forbidContextAny.length > 0;
+      if (hasShortAcronym && !hasExplicitGuardrails) {
+        const implicitContext = deriveImplicitAcronymContextTerms(
+          rule.rewrites,
+          domain,
+        );
+        if (
+          implicitContext.length > 0 &&
+          !implicitContext.some((term) => includesContextTerm(context, term))
+        ) {
+          return null;
+        }
       }
 
       return {

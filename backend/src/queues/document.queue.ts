@@ -56,6 +56,10 @@ import { TenantKeyService } from "../services/security/tenantKey.service";
 import { DocumentKeyService } from "../services/documents/documentKey.service";
 import { DocumentCryptoService } from "../services/documents/documentCrypto.service";
 import { EncryptedDocumentRepo } from "../services/documents/encryptedDocumentRepo.service";
+import {
+  deduplicateChunkRecords,
+  splitTextIntoChunks,
+} from "../services/ingestion/chunking.service";
 
 // Preview generation imports (restored from preview services)
 import {
@@ -359,9 +363,6 @@ async function extractText(
 // Text → InputChunk[] helper
 // ---------------------------------------------------------------------------
 
-const CHUNK_TARGET_CHARS = 1500;
-const CHUNK_OVERLAP_CHARS = 150;
-
 interface InputChunk {
   chunkIndex: number;
   content: string;
@@ -379,11 +380,7 @@ function buildInputChunks(extraction: any, fullText: string): InputChunk[] {
       const pageText = (p.text || "").trim();
       if (!pageText) continue;
       // Split large pages into sub-chunks
-      for (const segment of splitText(
-        pageText,
-        CHUNK_TARGET_CHARS,
-        CHUNK_OVERLAP_CHARS,
-      )) {
+      for (const segment of splitTextIntoChunks(pageText)) {
         out.push({ chunkIndex: idx++, content: segment, pageNumber: p.page });
       }
     }
@@ -406,11 +403,7 @@ function buildInputChunks(extraction: any, fullText: string): InputChunk[] {
       const slideText = parts.join("\n\n").trim();
       if (!slideText) continue;
       // Split large slides into sub-chunks
-      for (const segment of splitText(
-        slideText,
-        CHUNK_TARGET_CHARS,
-        CHUNK_OVERLAP_CHARS,
-      )) {
+      for (const segment of splitTextIntoChunks(slideText)) {
         out.push({ chunkIndex: idx++, content: segment, pageNumber: s.slide });
       }
     }
@@ -418,47 +411,8 @@ function buildInputChunks(extraction: any, fullText: string): InputChunk[] {
   }
 
   // For DOCX / XLSX / plain text: split the full text
-  const segments = splitText(
-    fullText.trim(),
-    CHUNK_TARGET_CHARS,
-    CHUNK_OVERLAP_CHARS,
-  );
+  const segments = splitTextIntoChunks(fullText.trim());
   return segments.map((content, idx) => ({ chunkIndex: idx, content }));
-}
-
-function splitText(
-  text: string,
-  targetChars: number,
-  overlap: number,
-): string[] {
-  if (text.length <= targetChars) return [text];
-
-  const chunks: string[] = [];
-  let offset = 0;
-  while (offset < text.length) {
-    let end = Math.min(offset + targetChars, text.length);
-    // Try to break on a paragraph or sentence boundary
-    if (end < text.length) {
-      const paraBreak = text.lastIndexOf("\n\n", end);
-      if (paraBreak > offset + targetChars * 0.5) {
-        end = paraBreak;
-      } else {
-        const sentBreak = text.lastIndexOf(". ", end);
-        if (sentBreak > offset + targetChars * 0.5) {
-          end = sentBreak + 1;
-        }
-      }
-    }
-    chunks.push(text.slice(offset, end).trim());
-    // Advance offset; if remaining text is <= overlap, just stop
-    const nextOffset = end - overlap;
-    if (nextOffset <= offset) {
-      // Prevent infinite loop — no progress possible
-      break;
-    }
-    offset = nextOffset;
-  }
-  return chunks.filter((c) => c.length > 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -467,39 +421,10 @@ function splitText(
 
 function deduplicateChunks(chunks: InputChunk[]): InputChunk[] {
   if (chunks.length <= 1) return chunks;
-
-  const SIMILARITY_THRESHOLD = 0.8;
-  const accepted: InputChunk[] = [];
-  const acceptedWordSets: Set<string>[] = [];
-
-  for (const chunk of chunks) {
-    const words = new Set(
-      chunk.content
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((w) => w.length > 2),
-    );
-    let isDuplicate = false;
-
-    for (const existingWords of acceptedWordSets) {
-      // Jaccard similarity: |intersection| / |union|
-      let intersection = 0;
-      for (const w of words) {
-        if (existingWords.has(w)) intersection++;
-      }
-      const union = words.size + existingWords.size - intersection;
-      if (union > 0 && intersection / union > SIMILARITY_THRESHOLD) {
-        isDuplicate = true;
-        break;
-      }
-    }
-
-    if (!isDuplicate) {
-      accepted.push(chunk);
-      acceptedWordSets.push(words);
-    }
-  }
-
+  const accepted = deduplicateChunkRecords(chunks, {
+    dedupeSimilarityThreshold: 0.8,
+    dedupeMinWordLength: 3,
+  });
   if (accepted.length < chunks.length) {
     logger.info("[deduplicateChunks] Removed near-duplicate chunks", {
       before: chunks.length,
@@ -1018,7 +943,12 @@ export async function processDocumentJobData(
 
     const updated = await prisma.document.updateMany({
       where: { id: documentId, status: "uploaded" },
-      data: { status: "enriching" },
+      data: {
+        status: "enriching",
+        indexingState: "running",
+        indexingError: null,
+        indexingUpdatedAt: new Date(),
+      },
     });
 
     if (updated.count === 0) {
@@ -1063,6 +993,11 @@ export async function processDocumentJobData(
         where: { id: documentId },
         data: {
           status: keepVisibleWithoutText ? "ready" : "skipped",
+          indexingState: keepVisibleWithoutText ? "indexed" : "failed",
+          indexingError: keepVisibleWithoutText
+            ? null
+            : (skipReason || "No extractable content").slice(0, 500),
+          indexingUpdatedAt: new Date(),
           chunksCount: 0,
           error: keepVisibleWithoutText
             ? null
@@ -1106,6 +1041,11 @@ export async function processDocumentJobData(
         where: { id: documentId },
         data: {
           status: keepVisibleWithoutText ? "ready" : "skipped",
+          indexingState: keepVisibleWithoutText ? "indexed" : "failed",
+          indexingError: keepVisibleWithoutText
+            ? null
+            : "No extractable text content",
+          indexingUpdatedAt: new Date(),
           chunksCount: 0,
           error: keepVisibleWithoutText ? null : "No extractable text content",
         },
@@ -1142,6 +1082,9 @@ export async function processDocumentJobData(
       where: { id: documentId },
       data: {
         status: "indexed",
+        indexingState: "indexed",
+        indexingError: null,
+        indexingUpdatedAt: new Date(),
         chunksCount: timings.chunkCount,
       },
     });
@@ -1249,6 +1192,11 @@ export async function processDocumentJobData(
         where: { id: documentId },
         data: {
           status: "failed",
+          indexingState: "failed",
+          indexingError: String(
+            (err.message || "Processing failed").slice(0, 500),
+          ),
+          indexingUpdatedAt: new Date(),
           error: (err.message || "Processing failed").slice(0, 500),
         },
       });
@@ -2083,7 +2031,12 @@ export async function startStuckDocSweeper() {
       if (stuckEnriching.length > 0) {
         await prisma.document.updateMany({
           where: { id: { in: stuckEnriching.map((d) => d.id) } },
-          data: { status: "uploaded" },
+          data: {
+            status: "uploaded",
+            indexingState: "pending",
+            indexingError: null,
+            indexingUpdatedAt: new Date(),
+          },
         });
       }
 

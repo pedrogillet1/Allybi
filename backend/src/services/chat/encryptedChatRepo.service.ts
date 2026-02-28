@@ -56,12 +56,13 @@ export class EncryptedChatRepo {
     userId: string,
     conversationId: string,
     limit = 50,
+    fromLatest = false,
   ) {
     const ck = await this.convoKeys.getConversationKey(userId, conversationId);
 
     const rows = await this.prisma.message.findMany({
       where: { conversationId },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: fromLatest ? "desc" : "asc" },
       take: limit,
       select: {
         id: true,
@@ -71,8 +72,9 @@ export class EncryptedChatRepo {
         metadata: true,
       },
     });
+    const orderedRows = fromLatest ? [...rows].reverse() : rows;
 
-    return rows.map((r) => ({
+    return orderedRows.map((r) => ({
       id: r.id,
       role: r.role,
       createdAt: r.createdAt,

@@ -1,0 +1,668 @@
+{
+  "_meta": {
+    "id": "legacy_legal_employment_agreement_extraction_hints",
+    "version": "2.0.0",
+    "description": "Extraction hints and pitfalls for Employment Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_employment_agreement"
+  },
+  "hints": [
+    {
+      "id": "legal_employment_agreement_hint_001",
+      "entity": "document_title",
+      "anchors": [
+        "document title",
+        "employment agreement document title",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document title in legal_employment_agreement",
+        "document_header document title"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_002",
+      "entity": "document_version",
+      "anchors": [
+        "document version",
+        "employment agreement document version",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "document version in legal_employment_agreement",
+        "parties document version"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_003",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "employment agreement effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "effective date in legal_employment_agreement",
+        "recitals_background effective date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_004",
+      "entity": "execution_date",
+      "anchors": [
+        "execution date",
+        "employment agreement execution date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "execution date in legal_employment_agreement",
+        "definitions execution date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_005",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "employment agreement expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "expiration date in legal_employment_agreement",
+        "scope_of_services expiration date"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_006",
+      "entity": "renewal_term_days",
+      "anchors": [
+        "renewal term days",
+        "employment agreement renewal term days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "renewal term days in legal_employment_agreement",
+        "fees_and_payment renewal term days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_007",
+      "entity": "notice_period_days",
+      "anchors": [
+        "notice period days",
+        "employment agreement notice period days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "notice period days in legal_employment_agreement",
+        "term_and_renewal notice period days"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_008",
+      "entity": "governing_law",
+      "anchors": [
+        "governing law",
+        "employment agreement governing law",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "governing law in legal_employment_agreement",
+        "termination governing law"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_009",
+      "entity": "jurisdiction_venue",
+      "anchors": [
+        "jurisdiction venue",
+        "employment agreement jurisdiction venue",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "jurisdiction venue in legal_employment_agreement",
+        "confidentiality_privacy jurisdiction venue"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_010",
+      "entity": "arbitration_forum",
+      "anchors": [
+        "arbitration forum",
+        "employment agreement arbitration forum",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "arbitration forum in legal_employment_agreement",
+        "security_compliance arbitration forum"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_011",
+      "entity": "party_one_name",
+      "anchors": [
+        "party one name",
+        "employment agreement party one name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "ip_and_license",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one name in legal_employment_agreement",
+        "ip_and_license party one name"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_012",
+      "entity": "party_one_role",
+      "anchors": [
+        "party one role",
+        "employment agreement party one role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "liability_and_indemnity",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one role in legal_employment_agreement",
+        "liability_and_indemnity party one role"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "legal_employment_agreement_hint_013",
+      "entity": "party_one_address",
+      "anchors": [
+        "party one address",
+        "employment agreement party one address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "dispute_resolution",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party one address in legal_employment_agreement",
+        "dispute_resolution party one address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_014",
+      "entity": "party_two_name",
+      "anchors": [
+        "party two name",
+        "employment agreement party two name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "notices_misc",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two name in legal_employment_agreement",
+        "notices_misc party two name"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_015",
+      "entity": "party_two_role",
+      "anchors": [
+        "party two role",
+        "employment agreement party two role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "signatures",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two role in legal_employment_agreement",
+        "signatures party two role"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_016",
+      "entity": "party_two_address",
+      "anchors": [
+        "party two address",
+        "employment agreement party two address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "annexes_schedules",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "party two address in legal_employment_agreement",
+        "annexes_schedules party two address"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_017",
+      "entity": "affiliate_definition",
+      "anchors": [
+        "affiliate definition",
+        "employment agreement affiliate definition",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "affiliate definition in legal_employment_agreement",
+        "document_header affiliate definition"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_018",
+      "entity": "services_description",
+      "anchors": [
+        "services description",
+        "employment agreement services description",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "parties",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "services description in legal_employment_agreement",
+        "parties services description"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_019",
+      "entity": "deliverables_summary",
+      "anchors": [
+        "deliverables summary",
+        "employment agreement deliverables summary",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals_background",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "deliverables summary in legal_employment_agreement",
+        "recitals_background deliverables summary"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_020",
+      "entity": "service_level_target",
+      "anchors": [
+        "service level target",
+        "employment agreement service level target",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "service level target in legal_employment_agreement",
+        "definitions service level target"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "legal_employment_agreement_hint_021",
+      "entity": "fee_amount",
+      "anchors": [
+        "fee amount",
+        "employment agreement fee amount",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "scope_of_services",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee amount in legal_employment_agreement",
+        "scope_of_services fee amount"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_employment_agreement_hint_022",
+      "entity": "fee_currency",
+      "anchors": [
+        "fee currency",
+        "employment agreement fee currency",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "fees_and_payment",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "fee currency in legal_employment_agreement",
+        "fees_and_payment fee currency"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_employment_agreement_hint_023",
+      "entity": "payment_terms_days",
+      "anchors": [
+        "payment terms days",
+        "employment agreement payment terms days",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "term_and_renewal",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "payment terms days in legal_employment_agreement",
+        "term_and_renewal payment terms days"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_employment_agreement_hint_024",
+      "entity": "late_fee_rate",
+      "anchors": [
+        "late fee rate",
+        "employment agreement late fee rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "termination",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "late fee rate in legal_employment_agreement",
+        "termination late fee rate"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_employment_agreement_hint_025",
+      "entity": "liability_cap_text",
+      "anchors": [
+        "liability cap text",
+        "employment agreement liability cap text",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_privacy",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "liability cap text in legal_employment_agreement",
+        "confidentiality_privacy liability cap text"
+      ],
+      "confidenceBias": "low"
+    },
+    {
+      "id": "legal_employment_agreement_hint_026",
+      "entity": "indemnity_scope",
+      "anchors": [
+        "indemnity scope",
+        "employment agreement indemnity scope",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "security_compliance",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex or schedule",
+        "can appear in signature block or definitions"
+      ],
+      "pitfalls": [
+        "do not infer missing values from nearby paragraphs",
+        "avoid picking superseded values in amendment history"
+      ],
+      "fallbackQueries": [
+        "indemnity scope in legal_employment_agreement",
+        "security_compliance indemnity scope"
+      ],
+      "confidenceBias": "low"
+    }
+  ]
+}

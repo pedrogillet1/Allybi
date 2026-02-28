@@ -322,10 +322,15 @@ export class QualityGateRunnerService {
         "hr_payroll",
       ]);
       const hasNumericFact = /\b\d[\d.,]*\b/.test(responseText);
-      const hasUnitOrCurrency = /\b(?:usd|eur|brl|gbp|dollars?|euros?|reais|hours?|hrs?|dias?|days?|months?|meses?|m2|sqm|sqft|%)\b|[$€£]|r\$/i.test(
-        responseText,
-      );
-      if (strictNumericDomains.has(domain) && hasNumericFact && !hasUnitOrCurrency) {
+      const hasUnitOrCurrency =
+        /\b(?:usd|eur|brl|gbp|dollars?|euros?|reais|hours?|hrs?|dias?|days?|months?|meses?|m2|sqm|sqft|%)\b|[$€£]|r\$/i.test(
+          responseText,
+        );
+      if (
+        strictNumericDomains.has(domain) &&
+        hasNumericFact &&
+        !hasUnitOrCurrency
+      ) {
         results.push({
           gateName: "numeric_integrity_domain_unit_required",
           passed: false,
@@ -342,14 +347,19 @@ export class QualityGateRunnerService {
       if (equation) {
         const lhs = Number(equation[1]) + Number(equation[2]);
         const rhs = Number(equation[3]);
-        const reconciles = Number.isFinite(lhs) && Number.isFinite(rhs) && Math.abs(lhs - rhs) < 1e-9;
+        const reconciles =
+          Number.isFinite(lhs) &&
+          Number.isFinite(rhs) &&
+          Math.abs(lhs - rhs) < 1e-9;
         results.push({
           gateName: "numeric_integrity_totals_reconciliation",
           passed: reconciles,
           score: reconciles ? 1 : 0.1,
           issues: reconciles
             ? undefined
-            : ["Stated numeric equation does not reconcile in the response output."],
+            : [
+                "Stated numeric equation does not reconcile in the response output.",
+              ],
         });
       }
     }
@@ -447,11 +457,21 @@ export class QualityGateRunnerService {
     const domainSignals: Array<{ domain: string; patterns: RegExp[] }> = [
       {
         domain: "medical",
-        patterns: [/\bdiagnosis\b/i, /\bmedication\b/i, /\blab\b/i, /\bpaciente\b/i],
+        patterns: [
+          /\bdiagnosis\b/i,
+          /\bmedication\b/i,
+          /\blab\b/i,
+          /\bpaciente\b/i,
+        ],
       },
       {
         domain: "identity",
-        patterns: [/\bpassport\b/i, /\bdriver license\b/i, /\bcnh\b/i, /\bproof of address\b/i],
+        patterns: [
+          /\bpassport\b/i,
+          /\bdriver license\b/i,
+          /\bcnh\b/i,
+          /\bproof of address\b/i,
+        ],
       },
       {
         domain: "tax",
@@ -471,7 +491,12 @@ export class QualityGateRunnerService {
       },
       {
         domain: "hr_payroll",
-        patterns: [/\bpayroll\b/i, /\bsalary\b/i, /\bholerite\b/i, /\bbenefits?\b/i],
+        patterns: [
+          /\bpayroll\b/i,
+          /\bsalary\b/i,
+          /\bholerite\b/i,
+          /\bbenefits?\b/i,
+        ],
       },
     ];
     for (const signal of domainSignals) {

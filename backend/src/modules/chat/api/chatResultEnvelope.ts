@@ -33,6 +33,13 @@ function defaultEvidence(result: ChatResult) {
   };
 }
 
+function defaultQualityGates() {
+  return {
+    allPassed: true,
+    failed: [],
+  };
+}
+
 export function normalizeChatResult(result: ChatResult): ChatResult {
   return normalizer.normalize(result);
 }
@@ -60,6 +67,7 @@ export function toChatFinalEvent(result: ChatResult): Record<string, unknown> {
     completion: (normalized as any).completion || defaultCompletion(normalized),
     truncation: (normalized as any).truncation || defaultTruncation(),
     evidence: (normalized as any).evidence || defaultEvidence(normalized),
+    qualityGates: (normalized as any).qualityGates || defaultQualityGates(),
     ...(String((normalized as any).scopeRelaxReason || "").trim()
       ? { scopeRelaxReason: (normalized as any).scopeRelaxReason }
       : {}),

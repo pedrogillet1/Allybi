@@ -1,11 +1,21 @@
 /* eslint-disable no-console */
 
+import path from "path";
 import {
   RetrievalEngineService,
   type RetrievalRequest,
 } from "../../src/services/core/retrieval/retrievalEngine.service";
+import {
+  getBankLoaderInstance,
+  initializeBanks,
+} from "../../src/services/core/banks/bankLoader.service";
+import {
+  getDocumentIntelligenceBanksInstance,
+  type DocumentIntelligenceBanksService,
+} from "../../src/services/core/banks/documentIntelligenceBanks.service";
 
 type Domain = "finance" | "legal" | "medical" | "ops";
+type EvalMode = "mock" | "real_banks";
 
 type SeedDoc = {
   docId: string;
@@ -32,6 +42,20 @@ type EvalCase = {
 };
 
 const TOP_K = 3;
+const DEFAULT_EVAL_MODE: EvalMode = "mock";
+
+type DocumentIntelligenceSubset = Pick<
+  DocumentIntelligenceBanksService,
+  | "getCrossDocGroundingPolicy"
+  | "getDocumentIntelligenceDomains"
+  | "getDocTypeCatalog"
+  | "getDocTypeSections"
+  | "getDocTypeTables"
+  | "getDomainDetectionRules"
+  | "getRetrievalBoostRules"
+  | "getQueryRewriteRules"
+  | "getSectionPriorityRules"
+>;
 
 const DOCS: SeedDoc[] = [
   {
@@ -71,11 +95,11 @@ const DOCS: SeedDoc[] = [
     keywords: [
       "accounts payable",
       "payables",
-      "vendor invoice",
-      "aging",
+      "payables ledger",
+      "due-date buckets",
       "days outstanding",
     ],
-    content: "Accounts payable aging by vendor and due-date buckets.",
+    content: "Accounts payable ledger by due-date buckets and days outstanding.",
   },
   {
     docId: "fin-pl",
@@ -84,18 +108,33 @@ const DOCS: SeedDoc[] = [
     domain: "finance",
     docType: "profit_and_loss",
     sectionKey: "summary",
-    keywords: ["income statement", "p&l", "dre", "gross margin", "ebitda"],
+    keywords: ["income statement", "p&l", "gross margin", "ebitda"],
     content: "Income statement summary and margin profile.",
+  },
+  {
+    docId: "fin-forecast-2025",
+    title: "FY25 Rolling Forecast",
+    filename: "forecast_fy25.xlsx",
+    domain: "finance",
+    docType: "forecast_report",
+    sectionKey: "forecast",
+    keywords: [
+      "forecast",
+      "rolling forecast",
+      "fy25",
+      "expected revenue",
+      "projected opex",
+    ],
+    content: "Rolling forecast covering expected revenue and opex changes.",
   },
   {
     docId: "legal-msa",
     title: "Master Services Agreement",
-    filename: "msa_allybi_vendor.pdf",
+    filename: "master_services_agreement_vendor.pdf",
     domain: "legal",
     docType: "msa",
     sectionKey: "liability",
     keywords: [
-      "msa",
       "master services agreement",
       "liability cap",
       "indemnity",
@@ -120,24 +159,59 @@ const DOCS: SeedDoc[] = [
     content: "Lease terms, rent schedule, and termination clauses.",
   },
   {
+    docId: "legal-nda",
+    title: "Mutual NDA",
+    filename: "nda_partner.pdf",
+    domain: "legal",
+    docType: "nda",
+    sectionKey: "confidentiality",
+    keywords: [
+      "nda",
+      "non-disclosure",
+      "confidentiality",
+      "permitted disclosure",
+      "term",
+    ],
+    content: "NDA confidentiality obligations and permitted disclosure carve-outs.",
+  },
+  {
     docId: "med-lab-cbc",
-    title: "CBC Lab Report",
-    filename: "cbc_lab_report.pdf",
+    title: "Complete Blood Count Report",
+    filename: "complete_blood_count_report.pdf",
     domain: "medical",
     docType: "lab_report",
     sectionKey: "results",
     keywords: [
       "lab report",
-      "cbc",
+      "complete blood count",
       "wbc",
       "leukocytes",
+      "differential",
+      "reference range",
+      "white blood cell count",
+    ],
+    content:
+      "Complete blood count panel with leukocyte differential, white blood cell count values, and reference range.",
+  },
+  {
+    docId: "med-lab-lipid",
+    title: "Lipid Panel Report",
+    filename: "lipid_panel_report.pdf",
+    domain: "medical",
+    docType: "lab_report",
+    sectionKey: "results",
+    keywords: [
+      "lipid panel",
+      "hdl",
+      "ldl",
+      "triglycerides",
       "reference range",
     ],
-    content: "Lab panel with WBC values and reference ranges.",
+    content: "Lipid panel values with HDL, LDL, and reference ranges.",
   },
   {
     docId: "ops-incident",
-    title: "SEV-1 Incident Report",
+    title: "Production Incident Report",
     filename: "incident_sev1.md",
     domain: "ops",
     docType: "incident_report",
@@ -151,12 +225,28 @@ const DOCS: SeedDoc[] = [
     ],
     content: "Incident timeline, root cause, and mitigation actions.",
   },
+  {
+    docId: "ops-postmortem",
+    title: "SEV-1 Postmortem",
+    filename: "incident_postmortem.md",
+    domain: "ops",
+    docType: "incident_report",
+    sectionKey: "timeline",
+    keywords: [
+      "incident",
+      "postmortem",
+      "timeline",
+      "root cause analysis",
+      "corrective actions",
+    ],
+    content: "Postmortem timeline, root cause analysis, and corrective actions.",
+  },
 ];
 
 const CASES: EvalCase[] = [
   {
     id: "q1",
-    query: "show ap aging trend by vendor",
+    query: "show ap vendor invoice status",
     domain: "finance",
     operator: "extract",
     intent: "documents",
@@ -178,7 +268,7 @@ const CASES: EvalCase[] = [
   },
   {
     id: "q3",
-    query: "show dre margins for fy25",
+    query: "show gross margin summary for fy25",
     domain: "finance",
     operator: "summarize",
     intent: "documents",
@@ -228,6 +318,54 @@ const CASES: EvalCase[] = [
   },
   {
     id: "q8",
+    query: "compare budget, forecast, and actual fy25",
+    domain: "finance",
+    operator: "compare",
+    intent: "documents",
+    expectedDocIds: ["fin-budget-2025", "fin-forecast-2025", "fin-actual-2025"],
+    explicitDocIds: ["fin-budget-2025", "fin-forecast-2025", "fin-actual-2025"],
+    explicitDocTypes: ["budget_report", "forecast_report", "variance_report"],
+    explicitDocDomains: ["finance"],
+    evalGroup: "retrieval",
+  },
+  {
+    id: "q9",
+    query: "compare msa and nda confidentiality obligations",
+    domain: "legal",
+    operator: "compare",
+    intent: "documents",
+    expectedDocIds: ["legal-msa", "legal-nda"],
+    explicitDocIds: ["legal-msa", "legal-nda"],
+    explicitDocTypes: ["msa", "nda"],
+    explicitDocDomains: ["legal"],
+    evalGroup: "retrieval",
+  },
+  {
+    id: "q10",
+    query: "compare cbc and lipid panel reference ranges",
+    domain: "medical",
+    operator: "compare",
+    intent: "documents",
+    expectedDocIds: ["med-lab-cbc", "med-lab-lipid"],
+    explicitDocIds: ["med-lab-cbc", "med-lab-lipid"],
+    explicitDocTypes: ["lab_report"],
+    explicitDocDomains: ["medical"],
+    evalGroup: "retrieval",
+  },
+  {
+    id: "q11",
+    query: "compare sev1 incident and postmortem timeline root cause",
+    domain: "ops",
+    operator: "compare",
+    intent: "documents",
+    expectedDocIds: ["ops-incident", "ops-postmortem"],
+    explicitDocIds: ["ops-incident", "ops-postmortem"],
+    explicitDocTypes: ["incident_report"],
+    explicitDocDomains: ["ops"],
+    evalGroup: "retrieval",
+  },
+  {
+    id: "q12",
     query: "compare budget vs actual",
     domain: "finance",
     operator: "compare",
@@ -245,6 +383,18 @@ function tokenize(input: string): string[] {
     .split(/\s+/)
     .map((token) => token.trim())
     .filter(Boolean);
+}
+
+function uniqueDocIds(ids: string[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of ids) {
+    const id = String(raw || "").trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
 }
 
 function overlapScore(query: string, doc: SeedDoc): number {
@@ -563,18 +713,70 @@ function makeDocumentIntelligenceBanks(opts: { rewritesEnabled: boolean }) {
   };
 }
 
-function createEngine(opts: { rewritesEnabled: boolean }): RetrievalEngineService {
+function parseEvalModeArg(argv: string[]): EvalMode {
+  const flag = argv.find((arg) => arg.startsWith("--mode="));
+  if (!flag) return DEFAULT_EVAL_MODE;
+  const value = flag.slice("--mode=".length).trim().toLowerCase();
+  if (value === "real_banks") return "real_banks";
+  if (value === "mock") return "mock";
+  throw new Error(
+    `Unsupported --mode value "${value}". Expected "mock" or "real_banks".`,
+  );
+}
+
+function buildNoRewriteProxy(
+  source: DocumentIntelligenceSubset,
+): DocumentIntelligenceSubset {
+  return {
+    getCrossDocGroundingPolicy: () => source.getCrossDocGroundingPolicy(),
+    getDocumentIntelligenceDomains: () =>
+      source.getDocumentIntelligenceDomains(),
+    getDocTypeCatalog: () => source.getDocTypeCatalog(),
+    getDocTypeSections: (docTypeId) => source.getDocTypeSections(docTypeId),
+    getDocTypeTables: (docTypeId) => source.getDocTypeTables(docTypeId),
+    getDomainDetectionRules: (domain) => source.getDomainDetectionRules(domain),
+    getRetrievalBoostRules: (domain) => source.getRetrievalBoostRules(domain),
+    getQueryRewriteRules: (domain) => {
+      const bank = source.getQueryRewriteRules(domain);
+      return { ...bank, rules: [] };
+    },
+    getSectionPriorityRules: (domain) => source.getSectionPriorityRules(domain),
+  };
+}
+
+function createEngineWithDeps(opts: {
+  rewritesEnabled: boolean;
+  mode: EvalMode;
+  runtimeBankLoader?: ReturnType<typeof getBankLoaderInstance>;
+  runtimeDiBanks?: DocumentIntelligenceSubset;
+}): RetrievalEngineService {
   const indexes = makeIndexes();
+  const bankLoader =
+    opts.mode === "real_banks" ? opts.runtimeBankLoader : makeBankLoader();
+  if (!bankLoader) {
+    throw new Error("Runtime bank loader is required in real_banks mode.");
+  }
+
+  const diBanks =
+    opts.mode === "real_banks"
+      ? opts.rewritesEnabled
+        ? opts.runtimeDiBanks
+        : opts.runtimeDiBanks
+          ? buildNoRewriteProxy(opts.runtimeDiBanks)
+          : null
+      : makeDocumentIntelligenceBanks({ rewritesEnabled: opts.rewritesEnabled });
+  if (!diBanks) {
+    throw new Error("Runtime document intelligence banks are required.");
+  }
+
   return new RetrievalEngineService(
-    makeBankLoader() as any,
+    bankLoader as any,
     makeDocStore() as any,
     indexes.semanticIndex as any,
     indexes.lexicalIndex as any,
     indexes.structuralIndex as any,
     undefined,
-    makeDocumentIntelligenceBanks({
-      rewritesEnabled: opts.rewritesEnabled,
-    }) as any,
+    diBanks as any,
   );
 }
 
@@ -601,18 +803,71 @@ function round(value: number, digits = 4): number {
 }
 
 async function main() {
-  const engineWithRewrites = createEngine({ rewritesEnabled: true });
-  const engineWithoutRewrites = createEngine({ rewritesEnabled: false });
+  const mode = parseEvalModeArg(process.argv.slice(2));
+  let runtimeLoadedBankIds: string[] = [];
+
+  let runtimeBankLoader: ReturnType<typeof getBankLoaderInstance> | undefined;
+  let runtimeDiBanks: DocumentIntelligenceSubset | undefined;
+  if (mode === "real_banks") {
+    await initializeBanks({
+      env: "dev",
+      rootDir: path.resolve(__dirname, "../../src/data_banks"),
+      strict: false,
+      validateSchemas: false,
+      allowEmptyChecksumsInNonProd: true,
+      enableHotReload: false,
+      logger: {
+        info: () => undefined,
+        warn: () => undefined,
+        error: () => undefined,
+      },
+    });
+    runtimeBankLoader = getBankLoaderInstance();
+    runtimeLoadedBankIds = runtimeBankLoader.listLoaded();
+    runtimeDiBanks = getDocumentIntelligenceBanksInstance() as any;
+  }
+
+  const engineWithRewrites = createEngineWithDeps({
+    rewritesEnabled: true,
+    mode,
+    runtimeBankLoader,
+    runtimeDiBanks,
+  });
+  const engineWithoutRewrites = createEngineWithDeps({
+    rewritesEnabled: false,
+    mode,
+    runtimeBankLoader,
+    runtimeDiBanks,
+  });
 
   let precisionNumerator = 0;
   let precisionDenominator = 0;
-  let wrongDocCount = 0;
+  let precisionDenominatorRequested = 0;
+  let precisionEffectiveNumerator = 0;
+  let precisionEffectiveDenominator = 0;
+  let top1HitCount = 0;
+  let top1WrongCount = 0;
+  let topKContaminationCount = 0;
   let retrievalCases = 0;
   let rewriteTriggeredCases = 0;
   let rewriteUsefulCases = 0;
   let rewriteNeutralOrNegativeCases = 0;
+  let rewriteHarmfulCases = 0;
+  let rewriteTop1ImprovedCases = 0;
+  let rewritePrecisionImprovedCases = 0;
+  let rewriteContaminationReducedCases = 0;
   const eventNameCounts = new Map<string, number>();
   const ruleHitCounts = new Map<string, number>();
+  const rewriteByDomain = new Map<
+    Domain,
+    {
+      queries: number;
+        triggeredCases: number;
+        usefulCases: number;
+        neutralOrNegativeCases: number;
+        harmfulCases: number;
+      }
+  >();
 
   const queryDiagnostics: Array<Record<string, unknown>> = [];
 
@@ -622,20 +877,43 @@ async function main() {
       buildRequest(evalCase),
     );
 
-    const topWith = withRewrite.evidence.slice(0, TOP_K).map((item) => item.docId);
-    const topWithout = withoutRewrite.evidence
+    const topWithRaw = withRewrite.evidence.slice(0, TOP_K).map((item) => item.docId);
+    const topWithoutRaw = withoutRewrite.evidence
       .slice(0, TOP_K)
       .map((item) => item.docId);
+    const topWith = uniqueDocIds(topWithRaw);
+    const topWithout = uniqueDocIds(topWithoutRaw);
     const expectedSet = new Set(evalCase.expectedDocIds);
     const relevantWith = topWith.filter((docId) => expectedSet.has(docId)).length;
+    const relevantWithout = topWithout.filter((docId) => expectedSet.has(docId)).length;
+    const top1WithHit = topWith.length > 0 && expectedSet.has(topWith[0]);
+    const top1WithoutHit =
+      topWithout.length > 0 && expectedSet.has(topWithout[0]);
+    const contaminationWith = topWith.filter((docId) => !expectedSet.has(docId)).length;
+    const contaminationWithout = topWithout.filter(
+      (docId) => !expectedSet.has(docId),
+    ).length;
 
     if (evalCase.evalGroup === "retrieval") {
       retrievalCases += 1;
       precisionNumerator += relevantWith;
-      precisionDenominator += TOP_K;
-      if (topWith.some((docId) => !expectedSet.has(docId))) {
-        wrongDocCount += 1;
-      }
+      precisionDenominator += Math.min(TOP_K, Math.max(1, topWith.length));
+      precisionDenominatorRequested += TOP_K;
+      const effectiveDenominator = Math.min(TOP_K, Math.max(1, expectedSet.size));
+      precisionEffectiveDenominator += effectiveDenominator;
+      precisionEffectiveNumerator += Math.min(relevantWith, effectiveDenominator);
+      if (top1WithHit) top1HitCount += 1;
+      else top1WrongCount += 1;
+      if (contaminationWith > 0) topKContaminationCount += 1;
+      const domainState = rewriteByDomain.get(evalCase.domain) || {
+        queries: 0,
+        triggeredCases: 0,
+        usefulCases: 0,
+        neutralOrNegativeCases: 0,
+        harmfulCases: 0,
+      };
+      domainState.queries += 1;
+      rewriteByDomain.set(evalCase.domain, domainState);
     }
 
     const rewriteEvents = (withRewrite.telemetry?.ruleEvents || []).filter(
@@ -643,10 +921,38 @@ async function main() {
     );
     if (rewriteEvents.length > 0) {
       rewriteTriggeredCases += 1;
-      const hitWith = topWith.some((docId) => expectedSet.has(docId));
-      const hitWithout = topWithout.some((docId) => expectedSet.has(docId));
-      if (hitWith && !hitWithout) rewriteUsefulCases += 1;
-      else rewriteNeutralOrNegativeCases += 1;
+      const improvedTop1 = top1WithHit && !top1WithoutHit;
+      const improvedPrecision = relevantWith > relevantWithout;
+      const reducedContamination = contaminationWith < contaminationWithout;
+      const degradedTop1 = !top1WithHit && top1WithoutHit;
+      const degradedPrecision = relevantWith < relevantWithout;
+      const worsenedContamination = contaminationWith > contaminationWithout;
+      const harmful =
+        degradedTop1 || degradedPrecision || worsenedContamination;
+
+      if (improvedTop1) rewriteTop1ImprovedCases += 1;
+      if (improvedPrecision) rewritePrecisionImprovedCases += 1;
+      if (reducedContamination) rewriteContaminationReducedCases += 1;
+
+      if (!harmful && (improvedTop1 || improvedPrecision || reducedContamination)) {
+        rewriteUsefulCases += 1;
+        if (evalCase.evalGroup === "retrieval") {
+          const domainState = rewriteByDomain.get(evalCase.domain);
+          if (domainState) domainState.usefulCases += 1;
+        }
+      } else {
+        rewriteNeutralOrNegativeCases += 1;
+        if (evalCase.evalGroup === "retrieval") {
+          const domainState = rewriteByDomain.get(evalCase.domain);
+          if (domainState) domainState.neutralOrNegativeCases += 1;
+          if (domainState && harmful) domainState.harmfulCases += 1;
+        }
+        if (harmful) rewriteHarmfulCases += 1;
+      }
+      if (evalCase.evalGroup === "retrieval") {
+        const domainState = rewriteByDomain.get(evalCase.domain);
+        if (domainState) domainState.triggeredCases += 1;
+      }
     }
 
     for (const event of withRewrite.telemetry?.ruleEvents || []) {
@@ -663,17 +969,38 @@ async function main() {
       evalGroup: evalCase.evalGroup,
       expectedDocIds: evalCase.expectedDocIds,
       topDocs: topWith,
+      topDocsWithoutRewrite: topWithout,
       firedEvents: (withRewrite.telemetry?.ruleEvents || []).map((event) => ({
         event: event.event,
         ruleId: String(event.payload.ruleId || "") || null,
       })),
+      rewriteImpact:
+        rewriteEvents.length > 0
+          ? {
+              top1Improved: top1WithHit && !top1WithoutHit,
+              precisionDeltaAtK: relevantWith - relevantWithout,
+              contaminationDelta: contaminationWith - contaminationWithout,
+            }
+          : null,
       summary: withRewrite.telemetry?.summary || null,
     });
   }
 
   const precisionAtK =
     precisionDenominator > 0 ? precisionNumerator / precisionDenominator : 0;
-  const wrongDocRate = retrievalCases > 0 ? wrongDocCount / retrievalCases : 0;
+  const precisionAtKRequested =
+    precisionDenominatorRequested > 0
+      ? precisionNumerator / precisionDenominatorRequested
+      : 0;
+  const precisionAtKEffective =
+    precisionEffectiveDenominator > 0
+      ? precisionEffectiveNumerator / precisionEffectiveDenominator
+      : 0;
+  const top1HitRate = retrievalCases > 0 ? top1HitCount / retrievalCases : 0;
+  const top1WrongDocRate =
+    retrievalCases > 0 ? top1WrongCount / retrievalCases : 0;
+  const topKContaminationRate =
+    retrievalCases > 0 ? topKContaminationCount / retrievalCases : 0;
   const rewriteUsefulness =
     rewriteTriggeredCases > 0 ? rewriteUsefulCases / rewriteTriggeredCases : 0;
 
@@ -692,6 +1019,7 @@ async function main() {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    evaluationMode: mode,
     dataset: {
       docs: DOCS.length,
       queries: CASES.length,
@@ -699,12 +1027,21 @@ async function main() {
       topK: TOP_K,
     },
     metrics: {
+      precisionAtKRequestedEstimate: round(precisionAtKRequested),
       precisionAtKEstimate: round(precisionAtK),
-      wrongDocRateEstimate: round(wrongDocRate),
+      precisionAtKEffectiveEstimate: round(precisionAtKEffective),
+      top1HitRateEstimate: round(top1HitRate),
+      top1WrongDocRateEstimate: round(top1WrongDocRate),
+      topKContaminationRateEstimate: round(topKContaminationRate),
+      wrongDocRateEstimate: round(topKContaminationRate),
       rewriteUsefulness: {
         triggeredCases: rewriteTriggeredCases,
         usefulCases: rewriteUsefulCases,
         neutralOrNegativeCases: rewriteNeutralOrNegativeCases,
+        harmfulCases: rewriteHarmfulCases,
+        top1ImprovedCases: rewriteTop1ImprovedCases,
+        precisionImprovedCases: rewritePrecisionImprovedCases,
+        contaminationReducedCases: rewriteContaminationReducedCases,
         usefulnessRate: round(rewriteUsefulness),
       },
       eventCounts: Array.from(eventNameCounts.entries())
@@ -715,7 +1052,33 @@ async function main() {
         hits: entry.hits,
         hitRate: round(entry.hitRate),
       })),
+      rewriteByDomain: Array.from(rewriteByDomain.entries())
+        .map(([domain, stats]) => ({
+          domain,
+          queries: stats.queries,
+          triggeredCases: stats.triggeredCases,
+          usefulCases: stats.usefulCases,
+          neutralOrNegativeCases: stats.neutralOrNegativeCases,
+          harmfulCases: stats.harmfulCases,
+          triggerRate:
+            stats.queries > 0 ? round(stats.triggeredCases / stats.queries) : 0,
+          usefulnessRate:
+            stats.triggeredCases > 0
+              ? round(stats.usefulCases / stats.triggeredCases)
+              : 0,
+        }))
+        .sort((a, b) => a.domain.localeCompare(b.domain)),
     },
+    banks:
+      mode === "real_banks"
+        ? {
+            loadedCount: runtimeLoadedBankIds.length,
+            loadedIdsSample: runtimeLoadedBankIds.slice(0, 25),
+          }
+        : {
+            loadedCount: 0,
+            loadedIdsSample: [],
+          },
     queryDiagnostics,
   };
 
@@ -726,4 +1089,3 @@ void main().catch((error) => {
   console.error("[retrieval_eval] failed:", error);
   process.exitCode = 1;
 });
-

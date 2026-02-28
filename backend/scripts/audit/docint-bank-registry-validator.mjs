@@ -233,6 +233,10 @@ for (const entry of registryBanks) {
   const id = String(entry?.id || "").trim();
   const relPath = String(entry?.path || "").trim();
   if (!id || !relPath) continue;
+  if (id === "bank_registry" && relPath === "manifest/bank_registry.any.json") {
+    // Self-referential checksum entry; validated via banks:checksum flow.
+    continue;
+  }
 
   const fullPath = path.join(dataBanksRoot, relPath);
   if (!fs.existsSync(fullPath)) {

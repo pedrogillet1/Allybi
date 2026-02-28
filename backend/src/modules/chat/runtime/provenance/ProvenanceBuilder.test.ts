@@ -1,6 +1,6 @@
 import { buildChatProvenance } from "./ProvenanceBuilder";
 
-describe("buildChatProvenance fallback refs", () => {
+describe("buildChatProvenance strict refs", () => {
   const retrievalPack = {
     evidence: [
       {
@@ -16,7 +16,7 @@ describe("buildChatProvenance fallback refs", () => {
     ],
   } as any;
 
-  test("seeds provenance refs when required and lexical overlap is too weak", () => {
+  test("does not seed provenance refs when lexical overlap is too weak", () => {
     const provenance = buildChatProvenance({
       answerText: "Tabela comparativa consolidada por prioridade.",
       answerMode: "doc_grounded_table" as any,
@@ -25,8 +25,9 @@ describe("buildChatProvenance fallback refs", () => {
     });
 
     expect(provenance.required).toBe(true);
-    expect(provenance.snippetRefs.length).toBeGreaterThan(0);
-    expect(provenance.sourceDocumentIds).toContain("doc-1");
+    expect(provenance.snippetRefs.length).toBe(0);
+    expect(provenance.sourceDocumentIds).toEqual([]);
+    expect(provenance.coverageScore).toBe(0);
   });
 
   test("keeps non-required provenance empty when answer is general", () => {
@@ -39,5 +40,24 @@ describe("buildChatProvenance fallback refs", () => {
 
     expect(provenance.required).toBe(false);
     expect(provenance.snippetRefs).toHaveLength(0);
+  });
+
+  test("supports legacy fallback refs when strict provenance flag is disabled", () => {
+    const prev = process.env.STRICT_PROVENANCE_V2;
+    process.env.STRICT_PROVENANCE_V2 = "0";
+    try {
+      const provenance = buildChatProvenance({
+        answerText: "Tabela comparativa consolidada por prioridade.",
+        answerMode: "doc_grounded_table" as any,
+        answerClass: "DOCUMENT" as any,
+        retrievalPack,
+      });
+      expect(provenance.required).toBe(true);
+      expect(provenance.snippetRefs.length).toBeGreaterThan(0);
+      expect(provenance.coverageScore).toBeGreaterThan(0);
+    } finally {
+      if (prev === undefined) delete process.env.STRICT_PROVENANCE_V2;
+      else process.env.STRICT_PROVENANCE_V2 = prev;
+    }
   });
 });

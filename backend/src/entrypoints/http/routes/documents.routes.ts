@@ -2510,6 +2510,9 @@ router.post(
         where: { id: doc.id },
         data: {
           status: "uploaded",
+          indexingState: "pending",
+          indexingError: null,
+          indexingUpdatedAt: new Date(),
           error: null,
         },
       });

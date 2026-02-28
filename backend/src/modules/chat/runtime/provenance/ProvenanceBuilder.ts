@@ -31,6 +31,23 @@ function overlapRatio(a: string[], b: string[]): number {
   return overlap / b.length;
 }
 
+function anchoredSnippetCoverage(
+  normalizedAnswer: string,
+  normalizedSnippet: string,
+): number {
+  if (!normalizedAnswer || !normalizedSnippet) return 0;
+  const anchors: string[] = [];
+  if (normalizedSnippet.length >= 20) {
+    anchors.push(normalizedSnippet.slice(0, Math.min(90, normalizedSnippet.length)));
+  }
+  if (normalizedSnippet.length >= 140) {
+    anchors.push(normalizedSnippet.slice(-90));
+  }
+  if (anchors.length === 0) return 0;
+  const matched = anchors.filter((anchor) => normalizedAnswer.includes(anchor)).length;
+  return matched / anchors.length;
+}
+
 function hashSnippet(snippet: string): string {
   return createHash("sha256").update(snippet).digest("hex").slice(0, 16);
 }
@@ -45,6 +62,29 @@ function requiresProvenance(
 
 function round3(value: number): number {
   return Math.round(value * 1000) / 1000;
+}
+
+function resolveMinSnippetCoverage(answerMode?: AnswerMode): number {
+  switch (answerMode) {
+    case "doc_grounded_quote":
+      return 0.55;
+    case "doc_grounded_table":
+      return 0.28;
+    case "doc_grounded_multi":
+      return 0.24;
+    case "doc_grounded_single":
+      return 0.22;
+    case "help_steps":
+      return 0.2;
+    default:
+      return 0.22;
+  }
+}
+
+function isStrictProvenanceV2Enabled(): boolean {
+  const raw = String(process.env.STRICT_PROVENANCE_V2 || "").trim().toLowerCase();
+  if (!raw) return true;
+  return !["0", "false", "off", "no"].includes(raw);
 }
 
 export function buildChatProvenance(params: {
@@ -66,12 +106,93 @@ export function buildChatProvenance(params: {
       sourceDocumentIds: [],
       snippetRefs: [],
       coverageScore: 0,
+      anchorCoverage: 0,
+      semanticCoverage: 0,
+      minimumCoverage: resolveMinSnippetCoverage(params.answerMode),
     };
   }
 
   const normalizedAnswer = normalizeText(params.answerText);
   const answerTokens = tokenize(params.answerText);
+  if (!isStrictProvenanceV2Enabled()) {
+    const legacyRefs: ChatProvenanceDTO["snippetRefs"] = [];
+    for (const item of evidence) {
+      const snippet = String(item.snippet || "").trim();
+      const docId = String(item.docId || "").trim();
+      const locationKey = String(item.locationKey || "").trim();
+      if (!snippet || !docId || !locationKey) continue;
+
+      const normalizedSnippet = normalizeText(snippet);
+      const directNeedle =
+        normalizedSnippet.length > 90
+          ? normalizedSnippet.slice(0, 90)
+          : normalizedSnippet;
+      const directMatch =
+        directNeedle.length >= 18 && normalizedAnswer.includes(directNeedle);
+      const lexicalCoverage = overlapRatio(answerTokens, tokenize(snippet));
+      const legacyCoverageScore = directMatch
+        ? Math.max(lexicalCoverage, 1)
+        : lexicalCoverage;
+      const legacyMinCoverage =
+        params.answerMode === "doc_grounded_multi" ? 0.1 : 0.18;
+      if (legacyCoverageScore < legacyMinCoverage) continue;
+
+      legacyRefs.push({
+        evidenceId: `${docId}:${locationKey}`,
+        documentId: docId,
+        locationKey,
+        snippetHash: hashSnippet(normalizedSnippet),
+        coverageScore: round3(Math.min(1, legacyCoverageScore)),
+        anchorCoverage: directMatch ? 1 : 0,
+        semanticCoverage: round3(Math.min(1, lexicalCoverage)),
+      });
+    }
+
+    if (required && legacyRefs.length === 0 && evidence.length > 0) {
+      for (const item of evidence.slice(0, 3)) {
+        const snippet = String(item.snippet || "").trim();
+        const docId = String(item.docId || "").trim();
+        const locationKey = String(item.locationKey || "").trim();
+        if (!snippet || !docId || !locationKey) continue;
+        legacyRefs.push({
+          evidenceId: `${docId}:${locationKey}`,
+          documentId: docId,
+          locationKey,
+          snippetHash: hashSnippet(normalizeText(snippet)),
+          coverageScore: 0,
+          anchorCoverage: 0,
+          semanticCoverage: 0,
+        });
+      }
+    }
+
+    const evidenceIdsUsed = Array.from(new Set(legacyRefs.map((ref) => ref.evidenceId)));
+    const sourceDocumentIds = Array.from(
+      new Set(legacyRefs.map((ref) => ref.documentId)),
+    );
+    const coverageScore = round3(
+      legacyRefs.length / Math.max(1, Math.min(evidence.length, 12)),
+    );
+    return {
+      mode: "hidden_map",
+      required,
+      validated: false,
+      failureCode: null,
+      evidenceIdsUsed,
+      sourceDocumentIds,
+      snippetRefs: legacyRefs,
+      coverageScore,
+      anchorCoverage: coverageScore,
+      semanticCoverage: coverageScore,
+      minimumCoverage: params.answerMode === "doc_grounded_multi" ? 0.1 : 0.18,
+    };
+  }
+
+  const minCoverage = resolveMinSnippetCoverage(params.answerMode);
   const snippetRefs: ChatProvenanceDTO["snippetRefs"] = [];
+  const refAnchorCoverage: number[] = [];
+  const refSemanticCoverage: number[] = [];
+  const refCombinedCoverage: number[] = [];
 
   for (const item of evidence) {
     const snippet = String(item.snippet || "").trim();
@@ -80,47 +201,30 @@ export function buildChatProvenance(params: {
     if (!snippet || !docId || !locationKey) continue;
 
     const normalizedSnippet = normalizeText(snippet);
-    const directNeedle =
-      normalizedSnippet.length > 90
-        ? normalizedSnippet.slice(0, 90)
-        : normalizedSnippet;
-    const directMatch =
-      directNeedle.length >= 18 && normalizedAnswer.includes(directNeedle);
     const lexicalCoverage = overlapRatio(answerTokens, tokenize(snippet));
-    const coverageScore = directMatch
-      ? Math.max(lexicalCoverage, 1)
-      : lexicalCoverage;
-
-    const minCoverage = params.answerMode === "doc_grounded_multi" ? 0.1 : 0.18;
+    const anchorCoverage = anchoredSnippetCoverage(
+      normalizedAnswer,
+      normalizedSnippet,
+    );
+    const coverageScore = Math.max(lexicalCoverage, anchorCoverage);
     if (coverageScore < minCoverage) continue;
+
+    const roundedAnchor = round3(Math.min(1, anchorCoverage));
+    const roundedSemantic = round3(Math.min(1, lexicalCoverage));
+    const roundedCoverage = round3(Math.min(1, coverageScore));
 
     snippetRefs.push({
       evidenceId: `${docId}:${locationKey}`,
       documentId: docId,
       locationKey,
       snippetHash: hashSnippet(normalizedSnippet),
-      coverageScore: round3(Math.min(1, coverageScore)),
+      coverageScore: roundedCoverage,
+      anchorCoverage: roundedAnchor,
+      semanticCoverage: roundedSemantic,
     });
-  }
-
-  // Fail-closed systems still need provenance refs even when lexical overlap is
-  // weak (tables/rewrites). If we have evidence but no matched refs, seed a
-  // minimal provenance map from top evidence items so downstream evidence-map
-  // integrity can validate deterministic doc anchors.
-  if (required && snippetRefs.length === 0 && evidence.length > 0) {
-    for (const item of evidence.slice(0, 3)) {
-      const snippet = String(item.snippet || "").trim();
-      const docId = String(item.docId || "").trim();
-      const locationKey = String(item.locationKey || "").trim();
-      if (!snippet || !docId || !locationKey) continue;
-      snippetRefs.push({
-        evidenceId: `${docId}:${locationKey}`,
-        documentId: docId,
-        locationKey,
-        snippetHash: hashSnippet(normalizeText(snippet)),
-        coverageScore: 0,
-      });
-    }
+    refAnchorCoverage.push(roundedAnchor);
+    refSemanticCoverage.push(roundedSemantic);
+    refCombinedCoverage.push(roundedCoverage);
   }
 
   const evidenceIdsUsed = Array.from(
@@ -129,9 +233,27 @@ export function buildChatProvenance(params: {
   const sourceDocumentIds = Array.from(
     new Set(snippetRefs.map((ref) => ref.documentId)),
   );
-  const coverageScore = round3(
-    snippetRefs.length / Math.max(1, Math.min(evidence.length, 12)),
-  );
+  const coverageScore =
+    refCombinedCoverage.length > 0
+      ? round3(
+          refCombinedCoverage.reduce((sum, score) => sum + score, 0) /
+            refCombinedCoverage.length,
+        )
+      : 0;
+  const anchorCoverage =
+    refAnchorCoverage.length > 0
+      ? round3(
+          refAnchorCoverage.reduce((sum, score) => sum + score, 0) /
+            refAnchorCoverage.length,
+        )
+      : 0;
+  const semanticCoverage =
+    refSemanticCoverage.length > 0
+      ? round3(
+          refSemanticCoverage.reduce((sum, score) => sum + score, 0) /
+            refSemanticCoverage.length,
+        )
+      : 0;
 
   return {
     mode: "hidden_map",
@@ -142,5 +264,8 @@ export function buildChatProvenance(params: {
     sourceDocumentIds,
     snippetRefs,
     coverageScore,
+    anchorCoverage,
+    semanticCoverage,
+    minimumCoverage: minCoverage,
   };
 }

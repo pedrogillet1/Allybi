@@ -163,17 +163,13 @@ describe("Document Intelligence Eval Pack", () => {
       });
 
       it("all domains are valid", () => {
-        const invalid = cases.filter(
-          (c) => !VALID_DOMAINS.includes(c.domain),
-        );
+        const invalid = cases.filter((c) => !VALID_DOMAINS.includes(c.domain));
         expect(invalid.map((c) => `${c.id}:${c.domain}`)).toEqual([]);
       });
 
       it("all docTypeIds resolve in taxonomy", () => {
         if (validDocTypes.size === 0) return; // taxonomy not found; skip
-        const invalid = cases.filter(
-          (c) => !validDocTypes.has(c.docTypeId),
-        );
+        const invalid = cases.filter((c) => !validDocTypes.has(c.docTypeId));
         expect(
           invalid.map((c) => `${c.id}: unknown docTypeId=${c.docTypeId}`),
         ).toEqual([]);
@@ -217,12 +213,9 @@ describe("Document Intelligence Eval Pack", () => {
       });
 
       it("negative cases have refusalTrigger or clarifyTrigger", () => {
-        const negCases = cases.filter(
-          (c) => c.expected?.negative === true,
-        );
+        const negCases = cases.filter((c) => c.expected?.negative === true);
         const missing = negCases.filter(
-          (c) =>
-            !c.expected.refusalTrigger && !c.expected.clarifyTrigger,
+          (c) => !c.expected.refusalTrigger && !c.expected.clarifyTrigger,
         );
         expect(
           missing.map(
@@ -232,19 +225,19 @@ describe("Document Intelligence Eval Pack", () => {
       });
 
       it("positive cases have non-empty mustCite", () => {
-        const posCases = cases.filter(
-          (c) => c.expected?.negative !== true,
-        );
+        const posCases = cases.filter((c) => c.expected?.negative !== true);
         const empty = posCases.filter(
-          (c) =>
-            !c.expected.mustCite || c.expected.mustCite.length === 0,
+          (c) => !c.expected.mustCite || c.expected.mustCite.length === 0,
         );
         expect(
           empty.map((c) => `${c.id}: positive but empty mustCite`),
         ).toEqual([]);
       });
 
-      if (suite.requiredLangs?.includes("en") && suite.requiredLangs?.includes("pt")) {
+      if (
+        suite.requiredLangs?.includes("en") &&
+        suite.requiredLangs?.includes("pt")
+      ) {
         it("has both EN and PT cases", () => {
           const enCount = cases.filter((c) => c.lang === "en").length;
           const ptCount = cases.filter((c) => c.lang === "pt").length;

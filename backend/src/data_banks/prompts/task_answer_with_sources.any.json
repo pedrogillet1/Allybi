@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "task_answer_with_sources",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Task-level answer formatting with structured sources contract.",
     "languages": ["any", "en", "pt", "es"],
     "lastUpdated": "2026-02-19"
@@ -24,9 +24,48 @@
       ]
     },
     {
+      "id": "answer_with_quote_sources",
+      "priority": 220,
+      "when": { "answerModes": ["doc_grounded_quote"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Answer task contract: produce a concise user-facing answer grounded in provided evidence only. Include exact quote(s) from the retrieved snippets when asked. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
+          }
+        }
+      ]
+    },
+    {
+      "id": "answer_with_table_sources",
+      "priority": 210,
+      "when": { "answerModes": ["doc_grounded_table"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Answer task contract: produce user-facing markdown with a compact table grounded in provided evidence only. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
+          }
+        }
+      ]
+    },
+    {
+      "id": "answer_help_steps_scoped",
+      "priority": 205,
+      "when": { "answerModes": ["help_steps"] },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Answer task contract: provide short actionable steps about the currently scoped document context. Do NOT invent evidence and do NOT include an inline `Sources` section."
+          }
+        }
+      ]
+    },
+    {
       "id": "answer_without_sources",
       "priority": 100,
-      "when": { "answerModes": ["general_answer", "action_receipt", "nav_pills", "rank_disambiguate"] },
+      "when": { "answerModes": ["general_answer", "action_receipt", "nav_pills", "rank_disambiguate", "rank_autopick"] },
       "messages": [
         {
           "role": "system",

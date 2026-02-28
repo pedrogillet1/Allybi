@@ -17,6 +17,125 @@
   "domain": "finance",
   "rules": [
     {
+      "id": "finance_rewrite_core_dre",
+      "priority": 95,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract",
+        "summarize",
+        "locate",
+        "compare",
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bdre\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "income statement",
+          "weight": 1
+        },
+        {
+          "value": "profit and loss statement",
+          "weight": 0.95
+        },
+        {
+          "value": "demonstracao do resultado do exercicio",
+          "weight": 0.93
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "negativePatterns": [
+        "\\bdre\\s*station\\b"
+      ],
+      "requireContextAny": [
+        "resultado",
+        "income statement",
+        "p&l",
+        "profit",
+        "margem",
+        "ebitda",
+        "receita"
+      ],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "finance_rewrite_core_income_statement",
+      "priority": 94,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract",
+        "summarize",
+        "locate",
+        "compare",
+        "evaluate"
+      ],
+      "domains": [
+        "finance"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bincome statement\\b",
+        "\\bprofit and loss\\b",
+        "\\bp&l\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "dre",
+          "weight": 0.96
+        },
+        {
+          "value": "statement of operations",
+          "weight": 0.93
+        },
+        {
+          "value": "demonstracao do resultado",
+          "weight": 0.92
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "finance"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [
+        "revenue",
+        "expense",
+        "margin",
+        "resultado",
+        "margem",
+        "ebitda"
+      ],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
       "id": "finance_rewrite_ap_guarded",
       "priority": 96,
       "enabled": true,
@@ -80,7 +199,9 @@
         "requireDomainMatch": true,
         "domains": [
           "finance"
-        ]
+        ],
+        "allowWhenExplicitDocTypes": true,
+        "allowWhenExplicitDocIds": true
       }
     },
     {
@@ -175,7 +296,11 @@
         "documents"
       ],
       "operators": [
-        "compare"
+        "extract",
+        "summarize",
+        "locate",
+        "compare",
+        "evaluate"
       ],
       "domains": [
         "finance"
@@ -198,10 +323,20 @@
         "requireDomainMatch": true,
         "domains": [
           "finance"
-        ]
+        ],
+        "requireNoExplicitDocTypes": true,
+        "requireNoExplicitDocIds": true
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "gross",
+        "margin",
+        "margem",
+        "bruta",
+        "income statement",
+        "p&l",
+        "dre"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -315,7 +450,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "operating",
+        "income",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -391,7 +536,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "year",
+        "over",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -429,7 +584,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "quarter",
+        "over",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -593,7 +758,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "operating",
+        "expenses",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -669,7 +844,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "debt",
+        "service",
+        "coverage",
+        "ratio",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -707,7 +893,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "annual",
+        "recurring",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -935,7 +1131,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "average",
+        "daily",
+        "rate",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1209,7 +1416,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "earnings",
+        "before",
+        "interest",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1285,7 +1503,16 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "gross",
+        "margin",
+        "revenue",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1323,7 +1550,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "present",
+        "value",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1361,7 +1598,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "internal",
+        "rate",
+        "return",
+        "revenue",
+        "margin",
+        "statement",
+        "budget",
+        "forecast",
+        "cash",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },

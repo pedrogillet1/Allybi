@@ -24,6 +24,10 @@
         "documents"
       ],
       "operators": [
+        "extract",
+        "locate",
+        "summarize",
+        "compare",
         "advise"
       ],
       "domains": [
@@ -54,7 +58,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "white",
+        "blood",
+        "cell",
+        "count",
+        "leucocitos",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -108,6 +123,9 @@
         "documents"
       ],
       "operators": [
+        "extract",
+        "locate",
+        "summarize",
         "compare"
       ],
       "domains": [
@@ -131,10 +149,26 @@
         "requireDomainMatch": true,
         "domains": [
           "medical"
-        ]
+        ],
+        "requireNoExplicitDocTypes": true,
+        "requireNoExplicitDocIds": true
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "complete",
+        "blood",
+        "count",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range",
+        "cbc",
+        "reference",
+        "range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -172,7 +206,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "metabolic",
+        "panel",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -400,7 +444,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "estimated",
+        "glomerular",
+        "filtration",
+        "rate",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -476,7 +531,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "oxygen",
+        "saturation",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -514,7 +579,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "blood",
+        "pressure",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -552,7 +627,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "heart",
+        "rate",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -590,7 +675,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "respiratory",
+        "rate",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -856,7 +951,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "reactive",
+        "protein",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -894,7 +999,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "erythrocyte",
+        "sedimentation",
+        "rate",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1236,7 +1352,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "emergency",
+        "department",
+        "patient",
+        "result",
+        "laboratory",
+        "clinical",
+        "diagnostic",
+        "medication",
+        "reference range"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },

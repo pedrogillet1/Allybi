@@ -204,6 +204,10 @@ model Document {
   language                   String                     @default("en")
   chunksCount                Int?                       @default(0)
   embeddingsGenerated        Boolean                    @default(false)
+  indexingState              String?                    @map("indexing_state")
+  indexingOperationId        String?                    @map("indexing_operation_id")
+  indexingError              String?                    @map("indexing_error")
+  indexingUpdatedAt          DateTime?                  @map("indexing_updated_at")
   error                      String?
   displayTitle               String?
   rawText                    String?
@@ -235,6 +239,8 @@ model Document {
   @@index([language])
   @@index([userId, language])
   @@index([uploadSessionId])
+  @@index([indexingState])
+  @@index([userId, indexingState])
   @@map("documents")
 }
 
@@ -303,6 +309,7 @@ model DocumentChunk {
   @@index([documentId])
   @@index([documentId, chunkIndex])
   @@index([documentId, page])
+  @@unique([documentId, chunkIndex])
   @@map("document_chunks")
 }
 
@@ -456,6 +463,7 @@ model DocumentEmbedding {
   @@index([documentId, pageNumber])
   @@index([pineconeNamespace])
   @@index([userId, documentId])
+  @@unique([documentId, chunkIndex])
   @@map("document_embeddings")
 }
 

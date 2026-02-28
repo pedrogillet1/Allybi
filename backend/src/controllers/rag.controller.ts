@@ -69,6 +69,15 @@ function toLanguage(value: unknown): ChatLanguage | undefined {
   return undefined;
 }
 
+function resolvePreferredLanguage(req: Request): ChatLanguage | undefined {
+  return (
+    toLanguage(req.body?.preferredLanguage) ||
+    toLanguage(req.body?.language) ||
+    toLanguage(req.body?.locale) ||
+    toLanguage(req.headers["accept-language"])
+  );
+}
+
 function toAttachments(value: unknown): Attachment[] {
   if (Array.isArray(value)) return value as Attachment[];
   return [];
@@ -170,9 +179,7 @@ export class RagController {
         req.body?.conversationId ?? req.body?.conversation_id,
         120,
       );
-      const preferredLanguage =
-        toLanguage(req.body?.locale) ||
-        toLanguage(req.headers["accept-language"]);
+      const preferredLanguage = resolvePreferredLanguage(req);
       const options =
         req.body?.options && typeof req.body.options === "object"
           ? (req.body.options as Record<string, unknown>)
@@ -230,9 +237,7 @@ export class RagController {
         req.body?.conversationId ?? req.body?.conversation_id,
         120,
       );
-      const preferredLanguage =
-        toLanguage(req.body?.locale) ||
-        toLanguage(req.headers["accept-language"]);
+      const preferredLanguage = resolvePreferredLanguage(req);
       const options =
         req.body?.options && typeof req.body.options === "object"
           ? (req.body.options as Record<string, unknown>)

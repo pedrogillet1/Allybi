@@ -22,11 +22,6 @@ export class EvidenceValidator {
           allowed.has(String(ref.documentId || "").trim()),
         )
       : [];
-    // If provenance was already soft-validated upstream (e.g. attached-document
-    // mode with keyword retrieval), preserve the validated state.
-    const upstreamSoftPass =
-      currentProvenance?.validated === true &&
-      currentProvenance.snippetRefs.length === 0;
     let nextProvenance = currentProvenance
       ? {
           ...currentProvenance,
@@ -45,12 +40,10 @@ export class EvidenceValidator {
                     1000,
                 ) / 1000
               : 0,
-          validated: upstreamSoftPass || scopedSnippetRefs.length > 0,
-          failureCode: upstreamSoftPass
-            ? null
-            : scopedSnippetRefs.length > 0
-              ? null
-              : "out_of_scope_provenance",
+          validated:
+            currentProvenance.validated === true && scopedSnippetRefs.length > 0,
+          failureCode:
+            scopedSnippetRefs.length > 0 ? null : "out_of_scope_provenance",
         }
       : undefined;
 
@@ -73,29 +66,7 @@ export class EvidenceValidator {
 
     let provenanceMissing =
       Boolean(nextProvenance?.required) &&
-      !upstreamSoftPass &&
       (nextProvenance?.snippetRefs?.length ?? 0) === 0;
-
-    // Soft-pass provenance in strict scoped mode when we still have in-scope
-    // sources after filtering. This avoids false "missing_provenance" errors
-    // for transformed/condensed answers where lexical overlap is weak even
-    // though evidence sources are valid and doc-locked.
-    if (provenanceMissing && scopedSources.length > 0 && nextProvenance) {
-      provenanceMissing = false;
-      nextProvenance = {
-        ...nextProvenance,
-        validated: true,
-        failureCode: null,
-        sourceDocumentIds: Array.from(
-          new Set(
-            scopedSources
-              .map((source) => String(source.documentId || "").trim())
-              .filter(Boolean),
-          ),
-        ),
-      };
-      next.provenance = nextProvenance;
-    }
 
     if (evidenceRequired && (scopedSources.length === 0 || provenanceMissing)) {
       next.status = "partial";

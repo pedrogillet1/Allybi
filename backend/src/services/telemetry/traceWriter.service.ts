@@ -228,7 +228,13 @@ export class TraceWriterService {
     private readonly prisma: PrismaClient,
     config: TraceWriterConfig = {},
   ) {
-    this.enabled = config.enabled ?? process.env.TELEMETRY_ENABLED !== "false";
+    const isTestEnv =
+      String(process.env.NODE_ENV || "").toLowerCase() === "test";
+    this.enabled =
+      config.enabled ??
+      (isTestEnv
+        ? String(process.env.TELEMETRY_ENABLED || "").toLowerCase() === "true"
+        : process.env.TELEMETRY_ENABLED !== "false");
     this.successSamplePercent = clampSamplePercent(
       config.successSamplePercent ??
         process.env.OBS_TRACE_SUCCESS_SAMPLE_PERCENT,

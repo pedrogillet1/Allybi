@@ -197,6 +197,8 @@ export class PrismaDocumentService implements DocumentService {
             fileHash: "",
             folderId: input.data.folderId ?? null,
             status: "uploaded",
+            indexingState: "pending",
+            indexingUpdatedAt: new Date(),
           },
           include: { folder: { select: { path: true } } },
         });

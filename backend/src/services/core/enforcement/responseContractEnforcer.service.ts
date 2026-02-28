@@ -619,16 +619,11 @@ export class ResponseContractEnforcerService {
     }
 
     if (requiresProvenance) {
-      // Skip re-validation when provenance was already soft-passed upstream
-      // (e.g. attached-document mode with keyword retrieval).
-      const alreadyValidated = ctx.provenance?.validated === true;
-      const provenanceCheck = alreadyValidated
-        ? { ok: true, failureCode: null, warnings: [] as string[] }
-        : validateChatProvenance({
-            provenance: ctx.provenance,
-            answerMode: ctx.answerMode as any,
-            allowedDocumentIds: ctx.allowedDocumentIds || [],
-          });
+      const provenanceCheck = validateChatProvenance({
+        provenance: ctx.provenance,
+        answerMode: ctx.answerMode as any,
+        allowedDocumentIds: ctx.allowedDocumentIds || [],
+      });
       if (!provenanceCheck.ok) {
         return {
           content: "",

@@ -45,7 +45,12 @@ export interface GoogleGeminiMetrics {
 
 export interface GoogleOcrMetrics {
   docsProcessed: number;
+  ocrAttempted: number;
   ocrUsed: number;
+  ocrAttemptRate: number;
+  ocrAppliedRate: number;
+  ocrSkipRate: number;
+  ocrErrorRate: number;
   ocrCoverageRate: number;
   avgConfidence: number;
   failures: number;
@@ -82,6 +87,125 @@ function toNum(value: unknown): number {
     return Number.isFinite(parsed) ? parsed : 0;
   }
   return 0;
+}
+
+type OcrOutcome =
+  | "not_attempted"
+  | "applied"
+  | "no_text"
+  | "skipped_heuristic"
+  | "provider_unavailable"
+  | "runtime_error";
+
+interface OcrEventLike {
+  status?: string | null;
+  ocrUsed?: boolean | null;
+  ocrConfidence?: number | null;
+  meta?: unknown;
+}
+
+const OCR_SKIP_OUTCOMES = new Set<OcrOutcome>(["no_text", "skipped_heuristic"]);
+const OCR_ERROR_OUTCOMES = new Set<OcrOutcome>([
+  "provider_unavailable",
+  "runtime_error",
+]);
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
+
+function readBoolean(value: unknown): boolean | null {
+  return typeof value === "boolean" ? value : null;
+}
+
+function normalizeOcrOutcome(value: unknown): OcrOutcome | null {
+  if (typeof value !== "string") return null;
+  const raw = value.trim().toLowerCase();
+  switch (raw) {
+    case "not_attempted":
+    case "applied":
+    case "no_text":
+    case "skipped_heuristic":
+    case "provider_unavailable":
+    case "runtime_error":
+      return raw;
+    default:
+      return null;
+  }
+}
+
+function normalizeConfidencePercent(value: unknown): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  if (value <= 1) return Math.max(0, Math.min(100, value * 100));
+  return Math.max(0, Math.min(100, value));
+}
+
+function toRate(numerator: number, denominator: number): number {
+  if (denominator <= 0) return 0;
+  return round2((numerator / denominator) * 100);
+}
+
+export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
+  let docsProcessed = 0;
+  let ocrAttempted = 0;
+  let ocrUsed = 0;
+  let ocrSkipped = 0;
+  let ocrErrors = 0;
+  let failures = 0;
+  const confidenceValues: number[] = [];
+
+  for (const event of events) {
+    docsProcessed += 1;
+
+    const used = Boolean(event.ocrUsed);
+    if (used) ocrUsed += 1;
+
+    const status = String(event.status || "").toLowerCase();
+    if (status === "fail") failures += 1;
+
+    const meta = asRecord(event.meta);
+    const attemptedFromMeta = readBoolean(meta?.ocrAttempted);
+    const attempted = attemptedFromMeta ?? used;
+    if (attempted) ocrAttempted += 1;
+
+    const explicitOutcome = normalizeOcrOutcome(meta?.ocrOutcome);
+    let outcome: OcrOutcome = explicitOutcome ?? "not_attempted";
+    if (!explicitOutcome) {
+      if (used) outcome = "applied";
+      else if (attempted && status === "fail") outcome = "runtime_error";
+      else if (attempted) outcome = "no_text";
+    }
+
+    if (OCR_SKIP_OUTCOMES.has(outcome)) ocrSkipped += 1;
+    if (OCR_ERROR_OUTCOMES.has(outcome)) ocrErrors += 1;
+
+    if (used) {
+      const normalizedConfidence = normalizeConfidencePercent(event.ocrConfidence);
+      if (normalizedConfidence !== null) confidenceValues.push(normalizedConfidence);
+    }
+  }
+
+  const avgConfidence =
+    confidenceValues.length > 0
+      ? round2(
+          confidenceValues.reduce((sum, value) => sum + value, 0) /
+            confidenceValues.length,
+        )
+      : 0;
+
+  return {
+    docsProcessed,
+    ocrAttempted,
+    ocrUsed,
+    ocrAttemptRate: toRate(ocrAttempted, docsProcessed),
+    ocrAppliedRate: toRate(ocrUsed, docsProcessed),
+    ocrSkipRate: toRate(ocrSkipped, docsProcessed),
+    ocrErrorRate: toRate(ocrErrors, docsProcessed),
+    ocrCoverageRate: toRate(ocrUsed, docsProcessed),
+    avgConfidence,
+    failures,
+  };
 }
 
 async function getCloudSqlMetrics(
@@ -302,43 +426,14 @@ async function getOcrMetrics(
         status: true,
         ocrUsed: true,
         ocrConfidence: true,
+        meta: true,
       },
       take: 100000,
     });
 
-    const docsProcessed = events.length;
-    const ocrEvents = events.filter((e) => e.ocrUsed);
-    const ocrUsed = ocrEvents.length;
-    const failures = events.filter((e) => e.status === "fail").length;
-    const confidenceValues = ocrEvents
-      .map((e) => e.ocrConfidence)
-      .filter((v): v is number => typeof v === "number");
-
-    const avgConfidence =
-      confidenceValues.length > 0
-        ? round2(
-            (confidenceValues.reduce((sum, c) => sum + c, 0) /
-              confidenceValues.length) *
-              100,
-          )
-        : 0;
-
-    return {
-      docsProcessed,
-      ocrUsed,
-      ocrCoverageRate:
-        docsProcessed > 0 ? round2((ocrUsed / docsProcessed) * 100) : 0,
-      avgConfidence,
-      failures,
-    };
+    return summarizeOcrEvents(events);
   } catch {
-    return {
-      docsProcessed: 0,
-      ocrUsed: 0,
-      ocrCoverageRate: 0,
-      avgConfidence: 0,
-      failures: 0,
-    };
+    return summarizeOcrEvents([]);
   }
 }
 

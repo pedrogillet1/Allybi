@@ -13,11 +13,13 @@ export class EncryptedChatContextService {
     userId: string,
     conversationId: string,
     limit = 20,
+    fromLatest = false,
   ): Promise<Array<{ role: ChatRole; content: string }>> {
     const msgs = await this.chatRepo.listMessagesDecrypted(
       userId,
       conversationId,
       limit,
+      fromLatest,
     );
     return msgs.map((m) => ({ role: m.role as ChatRole, content: m.content }));
   }

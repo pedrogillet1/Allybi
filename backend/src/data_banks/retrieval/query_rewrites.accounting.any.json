@@ -17,6 +17,115 @@
   "domain": "accounting",
   "rules": [
     {
+      "id": "accounting_rewrite_core_trial_balance",
+      "priority": 92,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract",
+        "summarize",
+        "locate",
+        "compare",
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\btrial balance\\b",
+        "\\bbalancete\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "tb report",
+          "weight": 0.97
+        },
+        {
+          "value": "balancete de verificacao",
+          "weight": 0.95
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [
+        "ledger",
+        "journal",
+        "account",
+        "debit",
+        "credit",
+        "closing"
+      ],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
+      "id": "accounting_rewrite_core_general_ledger",
+      "priority": 91,
+      "enabled": true,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract",
+        "summarize",
+        "locate",
+        "compare",
+        "calculate"
+      ],
+      "domains": [
+        "accounting"
+      ],
+      "languages": [
+        "en",
+        "pt",
+        "any"
+      ],
+      "patterns": [
+        "\\bgeneral ledger\\b",
+        "\\bg/l\\b",
+        "\\brazao geral\\b"
+      ],
+      "rewrites": [
+        {
+          "value": "gl export",
+          "weight": 1
+        },
+        {
+          "value": "ledger detail",
+          "weight": 0.95
+        }
+      ],
+      "conditions": {
+        "requireDomainMatch": true,
+        "domains": [
+          "accounting"
+        ]
+      },
+      "negativePatterns": [],
+      "requireContextAny": [
+        "account",
+        "posting",
+        "journal",
+        "debit",
+        "credit",
+        "entry"
+      ],
+      "requireContextAll": [],
+      "forbidContextAny": []
+    },
+    {
       "id": "accounting_rewrite_ap_guarded",
       "priority": 96,
       "enabled": true,
@@ -315,7 +424,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "operating",
+        "income",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -391,7 +510,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "year",
+        "over",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -429,7 +558,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "quarter",
+        "over",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -593,7 +732,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "operating",
+        "expenses",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -669,7 +818,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "debt",
+        "service",
+        "coverage",
+        "ratio",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -707,7 +867,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "annual",
+        "recurring",
+        "revenue",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -935,7 +1106,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "average",
+        "daily",
+        "rate",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1209,7 +1391,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "earnings",
+        "before",
+        "interest",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1285,7 +1478,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "gross",
+        "margin",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1323,7 +1526,17 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "present",
+        "value",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },
@@ -1361,7 +1574,18 @@
         ]
       },
       "negativePatterns": [],
-      "requireContextAny": [],
+      "requireContextAny": [
+        "internal",
+        "rate",
+        "return",
+        "ledger",
+        "invoice",
+        "aging",
+        "statement",
+        "journal",
+        "balance",
+        "fiscal"
+      ],
       "requireContextAll": [],
       "forbidContextAny": []
     },

@@ -658,7 +658,9 @@ function resolveDataBanksRoot(): string {
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate;
   }
-  throw new Error(`Cannot locate data_banks root. Tried: ${candidates.join(", ")}`);
+  throw new Error(
+    `Cannot locate data_banks root. Tried: ${candidates.join(", ")}`,
+  );
 }
 
 function readJson(filePath: string): any {
@@ -716,7 +718,9 @@ describe("governance family proof coverage", () => {
         ...(Array.isArray(mapBank?.requiredCoreBankIds)
           ? mapBank.requiredCoreBankIds
           : []),
-        ...(Array.isArray(mapBank?.optionalBankIds) ? mapBank.optionalBankIds : []),
+        ...(Array.isArray(mapBank?.optionalBankIds)
+          ? mapBank.optionalBankIds
+          : []),
       ]),
     ].map((id) => String(id || ""));
 
@@ -744,7 +748,8 @@ describe("governance family proof coverage", () => {
     const uncovered = runtimeIds.filter((id) => {
       return !compiled.some((family) => {
         if (family.sample.has(id)) return true;
-        if (family.prefixes.some((prefix) => id.startsWith(prefix))) return true;
+        if (family.prefixes.some((prefix) => id.startsWith(prefix)))
+          return true;
         if (family.patterns.some((regex) => regex.test(id))) return true;
         return false;
       });

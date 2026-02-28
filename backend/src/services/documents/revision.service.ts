@@ -196,6 +196,8 @@ export class RevisionService {
         fileHash,
         parentVersionId: rootDocumentId,
         status: "uploaded",
+        indexingState: "pending",
+        indexingUpdatedAt: new Date(),
         error: null,
       },
       select: {
