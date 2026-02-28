@@ -40,6 +40,8 @@ export interface TestResult {
   actualOps: string[];
   expectedIntentIds: string[];
   actualIntentIds: string[];
+  domain?: "excel" | "docx";
+  language?: "en" | "pt";
   error?: string;
 }
 
@@ -58,7 +60,10 @@ export interface CoverageReport {
 // Test case loader
 // ---------------------------------------------------------------------------
 
-function loadTestCases(testDir: string): GoldenTestCase[] {
+function loadTestCases(
+  testDir: string,
+  evalDir?: string,
+): GoldenTestCase[] {
   const files = [
     "excel.en.json",
     "excel.pt.json",
@@ -68,6 +73,7 @@ function loadTestCases(testDir: string): GoldenTestCase[] {
 
   const allCases: GoldenTestCase[] = [];
 
+  // --- Legacy JSON loading (backwards compatible) ---
   for (const file of files) {
     const filePath = path.join(testDir, file);
     if (!fs.existsSync(filePath)) continue;
@@ -81,6 +87,38 @@ function loadTestCases(testDir: string): GoldenTestCase[] {
       allCases.push(...cases);
     } catch {
       // Skip invalid files
+    }
+  }
+
+  // --- JSONL eval loading ---
+  const resolvedEvalDir =
+    evalDir ?? path.resolve(__dirname, "../../../data_banks/eval");
+
+  if (fs.existsSync(resolvedEvalDir)) {
+    try {
+      const entries = fs.readdirSync(resolvedEvalDir);
+      for (const entry of entries) {
+        if (!entry.endsWith(".jsonl")) continue;
+        const filePath = path.join(resolvedEvalDir, entry);
+        try {
+          const lines = fs
+            .readFileSync(filePath, "utf8")
+            .split("\n")
+            .filter((l) => l.trim().length > 0);
+          for (const line of lines) {
+            try {
+              const tc = JSON.parse(line) as GoldenTestCase;
+              allCases.push(tc);
+            } catch {
+              // Skip malformed JSONL lines
+            }
+          }
+        } catch {
+          // Skip unreadable files
+        }
+      }
+    } catch {
+      // Skip if directory cannot be read
     }
   }
 
@@ -114,6 +152,8 @@ function runSingleTest(tc: GoldenTestCase): TestResult {
         actualOps: [],
         expectedIntentIds: tc.expected.intentIds,
         actualIntentIds: [],
+        domain,
+        language: lang,
         error: "No result returned (null)",
       };
     }
@@ -130,6 +170,8 @@ function runSingleTest(tc: GoldenTestCase): TestResult {
             : (result as ClarificationNeeded).partialOps.map((o) => o.op),
         expectedIntentIds: tc.expected.intentIds,
         actualIntentIds: result.sourcePatternIds,
+        domain,
+        language: lang,
         error: isClarification
           ? undefined
           : "Expected clarification but got a plan",
@@ -144,6 +186,8 @@ function runSingleTest(tc: GoldenTestCase): TestResult {
         actualOps: (result as ClarificationNeeded).partialOps.map((o) => o.op),
         expectedIntentIds: tc.expected.intentIds,
         actualIntentIds: result.sourcePatternIds,
+        domain,
+        language: lang,
         error: `Expected plan but got clarification: ${(result as ClarificationNeeded).missingSlots.map((s) => s.slot).join(", ")}`,
       };
     }
@@ -171,6 +215,8 @@ function runSingleTest(tc: GoldenTestCase): TestResult {
       actualOps,
       expectedIntentIds: tc.expected.intentIds,
       actualIntentIds: plan.sourcePatternIds,
+      domain,
+      language: lang,
       error: !opsMatch
         ? `Op mismatch: expected [${expectedOps}] got [${actualOps}]`
         : !intentMatch
@@ -185,6 +231,8 @@ function runSingleTest(tc: GoldenTestCase): TestResult {
       actualOps: [],
       expectedIntentIds: tc.expected.intentIds,
       actualIntentIds: [],
+      domain,
+      language: lang,
       error: `Exception: ${err instanceof Error ? err.message : String(err)}`,
     };
   }
@@ -247,8 +295,8 @@ function findCollisions(domain: "excel" | "docx", lang: "en" | "pt"): string[] {
 // Public API
 // ---------------------------------------------------------------------------
 
-export function runCoverage(testDir: string): CoverageReport {
-  const testCases = loadTestCases(testDir);
+export function runCoverage(testDir: string, evalDir?: string): CoverageReport {
+  const testCases = loadTestCases(testDir, evalDir);
   const results: TestResult[] = [];
 
   for (const tc of testCases) {
@@ -318,6 +366,42 @@ export function generateMarkdownReport(report: CoverageReport): string {
     }
     if (report.collisions.length > 20) {
       lines.push(`- ... and ${report.collisions.length - 20} more`);
+    }
+    lines.push("");
+  }
+
+  // --- Coverage by Domain/Language ---
+  const groupMap = new Map<string, { total: number; passed: number }>();
+  for (const r of report.results) {
+    const domain = r.domain || "unknown";
+    const lang = r.language || "unknown";
+    const key = `${domain}|${lang}`;
+    if (!groupMap.has(key)) groupMap.set(key, { total: 0, passed: 0 });
+    const g = groupMap.get(key)!;
+    g.total++;
+    if (r.passed) g.passed++;
+  }
+
+  if (groupMap.size > 0) {
+    lines.push("## Coverage by Domain/Language");
+    lines.push("");
+    lines.push(
+      "| Domain | Language | Total | Passed | Failed | Rate |",
+    );
+    lines.push(
+      "|--------|----------|-------|--------|--------|------|",
+    );
+
+    const sortedKeys = [...groupMap.keys()].sort();
+    for (const key of sortedKeys) {
+      const [domain, lang] = key.split("|");
+      const g = groupMap.get(key)!;
+      const failed = g.total - g.passed;
+      const rate =
+        g.total > 0 ? ((g.passed / g.total) * 100).toFixed(1) + "%" : "N/A";
+      lines.push(
+        `| ${domain} | ${lang} | ${g.total} | ${g.passed} | ${failed} | ${rate} |`,
+      );
     }
     lines.push("");
   }
