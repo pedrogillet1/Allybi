@@ -1,0 +1,478 @@
+{
+  "_meta": {
+    "id": "chart_templates",
+    "bankId": "chart_templates",
+    "version": "1.0.0",
+    "description": "Declarative chart templates for rendering-ready Excel chart payloads.",
+    "owner": "excel-calc-agent",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "chart_intent_taxonomy",
+      "locale_numeric_date_rules",
+      "column_semantics_ontology"
+    ],
+    "usedBy": [
+      "chart_recipe_catalog",
+      "excel_calc_chart_renderer"
+    ],
+    "tests": [
+      "chart_template_schema",
+      "chart_template_intent_link_integrity"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "strictTemplateValidation": true
+  },
+  "templates": [
+    {
+      "templateId": "tmpl.histogram_distribution",
+      "intentId": "histogram_distribution",
+      "chartType": "histogram",
+      "localeAware": true,
+      "title": {
+        "en": "histogram distribution chart",
+        "pt": "grafico histogram distribution"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "input_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "input_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_default",
+        "showLegend": false,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.scatter_relationship",
+      "intentId": "scatter_relationship",
+      "chartType": "scatter",
+      "localeAware": true,
+      "title": {
+        "en": "scatter relationship chart",
+        "pt": "grafico scatter relationship"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "x_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "y_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_alt",
+        "showLegend": true,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.line_timeseries",
+      "intentId": "line_timeseries",
+      "chartType": "line",
+      "localeAware": true,
+      "title": {
+        "en": "line timeseries chart",
+        "pt": "grafico line timeseries"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "date_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "value_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_default",
+        "showLegend": true,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.bar_comparison",
+      "intentId": "bar_comparison",
+      "chartType": "bar",
+      "localeAware": true,
+      "title": {
+        "en": "bar comparison chart",
+        "pt": "grafico bar comparison"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "category_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "value_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_alt",
+        "showLegend": true,
+        "showDataLabels": true,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.tornado_sensitivity",
+      "intentId": "tornado_sensitivity",
+      "chartType": "bar_horizontal",
+      "localeAware": true,
+      "title": {
+        "en": "tornado sensitivity chart",
+        "pt": "grafico tornado sensitivity"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "parameter_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "impact_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "abs_desc"
+      },
+      "visualDefaults": {
+        "palette": "koda_default",
+        "showLegend": true,
+        "showDataLabels": true,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.boxplot_spread",
+      "intentId": "boxplot_spread",
+      "chartType": "boxplot",
+      "localeAware": true,
+      "title": {
+        "en": "boxplot spread chart",
+        "pt": "grafico boxplot spread"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "input_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "input_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_alt",
+        "showLegend": true,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.residual_diagnostics",
+      "intentId": "residual_diagnostics",
+      "chartType": "scatter",
+      "localeAware": true,
+      "title": {
+        "en": "residual diagnostics chart",
+        "pt": "grafico residual diagnostics"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "predicted_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "residual_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_default",
+        "showLegend": true,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.waterfall_bridge",
+      "intentId": "waterfall_bridge",
+      "chartType": "waterfall",
+      "localeAware": true,
+      "title": {
+        "en": "waterfall bridge chart",
+        "pt": "grafico waterfall bridge"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "step_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "delta_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_alt",
+        "showLegend": true,
+        "showDataLabels": true,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.stacked_composition",
+      "intentId": "stacked_composition",
+      "chartType": "stacked_bar",
+      "localeAware": true,
+      "title": {
+        "en": "stacked composition chart",
+        "pt": "grafico stacked composition"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "category_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "series_ranges",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 8,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_default",
+        "showLegend": true,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.heatmap_matrix",
+      "intentId": "heatmap_matrix",
+      "chartType": "heatmap",
+      "localeAware": true,
+      "title": {
+        "en": "heatmap matrix chart",
+        "pt": "grafico heatmap matrix"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "matrix_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "matrix_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_alt",
+        "showLegend": true,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.run_chart_control",
+      "intentId": "run_chart_control",
+      "chartType": "line",
+      "localeAware": true,
+      "title": {
+        "en": "run chart control chart",
+        "pt": "grafico run chart control"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "sequence_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "value_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_default",
+        "showLegend": false,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    },
+    {
+      "templateId": "tmpl.dual_axis_combo",
+      "intentId": "dual_axis_combo",
+      "chartType": "combo",
+      "localeAware": true,
+      "title": {
+        "en": "dual axis combo chart",
+        "pt": "grafico dual axis combo"
+      },
+      "axis": {
+        "x": {
+          "label": "x_axis",
+          "sourceSlot": "x_range",
+          "formatHint": "auto"
+        },
+        "y": {
+          "label": "y_axis",
+          "sourceSlot": "primary_value_range",
+          "formatHint": "numeric"
+        }
+      },
+      "seriesPolicy": {
+        "maxSeries": 4,
+        "missingData": "skip_and_flag",
+        "sortDefault": "none"
+      },
+      "visualDefaults": {
+        "palette": "koda_alt",
+        "showLegend": true,
+        "showDataLabels": false,
+        "grid": "y_major"
+      },
+      "validationHooks": [
+        "numeric_integrity_rules",
+        "result_verification_policy"
+      ]
+    }
+  ]
+}

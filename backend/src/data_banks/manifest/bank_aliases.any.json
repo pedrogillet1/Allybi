@@ -304,8 +304,44 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "calc_intent_patterns_en",
+      "canonicalId": "calc_intent_patterns_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "calc_intent_patterns_pt",
+      "canonicalId": "calc_intent_patterns_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "calc_task_taxonomy",
+      "canonicalId": "calc_task_taxonomy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "capabilities_catalog",
       "canonicalId": "capabilities_catalog",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "chart_intent_taxonomy",
+      "canonicalId": "chart_intent_taxonomy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "chart_recipe_catalog",
+      "canonicalId": "chart_recipe_catalog",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "chart_templates",
+      "canonicalId": "chart_templates",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -334,6 +370,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "clarification_policy_excel_calc",
+      "canonicalId": "clarification_policy_excel_calc",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "clarify_phrases",
       "canonicalId": "clarification_phrases",
       "reason": "Legacy name used before 'clarification_phrases' became standard.",
@@ -349,6 +391,12 @@
     {
       "alias": "colors_pt",
       "canonicalId": "colors_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "column_semantics_ontology",
+      "canonicalId": "column_semantics_ontology",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -3553,6 +3601,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "distribution_ontology",
+      "canonicalId": "distribution_ontology",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "diversification_rules",
       "canonicalId": "diversification_rules",
       "source": "runtime_self_alias",
@@ -4005,6 +4059,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "excel_calc_eval_suite_registry",
+      "canonicalId": "excel_calc_eval_suite_registry",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "excel_chart_types_en",
       "canonicalId": "excel_chart_types_en",
       "source": "runtime_self_alias",
@@ -4031,6 +4091,12 @@
     {
       "alias": "excel_formula_catalog",
       "canonicalId": "excel_formula_catalog",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "excel_function_catalog",
+      "canonicalId": "excel_function_catalog",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5503,6 +5569,12 @@
       "expiresInDays": null
     },
     {
+      "alias": "locale_numeric_date_rules",
+      "canonicalId": "locale_numeric_date_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "marketing_probe_schema",
       "canonicalId": "marketing_probe_schema",
       "source": "runtime_self_alias",
@@ -6517,6 +6589,12 @@
       "notes": "Required runtime self-alias for integrity checks."
     },
     {
+      "alias": "numeric_integrity_rules",
+      "canonicalId": "numeric_integrity_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "numeric.integrity",
       "canonicalId": "numeric_integrity",
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
@@ -6532,6 +6610,12 @@
     {
       "alias": "operator_catalog",
       "canonicalId": "operator_catalog",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_collision_matrix",
+      "canonicalId": "operator_collision_matrix",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -7272,6 +7356,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "python_recipe_catalog",
+      "canonicalId": "python_recipe_catalog",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "python_sandbox_policy",
       "canonicalId": "python_sandbox_policy",
       "source": "runtime_self_alias",
@@ -7366,6 +7456,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "range_resolution_rules",
+      "canonicalId": "range_resolution_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "reasoning_policy_schema",
       "canonicalId": "reasoning_policy_schema",
       "source": "runtime_self_alias",
@@ -7392,6 +7488,12 @@
     {
       "alias": "render_policy",
       "canonicalId": "render_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "result_verification_policy",
+      "canonicalId": "result_verification_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -7527,6 +7629,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "slot_schemas_excel_calc",
+      "canonicalId": "slot_schemas_excel_calc",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "source_engine",
       "canonicalId": "source_engine",
       "source": "runtime_self_alias",
@@ -7548,6 +7656,12 @@
     {
       "alias": "spreadsheet_semantics",
       "canonicalId": "spreadsheet_semantics",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "stats_method_ontology",
+      "canonicalId": "stats_method_ontology",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },

@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "id": "excel_calc_eval_suite_registry",
+    "version": "1.0.0",
+    "description": "Evaluation suite registry for excel calc agent precision, locale, and chart capability.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "excel-calc-agent"
+  },
+  "config": {
+    "enabled": true,
+    "minCasesPerSuite": 30
+  },
+  "schema": {
+    "required": [
+      "id",
+      "lang",
+      "query",
+      "expected"
+    ],
+    "optional": [
+      "calcFamily",
+      "chartIntent",
+      "slots",
+      "negative",
+      "reasonCode"
+    ]
+  },
+  "suites": [
+    {
+      "id": "calc_precision",
+      "path": "agents/excel_calc/eval/calc_precision.qa.jsonl",
+      "minimumCases": 60,
+      "domains": [
+        "excel_calc"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "locale_coverage",
+      "path": "agents/excel_calc/eval/locale_coverage.qa.jsonl",
+      "minimumCases": 40,
+      "domains": [
+        "excel_calc"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "chart_tests",
+      "path": "agents/excel_calc/eval/chart_tests.qa.jsonl",
+      "minimumCases": 45,
+      "domains": [
+        "excel_calc"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    }
+  ]
+}

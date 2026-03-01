@@ -44,7 +44,9 @@
     "semantics": [
       "manifest",
       "normalizers",
-      "operators"
+      "operators",
+      "quality",
+      "routing"
     ],
     "scope": [],
     "retrieval": [
@@ -117,7 +119,11 @@
       "routing",
       "semantics"
     ],
-    "templates": [],
+    "templates": [
+      "quality",
+      "routing",
+      "semantics"
+    ],
     "tests": []
   },
   "banks": [
@@ -317,11 +323,62 @@
       "optional": true
     },
     {
+      "id": "calc_intent_patterns_en",
+      "dependsOn": [
+        "calc_task_taxonomy",
+        "slot_schemas_excel_calc"
+      ],
+      "optional": true
+    },
+    {
+      "id": "calc_intent_patterns_pt",
+      "dependsOn": [
+        "calc_task_taxonomy",
+        "slot_schemas_excel_calc"
+      ],
+      "optional": true
+    },
+    {
+      "id": "calc_task_taxonomy",
+      "dependsOn": [
+        "slot_schemas_excel_calc"
+      ],
+      "optional": true
+    },
+    {
       "id": "capabilities_catalog",
       "dependsOn": [
         "operator_contracts",
         "operator_output_shapes"
       ]
+    },
+    {
+      "id": "chart_intent_taxonomy",
+      "dependsOn": [
+        "calc_task_taxonomy",
+        "slot_schemas_excel_calc"
+      ],
+      "optional": true
+    },
+    {
+      "id": "chart_recipe_catalog",
+      "dependsOn": [
+        "chart_intent_taxonomy",
+        "chart_templates",
+        "numeric_integrity_rules",
+        "python_recipe_catalog",
+        "result_verification_policy"
+      ],
+      "optional": true
+    },
+    {
+      "id": "chart_templates",
+      "dependsOn": [
+        "chart_intent_taxonomy",
+        "column_semantics_ontology",
+        "locale_numeric_date_rules"
+      ],
+      "optional": true
     },
     {
       "id": "chart_types_en",
@@ -344,12 +401,25 @@
       "optional": true
     },
     {
+      "id": "clarification_policy_excel_calc",
+      "dependsOn": [
+        "calc_task_taxonomy",
+        "slot_schemas_excel_calc"
+      ],
+      "optional": true
+    },
+    {
       "id": "colors_en",
       "dependsOn": [],
       "optional": true
     },
     {
       "id": "colors_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "column_semantics_ontology",
       "dependsOn": [],
       "optional": true
     },
@@ -3289,6 +3359,11 @@
       "optional": true
     },
     {
+      "id": "distribution_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "diversification_rules",
       "dependsOn": [
         "retrieval_negatives"
@@ -3575,6 +3650,11 @@
       ]
     },
     {
+      "id": "excel_calc_eval_suite_registry",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "excel_chart_types_en",
       "dependsOn": [],
       "optional": true
@@ -3596,6 +3676,11 @@
     },
     {
       "id": "excel_formula_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_function_catalog",
       "dependsOn": [],
       "optional": true
     },
@@ -4722,6 +4807,11 @@
       "optional": true
     },
     {
+      "id": "locale_numeric_date_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "marketing_probe_schema",
       "dependsOn": [
         "bank_registry"
@@ -5535,6 +5625,11 @@
       ]
     },
     {
+      "id": "numeric_integrity_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "ontology_schema",
       "dependsOn": [
         "bank_schema"
@@ -5544,6 +5639,13 @@
       "id": "operator_catalog",
       "dependsOn": [],
       "optional": true
+    },
+    {
+      "id": "operator_collision_matrix",
+      "dependsOn": [
+        "file_action_operators",
+        "operator_contracts"
+      ]
     },
     {
       "id": "operator_contracts",
@@ -6004,6 +6106,19 @@
       "optional": true
     },
     {
+      "id": "python_recipe_catalog",
+      "dependsOn": [
+        "calc_task_taxonomy",
+        "column_semantics_ontology",
+        "locale_numeric_date_rules",
+        "numeric_integrity_rules",
+        "range_resolution_rules",
+        "result_verification_policy",
+        "slot_schemas_excel_calc"
+      ],
+      "optional": true
+    },
+    {
       "id": "python_sandbox_policy",
       "dependsOn": [],
       "optional": true
@@ -6065,6 +6180,11 @@
       "optional": true
     },
     {
+      "id": "range_resolution_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "reasoning_policy_schema",
       "dependsOn": [
         "bank_registry"
@@ -6087,6 +6207,11 @@
     },
     {
       "id": "render_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "result_verification_policy",
       "dependsOn": [],
       "optional": true
     },
@@ -6176,6 +6301,11 @@
       "optional": true
     },
     {
+      "id": "slot_schemas_excel_calc",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "source_engine",
       "dependsOn": [],
       "optional": true
@@ -6188,6 +6318,11 @@
     },
     {
       "id": "spreadsheet_semantics",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "stats_method_ontology",
       "dependsOn": [],
       "optional": true
     },
