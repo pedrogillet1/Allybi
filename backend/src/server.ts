@@ -14,8 +14,7 @@ import app from "./app";
 import { config } from "./config/env";
 import { createSecureServer } from "./config/ssl.config";
 import prisma from "./platform/db/prismaClient";
-import { gcsStorage } from "./platform/storage/gcsStorage.service";
-import { driveStorage } from "./platform/storage/driveStorage.service";
+import * as gcsStorage from "./config/storage";
 import { initializeContainer, getContainer } from "./bootstrap/container";
 import { createAuthService } from "./bootstrap/authBridge";
 import { PrismaDocumentService } from "./services/prismaDocument.service";
@@ -58,6 +57,11 @@ import { DocumentKeyService } from "./services/documents/documentKey.service";
 import { DocumentCryptoService } from "./services/documents/documentCrypto.service";
 import { EncryptedDocumentRepo } from "./services/documents/encryptedDocumentRepo.service";
 import { ChunkCryptoService } from "./services/retrieval/chunkCrypto.service";
+
+const driveStorage = {
+  provider: "drive",
+  isConfigured: false,
+};
 
 // ============================================================================
 // Global Error Handlers
