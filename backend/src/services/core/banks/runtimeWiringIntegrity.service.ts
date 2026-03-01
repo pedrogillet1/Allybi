@@ -38,9 +38,24 @@ export const RUNTIME_REQUIRED_BANKS = [
   "operator_families",
   "operator_contracts",
   "operator_output_shapes",
+  "operator_collision_matrix",
+  "render_policy",
+  "answer_style_policy",
+  "truncation_and_limits",
+  "banned_phrases",
+  "bullet_rules",
+  "table_rules",
+  "bolding_rules",
+  "list_styles",
+  "table_styles",
+  "quote_styles",
+  "citation_styles",
   "prompt_registry",
   "language_triggers",
   "processing_messages",
+  "no_docs_messages",
+  "scoped_not_found_messages",
+  "disambiguation_microcopy",
   "edit_error_catalog",
   "operator_catalog",
   "allybi_capabilities",
@@ -57,7 +72,28 @@ export const RUNTIME_REQUIRED_BANKS = [
   "fallback_not_found_scope",
   "fallback_extraction_recovery",
   "koda_product_help",
+  "doc_grounding_checks",
+  "hallucination_guards",
+  "dedupe_and_repetition",
+  "privacy_minimal_rules",
+  "pii_field_labels",
+  "clarification_policy",
+  "compliance_policy",
+  "logging_policy",
+  "rate_limit_policy",
+  "refusal_policy",
 ] as const;
+
+function collectRenderPolicyHookBankIds(bank: any): string[] {
+  const hooks = bank?.config?.integrationHooks;
+  if (!hooks || typeof hooks !== "object") return [];
+  const ids = new Set<string>();
+  for (const value of Object.values(hooks)) {
+    const id = asTrimmedString(value);
+    if (id) ids.add(id);
+  }
+  return Array.from(ids);
+}
 
 function asTrimmedString(value: unknown): string {
   return String(value || "").trim();
@@ -311,8 +347,27 @@ function collectHardcodedRuntimeHeuristics(): string[] {
   return failures;
 }
 
+function resolveRuntimePathCandidates(paths: string[]): string[] {
+  const cwd = process.cwd();
+  const resolved = new Set<string>();
+  for (const rawPath of paths) {
+    const normalized = asTrimmedString(rawPath).replace(/\\/g, "/");
+    if (!normalized) continue;
+    if (path.isAbsolute(normalized)) {
+      resolved.add(normalized);
+      continue;
+    }
+    resolved.add(path.join(cwd, normalized));
+    resolved.add(path.join(cwd, "backend", normalized));
+    if (normalized.startsWith("backend/")) {
+      resolved.add(path.join(cwd, normalized.slice("backend/".length)));
+    }
+  }
+  return Array.from(resolved);
+}
+
 function collectRawConsoleRuntimeUsage(): string[] {
-  const candidatePaths = [
+  const defaultCandidatePaths = [
     path.join(
       process.cwd(),
       "backend/src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
@@ -330,6 +385,20 @@ function collectRawConsoleRuntimeUsage(): string[] {
       "backend/src/services/creative/creativeOrchestrator.service.ts",
     ),
   ];
+  const loggingPolicy = getOptionalBank<any>("logging_policy");
+  const policyEnabled = loggingPolicy?.config?.enabled !== false;
+  const policyPaths = Array.isArray(
+    loggingPolicy?.config?.runtimePathsNoRawConsole,
+  )
+    ? loggingPolicy.config.runtimePathsNoRawConsole
+        .map((value: unknown) => asTrimmedString(value))
+        .filter(Boolean)
+    : [];
+  const candidatePaths =
+    policyEnabled && policyPaths.length > 0
+      ? resolveRuntimePathCandidates(policyPaths)
+      : defaultCandidatePaths;
+
   const failures: string[] = [];
   for (const filePath of candidatePaths) {
     if (!fs.existsSync(filePath)) continue;
@@ -503,7 +572,10 @@ function collectProductHelpRuntimeUsageMissing(): string[] {
   const checks: Array<{ filePaths: string[]; patterns: RegExp[] }> = [
     {
       filePaths: [
-        path.join(process.cwd(), "backend/src/services/llm/core/llmGateway.service.ts"),
+        path.join(
+          process.cwd(),
+          "backend/src/services/llm/core/llmGateway.service.ts",
+        ),
         path.join(process.cwd(), "src/services/llm/core/llmGateway.service.ts"),
       ],
       patterns: [
@@ -550,9 +622,12 @@ function collectProductHelpRuntimeUsageMissing(): string[] {
 
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
-    const missingBanks = RUNTIME_REQUIRED_BANKS.filter(
-      (id) => !getOptionalBank(id),
+    const renderPolicy = getOptionalBank<any>("render_policy");
+    const hookRequiredBanks = collectRenderPolicyHookBankIds(renderPolicy);
+    const requiredBanks = Array.from(
+      new Set<string>([...RUNTIME_REQUIRED_BANKS, ...hookRequiredBanks]),
     );
+    const missingBanks = requiredBanks.filter((id) => !getOptionalBank(id));
 
     const intentConfig = getOptionalBank<any>("intent_config");
     const operatorFamilies = getOptionalBank<any>("operator_families");
@@ -560,7 +635,9 @@ export class RuntimeWiringIntegrityService {
     const operatorContracts = getOptionalBank<any>("operator_contracts");
     const operatorOutputShapes = getOptionalBank<any>("operator_output_shapes");
     const promptRegistry = getOptionalBank<any>("prompt_registry");
-    const taskAnswerWithSources = getOptionalBank<any>("task_answer_with_sources");
+    const taskAnswerWithSources = getOptionalBank<any>(
+      "task_answer_with_sources",
+    );
 
     const routingOps = new Set<string>([
       ...collectOperatorIdsFromIntentConfig(intentConfig),
@@ -621,8 +698,9 @@ export class RuntimeWiringIntegrityService {
     const memoryPolicyHookEngineMissing =
       collectMemoryPolicyHookEngineMissing();
     const dormantIntentConfigUsage = collectDormantIntentConfigUsage();
-    const composeAnswerModeTemplateGaps =
-      collectComposeAnswerModeTemplateGaps(taskAnswerWithSources);
+    const composeAnswerModeTemplateGaps = collectComposeAnswerModeTemplateGaps(
+      taskAnswerWithSources,
+    );
     const answerModeContractDrift = collectAnswerModeContractDrift();
     const productHelpRuntimeUsageMissing =
       collectProductHelpRuntimeUsageMissing();

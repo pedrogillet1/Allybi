@@ -25,7 +25,11 @@ import type {
 import { ConversationNotFoundError } from "../domain/chat.contracts";
 import type { EncryptedChatRepo } from "../../../services/chat/encryptedChatRepo.service";
 import type { EncryptedChatContextService } from "../../../services/chat/encryptedChatContext.service";
-import { resolveRuntimeFallbackMessage } from "../../../services/chat/chatMicrocopy.service";
+import {
+  resolveRuntimeFallbackMessage,
+  type FallbackMessageContext,
+  type FallbackRouteHints,
+} from "../../../services/chat/chatMicrocopy.service";
 import { ConversationMemoryService } from "../../../services/memory/conversationMemory.service";
 import {
   MemoryPolicyEngine,
@@ -51,10 +55,8 @@ import {
   type DocumentReferenceDoc,
 } from "../../../services/core/scope/documentReferenceResolver.service";
 import {
-  extractUsedDocuments,
   filterSourceButtonsByUsage,
   type SourceButtonsAttachment,
-  type EvidenceChunkForFiltering,
 } from "../../../services/core/retrieval/sourceButtons.service";
 import {
   RuntimePolicyError,
@@ -85,6 +87,11 @@ import {
   TraceWriterService,
   type TurnDebugPacket,
 } from "../../../services/telemetry/traceWriter.service";
+import { coerceRetrievalAnswerMode } from "../domain/answerModes";
+import { RefusalPolicyService } from "../../../services/core/policy/refusalPolicy.service";
+import { ClarificationPolicyService } from "../../../services/core/policy/clarificationPolicy.service";
+import { CompliancePolicyService } from "../../../services/core/policy/compliancePolicy.service";
+import { FallbackDecisionPolicyService } from "../../../services/core/policy/fallbackDecisionPolicy.service";
 
 function mkTraceId(): string {
   return `tr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -114,32 +121,6 @@ function normalizeEnv(): "production" | "staging" | "dev" | "local" {
   if (raw === "staging") return "staging";
   if (raw === "test" || raw === "development" || raw === "dev") return "dev";
   return "local";
-}
-
-function coerceRetrievalAnswerMode(
-  value: unknown,
-): RetrievalRequest["signals"]["answerMode"] {
-  if (typeof value !== "string") return null;
-  const normalized = value.trim();
-  if (!normalized) return null;
-  const allowed = new Set<
-    NonNullable<RetrievalRequest["signals"]["answerMode"]>
-  >([
-    "nav_pills",
-    "doc_grounded_single",
-    "doc_grounded_multi",
-    "doc_grounded_quote",
-    "doc_grounded_table",
-    "general_answer",
-    "help_steps",
-    "rank_disambiguate",
-    "rank_autopick",
-  ]);
-  return allowed.has(
-    normalized as NonNullable<RetrievalRequest["signals"]["answerMode"]>,
-  )
-    ? (normalized as NonNullable<RetrievalRequest["signals"]["answerMode"]>)
-    : null;
 }
 
 export function buildAttachmentDocScopeSignals(
@@ -452,8 +433,12 @@ export function ensureFallbackSourceCoverage(params: {
   if (attachedDocIds.length === 0) return params.sources;
 
   const attachedSet = new Set(attachedDocIds);
-  const activeDocId = String(params.retrievalPack?.scope?.activeDocId || "").trim();
-  const candidateDocIds = Array.isArray(params.retrievalPack?.scope?.candidateDocIds)
+  const activeDocId = String(
+    params.retrievalPack?.scope?.activeDocId || "",
+  ).trim();
+  const candidateDocIds = Array.isArray(
+    params.retrievalPack?.scope?.candidateDocIds,
+  )
     ? params.retrievalPack?.scope?.candidateDocIds
         .map((id) => String(id || "").trim())
         .filter((id) => id.length > 0)
@@ -488,6 +473,8 @@ function filterSourcesByProvenance(
   evidence: EvidenceItem[],
   options: SourceGroundingOptions = {},
 ): ChatSourceEntry[] {
+  void answerText;
+  void evidence;
   if (!provenance || sources.length === 0) {
     return options.enforceScopedSources ? [] : sources;
   }
@@ -496,23 +483,6 @@ function filterSourcesByProvenance(
   if (provenance.sourceDocumentIds.length > 0) {
     const allowed = new Set(provenance.sourceDocumentIds);
     const filtered = sources.filter((s) => allowed.has(s.documentId));
-    if (filtered.length > 0) return filtered;
-    return options.enforceScopedSources ? [] : sources.slice(0, 1);
-  }
-
-  // Fallback: text-matching via extractUsedDocuments
-  const chunks: EvidenceChunkForFiltering[] = evidence.map((e) => ({
-    docId: e.docId,
-    fileName: String(e.filename || e.title || ""),
-    docTitle: String(e.title || e.filename || ""),
-    text: e.snippet || "",
-    pageStart: e.location?.page ?? undefined,
-    sheetName: e.location?.sheet ?? undefined,
-    slideNumber: e.location?.slide ?? undefined,
-  }));
-  const usedDocIds = extractUsedDocuments(answerText, chunks);
-  if (usedDocIds.size > 0) {
-    const filtered = sources.filter((s) => usedDocIds.has(s.documentId));
     if (filtered.length > 0) return filtered;
     return options.enforceScopedSources ? [] : sources.slice(0, 1);
   }
@@ -527,22 +497,13 @@ function filterAttachmentByProvenance(
   evidence: EvidenceItem[],
   options: SourceGroundingOptions = {},
 ): unknown | null {
+  void answerText;
+  void evidence;
   if (!attachment || !provenance) {
     return options.enforceScopedSources ? null : attachment;
   }
 
-  let allowedDocIds: Set<string>;
-  if (provenance.sourceDocumentIds.length > 0) {
-    allowedDocIds = new Set(provenance.sourceDocumentIds);
-  } else {
-    const chunks: EvidenceChunkForFiltering[] = evidence.map((e) => ({
-      docId: e.docId,
-      fileName: String(e.filename || e.title || ""),
-      docTitle: String(e.title || e.filename || ""),
-      text: e.snippet || "",
-    }));
-    allowedDocIds = extractUsedDocuments(answerText, chunks);
-  }
+  const allowedDocIds = new Set(provenance.sourceDocumentIds);
   if (allowedDocIds.size === 0) {
     return options.enforceScopedSources ? null : attachment;
   }
@@ -615,12 +576,87 @@ function buildEmptyAssistantText(params: {
   language?: string;
   reasonCode?: string | null;
   seed: string;
+  context?: FallbackMessageContext;
+  routeHints?: FallbackRouteHints;
 }): string {
   return resolveRuntimeFallbackMessage({
     language: params.language,
     reasonCode: params.reasonCode,
     seed: params.seed,
+    context: params.context,
+    routeHints: params.routeHints,
   });
+}
+
+function buildFallbackMicrocopyParams(input: {
+  reasonCode?: string | null;
+  query?: string;
+  retrievalPack?: EvidencePack | null;
+  attachedDocumentIds?: string[];
+}): {
+  context: FallbackMessageContext;
+  routeHints: FallbackRouteHints;
+} {
+  const reason = String(input.reasonCode || "")
+    .trim()
+    .toLowerCase();
+  const retrievalPack = input.retrievalPack || null;
+  const evidence = Array.isArray(retrievalPack?.evidence)
+    ? retrievalPack.evidence
+    : [];
+  const firstEvidence = evidence[0] || null;
+  const scope = retrievalPack?.scope || {};
+  const candidateDocCount = Array.isArray(scope.candidateDocIds)
+    ? scope.candidateDocIds.length
+    : 0;
+  const fallbackScopeName =
+    candidateDocCount > 0
+      ? candidateDocCount === 1
+        ? "selected document"
+        : "selected documents"
+      : scope.hardScopeActive
+        ? "current scope"
+        : "all documents";
+
+  const suggestedOptions = Array.from(
+    new Set(
+      evidence
+        .map((item) => String(item?.filename || item?.title || "").trim())
+        .filter((value) => value.length > 0),
+    ),
+  ).slice(0, 4);
+
+  const context: FallbackMessageContext = {
+    fileName: firstEvidence?.filename || "",
+    docTitle: firstEvidence?.title || "",
+    scopeName: fallbackScopeName,
+    reasonShort: reason || "unknown",
+    expectedDocTypes: "PDF, DOCX, XLSX, PPTX",
+    uploadLimit: "25 MB",
+    indexName: "knowledge index",
+    queryHint: String(input.query || "").trim().slice(0, 120),
+  };
+
+  const routeHints: FallbackRouteHints = {
+    hasIndexedDocs:
+      reason === "no_docs_indexed"
+        ? false
+        : candidateDocCount > 0 || evidence.length > 0,
+    hardScopeActive: Boolean(scope.hardScopeActive),
+    explicitDocRef: reason === "explicit_doc_not_found",
+    needsDocChoice: reason === "needs_doc_choice" || reason === "doc_ambiguous",
+    disambiguationOptions: suggestedOptions,
+    topConfidence:
+      typeof retrievalPack?.stats?.topScore === "number"
+        ? retrievalPack.stats.topScore
+        : undefined,
+    confidenceGap:
+      typeof retrievalPack?.stats?.scoreGap === "number"
+        ? retrievalPack.stats.scoreGap
+        : undefined,
+  };
+
+  return { context, routeHints };
 }
 
 function normalizeChatLanguage(value: unknown): "en" | "pt" | "es" {
@@ -631,13 +667,24 @@ function normalizeChatLanguage(value: unknown): "en" | "pt" | "es" {
   return "en";
 }
 
+function hashSeed(input: string): number {
+  let h = 0;
+  const text = String(input || "");
+  for (let i = 0; i < text.length; i += 1) {
+    h = (h * 31 + text.charCodeAt(i)) >>> 0;
+  }
+  return h >>> 0;
+}
+
 function countRegexMatches(text: string, pattern: RegExp): number {
   const matches = text.match(pattern);
   return matches ? matches.length : 0;
 }
 
 function isRuntimeFlagEnabled(flagName: string, defaultValue = true): boolean {
-  const raw = String(process.env[flagName] || "").trim().toLowerCase();
+  const raw = String(process.env[flagName] || "")
+    .trim()
+    .toLowerCase();
   if (!raw) return defaultValue;
   if (["1", "true", "on", "yes"].includes(raw)) return true;
   if (["0", "false", "off", "no"].includes(raw)) return false;
@@ -651,7 +698,8 @@ const PT_LANGUAGE_MARKERS =
 const ES_LANGUAGE_MARKERS =
   /\b(con|donde|cual|cuál|cuales|cuáles|gracias|resumen|tabla|evidencia|documento|documentos|si|sí)\b/g;
 const ENGLISH_STRUCTURAL_WORDS = /\b(and|or|to|of|in|on|is|are|was|were)\b/g;
-const PORTUGUESE_STRUCTURAL_WORDS = /\b(e|ou|para|de|do|da|dos|das|que|em|ao|aos)\b/g;
+const PORTUGUESE_STRUCTURAL_WORDS =
+  /\b(e|ou|para|de|do|da|dos|das|que|em|ao|aos)\b/g;
 const SPANISH_STRUCTURAL_WORDS = /\b(y|o|para|de|del|la|las|los|que|en|al)\b/g;
 const EN_DISTINCT_LANGUAGE_MARKERS =
   /\b(the|with|this|that|please|summary|according|based|thanks|answer)\b/g;
@@ -678,7 +726,11 @@ function strongestCompetingLanguageScore(
   return Math.max(scores.en, scores.pt);
 }
 
-function languageDistinctSignals(text: string): { en: number; pt: number; es: number } {
+function languageDistinctSignals(text: string): {
+  en: number;
+  pt: number;
+  es: number;
+} {
   const value = ` ${String(text || "").toLowerCase()} `;
   return {
     en: countRegexMatches(value, EN_DISTINCT_LANGUAGE_MARKERS),
@@ -697,7 +749,10 @@ function hasStrongMixedLanguageSignal(params: {
   const longEnough = wordCount >= 12 || normalized.length >= 72;
   if (!longEnough) return false;
 
-  const primaryScore = languageScoreFor(params.preferredLanguage, params.scores);
+  const primaryScore = languageScoreFor(
+    params.preferredLanguage,
+    params.scores,
+  );
   const competingScore = strongestCompetingLanguageScore(
     params.preferredLanguage,
     params.scores,
@@ -801,30 +856,74 @@ function buildLanguageContractFallback(language: "en" | "pt" | "es"): string {
   return "I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.";
 }
 
-export function enforceLanguageContract(params: {
-  text: string;
-  preferredLanguage?: string | null;
-}): { text: string; adjusted: boolean } {
-  if (!isRuntimeFlagEnabled("LANGUAGE_CONTRACT_V2", true)) {
-    return { text: String(params.text || "").trim(), adjusted: false };
+function stripRepeatedDocLeadIn(
+  text: string,
+  language: "en" | "pt" | "es",
+): string {
+  const raw = String(text || "").trim();
+  if (!raw) return raw;
+  const patterns =
+    language === "pt"
+      ? [
+          /^com base nos documentos (enviados|fornecidos),?\s*(segue a resposta:)?\s*/i,
+          /^aqui est[aá] o que encontrei nos documentos:?\s*/i,
+          /^resumo objetivo do que os documentos mostram:?\s*/i,
+        ]
+      : language === "es"
+        ? [
+            /^con base en los documentos (enviados|proporcionados),?\s*/i,
+            /^aqui est[aá] lo que encontr[eé] en los documentos:?\s*/i,
+          ]
+        : [
+            /^based on the documents (provided|shared),?\s*(here(?:'| i)s (?:the )?answer:)?\s*/i,
+            /^here(?:'| i)s what i found in the documents:?\s*/i,
+          ];
+  let out = raw;
+  for (const re of patterns) {
+    out = out.replace(re, "");
   }
-  const normalized = String(params.text || "").trim();
-  if (!normalized) return { text: normalized, adjusted: false };
-  if (isShortNeutralText(normalized)) {
-    return { text: normalized, adjusted: false };
+  return out.trim() || raw;
+}
+
+function softRepairLanguageContract(
+  text: string,
+  language: "en" | "pt" | "es",
+): string {
+  let out = stripRepeatedDocLeadIn(text, language);
+  if (!out) return String(text || "").trim();
+
+  if (language === "pt") {
+    out = out
+      .replace(/\bhere(?:'| i)s what i found in the documents:?\s*/gi, "")
+      .replace(
+        /\bbased on the documents (provided|shared),?\s*(here(?:'| i)s (?:the )?answer:?)?/gi,
+        "",
+      )
+      .replace(/\bsummary of what the documents show:?\s*/gi, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  } else if (language === "es") {
+    out = out
+      .replace(/\bhere(?:'| i)s what i found in the documents:?\s*/gi, "")
+      .replace(/\bbased on the documents (provided|shared),?\s*/gi, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
   }
-  if (!hasSubstantialAlphabeticContent(normalized)) {
-    return { text: normalized, adjusted: false };
-  }
+  return out || String(text || "").trim();
+}
+
+function hasLanguageMismatch(
+  normalized: string,
+  lang: "en" | "pt" | "es",
+): boolean {
+  if (isShortNeutralText(normalized)) return false;
+  if (!hasSubstantialAlphabeticContent(normalized)) return false;
   const scores = languageScores(normalized);
   const signalStrength = scores.en + scores.pt + scores.es;
-  if (signalStrength < 1.1) {
-    return { text: normalized, adjusted: false };
-  }
-  const lang = normalizeChatLanguage(params.preferredLanguage);
+  if (signalStrength < 1.1) return false;
   const langScore = languageScoreFor(lang, scores);
   const otherTop = strongestCompetingLanguageScore(lang, scores);
-  const mismatch =
+  return (
     otherTop >= langScore + 1.2 ||
     hasStrongMixedLanguageSignal({
       text: normalized,
@@ -834,9 +933,40 @@ export function enforceLanguageContract(params: {
     hasSentenceLanguageSwitch({
       text: normalized,
       preferredLanguage: lang,
-    });
-  if (!mismatch) return { text: normalized, adjusted: false };
-  return { text: buildLanguageContractFallback(lang), adjusted: true };
+    })
+  );
+}
+
+export function enforceLanguageContract(params: {
+  text: string;
+  preferredLanguage?: string | null;
+}): { text: string; adjusted: boolean; failClosed: boolean } {
+  if (!isRuntimeFlagEnabled("LANGUAGE_CONTRACT_V2", true)) {
+    return {
+      text: String(params.text || "").trim(),
+      adjusted: false,
+      failClosed: false,
+    };
+  }
+  const normalized = String(params.text || "").trim();
+  if (!normalized)
+    return { text: normalized, adjusted: false, failClosed: false };
+  const lang = normalizeChatLanguage(params.preferredLanguage);
+  const mismatch = hasLanguageMismatch(normalized, lang);
+  if (!mismatch)
+    return { text: normalized, adjusted: false, failClosed: false };
+
+  // Soft-repair first to avoid dropping grounded content when mismatch is recoverable.
+  const repaired = softRepairLanguageContract(normalized, lang);
+  if (repaired && !hasLanguageMismatch(repaired, lang)) {
+    return { text: repaired, adjusted: true, failClosed: false };
+  }
+
+  return {
+    text: buildLanguageContractFallback(lang),
+    adjusted: true,
+    failClosed: true,
+  };
 }
 
 const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
@@ -847,6 +977,11 @@ const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
   "source_policy_navigation_mode",
   "numeric_integrity_totals_reconciliation",
   "no_raw_json",
+  "doc_grounding_minimums",
+  "hallucination_risk",
+  "repetition_and_banned_phrases",
+  "privacy_minimal",
+  "final_consistency",
 ]);
 
 type QualityGatesBank = {
@@ -855,10 +990,10 @@ type QualityGatesBank = {
   };
 };
 
-function normalizeGateSeverity(
-  value: unknown,
-): "warn" | "block" | null {
-  const normalized = String(value || "").trim().toLowerCase();
+function normalizeGateSeverity(value: unknown): "warn" | "block" | null {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
   if (normalized === "block" || normalized === "error") return "block";
   if (normalized === "warn" || normalized === "warning") return "warn";
   return null;
@@ -987,6 +1122,10 @@ export class CentralizedChatRuntimeDelegate {
   private readonly conversationMemory: ConversationMemoryService;
   private readonly memoryPolicyEngine: MemoryPolicyEngine;
   private readonly memoryRedaction: MemoryRedactionService;
+  private readonly refusalPolicy = new RefusalPolicyService();
+  private readonly clarificationPolicy = new ClarificationPolicyService();
+  private readonly compliancePolicy = new CompliancePolicyService();
+  private readonly fallbackDecisionPolicy = new FallbackDecisionPolicyService();
   private readonly traceWriter = new TraceWriterService(prisma as any);
 
   constructor(
@@ -1555,6 +1694,49 @@ export class CentralizedChatRuntimeDelegate {
         userId: req.userId,
       });
 
+      const governanceBlock = this.resolveGovernancePolicyBlock(req);
+      if (governanceBlock) {
+        const result = await this.buildGovernanceBlockedResult({
+          req,
+          conversationId,
+          userMessage,
+          code: governanceBlock.code,
+          text: governanceBlock.text,
+          status: governanceBlock.status,
+        });
+        await this.persistTraceArtifacts({
+          traceId,
+          req,
+          conversationId: result.conversationId,
+          userMessageId: result.userMessageId,
+          assistantMessageId: result.assistantMessageId,
+          retrievalPack,
+          evidenceGateDecision,
+          answerMode: result.answerMode || answerMode,
+          status: result.status || "blocked",
+          failureCode: result.failureCode || null,
+          fallbackReasonCode: result.fallbackReasonCode,
+          assistantText: result.assistantText,
+          telemetry: null,
+          totalMs: Date.now() - turnStartedAt,
+          retrievalMs,
+          llmMs,
+          stream: false,
+        }).catch((persistError) => {
+          appLogger.warn(
+            "[trace-writer] failed to persist governance-policy trace",
+            {
+              traceId,
+              error:
+                persistError instanceof Error
+                  ? persistError.message
+                  : String(persistError),
+            },
+          );
+        });
+        return { ...result, traceId };
+      }
+
       const history = await this.loadRecentForEngine(
         conversationId,
         this.resolveRecentContextLimit(),
@@ -1670,7 +1852,10 @@ export class CentralizedChatRuntimeDelegate {
           answerClass,
           navType,
           fallbackReasonCode: bypass.failureCode,
-          status: "partial",
+          status:
+            bypass.failureCode === "EVIDENCE_NEEDS_CLARIFICATION"
+              ? "clarification_required"
+              : "partial",
           failureCode: bypass.failureCode,
           completion: {
             answered: false,
@@ -1733,7 +1918,7 @@ export class CentralizedChatRuntimeDelegate {
         conversationId,
         messages,
         evidencePack: toEngineEvidencePack(retrievalPack),
-        context: this.buildRuntimeContext(req, retrievalPack),
+        context: this.buildRuntimeContext(req, retrievalPack, answerMode),
         meta: this.buildRuntimeMeta(
           req,
           retrievalPack,
@@ -1761,12 +1946,20 @@ export class CentralizedChatRuntimeDelegate {
         req,
         retrievalPack,
       );
+      const fallbackMicrocopyParams = buildFallbackMicrocopyParams({
+        reasonCode: fallbackReasonCode,
+        query: req.message,
+        retrievalPack,
+        attachedDocumentIds: req.attachedDocumentIds || [],
+      });
       const assistantTextBase =
         assistantTextRaw ||
         buildEmptyAssistantText({
           language: req.preferredLanguage,
           reasonCode: fallbackReasonCode,
           seed: `${conversationId}:chat:${fallbackReasonCode || "empty_model_response"}`,
+          context: fallbackMicrocopyParams.context,
+          routeHints: fallbackMicrocopyParams.routeHints,
         });
       const assistantTextWithGate = this.applyEvidenceGatePostProcessText(
         assistantTextBase,
@@ -1820,10 +2013,18 @@ export class CentralizedChatRuntimeDelegate {
         filteredSources,
       });
       if (sourceInvariantFailureCode) {
+        const sourceInvariantMicrocopy = buildFallbackMicrocopyParams({
+          reasonCode: sourceInvariantFailureCode,
+          query: req.message,
+          retrievalPack,
+          attachedDocumentIds: req.attachedDocumentIds || [],
+        });
         assistantText = buildEmptyAssistantText({
           language: req.preferredLanguage,
           reasonCode: sourceInvariantFailureCode,
           seed: `${req.userId}:sources:${sourceInvariantFailureCode}`,
+          context: sourceInvariantMicrocopy.context,
+          routeHints: sourceInvariantMicrocopy.routeHints,
         });
       }
 
@@ -2062,6 +2263,59 @@ export class CentralizedChatRuntimeDelegate {
         userId: req.userId,
       });
 
+      const governanceBlock = this.resolveGovernancePolicyBlock(req);
+      if (governanceBlock) {
+        if (sink.isOpen()) {
+          sink.write({
+            event: "worklog",
+            data: {
+              eventType: "POLICY_BLOCK",
+              summary: governanceBlock.code,
+              t: Date.now(),
+            },
+          } as any);
+        }
+        const result = await this.buildGovernanceBlockedResult({
+          req,
+          conversationId,
+          userMessage,
+          code: governanceBlock.code,
+          text: governanceBlock.text,
+          status: governanceBlock.status,
+        });
+        await this.persistTraceArtifacts({
+          traceId,
+          req,
+          conversationId: result.conversationId,
+          userMessageId: result.userMessageId,
+          assistantMessageId: result.assistantMessageId,
+          retrievalPack,
+          evidenceGateDecision,
+          answerMode: result.answerMode || answerMode,
+          status: result.status || "blocked",
+          failureCode: result.failureCode || null,
+          fallbackReasonCode: result.fallbackReasonCode,
+          assistantText: result.assistantText,
+          telemetry: null,
+          totalMs: Date.now() - turnStartedAt,
+          retrievalMs,
+          llmMs,
+          stream: true,
+        }).catch((persistError) => {
+          appLogger.warn(
+            "[trace-writer] failed to persist stream governance-policy trace",
+            {
+              traceId,
+              error:
+                persistError instanceof Error
+                  ? persistError.message
+                  : String(persistError),
+            },
+          );
+        });
+        return { ...result, traceId };
+      }
+
       if (sink.isOpen()) {
         sink.write({
           event: "progress",
@@ -2201,7 +2455,10 @@ export class CentralizedChatRuntimeDelegate {
           answerClass,
           navType,
           fallbackReasonCode: bypass.failureCode,
-          status: "partial",
+          status:
+            bypass.failureCode === "EVIDENCE_NEEDS_CLARIFICATION"
+              ? "clarification_required"
+              : "partial",
           failureCode: bypass.failureCode,
           completion: {
             answered: false,
@@ -2287,7 +2544,7 @@ export class CentralizedChatRuntimeDelegate {
         conversationId,
         messages,
         evidencePack: toEngineEvidencePack(retrievalPack),
-        context: this.buildRuntimeContext(req, retrievalPack),
+        context: this.buildRuntimeContext(req, retrievalPack, answerMode),
         meta: this.buildRuntimeMeta(
           req,
           retrievalPack,
@@ -2316,12 +2573,20 @@ export class CentralizedChatRuntimeDelegate {
         req,
         retrievalPack,
       );
+      const fallbackMicrocopyParams = buildFallbackMicrocopyParams({
+        reasonCode: fallbackReasonCode,
+        query: req.message,
+        retrievalPack,
+        attachedDocumentIds: req.attachedDocumentIds || [],
+      });
       const assistantTextBase =
         assistantTextRaw ||
         buildEmptyAssistantText({
           language: req.preferredLanguage,
           reasonCode: fallbackReasonCode,
           seed: `${conversationId}:stream:${fallbackReasonCode || "empty_model_response"}`,
+          context: fallbackMicrocopyParams.context,
+          routeHints: fallbackMicrocopyParams.routeHints,
         });
       const assistantTextWithGate = this.applyEvidenceGatePostProcessText(
         assistantTextBase,
@@ -2378,10 +2643,18 @@ export class CentralizedChatRuntimeDelegate {
         filteredSources,
       });
       if (sourceInvariantFailureCode) {
+        const sourceInvariantMicrocopy = buildFallbackMicrocopyParams({
+          reasonCode: sourceInvariantFailureCode,
+          query: req.message,
+          retrievalPack,
+          attachedDocumentIds: req.attachedDocumentIds || [],
+        });
         assistantText = buildEmptyAssistantText({
           language: req.preferredLanguage,
           reasonCode: sourceInvariantFailureCode,
           seed: `${req.userId}:sources:${sourceInvariantFailureCode}`,
+          context: sourceInvariantMicrocopy.context,
+          routeHints: sourceInvariantMicrocopy.routeHints,
         });
       }
 
@@ -3130,7 +3403,9 @@ export class CentralizedChatRuntimeDelegate {
       }
     }
 
-    return followups.slice(0, 3);
+    const desiredCount =
+      1 + (hashSeed(`${req.userId}:${req.message}:${answerMode}`) % 3);
+    return followups.slice(0, Math.max(1, Math.min(3, desiredCount)));
   }
 
   /**
@@ -3234,13 +3509,42 @@ export class CentralizedChatRuntimeDelegate {
     const qualityGateSeverityByName = resolveQualityGateSeverityMap();
     try {
       const qualityRunner = new QualityGateRunnerService();
+      const contextSignals = asObject(
+        (params.req.context as Record<string, unknown> | null)?.signals ?? null,
+      );
       const gateCtx: QualityGateContext = {
         answerMode: params.answerMode,
+        answerClass: params.answerClass,
+        operator: String((params.req.meta as any)?.operator || "")
+          .trim()
+          .toLowerCase(),
+        intentFamily: String((params.req.meta as any)?.intentFamily || "")
+          .trim()
+          .toLowerCase(),
         language: normalizeChatLanguage(params.req.preferredLanguage),
         evidenceItems: params.retrievalPack?.evidence.map((e) => ({
           snippet: e.snippet,
           docId: e.docId,
         })),
+        docLockEnabled:
+          Boolean(params.retrievalPack?.scope?.explicitDocLock) ||
+          (params.req.attachedDocumentIds || []).length > 0,
+        discoveryMode:
+          Boolean(contextSignals.discoveryQuery) ||
+          String(params.answerMode || "")
+            .trim()
+            .toLowerCase() === "nav_pills",
+        requiresClarification:
+          Boolean(contextSignals.requiresClarification) ||
+          String(params.answerMode || "")
+            .trim()
+            .toLowerCase() === "rank_disambiguate",
+        explicitDocRef:
+          Boolean(contextSignals.explicitDocRef) ||
+          Boolean(contextSignals.explicitDocLock) ||
+          (params.req.attachedDocumentIds || []).length === 1,
+        sourceButtonsCount: sourceDocumentIdsFromSources.length,
+        userRequestedShort: params.req.truncationRetry === true,
       };
       const gateResult = await qualityRunner.runGates(text, gateCtx);
       if (!gateResult.allPassed) {
@@ -3273,6 +3577,26 @@ export class CentralizedChatRuntimeDelegate {
       appLogger.warn("[finalizeChatTurn] Quality gate runner error", {
         error: error instanceof Error ? error.message : String(error),
       });
+      if (enforceQualityGates && !failureCode) {
+        const reasonCode = "quality_gate_runner_error";
+        failureCode = reasonCode;
+        text = buildEmptyAssistantText({
+          language: params.req.preferredLanguage,
+          reasonCode,
+          seed: `${params.req.userId}:quality_gate:${reasonCode}`,
+        });
+        qualityGates = {
+          allPassed: false,
+          failed: [
+            {
+              gateName: reasonCode,
+              severity: "block",
+              reason: error instanceof Error ? error.message : String(error),
+            },
+          ],
+        };
+        qualityGateIssues = [reasonCode];
+      }
     }
 
     // 3. Run response contract enforcer (format repair, strip leakage, length limits)
@@ -3280,14 +3604,42 @@ export class CentralizedChatRuntimeDelegate {
     try {
       const enforcer = getResponseContractEnforcer();
       const evidenceMap = buildEvidenceMapForEnforcer(params.retrievalPack);
+      const reqSignals = asObject(
+        (params.req.context as Record<string, unknown> | null)?.signals ?? null,
+      );
+      const styleSignals = this.buildFormattingStyleSignals(
+        params.req,
+        params.answerMode,
+      );
+      const operatorFamily =
+        String(
+          (params.req.meta as any)?.operatorFamily ||
+            reqSignals.operatorFamily ||
+            "",
+        )
+          .trim()
+          .toLowerCase() || null;
+      const mergedSignals = {
+        ...reqSignals,
+        ...(styleSignals || {}),
+        ...(operatorFamily ? { operatorFamily } : {}),
+      };
       const enforcerCtx: ResponseContractContext = {
         answerMode: params.answerMode,
         language: normalizeChatLanguage(params.req.preferredLanguage),
+        operator: String((params.req.meta as any)?.operator || "")
+          .trim()
+          .toLowerCase(),
+        intentFamily: String((params.req.meta as any)?.intentFamily || "")
+          .trim()
+          .toLowerCase(),
+        operatorFamily: operatorFamily || undefined,
         evidenceRequired: provenance.required,
         allowedDocumentIds: params.req.attachedDocumentIds || [],
         provenance,
         evidenceMapSchemaVersion: "v1",
         evidenceMap,
+        signals: mergedSignals,
         constraints: {
           maxOutputTokens: requestedMaxOutputTokens ?? undefined,
           hardMaxOutputTokens: requestedMaxOutputTokens
@@ -3392,11 +3744,15 @@ export class CentralizedChatRuntimeDelegate {
       preferredLanguage: params.req.preferredLanguage,
     });
     if (languageContract.adjusted) {
-      appLogger.warn("[finalizeChatTurn] language_contract_fail_closed", {
+      appLogger.warn("[finalizeChatTurn] language_contract_adjusted", {
         requestId: this.resolveTraceId(params.req),
         preferredLanguage: normalizeChatLanguage(params.req.preferredLanguage),
+        failClosed: languageContract.failClosed,
       });
       text = languageContract.text;
+      if (languageContract.failClosed && !failureCode) {
+        failureCode = "language_contract_mismatch";
+      }
     }
 
     // 4. Generate followups for doc-grounded answers
@@ -3524,6 +3880,125 @@ export class CentralizedChatRuntimeDelegate {
     };
   }
 
+  private resolveGovernancePolicyBlock(req: ChatRequest): {
+    code: string;
+    text: string;
+    status: "blocked" | "clarification_required";
+  } | null {
+    const compliance = this.compliancePolicy.decide({
+      meta: asObject(req.meta),
+      context: asObject(req.context),
+    });
+    if (compliance.blocked) {
+      return {
+        code: String(compliance.reasonCode || "compliance_blocked"),
+        text:
+          String(compliance.message || "").trim() ||
+          buildEmptyAssistantText({
+            language: req.preferredLanguage,
+            reasonCode: "compliance_blocked",
+            seed: `${req.userId}:compliance_blocked`,
+          }),
+        status: "blocked",
+      };
+    }
+
+    const refusal = this.refusalPolicy.decide({
+      meta: asObject(req.meta),
+      context: asObject(req.context),
+    });
+    if (refusal.blocked) {
+      return {
+        code: "policy_refusal_required",
+        text: this.refusalPolicy.buildUserFacingText({
+          decision: refusal,
+          preferredLanguage: req.preferredLanguage,
+        }),
+        status: "blocked",
+      };
+    }
+
+    return null;
+  }
+
+  private async buildGovernanceBlockedResult(input: {
+    req: ChatRequest;
+    conversationId: string;
+    userMessage: ChatMessageDTO | null;
+    code: string;
+    text: string;
+    status: "blocked" | "clarification_required";
+  }): Promise<ChatResult> {
+    const req = input.req;
+    const conversationId =
+      input.conversationId ||
+      (await this.ensureConversation(req.userId, req.conversationId)).id;
+    const userMessage =
+      input.userMessage ||
+      (await this.createMessage({
+        conversationId,
+        role: "user",
+        content: req.message,
+        userId: req.userId,
+      }));
+
+    const answerMode: AnswerMode =
+      (req.attachedDocumentIds || []).length > 0
+        ? "help_steps"
+        : "general_answer";
+    const answerClass: AnswerClass =
+      answerMode === "general_answer" || answerMode === "help_steps"
+        ? "GENERAL"
+        : "DOCUMENT";
+
+    const assistantMessage = await this.createMessage({
+      conversationId,
+      role: "assistant",
+      content: input.text,
+      userId: req.userId,
+      metadata: {
+        failureCode: input.code,
+        answerMode,
+        answerClass,
+      },
+    });
+
+    return {
+      conversationId,
+      userMessageId: userMessage.id,
+      assistantMessageId: assistantMessage.id,
+      assistantText: input.text,
+      attachmentsPayload: [],
+      assistantTelemetry: undefined,
+      sources: [],
+      followups: [],
+      answerMode,
+      answerClass,
+      navType: null,
+      fallbackReasonCode: input.code,
+      status: input.status,
+      failureCode: input.code,
+      completion: {
+        answered: false,
+        missingSlots: [input.code],
+        nextAction: null,
+      },
+      truncation: {
+        occurred: false,
+        reason: null,
+        resumeToken: null,
+        providerOccurred: false,
+        providerReason: null,
+        detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
+      },
+      evidence: {
+        required: (req.attachedDocumentIds || []).length > 0,
+        provided: false,
+        sourceIds: [],
+      },
+    };
+  }
+
   private async loadRecentForEngine(
     conversationId: string,
     limit: number,
@@ -3557,9 +4032,9 @@ export class CentralizedChatRuntimeDelegate {
       });
       const orderedRows = useRecentHistoryWindow ? [...rows].reverse() : rows;
       recent = orderedRows.map((row) => ({
-          role: row.role as ChatRole,
-          content: String(row.content ?? ""),
-        }));
+        role: row.role as ChatRole,
+        content: String(row.content ?? ""),
+      }));
     }
 
     const memoryBlocks = await this.buildMemorySystemBlocks({
@@ -4047,6 +4522,28 @@ export class CentralizedChatRuntimeDelegate {
           delete (nextMemory as any).numericSnapshots;
           delete (nextMemory as any).rawNumbers;
         }
+        if (policyConfig.privacy.debugTracesNotPersisted) {
+          delete (nextMemory as any).debugTraces;
+        }
+        const structuralHints = new Set(
+          (policyConfig.privacy.persistOnlyStructuralHints || []).map((item) =>
+            String(item || "").trim(),
+          ),
+        );
+        if (structuralHints.size > 0) {
+          const sensitiveKeys = [
+            "rawUserTextHistory",
+            "fullRetrievedChunks",
+            "debugTraces",
+            "numericSnapshots",
+            "rawNumbers",
+          ];
+          for (const key of sensitiveKeys) {
+            if (!structuralHints.has(key)) {
+              delete (nextMemory as any)[key];
+            }
+          }
+        }
 
         const updated = await prisma.conversation.updateMany({
           where: {
@@ -4446,12 +4943,17 @@ export class CentralizedChatRuntimeDelegate {
           : lang === "es"
             ? "¿Qué parte exacta quieres validar en el documento?"
             : "Which exact part do you want me to validate in the document?");
+      const normalizedQuestion =
+        this.clarificationPolicy.enforceClarificationQuestion({
+          question,
+          preferredLanguage: lang,
+        });
       const prompt =
         lang === "pt"
-          ? `Preciso de uma confirmação para responder com precisão: ${question}`
+          ? `Preciso de uma confirmação para responder com precisão: ${normalizedQuestion}`
           : lang === "es"
-            ? `Necesito una confirmación para responder con precisión: ${question}`
-            : `I need one clarification to answer precisely: ${question}`;
+            ? `Necesito una confirmación para responder con precisión: ${normalizedQuestion}`
+            : `I need one clarification to answer precisely: ${normalizedQuestion}`;
       return {
         text: prompt,
         failureCode: "EVIDENCE_NEEDS_CLARIFICATION",
@@ -4507,14 +5009,282 @@ export class CentralizedChatRuntimeDelegate {
     return trimmed || null;
   }
 
+  private resolvePlaybookDomain(
+    value: unknown,
+  ): "finance" | "legal" | "medical" | "ops" | null {
+    const domain = String(value || "")
+      .trim()
+      .toLowerCase();
+    if (!domain) return null;
+    if (
+      domain === "finance" ||
+      domain === "legal" ||
+      domain === "medical" ||
+      domain === "ops"
+    ) {
+      return domain;
+    }
+    if (
+      domain === "accounting" ||
+      domain === "banking" ||
+      domain === "billing" ||
+      domain === "tax"
+    ) {
+      return "finance";
+    }
+    if (
+      domain === "hr_payroll" ||
+      domain === "travel" ||
+      domain === "education"
+    ) {
+      return "ops";
+    }
+    return null;
+  }
+
+  private resolvePlaybookOperator(value: unknown): string | null {
+    const operator = String(value || "")
+      .trim()
+      .toLowerCase();
+    if (!operator) return null;
+
+    const map: Record<string, string> = {
+      navigate: "navigate",
+      open: "open",
+      where: "locate",
+      locate_docs: "navigate",
+      locate_file: "locate",
+      locate_content: "locate",
+      summarize: "summarize",
+      extract: "extract",
+      compare: "compare",
+      compute: "calculate",
+      validate: "validate",
+      advise: "advise",
+      monitor: "monitor",
+      evaluate: "evaluate",
+      calculate: "calculate",
+    };
+    return map[operator] || null;
+  }
+
+  private buildOperatorPlaybookContext(
+    req: ChatRequest,
+  ): Record<string, unknown> | null {
+    const domain = this.resolvePlaybookDomain(
+      (req.meta as any)?.domain || (req.meta as any)?.domainId,
+    );
+    const operator = this.resolvePlaybookOperator((req.meta as any)?.operator);
+    if (!domain || !operator) return null;
+
+    const bankId = `operator_playbook_${operator}_${domain}`;
+    const bank = getOptionalBank<any>(bankId);
+    if (!bank || bank?.config?.enabled === false) return null;
+
+    const lookFor = Array.isArray(bank.lookFor)
+      ? bank.lookFor.slice(0, 16)
+      : [];
+    const requiredBlocks = Array.isArray(bank?.outputStructure?.requiredBlocks)
+      ? bank.outputStructure.requiredBlocks.slice(0, 8)
+      : [];
+    const askQuestionWhen = Array.isArray(bank.askQuestionWhen)
+      ? bank.askQuestionWhen
+          .slice(0, 3)
+          .map((item: any) => String(item?.questionTemplate || "").trim())
+          .filter(Boolean)
+      : [];
+    const validationChecks = Array.isArray(bank.validationChecks)
+      ? bank.validationChecks
+          .slice(0, 8)
+          .map((item: any) => String(item?.check || "").trim())
+          .filter(Boolean)
+      : [];
+
+    return {
+      bankId: String(bank?._meta?.id || bankId),
+      operator,
+      domain,
+      deterministic: bank?.config?.deterministic !== false,
+      outputPolicy: bank?.config?.outputPolicy || null,
+      lookFor,
+      requiredBlocks,
+      askQuestionWhen,
+      validationChecks,
+    };
+  }
+
+  private resolveRuntimeOperatorFamily(req: ChatRequest): string | null {
+    const metaOperatorFamily = String((req.meta as any)?.operatorFamily || "")
+      .trim()
+      .toLowerCase();
+    if (metaOperatorFamily) return metaOperatorFamily;
+    const contextSignals = asObject((req.context as any)?.signals || null);
+    const signalFamily = String(contextSignals.operatorFamily || "")
+      .trim()
+      .toLowerCase();
+    if (signalFamily) return signalFamily;
+    const operator = String((req.meta as any)?.operator || "")
+      .trim()
+      .toLowerCase();
+    if (operator === "open" || operator === "navigate" || operator === "where")
+      return "file_actions";
+    if (
+      operator === "thank_you" ||
+      operator === "greeting" ||
+      operator === "smalltalk"
+    ) {
+      return "conversation";
+    }
+    return null;
+  }
+
+  private resolveAnswerStyleProfileHint(
+    req: ChatRequest,
+    answerModeHint: AnswerMode | string | null | undefined,
+    answerStyleBank: any,
+  ): string | null {
+    const profiles =
+      answerStyleBank?.profiles && typeof answerStyleBank.profiles === "object"
+        ? answerStyleBank.profiles
+        : {};
+    const profileKeys = Object.keys(profiles).map((k) => k.toLowerCase());
+    const contextSignals = asObject((req.context as any)?.signals || null);
+    const explicitProfile = String(
+      contextSignals.styleProfile || contextSignals.profile || "",
+    )
+      .trim()
+      .toLowerCase();
+    if (explicitProfile && profileKeys.includes(explicitProfile)) {
+      return explicitProfile;
+    }
+
+    const answerMode = String(answerModeHint || "")
+      .trim()
+      .toLowerCase();
+    if (answerMode === "nav_pills" || answerMode === "rank_disambiguate") {
+      return profileKeys.includes("micro")
+        ? "micro"
+        : profileKeys[0] || "micro";
+    }
+    if (req.truncationRetry === true || contextSignals.userRequestedShort) {
+      if (profileKeys.includes("brief")) return "brief";
+      if (profileKeys.includes("micro")) return "micro";
+    }
+    if (
+      contextSignals.userRequestedDetailed ||
+      contextSignals.goDeep ||
+      contextSignals.fullBreakdown
+    ) {
+      if (profileKeys.includes("deep")) return "deep";
+      if (profileKeys.includes("detailed")) return "detailed";
+    }
+    if (profileKeys.includes("standard")) return "standard";
+    return profileKeys[0] || null;
+  }
+
+  private buildFormattingStyleSignals(
+    req: ChatRequest,
+    answerModeHint?: AnswerMode | string | null,
+  ): Record<string, unknown> | null {
+    const answerStyleBank = getOptionalBank<any>("answer_style_policy");
+    const boldingBank = getOptionalBank<any>("bolding_rules");
+    if (
+      (!answerStyleBank || answerStyleBank?.config?.enabled === false) &&
+      (!boldingBank || boldingBank?.config?.enabled === false)
+    ) {
+      return null;
+    }
+
+    const answerMode = String(answerModeHint || "")
+      .trim()
+      .toLowerCase();
+    const globalRules = answerStyleBank?.config?.globalRules || {};
+    const modeOverrides =
+      globalRules.answerModeOverrides &&
+      typeof globalRules.answerModeOverrides === "object"
+        ? globalRules.answerModeOverrides
+        : {};
+    const modeOverride =
+      answerMode && modeOverrides[answerMode] ? modeOverrides[answerMode] : null;
+    const styleProfile = this.resolveAnswerStyleProfileHint(
+      req,
+      answerModeHint,
+      answerStyleBank,
+    );
+    const profileEntry =
+      styleProfile && answerStyleBank?.profiles
+        ? answerStyleBank.profiles[styleProfile] || null
+        : null;
+    const profileMaxChars = toPositiveInt(profileEntry?.budget?.maxChars);
+    const profileMaxQuestions = toPositiveInt(profileEntry?.budget?.maxQuestions);
+    const overrideMaxQuestions = Number.isFinite(
+      Number(modeOverride?.maxQuestions),
+    )
+      ? Math.max(0, Math.floor(Number(modeOverride?.maxQuestions)))
+      : null;
+    const globalMaxQuestions = toPositiveInt(globalRules.maxQuestionsPerAnswer);
+    const styleMaxQuestions =
+      overrideMaxQuestions ??
+      (typeof profileMaxQuestions === "number" ? profileMaxQuestions : null) ??
+      (typeof globalMaxQuestions === "number" ? globalMaxQuestions : null);
+
+    const operatorFamily = this.resolveRuntimeOperatorFamily(req);
+    const modeSuppression =
+      boldingBank?.modeSuppressions && answerMode
+        ? boldingBank.modeSuppressions[answerMode]
+        : null;
+    const familySuppression =
+      boldingBank?.modeSuppressions && operatorFamily
+        ? boldingBank.modeSuppressions[operatorFamily]
+        : null;
+    const boldingEnabled =
+      boldingBank?.config?.defaultBoldingEnabled !== false &&
+      modeSuppression?.boldingEnabled !== false &&
+      familySuppression?.boldingEnabled !== false;
+
+    return {
+      styleProfile: styleProfile || null,
+      maxQuestions:
+        typeof styleMaxQuestions === "number" ? styleMaxQuestions : undefined,
+      profileMaxChars:
+        typeof profileMaxChars === "number" ? profileMaxChars : undefined,
+      allowBullets:
+        modeOverride?.allowBullets === false ? false : undefined,
+      allowTables: modeOverride?.allowTables === false ? false : undefined,
+      allowQuotes: modeOverride?.allowQuotes === false ? false : undefined,
+      suppressBodyFormatting:
+        modeOverride?.suppressBodyFormatting === true ? true : undefined,
+      boldingEnabled,
+      maxBoldSpansTotal: toPositiveInt(
+        boldingBank?.densityControl?.maxBoldSpansTotal,
+      ),
+      operatorFamily: operatorFamily || undefined,
+    };
+  }
+
   private buildRuntimeContext(
     req: ChatRequest,
     retrievalPack: EvidencePack | null,
+    answerModeHint?: AnswerMode,
   ): Record<string, unknown> {
+    const baseContext = asObject(req.context || {});
+    const baseSignals = asObject(baseContext.signals || {});
+    const formattingStyle = this.buildFormattingStyleSignals(
+      req,
+      answerModeHint,
+    );
+    const operatorFamily = this.resolveRuntimeOperatorFamily(req);
+    const mergedSignals = {
+      ...baseSignals,
+      ...(formattingStyle || {}),
+      ...(operatorFamily ? { operatorFamily } : {}),
+    };
+
     return {
-      ...(req.context || {}),
+      ...baseContext,
       preferredLanguage: req.preferredLanguage || "en",
       attachedDocumentIds: req.attachedDocumentIds || [],
+      signals: mergedSignals,
       retrieval: retrievalPack
         ? {
             query: retrievalPack.query,
@@ -4522,6 +5292,7 @@ export class CentralizedChatRuntimeDelegate {
             stats: retrievalPack.stats,
           }
         : null,
+      operatorPlaybook: this.buildOperatorPlaybookContext(req),
     };
   }
 
@@ -4559,18 +5330,7 @@ export class CentralizedChatRuntimeDelegate {
     req: ChatRequest,
     retrievalPack: EvidencePack | null,
   ): string | undefined {
-    if (!retrievalPack) return undefined;
-    if (retrievalPack.evidence.length > 0) return undefined;
-    if (retrievalPack.scope?.hardScopeActive) {
-      if ((retrievalPack.scope?.candidateDocIds || []).length === 0) {
-        return "explicit_doc_not_found";
-      }
-      return "scope_hard_constraints_empty";
-    }
-    if ((req.attachedDocumentIds || []).length > 0) {
-      return "no_relevant_chunks_in_scoped_docs";
-    }
-    return undefined;
+    return this.fallbackDecisionPolicy.resolveReasonCode(req, retrievalPack);
   }
 
   private buildSourceButtonsAttachment(
