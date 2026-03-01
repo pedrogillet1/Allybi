@@ -1,0 +1,238 @@
+{
+  "_meta": {
+    "id": "chart_intent_taxonomy",
+    "bankId": "chart_intent_taxonomy",
+    "version": "1.0.0",
+    "description": "Chart intent taxonomy for Excel calc agent chart planning and disambiguation.",
+    "owner": "excel-calc-agent",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "calc_task_taxonomy",
+      "slot_schemas_excel_calc"
+    ],
+    "usedBy": [
+      "chart_templates",
+      "chart_recipe_catalog",
+      "excel_calc_runtime_planner"
+    ],
+    "tests": [
+      "chart_intent_coverage",
+      "chart_intent_slot_requirements"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "defaultIntent": "bar_comparison",
+    "maxSeriesPerChart": 12
+  },
+  "intents": [
+    {
+      "intentId": "histogram_distribution",
+      "chartType": "histogram",
+      "requiredSlots": [
+        "input_range"
+      ],
+      "optionalSlots": [
+        "bin_count_value",
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "histogram",
+        "normality_test",
+        "distribution_fit"
+      ],
+      "description": "Distribution histogram with optional fitted curve overlay."
+    },
+    {
+      "intentId": "scatter_relationship",
+      "chartType": "scatter",
+      "requiredSlots": [
+        "x_range",
+        "y_range"
+      ],
+      "optionalSlots": [
+        "trendline_flag",
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "correlation",
+        "linear_regression",
+        "logistic_regression"
+      ],
+      "description": "Scatter plot for relationship analysis with optional trendline."
+    },
+    {
+      "intentId": "line_timeseries",
+      "chartType": "line",
+      "requiredSlots": [
+        "date_range",
+        "value_range"
+      ],
+      "optionalSlots": [
+        "forecast_horizon_value",
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "moving_average",
+        "exponential_smoothing",
+        "arima",
+        "seasonal_decomposition"
+      ],
+      "description": "Time-series line chart with optional forecast extension."
+    },
+    {
+      "intentId": "bar_comparison",
+      "chartType": "bar",
+      "requiredSlots": [
+        "category_range",
+        "value_range"
+      ],
+      "optionalSlots": [
+        "sort_desc_flag",
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "grouped_summary",
+        "variance_analysis",
+        "top_n"
+      ],
+      "description": "Categorical comparison bar chart."
+    },
+    {
+      "intentId": "tornado_sensitivity",
+      "chartType": "bar_horizontal",
+      "requiredSlots": [
+        "parameter_range",
+        "impact_range"
+      ],
+      "optionalSlots": [
+        "baseline_value",
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "sensitivity_analysis"
+      ],
+      "description": "Tornado chart for one-at-a-time sensitivity impacts."
+    },
+    {
+      "intentId": "boxplot_spread",
+      "chartType": "boxplot",
+      "requiredSlots": [
+        "input_range"
+      ],
+      "optionalSlots": [
+        "group_range",
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "quartiles",
+        "outlier_detection",
+        "distribution_summary"
+      ],
+      "description": "Boxplot for spread and outlier inspection."
+    },
+    {
+      "intentId": "residual_diagnostics",
+      "chartType": "scatter",
+      "requiredSlots": [
+        "predicted_range",
+        "residual_range"
+      ],
+      "optionalSlots": [
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "linear_regression",
+        "multiple_regression"
+      ],
+      "description": "Residual diagnostic plot for model assumption checks."
+    },
+    {
+      "intentId": "waterfall_bridge",
+      "chartType": "waterfall",
+      "requiredSlots": [
+        "step_range",
+        "delta_range"
+      ],
+      "optionalSlots": [
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "variance_bridge",
+        "budget_vs_actual_bridge"
+      ],
+      "description": "Bridge chart to explain cumulative change."
+    },
+    {
+      "intentId": "stacked_composition",
+      "chartType": "stacked_bar",
+      "requiredSlots": [
+        "category_range",
+        "series_ranges"
+      ],
+      "optionalSlots": [
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "composition_analysis",
+        "cohort_composition"
+      ],
+      "description": "Stacked composition view across categories."
+    },
+    {
+      "intentId": "heatmap_matrix",
+      "chartType": "heatmap",
+      "requiredSlots": [
+        "matrix_range"
+      ],
+      "optionalSlots": [
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "correlation_matrix",
+        "risk_matrix"
+      ],
+      "description": "Heatmap for matrix-style magnitude interpretation."
+    },
+    {
+      "intentId": "run_chart_control",
+      "chartType": "line",
+      "requiredSlots": [
+        "sequence_range",
+        "value_range"
+      ],
+      "optionalSlots": [
+        "ucl_value",
+        "lcl_value",
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "control_chart",
+        "process_stability"
+      ],
+      "description": "Run/control chart with optional limits."
+    },
+    {
+      "intentId": "dual_axis_combo",
+      "chartType": "combo",
+      "requiredSlots": [
+        "x_range",
+        "primary_value_range",
+        "secondary_value_range"
+      ],
+      "optionalSlots": [
+        "output_cell"
+      ],
+      "supportsCalcFamilies": [
+        "ratio_vs_volume",
+        "kpi_dual_axis"
+      ],
+      "description": "Dual-axis combo chart for mixed-scale KPIs."
+    }
+  ]
+}

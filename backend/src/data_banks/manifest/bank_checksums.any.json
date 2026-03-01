@@ -37,6 +37,96 @@
     ]
   },
   "checksums": {
+    "agents/excel_calc/charts/chart_intent_taxonomy.any.json": {
+      "sha256": "559f447b939caa4419c686459fb528d44555e46c61d4c15b748790c33471dc1e",
+      "required": false,
+      "category": "routing"
+    },
+    "agents/excel_calc/charts/chart_recipe_catalog.any.json": {
+      "sha256": "b66b9b9f1c34eae282592eb7d90cf0b6caa49cbbcaee1fceaadbf9cb3dc407be",
+      "required": false,
+      "category": "templates"
+    },
+    "agents/excel_calc/charts/chart_templates.any.json": {
+      "sha256": "53778c288e5f5420f7492f3da320959888bee0457c3c09b0f85e13b2f358946c",
+      "required": false,
+      "category": "templates"
+    },
+    "agents/excel_calc/eval/suite_registry.any.json": {
+      "sha256": "01c75a08db557f9ccae6b9d024dbf3f17cf3b71f4c9767285dbcb7f6741ed143",
+      "required": false,
+      "category": "tests"
+    },
+    "agents/excel_calc/execution/distribution_ontology.any.json": {
+      "sha256": "4c8018ee13ad0cacf8d6ad01411c5cfb880f0a592d71b03ff0f10a8a80dbaadf",
+      "required": false,
+      "category": "semantics"
+    },
+    "agents/excel_calc/execution/excel_function_catalog.any.json": {
+      "sha256": "97f19ffe8d42a1bb9b92c3dc09def23993b7bc85dbe12bae8a2bbcbadc517cce",
+      "required": false,
+      "category": "semantics"
+    },
+    "agents/excel_calc/execution/python_recipe_catalog.any.json": {
+      "sha256": "b4fabac10b6d3795fe056cc648617d264a793ccdc48e87ecfcffc7a311a67f02",
+      "required": false,
+      "category": "semantics"
+    },
+    "agents/excel_calc/execution/stats_method_ontology.any.json": {
+      "sha256": "563faff1c998687b467c42114e508834da7a0e85a1c61601052535c4eb8c88cb",
+      "required": false,
+      "category": "semantics"
+    },
+    "agents/excel_calc/quality/clarification_policy.any.json": {
+      "sha256": "6c486ae0bd1dd31d3b12d47fef6558bf151be4450aa67c1d2b58d62ef880a7b9",
+      "required": false,
+      "category": "quality"
+    },
+    "agents/excel_calc/quality/numeric_integrity_rules.any.json": {
+      "sha256": "69fc56786de9765888d0dbb25c2ecd6ecf5c9ff698bf73a91186c6b4ad3776ee",
+      "required": false,
+      "category": "quality"
+    },
+    "agents/excel_calc/quality/result_verification_policy.any.json": {
+      "sha256": "bef370b8d2f46bbfd5ff50ea0aeb6e9e0600745cd8c9c70406626c0daa8fed70",
+      "required": false,
+      "category": "quality"
+    },
+    "agents/excel_calc/routing/calc_intent_patterns.en.any.json": {
+      "sha256": "70f2dccead430fdfb911564c0d22f4658ef6f1e56c10a1ee906929c36d11dd59",
+      "required": false,
+      "category": "routing"
+    },
+    "agents/excel_calc/routing/calc_intent_patterns.pt.any.json": {
+      "sha256": "7dfbb583c6238994e5aba11840983ef0c88f54ec3041a4341fc8e3f7ff391b10",
+      "required": false,
+      "category": "routing"
+    },
+    "agents/excel_calc/routing/calc_task_taxonomy.any.json": {
+      "sha256": "93cd4cc9a78ebf2210df948b95f6f24642255b4956820499cd7c78239bbbd42d",
+      "required": false,
+      "category": "routing"
+    },
+    "agents/excel_calc/routing/slot_schemas.any.json": {
+      "sha256": "a72b5afd889e2f58d46e24dba01d765f78f4304dd05325d3e7dae0184858fbd4",
+      "required": false,
+      "category": "routing"
+    },
+    "agents/excel_calc/semantics/column_semantics_ontology.any.json": {
+      "sha256": "90f4f55da1400c4c3a7f9cfe633076887a897acb1ce3a2b19a4a4b65315e1a03",
+      "required": false,
+      "category": "semantics"
+    },
+    "agents/excel_calc/semantics/locale_numeric_date_rules.any.json": {
+      "sha256": "965d452ef17b1fd8a222c96b207d0d94c07549a7fc0b709880cc7021ef4b3e9b",
+      "required": false,
+      "category": "semantics"
+    },
+    "agents/excel_calc/semantics/range_resolution_rules.any.json": {
+      "sha256": "b632ee1f1ea8b230c5a150a092081e994ae770c672a3697b0da3a10db5cab33b",
+      "required": false,
+      "category": "semantics"
+    },
     "ambiguity/ambiguity_rank_features.any.json": {
       "sha256": "b855576a2a0bc29bea8cb5149e2b0e5e644f3754e3e41c00250ac941d13a52b6",
       "required": false,
@@ -3513,22 +3603,22 @@
       "category": "formatting"
     },
     "intent_patterns/docx.en.any.json": {
-      "sha256": "27cf48eb87b3256e8905a3a4e28c8544e5baa99d589e80e47888f0b81737eab1",
+      "sha256": "269bfcdd58b93c31c499e84c25029f7c2a5ddba760c1afdd50f16706422ccea3",
       "required": false,
       "category": "intent_patterns"
     },
     "intent_patterns/docx.pt.any.json": {
-      "sha256": "0c012ddb73117280dbb627b0ce5610cc5327d9814571a96c34501e96dfebc3c9",
+      "sha256": "5ff1f4c8ed03fa207588cadcddf8c01d3bc8a03a2393b502a7214b6fb7102dc2",
       "required": false,
       "category": "intent_patterns"
     },
     "intent_patterns/excel.en.any.json": {
-      "sha256": "58c2024b7cb5070ff82d237651f2ff0281106c5e859bc2f726b30f83d8d8b91d",
+      "sha256": "52c9b92ebd7718bfbaa9f9c6a18f96e084d5b6889818c0e27b544aeaa9c9dc98",
       "required": false,
       "category": "intent_patterns"
     },
     "intent_patterns/excel.pt.any.json": {
-      "sha256": "9c5da544433bb13707f79cb9a73a1fbdbbfc5b32c8533f1289356409d4ff19da",
+      "sha256": "c737754484efe43ed4aca1c7e0c3d2ed483cd1f7faa9512e14c41065566b518a",
       "required": false,
       "category": "intent_patterns"
     },
@@ -3563,7 +3653,7 @@
       "category": "lexicons"
     },
     "manifest/bank_aliases.any.json": {
-      "sha256": "a2ddae7db4361c3dbfe318f687212eb9e6e27fe909bc9e388f81f8fc61a05156",
+      "sha256": "a81ddcb86c614397ff4afd0c5b93a419528ab2d25418d624f2fc120e9cbcda3c",
       "required": true,
       "category": "manifest"
     },
@@ -3573,7 +3663,7 @@
       "category": "manifest"
     },
     "manifest/bank_dependencies.any.json": {
-      "sha256": "ece128d1daf5552024907183a299d4fc60288427853258504667ed7ced54b861",
+      "sha256": "98573744997b4e53ae44ef899df99b7262c854fda534939f6210fa86ff1aba1d",
       "required": false,
       "category": "manifest"
     },
@@ -3648,7 +3738,7 @@
       "category": "microcopy"
     },
     "microcopy/koda_product_help.any.json": {
-      "sha256": "dbd25ff86e977778717f17a5e290ae5120701dfc0b424ce0c10c0d612921b2be",
+      "sha256": "c9d994758a76c3f9f37b09cf81915b58ea28106d34dbf72213f95fedd4986d99",
       "required": false,
       "category": "microcopy"
     },
@@ -3807,13 +3897,18 @@
       "required": true,
       "category": "operators"
     },
+    "operators/operator_collision_matrix.any.json": {
+      "sha256": "89f4dfd2171d13a8fac8c22a020639673fb0e1bebffc5d0201b53738b670a434",
+      "required": true,
+      "category": "operators"
+    },
     "operators/operator_contracts.any.json": {
-      "sha256": "ee1b5aae711a97607c6b871990f80be8afba6c2dbcef26fd3dff3f51e0105d77",
+      "sha256": "e821ffe56a18f73ddca32b264cb5b6696beb71775d2c20f228866fb93856672b",
       "required": true,
       "category": "operators"
     },
     "operators/operator_output_shapes.any.json": {
-      "sha256": "882f56a62fe7000f6962990192e46c8a6859ebeb36a5c6fe4f1703db714ab321",
+      "sha256": "1843dd6b246e7ff023d3c28756481f707d8eed5b1e47b0f65218c6d1082e28bb",
       "required": true,
       "category": "operators"
     },
@@ -4518,7 +4613,7 @@
       "category": "routing"
     },
     "routing/intent_config.any.json": {
-      "sha256": "600c57b676a9a3c33eabd2b4ee708d5bea6154fb447efe388a8d35f26d024ae3",
+      "sha256": "b17372063370d1790017340a3b6e0003363d1220f7d4b616bc01d8b48af650e4",
       "required": true,
       "category": "routing"
     },
@@ -4528,7 +4623,7 @@
       "category": "routing"
     },
     "routing/operator_families.any.json": {
-      "sha256": "c145900de3bd42375f056b6dbb4e81d768d5a803c3aef536369503e85f7e4bc9",
+      "sha256": "d7063438998be7a895b1365866de83a6a8243c217f13496b1b9d8576020cbfd4",
       "required": true,
       "category": "routing"
     },
@@ -4658,7 +4753,7 @@
       "category": "semantics"
     },
     "semantics/document_intelligence_bank_map.any.json": {
-      "sha256": "ced3cf00f2671049b32208cd2fcd7a7f0abd0f9130651658ff6189a0b447c0c2",
+      "sha256": "c5d159f5fcdce8771dbe94b2d7d46d732faa1601e377293d6a3a65e360ca8d9d",
       "required": true,
       "category": "semantics"
     },
@@ -4668,87 +4763,87 @@
       "category": "semantics"
     },
     "semantics/domain/accounting_rules.any.json": {
-      "sha256": "bc4a03d1e509dfeec8c8e392e308f15afa1fcfe2fb0e9313615c9370f33b7453",
+      "sha256": "cbda5176c181c5657b8956bf45b44004abb4290fda856ebcbdc1b1011f982feb",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/finance_doc_logic.any.json": {
-      "sha256": "465167a24d4bda40a054d49ad102b002a4d543b17142b41f01218c942b4245c6",
+      "sha256": "5f7f0a12a3f766e073f60b40a11ebfeb0bc4f2a11f27bf63134181052438b800",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/finance_kpi_ontology.any.json": {
-      "sha256": "9a6855f18155ef25fd6d6a8b874b3b956e7d28b66b3d38e565087839fbf7c314",
+      "sha256": "b9cf7becce3a4e5b737712a2aaa160eb12b57210c7aa9d5422ba90613b0a8487",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/legal_clause_ontology.any.json": {
-      "sha256": "c88a3ff786f12cc2bb6b0cde7159a457ca42653d436c86f8f6b9f1bbe12c58e6",
+      "sha256": "b9549b7fad4e2ead9e6853fbbf1799e98130514a1d729f38bccfcda1f16f30d4",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/legal_reference_rules.any.json": {
-      "sha256": "2c0ecf3c3d29461d57b56f4fa19ffe29b575345858a2993e88c7e8fdea1e4c71",
+      "sha256": "30b7dc97f3b9a2049d1aba13434053dfe2b00bd8e53bf7e0482dedfc077d06a7",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/legal_risk_heuristics.any.json": {
-      "sha256": "db0aeecf5497e851dc2a38c66086d3b948d6dd05cea2dcecbb13e88b0fb70da7",
+      "sha256": "510392b32a8877737eeacafabf9eba32b2000354b4cd5e1bc038e214386bf29b",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/medical_explanation_templates.any.json": {
-      "sha256": "b36bf06a682353cf3d51d53a564e396868faf9e6ca1d1b92c7e05da4ac0cef28",
+      "sha256": "8c4b1b87ac30b677a79fc4d61c2c01e72f343be51b311d7fdabaf410327cc4f8",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/medical_report_ontology.any.json": {
-      "sha256": "c8673a521489e7b0c0dc7a7054121ead68f594f9ba5da9feaa8708e9bd8738f1",
+      "sha256": "955e3eb66d0fc55b74a3f679ca9b12197ebb534b4c455a9742863c07ec74fc67",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/medical_safety_boundaries.any.json": {
-      "sha256": "342572a0367b4eef1cd02171108cddd4eb3d9c68fe5b1a3b1b360d142aa9b578",
+      "sha256": "a51c09cdaa85c8cdb334095621b26557a697694cce33a634e816b5905654b4a0",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/ops_doc_logic.any.json": {
-      "sha256": "230524fc3d129114592bb21b4cc49a2faec4c8344c4e40859adb06f6628b09e0",
+      "sha256": "fa8d85cb47e698ecbd3f2ab54ec8ddb2074634ebded4f94d91df7de3ca4ae6b5",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain/ops_kpi_ontology.any.json": {
-      "sha256": "e0584651f7f0f8f8a7262b8c7a8577ca8c13dbd451afaf9e178b8dae91206e2c",
+      "sha256": "45e614df4a3e6864f85b1b4db6442ab548f3278cf9a34c83beefa7e93c7e48d3",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/date_patterns.any.json": {
-      "sha256": "8f5cedd66f90e4b1ca942b58a3fc320248c40d594c04591bd91b77929f278cb5",
+      "sha256": "5e4349877996d8a2a3d8abd0ab2945b0043bf1c42b92e7c100f2185abde69950",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/identifier_patterns.any.json": {
-      "sha256": "92b0637fc1da69b5bef7917a9526affaee8032fdedbd39bfa802619840b38b79",
+      "sha256": "157ed5a6228a8b75c2eda379f44744619a11f0f06b8348f3ba7cf3ac096c6e64",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/lab_result_patterns.any.json": {
-      "sha256": "570cd299eca4a9adff7d65e87fe6369f7378c1905a1b6d4ea30f9dd9dfae069f",
+      "sha256": "dfdad0345041acbc0ad467cad996d62239a3f953e598f102148bbb7a3cd2e6a4",
       "required": false,
       "category": "semantics"
     },
     "semantics/entities/money_patterns.any.json": {
-      "sha256": "cd8ab2fc20c7b3a1d5122f9dd586eda1f52f5542c2bfa60c794f0dcc1ed94036",
+      "sha256": "413b3c711e3fd25f1d932ba902de2b32afac7c54cf5849a29010ab9d940de8fe",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/party_patterns.any.json": {
-      "sha256": "4a670d64365af24036bf10a061abc13ea0e98f24151d7197fcf58a2e1fb33804",
+      "sha256": "f4d3a127bc2a2755dd582391fa6ecacfab236e03f442bed8fcd1819141fa9e35",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/telecom_usage_patterns.any.json": {
-      "sha256": "4c5efaeb730286566cd0bd3e8ee6dd31be1bbdf547e5f69f4016b1d45cbac5d7",
+      "sha256": "b6106e1396c859c5bf88091768985e88687fcc2db67908207a8c6d16ae3f25f4",
       "required": false,
       "category": "semantics"
     },
@@ -4778,7 +4873,7 @@
       "category": "semantics"
     },
     "semantics/spreadsheet_semantics.any.json": {
-      "sha256": "32597b3030f560309115a0ccaddadef04f1c83cd8b4fd1b697cf6e5afecf983c",
+      "sha256": "187fb88ffc38d43a5afc607a4a55432832039284c858cae3dda7bf384ec0a018",
       "required": false,
       "category": "semantics"
     },
@@ -4788,77 +4883,77 @@
       "category": "semantics"
     },
     "semantics/structure/docx_heading_levels.en.any.json": {
-      "sha256": "ed003ab5e589b025cbb615f8fa832318548b35ea59ed7c58958efd47bb13b4f6",
+      "sha256": "61a04464fe93913c1e41eed21c6997eb1d8241e77918afabaf73a47c80c86443",
       "required": false,
       "category": "parsers"
     },
     "semantics/structure/docx_heading_levels.pt.any.json": {
-      "sha256": "230fc9b307331fc87fa8605263883c72e8ae7242c2848ee7f8c2463b36036192",
+      "sha256": "17fb82706244ed2634278ed23695a7f5a5b9e7c1912c5680fd9a01930e7d6dbb",
       "required": false,
       "category": "parsers"
     },
     "semantics/structure/excel_number_formats.any.json": {
-      "sha256": "c157ee76cd8cc1069782f7d1ffb9a6ad2650745000d5a0cf4e1dff75a410c7b5",
+      "sha256": "0b9c3d6e8eef6486ed7755af29939846334dd2d9eb5c1c9424a0e513632b91fb",
       "required": false,
       "category": "semantics"
     },
     "semantics/structure/headings_map.any.json": {
-      "sha256": "0b5b7432bbd4150cb8e9fffccc0f9f49688d56e1736232f1de2b4a701a49ceef",
+      "sha256": "2c356e3f741bf31d114e184f0a7a8570502a06d00450a12049e2aa86e70473f9",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/layout_cues.any.json": {
-      "sha256": "3ff797fcc43049e6f708045b9a93d833890b87ea4080a46684835696a7a0a979",
+      "sha256": "cc8303cdd3fb03f5e43e0cb9bfd56715cc807a8d102b7b322229389ec6912088",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/sheetname_patterns.any.json": {
-      "sha256": "5d59ccd67ec133ee4e22904a236a30d2a7de0ee2449e3d532e9bcd5d98b0d7c5",
+      "sha256": "72b195a8d90063367b70c34068a6f533451c16d490f5606ebd32d87999905b40",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.accounting.any.json": {
-      "sha256": "f1fbde51586096d444f438f2c980592070dd321a8d927e1ad94c0caff3cff1a3",
+      "sha256": "92c5490324b28bf5559e4034f00303336d229e3e0788b52b80f7e319e138cff1",
       "required": false,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.banking.any.json": {
-      "sha256": "8df10aa6086992c0bdc4783955207a0241aca2e2221e5fd3b7a1c652b520da52",
+      "sha256": "8a0dab405205cebd2cbd07c1f0529499c06f1a06828ee1a53849637eb16c8c96",
       "required": false,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.billing.any.json": {
-      "sha256": "2c70777acb31956f7871811687c762e62175e8271ba0f0539bb7253b8d2d7eed",
+      "sha256": "83e275f46b9b18d510271ab6e078479407d7d30f935b0b0c88114f9b5c5a953c",
       "required": false,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.finance.any.json": {
-      "sha256": "5e64db84abbaf72e8ef6e557e242d0a364521a1da21ef4950c17c72bfdddfaeb",
+      "sha256": "bcc14d172e4a24101ccca31ff0ed1668aaca11f347eca717c3be07d6b4dd4017",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.insurance.any.json": {
-      "sha256": "a47ac1989f8a44267b34acd603ef3fc8c6489e38c87dbde1a3281169faa57904",
+      "sha256": "d15e2774176b91b7f5db215cd55df31847d529456c3ca91bb4486743e48334b6",
       "required": false,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.legal.any.json": {
-      "sha256": "f3d64cbf7551337e2014339764227cbfed954e5f69f6f69ea39e6a2ea78e0634",
+      "sha256": "ba1d8003e51ee70667f074b823370afda19cda0a56b26ce25a0214f733837299",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.medical.any.json": {
-      "sha256": "24a4dfd73cb1f6d0c1160797981ef9cf9407914c0df1873c5e52ba566973b76a",
+      "sha256": "6d0dac99ea8673746400a9c46bec5d845b05ad4b142b68877f1055d1abf4b7dd",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.ops.any.json": {
-      "sha256": "5f37e6fd9a1d19130b9bad0530657015772e64ba7bbf0281771803ae97b93ae8",
+      "sha256": "24e27250cbc878f8dd8ddda109a76c2471eebed3473c382a01377ff890dc76ab",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.tax.any.json": {
-      "sha256": "d09930399be5e662a619ceb77b222c05552d2d763561728f08fab0d841495d37",
+      "sha256": "7f4ac6968e7e086508a9b1118895d87652923bea6475858d15b0cdf6ce87af87",
       "required": false,
       "category": "semantics"
     },
@@ -4888,7 +4983,7 @@
       "category": "semantics"
     },
     "semantics/taxonomy/doc_taxonomy.any.json": {
-      "sha256": "c0035e276d5906154c047d671333e66947456458636a47b7a19e91d715942225",
+      "sha256": "d193c28a491e8b8da3761097fefce0c65cda7ca6bb3d91072ae947b4d31cda90",
       "required": true,
       "category": "semantics"
     },

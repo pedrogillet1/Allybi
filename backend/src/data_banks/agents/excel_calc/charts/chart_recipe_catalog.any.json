@@ -1,0 +1,451 @@
+{
+  "_meta": {
+    "id": "chart_recipe_catalog",
+    "bankId": "chart_recipe_catalog",
+    "version": "1.0.0",
+    "description": "Chart preparation recipes mapping chart intents to deterministic data-shaping pipelines.",
+    "owner": "excel-calc-agent",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "chart_intent_taxonomy",
+      "chart_templates",
+      "python_recipe_catalog",
+      "numeric_integrity_rules",
+      "result_verification_policy"
+    ],
+    "usedBy": [
+      "excel_calc_chart_planner",
+      "excel_calc_chart_executor"
+    ],
+    "tests": [
+      "chart_recipe_coverage",
+      "chart_recipe_intent_template_join"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxRowsPerChart": 200000
+  },
+  "recipes": [
+    {
+      "recipeId": "chart.histogram_distribution",
+      "intentId": "histogram_distribution",
+      "inputSlots": {
+        "required": [
+          "input_range"
+        ],
+        "optional": [
+          "bin_count_value",
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_bins_and_density_optional",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "histogram_distribution_series_table",
+        "histogram_distribution_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.scatter_relationship",
+      "intentId": "scatter_relationship",
+      "inputSlots": {
+        "required": [
+          "x_range",
+          "y_range"
+        ],
+        "optional": [
+          "trendline_flag",
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "scatter_relationship_series_table",
+        "scatter_relationship_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.line_timeseries",
+      "intentId": "line_timeseries",
+      "inputSlots": {
+        "required": [
+          "date_range",
+          "value_range"
+        ],
+        "optional": [
+          "forecast_horizon_value",
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "line_timeseries_series_table",
+        "line_timeseries_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.bar_comparison",
+      "intentId": "bar_comparison",
+      "inputSlots": {
+        "required": [
+          "category_range",
+          "value_range"
+        ],
+        "optional": [
+          "sort_desc_flag",
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "bar_comparison_series_table",
+        "bar_comparison_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.tornado_sensitivity",
+      "intentId": "tornado_sensitivity",
+      "inputSlots": {
+        "required": [
+          "parameter_range",
+          "impact_range"
+        ],
+        "optional": [
+          "baseline_value",
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "tornado_sensitivity_series_table",
+        "tornado_sensitivity_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.boxplot_spread",
+      "intentId": "boxplot_spread",
+      "inputSlots": {
+        "required": [
+          "input_range"
+        ],
+        "optional": [
+          "group_range",
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "boxplot_spread_series_table",
+        "boxplot_spread_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.residual_diagnostics",
+      "intentId": "residual_diagnostics",
+      "inputSlots": {
+        "required": [
+          "predicted_range",
+          "residual_range"
+        ],
+        "optional": [
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_residual_summary_metrics"
+      ],
+      "outputTables": [
+        "residual_diagnostics_series_table",
+        "residual_diagnostics_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.waterfall_bridge",
+      "intentId": "waterfall_bridge",
+      "inputSlots": {
+        "required": [
+          "step_range",
+          "delta_range"
+        ],
+        "optional": [
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "waterfall_bridge_series_table",
+        "waterfall_bridge_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.stacked_composition",
+      "intentId": "stacked_composition",
+      "inputSlots": {
+        "required": [
+          "category_range",
+          "series_ranges"
+        ],
+        "optional": [
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "stacked_composition_series_table",
+        "stacked_composition_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.heatmap_matrix",
+      "intentId": "heatmap_matrix",
+      "inputSlots": {
+        "required": [
+          "matrix_range"
+        ],
+        "optional": [
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "heatmap_matrix_series_table",
+        "heatmap_matrix_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.run_chart_control",
+      "intentId": "run_chart_control",
+      "inputSlots": {
+        "required": [
+          "sequence_range",
+          "value_range"
+        ],
+        "optional": [
+          "ucl_value",
+          "lcl_value",
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "run_chart_control_series_table",
+        "run_chart_control_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    },
+    {
+      "recipeId": "chart.dual_axis_combo",
+      "intentId": "dual_axis_combo",
+      "inputSlots": {
+        "required": [
+          "x_range",
+          "primary_value_range",
+          "secondary_value_range"
+        ],
+        "optional": [
+          "output_cell"
+        ]
+      },
+      "preprocessing": [
+        "resolve_ranges_with_range_resolution_rules",
+        "coerce_numeric_and_datetime_with_locale_rules",
+        "drop_or_flag_invalid_rows",
+        "compute_series_grouping",
+        "compute_series_summary"
+      ],
+      "outputTables": [
+        "dual_axis_combo_series_table",
+        "dual_axis_combo_metadata_table"
+      ],
+      "qaChecks": [
+        "row_count_consistency",
+        "axis_domain_validity",
+        "series_non_empty",
+        "tolerance_recompute_check"
+      ],
+      "fallbackBehavior": {
+        "onInsufficientData": "clarify_with_minimum_required_points",
+        "onSparseData": "switch_to_table_summary"
+      }
+    }
+  ]
+}
