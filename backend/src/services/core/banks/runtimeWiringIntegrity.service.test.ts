@@ -18,6 +18,10 @@ import {
   RuntimeWiringIntegrityService,
   RUNTIME_REQUIRED_BANKS,
 } from "./runtimeWiringIntegrity.service";
+import {
+  COMPOSE_ANSWER_TEMPLATE_MODES,
+  RETRIEVAL_ANSWER_MODES,
+} from "../../../modules/chat/domain/answerModes";
 
 // ---- typed mock helpers -------------------------------------------------------
 
@@ -74,6 +78,20 @@ function makeCleanBanks(): Record<string, unknown> {
       requiredCoreBankIds: [],
       optionalBankIds: [],
     },
+    task_answer_with_sources: {
+      templates: COMPOSE_ANSWER_TEMPLATE_MODES.map((mode) => ({
+        id: `t_${mode}`,
+        when: { answerModes: [mode] },
+        messages: [{ role: "system", content: "ok" }],
+      })),
+    },
+    fallback_prompt: { templates: [] },
+    fallback_router: { scenarios: [] },
+    fallback_processing: { config: { enabled: true } },
+    fallback_scope_empty: { config: { enabled: true } },
+    fallback_not_found_scope: { config: { enabled: true } },
+    fallback_extraction_recovery: { config: { enabled: true } },
+    koda_product_help: { config: { enabled: true } },
   };
   for (const id of RUNTIME_REQUIRED_BANKS) {
     if (!(id in out)) out[id] = {};
@@ -158,6 +176,9 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
       "memoryRawPersistencePatterns",
       "memoryPolicyHookEngineMissing",
       "dormantIntentConfigUsage",
+      "composeAnswerModeTemplateGaps",
+      "answerModeContractDrift",
+      "productHelpRuntimeUsageMissing",
     ];
 
     for (const field of expectedFields) {
@@ -916,7 +937,78 @@ describe("RuntimeWiringIntegrityService – dormantIntentConfigUsage", () => {
 });
 
 // ==============================================================================
-// 16. ok flag is the conjunction of all issue arrays
+// 16. Compose answer mode template coverage
+// ==============================================================================
+
+describe("RuntimeWiringIntegrityService – composeAnswerModeTemplateGaps", () => {
+  test("composeAnswerModeTemplateGaps is empty when all canonical compose modes are covered", () => {
+    wireCleanBanks();
+    const result = buildService().validate();
+    expect(result.composeAnswerModeTemplateGaps).toHaveLength(0);
+  });
+
+  test("composeAnswerModeTemplateGaps flags modes missing from task_answer_with_sources templates", () => {
+    const banks = makeCleanBanks();
+    (banks["task_answer_with_sources"] as any).templates = [
+      {
+        id: "only_general",
+        when: { answerModes: ["general_answer"] },
+        messages: [{ role: "system", content: "ok" }],
+      },
+    ];
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+
+    expect(result.composeAnswerModeTemplateGaps).toContain("doc_grounded_single");
+    expect(result.composeAnswerModeTemplateGaps).toContain("help_steps");
+    expect(result.ok).toBe(false);
+  });
+});
+
+// ==============================================================================
+// 17. Answer mode parity + product-help wiring checks
+// ==============================================================================
+
+describe("RuntimeWiringIntegrityService – answer mode parity and product help wiring", () => {
+  test("answerModeContractDrift is empty in canonical mode graph", () => {
+    wireCleanBanks();
+    const result = buildService().validate();
+    expect(result.answerModeContractDrift).toHaveLength(0);
+    for (const mode of RETRIEVAL_ANSWER_MODES) {
+      expect(result.answerModeContractDrift).not.toContain(
+        `retrieval_not_in_chat:${mode}`,
+      );
+    }
+  });
+
+  test("productHelpRuntimeUsageMissing flags gateway when product help markers are absent", () => {
+    wireCleanBanks();
+    mockedExistsSync.mockImplementation((p) =>
+      String(p).includes("llmGateway.service.ts"),
+    );
+    mockedReadFileSync.mockImplementation((p) => {
+      if (String(p).includes("llmGateway.service.ts")) {
+        return "const x = 1; // no product help wiring" as unknown as Buffer;
+      }
+      if (
+        MEMORY_POLICY_PATHS_SUFFIX.some((suffix) => String(p).endsWith(suffix))
+      ) {
+        return CLEAN_MEMORY_POLICY_CONTENT as unknown as Buffer;
+      }
+      return "" as unknown as Buffer;
+    });
+
+    const result = buildService().validate();
+    expect(result.productHelpRuntimeUsageMissing.length).toBeGreaterThan(0);
+    expect(result.ok).toBe(false);
+  });
+});
+
+// ==============================================================================
+// 18. ok flag is the conjunction of all issue arrays
 // ==============================================================================
 
 describe("RuntimeWiringIntegrityService – ok flag invariant", () => {

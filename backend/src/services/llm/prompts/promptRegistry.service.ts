@@ -171,6 +171,28 @@ function matchesWhen(when: any, ctx: PromptContext): boolean {
   if (Array.isArray(when.intentFamilies) && when.intentFamilies.length) {
     if (!when.intentFamilies.includes(inf)) return false;
   }
+  if (typeof when.fallbackTriggered === "boolean") {
+    if (Boolean(ctx.fallback?.triggered) !== Boolean(when.fallbackTriggered)) {
+      return false;
+    }
+  }
+  if (typeof when.fallbackReasonCodeEquals === "string") {
+    const expected = safeStr(when.fallbackReasonCodeEquals).toLowerCase();
+    const actual = safeStr(ctx.fallback?.reasonCode ?? "").toLowerCase();
+    if (!expected || actual !== expected) return false;
+  }
+  if (
+    Array.isArray(when.fallbackReasonCodes) &&
+    when.fallbackReasonCodes.length > 0
+  ) {
+    const allowed = new Set(
+      when.fallbackReasonCodes
+        .map((value: any) => safeStr(value).toLowerCase())
+        .filter(Boolean),
+    );
+    const actual = safeStr(ctx.fallback?.reasonCode ?? "").toLowerCase();
+    if (!actual || !allowed.has(actual)) return false;
+  }
 
   return true;
 }

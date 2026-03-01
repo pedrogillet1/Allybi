@@ -4,6 +4,11 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { getOptionalBank } from "./bankLoader.service";
+import {
+  CHAT_ANSWER_MODES,
+  COMPOSE_ANSWER_TEMPLATE_MODES,
+  RETRIEVAL_ANSWER_MODES,
+} from "../../../modules/chat/domain/answerModes";
 
 export interface RuntimeWiringIntegrityResult {
   ok: boolean;
@@ -22,6 +27,9 @@ export interface RuntimeWiringIntegrityResult {
   memoryRawPersistencePatterns: string[];
   memoryPolicyHookEngineMissing: string[];
   dormantIntentConfigUsage: string[];
+  composeAnswerModeTemplateGaps: string[];
+  answerModeContractDrift: string[];
+  productHelpRuntimeUsageMissing: string[];
 }
 
 export const RUNTIME_REQUIRED_BANKS = [
@@ -41,6 +49,14 @@ export const RUNTIME_REQUIRED_BANKS = [
   "intent_patterns_excel_en",
   "intent_patterns_excel_pt",
   "document_intelligence_bank_map",
+  "task_answer_with_sources",
+  "fallback_prompt",
+  "fallback_router",
+  "fallback_processing",
+  "fallback_scope_empty",
+  "fallback_not_found_scope",
+  "fallback_extraction_recovery",
+  "koda_product_help",
 ] as const;
 
 function asTrimmedString(value: unknown): string {
@@ -439,6 +455,99 @@ function collectDormantIntentConfigUsage(): string[] {
   return failures;
 }
 
+function collectComposeAnswerModeTemplateGaps(taskAnswerBank: any): string[] {
+  const templates = Array.isArray(taskAnswerBank?.templates)
+    ? taskAnswerBank.templates
+    : [];
+  if (templates.length === 0) {
+    return ["task_answer_with_sources:templates_missing"];
+  }
+
+  const presentModes = new Set<string>();
+  for (const template of templates) {
+    const modes = Array.isArray(template?.when?.answerModes)
+      ? template.when.answerModes
+      : [];
+    for (const mode of modes) {
+      const normalized = asTrimmedString(mode);
+      if (normalized) presentModes.add(normalized);
+    }
+  }
+
+  const gaps: string[] = [];
+  for (const mode of COMPOSE_ANSWER_TEMPLATE_MODES) {
+    if (!presentModes.has(mode)) gaps.push(mode);
+  }
+  return gaps;
+}
+
+function collectAnswerModeContractDrift(): string[] {
+  const chatModes = new Set(CHAT_ANSWER_MODES);
+  const drift: string[] = [];
+
+  for (const mode of RETRIEVAL_ANSWER_MODES) {
+    if (!chatModes.has(mode)) {
+      drift.push(`retrieval_not_in_chat:${mode}`);
+    }
+  }
+  for (const mode of COMPOSE_ANSWER_TEMPLATE_MODES) {
+    if (!chatModes.has(mode)) {
+      drift.push(`compose_not_in_chat:${mode}`);
+    }
+  }
+
+  return drift;
+}
+
+function collectProductHelpRuntimeUsageMissing(): string[] {
+  const checks: Array<{ filePaths: string[]; patterns: RegExp[] }> = [
+    {
+      filePaths: [
+        path.join(process.cwd(), "backend/src/services/llm/core/llmGateway.service.ts"),
+        path.join(process.cwd(), "src/services/llm/core/llmGateway.service.ts"),
+      ],
+      patterns: [
+        /\bgetProductHelpService\b|\bProductHelpService\b/,
+        /\bproductHelpSnippet\b/,
+        /\bproductHelpTopic\b/,
+      ],
+    },
+    {
+      filePaths: [
+        path.join(
+          process.cwd(),
+          "backend/src/services/llm/core/llmRequestBuilder.service.ts",
+        ),
+        path.join(
+          process.cwd(),
+          "src/services/llm/core/llmRequestBuilder.service.ts",
+        ),
+      ],
+      patterns: [/\bproductHelpSnippet\b/, /\bproductHelpTopic\b/],
+    },
+  ];
+
+  const failures: string[] = [];
+  for (const check of checks) {
+    const filePath = check.filePaths.find((candidate) =>
+      fs.existsSync(candidate),
+    );
+    if (!filePath) {
+      continue;
+    }
+    try {
+      const src = fs.readFileSync(filePath, "utf8");
+      if (!check.patterns.every((pattern) => pattern.test(src))) {
+        failures.push(filePath);
+      }
+    } catch {
+      failures.push(filePath);
+    }
+  }
+
+  return failures;
+}
+
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
     const missingBanks = RUNTIME_REQUIRED_BANKS.filter(
@@ -451,6 +560,7 @@ export class RuntimeWiringIntegrityService {
     const operatorContracts = getOptionalBank<any>("operator_contracts");
     const operatorOutputShapes = getOptionalBank<any>("operator_output_shapes");
     const promptRegistry = getOptionalBank<any>("prompt_registry");
+    const taskAnswerWithSources = getOptionalBank<any>("task_answer_with_sources");
 
     const routingOps = new Set<string>([
       ...collectOperatorIdsFromIntentConfig(intentConfig),
@@ -511,6 +621,11 @@ export class RuntimeWiringIntegrityService {
     const memoryPolicyHookEngineMissing =
       collectMemoryPolicyHookEngineMissing();
     const dormantIntentConfigUsage = collectDormantIntentConfigUsage();
+    const composeAnswerModeTemplateGaps =
+      collectComposeAnswerModeTemplateGaps(taskAnswerWithSources);
+    const answerModeContractDrift = collectAnswerModeContractDrift();
+    const productHelpRuntimeUsageMissing =
+      collectProductHelpRuntimeUsageMissing();
 
     return {
       ok:
@@ -528,7 +643,10 @@ export class RuntimeWiringIntegrityService {
         memoryDelegateDirectInstantiation.length === 0 &&
         memoryRawPersistencePatterns.length === 0 &&
         memoryPolicyHookEngineMissing.length === 0 &&
-        dormantIntentConfigUsage.length === 0,
+        dormantIntentConfigUsage.length === 0 &&
+        composeAnswerModeTemplateGaps.length === 0 &&
+        answerModeContractDrift.length === 0 &&
+        productHelpRuntimeUsageMissing.length === 0,
       missingBanks,
       missingOperatorContracts,
       missingOperatorOutputShapes,
@@ -544,6 +662,9 @@ export class RuntimeWiringIntegrityService {
       memoryRawPersistencePatterns,
       memoryPolicyHookEngineMissing,
       dormantIntentConfigUsage,
+      composeAnswerModeTemplateGaps,
+      answerModeContractDrift,
+      productHelpRuntimeUsageMissing,
     };
   }
 }

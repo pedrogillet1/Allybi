@@ -2,6 +2,7 @@ import type {
   StreamSink,
   LLMStreamingConfig,
 } from "../../../services/llm/types/llmStreaming.types";
+import type { ChatAnswerMode } from "./answerModes";
 
 export type ChatRole = "user" | "assistant" | "system";
 
@@ -24,17 +25,7 @@ export interface ChatRequest {
   };
 }
 
-export type AnswerMode =
-  | "doc_grounded_single"
-  | "doc_grounded_multi"
-  | "doc_grounded_quote"
-  | "doc_grounded_table"
-  | "nav_pills"
-  | "fallback"
-  | "general_answer"
-  | "help_steps"
-  | "action_confirmation"
-  | "action_receipt";
+export type AnswerMode = ChatAnswerMode;
 
 export type AnswerClass = "DOCUMENT" | "NAVIGATION" | "GENERAL";
 export type NavType = "open" | "discover" | "where" | null;

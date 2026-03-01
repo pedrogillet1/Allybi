@@ -157,6 +157,8 @@ export interface BuildRequestInput {
     // fallback/disambiguation
     fallback?: { triggered: boolean; reasonCode?: string | null };
     disambiguation?: DisambiguationPayload | null;
+    productHelpTopic?: string | null;
+    productHelpSnippet?: string | null;
 
     // nav pills
     navType?: "open" | "where" | "discover" | null;
@@ -401,6 +403,8 @@ export class LlmRequestBuilderService {
       // Interpolated into bank-driven prompt templates (e.g. {{brandName}}).
       slots: {
         brandName: BRAND_NAME,
+        productHelpTopic: String(input.signals.productHelpTopic || "").trim(),
+        productHelpSnippet: String(input.signals.productHelpSnippet || "").trim(),
       },
     };
   }

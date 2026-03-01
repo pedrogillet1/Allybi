@@ -29,6 +29,11 @@ describe("Runtime wiring proof (bank-driven behavior)", () => {
                     },
                   ],
                 },
+                then: {
+                  intent: "connectors",
+                  operator: "connect_slack",
+                  domain: "connectors",
+                },
               },
             ],
           };
@@ -65,6 +70,11 @@ describe("Runtime wiring proof (bank-driven behavior)", () => {
                       patterns: ["sync.*drive"],
                     },
                   ],
+                },
+                then: {
+                  intent: "connectors",
+                  operator: "sync_drive",
+                  domain: "connectors",
                 },
               },
             ],

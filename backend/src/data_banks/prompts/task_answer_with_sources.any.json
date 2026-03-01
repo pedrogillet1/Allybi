@@ -57,7 +57,7 @@
         {
           "role": "system",
           "content": {
-            "any": "Answer task contract: provide short actionable steps about the currently scoped document context. Do NOT invent evidence and do NOT include an inline `Sources` section."
+            "any": "Answer task contract: provide short actionable steps about the currently scoped document context. Use this scoped product-help snippet when relevant: {{productHelpSnippet}}. Do NOT invent evidence and do NOT include an inline `Sources` section."
           }
         }
       ]
@@ -65,7 +65,7 @@
     {
       "id": "answer_without_sources",
       "priority": 100,
-      "when": { "answerModes": ["general_answer", "action_receipt", "nav_pills", "rank_disambiguate", "rank_autopick"] },
+      "when": { "answerModes": ["general_answer", "action_receipt", "action_confirmation", "nav_pills", "rank_disambiguate", "rank_autopick"] },
       "messages": [
         {
           "role": "system",

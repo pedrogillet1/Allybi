@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "id": "koda_product_help",
+    "version": "1.0.0",
+    "description": "Scoped product-help snippets for help/fallback prompt enrichment.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLanguage": "en",
+    "maxSnippetChars": 280
+  },
+  "topics": [
+    {
+      "id": "limitations_memory_scope",
+      "priority": 140,
+      "when": {
+        "fallbackReasonCodes": [
+          "scope_hard_constraints_empty",
+          "no_docs_indexed",
+          "no_relevant_chunks_in_scoped_docs"
+        ],
+        "answerModes": ["general_answer", "help_steps"],
+        "intentFamilies": ["documents", "help"]
+      },
+      "snippets": {
+        "en": "I can only use indexed files in the current scope. Attach/select the target document and retry.",
+        "pt": "Eu so posso usar arquivos indexados no escopo atual. Anexe/selecione o documento alvo e tente novamente.",
+        "es": "Solo puedo usar archivos indexados en el alcance actual. Adjunta/selecciona el documento objetivo e intentalo de nuevo.",
+        "any": "Use indexed files in the current scope. Select the target document and retry."
+      }
+    },
+    {
+      "id": "docx_editing",
+      "priority": 90,
+      "when": {
+        "answerModes": ["help_steps"],
+        "queryAny": ["docx", "edit", "paragraph", "format"]
+      },
+      "snippets": {
+        "en": "DOCX editing is target-first: identify paragraph/range, then apply the change.",
+        "pt": "A edicao DOCX comeca pelo alvo: identifique paragrafo/intervalo e depois aplique a mudanca.",
+        "es": "La edicion DOCX empieza por el objetivo: identifica parrafo/rango y luego aplica el cambio.",
+        "any": "DOCX editing is target-first: identify range before applying changes."
+      }
+    },
+    {
+      "id": "xlsx_editing",
+      "priority": 85,
+      "when": {
+        "answerModes": ["help_steps"],
+        "queryAny": ["xlsx", "sheet", "cell", "formula", "spreadsheet"]
+      },
+      "snippets": {
+        "en": "Spreadsheet edits should include sheet + range (e.g. Sheet1!A1:C5) for safe scope.",
+        "pt": "Edicoes em planilha devem incluir aba + intervalo (ex.: Planilha1!A1:C5) para escopo seguro.",
+        "es": "Las ediciones en hoja deben incluir hoja + rango (ej.: Hoja1!A1:C5) para un alcance seguro.",
+        "any": "Use sheet + range for spreadsheet edits to keep scope precise."
+      }
+    }
+  ]
+}

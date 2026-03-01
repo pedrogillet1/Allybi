@@ -21,6 +21,18 @@ export type {
   PrismaChatServicePort,
 } from "./domain/chat.contracts";
 export { ConversationNotFoundError } from "./domain/chat.contracts";
+export {
+  CHAT_ANSWER_MODES,
+  COMPOSE_ANSWER_TEMPLATE_MODES,
+  RETRIEVAL_ANSWER_MODES,
+  coerceRetrievalAnswerMode,
+  isRetrievalAnswerMode,
+} from "./domain/answerModes";
+export type {
+  ChatAnswerMode,
+  ComposeAnswerTemplateMode,
+  RetrievalAnswerMode,
+} from "./domain/answerModes";
 
 export type {
   EditorSelectionRange,

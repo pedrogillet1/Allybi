@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "@jest/globals";
 import { PromptRegistryService } from "./promptRegistry.service";
+import { COMPOSE_ANSWER_TEMPLATE_MODES } from "../../../modules/chat/domain/answerModes";
 
 function loadPromptBanks() {
   const promptRoot = path.resolve(process.cwd(), "src/data_banks/prompts");
@@ -31,16 +32,7 @@ function loadPromptBanks() {
 describe("PromptRegistryService compose_answer mode coverage", () => {
   test("never falls back to meta.description for active runtime answer modes", () => {
     const service = new PromptRegistryService(loadPromptBanks());
-    const activeModes = [
-      "doc_grounded_single",
-      "doc_grounded_multi",
-      "doc_grounded_quote",
-      "doc_grounded_table",
-      "general_answer",
-      "help_steps",
-      "nav_pills",
-      "rank_disambiguate",
-    ];
+    const activeModes = [...COMPOSE_ANSWER_TEMPLATE_MODES];
     for (const answerMode of activeModes) {
       const bundle = service.buildPrompt("compose_answer", {
         env: "local",
