@@ -281,6 +281,30 @@ describe("domain accessor ID mapping", () => {
     service.getOperatorPlaybook("monitor", "ops");
     expect(mockGetBank).toHaveBeenCalledWith("operator_playbook_monitor_ops");
   });
+
+  test("legal doc-type lookup strips one leading legal_ prefix", () => {
+    service.invalidateCache();
+    mockGetBank.mockClear();
+    mockGetOptionalBank.mockClear();
+
+    service.getDocTypeSections("legal", "legal_nda");
+    expect(mockGetOptionalBank).toHaveBeenCalledWith("legal_nda_sections");
+
+    service.invalidateCache();
+    mockGetOptionalBank.mockClear();
+    service.getDocTypeTables("legal", "legal_nda");
+    expect(mockGetOptionalBank).toHaveBeenCalledWith("legal_nda_tables");
+  });
+
+  test("medical doc-type lookup preserves med_ prefix", () => {
+    service.invalidateCache();
+    mockGetOptionalBank.mockClear();
+
+    service.getDocTypeSections("medical", "med_soap_note");
+    expect(mockGetOptionalBank).toHaveBeenCalledWith(
+      "medical_med_soap_note_sections",
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------

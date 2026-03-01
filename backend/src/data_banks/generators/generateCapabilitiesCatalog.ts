@@ -2,7 +2,8 @@
 /**
  * generateCapabilitiesCatalog.ts
  *
- * Generates data_banks/semantics/capabilities_catalog.any.json from operator banks.
+ * Refreshes data_banks/semantics/capabilities_catalog.any.json sourceOperators
+ * from canonical operator banks while preserving curated copy text.
  *
  * Run:
  *   npx ts-node src/data_banks/generators/generateCapabilitiesCatalog.ts
@@ -10,8 +11,6 @@
 
 import * as fs from "fs";
 import * as path from "path";
-
-type Lang = "en" | "pt" | "es";
 
 function readJson(p: string): any {
   return JSON.parse(fs.readFileSync(p, "utf8"));
@@ -33,244 +32,112 @@ function nowIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+function ensureGroup(template: any, id: string): any {
+  const groups = safeArr(template?.groups);
+  const existing = groups.find((group: any) => String(group?.id || "").trim() === id);
+  if (existing) return existing;
+  const fallback = {
+    id,
+    title: { en: id, pt: id, es: id },
+    bullets: { en: [], pt: [], es: [] },
+    examplePrompts: { en: [], pt: [], es: [] },
+    sourceOperators: [],
+  };
+  groups.push(fallback);
+  template.groups = groups;
+  return fallback;
+}
+
 function main() {
   const root = path.join(__dirname, ".."); // backend/src/data_banks
   const operatorsDir = path.join(root, "operators");
   const semanticsDir = path.join(root, "semantics");
 
   const contractsPath = path.join(operatorsDir, "operator_contracts.any.json");
+  const capabilitiesPath = path.join(semanticsDir, "allybi_capabilities.any.json");
+  const outPath = path.join(semanticsDir, "capabilities_catalog.any.json");
+
   const contracts = readJson(contractsPath);
-  const ops: Array<{ id: string; family?: string; description?: string }> =
-    safeArr(contracts?.operators ?? contracts);
+  const capabilities = readJson(capabilitiesPath);
+  const template = fs.existsSync(outPath)
+    ? readJson(outPath)
+    : {
+        _meta: {
+          id: "capabilities_catalog",
+          version: "1.1.0",
+          description:
+            "Canonical capability catalog for Allybi. This is derived from operator banks to stay aligned with real system behavior.",
+          languages: ["any", "en", "pt", "es"],
+          owner: "allybi-banks",
+          compat: ">=1.0.0",
+        },
+        config: {
+          enabled: true,
+          maxGroups: 6,
+          maxBulletsPerGroup: 4,
+          maxExamplePromptsPerGroup: 3,
+        },
+        groups: [],
+      };
+
+  const ops: Array<{ id: string; family?: string }> = safeArr(
+    contracts?.operators ?? contracts,
+  );
 
   const byFamily = new Map<string, string[]>();
-  for (const o of ops) {
-    const id = String(o?.id ?? "").trim();
+  for (const op of ops) {
+    const id = String(op?.id || "").trim();
     if (!id) continue;
-    const fam = String(o?.family ?? "unknown").trim() || "unknown";
-    byFamily.set(fam, uniq([...(byFamily.get(fam) ?? []), id]));
+    const family = String(op?.family || "unknown").trim() || "unknown";
+    byFamily.set(family, uniq([...(byFamily.get(family) || []), id]));
   }
 
-  // Minimal derived groups: keep copy stable; only the operator lists are derived.
-  // This prevents the generated output from being unreadable while still staying aligned.
+  const supportedEditingOperators = Object.entries(capabilities?.operators || {})
+    .filter(([, data]: [string, any]) => Boolean(data?.supported))
+    .map(([id]) => String(id).trim())
+    .filter(Boolean);
+
   const groupOps = {
-    docs_qa: uniq([...(byFamily.get("documents") ?? [])]),
+    docs_qa: uniq([...(byFamily.get("documents") || [])]),
     search_nav: uniq([
-      ...(byFamily.get("navigation") ?? []),
-      ...(byFamily.get("file_actions") ?? []),
+      ...(byFamily.get("navigation") || []),
+      ...(byFamily.get("file_actions") || []),
     ]),
-    editing: uniq([...(byFamily.get("editing") ?? [])]),
+    editing: uniq([
+      ...(byFamily.get("editing") || []),
+      ...supportedEditingOperators,
+    ]),
     connectors_email: uniq([
-      ...(byFamily.get("connectors") ?? []),
-      ...(byFamily.get("email") ?? []),
+      ...(byFamily.get("connectors") || []),
+      ...(byFamily.get("email") || []),
     ]),
-    creative_slides: uniq([...(byFamily.get("creative") ?? [])]),
   };
 
-  const out = {
-    _meta: {
-      id: "capabilities_catalog",
-      version: "1.0.0",
-      description:
-        "Canonical capability catalog for Allybi. This is derived from operator banks to stay aligned with real system behavior.",
-      languages: ["any", "en", "pt", "es"],
-      lastUpdated: nowIso(),
-      owner: "allybi-banks",
-      compat: ">=1.0.0",
-      derivedFrom: ["operators/operator_contracts.any.json"],
-    },
-    config: {
-      enabled: true,
-      maxGroups: 6,
-      maxBulletsPerGroup: 4,
-      maxExamplePromptsPerGroup: 3,
-    },
-    groups: [
-      {
-        id: "docs_qa",
-        title: {
-          en: "Answer From Your Documents",
-          pt: "Responder a Partir dos Seus Documentos",
-          es: "Responder Desde Tus Documentos",
-        },
-        bullets: {
-          en: [
-            "Summarize documents with short paragraphs or bullets.",
-            "Extract key facts, numbers, and tables into clear formats.",
-            "Quote exact text and point to where it appears (page/section/sheet/cell when available).",
-            "Compare two documents or sections side-by-side.",
-          ],
-          pt: [
-            "Resumir documentos com parágrafos curtos ou bullets.",
-            "Extrair fatos, números e tabelas em formatos claros.",
-            "Citar texto exato e indicar onde aparece (página/seção/aba/célula quando disponível).",
-            "Comparar dois documentos ou seções lado a lado.",
-          ],
-          es: [
-            "Resumir documentos con párrafos cortos o bullets.",
-            "Extraer hechos, números y tablas en formatos claros.",
-            "Citar texto exacto e indicar dónde aparece (página/sección/hoja/celda cuando esté disponible).",
-            "Comparar dos documentos o secciones lado a lado.",
-          ],
-        },
-        examplePrompts: {
-          en: [
-            "Summarize this in 5 bullets.",
-            "Pull the key numbers into a table.",
-            "Quote the lines that support this claim.",
-          ],
-          pt: [
-            "Resuma em 5 bullets.",
-            "Extraia os números principais em uma tabela.",
-            "Cite as linhas que sustentam essa afirmação.",
-          ],
-          es: [
-            "Resume en 5 bullets.",
-            "Extrae los números clave en una tabla.",
-            "Cita las líneas que sustentan esta afirmación.",
-          ],
-        },
-        sourceOperators: groupOps.docs_qa,
-      },
-      {
-        id: "search_nav",
-        title: {
-          en: "Find and Navigate",
-          pt: "Encontrar e Navegar",
-          es: "Buscar y Navegar",
-        },
-        bullets: {
-          en: [
-            "Find the right file when you only remember a keyword.",
-            "Open a document directly from the results.",
-            "List folders/files to explore your library.",
-          ],
-          pt: [
-            "Encontrar o arquivo certo mesmo com só uma palavra-chave.",
-            "Abrir um documento diretamente a partir dos resultados.",
-            "Listar pastas/arquivos para explorar sua biblioteca.",
-          ],
-          es: [
-            "Encontrar el archivo correcto aunque solo recuerdes una palabra clave.",
-            "Abrir un documento directamente desde los resultados.",
-            "Listar carpetas/archivos para explorar tu biblioteca.",
-          ],
-        },
-        examplePrompts: {
-          en: [
-            "Where is the file about <topic>?",
-            "Open the contract from last week.",
-            "List my folders.",
-          ],
-          pt: [
-            "Onde está o arquivo sobre <tema>?",
-            "Abra o contrato da semana passada.",
-            "Liste minhas pastas.",
-          ],
-          es: [
-            "¿Dónde está el archivo sobre <tema>?",
-            "Abre el contrato de la semana pasada.",
-            "Lista mis carpetas.",
-          ],
-        },
-        sourceOperators: uniq(groupOps.search_nav),
-      },
-      {
-        id: "editing",
-        title: {
-          en: "Edit With Preview",
-          pt: "Editar com Prévia",
-          es: "Editar con Vista Previa",
-        },
-        bullets: {
-          en: [
-            "Rewrite specific text with a draft preview before applying changes.",
-            "Edit DOCX paragraphs or spans and confirm before creating a new revision.",
-            "Edit XLSX cells/ranges and add/rename sheets (with confirmation when needed).",
-          ],
-          pt: [
-            "Reescrever textos específicos com prévia antes de aplicar.",
-            "Editar parágrafos/trechos em DOCX e confirmar antes de criar uma nova revisão.",
-            "Editar células/intervalos em XLSX e adicionar/renomear abas (com confirmação quando necessário).",
-          ],
-          es: [
-            "Reescribir texto específico con vista previa antes de aplicar cambios.",
-            "Editar párrafos/fragmentos en DOCX y confirmar antes de crear una nueva revisión.",
-            "Editar celdas/rangos en XLSX y agregar/renombrar hojas (con confirmación cuando sea necesario).",
-          ],
-        },
-        examplePrompts: {
-          en: [
-            "Fix grammar in the selected text.",
-            "Rewrite this paragraph to be more concise.",
-            "Rename the sheet to 'Summary'.",
-          ],
-          pt: [
-            "Corrija gramática no texto selecionado.",
-            "Reescreva este parágrafo para ficar mais conciso.",
-            "Renomeie a aba para 'Resumo'.",
-          ],
-          es: [
-            "Corrige la gramática en el texto seleccionado.",
-            "Reescribe este párrafo para que sea más conciso.",
-            "Renombra la hoja a 'Resumen'.",
-          ],
-        },
-        sourceOperators: groupOps.editing,
-      },
-      {
-        id: "connectors_email",
-        title: {
-          en: "Email and Connectors (When Connected)",
-          pt: "Email e Conectores (Quando Conectado)",
-          es: "Email y Conectores (Cuando Esté Conectado)",
-        },
-        bullets: {
-          en: [
-            "Read and summarize connected email threads.",
-            "Draft emails and show a preview before sending (permissions required).",
-            "Search connected Slack/email content when the connector is enabled.",
-          ],
-          pt: [
-            "Ler e resumir threads de email conectadas.",
-            "Rascunhar emails e mostrar uma prévia antes de enviar (permissões necessárias).",
-            "Pesquisar conteúdo do Slack/email conectado quando o conector estiver habilitado.",
-          ],
-          es: [
-            "Leer y resumir hilos de email conectados.",
-            "Redactar emails y mostrar una vista previa antes de enviar (se requieren permisos).",
-            "Buscar contenido conectado de Slack/email cuando el conector esté habilitado.",
-          ],
-        },
-        examplePrompts: {
-          en: [
-            "Read my latest email and summarize the action items.",
-            "Draft a reply that is short and polite.",
-            "Search Slack for messages about <topic>.",
-          ],
-          pt: [
-            "Leia meu último email e resuma as ações.",
-            "Rascunhe uma resposta curta e educada.",
-            "Pesquise no Slack mensagens sobre <tema>.",
-          ],
-          es: [
-            "Lee mi último email y resume las acciones.",
-            "Redacta una respuesta corta y educada.",
-            "Busca en Slack mensajes sobre <tema>.",
-          ],
-        },
-        sourceOperators: uniq(groupOps.connectors_email),
-      },
+  const docsGroup = ensureGroup(template, "docs_qa");
+  const navGroup = ensureGroup(template, "search_nav");
+  const editingGroup = ensureGroup(template, "editing");
+  const connectorsGroup = ensureGroup(template, "connectors_email");
+
+  docsGroup.sourceOperators = groupOps.docs_qa;
+  navGroup.sourceOperators = groupOps.search_nav;
+  editingGroup.sourceOperators = groupOps.editing;
+  connectorsGroup.sourceOperators = groupOps.connectors_email;
+
+  template._meta = {
+    ...(template._meta || {}),
+    id: "capabilities_catalog",
+    version: "1.1.0",
+    lastUpdated: nowIso(),
+    derivedFrom: [
+      "operators/operator_contracts.any.json",
+      "semantics/allybi_capabilities.any.json",
     ],
   };
 
-  if (!fs.existsSync(semanticsDir))
-    fs.mkdirSync(semanticsDir, { recursive: true });
-  const outPath = path.join(semanticsDir, "capabilities_catalog.any.json");
-  writeJson(outPath, out);
+  writeJson(outPath, template);
 
   console.log(
-    `Wrote ${path.relative(process.cwd(), outPath)} (${out.groups.length} groups)`,
+    `Wrote ${path.relative(process.cwd(), outPath)} (${safeArr(template.groups).length} groups)`,
   );
 }
 

@@ -9,6 +9,15 @@ type ProcessingMessagesBank = {
   messages?: Record<string, Record<string, string[]>>;
 };
 
+type FallbackRouterBank = {
+  config?: {
+    enabled?: boolean;
+  };
+  maps?: {
+    reasonCodeToTelemetryReason?: Record<string, string>;
+  };
+};
+
 type EditErrorCatalogBank = {
   config?: {
     enabled?: boolean;
@@ -58,15 +67,60 @@ function getProcessingVariants(
   return english.length > 0 ? english : null;
 }
 
+function normalizeFallbackReasonCode(reasonCode: string): string {
+  const reason = String(reasonCode || "")
+    .trim()
+    .toLowerCase();
+  if (!reason) return "";
+  const aliases: Record<string, string> = {
+    no_evidence: "no_relevant_chunks_in_scoped_docs",
+    weak_evidence: "low_confidence",
+    scope_lock: "scope_hard_constraints_empty",
+    wrong_doc: "explicit_doc_not_found",
+  };
+  return aliases[reason] || reason;
+}
+
+function resolveFallbackKindFromRouter(reasonCode: string): "timeout" | "retry" | "error" {
+  const normalized = normalizeFallbackReasonCode(reasonCode);
+  if (!normalized) return "error";
+
+  const router = getOptionalBank<FallbackRouterBank>("fallback_router");
+  const map = router?.maps?.reasonCodeToTelemetryReason || {};
+  const mapped = String(
+    map[normalized] || map[normalized.toUpperCase()] || normalized || "",
+  ).trim();
+  const reasonKey = String(mapped || normalized).toUpperCase();
+
+  const timeoutReasons = new Set(["TIMEOUT", "NETWORK", "PROVIDER_DOWN"]);
+  if (timeoutReasons.has(reasonKey) || normalized === "indexing_in_progress") {
+    return "timeout";
+  }
+  const retryReasons = new Set([
+    "NO_EVIDENCE",
+    "WEAK_EVIDENCE",
+    "WRONG_DOC_LOCK",
+    "WRONG_DOC",
+    "SCOPE_LOCK",
+    "EXTRACTION_FAILED",
+  ]);
+  if (retryReasons.has(reasonKey)) return "retry";
+  return "error";
+}
+
 export function resolveProcessingMessage(
-  key: "processing" | "retry" | "error" | "timeout",
+  key: string,
   lang: unknown,
   seed: string,
 ): string | null {
+  const normalizedKey = String(key || "")
+    .trim()
+    .toLowerCase();
+  if (!normalizedKey) return null;
   const resolvedLang = normalizeLanguage(lang);
-  const variants = getProcessingVariants(key, resolvedLang);
+  const variants = getProcessingVariants(normalizedKey, resolvedLang);
   if (!variants) return null;
-  return pickVariant(variants, `${key}:${resolvedLang}:${seed}`);
+  return pickVariant(variants, `${normalizedKey}:${resolvedLang}:${seed}`);
 }
 
 export function resolveGenericChatFailureMessage(
@@ -87,15 +141,18 @@ export function resolveRuntimeFallbackMessage(params: {
   reasonCode?: string | null;
   seed: string;
 }): string {
-  const reason = String(params.reasonCode || "")
-    .trim()
-    .toLowerCase();
-  const kind: "timeout" | "retry" | "error" =
-    reason === "indexing_in_progress"
-      ? "timeout"
-      : reason === "extraction_failed"
-        ? "retry"
-        : "error";
+  const normalizedReason = normalizeFallbackReasonCode(
+    String(params.reasonCode || ""),
+  );
+  if (normalizedReason) {
+    const byReason = resolveProcessingMessage(
+      normalizedReason,
+      params.language,
+      params.seed,
+    );
+    if (byReason) return byReason;
+  }
+  const kind = resolveFallbackKindFromRouter(String(params.reasonCode || ""));
   return (
     resolveProcessingMessage(kind, params.language, params.seed) ||
     resolveGenericChatFailureMessage(params.language, params.seed)

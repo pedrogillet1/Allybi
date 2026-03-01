@@ -1,10 +1,15 @@
 {
   "_meta": {
     "id": "processing_messages",
-    "version": "1.0.0",
-    "description": "User-facing microcopy for processing states and recovery scenarios. Used during long operations, retries, and error recovery.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "version": "2.0.0",
+    "description": "User-facing microcopy aligned to canonical fallback reason codes.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01",
     "owner": "koda-microcopy",
     "compat": ">=1.0.0",
     "linkedPolicy": "fallback_processing"
@@ -12,6 +17,17 @@
   "config": {
     "enabled": true,
     "category": "fallback_messages",
+    "canonicalReasonCodes": [
+      "no_docs_indexed",
+      "scope_hard_constraints_empty",
+      "no_relevant_chunks_in_scoped_docs",
+      "indexing_in_progress",
+      "extraction_failed",
+      "low_confidence",
+      "doc_ambiguous",
+      "needs_doc_choice",
+      "explicit_doc_not_found"
+    ],
     "variationControl": {
       "enableEntropy": true,
       "entropyWindow": 6,
@@ -22,86 +38,223 @@
     "processing": {
       "en": [
         "Processing your request...",
-        "Working on that...",
-        "Looking into this..."
+        "Working on that now...",
+        "Checking this for you..."
       ],
       "pt": [
-        "Processando sua solicitação...",
-        "Trabalhando nisso...",
-        "Analisando isso..."
+        "Processando sua solicitacao...",
+        "Trabalhando nisso agora...",
+        "Verificando isso para voce..."
       ],
       "es": [
         "Procesando tu solicitud...",
-        "Trabajando en eso...",
-        "Analizando esto..."
+        "Trabajando en eso ahora...",
+        "Revisando esto para ti..."
       ]
     },
     "retry": {
       "en": [
-        "Let me try a different approach...",
-        "Trying another method...",
-        "Let me look at this differently..."
+        "Let me try a different approach.",
+        "Trying another method now.",
+        "I will re-check with a safer strategy."
       ],
       "pt": [
-        "Deixe-me tentar uma abordagem diferente...",
-        "Tentando outro método...",
-        "Deixe-me ver isso de outra forma..."
+        "Vou tentar uma abordagem diferente.",
+        "Tentando outro metodo agora.",
+        "Vou revisar com uma estrategia mais segura."
       ],
       "es": [
-        "Déjame intentar un enfoque diferente...",
-        "Probando otro método...",
-        "Déjame ver esto de otra manera..."
+        "Voy a intentar un enfoque diferente.",
+        "Probando otro metodo ahora.",
+        "Voy a revisar con una estrategia mas segura."
       ]
     },
     "error": {
       "en": [
-        "Something went wrong. Please try again.",
-        "There was an issue. Please try once more.",
-        "I encountered a problem. Could you try again?"
+        "I could not complete that safely. Please try again.",
+        "There was a processing issue. Please try once more.",
+        "I hit a runtime issue. Please retry in a moment."
       ],
       "pt": [
-        "Algo deu errado. Por favor, tente novamente.",
-        "Houve um problema. Por favor, tente mais uma vez.",
-        "Encontrei um problema. Poderia tentar novamente?"
+        "Nao consegui concluir isso com seguranca. Tente novamente.",
+        "Houve um problema de processamento. Tente mais uma vez.",
+        "Encontrei um problema de execucao. Tente de novo em instantes."
       ],
       "es": [
-        "Algo salió mal. Por favor, inténtalo de nuevo.",
-        "Hubo un problema. Por favor, intenta una vez más.",
-        "Encontré un problema. ¿Podrías intentar de nuevo?"
+        "No pude completar eso de forma segura. Intentalo de nuevo.",
+        "Hubo un problema de procesamiento. Intenta una vez mas.",
+        "Tuve un problema de ejecucion. Reintenta en un momento."
       ]
     },
     "timeout": {
       "en": [
-        "This is taking longer than expected. Please wait...",
-        "Still working on this. Thanks for your patience.",
-        "Processing is taking a moment. Almost there..."
+        "This is taking longer than expected. Please wait a moment.",
+        "Still indexing or processing. Thanks for your patience.",
+        "Almost there. Please try again shortly."
       ],
       "pt": [
-        "Isso está demorando mais do que o esperado. Por favor, aguarde...",
-        "Ainda trabalhando nisso. Obrigado pela paciência.",
-        "O processamento está levando um momento. Quase lá..."
+        "Isso esta demorando mais que o esperado. Aguarde um momento.",
+        "Ainda indexando ou processando. Obrigado pela paciencia.",
+        "Quase la. Tente novamente em breve."
       ],
       "es": [
-        "Esto está tardando más de lo esperado. Por favor, espera...",
-        "Todavía trabajando en esto. Gracias por tu paciencia.",
-        "El procesamiento está tomando un momento. Casi listo..."
+        "Esto esta tardando mas de lo esperado. Espera un momento.",
+        "Aun indexando o procesando. Gracias por tu paciencia.",
+        "Casi listo. Intentalo de nuevo en breve."
+      ]
+    },
+    "no_docs_indexed": {
+      "en": [
+        "I do not have indexed documents yet. Upload or index files to continue.",
+        "No indexed files are available right now. Add documents and try again.",
+        "I need indexed documents before I can answer from your files."
+      ],
+      "pt": [
+        "Ainda nao tenho documentos indexados. Envie ou indexe arquivos para continuar.",
+        "Nao ha arquivos indexados agora. Adicione documentos e tente novamente.",
+        "Preciso de documentos indexados para responder com base nos seus arquivos."
+      ],
+      "es": [
+        "Aun no tengo documentos indexados. Sube o indexa archivos para continuar.",
+        "No hay archivos indexados ahora. Agrega documentos e intenta de nuevo.",
+        "Necesito documentos indexados para responder con base en tus archivos."
+      ]
+    },
+    "scope_hard_constraints_empty": {
+      "en": [
+        "I searched within the locked scope but found no matching evidence.",
+        "Within the current document lock, I could not find relevant support.",
+        "The current scope is too narrow for this request."
+      ],
+      "pt": [
+        "Busquei dentro do escopo bloqueado, mas nao encontrei evidencia correspondente.",
+        "No bloqueio de documento atual, nao encontrei suporte relevante.",
+        "O escopo atual esta restrito demais para este pedido."
+      ],
+      "es": [
+        "Busque dentro del alcance bloqueado pero no encontre evidencia coincidente.",
+        "Con el bloqueo de documento actual, no encontre soporte relevante.",
+        "El alcance actual es demasiado limitado para esta solicitud."
+      ]
+    },
+    "no_relevant_chunks_in_scoped_docs": {
+      "en": [
+        "I searched the selected scope and did not find a direct match.",
+        "No relevant passage was found in the current scoped documents.",
+        "The scoped search returned no matching sections for this query."
+      ],
+      "pt": [
+        "Busquei no escopo selecionado e nao encontrei correspondencia direta.",
+        "Nenhum trecho relevante foi encontrado nos documentos no escopo atual.",
+        "A busca no escopo nao encontrou secoes correspondentes para esta pergunta."
+      ],
+      "es": [
+        "Busque en el alcance seleccionado y no encontre coincidencia directa.",
+        "No se encontro un pasaje relevante en los documentos del alcance actual.",
+        "La busqueda en alcance no encontro secciones coincidentes para esta consulta."
+      ]
+    },
+    "indexing_in_progress": {
+      "en": [
+        "Your files are still being indexed. Please try again shortly.",
+        "Indexing is in progress, so results may be incomplete right now.",
+        "I am still preparing your documents for search."
+      ],
+      "pt": [
+        "Seus arquivos ainda estao sendo indexados. Tente novamente em breve.",
+        "A indexacao esta em andamento, entao os resultados podem estar incompletos agora.",
+        "Ainda estou preparando seus documentos para busca."
+      ],
+      "es": [
+        "Tus archivos aun se estan indexando. Intenta de nuevo en breve.",
+        "La indexacion esta en curso, por eso los resultados pueden estar incompletos ahora.",
+        "Aun estoy preparando tus documentos para busqueda."
+      ]
+    },
+    "extraction_failed": {
+      "en": [
+        "I could not extract enough content from this file to answer reliably.",
+        "Extraction quality is too low for a safe answer.",
+        "This file needs a cleaner upload or another format for better extraction."
+      ],
+      "pt": [
+        "Nao consegui extrair conteudo suficiente deste arquivo para responder com confianca.",
+        "A qualidade da extracao esta baixa para uma resposta segura.",
+        "Este arquivo precisa de um reenvio mais limpo ou outro formato para melhor extracao."
+      ],
+      "es": [
+        "No pude extraer contenido suficiente de este archivo para responder con confianza.",
+        "La calidad de extraccion es baja para una respuesta segura.",
+        "Este archivo necesita una carga mas limpia u otro formato para mejorar la extraccion."
+      ]
+    },
+    "low_confidence": {
+      "en": [
+        "I found weak evidence for this request.",
+        "Confidence is low for a definitive answer.",
+        "I need a slightly narrower or clearer query to improve accuracy."
+      ],
+      "pt": [
+        "Encontrei evidencia fraca para este pedido.",
+        "A confianca esta baixa para uma resposta definitiva.",
+        "Preciso de uma pergunta um pouco mais clara ou especifica para melhorar a precisao."
+      ],
+      "es": [
+        "Encontre evidencia debil para esta solicitud.",
+        "La confianza es baja para una respuesta definitiva.",
+        "Necesito una consulta un poco mas clara o especifica para mejorar la precision."
+      ]
+    },
+    "doc_ambiguous": {
+      "en": [
+        "I need one quick clarification to pick the right document.",
+        "This could refer to more than one file.",
+        "Please confirm which document I should use."
+      ],
+      "pt": [
+        "Preciso de uma clarificacao rapida para escolher o documento correto.",
+        "Isto pode se referir a mais de um arquivo.",
+        "Confirme qual documento devo usar."
+      ],
+      "es": [
+        "Necesito una aclaracion rapida para elegir el documento correcto.",
+        "Esto puede referirse a mas de un archivo.",
+        "Confirma que documento debo usar."
+      ]
+    },
+    "needs_doc_choice": {
+      "en": [
+        "Please choose which document I should use.",
+        "I need your document selection before continuing.",
+        "Select one file so I can continue safely."
+      ],
+      "pt": [
+        "Escolha qual documento devo usar.",
+        "Preciso da sua selecao de documento para continuar.",
+        "Selecione um arquivo para que eu continue com seguranca."
+      ],
+      "es": [
+        "Elige que documento debo usar.",
+        "Necesito tu seleccion de documento para continuar.",
+        "Selecciona un archivo para que pueda continuar con seguridad."
+      ]
+    },
+    "explicit_doc_not_found": {
+      "en": [
+        "I could not locate the exact document you referenced.",
+        "That specific file was not found in your current scope.",
+        "Please confirm the exact filename or pick it from the list."
+      ],
+      "pt": [
+        "Nao consegui localizar o documento exato que voce mencionou.",
+        "Esse arquivo especifico nao foi encontrado no seu escopo atual.",
+        "Confirme o nome exato do arquivo ou selecione-o na lista."
+      ],
+      "es": [
+        "No pude localizar el documento exacto que mencionaste.",
+        "Ese archivo especifico no se encontro en tu alcance actual.",
+        "Confirma el nombre exacto del archivo o seleccionarlo de la lista."
       ]
     }
-  },
-  "tests": {
-    "cases": [
-      {
-        "id": "PM_0001_has_all_languages",
-        "assert": "all messages have en, pt, es variants"
-      },
-      {
-        "id": "PM_0002_no_blame_language",
-        "assert": "no message blames the user"
-      },
-      {
-        "id": "PM_0003_multiple_variants",
-        "assert": "each message type has at least 3 variants"
-      }
-    ]
   }
 }

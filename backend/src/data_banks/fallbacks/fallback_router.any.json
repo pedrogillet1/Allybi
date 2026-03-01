@@ -1,52 +1,37 @@
 {
   "_meta": {
     "id": "fallback_router",
-    "version": "1.0.0",
-    "description": "Deterministic fallback router for Koda. Selects a fallback action based on stage + reason codes + doc-lock + risk tier. Includes user-facing fallback scenarios with localized microcopy for NO_DOCUMENTS, OUT_OF_SCOPE, and AMBIGUOUS_QUESTION.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-22"
+    "version": "2.0.0",
+    "description": "Deterministic fallback router with canonical reason-code policy.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "actionsContract": {
-      "purpose": "Choose fallback behavior deterministically (no hallucinations, no banned phrases).",
-      "inputs": [
-        "stage",
-        "operator",
-        "reasonCode",
-        "errorCode",
-        "riskTier",
-        "docLock.enabled",
-        "explicitFileMentioned",
-        "attempt"
-      ],
-      "outputs": [
-        "action",
-        "nextOperator",
-        "fallbackProvider",
-        "fallbackModelKey",
-        "askOneQuestion",
-        "returnNavPillsOnly",
-        "telemetryReason"
-      ],
-      "determinism": "Pure lookup: first-match rule order, stable precedence."
-    },
-    "precedence": {
-      "order": [
-        "SAFETY_BLOCK",
-        "PRIVACY_BLOCK",
-        "WRONG_DOC",
-        "SCOPE_LOCK",
-        "NO_EVIDENCE",
-        "WEAK_EVIDENCE",
-        "RATE_LIMIT",
-        "TIMEOUT",
-        "PROVIDER_DOWN",
-        "NETWORK",
-        "BAD_REQUEST",
-        "UNKNOWN"
-      ]
-    },
+    "canonicalReasonCodes": [
+      "no_docs_indexed",
+      "scope_hard_constraints_empty",
+      "no_relevant_chunks_in_scoped_docs",
+      "indexing_in_progress",
+      "extraction_failed",
+      "low_confidence",
+      "doc_ambiguous",
+      "needs_doc_choice",
+      "explicit_doc_not_found",
+      "safety_block",
+      "privacy_block",
+      "timeout",
+      "network",
+      "provider_down",
+      "rate_limit",
+      "bad_request",
+      "unknown"
+    ],
     "defaults": {
       "riskTier": "medium",
       "attempt": 1,
@@ -58,52 +43,51 @@
       }
     }
   },
-  "enums": {
-    "stages": [
-      "input_normalization",
-      "intent_operator",
-      "scope_resolution",
-      "retrieval",
-      "evidence_gate",
-      "trust_gate",
-      "compose",
-      "quality_gates",
-      "output_contract",
-      "stream"
-    ],
-    "actions": [
-      "ask_one_question",
-      "route_to_discovery",
-      "route_to_nav_pills",
-      "regen_with_stricter_model",
-      "retry_same_provider",
-      "switch_provider",
-      "degrade_to_local",
-      "return_reason_only"
-    ],
-    "riskTiers": ["low", "medium", "high"]
-  },
   "maps": {
     "reasonCodeToTelemetryReason": {
-      "NO_EVIDENCE": "NO_EVIDENCE",
-      "WEAK_EVIDENCE": "WEAK_EVIDENCE",
-      "WRONG_DOC": "WRONG_DOC_LOCK",
-      "SCOPE_LOCK": "WRONG_DOC_LOCK",
+      "no_docs_indexed": "NO_EVIDENCE",
+      "scope_hard_constraints_empty": "SCOPE_LOCK",
+      "no_relevant_chunks_in_scoped_docs": "NO_EVIDENCE",
+      "indexing_in_progress": "TIMEOUT",
+      "extraction_failed": "EXTRACTION_FAILED",
+      "low_confidence": "WEAK_EVIDENCE",
+      "doc_ambiguous": "WRONG_DOC",
+      "needs_doc_choice": "WRONG_DOC",
+      "explicit_doc_not_found": "WRONG_DOC",
+      "safety_block": "SAFETY_BLOCK",
+      "privacy_block": "PRIVACY_REDACT",
+      "timeout": "TIMEOUT",
+      "network": "NETWORK",
+      "provider_down": "PROVIDER_DOWN",
+      "rate_limit": "RATE_LIMIT",
+      "bad_request": "BAD_REQUEST",
+      "unknown": "UNKNOWN",
+      "NO_DOCS_INDEXED": "NO_EVIDENCE",
+      "SCOPE_HARD_CONSTRAINTS_EMPTY": "SCOPE_LOCK",
+      "NO_RELEVANT_CHUNKS_IN_SCOPED_DOCS": "NO_EVIDENCE",
+      "INDEXING_IN_PROGRESS": "TIMEOUT",
+      "EXTRACTION_FAILED": "EXTRACTION_FAILED",
+      "LOW_CONFIDENCE": "WEAK_EVIDENCE",
+      "DOC_AMBIGUOUS": "WRONG_DOC",
+      "NEEDS_DOC_CHOICE": "WRONG_DOC",
+      "EXPLICIT_DOC_NOT_FOUND": "WRONG_DOC",
       "SAFETY_BLOCK": "SAFETY_BLOCK",
       "PRIVACY_BLOCK": "PRIVACY_REDACT",
-      "RATE_LIMIT": "RATE_LIMIT",
       "TIMEOUT": "TIMEOUT",
-      "PROVIDER_DOWN": "PROVIDER_DOWN",
       "NETWORK": "NETWORK",
+      "PROVIDER_DOWN": "PROVIDER_DOWN",
+      "RATE_LIMIT": "RATE_LIMIT",
       "BAD_REQUEST": "BAD_REQUEST",
       "UNKNOWN": "UNKNOWN"
     }
   },
   "rules": [
     {
-      "id": "safety_block_always_return_reason_only",
+      "id": "fr_safety_block_terminal",
       "when": {
-        "reasonCodeIn": ["SAFETY_BLOCK"]
+        "reasonCodeIn": [
+          "safety_block"
+        ]
       },
       "do": {
         "action": "return_reason_only",
@@ -111,54 +95,39 @@
       }
     },
     {
-      "id": "privacy_block_redact_then_ask_one_question",
+      "id": "fr_privacy_block",
       "when": {
-        "reasonCodeIn": ["PRIVACY_BLOCK"]
+        "reasonCodeIn": [
+          "privacy_block"
+        ]
       },
       "do": {
         "action": "ask_one_question",
-        "askOneQuestion": {
-          "enabled": true,
-          "reasonCode": "PRIVACY_BLOCK"
-        },
         "telemetryReason": "PRIVACY_REDACT"
       }
     },
     {
-      "id": "wrong_doc_or_scope_lock_never_switch_docs",
+      "id": "fr_scope_or_not_found",
       "when": {
-        "reasonCodeIn": ["WRONG_DOC", "SCOPE_LOCK"],
-        "docLock": { "enabled": true }
+        "reasonCodeIn": [
+          "scope_hard_constraints_empty",
+          "no_relevant_chunks_in_scoped_docs",
+          "explicit_doc_not_found",
+          "needs_doc_choice",
+          "doc_ambiguous"
+        ]
       },
       "do": {
         "action": "ask_one_question",
-        "askOneQuestion": {
-          "enabled": true,
-          "reasonCode": "WRONG_DOC"
-        },
-        "telemetryReason": "WRONG_DOC_LOCK"
+        "telemetryReason": "WRONG_DOC"
       }
     },
     {
-      "id": "no_evidence_with_doc_lock_ask_one_question",
+      "id": "fr_no_docs_indexed",
       "when": {
-        "reasonCodeIn": ["NO_EVIDENCE"],
-        "docLock": { "enabled": true }
-      },
-      "do": {
-        "action": "ask_one_question",
-        "askOneQuestion": {
-          "enabled": true,
-          "reasonCode": "NO_EVIDENCE"
-        },
-        "telemetryReason": "NO_EVIDENCE"
-      }
-    },
-    {
-      "id": "no_evidence_without_doc_lock_route_discovery",
-      "when": {
-        "reasonCodeIn": ["NO_EVIDENCE"],
-        "docLock": { "enabled": false }
+        "reasonCodeIn": [
+          "no_docs_indexed"
+        ]
       },
       "do": {
         "action": "route_to_discovery",
@@ -167,90 +136,45 @@
       }
     },
     {
-      "id": "weak_evidence_low_risk_retry_retrieval_once",
+      "id": "fr_extraction_or_low_confidence",
       "when": {
-        "reasonCodeIn": ["WEAK_EVIDENCE"],
-        "riskTier": "low",
-        "stageIn": ["retrieval", "evidence_gate"],
-        "attempt": 1
-      },
-      "do": {
-        "action": "retry_same_provider",
-        "telemetryReason": "WEAK_EVIDENCE",
-        "retryPolicy": { "maxAttempts": 1, "backoffMs": 200 }
-      }
-    },
-    {
-      "id": "weak_evidence_medium_or_high_escalate_model",
-      "when": {
-        "reasonCodeIn": ["WEAK_EVIDENCE"],
-        "riskTierIn": ["medium", "high"]
+        "reasonCodeIn": [
+          "extraction_failed",
+          "low_confidence"
+        ]
       },
       "do": {
         "action": "regen_with_stricter_model",
         "fallbackProvider": "openai",
-        "fallbackModelKey": "GPT_5_2",
+        "fallbackModelKey": "GPT_5_MINI",
         "telemetryReason": "WEAK_EVIDENCE"
       }
     },
     {
-      "id": "rate_limit_low_degrade_to_local",
+      "id": "fr_indexing_in_progress",
       "when": {
-        "reasonCodeIn": ["RATE_LIMIT"],
-        "riskTier": "low"
-      },
-      "do": {
-        "action": "degrade_to_local",
-        "fallbackProvider": "local",
-        "fallbackModelKey": "OLLAMA_DEFAULT_STREAM",
-        "telemetryReason": "RATE_LIMIT"
-      }
-    },
-    {
-      "id": "rate_limit_medium_switch_provider_google_flash",
-      "when": {
-        "reasonCodeIn": ["RATE_LIMIT"],
-        "riskTier": "medium"
-      },
-      "do": {
-        "action": "switch_provider",
-        "fallbackProvider": "google",
-        "fallbackModelKey": "GEMINI_3_FLASH",
-        "telemetryReason": "RATE_LIMIT"
-      }
-    },
-    {
-      "id": "timeout_retry_once_then_switch_provider",
-      "when": {
-        "reasonCodeIn": ["TIMEOUT", "NETWORK", "PROVIDER_DOWN"],
-        "attempt": 1
+        "reasonCodeIn": [
+          "indexing_in_progress"
+        ]
       },
       "do": {
         "action": "retry_same_provider",
-        "retryPolicy": { "maxAttempts": 1, "backoffMs": 300 },
+        "retryPolicy": {
+          "maxAttempts": 1,
+          "backoffMs": 500
+        },
         "telemetryReason": "TIMEOUT"
       }
     },
     {
-      "id": "timeout_after_retry_switch_provider_chain",
+      "id": "fr_provider_failures",
       "when": {
-        "reasonCodeIn": ["TIMEOUT", "NETWORK", "PROVIDER_DOWN"],
-        "attempt": 2,
-        "riskTier": "low"
-      },
-      "do": {
-        "action": "switch_provider",
-        "fallbackProvider": "local",
-        "fallbackModelKey": "OLLAMA_DEFAULT_STREAM",
-        "telemetryReason": "PROVIDER_DOWN"
-      }
-    },
-    {
-      "id": "timeout_after_retry_switch_provider_chain_medium",
-      "when": {
-        "reasonCodeIn": ["TIMEOUT", "NETWORK", "PROVIDER_DOWN"],
-        "attempt": 2,
-        "riskTierIn": ["medium", "high"]
+        "reasonCodeIn": [
+          "timeout",
+          "network",
+          "provider_down",
+          "rate_limit"
+        ]
       },
       "do": {
         "action": "switch_provider",
@@ -260,167 +184,12 @@
       }
     },
     {
-      "id": "bad_request_never_retry_return_reason_only",
-      "when": {
-        "reasonCodeIn": ["BAD_REQUEST"]
-      },
-      "do": {
-        "action": "return_reason_only",
-        "telemetryReason": "BAD_REQUEST"
-      }
-    },
-    {
-      "id": "final_default_ask_one_question",
+      "id": "fr_default",
       "when": {},
       "do": {
         "action": "ask_one_question",
-        "askOneQuestion": { "enabled": true, "reasonCode": "UNKNOWN" },
         "telemetryReason": "UNKNOWN"
       }
-    }
-  ],
-  "tests": [
-    {
-      "name": "no_evidence_without_lock_routes_discovery",
-      "input": {
-        "stage": "evidence_gate",
-        "reasonCode": "NO_EVIDENCE",
-        "docLock": { "enabled": false },
-        "riskTier": "medium",
-        "attempt": 1
-      },
-      "expect": {
-        "action": "route_to_discovery",
-        "nextOperator": "discover",
-        "telemetryReason": "NO_EVIDENCE"
-      }
-    },
-    {
-      "name": "no_evidence_with_lock_asks_one_question",
-      "input": {
-        "stage": "evidence_gate",
-        "reasonCode": "NO_EVIDENCE",
-        "docLock": { "enabled": true },
-        "riskTier": "medium",
-        "attempt": 1
-      },
-      "expect": {
-        "action": "ask_one_question",
-        "askOneQuestion.enabled": true,
-        "telemetryReason": "NO_EVIDENCE"
-      }
-    },
-    {
-      "name": "weak_evidence_high_escalates_to_openai_authority",
-      "input": {
-        "stage": "compose",
-        "reasonCode": "WEAK_EVIDENCE",
-        "docLock": { "enabled": true },
-        "riskTier": "high",
-        "attempt": 1
-      },
-      "expect": {
-        "action": "regen_with_stricter_model",
-        "fallbackProvider": "openai",
-        "fallbackModelKey": "GPT_5_2",
-        "telemetryReason": "WEAK_EVIDENCE"
-      }
-    },
-    {
-      "name": "timeout_attempt2_low_switches_to_local",
-      "input": {
-        "stage": "stream",
-        "reasonCode": "TIMEOUT",
-        "docLock": { "enabled": false },
-        "riskTier": "low",
-        "attempt": 2
-      },
-      "expect": {
-        "action": "switch_provider",
-        "fallbackProvider": "local",
-        "fallbackModelKey": "OLLAMA_DEFAULT_STREAM",
-        "telemetryReason": "PROVIDER_DOWN"
-      }
-    }
-  ],
-  "scenarios": [
-    {
-      "key": "NO_DOCUMENTS",
-      "category": "retrieval_failure",
-      "description": "Retrieval found no relevant content in the attached documents for the user's question.",
-      "styles": [
-        {
-          "id": "transparent_guidance",
-          "tone": "helpful",
-          "renderHint": { "layout": "simple", "showIcon": true, "icon": "info" },
-          "languages": {
-            "en": {
-              "template": "I searched your documents but couldn't find content relevant to this question. {{reason}} Could you rephrase or point me to which document might have this information?",
-              "placeholders": ["reason"]
-            },
-            "pt": {
-              "template": "Pesquisei nos seus documentos, mas não encontrei conteúdo relevante para esta pergunta. {{reason}} Poderia reformular ou indicar qual documento pode ter essa informação?",
-              "placeholders": ["reason"]
-            },
-            "es": {
-              "template": "Busqué en sus documentos pero no encontré contenido relevante para esta pregunta. {{reason}} ¿Podría reformular o indicar qué documento podría tener esta información?",
-              "placeholders": ["reason"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "key": "OUT_OF_SCOPE",
-      "category": "scope_mismatch",
-      "description": "The question does not appear to be covered by the attached documents.",
-      "styles": [
-        {
-          "id": "transparent_guidance",
-          "tone": "helpful",
-          "renderHint": { "layout": "simple", "showIcon": true, "icon": "info" },
-          "languages": {
-            "en": {
-              "template": "This question doesn't appear to be covered in the attached documents. The documents I have access to cover: {{topics}}. Would you like to ask something about those topics instead?",
-              "placeholders": ["topics"]
-            },
-            "pt": {
-              "template": "Esta pergunta não parece estar coberta nos documentos anexados. Os documentos que tenho acesso cobrem: {{topics}}. Gostaria de perguntar algo sobre esses temas?",
-              "placeholders": ["topics"]
-            },
-            "es": {
-              "template": "Esta pregunta no parece estar cubierta en los documentos adjuntos. Los documentos a los que tengo acceso cubren: {{topics}}. ¿Le gustaría preguntar algo sobre esos temas?",
-              "placeholders": ["topics"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "key": "AMBIGUOUS_QUESTION",
-      "category": "clarification_needed",
-      "description": "The question is too broad or ambiguous to produce a focused answer from the available evidence.",
-      "styles": [
-        {
-          "id": "one_clarification",
-          "tone": "collaborative",
-          "renderHint": { "layout": "simple", "showIcon": false },
-          "languages": {
-            "en": {
-              "template": "I found information in your documents, but your question could refer to several topics. Could you clarify which aspect you'd like me to focus on? {{suggestion}}",
-              "placeholders": ["suggestion"]
-            },
-            "pt": {
-              "template": "Encontrei informações nos seus documentos, mas sua pergunta pode se referir a vários temas. Poderia esclarecer em qual aspecto gostaria que eu focasse? {{suggestion}}",
-              "placeholders": ["suggestion"]
-            },
-            "es": {
-              "template": "Encontré información en sus documentos, pero su pregunta podría referirse a varios temas. ¿Podría aclarar en qué aspecto le gustaría que me enfocara? {{suggestion}}",
-              "placeholders": ["suggestion"]
-            }
-          }
-        }
-      ]
     }
   ]
 }

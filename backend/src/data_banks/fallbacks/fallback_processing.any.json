@@ -1,64 +1,83 @@
 {
   "_meta": {
     "id": "fallback_processing",
-    "version": "1.0.0",
-    "description": "Adaptive fallback decision and behavior rules for Koda. Governs fallback selection, prioritization, and recovery paths without hardcoded responses, ensuring dynamic, unique, and ChatGPT-like fallback behavior.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "version": "2.0.0",
+    "description": "Canonical fallback decision rules shared across runtime fallback banks.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01",
     "owner": "koda-fallbacks",
     "compat": ">=1.0.0",
     "linkedMicrocopy": "processing_messages"
   },
   "config": {
     "enabled": true,
+    "canonicalReasonCodes": [
+      "no_docs_indexed",
+      "scope_hard_constraints_empty",
+      "no_relevant_chunks_in_scoped_docs",
+      "indexing_in_progress",
+      "extraction_failed",
+      "low_confidence",
+      "doc_ambiguous",
+      "needs_doc_choice",
+      "explicit_doc_not_found"
+    ],
     "actionsContract": {
-      "combination": {
-        "multipleMatches": "pick_highest_severity",
-        "hardBlockIsTerminal": false
-      },
-      "thresholds": {
-        "maxFallbacksPerTurn": 1,
-        "minConfidenceToProceed": 0.55
-      },
-      "conflictResolution": {
-        "ifMultipleFallbacks": "most_specific_reason"
-      }
+      "maxFallbacksPerTurn": 1,
+      "defaultFallbackType": "fallback_default",
+      "conflictResolution": "highest_severity_then_priority"
     },
     "variationControl": {
       "enableEntropy": true,
       "entropyWindow": 7,
       "cooldownTurns": 3,
-      "dedupeBy": ["reasonCode", "fallbackType"]
+      "dedupeBy": [
+        "reasonCode",
+        "fallbackType"
+      ]
     }
   },
   "rules": [
     {
-      "id": "no_docs_indexed",
-      "scope": "global",
-      "description": "Handle cases where no documents are indexed.",
-      "appliesTo": ["all_fallbacks"],
+      "id": "fp_no_docs_indexed",
+      "priority": 120,
       "when": {
         "all": [
-          { "path": "signals.hasIndexedDocs", "op": "eq", "value": false }
+          {
+            "path": "signals.hasIndexedDocs",
+            "op": "eq",
+            "value": false
+          }
         ]
       },
       "action": {
         "type": "fallback",
         "fallbackType": "no_docs_indexed",
-        "strategy": "guide_next_step"
+        "strategy": "guide_upload_or_indexing"
       },
       "reasonCode": "no_docs_indexed",
       "severity": "critical"
     },
     {
-      "id": "scope_empty",
-      "scope": "cross_family",
-      "description": "Handle empty results caused by hard scope constraints.",
-      "appliesTo": ["all_fallbacks"],
+      "id": "fp_scope_hard_constraints_empty",
+      "priority": 110,
       "when": {
         "all": [
-          { "path": "signals.hardScopeActive", "op": "eq", "value": true },
-          { "path": "metrics.retrievedChunks", "op": "eq", "value": 0 }
+          {
+            "path": "signals.hardScopeActive",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.retrievedChunks",
+            "op": "eq",
+            "value": 0
+          }
         ]
       },
       "action": {
@@ -70,69 +89,94 @@
       "severity": "high"
     },
     {
-      "id": "low_confidence_answer_block",
-      "scope": "global",
-      "description": "Block answer generation when confidence is too low to proceed safely.",
-      "appliesTo": ["all_fallbacks"],
+      "id": "fp_no_relevant_chunks_in_scoped_docs",
+      "priority": 100,
       "when": {
         "all": [
-          { "path": "metrics.topConfidence", "op": "lt", "value": 0.55 }
+          {
+            "path": "signals.searchExecuted",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.retrievedChunks",
+            "op": "eq",
+            "value": 0
+          },
+          {
+            "path": "signals.hardScopeActive",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "not_found_in_scope",
+        "strategy": "confirm_and_rephrase"
+      },
+      "reasonCode": "no_relevant_chunks_in_scoped_docs",
+      "severity": "medium"
+    },
+    {
+      "id": "fp_extraction_failed",
+      "priority": 90,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.extractionCoverage",
+            "op": "lt",
+            "value": 0.6
+          }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "extraction_failed",
+        "strategy": "offer_recovery_steps"
+      },
+      "reasonCode": "extraction_failed",
+      "severity": "high"
+    },
+    {
+      "id": "fp_low_confidence",
+      "priority": 80,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.topConfidence",
+            "op": "lt",
+            "value": 0.55
+          }
         ]
       },
       "action": {
         "type": "fallback",
         "fallbackType": "low_confidence",
-        "strategy": "request_clarification_or_rephrase"
+        "strategy": "ask_clarification_or_hedge"
       },
       "reasonCode": "low_confidence",
       "severity": "medium"
     },
     {
-      "id": "ambiguous_intent",
-      "scope": "global",
-      "description": "Handle unresolved ambiguity after routing and operator resolution.",
-      "appliesTo": ["all_fallbacks"],
+      "id": "fp_doc_ambiguous",
+      "priority": 70,
       "when": {
         "all": [
-          { "path": "signals.isAmbiguous", "op": "eq", "value": true }
+          {
+            "path": "signals.isAmbiguous",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
         "type": "fallback",
-        "fallbackType": "ambiguous_intent",
-        "strategy": "clarify_with_minimal_question"
+        "fallbackType": "doc_ambiguous",
+        "strategy": "ask_minimal_disambiguation"
       },
       "reasonCode": "doc_ambiguous",
       "severity": "medium"
     }
-  ],
-  "tests": {
-    "cases": [
-      {
-        "id": "FBP_001_no_docs_indexed",
-        "context": { "signals": { "hasIndexedDocs": false } },
-        "expect": { "fallbackType": "no_docs_indexed" }
-      },
-      {
-        "id": "FBP_002_scope_empty",
-        "context": {
-          "signals": { "hardScopeActive": true },
-          "metrics": { "retrievedChunks": 0 }
-        },
-        "expect": { "fallbackType": "scope_empty" }
-      },
-      {
-        "id": "FBP_003_low_confidence",
-        "context": { "metrics": { "topConfidence": 0.3 } },
-        "expect": { "fallbackType": "low_confidence" }
-      },
-      {
-        "id": "FBP_004_single_fallback_only",
-        "context": {
-          "signals": { "hasIndexedDocs": false, "isAmbiguous": true }
-        },
-        "expect": { "fallbackCountMax": 1 }
-      }
-    ]
-  }
+  ]
 }

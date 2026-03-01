@@ -1,46 +1,44 @@
 {
   "_meta": {
     "id": "fallback_extraction_recovery",
-    "version": "1.0.0",
-    "description": "Adaptive recovery rules for partial or failed content extraction in Koda. Governs fallback strategies when OCR, parsing, or structured extraction fails, ensuring graceful recovery without hardcoded messaging.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "version": "2.0.0",
+    "description": "Canonical recovery rules when extraction quality is partial or failed.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01",
     "owner": "koda-fallbacks",
     "compat": ">=1.0.0",
-    "linkedMicrocopy": "extraction_recovery_messages"
+    "linkedMicrocopy": "processing_messages"
   },
   "config": {
     "enabled": true,
-    "actionsContract": {
-      "combination": {
-        "multipleMatches": "pick_highest_severity",
-        "hardBlockIsTerminal": false
-      },
-      "thresholds": {
-        "minExtractionCoverage": 0.6,
-        "minRecoveryConfidence": 0.5
-      },
-      "conflictResolution": {
-        "ifMultipleRecoveries": "prefer_least_disruptive"
-      }
-    },
-    "variationControl": {
-      "enableEntropy": true,
-      "entropyWindow": 7,
-      "cooldownTurns": 3,
-      "dedupeBy": ["reasonCode", "recoveryType"]
-    }
+    "canonicalReasonCodes": [
+      "extraction_failed",
+      "low_confidence"
+    ],
+    "minExtractionCoverage": 0.6,
+    "minRecoveryConfidence": 0.5
   },
   "rules": [
     {
-      "id": "partial_text_extraction",
-      "scope": "operator_specific",
-      "description": "Recover when text extraction coverage is partial but usable.",
-      "appliesTo": ["summarize", "extract", "quote"],
+      "id": "fer_partial_extraction_low_confidence",
+      "priority": 110,
       "when": {
         "all": [
-          { "path": "metrics.extractionCoverage", "op": "gte", "value": 0.6 },
-          { "path": "metrics.extractionCoverage", "op": "lt", "value": 1.0 }
+          {
+            "path": "metrics.extractionCoverage",
+            "op": "gte",
+            "value": 0.6
+          },
+          {
+            "path": "metrics.extractionCoverage",
+            "op": "lt",
+            "value": 1.0
+          }
         ]
       },
       "action": {
@@ -48,17 +46,19 @@
         "recoveryType": "partial_extraction",
         "strategy": "answer_with_coverage_notice"
       },
-      "reasonCode": "partial_extraction",
+      "reasonCode": "low_confidence",
       "severity": "medium"
     },
     {
-      "id": "ocr_failed_fallback",
-      "scope": "operator_specific",
-      "description": "Handle complete OCR or parsing failure.",
-      "appliesTo": ["summarize", "extract", "quote"],
+      "id": "fer_extraction_failed",
+      "priority": 120,
       "when": {
         "all": [
-          { "path": "metrics.extractionCoverage", "op": "lt", "value": 0.6 }
+          {
+            "path": "metrics.extractionCoverage",
+            "op": "lt",
+            "value": 0.6
+          }
         ]
       },
       "action": {
@@ -68,54 +68,6 @@
       },
       "reasonCode": "extraction_failed",
       "severity": "high"
-    },
-    {
-      "id": "table_structure_lost",
-      "scope": "operator_specific",
-      "description": "Recover when table structure is lost but raw values exist.",
-      "appliesTo": ["extract", "compute", "compare"],
-      "when": {
-        "all": [
-          { "path": "signals.tableExpected", "op": "eq", "value": true },
-          { "path": "signals.tableParsed", "op": "eq", "value": false }
-        ]
-      },
-      "action": {
-        "type": "recovery",
-        "recoveryType": "table_structure_lost",
-        "strategy": "fallback_to_bullets_or_paragraphs"
-      },
-      "reasonCode": "table_parse_failed",
-      "severity": "medium"
     }
-  ],
-  "tests": {
-    "cases": [
-      {
-        "id": "FBER_001_partial_extraction_recovery",
-        "context": { "metrics": { "extractionCoverage": 0.75 } },
-        "expect": { "recoveryType": "partial_extraction" }
-      },
-      {
-        "id": "FBER_002_full_extraction_failure",
-        "context": { "metrics": { "extractionCoverage": 0.2 } },
-        "expect": { "recoveryType": "extraction_failed" }
-      },
-      {
-        "id": "FBER_003_table_structure_lost",
-        "context": {
-          "signals": { "tableExpected": true, "tableParsed": false }
-        },
-        "expect": { "recoveryType": "table_structure_lost" }
-      },
-      {
-        "id": "FBER_004_single_recovery_only",
-        "context": {
-          "metrics": { "extractionCoverage": 0.2 },
-          "signals": { "tableExpected": true, "tableParsed": false }
-        },
-        "expect": { "recoveryCountMax": 1 }
-      }
-    ]
-  }
+  ]
 }

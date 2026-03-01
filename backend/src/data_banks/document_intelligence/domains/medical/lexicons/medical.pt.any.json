@@ -1,0 +1,1449 @@
+{
+  "_meta": {
+    "id": "medical_lexicon_pt",
+    "version": "1.0.0",
+    "description": "Portuguese lexicon for medical domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "language": "pt"
+  },
+  "domain": "medical",
+  "terms": [
+    {
+      "id": "medical_lex_pt_001",
+      "canonical": "admission data",
+      "synonyms": [
+        "admission data",
+        "admission data clausula",
+        "admission data disposicao"
+      ],
+      "display": "Admission Data",
+      "enRef": "medical_lex_en_001"
+    },
+    {
+      "id": "medical_lex_pt_002",
+      "canonical": "allergy",
+      "synonyms": [
+        "allergy",
+        "allergy clausula",
+        "allergy disposicao"
+      ],
+      "display": "Allergy",
+      "enRef": "medical_lex_en_002"
+    },
+    {
+      "id": "medical_lex_pt_003",
+      "canonical": "assessment",
+      "synonyms": [
+        "assessment",
+        "assessment clausula",
+        "assessment disposicao"
+      ],
+      "display": "Assessment",
+      "enRef": "medical_lex_en_003"
+    },
+    {
+      "id": "medical_lex_pt_004",
+      "canonical": "attending physician",
+      "synonyms": [
+        "attending physician",
+        "attending physician clausula",
+        "attending physician disposicao"
+      ],
+      "display": "Attending Physician",
+      "enRef": "medical_lex_en_004"
+    },
+    {
+      "id": "medical_lex_pt_005",
+      "canonical": "blood pressure",
+      "synonyms": [
+        "blood pressure",
+        "blood pressure clausula",
+        "blood pressure disposicao"
+      ],
+      "display": "Blood Pressure",
+      "enRef": "medical_lex_en_005"
+    },
+    {
+      "id": "medical_lex_pt_006",
+      "canonical": "body mass index",
+      "synonyms": [
+        "body mass index",
+        "body mass index clausula",
+        "body mass index disposicao"
+      ],
+      "display": "Body Mass Index",
+      "enRef": "medical_lex_en_006"
+    },
+    {
+      "id": "medical_lex_pt_007",
+      "canonical": "care coordination",
+      "synonyms": [
+        "care coordination",
+        "care coordination clausula",
+        "care coordination disposicao"
+      ],
+      "display": "Care Coordination",
+      "enRef": "medical_lex_en_007"
+    },
+    {
+      "id": "medical_lex_pt_008",
+      "canonical": "care plano",
+      "synonyms": [
+        "care plano",
+        "care plano clausula",
+        "care plano disposicao"
+      ],
+      "display": "Care Plano",
+      "enRef": "medical_lex_en_008"
+    },
+    {
+      "id": "medical_lex_pt_009",
+      "canonical": "chief complaint",
+      "synonyms": [
+        "chief complaint",
+        "chief complaint clausula",
+        "chief complaint disposicao"
+      ],
+      "display": "Chief Complaint",
+      "enRef": "medical_lex_en_009"
+    },
+    {
+      "id": "medical_lex_pt_010",
+      "canonical": "clinical achado",
+      "synonyms": [
+        "clinical achado",
+        "clinical achado clausula",
+        "clinical achado disposicao"
+      ],
+      "display": "Clinical Achado",
+      "enRef": "medical_lex_en_010"
+    },
+    {
+      "id": "medical_lex_pt_011",
+      "canonical": "clinical impression",
+      "synonyms": [
+        "clinical impression",
+        "clinical impression clausula",
+        "clinical impression disposicao"
+      ],
+      "display": "Clinical Impression",
+      "enRef": "medical_lex_en_011"
+    },
+    {
+      "id": "medical_lex_pt_012",
+      "canonical": "code status",
+      "synonyms": [
+        "code status",
+        "code status clausula",
+        "code status disposicao"
+      ],
+      "display": "Code Status",
+      "enRef": "medical_lex_en_012"
+    },
+    {
+      "id": "medical_lex_pt_013",
+      "canonical": "consultation",
+      "synonyms": [
+        "consultation",
+        "consultation clausula",
+        "consultation disposicao"
+      ],
+      "display": "Consultation",
+      "enRef": "medical_lex_en_013"
+    },
+    {
+      "id": "medical_lex_pt_014",
+      "canonical": "contraindication",
+      "synonyms": [
+        "contraindication",
+        "contraindication clausula",
+        "contraindication disposicao"
+      ],
+      "display": "Contraindication",
+      "enRef": "medical_lex_en_014"
+    },
+    {
+      "id": "medical_lex_pt_015",
+      "canonical": "critical value",
+      "synonyms": [
+        "critical value",
+        "critical value clausula",
+        "critical value disposicao"
+      ],
+      "display": "Critical Value",
+      "enRef": "medical_lex_en_015"
+    },
+    {
+      "id": "medical_lex_pt_016",
+      "canonical": "differential diagnostico",
+      "synonyms": [
+        "differential diagnostico",
+        "differential diagnostico clausula",
+        "differential diagnostico disposicao"
+      ],
+      "display": "Differential Diagnostico",
+      "enRef": "medical_lex_en_016"
+    },
+    {
+      "id": "medical_lex_pt_017",
+      "canonical": "discharge data",
+      "synonyms": [
+        "discharge data",
+        "discharge data clausula",
+        "discharge data disposicao"
+      ],
+      "display": "Discharge Data",
+      "enRef": "medical_lex_en_017"
+    },
+    {
+      "id": "medical_lex_pt_018",
+      "canonical": "discharge instruction",
+      "synonyms": [
+        "discharge instruction",
+        "discharge instruction clausula",
+        "discharge instruction disposicao"
+      ],
+      "display": "Discharge Instruction",
+      "enRef": "medical_lex_en_018"
+    },
+    {
+      "id": "medical_lex_pt_019",
+      "canonical": "dosage",
+      "synonyms": [
+        "dosage",
+        "dosage clausula",
+        "dosage disposicao"
+      ],
+      "display": "Dosage",
+      "enRef": "medical_lex_en_019"
+    },
+    {
+      "id": "medical_lex_pt_020",
+      "canonical": "duration",
+      "synonyms": [
+        "duration",
+        "duration clausula",
+        "duration disposicao"
+      ],
+      "display": "Duration",
+      "enRef": "medical_lex_en_020"
+    },
+    {
+      "id": "medical_lex_pt_021",
+      "canonical": "encounter data",
+      "synonyms": [
+        "encounter data",
+        "encounter data clausula",
+        "encounter data disposicao"
+      ],
+      "display": "Encounter Data",
+      "enRef": "medical_lex_en_021"
+    },
+    {
+      "id": "medical_lex_pt_022",
+      "canonical": "evaluation",
+      "synonyms": [
+        "evaluation",
+        "evaluation clausula",
+        "evaluation disposicao"
+      ],
+      "display": "Evaluation",
+      "enRef": "medical_lex_en_022"
+    },
+    {
+      "id": "medical_lex_pt_023",
+      "canonical": "follow up",
+      "synonyms": [
+        "follow up",
+        "follow up clausula",
+        "follow up disposicao"
+      ],
+      "display": "Follow Up",
+      "enRef": "medical_lex_en_023"
+    },
+    {
+      "id": "medical_lex_pt_024",
+      "canonical": "frequency",
+      "synonyms": [
+        "frequency",
+        "frequency clausula",
+        "frequency disposicao"
+      ],
+      "display": "Frequency",
+      "enRef": "medical_lex_en_024"
+    },
+    {
+      "id": "medical_lex_pt_025",
+      "canonical": "history of present illness",
+      "synonyms": [
+        "history of present illness",
+        "history of present illness clausula",
+        "history of present illness disposicao"
+      ],
+      "display": "History Of Present Illness",
+      "enRef": "medical_lex_en_025"
+    },
+    {
+      "id": "medical_lex_pt_026",
+      "canonical": "hospital course",
+      "synonyms": [
+        "hospital course",
+        "hospital course clausula",
+        "hospital course disposicao"
+      ],
+      "display": "Hospital Course",
+      "enRef": "medical_lex_en_026"
+    },
+    {
+      "id": "medical_lex_pt_027",
+      "canonical": "imaging achado",
+      "synonyms": [
+        "imaging achado",
+        "imaging achado clausula",
+        "imaging achado disposicao"
+      ],
+      "display": "Imaging Achado",
+      "enRef": "medical_lex_en_027"
+    },
+    {
+      "id": "medical_lex_pt_028",
+      "canonical": "impression",
+      "synonyms": [
+        "impression",
+        "impression clausula",
+        "impression disposicao"
+      ],
+      "display": "Impression",
+      "enRef": "medical_lex_en_028"
+    },
+    {
+      "id": "medical_lex_pt_029",
+      "canonical": "indication",
+      "synonyms": [
+        "indication",
+        "indication clausula",
+        "indication disposicao"
+      ],
+      "display": "Indication",
+      "enRef": "medical_lex_en_029"
+    },
+    {
+      "id": "medical_lex_pt_030",
+      "canonical": "infection control",
+      "synonyms": [
+        "infection control",
+        "infection control clausula",
+        "infection control disposicao"
+      ],
+      "display": "Infection Control",
+      "enRef": "medical_lex_en_030"
+    },
+    {
+      "id": "medical_lex_pt_031",
+      "canonical": "informed consent",
+      "synonyms": [
+        "informed consent",
+        "informed consent clausula",
+        "informed consent disposicao"
+      ],
+      "display": "Informed Consent",
+      "enRef": "medical_lex_en_031"
+    },
+    {
+      "id": "medical_lex_pt_032",
+      "canonical": "intake",
+      "synonyms": [
+        "intake",
+        "intake clausula",
+        "intake disposicao"
+      ],
+      "display": "Intake",
+      "enRef": "medical_lex_en_032"
+    },
+    {
+      "id": "medical_lex_pt_033",
+      "canonical": "lab resultado",
+      "synonyms": [
+        "lab resultado",
+        "lab resultado clausula",
+        "lab resultado disposicao"
+      ],
+      "display": "Lab Resultado",
+      "enRef": "medical_lex_en_033"
+    },
+    {
+      "id": "medical_lex_pt_034",
+      "canonical": "lab specimen",
+      "synonyms": [
+        "lab specimen",
+        "lab specimen clausula",
+        "lab specimen disposicao"
+      ],
+      "display": "Lab Specimen",
+      "enRef": "medical_lex_en_034"
+    },
+    {
+      "id": "medical_lex_pt_035",
+      "canonical": "medicacao",
+      "synonyms": [
+        "medicacao",
+        "medicacao clausula",
+        "medicacao disposicao"
+      ],
+      "display": "Medicacao",
+      "enRef": "medical_lex_en_035"
+    },
+    {
+      "id": "medical_lex_pt_036",
+      "canonical": "medicacao reconciliation",
+      "synonyms": [
+        "medicacao reconciliation",
+        "medicacao reconciliation clausula",
+        "medicacao reconciliation disposicao"
+      ],
+      "display": "Medicacao Reconciliation",
+      "enRef": "medical_lex_en_036"
+    },
+    {
+      "id": "medical_lex_pt_037",
+      "canonical": "monitoring plano",
+      "synonyms": [
+        "monitoring plano",
+        "monitoring plano clausula",
+        "monitoring plano disposicao"
+      ],
+      "display": "Monitoring Plano",
+      "enRef": "medical_lex_en_037"
+    },
+    {
+      "id": "medical_lex_pt_038",
+      "canonical": "narrative note",
+      "synonyms": [
+        "narrative note",
+        "narrative note clausula",
+        "narrative note disposicao"
+      ],
+      "display": "Narrative Note",
+      "enRef": "medical_lex_en_038"
+    },
+    {
+      "id": "medical_lex_pt_039",
+      "canonical": "objective achado",
+      "synonyms": [
+        "objective achado",
+        "objective achado clausula",
+        "objective achado disposicao"
+      ],
+      "display": "Objective Achado",
+      "enRef": "medical_lex_en_039"
+    },
+    {
+      "id": "medical_lex_pt_040",
+      "canonical": "order set",
+      "synonyms": [
+        "order set",
+        "order set clausula",
+        "order set disposicao"
+      ],
+      "display": "Order Set",
+      "enRef": "medical_lex_en_040"
+    },
+    {
+      "id": "medical_lex_pt_041",
+      "canonical": "oxygen saturation",
+      "synonyms": [
+        "oxygen saturation",
+        "oxygen saturation clausula",
+        "oxygen saturation disposicao"
+      ],
+      "display": "Oxygen Saturation",
+      "enRef": "medical_lex_en_041"
+    },
+    {
+      "id": "medical_lex_pt_042",
+      "canonical": "past medical history",
+      "synonyms": [
+        "past medical history",
+        "past medical history clausula",
+        "past medical history disposicao"
+      ],
+      "display": "Past Medical History",
+      "enRef": "medical_lex_en_042"
+    },
+    {
+      "id": "medical_lex_pt_043",
+      "canonical": "patient identifier",
+      "synonyms": [
+        "patient identifier",
+        "patient identifier clausula",
+        "patient identifier disposicao"
+      ],
+      "display": "Patient Identifier",
+      "enRef": "medical_lex_en_043"
+    },
+    {
+      "id": "medical_lex_pt_044",
+      "canonical": "patient instruction",
+      "synonyms": [
+        "patient instruction",
+        "patient instruction clausula",
+        "patient instruction disposicao"
+      ],
+      "display": "Patient Instruction",
+      "enRef": "medical_lex_en_044"
+    },
+    {
+      "id": "medical_lex_pt_045",
+      "canonical": "physical examination",
+      "synonyms": [
+        "physical examination",
+        "physical examination clausula",
+        "physical examination disposicao"
+      ],
+      "display": "Physical Examination",
+      "enRef": "medical_lex_en_045"
+    },
+    {
+      "id": "medical_lex_pt_046",
+      "canonical": "plano of care",
+      "synonyms": [
+        "plano of care",
+        "plano of care clausula",
+        "plano of care disposicao"
+      ],
+      "display": "Plano Of Care",
+      "enRef": "medical_lex_en_046"
+    },
+    {
+      "id": "medical_lex_pt_047",
+      "canonical": "problem list",
+      "synonyms": [
+        "problem list",
+        "problem list clausula",
+        "problem list disposicao"
+      ],
+      "display": "Problem List",
+      "enRef": "medical_lex_en_047"
+    },
+    {
+      "id": "medical_lex_pt_048",
+      "canonical": "procedure",
+      "synonyms": [
+        "procedure",
+        "procedure clausula",
+        "procedure disposicao"
+      ],
+      "display": "Procedure",
+      "enRef": "medical_lex_en_048"
+    },
+    {
+      "id": "medical_lex_pt_049",
+      "canonical": "progress note",
+      "synonyms": [
+        "progress note",
+        "progress note clausula",
+        "progress note disposicao"
+      ],
+      "display": "Progress Note",
+      "enRef": "medical_lex_en_049"
+    },
+    {
+      "id": "medical_lex_pt_050",
+      "canonical": "provisional diagnostico",
+      "synonyms": [
+        "provisional diagnostico",
+        "provisional diagnostico clausula",
+        "provisional diagnostico disposicao"
+      ],
+      "display": "Provisional Diagnostico",
+      "enRef": "medical_lex_en_050"
+    },
+    {
+      "id": "medical_lex_pt_051",
+      "canonical": "radiology relatorio",
+      "synonyms": [
+        "radiology relatorio",
+        "radiology relatorio clausula",
+        "radiology relatorio disposicao"
+      ],
+      "display": "Radiology Relatorio",
+      "enRef": "medical_lex_en_051"
+    },
+    {
+      "id": "medical_lex_pt_052",
+      "canonical": "reason for referral",
+      "synonyms": [
+        "reason for referral",
+        "reason for referral clausula",
+        "reason for referral disposicao"
+      ],
+      "display": "Reason For Referral",
+      "enRef": "medical_lex_en_052"
+    },
+    {
+      "id": "medical_lex_pt_053",
+      "canonical": "reference range",
+      "synonyms": [
+        "reference range",
+        "reference range clausula",
+        "reference range disposicao"
+      ],
+      "display": "Reference Range",
+      "enRef": "medical_lex_en_053"
+    },
+    {
+      "id": "medical_lex_pt_054",
+      "canonical": "referral",
+      "synonyms": [
+        "referral",
+        "referral clausula",
+        "referral disposicao"
+      ],
+      "display": "Referral",
+      "enRef": "medical_lex_en_054"
+    },
+    {
+      "id": "medical_lex_pt_055",
+      "canonical": "response to treatment",
+      "synonyms": [
+        "response to treatment",
+        "response to treatment clausula",
+        "response to treatment disposicao"
+      ],
+      "display": "Response To Treatment",
+      "enRef": "medical_lex_en_055"
+    },
+    {
+      "id": "medical_lex_pt_056",
+      "canonical": "risk factor",
+      "synonyms": [
+        "risk factor",
+        "risk factor clausula",
+        "risk factor disposicao"
+      ],
+      "display": "Risk Factor",
+      "enRef": "medical_lex_en_056"
+    },
+    {
+      "id": "medical_lex_pt_057",
+      "canonical": "route",
+      "synonyms": [
+        "route",
+        "route clausula",
+        "route disposicao"
+      ],
+      "display": "Route",
+      "enRef": "medical_lex_en_057"
+    },
+    {
+      "id": "medical_lex_pt_058",
+      "canonical": "safety trigger",
+      "synonyms": [
+        "safety trigger",
+        "safety trigger clausula",
+        "safety trigger disposicao"
+      ],
+      "display": "Safety Trigger",
+      "enRef": "medical_lex_en_058"
+    },
+    {
+      "id": "medical_lex_pt_059",
+      "canonical": "secondary diagnostico",
+      "synonyms": [
+        "secondary diagnostico",
+        "secondary diagnostico clausula",
+        "secondary diagnostico disposicao"
+      ],
+      "display": "Secondary Diagnostico",
+      "enRef": "medical_lex_en_059"
+    },
+    {
+      "id": "medical_lex_pt_060",
+      "canonical": "severity",
+      "synonyms": [
+        "severity",
+        "severity clausula",
+        "severity disposicao"
+      ],
+      "display": "Severity",
+      "enRef": "medical_lex_en_060"
+    },
+    {
+      "id": "medical_lex_pt_061",
+      "canonical": "soap note",
+      "synonyms": [
+        "soap note",
+        "soap note clausula",
+        "soap note disposicao"
+      ],
+      "display": "Soap Note",
+      "enRef": "medical_lex_en_061"
+    },
+    {
+      "id": "medical_lex_pt_062",
+      "canonical": "specimen collection",
+      "synonyms": [
+        "specimen collection",
+        "specimen collection clausula",
+        "specimen collection disposicao"
+      ],
+      "display": "Specimen Collection",
+      "enRef": "medical_lex_en_062"
+    },
+    {
+      "id": "medical_lex_pt_063",
+      "canonical": "subjective symptom",
+      "synonyms": [
+        "subjective symptom",
+        "subjective symptom clausula",
+        "subjective symptom disposicao"
+      ],
+      "display": "Subjective Symptom",
+      "enRef": "medical_lex_en_063"
+    },
+    {
+      "id": "medical_lex_pt_064",
+      "canonical": "resumo",
+      "synonyms": [
+        "resumo",
+        "resumo clausula",
+        "resumo disposicao"
+      ],
+      "display": "Resumo",
+      "enRef": "medical_lex_en_064"
+    },
+    {
+      "id": "medical_lex_pt_065",
+      "canonical": "surgical history",
+      "synonyms": [
+        "surgical history",
+        "surgical history clausula",
+        "surgical history disposicao"
+      ],
+      "display": "Surgical History",
+      "enRef": "medical_lex_en_065"
+    },
+    {
+      "id": "medical_lex_pt_066",
+      "canonical": "temperature",
+      "synonyms": [
+        "temperature",
+        "temperature clausula",
+        "temperature disposicao"
+      ],
+      "display": "Temperature",
+      "enRef": "medical_lex_en_066"
+    },
+    {
+      "id": "medical_lex_pt_067",
+      "canonical": "test interpretation",
+      "synonyms": [
+        "test interpretation",
+        "test interpretation clausula",
+        "test interpretation disposicao"
+      ],
+      "display": "Test Interpretation",
+      "enRef": "medical_lex_en_067"
+    },
+    {
+      "id": "medical_lex_pt_068",
+      "canonical": "therapeutic plano",
+      "synonyms": [
+        "therapeutic plano",
+        "therapeutic plano clausula",
+        "therapeutic plano disposicao"
+      ],
+      "display": "Therapeutic Plano",
+      "enRef": "medical_lex_en_068"
+    },
+    {
+      "id": "medical_lex_pt_069",
+      "canonical": "timeline",
+      "synonyms": [
+        "timeline",
+        "timeline clausula",
+        "timeline disposicao"
+      ],
+      "display": "Timeline",
+      "enRef": "medical_lex_en_069"
+    },
+    {
+      "id": "medical_lex_pt_070",
+      "canonical": "treatment plano",
+      "synonyms": [
+        "treatment plano",
+        "treatment plano clausula",
+        "treatment plano disposicao"
+      ],
+      "display": "Treatment Plano",
+      "enRef": "medical_lex_en_070"
+    },
+    {
+      "id": "medical_lex_pt_071",
+      "canonical": "triage",
+      "synonyms": [
+        "triage",
+        "triage clausula",
+        "triage disposicao"
+      ],
+      "display": "Triage",
+      "enRef": "medical_lex_en_071"
+    },
+    {
+      "id": "medical_lex_pt_072",
+      "canonical": "unit",
+      "synonyms": [
+        "unit",
+        "unit clausula",
+        "unit disposicao"
+      ],
+      "display": "Unit",
+      "enRef": "medical_lex_en_072"
+    },
+    {
+      "id": "medical_lex_pt_073",
+      "canonical": "urgency",
+      "synonyms": [
+        "urgency",
+        "urgency clausula",
+        "urgency disposicao"
+      ],
+      "display": "Urgency",
+      "enRef": "medical_lex_en_073"
+    },
+    {
+      "id": "medical_lex_pt_074",
+      "canonical": "vital signs",
+      "synonyms": [
+        "vital signs",
+        "vital signs clausula",
+        "vital signs disposicao"
+      ],
+      "display": "Vital Signs",
+      "enRef": "medical_lex_en_074"
+    },
+    {
+      "id": "medical_lex_pt_075",
+      "canonical": "weight",
+      "synonyms": [
+        "weight",
+        "weight clausula",
+        "weight disposicao"
+      ],
+      "display": "Weight",
+      "enRef": "medical_lex_en_075"
+    },
+    {
+      "id": "medical_lex_pt_076",
+      "canonical": "height",
+      "synonyms": [
+        "height",
+        "height clausula",
+        "height disposicao"
+      ],
+      "display": "Height",
+      "enRef": "medical_lex_en_076"
+    },
+    {
+      "id": "medical_lex_pt_077",
+      "canonical": "pulse",
+      "synonyms": [
+        "pulse",
+        "pulse clausula",
+        "pulse disposicao"
+      ],
+      "display": "Pulse",
+      "enRef": "medical_lex_en_077"
+    },
+    {
+      "id": "medical_lex_pt_078",
+      "canonical": "respiratory rate",
+      "synonyms": [
+        "respiratory rate",
+        "respiratory rate clausula",
+        "respiratory rate disposicao"
+      ],
+      "display": "Respiratory Rate",
+      "enRef": "medical_lex_en_078"
+    },
+    {
+      "id": "medical_lex_pt_079",
+      "canonical": "pain score",
+      "synonyms": [
+        "pain score",
+        "pain score clausula",
+        "pain score disposicao"
+      ],
+      "display": "Pain Score",
+      "enRef": "medical_lex_en_079"
+    },
+    {
+      "id": "medical_lex_pt_080",
+      "canonical": "glucose",
+      "synonyms": [
+        "glucose",
+        "glucose clausula",
+        "glucose disposicao"
+      ],
+      "display": "Glucose",
+      "enRef": "medical_lex_en_080"
+    },
+    {
+      "id": "medical_lex_pt_081",
+      "canonical": "hemoglobin",
+      "synonyms": [
+        "hemoglobin",
+        "hemoglobin clausula",
+        "hemoglobin disposicao"
+      ],
+      "display": "Hemoglobin",
+      "enRef": "medical_lex_en_081"
+    },
+    {
+      "id": "medical_lex_pt_082",
+      "canonical": "hematocrit",
+      "synonyms": [
+        "hematocrit",
+        "hematocrit clausula",
+        "hematocrit disposicao"
+      ],
+      "display": "Hematocrit",
+      "enRef": "medical_lex_en_082"
+    },
+    {
+      "id": "medical_lex_pt_083",
+      "canonical": "platelet count",
+      "synonyms": [
+        "platelet count",
+        "platelet count clausula",
+        "platelet count disposicao"
+      ],
+      "display": "Platelet Count",
+      "enRef": "medical_lex_en_083"
+    },
+    {
+      "id": "medical_lex_pt_084",
+      "canonical": "white blood cell count",
+      "synonyms": [
+        "white blood cell count",
+        "white blood cell count clausula",
+        "white blood cell count disposicao"
+      ],
+      "display": "White Blood Cell Count",
+      "enRef": "medical_lex_en_084"
+    },
+    {
+      "id": "medical_lex_pt_085",
+      "canonical": "sodium",
+      "synonyms": [
+        "sodium",
+        "sodium clausula",
+        "sodium disposicao"
+      ],
+      "display": "Sodium",
+      "enRef": "medical_lex_en_085"
+    },
+    {
+      "id": "medical_lex_pt_086",
+      "canonical": "potassium",
+      "synonyms": [
+        "potassium",
+        "potassium clausula",
+        "potassium disposicao"
+      ],
+      "display": "Potassium",
+      "enRef": "medical_lex_en_086"
+    },
+    {
+      "id": "medical_lex_pt_087",
+      "canonical": "creatinine",
+      "synonyms": [
+        "creatinine",
+        "creatinine clausula",
+        "creatinine disposicao"
+      ],
+      "display": "Creatinine",
+      "enRef": "medical_lex_en_087"
+    },
+    {
+      "id": "medical_lex_pt_088",
+      "canonical": "urea",
+      "synonyms": [
+        "urea",
+        "urea clausula",
+        "urea disposicao"
+      ],
+      "display": "Urea",
+      "enRef": "medical_lex_en_088"
+    },
+    {
+      "id": "medical_lex_pt_089",
+      "canonical": "bilirubin",
+      "synonyms": [
+        "bilirubin",
+        "bilirubin clausula",
+        "bilirubin disposicao"
+      ],
+      "display": "Bilirubin",
+      "enRef": "medical_lex_en_089"
+    },
+    {
+      "id": "medical_lex_pt_090",
+      "canonical": "ast",
+      "synonyms": [
+        "ast",
+        "ast clausula",
+        "ast disposicao"
+      ],
+      "display": "Ast",
+      "enRef": "medical_lex_en_090"
+    },
+    {
+      "id": "medical_lex_pt_091",
+      "canonical": "alt",
+      "synonyms": [
+        "alt",
+        "alt clausula",
+        "alt disposicao"
+      ],
+      "display": "Alt",
+      "enRef": "medical_lex_en_091"
+    },
+    {
+      "id": "medical_lex_pt_092",
+      "canonical": "alkaline phosphatase",
+      "synonyms": [
+        "alkaline phosphatase",
+        "alkaline phosphatase clausula",
+        "alkaline phosphatase disposicao"
+      ],
+      "display": "Alkaline Phosphatase",
+      "enRef": "medical_lex_en_092"
+    },
+    {
+      "id": "medical_lex_pt_093",
+      "canonical": "troponin",
+      "synonyms": [
+        "troponin",
+        "troponin clausula",
+        "troponin disposicao"
+      ],
+      "display": "Troponin",
+      "enRef": "medical_lex_en_093"
+    },
+    {
+      "id": "medical_lex_pt_094",
+      "canonical": "d dimer",
+      "synonyms": [
+        "d dimer",
+        "d dimer clausula",
+        "d dimer disposicao"
+      ],
+      "display": "D Dimer",
+      "enRef": "medical_lex_en_094"
+    },
+    {
+      "id": "medical_lex_pt_095",
+      "canonical": "ct scan",
+      "synonyms": [
+        "ct scan",
+        "ct scan clausula",
+        "ct scan disposicao"
+      ],
+      "display": "Ct Scan",
+      "enRef": "medical_lex_en_095"
+    },
+    {
+      "id": "medical_lex_pt_096",
+      "canonical": "x ray",
+      "synonyms": [
+        "x ray",
+        "x ray clausula",
+        "x ray disposicao"
+      ],
+      "display": "X Ray",
+      "enRef": "medical_lex_en_096"
+    },
+    {
+      "id": "medical_lex_pt_097",
+      "canonical": "mri",
+      "synonyms": [
+        "mri",
+        "mri clausula",
+        "mri disposicao"
+      ],
+      "display": "Mri",
+      "enRef": "medical_lex_en_097"
+    },
+    {
+      "id": "medical_lex_pt_098",
+      "canonical": "ultrasound",
+      "synonyms": [
+        "ultrasound",
+        "ultrasound clausula",
+        "ultrasound disposicao"
+      ],
+      "display": "Ultrasound",
+      "enRef": "medical_lex_en_098"
+    },
+    {
+      "id": "medical_lex_pt_099",
+      "canonical": "ecg",
+      "synonyms": [
+        "ecg",
+        "ecg clausula",
+        "ecg disposicao"
+      ],
+      "display": "Ecg",
+      "enRef": "medical_lex_en_099"
+    },
+    {
+      "id": "medical_lex_pt_100",
+      "canonical": "echocardiogram",
+      "synonyms": [
+        "echocardiogram",
+        "echocardiogram clausula",
+        "echocardiogram disposicao"
+      ],
+      "display": "Echocardiogram",
+      "enRef": "medical_lex_en_100"
+    },
+    {
+      "id": "medical_lex_pt_101",
+      "canonical": "medicacao list",
+      "synonyms": [
+        "medicacao list",
+        "medicacao list clausula",
+        "medicacao list disposicao"
+      ],
+      "display": "Medicacao List",
+      "enRef": "medical_lex_en_101"
+    },
+    {
+      "id": "medical_lex_pt_102",
+      "canonical": "current medicacao",
+      "synonyms": [
+        "current medicacao",
+        "current medicacao clausula",
+        "current medicacao disposicao"
+      ],
+      "display": "Current Medicacao",
+      "enRef": "medical_lex_en_102"
+    },
+    {
+      "id": "medical_lex_pt_103",
+      "canonical": "discontinued medicacao",
+      "synonyms": [
+        "discontinued medicacao",
+        "discontinued medicacao clausula",
+        "discontinued medicacao disposicao"
+      ],
+      "display": "Discontinued Medicacao",
+      "enRef": "medical_lex_en_103"
+    },
+    {
+      "id": "medical_lex_pt_104",
+      "canonical": "prn medicacao",
+      "synonyms": [
+        "prn medicacao",
+        "prn medicacao clausula",
+        "prn medicacao disposicao"
+      ],
+      "display": "Prn Medicacao",
+      "enRef": "medical_lex_en_104"
+    },
+    {
+      "id": "medical_lex_pt_105",
+      "canonical": "dose adjustment",
+      "synonyms": [
+        "dose adjustment",
+        "dose adjustment clausula",
+        "dose adjustment disposicao"
+      ],
+      "display": "Dose Adjustment",
+      "enRef": "medical_lex_en_105"
+    },
+    {
+      "id": "medical_lex_pt_106",
+      "canonical": "adverse event",
+      "synonyms": [
+        "adverse event",
+        "adverse event clausula",
+        "adverse event disposicao"
+      ],
+      "display": "Adverse Event",
+      "enRef": "medical_lex_en_106"
+    },
+    {
+      "id": "medical_lex_pt_107",
+      "canonical": "medicacao interaction",
+      "synonyms": [
+        "medicacao interaction",
+        "medicacao interaction clausula",
+        "medicacao interaction disposicao"
+      ],
+      "display": "Medicacao Interaction",
+      "enRef": "medical_lex_en_107"
+    },
+    {
+      "id": "medical_lex_pt_108",
+      "canonical": "care transition",
+      "synonyms": [
+        "care transition",
+        "care transition clausula",
+        "care transition disposicao"
+      ],
+      "display": "Care Transition",
+      "enRef": "medical_lex_en_108"
+    },
+    {
+      "id": "medical_lex_pt_109",
+      "canonical": "discharge resumo",
+      "synonyms": [
+        "discharge resumo",
+        "discharge resumo clausula",
+        "discharge resumo disposicao"
+      ],
+      "display": "Discharge Resumo",
+      "enRef": "medical_lex_en_109"
+    },
+    {
+      "id": "medical_lex_pt_110",
+      "canonical": "referral note",
+      "synonyms": [
+        "referral note",
+        "referral note clausula",
+        "referral note disposicao"
+      ],
+      "display": "Referral Note",
+      "enRef": "medical_lex_en_110"
+    },
+    {
+      "id": "medical_lex_pt_111",
+      "canonical": "primary diagnostico",
+      "synonyms": [
+        "primary diagnostico",
+        "primary diagnostico clausula",
+        "primary diagnostico disposicao"
+      ],
+      "display": "Primary Diagnostico",
+      "enRef": "medical_lex_en_111"
+    },
+    {
+      "id": "medical_lex_pt_112",
+      "canonical": "secondary achado",
+      "synonyms": [
+        "secondary achado",
+        "secondary achado clausula",
+        "secondary achado disposicao"
+      ],
+      "display": "Secondary Achado",
+      "enRef": "medical_lex_en_112"
+    },
+    {
+      "id": "medical_lex_pt_113",
+      "canonical": "contraindication alert",
+      "synonyms": [
+        "contraindication alert",
+        "contraindication alert clausula",
+        "contraindication alert disposicao"
+      ],
+      "display": "Contraindication Alert",
+      "enRef": "medical_lex_en_113"
+    },
+    {
+      "id": "medical_lex_pt_114",
+      "canonical": "escalation to clinician",
+      "synonyms": [
+        "escalation to clinician",
+        "escalation to clinician clausula",
+        "escalation to clinician disposicao"
+      ],
+      "display": "Escalation To Clinician",
+      "enRef": "medical_lex_en_114"
+    },
+    {
+      "id": "medical_lex_pt_115",
+      "canonical": "no diagnostico inference",
+      "synonyms": [
+        "no diagnostico inference",
+        "no diagnostico inference clausula",
+        "no diagnostico inference disposicao"
+      ],
+      "display": "No Diagnostico Inference",
+      "enRef": "medical_lex_en_115"
+    },
+    {
+      "id": "medical_lex_pt_116",
+      "canonical": "patient education",
+      "synonyms": [
+        "patient education",
+        "patient education clausula",
+        "patient education disposicao"
+      ],
+      "display": "Patient Education",
+      "enRef": "medical_lex_en_116"
+    },
+    {
+      "id": "medical_lex_pt_117",
+      "canonical": "rehabilitation plano",
+      "synonyms": [
+        "rehabilitation plano",
+        "rehabilitation plano clausula",
+        "rehabilitation plano disposicao"
+      ],
+      "display": "Rehabilitation Plano",
+      "enRef": "medical_lex_en_117"
+    },
+    {
+      "id": "medical_lex_pt_118",
+      "canonical": "post operative note",
+      "synonyms": [
+        "post operative note",
+        "post operative note clausula",
+        "post operative note disposicao"
+      ],
+      "display": "Post Operative Note",
+      "enRef": "medical_lex_en_118"
+    },
+    {
+      "id": "medical_lex_pt_119",
+      "canonical": "nursing observation",
+      "synonyms": [
+        "nursing observation",
+        "nursing observation clausula",
+        "nursing observation disposicao"
+      ],
+      "display": "Nursing Observation",
+      "enRef": "medical_lex_en_119"
+    },
+    {
+      "id": "medical_lex_pt_120",
+      "canonical": "consult note",
+      "synonyms": [
+        "consult note",
+        "consult note clausula",
+        "consult note disposicao"
+      ],
+      "display": "Consult Note",
+      "enRef": "medical_lex_en_120"
+    },
+    {
+      "id": "medical_lex_pt_121",
+      "canonical": "telemedicine encounter",
+      "synonyms": [
+        "telemedicine encounter",
+        "telemedicine encounter clausula",
+        "telemedicine encounter disposicao"
+      ],
+      "display": "Telemedicine Encounter",
+      "enRef": "medical_lex_en_121"
+    },
+    {
+      "id": "medical_lex_pt_122",
+      "canonical": "follow up window",
+      "synonyms": [
+        "follow up window",
+        "follow up window clausula",
+        "follow up window disposicao"
+      ],
+      "display": "Follow Up Window",
+      "enRef": "medical_lex_en_122"
+    },
+    {
+      "id": "medical_lex_pt_123",
+      "canonical": "critical alert",
+      "synonyms": [
+        "critical alert",
+        "critical alert clausula",
+        "critical alert disposicao"
+      ],
+      "display": "Critical Alert",
+      "enRef": "medical_lex_en_123"
+    },
+    {
+      "id": "medical_lex_pt_124",
+      "canonical": "resultados pending",
+      "synonyms": [
+        "resultados pending",
+        "resultados pending clausula",
+        "resultados pending disposicao"
+      ],
+      "display": "Resultados Pending",
+      "enRef": "medical_lex_en_124"
+    },
+    {
+      "id": "medical_lex_pt_125",
+      "canonical": "repeat test",
+      "synonyms": [
+        "repeat test",
+        "repeat test clausula",
+        "repeat test disposicao"
+      ],
+      "display": "Repeat Test",
+      "enRef": "medical_lex_en_125"
+    },
+    {
+      "id": "medical_lex_pt_126",
+      "canonical": "specimen quality",
+      "synonyms": [
+        "specimen quality",
+        "specimen quality clausula",
+        "specimen quality disposicao"
+      ],
+      "display": "Specimen Quality",
+      "enRef": "medical_lex_en_126"
+    },
+    {
+      "id": "medical_lex_pt_127",
+      "canonical": "clinical status",
+      "synonyms": [
+        "clinical status",
+        "clinical status clausula",
+        "clinical status disposicao"
+      ],
+      "display": "Clinical Status",
+      "enRef": "medical_lex_en_127"
+    },
+    {
+      "id": "medical_lex_pt_128",
+      "canonical": "baseline value",
+      "synonyms": [
+        "baseline value",
+        "baseline value clausula",
+        "baseline value disposicao"
+      ],
+      "display": "Baseline Value",
+      "enRef": "medical_lex_en_128"
+    },
+    {
+      "id": "medical_lex_pt_129",
+      "canonical": "trend analysis",
+      "synonyms": [
+        "trend analysis",
+        "trend analysis clausula",
+        "trend analysis disposicao"
+      ],
+      "display": "Trend Analysis",
+      "enRef": "medical_lex_en_129"
+    },
+    {
+      "id": "medical_lex_pt_130",
+      "canonical": "care objective",
+      "synonyms": [
+        "care objective",
+        "care objective clausula",
+        "care objective disposicao"
+      ],
+      "display": "Care Objective",
+      "enRef": "medical_lex_en_130"
+    }
+  ]
+}

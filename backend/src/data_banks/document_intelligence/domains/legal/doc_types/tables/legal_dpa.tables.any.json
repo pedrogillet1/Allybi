@@ -1,0 +1,1338 @@
+{
+  "_meta": {
+    "id": "legal_dpa_tables",
+    "version": "1.0.0",
+    "description": "Expected table patterns for Data Processing Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "dpa"
+  },
+  "tables": [
+    {
+      "id": "dpa_table_01",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 1",
+        "pt": "Data Processing Agreement Tabela 1"
+      },
+      "section": "abstract",
+      "expectedColumns": [
+        "clause",
+        "obligation",
+        "owner",
+        "deadline"
+      ],
+      "keyRows": [
+        "address",
+        "city"
+      ],
+      "headerSynonyms": {
+        "clause": [
+          "clause",
+          "clause",
+          "clause_value"
+        ],
+        "obligation": [
+          "obligation",
+          "obligation",
+          "obligation_value"
+        ],
+        "owner": [
+          "owner",
+          "owner",
+          "owner_value"
+        ],
+        "deadline": [
+          "deadline",
+          "deadline",
+          "deadline_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "aud",
+          "appliesToColumns": [
+            "clause"
+          ]
+        },
+        {
+          "unitId": "chf",
+          "appliesToColumns": [
+            "clause"
+          ]
+        },
+        {
+          "unitId": "gallon",
+          "appliesToColumns": [
+            "clause"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_02",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 2",
+        "pt": "Data Processing Agreement Tabela 2"
+      },
+      "section": "action_items",
+      "expectedColumns": [
+        "section",
+        "subsection",
+        "summary",
+        "risk_level"
+      ],
+      "keyRows": [
+        "article_number",
+        "clause_reference"
+      ],
+      "headerSynonyms": {
+        "section": [
+          "section",
+          "section",
+          "section_value"
+        ],
+        "subsection": [
+          "subsection",
+          "subsection",
+          "subsection_value"
+        ],
+        "summary": [
+          "summary",
+          "summary",
+          "summary_value"
+        ],
+        "risk_level": [
+          "risk_level",
+          "risk level",
+          "risk_level_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "basis_point",
+          "appliesToColumns": [
+            "subsection"
+          ]
+        },
+        {
+          "unitId": "day",
+          "appliesToColumns": [
+            "subsection"
+          ]
+        },
+        {
+          "unitId": "gbp",
+          "appliesToColumns": [
+            "subsection"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_03",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 3",
+        "pt": "Data Processing Agreement Tabela 3"
+      },
+      "section": "appendix",
+      "expectedColumns": [
+        "term",
+        "definition",
+        "source_section",
+        "notes"
+      ],
+      "keyRows": [
+        "case_number",
+        "company_name"
+      ],
+      "headerSynonyms": {
+        "term": [
+          "term",
+          "term",
+          "term_value"
+        ],
+        "definition": [
+          "definition",
+          "definition",
+          "definition_value"
+        ],
+        "source_section": [
+          "source_section",
+          "source section",
+          "source_section_value"
+        ],
+        "notes": [
+          "notes",
+          "notes",
+          "notes_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "billion",
+          "appliesToColumns": [
+            "source_section"
+          ]
+        },
+        {
+          "unitId": "dozen",
+          "appliesToColumns": [
+            "source_section"
+          ]
+        },
+        {
+          "unitId": "gram",
+          "appliesToColumns": [
+            "source_section"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_04",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 4",
+        "pt": "Data Processing Agreement Tabela 4"
+      },
+      "section": "approvals",
+      "expectedColumns": [
+        "party",
+        "role",
+        "jurisdiction",
+        "effective_date"
+      ],
+      "keyRows": [
+        "city",
+        "counterparty"
+      ],
+      "headerSynonyms": {
+        "party": [
+          "party",
+          "party",
+          "party_value"
+        ],
+        "role": [
+          "role",
+          "role",
+          "role_value"
+        ],
+        "jurisdiction": [
+          "jurisdiction",
+          "jurisdiction",
+          "jurisdiction_value"
+        ],
+        "effective_date": [
+          "effective_date",
+          "effective date",
+          "effective_date_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "brl",
+          "appliesToColumns": [
+            "effective_date"
+          ]
+        },
+        {
+          "unitId": "eur",
+          "appliesToColumns": [
+            "effective_date"
+          ]
+        },
+        {
+          "unitId": "hour",
+          "appliesToColumns": [
+            "effective_date"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_05",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 5",
+        "pt": "Data Processing Agreement Tabela 5"
+      },
+      "section": "assumptions",
+      "expectedColumns": [
+        "line_item",
+        "amount",
+        "currency",
+        "period"
+      ],
+      "keyRows": [
+        "clause_reference",
+        "country"
+      ],
+      "headerSynonyms": {
+        "line_item": [
+          "line_item",
+          "line item",
+          "line_item_value"
+        ],
+        "amount": [
+          "amount",
+          "amount",
+          "amount_value"
+        ],
+        "currency": [
+          "currency",
+          "currency",
+          "currency_value"
+        ],
+        "period": [
+          "period",
+          "period",
+          "period_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "cad",
+          "appliesToColumns": [
+            "line_item"
+          ]
+        },
+        {
+          "unitId": "fahrenheit",
+          "appliesToColumns": [
+            "line_item"
+          ]
+        },
+        {
+          "unitId": "inch",
+          "appliesToColumns": [
+            "line_item"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_06",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 6",
+        "pt": "Data Processing Agreement Tabela 6"
+      },
+      "section": "attachments",
+      "expectedColumns": [
+        "metric",
+        "value",
+        "unit",
+        "reference_range"
+      ],
+      "keyRows": [
+        "company_name",
+        "court_name"
+      ],
+      "headerSynonyms": {
+        "metric": [
+          "metric",
+          "metric",
+          "metric_value"
+        ],
+        "value": [
+          "value",
+          "value",
+          "value_value"
+        ],
+        "unit": [
+          "unit",
+          "unit",
+          "unit_value"
+        ],
+        "reference_range": [
+          "reference_range",
+          "reference range",
+          "reference_range_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "celsius",
+          "appliesToColumns": [
+            "value"
+          ]
+        },
+        {
+          "unitId": "fluid_ounce",
+          "appliesToColumns": [
+            "value"
+          ]
+        },
+        {
+          "unitId": "jpy",
+          "appliesToColumns": [
+            "value"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_07",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 7",
+        "pt": "Data Processing Agreement Tabela 7"
+      },
+      "section": "audit_trail",
+      "expectedColumns": [
+        "finding",
+        "severity",
+        "recommendation",
+        "owner"
+      ],
+      "keyRows": [
+        "counterparty",
+        "currency_amount"
+      ],
+      "headerSynonyms": {
+        "finding": [
+          "finding",
+          "finding",
+          "finding_value"
+        ],
+        "severity": [
+          "severity",
+          "severity",
+          "severity_value"
+        ],
+        "recommendation": [
+          "recommendation",
+          "recommendation",
+          "recommendation_value"
+        ],
+        "owner": [
+          "owner",
+          "owner",
+          "owner_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "centimeter",
+          "appliesToColumns": [
+            "recommendation"
+          ]
+        },
+        {
+          "unitId": "gallon",
+          "appliesToColumns": [
+            "recommendation"
+          ]
+        },
+        {
+          "unitId": "kelvin",
+          "appliesToColumns": [
+            "recommendation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_08",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 8",
+        "pt": "Data Processing Agreement Tabela 8"
+      },
+      "section": "authorization",
+      "expectedColumns": [
+        "event",
+        "date",
+        "status",
+        "evidence"
+      ],
+      "keyRows": [
+        "country",
+        "currency_code"
+      ],
+      "headerSynonyms": {
+        "event": [
+          "event",
+          "event",
+          "event_value"
+        ],
+        "date": [
+          "date",
+          "date",
+          "date_value"
+        ],
+        "status": [
+          "status",
+          "status",
+          "status_value"
+        ],
+        "evidence": [
+          "evidence",
+          "evidence",
+          "evidence_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "chf",
+          "appliesToColumns": [
+            "evidence"
+          ]
+        },
+        {
+          "unitId": "gbp",
+          "appliesToColumns": [
+            "evidence"
+          ]
+        },
+        {
+          "unitId": "kilogram",
+          "appliesToColumns": [
+            "evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_09",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 9",
+        "pt": "Data Processing Agreement Tabela 9"
+      },
+      "section": "certifications",
+      "expectedColumns": [
+        "control",
+        "test",
+        "result",
+        "owner"
+      ],
+      "keyRows": [
+        "court_name",
+        "document_number"
+      ],
+      "headerSynonyms": {
+        "control": [
+          "control",
+          "control",
+          "control_value"
+        ],
+        "test": [
+          "test",
+          "test",
+          "test_value"
+        ],
+        "result": [
+          "result",
+          "result",
+          "result_value"
+        ],
+        "owner": [
+          "owner",
+          "owner",
+          "owner_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "day",
+          "appliesToColumns": [
+            "control"
+          ]
+        },
+        {
+          "unitId": "gram",
+          "appliesToColumns": [
+            "control"
+          ]
+        },
+        {
+          "unitId": "liter",
+          "appliesToColumns": [
+            "control"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_10",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 10",
+        "pt": "Data Processing Agreement Tabela 10"
+      },
+      "section": "compliance_section",
+      "expectedColumns": [
+        "question",
+        "answer",
+        "citation",
+        "confidence"
+      ],
+      "keyRows": [
+        "currency_amount",
+        "effective_date"
+      ],
+      "headerSynonyms": {
+        "question": [
+          "question",
+          "question",
+          "question_value"
+        ],
+        "answer": [
+          "answer",
+          "answer",
+          "answer_value"
+        ],
+        "citation": [
+          "citation",
+          "citation",
+          "citation_value"
+        ],
+        "confidence": [
+          "confidence",
+          "confidence",
+          "confidence_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "dozen",
+          "appliesToColumns": [
+            "answer"
+          ]
+        },
+        {
+          "unitId": "hour",
+          "appliesToColumns": [
+            "answer"
+          ]
+        },
+        {
+          "unitId": "meter",
+          "appliesToColumns": [
+            "answer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_11",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 11",
+        "pt": "Data Processing Agreement Tabela 11"
+      },
+      "section": "confidentiality_clause",
+      "expectedColumns": [
+        "document",
+        "version",
+        "change",
+        "approved_by"
+      ],
+      "keyRows": [
+        "currency_code",
+        "execution_date"
+      ],
+      "headerSynonyms": {
+        "document": [
+          "document",
+          "document",
+          "document_value"
+        ],
+        "version": [
+          "version",
+          "version",
+          "version_value"
+        ],
+        "change": [
+          "change",
+          "change",
+          "change_value"
+        ],
+        "approved_by": [
+          "approved_by",
+          "approved by",
+          "approved_by_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "eur",
+          "appliesToColumns": [
+            "change"
+          ]
+        },
+        {
+          "unitId": "inch",
+          "appliesToColumns": [
+            "change"
+          ]
+        },
+        {
+          "unitId": "milligram",
+          "appliesToColumns": [
+            "change"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_12",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 12",
+        "pt": "Data Processing Agreement Tabela 12"
+      },
+      "section": "criteria",
+      "expectedColumns": [
+        "service",
+        "sla",
+        "measurement",
+        "breach_flag"
+      ],
+      "keyRows": [
+        "document_number",
+        "expiration_date"
+      ],
+      "headerSynonyms": {
+        "service": [
+          "service",
+          "service",
+          "service_value"
+        ],
+        "sla": [
+          "sla",
+          "sla",
+          "sla_value"
+        ],
+        "measurement": [
+          "measurement",
+          "measurement",
+          "measurement_value"
+        ],
+        "breach_flag": [
+          "breach_flag",
+          "breach flag",
+          "breach_flag_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "fahrenheit",
+          "appliesToColumns": [
+            "breach_flag"
+          ]
+        },
+        {
+          "unitId": "jpy",
+          "appliesToColumns": [
+            "breach_flag"
+          ]
+        },
+        {
+          "unitId": "milliliter",
+          "appliesToColumns": [
+            "breach_flag"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_13",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 13",
+        "pt": "Data Processing Agreement Tabela 13"
+      },
+      "section": "data_tables",
+      "expectedColumns": [
+        "procedure",
+        "code",
+        "description",
+        "notes"
+      ],
+      "keyRows": [
+        "effective_date",
+        "filing_date"
+      ],
+      "headerSynonyms": {
+        "procedure": [
+          "procedure",
+          "procedure",
+          "procedure_value"
+        ],
+        "code": [
+          "code",
+          "code",
+          "code_value"
+        ],
+        "description": [
+          "description",
+          "description",
+          "description_value"
+        ],
+        "notes": [
+          "notes",
+          "notes",
+          "notes_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "fluid_ounce",
+          "appliesToColumns": [
+            "procedure"
+          ]
+        },
+        {
+          "unitId": "kelvin",
+          "appliesToColumns": [
+            "procedure"
+          ]
+        },
+        {
+          "unitId": "millimeter",
+          "appliesToColumns": [
+            "procedure"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_14",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 14",
+        "pt": "Data Processing Agreement Tabela 14"
+      },
+      "section": "definitions",
+      "expectedColumns": [
+        "medication",
+        "dose",
+        "route",
+        "frequency"
+      ],
+      "keyRows": [
+        "execution_date",
+        "interest_rate"
+      ],
+      "headerSynonyms": {
+        "medication": [
+          "medication",
+          "medication",
+          "medication_value"
+        ],
+        "dose": [
+          "dose",
+          "dose",
+          "dose_value"
+        ],
+        "route": [
+          "route",
+          "route",
+          "route_value"
+        ],
+        "frequency": [
+          "frequency",
+          "frequency",
+          "frequency_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "gallon",
+          "appliesToColumns": [
+            "dose"
+          ]
+        },
+        {
+          "unitId": "kilogram",
+          "appliesToColumns": [
+            "dose"
+          ]
+        },
+        {
+          "unitId": "million",
+          "appliesToColumns": [
+            "dose"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_15",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 15",
+        "pt": "Data Processing Agreement Tabela 15"
+      },
+      "section": "detailed_analysis",
+      "expectedColumns": [
+        "test",
+        "result",
+        "unit",
+        "flag"
+      ],
+      "keyRows": [
+        "expiration_date",
+        "jurisdiction"
+      ],
+      "headerSynonyms": {
+        "test": [
+          "test",
+          "test",
+          "test_value"
+        ],
+        "result": [
+          "result",
+          "result",
+          "result_value"
+        ],
+        "unit": [
+          "unit",
+          "unit",
+          "unit_value"
+        ],
+        "flag": [
+          "flag",
+          "flag",
+          "flag_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "gbp",
+          "appliesToColumns": [
+            "unit"
+          ]
+        },
+        {
+          "unitId": "liter",
+          "appliesToColumns": [
+            "unit"
+          ]
+        },
+        {
+          "unitId": "minute",
+          "appliesToColumns": [
+            "unit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_16",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 16",
+        "pt": "Data Processing Agreement Tabela 16"
+      },
+      "section": "disclaimers",
+      "expectedColumns": [
+        "problem",
+        "assessment",
+        "plan",
+        "follow_up"
+      ],
+      "keyRows": [
+        "filing_date",
+        "period_reference"
+      ],
+      "headerSynonyms": {
+        "problem": [
+          "problem",
+          "problem",
+          "problem_value"
+        ],
+        "assessment": [
+          "assessment",
+          "assessment",
+          "assessment_value"
+        ],
+        "plan": [
+          "plan",
+          "plan",
+          "plan_value"
+        ],
+        "follow_up": [
+          "follow_up",
+          "follow up",
+          "follow_up_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "gram",
+          "appliesToColumns": [
+            "follow_up"
+          ]
+        },
+        {
+          "unitId": "meter",
+          "appliesToColumns": [
+            "follow_up"
+          ]
+        },
+        {
+          "unitId": "month",
+          "appliesToColumns": [
+            "follow_up"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_17",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 17",
+        "pt": "Data Processing Agreement Tabela 17"
+      },
+      "section": "discussion",
+      "expectedColumns": [
+        "invoice",
+        "amount",
+        "due_date",
+        "status"
+      ],
+      "keyRows": [
+        "interest_rate",
+        "person_name"
+      ],
+      "headerSynonyms": {
+        "invoice": [
+          "invoice",
+          "invoice",
+          "invoice_value"
+        ],
+        "amount": [
+          "amount",
+          "amount",
+          "amount_value"
+        ],
+        "due_date": [
+          "due_date",
+          "due date",
+          "due_date_value"
+        ],
+        "status": [
+          "status",
+          "status",
+          "status_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "hour",
+          "appliesToColumns": [
+            "invoice"
+          ]
+        },
+        {
+          "unitId": "milligram",
+          "appliesToColumns": [
+            "invoice"
+          ]
+        },
+        {
+          "unitId": "percent",
+          "appliesToColumns": [
+            "invoice"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_18",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 18",
+        "pt": "Data Processing Agreement Tabela 18"
+      },
+      "section": "dispute_resolution",
+      "expectedColumns": [
+        "milestone",
+        "owner",
+        "target_date",
+        "completion"
+      ],
+      "keyRows": [
+        "jurisdiction",
+        "person_role"
+      ],
+      "headerSynonyms": {
+        "milestone": [
+          "milestone",
+          "milestone",
+          "milestone_value"
+        ],
+        "owner": [
+          "owner",
+          "owner",
+          "owner_value"
+        ],
+        "target_date": [
+          "target_date",
+          "target date",
+          "target_date_value"
+        ],
+        "completion": [
+          "completion",
+          "completion",
+          "completion_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "inch",
+          "appliesToColumns": [
+            "owner"
+          ]
+        },
+        {
+          "unitId": "milliliter",
+          "appliesToColumns": [
+            "owner"
+          ]
+        },
+        {
+          "unitId": "percentage_point",
+          "appliesToColumns": [
+            "owner"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_19",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 19",
+        "pt": "Data Processing Agreement Tabela 19"
+      },
+      "section": "distribution_list",
+      "expectedColumns": [
+        "exception",
+        "reason",
+        "impact",
+        "mitigation"
+      ],
+      "keyRows": [
+        "period_reference",
+        "person_title"
+      ],
+      "headerSynonyms": {
+        "exception": [
+          "exception",
+          "exception",
+          "exception_value"
+        ],
+        "reason": [
+          "reason",
+          "reason",
+          "reason_value"
+        ],
+        "impact": [
+          "impact",
+          "impact",
+          "impact_value"
+        ],
+        "mitigation": [
+          "mitigation",
+          "mitigation",
+          "mitigation_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "jpy",
+          "appliesToColumns": [
+            "impact"
+          ]
+        },
+        {
+          "unitId": "millimeter",
+          "appliesToColumns": [
+            "impact"
+          ]
+        },
+        {
+          "unitId": "pound",
+          "appliesToColumns": [
+            "impact"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_20",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 20",
+        "pt": "Data Processing Agreement Tabela 20"
+      },
+      "section": "document_metadata",
+      "expectedColumns": [
+        "citation",
+        "quote",
+        "location",
+        "commentary"
+      ],
+      "keyRows": [
+        "person_name",
+        "reference_code"
+      ],
+      "headerSynonyms": {
+        "citation": [
+          "citation",
+          "citation",
+          "citation_value"
+        ],
+        "quote": [
+          "quote",
+          "quote",
+          "quote_value"
+        ],
+        "location": [
+          "location",
+          "location",
+          "location_value"
+        ],
+        "commentary": [
+          "commentary",
+          "commentary",
+          "commentary_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "kelvin",
+          "appliesToColumns": [
+            "commentary"
+          ]
+        },
+        {
+          "unitId": "million",
+          "appliesToColumns": [
+            "commentary"
+          ]
+        },
+        {
+          "unitId": "second",
+          "appliesToColumns": [
+            "commentary"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_21",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 21",
+        "pt": "Data Processing Agreement Tabela 21"
+      },
+      "section": "executive_summary",
+      "expectedColumns": [
+        "contact",
+        "organization",
+        "email",
+        "phone"
+      ],
+      "keyRows": [
+        "person_role",
+        "registration_number"
+      ],
+      "headerSynonyms": {
+        "contact": [
+          "contact",
+          "contact",
+          "contact_value"
+        ],
+        "organization": [
+          "organization",
+          "organization",
+          "organization_value"
+        ],
+        "email": [
+          "email",
+          "email",
+          "email_value"
+        ],
+        "phone": [
+          "phone",
+          "phone",
+          "phone_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "kilogram",
+          "appliesToColumns": [
+            "contact"
+          ]
+        },
+        {
+          "unitId": "minute",
+          "appliesToColumns": [
+            "contact"
+          ]
+        },
+        {
+          "unitId": "thousand",
+          "appliesToColumns": [
+            "contact"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dpa_table_22",
+      "name": {
+        "en": "Data Processing Agreement Table Shape 22",
+        "pt": "Data Processing Agreement Tabela 22"
+      },
+      "section": "exhibits",
+      "expectedColumns": [
+        "policy",
+        "requirement",
+        "evidence",
+        "gap"
+      ],
+      "keyRows": [
+        "person_title",
+        "regulatory_body"
+      ],
+      "headerSynonyms": {
+        "policy": [
+          "policy",
+          "policy",
+          "policy_value"
+        ],
+        "requirement": [
+          "requirement",
+          "requirement",
+          "requirement_value"
+        ],
+        "evidence": [
+          "evidence",
+          "evidence",
+          "evidence_value"
+        ],
+        "gap": [
+          "gap",
+          "gap",
+          "gap_value"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "liter",
+          "appliesToColumns": [
+            "requirement"
+          ]
+        },
+        {
+          "unitId": "month",
+          "appliesToColumns": [
+            "requirement"
+          ]
+        },
+        {
+          "unitId": "unit",
+          "appliesToColumns": [
+            "requirement"
+          ]
+        }
+      ]
+    }
+  ]
+}

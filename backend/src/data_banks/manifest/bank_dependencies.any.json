@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -19,76 +19,106 @@
     }
   },
   "categories": {
-    "_comment": "Category-level dependencies used to validate loadOrder. Individual bank deps may be stricter.",
-    "manifest": [],
+    "_comment": "Category-level dependencies derived from registry + preserved curated edges.",
+    "manifest": [
+      "schemas",
+      "semantics"
+    ],
     "schemas": [
       "manifest"
     ],
     "normalizers": [
-      "schemas"
+      "schemas",
+      "semantics"
     ],
     "routing": [
-      "normalizers"
+      "normalizers",
+      "schemas",
+      "semantics"
     ],
     "operators": [
-      "routing"
-    ],
-    "retrieval": [
+      "normalizers",
       "routing",
+      "semantics"
+    ],
+    "semantics": [
+      "manifest",
+      "normalizers",
+      "operators"
+    ],
+    "scope": [],
+    "retrieval": [
+      "normalizers",
       "operators",
-      "normalizers"
+      "routing",
+      "semantics"
     ],
     "formatting": [
+      "operators",
       "routing",
-      "operators"
+      "semantics"
     ],
+    "dictionaries": [
+      "semantics"
+    ],
+    "lexicons": [
+      "semantics"
+    ],
+    "parsers": [],
+    "intent_patterns": [],
     "microcopy": [
-      "formatting"
+      "formatting",
+      "semantics"
     ],
     "overlays": [
-      "routing",
-      "retrieval",
-      "formatting",
-      "microcopy"
-    ],
-    "prompts": [
-      "routing",
-      "operators",
-      "formatting"
-    ],
-    "policies": [
-      "routing",
-      "operators",
-      "formatting",
-      "prompts"
-    ],
-    "fallbacks": [
-      "policies",
-      "microcopy"
-    ],
-    "quality": [
-      "routing",
-      "retrieval",
       "formatting",
       "microcopy",
-      "prompts"
+      "retrieval",
+      "routing"
+    ],
+    "prompts": [
+      "formatting",
+      "operators",
+      "routing"
+    ],
+    "policies": [
+      "formatting",
+      "operators",
+      "prompts",
+      "routing",
+      "semantics"
+    ],
+    "fallbacks": [
+      "microcopy",
+      "policies"
+    ],
+    "quality": [
+      "formatting",
+      "microcopy",
+      "prompts",
+      "retrieval",
+      "routing",
+      "semantics"
     ],
     "triggers": [
-      "routing",
+      "normalizers",
       "operators",
-      "normalizers"
+      "routing"
     ],
     "ambiguity": [
-      "routing",
+      "operators",
       "retrieval",
-      "operators"
+      "routing"
     ],
     "probes": [
-      "routing",
-      "retrieval",
       "formatting",
-      "quality"
-    ]
+      "quality",
+      "retrieval",
+      "routing",
+      "semantics"
+    ],
+    "templates": [],
+    "tests": []
   },
   "banks": [
     {
@@ -98,21 +128,110 @@
       ]
     },
     {
+      "id": "agg_stats_terms_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "agg_stats_terms_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_capabilities",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_chart_spec_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_connector_permissions",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_crossdoc_grounding",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_docx_operators",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_docx_resolvers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_font_aliases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_formula_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_intents",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_language_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_python_operators",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_render_cards",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_response_style",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_xlsx_operators",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_xlsx_resolvers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "ambiguity_questions",
       "dependsOn": [
         "quality_gates"
       ]
     },
     {
-      "id": "ambiguous_terms",
+      "id": "ambiguity_rank_features",
       "dependsOn": [],
       "optional": true
     },
     {
       "id": "answer_style_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "answer_style_schema",
       "dependsOn": [
-        "banned_phrases",
-        "truncation_and_limits"
+        "bank_schema"
       ]
     },
     {
@@ -128,12 +247,23 @@
       ]
     },
     {
+      "id": "bank_checksums",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "bank_dependencies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "bank_manifest",
+      "dependsOn": []
+    },
+    {
       "id": "bank_registry",
       "dependsOn": [
-        "manifest"
-      ],
-      "notes": [
-        "Registry loads after base manifest category is available."
+        "bank_manifest"
       ]
     },
     {
@@ -141,6 +271,21 @@
       "dependsOn": [
         "bank_registry"
       ]
+    },
+    {
+      "id": "banned_phrases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "bolding_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "boost_rules_accounting",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "boost_rules_finance",
@@ -167,6 +312,85 @@
       ]
     },
     {
+      "id": "bullet_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "capabilities_catalog",
+      "dependsOn": [
+        "operator_contracts",
+        "operator_output_shapes"
+      ]
+    },
+    {
+      "id": "chart_types_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "chart_types_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "clarification_phrases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "clarification_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "colors_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "colors_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "common_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "common_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "compose_answer_prompt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "connector_operators",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "connectors_routing",
+      "dependsOn": [
+        "intent_patterns",
+        "operator_families"
+      ]
+    },
+    {
+      "id": "conversation_messages",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "creative_operators",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "date_patterns",
       "dependsOn": [
         "doc_taxonomy"
@@ -175,372 +399,2899 @@
     {
       "id": "decision_support_accounting",
       "dependsOn": [
-        "explain_style_accounting",
-        "assumption_policy"
-      ]
+        "assumption_policy",
+        "explain_style_accounting"
+      ],
+      "optional": true
     },
     {
       "id": "decision_support_finance",
       "dependsOn": [
-        "explain_style_finance",
-        "assumption_policy"
+        "assumption_policy",
+        "explain_style_finance"
       ]
     },
     {
       "id": "decision_support_legal",
       "dependsOn": [
-        "explain_style_legal",
-        "assumption_policy"
+        "assumption_policy",
+        "explain_style_legal"
       ]
     },
     {
       "id": "decision_support_medical",
       "dependsOn": [
-        "explain_style_medical",
-        "assumption_policy"
+        "assumption_policy",
+        "explain_style_medical"
       ]
     },
     {
       "id": "decision_support_ops",
       "dependsOn": [
-        "explain_style_ops",
-        "assumption_policy"
+        "assumption_policy",
+        "explain_style_ops"
       ]
+    },
+    {
+      "id": "di_abbreviation_global",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_abbreviations_en",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_abbreviations_pt",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_answer_style_bank",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_disclaimer_policy",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_doc_type_catalog",
       "dependsOn": [
         "di_accounting_domain_profile"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_domain_detection_rules",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_evidence_requirements",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_accruals_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_ap_aging",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_ar_aging",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_audit_workpaper",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_bank_rec",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_bank_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_chart_of_accounts",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_controls_narrative",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_credit_card_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_depreciation_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_fixed_asset_register",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_gl_export",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_intercompany_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_inventory_valuation_report",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_invoice_register",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_je_support",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_journal_entry_support",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_lease_accounting_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_management_rep_letter",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_payment_run_report",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_pbc_list",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_prepaids_amortization_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_revenue_recognition_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_extraction_acct_trial_balance",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_lexicon_en",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_lexicon_pt",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_reasoning_scaffolds",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_redaction_and_safety_rules",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_retrieval_strategies",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_accruals_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_ap_aging",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_ar_aging",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_audit_workpaper",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_bank_rec",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_bank_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_chart_of_accounts",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_controls_narrative",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_credit_card_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_depreciation_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_fixed_asset_register",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_gl_export",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_intercompany_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_inventory_valuation_report",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_invoice_register",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_je_support",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_journal_entry_support",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_lease_accounting_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_management_rep_letter",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_payment_run_report",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_pbc_list",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_prepaids_amortization_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_revenue_recognition_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_sections_acct_trial_balance",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_accruals_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_ap_aging",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_ar_aging",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_audit_workpaper",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_bank_rec",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_bank_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_chart_of_accounts",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_controls_narrative",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_credit_card_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_depreciation_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_fixed_asset_register",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_gl_export",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_intercompany_reconciliation",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_inventory_valuation_report",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_invoice_register",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_je_support",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_journal_entry_support",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_lease_accounting_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_management_rep_letter",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_payment_run_report",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_pbc_list",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_prepaids_amortization_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_revenue_recognition_schedule",
+      "dependsOn": [
+        "di_accounting_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_accounting_tables_acct_trial_balance",
       "dependsOn": [
         "di_accounting_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_validation_policies",
+      "dependsOn": [
+        "di_accounting_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_extraction_banking_bank_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_extraction_banking_credit_card_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_extraction_banking_loan_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_extraction_banking_payment_receipt",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_sections_banking_bank_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_sections_banking_credit_card_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_sections_banking_loan_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_sections_banking_payment_receipt",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_tables_banking_bank_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_tables_banking_credit_card_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_tables_banking_loan_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_tables_banking_payment_receipt",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_extraction_billing_electricity_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_extraction_billing_internet_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_extraction_billing_invoice_business",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_extraction_billing_phone_bill_mobile",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_extraction_billing_retail_receipt",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_extraction_billing_water_sewer_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_billing_sections_billing_electricity_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_sections_billing_internet_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_sections_billing_invoice_business",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_sections_billing_phone_bill_mobile",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_sections_billing_retail_receipt",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_sections_billing_water_sewer_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_tables_billing_electricity_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_tables_billing_internet_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_tables_billing_invoice_business",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_tables_billing_phone_bill_mobile",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_tables_billing_retail_receipt",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_tables_billing_water_sewer_bill",
+      "dependsOn": [
+        "di_billing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_billing_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_doc_type_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_domain_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_extraction_edu_course_syllabus",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_extraction_edu_diploma_certificate",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_extraction_edu_enrollment_letter",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_extraction_edu_student_financial_aid_award",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_extraction_edu_student_schedule",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_extraction_edu_transcript",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_education_sections_edu_course_syllabus",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_sections_edu_diploma_certificate",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_sections_edu_enrollment_letter",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_sections_edu_student_financial_aid_award",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_sections_edu_student_schedule",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_sections_edu_transcript",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_tables_edu_course_syllabus",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_tables_edu_diploma_certificate",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_tables_edu_enrollment_letter",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_tables_edu_student_financial_aid_award",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_tables_edu_student_schedule",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_tables_edu_transcript",
+      "dependsOn": [
+        "di_education_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_education_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_entity_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_abbreviations_en",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_abbreviations_pt",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_answer_style_bank",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_disclaimer_policy",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_doc_type_catalog",
       "dependsOn": [
         "di_finance_domain_profile"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_domain_detection_rules",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_evidence_requirements",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_10k",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_10q",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_8k",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_arr_mrr_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_bank_statement",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_board_deck_finance",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_budget",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_cap_table",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_cash_forecast",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_cohort_analysis",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_covenant",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_covenant_compliance_certificate",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_debt_schedule",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_earnings_release",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_esg_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_investor_presentation",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_kpi_dashboard",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_monthly_close_pack",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_pipeline_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_rolling_forecast",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_statements_pack",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_unit_economics_model",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_extraction_fin_variance",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_variance_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_lexicon_en",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_lexicon_pt",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_reasoning_scaffolds",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_redaction_and_safety_rules",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_retrieval_strategies",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_10k",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_10q",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_8k",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_arr_mrr_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_bank_statement",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_board_deck_finance",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_budget",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_cap_table",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_cash_forecast",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_cohort_analysis",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_covenant",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_covenant_compliance_certificate",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_debt_schedule",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_earnings_release",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_esg_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_investor_presentation",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_kpi_dashboard",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_monthly_close_pack",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_pipeline_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_rolling_forecast",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_statements_pack",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_unit_economics_model",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_sections_fin_variance",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_variance_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_10k",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_10q",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_8k",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_arr_mrr_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_bank_statement",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_board_deck_finance",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_budget",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_cap_table",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_cash_forecast",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_cohort_analysis",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_covenant",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_covenant_compliance_certificate",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_debt_schedule",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_earnings_release",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_esg_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_investor_presentation",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_kpi_dashboard",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_monthly_close_pack",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_pipeline_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_rolling_forecast",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_statements_pack",
       "dependsOn": [
         "di_finance_doc_type_catalog"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_unit_economics_model",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "di_finance_tables_fin_variance",
       "dependsOn": [
         "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_variance_report",
+      "dependsOn": [
+        "di_finance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_validation_policies",
+      "dependsOn": [
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_extraction_housing_hoa_statement",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_extraction_housing_home_inspection_report",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_extraction_housing_lease_summary",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_extraction_housing_mortgage_statement",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_extraction_housing_property_tax_bill",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_extraction_housing_rent_receipt",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_housing_sections_housing_hoa_statement",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_sections_housing_home_inspection_report",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_sections_housing_lease_summary",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_sections_housing_mortgage_statement",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_sections_housing_property_tax_bill",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_sections_housing_rent_receipt",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_tables_housing_hoa_statement",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_tables_housing_home_inspection_report",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_tables_housing_lease_summary",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_tables_housing_mortgage_statement",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_tables_housing_property_tax_bill",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_tables_housing_rent_receipt",
+      "dependsOn": [
+        "di_housing_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_housing_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_extraction_hr_benefits_enrollment_summary",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_extraction_hr_employment_verification_letter",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_extraction_hr_expense_report",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_extraction_hr_pay_stub",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_extraction_hr_timesheet",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_sections_hr_benefits_enrollment_summary",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_sections_hr_employment_verification_letter",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_sections_hr_expense_report",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_sections_hr_pay_stub",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_sections_hr_timesheet",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_tables_hr_benefits_enrollment_summary",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_tables_hr_employment_verification_letter",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_tables_hr_expense_report",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_tables_hr_pay_stub",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_tables_hr_timesheet",
+      "dependsOn": [
+        "di_hr_payroll_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_hr_payroll_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_extraction_id_business_registration_certificate",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_extraction_id_driver_license",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_extraction_id_passport",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_extraction_id_proof_of_address",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_sections_id_business_registration_certificate",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_sections_id_driver_license",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_sections_id_passport",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_sections_id_proof_of_address",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_business_registration_certificate",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_driver_license",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_passport",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_proof_of_address",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_extraction_ins_claim_submission",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_extraction_ins_explanation_of_benefits",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_extraction_ins_policy_document",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_extraction_ins_premium_invoice",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_sections_ins_claim_submission",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_sections_ins_explanation_of_benefits",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_sections_ins_policy_document",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_sections_ins_premium_invoice",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_claim_submission",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_explanation_of_benefits",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_policy_document",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_premium_invoice",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_metric_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_normalization_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_section_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_extraction_tax_assessment_notice",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_extraction_tax_individual_income_return",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_extraction_tax_payment_slip",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_extraction_tax_property_tax_bill",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_tax_sections_tax_assessment_notice",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_sections_tax_individual_income_return",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_sections_tax_payment_slip",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_sections_tax_property_tax_bill",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_tables_tax_assessment_notice",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_tables_tax_individual_income_return",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_tables_tax_payment_slip",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_tables_tax_property_tax_bill",
+      "dependsOn": [
+        "di_tax_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_tax_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_extraction_travel_boarding_pass",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_extraction_travel_car_rental_agreement",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_extraction_travel_hotel_booking_confirmation",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_extraction_travel_itinerary",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_extraction_travel_travel_insurance_policy",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_extraction_travel_visa_application_receipt",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_travel_sections_travel_boarding_pass",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_sections_travel_car_rental_agreement",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_sections_travel_hotel_booking_confirmation",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_sections_travel_itinerary",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_sections_travel_travel_insurance_policy",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_sections_travel_visa_application_receipt",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_tables_travel_boarding_pass",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_tables_travel_car_rental_agreement",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_tables_travel_hotel_booking_confirmation",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_tables_travel_itinerary",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_tables_travel_travel_insurance_policy",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_tables_travel_visa_application_receipt",
+      "dependsOn": [
+        "di_travel_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_travel_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_unit_and_measurement_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "disambiguation_microcopy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "disambiguation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "disambiguation_prompt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "discourse_markers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "diversification_rules",
+      "dependsOn": [
+        "retrieval_negatives"
       ]
     },
     {
@@ -554,10 +3305,35 @@
       ]
     },
     {
+      "id": "doc_aliases_banking",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_aliases_billing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "doc_aliases_finance",
       "dependsOn": [
         "doc_taxonomy"
       ]
+    },
+    {
+      "id": "doc_aliases_housing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_aliases_identity",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_aliases_insurance",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "doc_aliases_legal",
@@ -576,6 +3352,16 @@
       "dependsOn": [
         "doc_taxonomy"
       ]
+    },
+    {
+      "id": "doc_aliases_tax",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_archetypes",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "doc_archetypes_accounting",
@@ -608,8 +3394,35 @@
       ]
     },
     {
+      "id": "doc_identity_schema",
+      "dependsOn": [
+        "bank_registry"
+      ]
+    },
+    {
       "id": "doc_taxonomy",
       "dependsOn": []
+    },
+    {
+      "id": "doc_title_boost_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_type_boost_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_type_catalog_schema",
+      "dependsOn": [
+        "bank_schema"
+      ]
+    },
+    {
+      "id": "docint_eval_suite_registry",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "document_intelligence_bank_map",
@@ -658,6 +3471,93 @@
       ]
     },
     {
+      "id": "docx_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "docx_heading_levels_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "docx_heading_levels_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "docx_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "domain_detection_schema",
+      "dependsOn": [
+        "bank_schema"
+      ]
+    },
+    {
+      "id": "domain_ontology",
+      "dependsOn": []
+    },
+    {
+      "id": "domain_profile_schema",
+      "dependsOn": [
+        "bank_schema"
+      ]
+    },
+    {
+      "id": "edit_error_catalog",
+      "dependsOn": []
+    },
+    {
+      "id": "editing_agent_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "editing_microcopy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "editing_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "editing_routing",
+      "dependsOn": []
+    },
+    {
+      "id": "editing_task_prompts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "editing_ux",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "email_action_operators",
+      "dependsOn": [
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "email_routing",
+      "dependsOn": [
+        "intent_patterns",
+        "operator_families"
+      ]
+    },
+    {
+      "id": "entity_role_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "environments",
       "dependsOn": [
         "bank_registry"
@@ -665,21 +3565,81 @@
     },
     {
       "id": "evidence_packaging",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "evidence_requirements_schema",
       "dependsOn": [
-        "retrieval_ranker_config"
+        "bank_schema"
       ]
+    },
+    {
+      "id": "excel_chart_types_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_chart_types_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_edit_regression",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_formula_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_functions_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_functions_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_functions_pt_to_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_number_formats",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "excel_number_formats_structure",
       "dependsOn": [
         "sheetname_patterns"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "excel_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "excel_shortcuts",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "explain_style_accounting",
-      "dependsOn": [
-        "doc_archetypes_finance"
-      ]
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "explain_style_finance",
@@ -706,10 +3666,64 @@
       ]
     },
     {
+      "id": "extraction_policy",
+      "dependsOn": [
+        "entity_role_ontology",
+        "query_slot_contracts"
+      ],
+      "optional": true
+    },
+    {
+      "id": "fallback_extraction_recovery",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "fallback_not_found_scope",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "fallback_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "fallback_processing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "fallback_prompt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "fallback_router",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "fallback_scope_empty",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "feature_flags",
       "dependsOn": [
         "environments"
       ]
+    },
+    {
+      "id": "file_action_operators",
+      "dependsOn": [
+        "operator_contracts"
+      ]
+    },
+    {
+      "id": "file_actions_microcopy",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "finance_doc_logic",
@@ -721,6 +3735,28 @@
       "id": "finance_kpi_ontology",
       "dependsOn": [
         "doc_archetypes_finance"
+      ]
+    },
+    {
+      "id": "followup_indicators",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "followup_suggestions",
+      "dependsOn": [
+        "conversation_messages"
+      ]
+    },
+    {
+      "id": "fonts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "format_semantics",
+      "dependsOn": [
+        "language_indicators"
       ]
     },
     {
@@ -736,8 +3772,41 @@
       ]
     },
     {
+      "id": "intent_config",
+      "dependsOn": [
+        "bank_schema"
+      ]
+    },
+    {
       "id": "intent_patterns",
-      "dependsOn": []
+      "dependsOn": [
+        "bank_schema"
+      ]
+    },
+    {
+      "id": "intent_patterns_docx_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "intent_patterns_docx_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "intent_patterns_excel_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "intent_patterns_excel_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "keyword_boost_rules",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "keyword_taxonomy_finance",
@@ -768,8 +3837,34 @@
       "optional": true
     },
     {
+      "id": "koda_product_help",
+      "dependsOn": [
+        "capabilities_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "lab_result_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "language_indicators",
-      "dependsOn": []
+      "dependsOn": [
+        "bank_schema"
+      ]
+    },
+    {
+      "id": "language_triggers",
+      "dependsOn": [
+        "language_indicators"
+      ]
+    },
+    {
+      "id": "languages",
+      "dependsOn": [
+        "bank_registry"
+      ]
     },
     {
       "id": "layout_cues",
@@ -792,9 +3887,72 @@
       "optional": true
     },
     {
+      "id": "legal_acceptable_use_policy_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_acceptable_use_policy_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_acceptable_use_policy_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "legal_answer_style_bank",
       "dependsOn": [
         "legal_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_baa_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_baa_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_baa_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_board_minutes_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_board_minutes_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_board_minutes_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
       ],
       "optional": true
     },
@@ -820,10 +3978,178 @@
       "optional": true
     },
     {
+      "id": "legal_bylaws_charter_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_bylaws_charter_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_bylaws_charter_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "legal_clause_ontology",
       "dependsOn": [
         "doc_archetypes_legal"
       ]
+    },
+    {
+      "id": "legal_code_of_conduct_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_code_of_conduct_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_code_of_conduct_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_complaint_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_complaint_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_complaint_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_consulting_agreement_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_consulting_agreement_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_consulting_agreement_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_contractor_agreement_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_contractor_agreement_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_contractor_agreement_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_cookie_policy_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_cookie_policy_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_cookie_policy_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_court_order_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_court_order_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_court_order_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_data_retention_policy_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_data_retention_policy_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_data_retention_policy_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "legal_disclaimer_policy",
@@ -894,9 +4220,51 @@
       "optional": true
     },
     {
+      "id": "legal_eula_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_eula_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_eula_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "legal_evidence_requirements",
       "dependsOn": [
         "legal_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_ip_assignment_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_ip_assignment_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_ip_assignment_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
       ],
       "optional": true
     },
@@ -922,6 +4290,48 @@
       "optional": true
     },
     {
+      "id": "legal_legal_lease_agreement_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_legal_lease_agreement_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_legal_lease_agreement_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_legal_litigation_memo_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_legal_litigation_memo_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_legal_litigation_memo_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "legal_lexicon_en",
       "dependsOn": [
         "legal_domain_profile"
@@ -932,6 +4342,27 @@
       "id": "legal_lexicon_pt",
       "dependsOn": [
         "legal_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_license_agreement_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_license_agreement_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_license_agreement_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
       ],
       "optional": true
     },
@@ -951,6 +4382,27 @@
     },
     {
       "id": "legal_litigation_memo_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_motion_brief_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_motion_brief_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_motion_brief_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
@@ -999,6 +4451,48 @@
       "optional": true
     },
     {
+      "id": "legal_offer_letter_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_offer_letter_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_offer_letter_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_partnership_jv_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_partnership_jv_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_partnership_jv_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "legal_privacy_policy_extraction_hints",
       "dependsOn": [
         "legal_doc_type_catalog"
@@ -1040,6 +4534,27 @@
       ]
     },
     {
+      "id": "legal_reseller_distribution_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_reseller_distribution_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_reseller_distribution_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "legal_retrieval_strategies",
       "dependsOn": [
         "legal_domain_profile"
@@ -1051,6 +4566,69 @@
       "dependsOn": [
         "doc_archetypes_legal"
       ]
+    },
+    {
+      "id": "legal_security_policy_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_security_policy_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_security_policy_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_settlement_agreement_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_settlement_agreement_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_settlement_agreement_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_sla_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_sla_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_sla_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
     },
     {
       "id": "legal_sow_extraction_hints",
@@ -1081,6 +4659,27 @@
       "optional": true
     },
     {
+      "id": "legal_terms_of_service_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_terms_of_service_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_terms_of_service_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "legal_terms_sections",
       "dependsOn": [
         "legal_doc_type_catalog"
@@ -1100,6 +4699,33 @@
         "legal_domain_profile"
       ],
       "optional": true
+    },
+    {
+      "id": "legal_written_consent_extraction_hints",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_written_consent_sections",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_written_consent_tables",
+      "dependsOn": [
+        "legal_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "marketing_probe_schema",
+      "dependsOn": [
+        "bank_registry"
+      ]
     },
     {
       "id": "medical_abbreviations_en",
@@ -1239,6 +4865,237 @@
       "optional": true
     },
     {
+      "id": "medical_med_allergy_list_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_allergy_list_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_allergy_list_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_care_plan_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_care_plan_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_care_plan_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_consult_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_consult_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_consult_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_discharge_summary_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_discharge_summary_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_discharge_summary_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_ecg_report_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_ecg_report_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_ecg_report_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_emergency_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_emergency_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_emergency_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_followup_instructions_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_followup_instructions_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_followup_instructions_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_history_and_physical_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_history_and_physical_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_history_and_physical_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_immunization_record_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_immunization_record_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_immunization_record_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_lab_report_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_lab_report_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_lab_report_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_lab_results_report_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_lab_results_report_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_lab_results_report_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "medical_med_list_extraction_hints",
       "dependsOn": [
         "medical_doc_type_catalog"
@@ -1254,6 +5111,237 @@
     },
     {
       "id": "medical_med_list_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_medication_list_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_medication_list_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_medication_list_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_nursing_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_nursing_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_nursing_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_pathology_report_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_pathology_report_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_pathology_report_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_prescription_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_prescription_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_prescription_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_problem_list_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_problem_list_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_problem_list_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_progress_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_progress_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_progress_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_radiology_report_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_radiology_report_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_radiology_report_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_referral_letter_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_referral_letter_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_referral_letter_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_referral_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_referral_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_referral_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_soap_note_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_soap_note_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_soap_note_tables",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_vitals_chart_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_vitals_chart_sections",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_vitals_chart_tables",
       "dependsOn": [
         "medical_doc_type_catalog"
       ],
@@ -1384,10 +5472,61 @@
       "optional": true
     },
     {
+      "id": "memory_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "memory_policy_tests",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "memory_semantic_continuity",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "mode_chat",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "mode_editing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "mode_editing_docx",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "mode_editing_sheets",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "money_patterns",
       "dependsOn": [
         "doc_taxonomy"
       ]
+    },
+    {
+      "id": "month_normalization",
+      "dependsOn": [
+        "language_indicators"
+      ]
+    },
+    {
+      "id": "nav_microcopy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "no_docs_messages",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "numeric_integrity",
@@ -1396,10 +5535,19 @@
       ]
     },
     {
-      "id": "operator_contracts",
+      "id": "ontology_schema",
       "dependsOn": [
-        "operator_families"
+        "bank_schema"
       ]
+    },
+    {
+      "id": "operator_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_contracts",
+      "dependsOn": []
     },
     {
       "id": "operator_families",
@@ -1416,352 +5564,358 @@
     {
       "id": "operator_playbook_advise_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_advise_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_advise_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_advise_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_calculate_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_calculate_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_calculate_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_calculate_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_compare_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_compare_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_compare_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_compare_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_evaluate_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_evaluate_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_evaluate_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_evaluate_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_extract_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_extract_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_extract_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_extract_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_locate_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_locate_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_locate_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_locate_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_monitor_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_monitor_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_monitor_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_monitor_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_navigate_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_navigate_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_navigate_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_navigate_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_open_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_open_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_open_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_open_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
+      ]
+    },
+    {
+      "id": "operator_playbook_schema",
+      "dependsOn": [
+        "bank_registry"
       ]
     },
     {
       "id": "operator_playbook_summarize_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_summarize_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_summarize_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_summarize_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_validate_finance",
       "dependsOn": [
-        "doc_archetypes_finance",
         "doc_aliases_finance",
+        "doc_archetypes_finance",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_validate_legal",
       "dependsOn": [
-        "doc_archetypes_legal",
         "doc_aliases_legal",
+        "doc_archetypes_legal",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_validate_medical",
       "dependsOn": [
-        "doc_archetypes_medical",
         "doc_aliases_medical",
+        "doc_archetypes_medical",
         "operator_contracts"
       ]
     },
     {
       "id": "operator_playbook_validate_ops",
       "dependsOn": [
-        "doc_archetypes_ops",
         "doc_aliases_ops",
+        "doc_archetypes_ops",
         "operator_contracts"
       ]
     },
@@ -1776,6 +5930,11 @@
       "dependsOn": [
         "doc_archetypes_ops"
       ]
+    },
+    {
+      "id": "orchestrator_certification",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "pain_points_finance",
@@ -1806,6 +5965,12 @@
       "optional": true
     },
     {
+      "id": "parser_bank_schema",
+      "dependsOn": [
+        "bank_registry"
+      ]
+    },
+    {
       "id": "party_patterns",
       "dependsOn": [
         "doc_taxonomy"
@@ -1819,16 +5984,45 @@
       "optional": true
     },
     {
-      "id": "quality_gates",
+      "id": "policy_citations",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "processing_messages",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "prompt_registry",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "python_chart_recipes",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "python_sandbox_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quality_document_intelligence_schema",
       "dependsOn": [
-        "fallback_processing",
-        "fallback_extraction_recovery",
-        "fallback_scope_empty",
-        "fallback_not_found_scope",
-        "no_docs_messages",
-        "clarification_phrases",
-        "refusal_phrases"
+        "bank_registry"
       ]
+    },
+    {
+      "id": "quality_gates",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "query_rewrites_accounting",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "query_rewrites_finance",
@@ -1857,26 +6051,89 @@
     {
       "id": "query_rewrites_schema",
       "dependsOn": [
-        "bank_schema"
+        "bank_registry"
       ]
+    },
+    {
+      "id": "query_slot_contracts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "rag_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "reasoning_policy_schema",
+      "dependsOn": [
+        "bank_registry"
+      ]
+    },
+    {
+      "id": "recency_boost_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "refusal_phrases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "refusal_policy",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "render_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "retrieval_document_intelligence_schema",
       "dependsOn": [
-        "answer_style_policy"
+        "bank_registry"
       ]
+    },
+    {
+      "id": "retrieval_negatives",
+      "dependsOn": []
+    },
+    {
+      "id": "retrieval_prompt",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "retrieval_ranker_config",
-      "dependsOn": [
-        "semantic_search_config"
-      ]
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "routing_priority",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "scope_hints",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "scope_resolution",
-      "dependsOn": [
-        "doc_aliases"
-      ]
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "scoped_not_found_messages",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_accounting",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "section_priority_finance",
@@ -1904,7 +6161,8 @@
     },
     {
       "id": "semantic_search_config",
-      "dependsOn": []
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "sheetname_patterns",
@@ -1913,26 +6171,71 @@
       ]
     },
     {
+      "id": "slot_extraction_cases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "source_engine",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "source_policy",
       "dependsOn": [
         "quality_gates"
       ]
     },
     {
+      "id": "spreadsheet_semantics",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "stopwords_docnames",
+      "dependsOn": []
+    },
+    {
       "id": "synonym_expansion",
       "dependsOn": []
+    },
+    {
+      "id": "system_base",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "system_prompt",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "table_header_ontology_accounting",
       "dependsOn": [
         "doc_taxonomy"
-      ]
+      ],
+      "optional": true
+    },
+    {
+      "id": "table_header_ontology_banking",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "table_header_ontology_billing",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "table_header_ontology_finance",
       "dependsOn": [
         "doc_archetypes_finance"
       ]
+    },
+    {
+      "id": "table_header_ontology_insurance",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "table_header_ontology_legal",
@@ -1950,6 +6253,67 @@
       "id": "table_header_ontology_ops",
       "dependsOn": [
         "doc_archetypes_ops"
+      ]
+    },
+    {
+      "id": "table_header_ontology_tax",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "table_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "task_answer_with_sources",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "task_plan_generation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "telecom_usage_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "tool_prompts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "truncation_and_limits",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "ui_contracts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "ui_intro_neutral",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "ui_next_step_suggestion",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "ui_soft_close",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "versioning",
+      "dependsOn": [
+        "bank_registry"
       ]
     },
     {
