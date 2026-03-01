@@ -14,6 +14,7 @@ import {
   type EvidencePackLike,
   type MemoryPackLike,
 } from "./llmRequestBuilder.service";
+import { getProductHelpService } from "../../chat/productHelp.service";
 
 export type GatewayChatRole = "system" | "user" | "assistant";
 
@@ -87,6 +88,14 @@ function clampText(input: string, maxChars: number): string {
   const v = String(input || "").trim();
   if (!v) return "";
   return v.length > maxChars ? `${v.slice(0, maxChars - 1)}…` : v;
+}
+
+function firstNonEmptyString(...values: Array<unknown>): string | null {
+  for (const value of values) {
+    const text = String(value || "").trim();
+    if (text) return text;
+  }
+  return null;
 }
 
 export class LlmGatewayService {
@@ -175,6 +184,20 @@ export class LlmGatewayService {
       typeof params.meta?.promptTask === "string"
         ? String(params.meta.promptTask)
         : null;
+    const productHelpService = getProductHelpService();
+    const resolvedProductHelp = productHelpService.resolve({
+      language: parsed.outputLanguage,
+      explicitTopic: parsed.productHelpTopic,
+      queryText: parsed.userText,
+      answerMode: parsed.answerMode,
+      operator: parsed.operator,
+      intentFamily: parsed.intentFamily,
+      fallbackReasonCode: parsed.fallback?.reasonCode ?? null,
+    });
+    const productHelpTopic =
+      parsed.productHelpTopic || resolvedProductHelp?.topic || null;
+    const productHelpSnippet =
+      parsed.productHelpSnippet || resolvedProductHelp?.snippet || null;
 
     const buildInput: BuildRequestInput = {
       env: this.cfg.env,
@@ -191,6 +214,8 @@ export class LlmGatewayService {
         navType: parsed.navType,
         fallback: parsed.fallback,
         disambiguation: parsed.disambiguation,
+        productHelpTopic,
+        productHelpSnippet,
       },
       evidencePack: params.evidencePack ?? parsed.evidencePack,
       memoryPack: parsed.memoryPack,
@@ -286,6 +311,8 @@ export class LlmGatewayService {
     disambiguation?: GatewayDisambiguation | null;
     evidencePack?: EvidencePackLike;
     memoryPack?: MemoryPackLike;
+    productHelpTopic?: string | null;
+    productHelpSnippet?: string | null;
   } {
     const messages = params.messages || [];
 
@@ -361,6 +388,20 @@ export class LlmGatewayService {
       typeof rawMeta.fallbackReasonCode === "string"
         ? rawMeta.fallbackReasonCode
         : null;
+    const contextSignals = (rawContext?.signals as any) || {};
+    const metaSignals = (rawMeta?.signals as any) || {};
+    const productHelpTopic = firstNonEmptyString(
+      rawMeta.productHelpTopic,
+      (rawContext as any).productHelpTopic,
+      contextSignals.productHelpTopic,
+      metaSignals.productHelpTopic,
+    );
+    const productHelpSnippet = firstNonEmptyString(
+      rawMeta.productHelpSnippet,
+      (rawContext as any).productHelpSnippet,
+      contextSignals.productHelpSnippet,
+      metaSignals.productHelpSnippet,
+    );
 
     return {
       userText,
@@ -376,6 +417,8 @@ export class LlmGatewayService {
       disambiguation,
       evidencePack,
       memoryPack,
+      productHelpTopic,
+      productHelpSnippet,
     };
   }
 
