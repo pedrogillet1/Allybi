@@ -1,0 +1,307 @@
+{
+  "_meta": {
+    "id": "medical_abbreviations_en",
+    "version": "1.0.0",
+    "description": "English abbreviations for medical domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "language": "en"
+  },
+  "domain": "medical",
+  "abbreviations": [
+    {
+      "abbr": "ABG",
+      "expansion": "Arterial Blood Gas"
+    },
+    {
+      "abbr": "ALP",
+      "expansion": "Alkaline Phosphatase"
+    },
+    {
+      "abbr": "ALT",
+      "expansion": "Alanine Aminotransferase"
+    },
+    {
+      "abbr": "aPTT",
+      "expansion": "Activated Partial Thromboplastin Time"
+    },
+    {
+      "abbr": "AST",
+      "expansion": "Aspartate Aminotransferase"
+    },
+    {
+      "abbr": "BID",
+      "expansion": "Twice Daily"
+    },
+    {
+      "abbr": "BMI",
+      "expansion": "Body Mass Index"
+    },
+    {
+      "abbr": "BMP",
+      "expansion": "Basic Metabolic Panel"
+    },
+    {
+      "abbr": "BP",
+      "expansion": "Blood Pressure"
+    },
+    {
+      "abbr": "BUN",
+      "expansion": "Blood Urea Nitrogen"
+    },
+    {
+      "abbr": "CBC",
+      "expansion": "Complete Blood Count"
+    },
+    {
+      "abbr": "CHF",
+      "expansion": "Congestive Heart Failure"
+    },
+    {
+      "abbr": "CMP",
+      "expansion": "Comprehensive Metabolic Panel"
+    },
+    {
+      "abbr": "COPD",
+      "expansion": "Chronic Obstructive Pulmonary Disease"
+    },
+    {
+      "abbr": "CPR",
+      "expansion": "Cardiopulmonary Resuscitation"
+    },
+    {
+      "abbr": "Cr",
+      "expansion": "Creatinine"
+    },
+    {
+      "abbr": "CRP",
+      "expansion": "C-Reactive Protein"
+    },
+    {
+      "abbr": "CT",
+      "expansion": "Computed Tomography"
+    },
+    {
+      "abbr": "CXR",
+      "expansion": "Chest X-Ray"
+    },
+    {
+      "abbr": "DM",
+      "expansion": "Diabetes Mellitus"
+    },
+    {
+      "abbr": "DNR",
+      "expansion": "Do Not Resuscitate"
+    },
+    {
+      "abbr": "DOB",
+      "expansion": "Date of Birth"
+    },
+    {
+      "abbr": "Dx",
+      "expansion": "Diagnosis"
+    },
+    {
+      "abbr": "ECG",
+      "expansion": "Electrocardiogram"
+    },
+    {
+      "abbr": "ED",
+      "expansion": "Emergency Department"
+    },
+    {
+      "abbr": "EKG",
+      "expansion": "Electrocardiogram"
+    },
+    {
+      "abbr": "ESR",
+      "expansion": "Erythrocyte Sedimentation Rate"
+    },
+    {
+      "abbr": "Fx",
+      "expansion": "Fracture"
+    },
+    {
+      "abbr": "Hb",
+      "expansion": "Hemoglobin"
+    },
+    {
+      "abbr": "Hct",
+      "expansion": "Hematocrit"
+    },
+    {
+      "abbr": "HPI",
+      "expansion": "History of Present Illness"
+    },
+    {
+      "abbr": "HR",
+      "expansion": "Heart Rate"
+    },
+    {
+      "abbr": "HTN",
+      "expansion": "Hypertension"
+    },
+    {
+      "abbr": "Hx",
+      "expansion": "History"
+    },
+    {
+      "abbr": "ICU",
+      "expansion": "Intensive Care Unit"
+    },
+    {
+      "abbr": "IM",
+      "expansion": "Intramuscular"
+    },
+    {
+      "abbr": "INR",
+      "expansion": "International Normalized Ratio"
+    },
+    {
+      "abbr": "IV",
+      "expansion": "Intravenous"
+    },
+    {
+      "abbr": "K",
+      "expansion": "Potassium"
+    },
+    {
+      "abbr": "LFT",
+      "expansion": "Liver Function Test"
+    },
+    {
+      "abbr": "LOS",
+      "expansion": "Length of Stay"
+    },
+    {
+      "abbr": "MRI",
+      "expansion": "Magnetic Resonance Imaging"
+    },
+    {
+      "abbr": "MRN",
+      "expansion": "Medical Record Number"
+    },
+    {
+      "abbr": "N/V",
+      "expansion": "Nausea and Vomiting"
+    },
+    {
+      "abbr": "Na",
+      "expansion": "Sodium"
+    },
+    {
+      "abbr": "NPO",
+      "expansion": "Nothing by Mouth"
+    },
+    {
+      "abbr": "OPD",
+      "expansion": "Outpatient Department"
+    },
+    {
+      "abbr": "PE",
+      "expansion": "Physical Examination"
+    },
+    {
+      "abbr": "PLT",
+      "expansion": "Platelet Count"
+    },
+    {
+      "abbr": "PMH",
+      "expansion": "Past Medical History"
+    },
+    {
+      "abbr": "PO",
+      "expansion": "By Mouth"
+    },
+    {
+      "abbr": "PRN",
+      "expansion": "As Needed"
+    },
+    {
+      "abbr": "PT",
+      "expansion": "Prothrombin Time"
+    },
+    {
+      "abbr": "QD",
+      "expansion": "Once Daily"
+    },
+    {
+      "abbr": "qHS",
+      "expansion": "Every Night at Bedtime"
+    },
+    {
+      "abbr": "QID",
+      "expansion": "Four Times Daily"
+    },
+    {
+      "abbr": "RBC",
+      "expansion": "Red Blood Cell"
+    },
+    {
+      "abbr": "RFT",
+      "expansion": "Renal Function Test"
+    },
+    {
+      "abbr": "ROS",
+      "expansion": "Review of Systems"
+    },
+    {
+      "abbr": "RR",
+      "expansion": "Respiratory Rate"
+    },
+    {
+      "abbr": "Rx",
+      "expansion": "Prescription"
+    },
+    {
+      "abbr": "SC",
+      "expansion": "Subcutaneous"
+    },
+    {
+      "abbr": "SOAP",
+      "expansion": "Subjective Objective Assessment Plan"
+    },
+    {
+      "abbr": "SOB",
+      "expansion": "Shortness of Breath"
+    },
+    {
+      "abbr": "SpO2",
+      "expansion": "Peripheral Oxygen Saturation"
+    },
+    {
+      "abbr": "STAT",
+      "expansion": "Immediately"
+    },
+    {
+      "abbr": "TID",
+      "expansion": "Three Times Daily"
+    },
+    {
+      "abbr": "Tx",
+      "expansion": "Treatment"
+    },
+    {
+      "abbr": "URI",
+      "expansion": "Upper Respiratory Infection"
+    },
+    {
+      "abbr": "US",
+      "expansion": "Ultrasound"
+    },
+    {
+      "abbr": "UTI",
+      "expansion": "Urinary Tract Infection"
+    },
+    {
+      "abbr": "WBC",
+      "expansion": "White Blood Cell"
+    }
+  ]
+}

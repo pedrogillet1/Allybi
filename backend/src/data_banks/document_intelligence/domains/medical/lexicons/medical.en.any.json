@@ -1,0 +1,1319 @@
+{
+  "_meta": {
+    "id": "medical_lexicon_en",
+    "version": "1.0.0",
+    "description": "English lexicon for medical domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "language": "en"
+  },
+  "domain": "medical",
+  "terms": [
+    {
+      "id": "medical_lex_en_001",
+      "canonical": "admission date",
+      "synonyms": [
+        "admission date",
+        "admission date clause",
+        "admission date provision"
+      ],
+      "display": "Admission Date"
+    },
+    {
+      "id": "medical_lex_en_002",
+      "canonical": "allergy",
+      "synonyms": [
+        "allergy",
+        "allergy clause",
+        "allergy provision"
+      ],
+      "display": "Allergy"
+    },
+    {
+      "id": "medical_lex_en_003",
+      "canonical": "assessment",
+      "synonyms": [
+        "assessment",
+        "assessment clause",
+        "assessment provision"
+      ],
+      "display": "Assessment"
+    },
+    {
+      "id": "medical_lex_en_004",
+      "canonical": "attending physician",
+      "synonyms": [
+        "attending physician",
+        "attending physician clause",
+        "attending physician provision"
+      ],
+      "display": "Attending Physician"
+    },
+    {
+      "id": "medical_lex_en_005",
+      "canonical": "blood pressure",
+      "synonyms": [
+        "blood pressure",
+        "blood pressure clause",
+        "blood pressure provision"
+      ],
+      "display": "Blood Pressure"
+    },
+    {
+      "id": "medical_lex_en_006",
+      "canonical": "body mass index",
+      "synonyms": [
+        "body mass index",
+        "body mass index clause",
+        "body mass index provision"
+      ],
+      "display": "Body Mass Index"
+    },
+    {
+      "id": "medical_lex_en_007",
+      "canonical": "care coordination",
+      "synonyms": [
+        "care coordination",
+        "care coordination clause",
+        "care coordination provision"
+      ],
+      "display": "Care Coordination"
+    },
+    {
+      "id": "medical_lex_en_008",
+      "canonical": "care plan",
+      "synonyms": [
+        "care plan",
+        "care plan clause",
+        "care plan provision"
+      ],
+      "display": "Care Plan"
+    },
+    {
+      "id": "medical_lex_en_009",
+      "canonical": "chief complaint",
+      "synonyms": [
+        "chief complaint",
+        "chief complaint clause",
+        "chief complaint provision"
+      ],
+      "display": "Chief Complaint"
+    },
+    {
+      "id": "medical_lex_en_010",
+      "canonical": "clinical finding",
+      "synonyms": [
+        "clinical finding",
+        "clinical finding clause",
+        "clinical finding provision"
+      ],
+      "display": "Clinical Finding"
+    },
+    {
+      "id": "medical_lex_en_011",
+      "canonical": "clinical impression",
+      "synonyms": [
+        "clinical impression",
+        "clinical impression clause",
+        "clinical impression provision"
+      ],
+      "display": "Clinical Impression"
+    },
+    {
+      "id": "medical_lex_en_012",
+      "canonical": "code status",
+      "synonyms": [
+        "code status",
+        "code status clause",
+        "code status provision"
+      ],
+      "display": "Code Status"
+    },
+    {
+      "id": "medical_lex_en_013",
+      "canonical": "consultation",
+      "synonyms": [
+        "consultation",
+        "consultation clause",
+        "consultation provision"
+      ],
+      "display": "Consultation"
+    },
+    {
+      "id": "medical_lex_en_014",
+      "canonical": "contraindication",
+      "synonyms": [
+        "contraindication",
+        "contraindication clause",
+        "contraindication provision"
+      ],
+      "display": "Contraindication"
+    },
+    {
+      "id": "medical_lex_en_015",
+      "canonical": "critical value",
+      "synonyms": [
+        "critical value",
+        "critical value clause",
+        "critical value provision"
+      ],
+      "display": "Critical Value"
+    },
+    {
+      "id": "medical_lex_en_016",
+      "canonical": "differential diagnosis",
+      "synonyms": [
+        "differential diagnosis",
+        "differential diagnosis clause",
+        "differential diagnosis provision"
+      ],
+      "display": "Differential Diagnosis"
+    },
+    {
+      "id": "medical_lex_en_017",
+      "canonical": "discharge date",
+      "synonyms": [
+        "discharge date",
+        "discharge date clause",
+        "discharge date provision"
+      ],
+      "display": "Discharge Date"
+    },
+    {
+      "id": "medical_lex_en_018",
+      "canonical": "discharge instruction",
+      "synonyms": [
+        "discharge instruction",
+        "discharge instruction clause",
+        "discharge instruction provision"
+      ],
+      "display": "Discharge Instruction"
+    },
+    {
+      "id": "medical_lex_en_019",
+      "canonical": "dosage",
+      "synonyms": [
+        "dosage",
+        "dosage clause",
+        "dosage provision"
+      ],
+      "display": "Dosage"
+    },
+    {
+      "id": "medical_lex_en_020",
+      "canonical": "duration",
+      "synonyms": [
+        "duration",
+        "duration clause",
+        "duration provision"
+      ],
+      "display": "Duration"
+    },
+    {
+      "id": "medical_lex_en_021",
+      "canonical": "encounter date",
+      "synonyms": [
+        "encounter date",
+        "encounter date clause",
+        "encounter date provision"
+      ],
+      "display": "Encounter Date"
+    },
+    {
+      "id": "medical_lex_en_022",
+      "canonical": "evaluation",
+      "synonyms": [
+        "evaluation",
+        "evaluation clause",
+        "evaluation provision"
+      ],
+      "display": "Evaluation"
+    },
+    {
+      "id": "medical_lex_en_023",
+      "canonical": "follow up",
+      "synonyms": [
+        "follow up",
+        "follow up clause",
+        "follow up provision"
+      ],
+      "display": "Follow Up"
+    },
+    {
+      "id": "medical_lex_en_024",
+      "canonical": "frequency",
+      "synonyms": [
+        "frequency",
+        "frequency clause",
+        "frequency provision"
+      ],
+      "display": "Frequency"
+    },
+    {
+      "id": "medical_lex_en_025",
+      "canonical": "history of present illness",
+      "synonyms": [
+        "history of present illness",
+        "history of present illness clause",
+        "history of present illness provision"
+      ],
+      "display": "History Of Present Illness"
+    },
+    {
+      "id": "medical_lex_en_026",
+      "canonical": "hospital course",
+      "synonyms": [
+        "hospital course",
+        "hospital course clause",
+        "hospital course provision"
+      ],
+      "display": "Hospital Course"
+    },
+    {
+      "id": "medical_lex_en_027",
+      "canonical": "imaging finding",
+      "synonyms": [
+        "imaging finding",
+        "imaging finding clause",
+        "imaging finding provision"
+      ],
+      "display": "Imaging Finding"
+    },
+    {
+      "id": "medical_lex_en_028",
+      "canonical": "impression",
+      "synonyms": [
+        "impression",
+        "impression clause",
+        "impression provision"
+      ],
+      "display": "Impression"
+    },
+    {
+      "id": "medical_lex_en_029",
+      "canonical": "indication",
+      "synonyms": [
+        "indication",
+        "indication clause",
+        "indication provision"
+      ],
+      "display": "Indication"
+    },
+    {
+      "id": "medical_lex_en_030",
+      "canonical": "infection control",
+      "synonyms": [
+        "infection control",
+        "infection control clause",
+        "infection control provision"
+      ],
+      "display": "Infection Control"
+    },
+    {
+      "id": "medical_lex_en_031",
+      "canonical": "informed consent",
+      "synonyms": [
+        "informed consent",
+        "informed consent clause",
+        "informed consent provision"
+      ],
+      "display": "Informed Consent"
+    },
+    {
+      "id": "medical_lex_en_032",
+      "canonical": "intake",
+      "synonyms": [
+        "intake",
+        "intake clause",
+        "intake provision"
+      ],
+      "display": "Intake"
+    },
+    {
+      "id": "medical_lex_en_033",
+      "canonical": "lab result",
+      "synonyms": [
+        "lab result",
+        "lab result clause",
+        "lab result provision"
+      ],
+      "display": "Lab Result"
+    },
+    {
+      "id": "medical_lex_en_034",
+      "canonical": "lab specimen",
+      "synonyms": [
+        "lab specimen",
+        "lab specimen clause",
+        "lab specimen provision"
+      ],
+      "display": "Lab Specimen"
+    },
+    {
+      "id": "medical_lex_en_035",
+      "canonical": "medication",
+      "synonyms": [
+        "medication",
+        "medication clause",
+        "medication provision"
+      ],
+      "display": "Medication"
+    },
+    {
+      "id": "medical_lex_en_036",
+      "canonical": "medication reconciliation",
+      "synonyms": [
+        "medication reconciliation",
+        "medication reconciliation clause",
+        "medication reconciliation provision"
+      ],
+      "display": "Medication Reconciliation"
+    },
+    {
+      "id": "medical_lex_en_037",
+      "canonical": "monitoring plan",
+      "synonyms": [
+        "monitoring plan",
+        "monitoring plan clause",
+        "monitoring plan provision"
+      ],
+      "display": "Monitoring Plan"
+    },
+    {
+      "id": "medical_lex_en_038",
+      "canonical": "narrative note",
+      "synonyms": [
+        "narrative note",
+        "narrative note clause",
+        "narrative note provision"
+      ],
+      "display": "Narrative Note"
+    },
+    {
+      "id": "medical_lex_en_039",
+      "canonical": "objective finding",
+      "synonyms": [
+        "objective finding",
+        "objective finding clause",
+        "objective finding provision"
+      ],
+      "display": "Objective Finding"
+    },
+    {
+      "id": "medical_lex_en_040",
+      "canonical": "order set",
+      "synonyms": [
+        "order set",
+        "order set clause",
+        "order set provision"
+      ],
+      "display": "Order Set"
+    },
+    {
+      "id": "medical_lex_en_041",
+      "canonical": "oxygen saturation",
+      "synonyms": [
+        "oxygen saturation",
+        "oxygen saturation clause",
+        "oxygen saturation provision"
+      ],
+      "display": "Oxygen Saturation"
+    },
+    {
+      "id": "medical_lex_en_042",
+      "canonical": "past medical history",
+      "synonyms": [
+        "past medical history",
+        "past medical history clause",
+        "past medical history provision"
+      ],
+      "display": "Past Medical History"
+    },
+    {
+      "id": "medical_lex_en_043",
+      "canonical": "patient identifier",
+      "synonyms": [
+        "patient identifier",
+        "patient identifier clause",
+        "patient identifier provision"
+      ],
+      "display": "Patient Identifier"
+    },
+    {
+      "id": "medical_lex_en_044",
+      "canonical": "patient instruction",
+      "synonyms": [
+        "patient instruction",
+        "patient instruction clause",
+        "patient instruction provision"
+      ],
+      "display": "Patient Instruction"
+    },
+    {
+      "id": "medical_lex_en_045",
+      "canonical": "physical examination",
+      "synonyms": [
+        "physical examination",
+        "physical examination clause",
+        "physical examination provision"
+      ],
+      "display": "Physical Examination"
+    },
+    {
+      "id": "medical_lex_en_046",
+      "canonical": "plan of care",
+      "synonyms": [
+        "plan of care",
+        "plan of care clause",
+        "plan of care provision"
+      ],
+      "display": "Plan Of Care"
+    },
+    {
+      "id": "medical_lex_en_047",
+      "canonical": "problem list",
+      "synonyms": [
+        "problem list",
+        "problem list clause",
+        "problem list provision"
+      ],
+      "display": "Problem List"
+    },
+    {
+      "id": "medical_lex_en_048",
+      "canonical": "procedure",
+      "synonyms": [
+        "procedure",
+        "procedure clause",
+        "procedure provision"
+      ],
+      "display": "Procedure"
+    },
+    {
+      "id": "medical_lex_en_049",
+      "canonical": "progress note",
+      "synonyms": [
+        "progress note",
+        "progress note clause",
+        "progress note provision"
+      ],
+      "display": "Progress Note"
+    },
+    {
+      "id": "medical_lex_en_050",
+      "canonical": "provisional diagnosis",
+      "synonyms": [
+        "provisional diagnosis",
+        "provisional diagnosis clause",
+        "provisional diagnosis provision"
+      ],
+      "display": "Provisional Diagnosis"
+    },
+    {
+      "id": "medical_lex_en_051",
+      "canonical": "radiology report",
+      "synonyms": [
+        "radiology report",
+        "radiology report clause",
+        "radiology report provision"
+      ],
+      "display": "Radiology Report"
+    },
+    {
+      "id": "medical_lex_en_052",
+      "canonical": "reason for referral",
+      "synonyms": [
+        "reason for referral",
+        "reason for referral clause",
+        "reason for referral provision"
+      ],
+      "display": "Reason For Referral"
+    },
+    {
+      "id": "medical_lex_en_053",
+      "canonical": "reference range",
+      "synonyms": [
+        "reference range",
+        "reference range clause",
+        "reference range provision"
+      ],
+      "display": "Reference Range"
+    },
+    {
+      "id": "medical_lex_en_054",
+      "canonical": "referral",
+      "synonyms": [
+        "referral",
+        "referral clause",
+        "referral provision"
+      ],
+      "display": "Referral"
+    },
+    {
+      "id": "medical_lex_en_055",
+      "canonical": "response to treatment",
+      "synonyms": [
+        "response to treatment",
+        "response to treatment clause",
+        "response to treatment provision"
+      ],
+      "display": "Response To Treatment"
+    },
+    {
+      "id": "medical_lex_en_056",
+      "canonical": "risk factor",
+      "synonyms": [
+        "risk factor",
+        "risk factor clause",
+        "risk factor provision"
+      ],
+      "display": "Risk Factor"
+    },
+    {
+      "id": "medical_lex_en_057",
+      "canonical": "route",
+      "synonyms": [
+        "route",
+        "route clause",
+        "route provision"
+      ],
+      "display": "Route"
+    },
+    {
+      "id": "medical_lex_en_058",
+      "canonical": "safety trigger",
+      "synonyms": [
+        "safety trigger",
+        "safety trigger clause",
+        "safety trigger provision"
+      ],
+      "display": "Safety Trigger"
+    },
+    {
+      "id": "medical_lex_en_059",
+      "canonical": "secondary diagnosis",
+      "synonyms": [
+        "secondary diagnosis",
+        "secondary diagnosis clause",
+        "secondary diagnosis provision"
+      ],
+      "display": "Secondary Diagnosis"
+    },
+    {
+      "id": "medical_lex_en_060",
+      "canonical": "severity",
+      "synonyms": [
+        "severity",
+        "severity clause",
+        "severity provision"
+      ],
+      "display": "Severity"
+    },
+    {
+      "id": "medical_lex_en_061",
+      "canonical": "soap note",
+      "synonyms": [
+        "soap note",
+        "soap note clause",
+        "soap note provision"
+      ],
+      "display": "Soap Note"
+    },
+    {
+      "id": "medical_lex_en_062",
+      "canonical": "specimen collection",
+      "synonyms": [
+        "specimen collection",
+        "specimen collection clause",
+        "specimen collection provision"
+      ],
+      "display": "Specimen Collection"
+    },
+    {
+      "id": "medical_lex_en_063",
+      "canonical": "subjective symptom",
+      "synonyms": [
+        "subjective symptom",
+        "subjective symptom clause",
+        "subjective symptom provision"
+      ],
+      "display": "Subjective Symptom"
+    },
+    {
+      "id": "medical_lex_en_064",
+      "canonical": "summary",
+      "synonyms": [
+        "summary",
+        "summary clause",
+        "summary provision"
+      ],
+      "display": "Summary"
+    },
+    {
+      "id": "medical_lex_en_065",
+      "canonical": "surgical history",
+      "synonyms": [
+        "surgical history",
+        "surgical history clause",
+        "surgical history provision"
+      ],
+      "display": "Surgical History"
+    },
+    {
+      "id": "medical_lex_en_066",
+      "canonical": "temperature",
+      "synonyms": [
+        "temperature",
+        "temperature clause",
+        "temperature provision"
+      ],
+      "display": "Temperature"
+    },
+    {
+      "id": "medical_lex_en_067",
+      "canonical": "test interpretation",
+      "synonyms": [
+        "test interpretation",
+        "test interpretation clause",
+        "test interpretation provision"
+      ],
+      "display": "Test Interpretation"
+    },
+    {
+      "id": "medical_lex_en_068",
+      "canonical": "therapeutic plan",
+      "synonyms": [
+        "therapeutic plan",
+        "therapeutic plan clause",
+        "therapeutic plan provision"
+      ],
+      "display": "Therapeutic Plan"
+    },
+    {
+      "id": "medical_lex_en_069",
+      "canonical": "timeline",
+      "synonyms": [
+        "timeline",
+        "timeline clause",
+        "timeline provision"
+      ],
+      "display": "Timeline"
+    },
+    {
+      "id": "medical_lex_en_070",
+      "canonical": "treatment plan",
+      "synonyms": [
+        "treatment plan",
+        "treatment plan clause",
+        "treatment plan provision"
+      ],
+      "display": "Treatment Plan"
+    },
+    {
+      "id": "medical_lex_en_071",
+      "canonical": "triage",
+      "synonyms": [
+        "triage",
+        "triage clause",
+        "triage provision"
+      ],
+      "display": "Triage"
+    },
+    {
+      "id": "medical_lex_en_072",
+      "canonical": "unit",
+      "synonyms": [
+        "unit",
+        "unit clause",
+        "unit provision"
+      ],
+      "display": "Unit"
+    },
+    {
+      "id": "medical_lex_en_073",
+      "canonical": "urgency",
+      "synonyms": [
+        "urgency",
+        "urgency clause",
+        "urgency provision"
+      ],
+      "display": "Urgency"
+    },
+    {
+      "id": "medical_lex_en_074",
+      "canonical": "vital signs",
+      "synonyms": [
+        "vital signs",
+        "vital signs clause",
+        "vital signs provision"
+      ],
+      "display": "Vital Signs"
+    },
+    {
+      "id": "medical_lex_en_075",
+      "canonical": "weight",
+      "synonyms": [
+        "weight",
+        "weight clause",
+        "weight provision"
+      ],
+      "display": "Weight"
+    },
+    {
+      "id": "medical_lex_en_076",
+      "canonical": "height",
+      "synonyms": [
+        "height",
+        "height clause",
+        "height provision"
+      ],
+      "display": "Height"
+    },
+    {
+      "id": "medical_lex_en_077",
+      "canonical": "pulse",
+      "synonyms": [
+        "pulse",
+        "pulse clause",
+        "pulse provision"
+      ],
+      "display": "Pulse"
+    },
+    {
+      "id": "medical_lex_en_078",
+      "canonical": "respiratory rate",
+      "synonyms": [
+        "respiratory rate",
+        "respiratory rate clause",
+        "respiratory rate provision"
+      ],
+      "display": "Respiratory Rate"
+    },
+    {
+      "id": "medical_lex_en_079",
+      "canonical": "pain score",
+      "synonyms": [
+        "pain score",
+        "pain score clause",
+        "pain score provision"
+      ],
+      "display": "Pain Score"
+    },
+    {
+      "id": "medical_lex_en_080",
+      "canonical": "glucose",
+      "synonyms": [
+        "glucose",
+        "glucose clause",
+        "glucose provision"
+      ],
+      "display": "Glucose"
+    },
+    {
+      "id": "medical_lex_en_081",
+      "canonical": "hemoglobin",
+      "synonyms": [
+        "hemoglobin",
+        "hemoglobin clause",
+        "hemoglobin provision"
+      ],
+      "display": "Hemoglobin"
+    },
+    {
+      "id": "medical_lex_en_082",
+      "canonical": "hematocrit",
+      "synonyms": [
+        "hematocrit",
+        "hematocrit clause",
+        "hematocrit provision"
+      ],
+      "display": "Hematocrit"
+    },
+    {
+      "id": "medical_lex_en_083",
+      "canonical": "platelet count",
+      "synonyms": [
+        "platelet count",
+        "platelet count clause",
+        "platelet count provision"
+      ],
+      "display": "Platelet Count"
+    },
+    {
+      "id": "medical_lex_en_084",
+      "canonical": "white blood cell count",
+      "synonyms": [
+        "white blood cell count",
+        "white blood cell count clause",
+        "white blood cell count provision"
+      ],
+      "display": "White Blood Cell Count"
+    },
+    {
+      "id": "medical_lex_en_085",
+      "canonical": "sodium",
+      "synonyms": [
+        "sodium",
+        "sodium clause",
+        "sodium provision"
+      ],
+      "display": "Sodium"
+    },
+    {
+      "id": "medical_lex_en_086",
+      "canonical": "potassium",
+      "synonyms": [
+        "potassium",
+        "potassium clause",
+        "potassium provision"
+      ],
+      "display": "Potassium"
+    },
+    {
+      "id": "medical_lex_en_087",
+      "canonical": "creatinine",
+      "synonyms": [
+        "creatinine",
+        "creatinine clause",
+        "creatinine provision"
+      ],
+      "display": "Creatinine"
+    },
+    {
+      "id": "medical_lex_en_088",
+      "canonical": "urea",
+      "synonyms": [
+        "urea",
+        "urea clause",
+        "urea provision"
+      ],
+      "display": "Urea"
+    },
+    {
+      "id": "medical_lex_en_089",
+      "canonical": "bilirubin",
+      "synonyms": [
+        "bilirubin",
+        "bilirubin clause",
+        "bilirubin provision"
+      ],
+      "display": "Bilirubin"
+    },
+    {
+      "id": "medical_lex_en_090",
+      "canonical": "ast",
+      "synonyms": [
+        "ast",
+        "ast clause",
+        "ast provision"
+      ],
+      "display": "Ast"
+    },
+    {
+      "id": "medical_lex_en_091",
+      "canonical": "alt",
+      "synonyms": [
+        "alt",
+        "alt clause",
+        "alt provision"
+      ],
+      "display": "Alt"
+    },
+    {
+      "id": "medical_lex_en_092",
+      "canonical": "alkaline phosphatase",
+      "synonyms": [
+        "alkaline phosphatase",
+        "alkaline phosphatase clause",
+        "alkaline phosphatase provision"
+      ],
+      "display": "Alkaline Phosphatase"
+    },
+    {
+      "id": "medical_lex_en_093",
+      "canonical": "troponin",
+      "synonyms": [
+        "troponin",
+        "troponin clause",
+        "troponin provision"
+      ],
+      "display": "Troponin"
+    },
+    {
+      "id": "medical_lex_en_094",
+      "canonical": "d dimer",
+      "synonyms": [
+        "d dimer",
+        "d dimer clause",
+        "d dimer provision"
+      ],
+      "display": "D Dimer"
+    },
+    {
+      "id": "medical_lex_en_095",
+      "canonical": "ct scan",
+      "synonyms": [
+        "ct scan",
+        "ct scan clause",
+        "ct scan provision"
+      ],
+      "display": "Ct Scan"
+    },
+    {
+      "id": "medical_lex_en_096",
+      "canonical": "x ray",
+      "synonyms": [
+        "x ray",
+        "x ray clause",
+        "x ray provision"
+      ],
+      "display": "X Ray"
+    },
+    {
+      "id": "medical_lex_en_097",
+      "canonical": "mri",
+      "synonyms": [
+        "mri",
+        "mri clause",
+        "mri provision"
+      ],
+      "display": "Mri"
+    },
+    {
+      "id": "medical_lex_en_098",
+      "canonical": "ultrasound",
+      "synonyms": [
+        "ultrasound",
+        "ultrasound clause",
+        "ultrasound provision"
+      ],
+      "display": "Ultrasound"
+    },
+    {
+      "id": "medical_lex_en_099",
+      "canonical": "ecg",
+      "synonyms": [
+        "ecg",
+        "ecg clause",
+        "ecg provision"
+      ],
+      "display": "Ecg"
+    },
+    {
+      "id": "medical_lex_en_100",
+      "canonical": "echocardiogram",
+      "synonyms": [
+        "echocardiogram",
+        "echocardiogram clause",
+        "echocardiogram provision"
+      ],
+      "display": "Echocardiogram"
+    },
+    {
+      "id": "medical_lex_en_101",
+      "canonical": "medication list",
+      "synonyms": [
+        "medication list",
+        "medication list clause",
+        "medication list provision"
+      ],
+      "display": "Medication List"
+    },
+    {
+      "id": "medical_lex_en_102",
+      "canonical": "current medication",
+      "synonyms": [
+        "current medication",
+        "current medication clause",
+        "current medication provision"
+      ],
+      "display": "Current Medication"
+    },
+    {
+      "id": "medical_lex_en_103",
+      "canonical": "discontinued medication",
+      "synonyms": [
+        "discontinued medication",
+        "discontinued medication clause",
+        "discontinued medication provision"
+      ],
+      "display": "Discontinued Medication"
+    },
+    {
+      "id": "medical_lex_en_104",
+      "canonical": "prn medication",
+      "synonyms": [
+        "prn medication",
+        "prn medication clause",
+        "prn medication provision"
+      ],
+      "display": "Prn Medication"
+    },
+    {
+      "id": "medical_lex_en_105",
+      "canonical": "dose adjustment",
+      "synonyms": [
+        "dose adjustment",
+        "dose adjustment clause",
+        "dose adjustment provision"
+      ],
+      "display": "Dose Adjustment"
+    },
+    {
+      "id": "medical_lex_en_106",
+      "canonical": "adverse event",
+      "synonyms": [
+        "adverse event",
+        "adverse event clause",
+        "adverse event provision"
+      ],
+      "display": "Adverse Event"
+    },
+    {
+      "id": "medical_lex_en_107",
+      "canonical": "medication interaction",
+      "synonyms": [
+        "medication interaction",
+        "medication interaction clause",
+        "medication interaction provision"
+      ],
+      "display": "Medication Interaction"
+    },
+    {
+      "id": "medical_lex_en_108",
+      "canonical": "care transition",
+      "synonyms": [
+        "care transition",
+        "care transition clause",
+        "care transition provision"
+      ],
+      "display": "Care Transition"
+    },
+    {
+      "id": "medical_lex_en_109",
+      "canonical": "discharge summary",
+      "synonyms": [
+        "discharge summary",
+        "discharge summary clause",
+        "discharge summary provision"
+      ],
+      "display": "Discharge Summary"
+    },
+    {
+      "id": "medical_lex_en_110",
+      "canonical": "referral note",
+      "synonyms": [
+        "referral note",
+        "referral note clause",
+        "referral note provision"
+      ],
+      "display": "Referral Note"
+    },
+    {
+      "id": "medical_lex_en_111",
+      "canonical": "primary diagnosis",
+      "synonyms": [
+        "primary diagnosis",
+        "primary diagnosis clause",
+        "primary diagnosis provision"
+      ],
+      "display": "Primary Diagnosis"
+    },
+    {
+      "id": "medical_lex_en_112",
+      "canonical": "secondary finding",
+      "synonyms": [
+        "secondary finding",
+        "secondary finding clause",
+        "secondary finding provision"
+      ],
+      "display": "Secondary Finding"
+    },
+    {
+      "id": "medical_lex_en_113",
+      "canonical": "contraindication alert",
+      "synonyms": [
+        "contraindication alert",
+        "contraindication alert clause",
+        "contraindication alert provision"
+      ],
+      "display": "Contraindication Alert"
+    },
+    {
+      "id": "medical_lex_en_114",
+      "canonical": "escalation to clinician",
+      "synonyms": [
+        "escalation to clinician",
+        "escalation to clinician clause",
+        "escalation to clinician provision"
+      ],
+      "display": "Escalation To Clinician"
+    },
+    {
+      "id": "medical_lex_en_115",
+      "canonical": "no diagnosis inference",
+      "synonyms": [
+        "no diagnosis inference",
+        "no diagnosis inference clause",
+        "no diagnosis inference provision"
+      ],
+      "display": "No Diagnosis Inference"
+    },
+    {
+      "id": "medical_lex_en_116",
+      "canonical": "patient education",
+      "synonyms": [
+        "patient education",
+        "patient education clause",
+        "patient education provision"
+      ],
+      "display": "Patient Education"
+    },
+    {
+      "id": "medical_lex_en_117",
+      "canonical": "rehabilitation plan",
+      "synonyms": [
+        "rehabilitation plan",
+        "rehabilitation plan clause",
+        "rehabilitation plan provision"
+      ],
+      "display": "Rehabilitation Plan"
+    },
+    {
+      "id": "medical_lex_en_118",
+      "canonical": "post operative note",
+      "synonyms": [
+        "post operative note",
+        "post operative note clause",
+        "post operative note provision"
+      ],
+      "display": "Post Operative Note"
+    },
+    {
+      "id": "medical_lex_en_119",
+      "canonical": "nursing observation",
+      "synonyms": [
+        "nursing observation",
+        "nursing observation clause",
+        "nursing observation provision"
+      ],
+      "display": "Nursing Observation"
+    },
+    {
+      "id": "medical_lex_en_120",
+      "canonical": "consult note",
+      "synonyms": [
+        "consult note",
+        "consult note clause",
+        "consult note provision"
+      ],
+      "display": "Consult Note"
+    },
+    {
+      "id": "medical_lex_en_121",
+      "canonical": "telemedicine encounter",
+      "synonyms": [
+        "telemedicine encounter",
+        "telemedicine encounter clause",
+        "telemedicine encounter provision"
+      ],
+      "display": "Telemedicine Encounter"
+    },
+    {
+      "id": "medical_lex_en_122",
+      "canonical": "follow up window",
+      "synonyms": [
+        "follow up window",
+        "follow up window clause",
+        "follow up window provision"
+      ],
+      "display": "Follow Up Window"
+    },
+    {
+      "id": "medical_lex_en_123",
+      "canonical": "critical alert",
+      "synonyms": [
+        "critical alert",
+        "critical alert clause",
+        "critical alert provision"
+      ],
+      "display": "Critical Alert"
+    },
+    {
+      "id": "medical_lex_en_124",
+      "canonical": "results pending",
+      "synonyms": [
+        "results pending",
+        "results pending clause",
+        "results pending provision"
+      ],
+      "display": "Results Pending"
+    },
+    {
+      "id": "medical_lex_en_125",
+      "canonical": "repeat test",
+      "synonyms": [
+        "repeat test",
+        "repeat test clause",
+        "repeat test provision"
+      ],
+      "display": "Repeat Test"
+    },
+    {
+      "id": "medical_lex_en_126",
+      "canonical": "specimen quality",
+      "synonyms": [
+        "specimen quality",
+        "specimen quality clause",
+        "specimen quality provision"
+      ],
+      "display": "Specimen Quality"
+    },
+    {
+      "id": "medical_lex_en_127",
+      "canonical": "clinical status",
+      "synonyms": [
+        "clinical status",
+        "clinical status clause",
+        "clinical status provision"
+      ],
+      "display": "Clinical Status"
+    },
+    {
+      "id": "medical_lex_en_128",
+      "canonical": "baseline value",
+      "synonyms": [
+        "baseline value",
+        "baseline value clause",
+        "baseline value provision"
+      ],
+      "display": "Baseline Value"
+    },
+    {
+      "id": "medical_lex_en_129",
+      "canonical": "trend analysis",
+      "synonyms": [
+        "trend analysis",
+        "trend analysis clause",
+        "trend analysis provision"
+      ],
+      "display": "Trend Analysis"
+    },
+    {
+      "id": "medical_lex_en_130",
+      "canonical": "care objective",
+      "synonyms": [
+        "care objective",
+        "care objective clause",
+        "care objective provision"
+      ],
+      "display": "Care Objective"
+    }
+  ]
+}

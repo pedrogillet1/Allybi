@@ -1,0 +1,260 @@
+{
+  "_meta": {
+    "id": "koda_product_help",
+    "version": "1.0.0",
+    "description": "Product help content with capability claims mapped to real operators.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "koda-product"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLanguage": "en",
+    "maxStarterPrompts": 8,
+    "maxFollowUpPrompts": 8
+  },
+  "capabilitiesOverview": [
+    {
+      "id": "doc_grounded_answers",
+      "title": {
+        "en": "Document-grounded answers",
+        "pt": "Respostas baseadas em documentos",
+        "es": "Respuestas basadas en documentos"
+      },
+      "summary": {
+        "en": "Summarize, extract, quote, and compare using retrieved evidence.",
+        "pt": "Resuma, extraia, cite e compare usando evidencia recuperada.",
+        "es": "Resume, extrae, cita y compara usando evidencia recuperada."
+      },
+      "operators": [
+        "summarize",
+        "extract",
+        "quote",
+        "compare",
+        "locate_content"
+      ]
+    },
+    {
+      "id": "file_navigation_and_open",
+      "title": {
+        "en": "Find and open files",
+        "pt": "Encontrar e abrir arquivos",
+        "es": "Encontrar y abrir archivos"
+      },
+      "summary": {
+        "en": "Locate files and set active context before deeper actions.",
+        "pt": "Localize arquivos e defina o contexto ativo antes de acoes mais profundas.",
+        "es": "Localiza archivos y define el contexto activo antes de acciones mas profundas."
+      },
+      "operators": [
+        "locate_docs",
+        "locate_file",
+        "open",
+        "set_active_doc",
+        "list"
+      ]
+    },
+    {
+      "id": "docx_editing",
+      "title": {
+        "en": "DOCX editing",
+        "pt": "Edicao de DOCX",
+        "es": "Edicion de DOCX"
+      },
+      "summary": {
+        "en": "Target, rewrite, format, and structure DOCX content with preview/apply flows.",
+        "pt": "Selecione alvos, reescreva, formate e ajuste estrutura em DOCX com fluxo de previa/aplicacao.",
+        "es": "Selecciona objetivos, reescribe, da formato y ajusta estructura en DOCX con flujo de vista previa/aplicar."
+      },
+      "operators": [
+        "DOCX_GET_TARGETS",
+        "DOCX_LOCK_TARGETS",
+        "DOCX_REWRITE_SECTION",
+        "DOCX_SET_TEXT_CASE",
+        "DOCX_UPDATE_TOC",
+        "DOCX_ENRICH_FROM_SOURCES"
+      ]
+    },
+    {
+      "id": "xlsx_editing",
+      "title": {
+        "en": "XLSX editing and calculations",
+        "pt": "Edicao e calculos em XLSX",
+        "es": "Edicion y calculos en XLSX"
+      },
+      "summary": {
+        "en": "Edit cells/ranges, manage sheets, and run structured aggregations.",
+        "pt": "Edite celulas/faixas, gerencie abas e execute agregacoes estruturadas.",
+        "es": "Edita celdas/rangos, gestiona hojas y ejecuta agregaciones estructuradas."
+      },
+      "operators": [
+        "XLSX_SET_CELL_VALUE",
+        "XLSX_SET_RANGE_VALUES",
+        "XLSX_INSERT_ROWS",
+        "XLSX_DELETE_COLUMNS",
+        "XLSX_ADD_SHEET",
+        "XLSX_AGGREGATION"
+      ]
+    },
+    {
+      "id": "connectors_and_email",
+      "title": {
+        "en": "Connectors and email",
+        "pt": "Conectores e email",
+        "es": "Conectores y email"
+      },
+      "summary": {
+        "en": "Use connector sync/search flows and email actions when enabled.",
+        "pt": "Use fluxos de sincronizacao/pesquisa de conectores e acoes de email quando habilitados.",
+        "es": "Usa flujos de sincronizacion/busqueda de conectores y acciones de email cuando esten habilitados."
+      },
+      "operators": [
+        "CONNECT_START",
+        "CONNECTOR_SYNC",
+        "CONNECTOR_SEARCH",
+        "EMAIL_LATEST",
+        "EMAIL_DRAFT"
+      ]
+    }
+  ],
+  "limits": [
+    {
+      "id": "requires_indexed_docs",
+      "text": {
+        "en": "Document-grounded answers require indexed files.",
+        "pt": "Respostas baseadas em documentos exigem arquivos indexados.",
+        "es": "Las respuestas basadas en documentos requieren archivos indexados."
+      }
+    },
+    {
+      "id": "scope_lock_behavior",
+      "text": {
+        "en": "With explicit doc lock, answers stay inside the selected scope.",
+        "pt": "Com bloqueio explicito de documento, as respostas ficam no escopo selecionado.",
+        "es": "Con bloqueo explicito de documento, las respuestas se mantienen en el alcance seleccionado."
+      }
+    },
+    {
+      "id": "extraction_quality_dependency",
+      "text": {
+        "en": "Low extraction quality can reduce confidence or trigger fallback guidance.",
+        "pt": "Qualidade baixa de extracao pode reduzir confianca ou acionar orientacao de fallback.",
+        "es": "La baja calidad de extraccion puede reducir confianza o activar guia de fallback."
+      }
+    }
+  ],
+  "starterPrompts": {
+    "en": [
+      "Summarize this file in 5 bullets.",
+      "Extract the key metrics into a table.",
+      "Quote the exact lines supporting this claim.",
+      "Compare these two files by risks and deadlines.",
+      "Find the file about vendor onboarding and open it.",
+      "Rewrite this DOCX section in a more concise style.",
+      "Insert 3 rows below this range and fill formulas.",
+      "Create a short draft email with the action items."
+    ],
+    "pt": [
+      "Resuma este arquivo em 5 bullets.",
+      "Extraia os principais indicadores em uma tabela.",
+      "Cite as linhas exatas que sustentam esta afirmacao.",
+      "Compare estes dois arquivos por riscos e prazos.",
+      "Encontre o arquivo sobre onboarding de fornecedores e abra.",
+      "Reescreva esta secao DOCX em estilo mais conciso.",
+      "Insira 3 linhas abaixo deste intervalo e preencha formulas.",
+      "Crie um rascunho curto de email com os itens de acao."
+    ],
+    "es": [
+      "Resume este archivo en 5 bullets.",
+      "Extrae los indicadores clave en una tabla.",
+      "Cita las lineas exactas que respaldan esta afirmacion.",
+      "Compara estos dos archivos por riesgos y plazos.",
+      "Encuentra el archivo sobre onboarding de proveedores y abrelo.",
+      "Reescribe esta seccion DOCX con estilo mas conciso.",
+      "Inserta 3 filas debajo de este rango y completa formulas.",
+      "Crea un borrador corto de email con los puntos de accion."
+    ]
+  },
+  "followUpPrompts": {
+    "en": [
+      "Now narrow this to only payment terms.",
+      "Show where each point appears in the source.",
+      "Turn this into a checklist with owners.",
+      "Rewrite for executive audience in under 120 words.",
+      "Apply this wording only to the selected DOCX targets.",
+      "Run the same extraction for the previous quarter file.",
+      "Group the results by vendor and total amount.",
+      "Draft a reply email using these findings."
+    ],
+    "pt": [
+      "Agora restrinja isso apenas aos termos de pagamento.",
+      "Mostre onde cada ponto aparece na fonte.",
+      "Transforme isso em checklist com responsaveis.",
+      "Reescreva para audiencia executiva em ate 120 palavras.",
+      "Aplique essa redacao apenas aos alvos DOCX selecionados.",
+      "Execute a mesma extracao para o arquivo do trimestre anterior.",
+      "Agrupe os resultados por fornecedor e valor total.",
+      "Rascunhe uma resposta de email usando esses achados."
+    ],
+    "es": [
+      "Ahora limita esto solo a terminos de pago.",
+      "Muestra donde aparece cada punto en la fuente.",
+      "Convierte esto en un checklist con responsables.",
+      "Reescribe para audiencia ejecutiva en menos de 120 palabras.",
+      "Aplica esta redaccion solo a los objetivos DOCX seleccionados.",
+      "Ejecuta la misma extraccion para el archivo del trimestre anterior.",
+      "Agrupa los resultados por proveedor y monto total.",
+      "Redacta una respuesta de email usando estos hallazgos."
+    ]
+  },
+  "topicSnippets": [
+    {
+      "topic": "limitations_memory_scope",
+      "snippet": {
+        "en": "Answers are grounded in indexed content and active scope; when scope is locked, broaden scope only with explicit user confirmation.",
+        "pt": "As respostas sao baseadas em conteudo indexado e escopo ativo; quando o escopo esta bloqueado, amplie apenas com confirmacao explicita do usuario.",
+        "es": "Las respuestas se basan en contenido indexado y alcance activo; cuando el alcance esta bloqueado, amplialo solo con confirmacion explicita del usuario."
+      },
+      "operators": [
+        "set_active_doc",
+        "locate_docs",
+        "extract",
+        "quote"
+      ]
+    },
+    {
+      "topic": "docx_editing",
+      "snippet": {
+        "en": "DOCX editing is target-first: resolve targets, preview changes, then apply.",
+        "pt": "A edicao DOCX e orientada por alvo: resolva alvos, veja previa e depois aplique.",
+        "es": "La edicion DOCX es orientada por objetivo: resuelve objetivos, revisa vista previa y luego aplica."
+      },
+      "operators": [
+        "DOCX_GET_TARGETS",
+        "DOCX_LOCK_TARGETS",
+        "DOCX_REWRITE_SECTION",
+        "DOCX_CLEAR_LOCK"
+      ]
+    },
+    {
+      "topic": "xlsx_editing",
+      "snippet": {
+        "en": "XLSX workflows support value/formula updates, structural edits, and sheet operations.",
+        "pt": "Fluxos XLSX suportam atualizacao de valores/formulas, edicao estrutural e operacoes de abas.",
+        "es": "Los flujos XLSX admiten actualizacion de valores/formulas, edicion estructural y operaciones de hojas."
+      },
+      "operators": [
+        "XLSX_SET_CELL_VALUE",
+        "XLSX_SET_RANGE_FORMULAS",
+        "XLSX_INSERT_ROWS",
+        "XLSX_RENAME_SHEET",
+        "XLSX_DELETE_SHEET"
+      ]
+    }
+  ]
+}

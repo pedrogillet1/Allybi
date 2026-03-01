@@ -1,137 +1,198 @@
 {
   "_meta": {
     "id": "fallback_prompt",
-    "version": "1.0.0",
-    "description": "Prompt templates for fallback scenarios in Koda. Provides LLM instructions for generating appropriate responses when retrieval fails, scope is empty, extraction fails, or documents are being indexed. Templates are parameterized (not hardcoded user copy) and integrate with fallback policies and microcopy banks.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "version": "2.0.0",
+    "description": "PromptRegistry-compatible fallback templates selected by fallback reason code.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01",
     "owner": "koda-prompts",
-    "compat": ">=1.0.0",
-    "changeLog": [
-      "Initial fallback prompt templates",
-      "Added templates for all fallback reason codes",
-      "Added parameterized placeholders for runtime values"
-    ]
+    "compat": ">=1.0.0"
   },
   "config": {
     "enabled": true,
-    "templateEngine": "mustache",
-    "integrationHooks": {
-      "dependsOn": [
-        "fallback_policy",
-        "fallback_processing",
-        "fallback_scope_empty",
-        "fallback_not_found_scope",
-        "fallback_extraction_recovery",
-        "ui_next_step_suggestion"
-      ],
-      "signalsExpected": [
-        "fallbackReasonCode",
-        "fallbackType",
-        "scopeDocNames",
-        "queryText",
-        "userLanguage"
+    "defaultReasonCode": "fallback_default",
+    "supportedReasonCodes": [
+      "no_docs_indexed",
+      "scope_hard_constraints_empty",
+      "no_relevant_chunks_in_scoped_docs",
+      "indexing_in_progress",
+      "extraction_failed",
+      "low_confidence",
+      "doc_ambiguous",
+      "needs_doc_choice",
+      "explicit_doc_not_found",
+      "fallback_default"
+    ]
+  },
+  "templates": [
+    {
+      "id": "fallback_scope_hard_constraints_empty",
+      "priority": 120,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodeEquals": "scope_hard_constraints_empty"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "The user is in a hard document scope and no relevant evidence was found. Acknowledge the scope clearly, avoid making unsupported claims, and ask at most one clarifying question about scope expansion. If product help exists, weave in a short hint using topic '{{productHelpTopic}}' and snippet '{{productHelpSnippet}}'.",
+            "pt": "O usuario esta em um escopo rigido de documento e nenhuma evidencia relevante foi encontrada. Reconheca o escopo com clareza, evite afirmacoes sem suporte e faca no maximo uma pergunta de clarificacao sobre ampliar o escopo. Se houver ajuda de produto, inclua uma dica curta com o topico '{{productHelpTopic}}' e o trecho '{{productHelpSnippet}}'.",
+            "es": "El usuario esta en un alcance estricto de documento y no se encontro evidencia relevante. Reconoce el alcance con claridad, evita afirmaciones sin respaldo y haz como maximo una pregunta de aclaracion sobre ampliar el alcance. Si hay ayuda de producto, incluye una pista breve con el tema '{{productHelpTopic}}' y el texto '{{productHelpSnippet}}'."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_no_relevant_chunks_in_scoped_docs",
+      "priority": 115,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodeEquals": "no_relevant_chunks_in_scoped_docs"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "Scoped retrieval ran but no matching evidence was found. State that search within current scope found no direct match, suggest one concise rephrase strategy, and do not invent facts.",
+            "pt": "A recuperacao no escopo foi executada, mas nenhuma evidencia correspondente foi encontrada. Informe que a busca no escopo atual nao encontrou correspondencia direta, sugira uma estrategia curta de reformulacao e nao invente fatos.",
+            "es": "La recuperacion en el alcance se ejecuto, pero no se encontro evidencia coincidente. Indica que la busqueda en el alcance actual no encontro coincidencia directa, sugiere una estrategia breve de reformulacion y no inventes hechos."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_no_docs_indexed",
+      "priority": 110,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodeEquals": "no_docs_indexed"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "No indexed documents are available. Respond briefly, explain that document-grounded answering is unavailable until files are indexed, and suggest uploading or indexing documents.",
+            "pt": "Nao ha documentos indexados disponiveis. Responda de forma breve, explique que a resposta baseada em documentos nao esta disponivel ate que os arquivos sejam indexados e sugira enviar ou indexar documentos.",
+            "es": "No hay documentos indexados disponibles. Responde de forma breve, explica que la respuesta basada en documentos no esta disponible hasta que los archivos se indexen y sugiere subir o indexar documentos."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_indexing_in_progress",
+      "priority": 105,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodeEquals": "indexing_in_progress"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "Indexing is still in progress. Be concise, set expectation to retry shortly, and do not claim document contents.",
+            "pt": "A indexacao ainda esta em andamento. Seja conciso, alinhe expectativa de tentar novamente em breve e nao afirme conteudo dos documentos.",
+            "es": "La indexacion aun esta en progreso. Se conciso, establece la expectativa de reintentar pronto y no afirmes contenido de documentos."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_extraction_failed",
+      "priority": 100,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodeEquals": "extraction_failed"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "Extraction quality is insufficient for a reliable answer. Acknowledge extraction limits and suggest practical next steps (re-upload cleaner file, try another format, or narrow the request).",
+            "pt": "A qualidade da extracao e insuficiente para uma resposta confiavel. Reconheca os limites da extracao e sugira proximos passos praticos (reenviar arquivo mais limpo, tentar outro formato ou restringir o pedido).",
+            "es": "La calidad de extraccion es insuficiente para una respuesta confiable. Reconoce las limitaciones de extraccion y sugiere pasos practicos (subir un archivo mas limpio, probar otro formato o acotar la solicitud)."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_low_confidence",
+      "priority": 95,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodeEquals": "low_confidence"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "Evidence confidence is low. If answering, hedge clearly and stay grounded. Prefer one clarifying question when that will materially improve accuracy.",
+            "pt": "A confianca da evidencia esta baixa. Se responder, use ressalvas claras e mantenha base documental. Prefira uma pergunta de clarificacao quando isso melhorar materialmente a precisao.",
+            "es": "La confianza de la evidencia es baja. Si respondes, usa cautela explicita y mantente en evidencia documental. Prefiere una pregunta de aclaracion cuando mejore materialmente la precision."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_doc_ambiguous",
+      "priority": 90,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodes": [
+          "doc_ambiguous",
+          "needs_doc_choice"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "The user intent is ambiguous across documents. Ask one short disambiguation question and avoid answering until scope is clear.",
+            "pt": "A intencao do usuario esta ambigua entre documentos. Faca uma pergunta curta de desambiguacao e evite responder antes de o escopo ficar claro.",
+            "es": "La intencion del usuario es ambigua entre documentos. Haz una pregunta corta de desambiguacion y evita responder hasta que el alcance este claro."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_explicit_doc_not_found",
+      "priority": 85,
+      "when": {
+        "fallbackTriggered": true,
+        "fallbackReasonCodeEquals": "explicit_doc_not_found"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "The explicitly referenced document could not be resolved. State that clearly, ask for a precise filename or selection, and do not assume alternatives.",
+            "pt": "O documento referenciado explicitamente nao foi resolvido. Informe isso com clareza, peca nome de arquivo ou selecao precisa e nao assuma alternativas.",
+            "es": "No se pudo resolver el documento referenciado explicitamente. Indicalo con claridad, pide nombre de archivo o seleccion precisa y no asumas alternativas."
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallback_default",
+      "priority": 10,
+      "when": {
+        "fallbackTriggered": true
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "en": "Fallback mode is active. Respond briefly, stay transparent about limits, avoid unsupported claims, and ask at most one question if needed to unblock.",
+            "pt": "O modo de fallback esta ativo. Responda de forma breve, seja transparente sobre limites, evite afirmacoes sem suporte e faca no maximo uma pergunta se necessario para destravar.",
+            "es": "El modo de fallback esta activo. Responde de forma breve, se transparente sobre limites, evita afirmaciones sin respaldo y haz como maximo una pregunta si es necesario para destrabar."
+          }
+        }
       ]
     }
-  },
-  "templates": {
-    "indexing_in_progress": {
-      "systemInstruction": "The user's documents are currently being indexed. Generate a brief, helpful response that acknowledges this temporary state and suggests the user wait or try again shortly. Do NOT make up information about the documents.",
-      "constraints": {
-        "maxSentences": 2,
-        "mustNotMakeClaims": true,
-        "mustNotAskQuestions": true,
-        "toneDirective": "helpful_patient"
-      },
-      "placeholders": ["{{docCount}}", "{{estimatedWaitHint}}"]
-    },
-    "extraction_failed": {
-      "systemInstruction": "Document extraction was incomplete or failed. Generate a brief response acknowledging the issue and suggesting alternatives (try re-uploading, use a different file format, or ask about a different part of the document). Do NOT blame the user.",
-      "constraints": {
-        "maxSentences": 2,
-        "mustOfferAlternative": true,
-        "mustNotBlameUser": true,
-        "toneDirective": "helpful_constructive"
-      },
-      "placeholders": ["{{docName}}", "{{extractionCoverage}}"]
-    },
-    "scope_hard_constraints_empty": {
-      "systemInstruction": "The user has a hard scope lock on specific document(s), but those documents don't contain relevant information for this query. Generate a brief response that: (1) acknowledges the scope, (2) explains the information wasn't found in the specified document(s), and (3) optionally suggests expanding scope. Do NOT make claims about document contents you haven't seen.",
-      "constraints": {
-        "maxSentences": 2,
-        "mustReferenceScope": true,
-        "mustNotMakeClaims": true,
-        "mayAskOneQuestion": true,
-        "toneDirective": "helpful_direct"
-      },
-      "placeholders": ["{{scopedDocNames}}", "{{queryIntent}}"]
-    },
-    "no_relevant_chunks_in_scoped_docs": {
-      "systemInstruction": "The search executed successfully within the scoped document(s), but found no relevant content matching the query. Generate a brief response that: (1) confirms the search was done, (2) explains nothing matching was found, and (3) suggests rephrasing or trying different terms. Do NOT invent information.",
-      "constraints": {
-        "maxSentences": 2,
-        "mustAcknowledgeSearch": true,
-        "mustNotMakeClaims": true,
-        "mayAskOneQuestion": true,
-        "toneDirective": "helpful_precise"
-      },
-      "placeholders": ["{{scopedDocNames}}", "{{queryTerms}}"]
-    },
-    "no_docs_indexed": {
-      "systemInstruction": "The user has no documents uploaded or indexed. Generate a brief response that: (1) explains no documents are available to search, and (2) suggests uploading documents. Keep it helpful and non-judgmental.",
-      "constraints": {
-        "maxSentences": 2,
-        "mustNotMakeClaims": true,
-        "mustNotAskQuestions": true,
-        "toneDirective": "helpful_encouraging"
-      },
-      "placeholders": []
-    },
-    "low_confidence": {
-      "systemInstruction": "The system found some potentially relevant content but with low confidence. Generate a brief response that: (1) acknowledges uncertainty, (2) presents what was found with appropriate hedging, or (3) asks for clarification. Prefer asking for clarification if confidence is very low.",
-      "constraints": {
-        "maxSentences": 2,
-        "mustHedgeIfAnswering": true,
-        "mayAskOneQuestion": true,
-        "toneDirective": "helpful_honest"
-      },
-      "placeholders": ["{{confidenceLevel}}", "{{topMatchSummary}}"]
-    }
-  },
-  "toneDirectives": {
-    "helpful_patient": "Respond with patience and understanding. Use calm, reassuring language.",
-    "helpful_constructive": "Respond with constructive suggestions. Focus on solutions, not problems.",
-    "helpful_direct": "Respond directly and clearly. Avoid unnecessary hedging but remain polite.",
-    "helpful_precise": "Respond with precision. Be specific about what was searched and not found.",
-    "helpful_encouraging": "Respond with encouragement. Make the user feel supported.",
-    "helpful_honest": "Respond honestly about limitations. Don't pretend to know more than you do."
-  },
-  "tests": {
-    "cases": [
-      {
-        "id": "FP_0001_indexing_template_no_claims",
-        "template": "indexing_in_progress",
-        "runtime": { "docCount": 3 },
-        "expect": { "mustNotContain": ["the document says", "according to", "based on"] }
-      },
-      {
-        "id": "FP_0002_extraction_failed_offers_alternative",
-        "template": "extraction_failed",
-        "runtime": { "docName": "report.pdf" },
-        "expect": { "mustContainAny": ["try", "alternative", "different", "re-upload"] }
-      },
-      {
-        "id": "FP_0003_scope_empty_references_scope",
-        "template": "scope_hard_constraints_empty",
-        "runtime": { "scopedDocNames": ["contract.pdf"] },
-        "expect": { "mustContainAny": ["document", "contract.pdf", "scope"] }
-      },
-      {
-        "id": "FP_0004_no_docs_no_questions",
-        "template": "no_docs_indexed",
-        "runtime": {},
-        "expect": { "mustNotContain": ["?"], "constraints": { "mustNotAskQuestions": true } }
-      }
-    ]
-  }
+  ]
 }

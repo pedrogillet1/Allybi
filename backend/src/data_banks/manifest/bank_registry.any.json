@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -20,9 +20,9 @@
     "allowOptionalBanks": true,
     "allowFutureUnknownCategories": false,
     "checksumPolicy": {
-      "enabled": false,
+      "enabled": true,
       "algorithm": "sha256",
-      "failOnMissingChecksumInProd": false
+      "failOnMissingChecksumInProd": true
     }
   },
   "loadOrder": [
@@ -48,7 +48,8 @@
     "triggers",
     "ambiguity",
     "probes",
-    "templates"
+    "templates",
+    "tests"
   ],
   "schemaMap": {
     "manifest": "bank_schema",
@@ -73,7 +74,8 @@
     "lexicons": "bank_schema",
     "parsers": "bank_schema",
     "intent_patterns": "bank_schema",
-    "templates": "bank_schema"
+    "templates": "bank_schema",
+    "tests": "bank_schema"
   },
   "banks": [
     {
@@ -84,9 +86,6 @@
       "version": "1.0.0",
       "contentType": "semantics",
       "schemaId": "bank_schema",
-      "dependsOn": [
-        "editing_operators"
-      ],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -467,7 +466,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "d962c041fba83ab46301a2f3e579df98f1e833fe3ac9e75eaaf2de6dc933c07e",
+      "checksumSha256": "a2ddae7db4361c3dbfe318f687212eb9e6e27fe909bc9e388f81f8fc61a05156",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -478,7 +477,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "4d61c5dd27e64bdefadc9aa5ce1c0d72024eddafeffb0467055298fd9c19144c"
+      "checksumSha256": "507544ae6242408217c36a2b8058bf6d46f5e6c765ebbf43561a43f83a7ba63e"
     },
     {
       "id": "bank_dependencies",
@@ -488,7 +487,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "7b9f0e078c40aaca6b086400c67e3c60fc7740ed773789428ae6a352e6100077"
+      "checksumSha256": "ece128d1daf5552024907183a299d4fc60288427853258504667ed7ced54b861"
     },
     {
       "id": "bank_manifest",
@@ -498,7 +497,6 @@
       "version": "1.1.0",
       "contentType": "policy",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -511,7 +509,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "f222f6e8a0f838061ab6570d7e9d6482cfcef9f10fc4a27f655e1906e7fbccd2",
+      "checksumSha256": "ca7c2cfaaba409da3d5848f0f7fa8fc2c1d39bb6dfb87782d2666615337f3f33",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -627,7 +625,7 @@
       "category": "semantics",
       "path": "semantics/capabilities_catalog.any.json",
       "filename": "capabilities_catalog.any.json",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "contentType": "catalog",
       "schemaId": "bank_schema",
       "dependsOn": [
@@ -646,8 +644,8 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "3c9bd7555ac8e61607627b70087e2f792f3d5f2ec0d4b038a280a8b1fd5ccfcc",
-      "lastUpdated": "2026-02-12"
+      "checksumSha256": "8aafe40a3ca5fd6dd297aea71acca314f46c062a662a0c861106261828d571ae",
+      "lastUpdated": "2026-03-01"
     },
     {
       "id": "clarification_phrases",
@@ -882,9 +880,6 @@
       "version": "1.0.0",
       "contentType": "rules",
       "schemaId": "bank_schema",
-      "dependsOn": [
-        "abbreviations"
-      ],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -1020,9 +1015,6 @@
       "version": "3.0.0",
       "contentType": "rules",
       "schemaId": "bank_schema",
-      "dependsOn": [
-        "domain_detection"
-      ],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -1046,7 +1038,6 @@
       "version": "1.0.0",
       "contentType": "microcopy",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -1416,7 +1407,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "a01cbd74e53e3070802f9b4a3ce37e2c5556f75d6d8eb1fd0d45452bd918f9ea"
+      "checksumSha256": "946bfe33835726b0587587c301977cdc3277d375381afe487fce2dfd160e1d8d"
     },
     {
       "id": "fallback_not_found_scope",
@@ -1426,7 +1417,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "7233d869872aa78a8b6e4fbeb7bc89b27f83f5916361de6f377d49a92363b8ed"
+      "checksumSha256": "85ca562bb1197d3a0b37c38e1cc30d3c6810749307ca854ec61f92820dfdbebb"
     },
     {
       "id": "fallback_policy",
@@ -1446,7 +1437,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "f91436df3c92e7c02fe45fb267a77ed55cc16aafcd8e30a3e40c0c0d98fdca27"
+      "checksumSha256": "92fb07d87dde0f8298ae1c2f63367be5d9bbd427967af0290c8059d54b429e02"
     },
     {
       "id": "fallback_prompt",
@@ -1456,7 +1447,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "ad9886f4ca1c712af435d01253b57ef66d5f6c76b9b007a62fc31edbaab27e37"
+      "checksumSha256": "f203d291cf79cfdbf25224c3c12337beca68885d36d89775b6783bec3c78d5f6"
     },
     {
       "id": "fallback_router",
@@ -1466,7 +1457,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-27",
-      "checksumSha256": "66548abda344521bc9fb4dc0253a0489166422797c6f55739a6ea2fad8e1effc"
+      "checksumSha256": "6d17ee98034d1b8595e17f6c2829a10d88f75f475378226a9e6a198ece9f34b2"
     },
     {
       "id": "fallback_scope_empty",
@@ -1476,7 +1467,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "b5abccbad9df46d2148d57d9c709e8847112c36a84a6f40b17656c36a32bc9c3"
+      "checksumSha256": "f3db0e0de14d09edb57d9179b0fa2e27e0f84012dcde75f2f8e2de837e45eee0"
     },
     {
       "id": "feature_flags",
@@ -1608,7 +1599,6 @@
       "contentType": "rules",
       "schemaId": "bank_schema",
       "dependsOn": [
-        "tokenization_rules",
         "language_indicators"
       ],
       "enabledByEnv": {
@@ -1779,6 +1769,19 @@
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
       "checksumSha256": "cf0519b489b704cd81693bec4c801a04d71d22c0b21b3e527fb30eae13e4ee93"
+    },
+    {
+      "id": "koda_product_help",
+      "category": "microcopy",
+      "path": "microcopy/koda_product_help.any.json",
+      "filename": "koda_product_help.any.json",
+      "version": "1.1.0",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "capabilities_catalog"
+      ],
+      "lastUpdated": "2026-03-01",
+      "checksumSha256": "dbd25ff86e977778717f17a5e290ae5120701dfc0b424ce0c10c0d612921b2be"
     },
     {
       "id": "language_indicators",
@@ -1983,7 +1986,6 @@
       "contentType": "rules",
       "schemaId": "bank_schema",
       "dependsOn": [
-        "tokenization_rules",
         "language_indicators"
       ],
       "enabledByEnv": {
@@ -2052,9 +2054,6 @@
       "version": "1.0.0",
       "contentType": "contracts",
       "schemaId": "bank_schema",
-      "dependsOn": [
-        "operator_negatives"
-      ],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -2162,7 +2161,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "a253a2fd47578a905a0dd0603871716c389fe7a4ba851916b850d16e98ca2b93"
+      "checksumSha256": "05cdbff27c030d330e355c19c0b6f73c61d5fe625f198eee139573576d4600dc"
     },
     {
       "id": "prompt_registry",
@@ -2242,9 +2241,6 @@
       "version": "1.0.0",
       "contentType": "rules",
       "schemaId": "bank_schema",
-      "dependsOn": [
-        "operator_negatives"
-      ],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -2383,9 +2379,6 @@
       "version": "2.0.0",
       "contentType": "rules",
       "schemaId": "bank_schema",
-      "dependsOn": [
-        "tokenization_rules"
-      ],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -2409,10 +2402,6 @@
       "version": "2.0.0",
       "contentType": "rules",
       "schemaId": "bank_schema",
-      "dependsOn": [
-        "abbreviations",
-        "domain_detection"
-      ],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -2466,7 +2455,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "62983505a1f49c43cb804958afd0b42be3169b25252d787817117182d7daa52b"
+      "checksumSha256": "f5bab190e1fb5192bec81c6ae7cd3269d8554724b285fe8d67cfec928bd8182c"
     },
     {
       "id": "task_plan_generation",
@@ -2561,7 +2550,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "1a15774d34248e86f06757de506ac362dc5266e91d34b8af66e1c30c0e0ba21d",
+      "checksumSha256": "21656f9a4b8dda5c653daab911fe456fde24cf8c47e92021980f114cbf0256ae",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -2572,7 +2561,6 @@
       "version": "1.0.0",
       "contentType": "semantics",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -2596,7 +2584,6 @@
       "version": "1.0.0",
       "contentType": "semantics",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -2690,7 +2677,7 @@
       "category": "semantics",
       "path": "semantics/document_intelligence_bank_map.any.json",
       "filename": "document_intelligence_bank_map.any.json",
-      "version": "1.0.0",
+      "version": "1.3.0",
       "contentType": "semantics",
       "schemaId": "bank_schema",
       "dependsOn": [
@@ -2708,18 +2695,17 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "f3c2b08f30e56b791fc9775230d0bd0b641fcd6c36e6f87291c194d9e5561f80",
-      "lastUpdated": "2026-02-27"
+      "checksumSha256": "ced3cf00f2671049b32208cd2fcd7a7f0abd0f9130651658ff6189a0b447c0c2",
+      "lastUpdated": "2026-03-01"
     },
     {
       "id": "doc_taxonomy",
       "category": "semantics",
       "path": "semantics/taxonomy/doc_taxonomy.any.json",
       "filename": "doc_taxonomy.any.json",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "contentType": "semantics",
       "schemaId": "doc_identity_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -2732,8 +2718,8 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "383b51e778ad7f21752940776469855d7a1b47bc607276bcf84b816ac9152a13",
-      "lastUpdated": "2026-02-27"
+      "checksumSha256": "c0035e276d5906154c047d671333e66947456458636a47b7a19e91d715942225",
+      "lastUpdated": "2026-03-01"
     },
     {
       "id": "doc_archetypes_finance",
@@ -5019,7 +5005,6 @@
       "version": "1.0.0",
       "contentType": "policies",
       "schemaId": "reasoning_policy_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -6179,7 +6164,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "147964fc2dfd5a5e1f10f04732c5839d24096fff15733af169b7b635482f3d7b",
+      "checksumSha256": "39ce9fbc7f4927186c960f452cc73693e345e5e083c5436df412240aa491b869",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -6244,7 +6229,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -6257,7 +6241,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "1bd1b77cfd883aab7ce4c8a3bc04fdf8f917175dde89432f31f07ba5541afc45",
+      "checksumSha256": "a9f5ef90f1b0fd7e8640b13e147e53f6437e9a4516672d72a5e41b75b9096bb2",
       "lastUpdated": "2026-02-27"
     },
     {
@@ -6398,7 +6382,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -6604,7 +6587,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -6617,7 +6599,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "d3c0fd0c7251abd91a373bab97e638077b7af8016b2ecb8db54a288a040ac7a7",
+      "checksumSha256": "d79ea790e1f9a8eeee2117a51d5db586ed2a7382228e62fa82d3b64d63947320",
       "lastUpdated": "2026-02-27"
     },
     {
@@ -6628,7 +6610,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -6641,7 +6622,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "ab1f369b2577872a7479426d1379ee9ef7e50dacb7c2a58c7f4517577f21693d",
+      "checksumSha256": "2a8f9e3113fc741cf758c6cf0f7c897f618ad8c4c35d163e6041620872434821",
       "lastUpdated": "2026-02-27"
     },
     {
@@ -6652,7 +6633,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -6665,7 +6645,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "71d6afe46c7fe4a93adc09e7ef9b16c4ad59c626ae1c4307b432381347ff4077",
+      "checksumSha256": "7528a8a95923a72530fab7da11bb4eb65305ca71a660c2af6ed6ad94f22835c6",
       "lastUpdated": "2026-02-27"
     },
     {
@@ -6806,7 +6786,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -7012,7 +6991,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -7025,7 +7003,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "fc158d9e3729bf5649ce3ae8d198ee0fda3349c4bf140af401af0a4fe6348504",
+      "checksumSha256": "a22086779271e1e15587d238ed60882ef0e79d8decaf32dba23d5e45e98ca322",
       "lastUpdated": "2026-02-27"
     },
     {
@@ -7036,7 +7014,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -7060,7 +7037,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -7073,7 +7049,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "666f2b685fd605d369ecd7fb7648247bc87efca950729a2186fbfbb57e0ac610",
+      "checksumSha256": "4ab34816e1bd21d4851abd5a029cd5644492dbf73eefc7a6d8f4785aa569e543",
       "lastUpdated": "2026-02-27"
     },
     {
@@ -7084,7 +7060,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -7342,7 +7317,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -8562,7 +8536,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -10432,7 +10405,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -10456,7 +10428,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -10480,7 +10451,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12271,7 +12241,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12295,7 +12264,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12319,7 +12287,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12343,7 +12310,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12367,7 +12333,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12703,7 +12668,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12727,7 +12691,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12751,7 +12714,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12775,7 +12737,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12799,7 +12760,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12823,7 +12783,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12847,7 +12806,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12871,7 +12829,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12895,7 +12852,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12919,7 +12875,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12943,7 +12898,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12967,7 +12921,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -12991,7 +12944,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13015,7 +12967,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13507,7 +13458,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13531,7 +13481,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13555,7 +13504,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13579,7 +13527,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13603,7 +13550,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13627,7 +13573,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13651,7 +13596,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13675,7 +13619,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13699,7 +13642,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13723,7 +13665,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13747,7 +13688,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13771,7 +13711,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13795,7 +13734,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -13819,7 +13757,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14311,7 +14248,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14335,7 +14271,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14359,7 +14294,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14383,7 +14317,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14407,7 +14340,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14431,7 +14363,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14455,7 +14386,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14479,7 +14409,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -14503,7 +14432,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -15697,7 +15625,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -15721,7 +15648,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -15745,7 +15671,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -15769,7 +15694,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -15793,7 +15717,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16285,7 +16208,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16309,7 +16231,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16333,7 +16254,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16357,7 +16277,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16381,7 +16300,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16405,7 +16323,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16429,7 +16346,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16453,7 +16369,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16477,7 +16392,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16501,7 +16415,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16525,7 +16438,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16549,7 +16461,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16573,7 +16484,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -16597,7 +16507,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17011,7 +16920,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17035,7 +16943,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17059,7 +16966,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17083,7 +16989,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17107,7 +17012,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17131,7 +17035,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17155,7 +17058,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17179,7 +17081,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17203,7 +17104,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17227,7 +17127,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17251,7 +17150,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17275,7 +17173,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17299,7 +17196,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17323,7 +17219,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17659,7 +17554,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17683,7 +17577,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17707,7 +17600,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17731,7 +17623,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17755,7 +17646,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17779,7 +17669,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17803,7 +17692,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17827,7 +17715,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17851,7 +17738,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17875,7 +17761,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17899,7 +17784,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17923,7 +17807,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17947,7 +17830,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -17971,7 +17853,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18307,7 +18188,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18331,7 +18211,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18355,7 +18234,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18379,7 +18257,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18403,7 +18280,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18427,7 +18303,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18451,7 +18326,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18475,7 +18349,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -18499,7 +18372,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22189,7 +22061,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22213,7 +22084,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22237,7 +22107,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22261,7 +22130,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22285,7 +22153,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22621,7 +22488,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22645,7 +22511,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22669,7 +22534,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22693,7 +22557,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22717,7 +22580,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22741,7 +22603,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22765,7 +22626,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22789,7 +22649,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22813,7 +22672,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22837,7 +22695,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22861,7 +22718,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22885,7 +22741,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22909,7 +22764,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -22933,7 +22787,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23425,7 +23278,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23449,7 +23301,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23473,7 +23324,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23497,7 +23347,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23521,7 +23370,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23545,7 +23393,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23569,7 +23416,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23593,7 +23439,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23617,7 +23462,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23641,7 +23485,6 @@
       "version": "3.1.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23665,7 +23508,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23689,7 +23531,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23713,7 +23554,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23737,7 +23577,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23761,7 +23600,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23785,7 +23623,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23809,7 +23646,6 @@
       "version": "2.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23833,7 +23669,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23857,7 +23692,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23881,7 +23715,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23905,7 +23738,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23929,7 +23761,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -23953,7 +23784,6 @@
       "version": "1.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
-      "dependsOn": [],
       "enabledByEnv": {
         "production": true,
         "staging": true,

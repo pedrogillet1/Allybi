@@ -110,21 +110,29 @@ interface BankLoaderLike {
   listLoaded(): string[];
 }
 
-const DOMAINS: DocumentIntelligenceDomain[] = [
+const CORE_DOMAINS: DocumentIntelligenceDomain[] = [
   "accounting",
+  "finance",
+  "legal",
+  "medical",
+  "ops",
+];
+
+const EXTENDED_DOMAINS: DocumentIntelligenceDomain[] = [
   "banking",
   "billing",
   "education",
-  "finance",
   "housing",
   "hr_payroll",
   "identity",
   "insurance",
-  "legal",
-  "medical",
-  "ops",
   "tax",
   "travel",
+];
+
+const DOMAINS: DocumentIntelligenceDomain[] = [
+  ...CORE_DOMAINS,
+  ...EXTENDED_DOMAINS,
 ];
 
 const OPERATORS: DocumentIntelligenceOperator[] = [
@@ -143,6 +151,27 @@ const OPERATORS: DocumentIntelligenceOperator[] = [
 
 const MISSING = Symbol("document_intelligence_bank_missing");
 
+const DOMAIN_ALIASES: Record<string, DocumentIntelligenceDomain> = {
+  operations: "ops",
+};
+
+function isDocumentIntelligenceDomain(
+  value: unknown,
+): value is DocumentIntelligenceDomain {
+  return DOMAINS.includes(value as DocumentIntelligenceDomain);
+}
+
+export function normalizeDocumentIntelligenceDomain(
+  value: unknown,
+): DocumentIntelligenceDomain | null {
+  const raw = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (!raw) return null;
+  const mapped = DOMAIN_ALIASES[raw] ?? raw;
+  return isDocumentIntelligenceDomain(mapped) ? mapped : null;
+}
+
 const DI_DOMAIN_FAMILIES: DocumentIntelligenceDomainBankFamily[] = [
   "domain_profile",
   "domain_detection_rules",
@@ -154,6 +183,12 @@ const DI_DOMAIN_FAMILIES: DocumentIntelligenceDomainBankFamily[] = [
   "redaction_and_safety_rules",
   "validation_policies",
 ];
+
+// Domain-pack families currently exist for domain folders under
+// data_banks/document_intelligence/domains/* and intentionally exclude "ops".
+const DI_DOMAIN_PACKED_DOMAINS: DocumentIntelligenceDomain[] = DOMAINS.filter(
+  (domain) => domain !== "ops",
+);
 
 const DI_ONTOLOGY_TYPES: DocumentIntelligenceOntologyType[] = [
   "doc_type",
@@ -270,22 +305,36 @@ export class DocumentIntelligenceBanksService {
 
   getDocumentIntelligenceDomains(): DocumentIntelligenceDomain[] {
     const fromMap = this.getDocumentIntelligenceMap();
-    const configured = Array.isArray(fromMap?.domains)
+    const configuredCore = Array.isArray(fromMap?.domains)
       ? fromMap.domains
-          .map((value: unknown) =>
-            String(value || "")
-              .trim()
-              .toLowerCase(),
+          .map((value: unknown) => normalizeDocumentIntelligenceDomain(value))
+          .filter((value): value is DocumentIntelligenceDomain =>
+            Boolean(value),
           )
-          .filter(Boolean)
       : [];
-    const merged = uniqueSorted([
-      ...DOMAINS,
-      ...(configured as DocumentIntelligenceDomain[]),
-    ]);
+    const configuredExtended = Array.isArray(fromMap?.extendedDomains)
+      ? fromMap.extendedDomains
+          .map((value: unknown) => normalizeDocumentIntelligenceDomain(value))
+          .filter((value): value is DocumentIntelligenceDomain =>
+            Boolean(value),
+          )
+      : [];
+    const configured = [...configuredCore, ...configuredExtended];
+    const merged = uniqueSorted(configured.length ? configured : DOMAINS);
     return merged.filter((domain): domain is DocumentIntelligenceDomain =>
       DOMAINS.includes(domain as DocumentIntelligenceDomain),
     );
+  }
+
+  private normalizeDomainOrThrow(
+    domain: unknown,
+    context: string,
+  ): DocumentIntelligenceDomain {
+    const normalized = normalizeDocumentIntelligenceDomain(domain);
+    if (!normalized) {
+      throw new Error(`Unsupported document intelligence domain for ${context}`);
+    }
+    return normalized;
   }
 
   getDocTaxonomy(): any {
@@ -293,11 +342,13 @@ export class DocumentIntelligenceBanksService {
   }
 
   getDocArchetypes(domain: DocumentIntelligenceDomain): any {
-    return this.getCachedRequired<any>(`doc_archetypes_${domain}`);
+    const normalized = this.normalizeDomainOrThrow(domain, "getDocArchetypes");
+    return this.getCachedRequired<any>(`doc_archetypes_${normalized}`);
   }
 
   getDocAliases(domain: DocumentIntelligenceDomain): any {
-    return this.getCachedRequired<any>(`doc_aliases_${domain}`);
+    const normalized = this.normalizeDomainOrThrow(domain, "getDocAliases");
+    return this.getCachedRequired<any>(`doc_aliases_${normalized}`);
   }
 
   getLegacyDocAliases(): any | null {
@@ -392,8 +443,12 @@ export class DocumentIntelligenceBanksService {
     operator: DocumentIntelligenceOperator,
     domain: DocumentIntelligenceDomain,
   ): any {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getOperatorPlaybook",
+    );
     return this.getCachedRequired<any>(
-      `operator_playbook_${operator}_${domain}`,
+      `operator_playbook_${operator}_${normalized}`,
     );
   }
 
@@ -402,15 +457,27 @@ export class DocumentIntelligenceBanksService {
   }
 
   getRetrievalBoostRules(domain: DocumentIntelligenceDomain): any | null {
-    return this.getCachedOptional<any>(`boost_rules_${domain}`);
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getRetrievalBoostRules",
+    );
+    return this.getCachedOptional<any>(`boost_rules_${normalized}`);
   }
 
   getQueryRewriteRules(domain: DocumentIntelligenceDomain): any | null {
-    return this.getCachedOptional<any>(`query_rewrites_${domain}`);
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getQueryRewriteRules",
+    );
+    return this.getCachedOptional<any>(`query_rewrites_${normalized}`);
   }
 
   getSectionPriorityRules(domain: DocumentIntelligenceDomain): any | null {
-    return this.getCachedOptional<any>(`section_priority_${domain}`);
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getSectionPriorityRules",
+    );
+    return this.getCachedOptional<any>(`section_priority_${normalized}`);
   }
 
   getCrossDocGroundingPolicy(): any | null {
@@ -438,11 +505,19 @@ export class DocumentIntelligenceBanksService {
   }
 
   getMarketingKeywordTaxonomy(domain: DocumentIntelligenceDomain): any | null {
-    return this.getCachedOptional<any>(`keyword_taxonomy_${domain}`);
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getMarketingKeywordTaxonomy",
+    );
+    return this.getCachedOptional<any>(`keyword_taxonomy_${normalized}`);
   }
 
   getMarketingPainPoints(domain: DocumentIntelligenceDomain): any | null {
-    return this.getCachedOptional<any>(`pain_points_${domain}`);
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getMarketingPainPoints",
+    );
+    return this.getCachedOptional<any>(`pain_points_${normalized}`);
   }
 
   getMarketingPatternLibrary(): any | null {
@@ -460,56 +535,89 @@ export class DocumentIntelligenceBanksService {
   // ── Document Intelligence Domain Banks ──────────────────────────────
 
   getDomainProfile(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(domain, "getDomainProfile");
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_domain_profile`,
+      `${domainBankPrefix(normalized)}_domain_profile`,
     );
   }
 
   getDomainDetectionRules(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getDomainDetectionRules",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_domain_detection_rules`,
+      `${domainBankPrefix(normalized)}_domain_detection_rules`,
     );
   }
 
   getAnswerStyleBank(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getAnswerStyleBank",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_answer_style_bank`,
+      `${domainBankPrefix(normalized)}_answer_style_bank`,
     );
   }
 
   getEvidenceRequirements(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getEvidenceRequirements",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_evidence_requirements`,
+      `${domainBankPrefix(normalized)}_evidence_requirements`,
     );
   }
 
   getReasoningScaffolds(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getReasoningScaffolds",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_reasoning_scaffolds`,
+      `${domainBankPrefix(normalized)}_reasoning_scaffolds`,
     );
   }
 
   getRetrievalStrategies(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getRetrievalStrategies",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_retrieval_strategies`,
+      `${domainBankPrefix(normalized)}_retrieval_strategies`,
     );
   }
 
   getDisclaimerPolicy(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getDisclaimerPolicy",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_disclaimer_policy`,
+      `${domainBankPrefix(normalized)}_disclaimer_policy`,
     );
   }
 
   getRedactionAndSafetyRules(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getRedactionAndSafetyRules",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_redaction_and_safety_rules`,
+      `${domainBankPrefix(normalized)}_redaction_and_safety_rules`,
     );
   }
 
   getValidationPolicies(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getValidationPolicies",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_validation_policies`,
+      `${domainBankPrefix(normalized)}_validation_policies`,
     );
   }
 
@@ -517,8 +625,9 @@ export class DocumentIntelligenceBanksService {
     domain: DocumentIntelligenceDomain,
     locale: "en" | "pt",
   ): any | null {
+    const normalized = this.normalizeDomainOrThrow(domain, "getDomainLexicon");
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_lexicon_${locale}`,
+      `${domainBankPrefix(normalized)}_lexicon_${locale}`,
     );
   }
 
@@ -526,14 +635,19 @@ export class DocumentIntelligenceBanksService {
     domain: DocumentIntelligenceDomain,
     locale: "en" | "pt",
   ): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getDomainAbbreviations",
+    );
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_abbreviations_${locale}`,
+      `${domainBankPrefix(normalized)}_abbreviations_${locale}`,
     );
   }
 
   getDocTypeCatalog(domain: DocumentIntelligenceDomain): any | null {
+    const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeCatalog");
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_doc_type_catalog`,
+      `${domainBankPrefix(normalized)}_doc_type_catalog`,
     );
   }
 
@@ -541,8 +655,11 @@ export class DocumentIntelligenceBanksService {
     domain: DocumentIntelligenceDomain,
     docType: string,
   ): any | null {
+    const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeSections");
+    const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
+    if (!lookupDocType) return null;
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_${docType}_sections`,
+      `${domainBankPrefix(normalized)}_${lookupDocType}_sections`,
     );
   }
 
@@ -550,8 +667,14 @@ export class DocumentIntelligenceBanksService {
     domain: DocumentIntelligenceDomain,
     docType: string,
   ): any | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getDocTypeExtractionHints",
+    );
+    const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
+    if (!lookupDocType) return null;
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_${docType}_extraction_hints`,
+      `${domainBankPrefix(normalized)}_${lookupDocType}_extraction_hints`,
     );
   }
 
@@ -559,9 +682,26 @@ export class DocumentIntelligenceBanksService {
     domain: DocumentIntelligenceDomain,
     docType: string,
   ): any | null {
+    const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeTables");
+    const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
+    if (!lookupDocType) return null;
     return this.getCachedOptional<any>(
-      `${domainBankPrefix(domain)}_${docType}_tables`,
+      `${domainBankPrefix(normalized)}_${lookupDocType}_tables`,
     );
+  }
+
+  private resolveDocTypeLookupKey(
+    domain: DocumentIntelligenceDomain,
+    docType: string,
+  ): string {
+    const normalizedDocType = String(docType || "")
+      .trim()
+      .toLowerCase();
+    if (!normalizedDocType) return "";
+    if (domain === "legal" && normalizedDocType.startsWith("legal_")) {
+      return normalizedDocType.slice("legal_".length);
+    }
+    return normalizedDocType;
   }
 
   // ── Document Intelligence Ontology Banks ────────────────────────────
@@ -643,7 +783,7 @@ export class DocumentIntelligenceBanksService {
         OPERATORS.map((operator) => `operator_playbook_${operator}_${domain}`),
       ),
       // Document intelligence domain banks
-      ...DOMAINS.flatMap((domain) =>
+      ...DI_DOMAIN_PACKED_DOMAINS.flatMap((domain) =>
         DI_DOMAIN_FAMILIES.map(
           (family) => `${domainBankPrefix(domain)}_${family}`,
         ),
@@ -699,7 +839,7 @@ export class DocumentIntelligenceBanksService {
 
     // Build per-family counts for document intelligence banks
     const documentIntelligenceFamilyCounts: Record<string, number> = {};
-    for (const domain of DOMAINS) {
+    for (const domain of DI_DOMAIN_PACKED_DOMAINS) {
       const prefix = domainBankPrefix(domain);
       let domainCount = 0;
       for (const family of DI_DOMAIN_FAMILIES) {
@@ -707,6 +847,7 @@ export class DocumentIntelligenceBanksService {
       }
       documentIntelligenceFamilyCounts[`domain:${domain}`] = domainCount;
     }
+    documentIntelligenceFamilyCounts["domain:ops"] = 0;
     let ontologyCount = 0;
     for (const type of DI_ONTOLOGY_TYPES) {
       if (loadedSet.has(`di_${type}_ontology`)) ontologyCount++;
