@@ -64,6 +64,9 @@ function makeCleanBanks(): Record<string, unknown> {
     },
     language_triggers: { triggers: [] },
     processing_messages: { messages: [] },
+    no_docs_messages: { config: { enabled: true }, scenarios: {} },
+    scoped_not_found_messages: { config: { enabled: true }, scenarios: {} },
+    disambiguation_microcopy: { config: { enabled: true }, rules: [] },
     edit_error_catalog: { errors: [] },
     // operator_catalog and allybi_capabilities need uppercase keys to match
     // the normalizeUpper() path used for editing ops.  The editing pattern
@@ -86,7 +89,7 @@ function makeCleanBanks(): Record<string, unknown> {
       })),
     },
     fallback_prompt: { templates: [] },
-    fallback_router: { scenarios: [] },
+    fallback_router: { rules: [] },
     fallback_processing: { config: { enabled: true } },
     fallback_scope_empty: { config: { enabled: true } },
     fallback_not_found_scope: { config: { enabled: true } },
@@ -729,6 +732,29 @@ describe("RuntimeWiringIntegrityService – rawConsoleRuntimeUsage", () => {
     const result = buildService().validate();
     expect(result.rawConsoleRuntimeUsage).toHaveLength(0);
   });
+
+  test("rawConsoleRuntimeUsage uses logging_policy runtime paths when configured", () => {
+    const banks = makeCleanBanks();
+    banks.logging_policy = {
+      config: {
+        enabled: true,
+        runtimePathsNoRawConsole: ["src/services/llm/core/llmGateway.service.ts"],
+      },
+    };
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    mockedExistsSync.mockImplementation((p) =>
+      String(p).includes("llmGateway.service.ts"),
+    );
+    mockedReadFileSync.mockReturnValue(
+      "console.warn('debug path');" as unknown as Buffer,
+    );
+
+    const result = buildService().validate();
+    expect(result.rawConsoleRuntimeUsage.length).toBeGreaterThan(0);
+  });
 });
 
 // ==============================================================================
@@ -962,7 +988,9 @@ describe("RuntimeWiringIntegrityService – composeAnswerModeTemplateGaps", () =
 
     const result = buildService().validate();
 
-    expect(result.composeAnswerModeTemplateGaps).toContain("doc_grounded_single");
+    expect(result.composeAnswerModeTemplateGaps).toContain(
+      "doc_grounded_single",
+    );
     expect(result.composeAnswerModeTemplateGaps).toContain("help_steps");
     expect(result.ok).toBe(false);
   });
