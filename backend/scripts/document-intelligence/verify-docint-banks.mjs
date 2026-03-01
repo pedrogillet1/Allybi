@@ -35,7 +35,16 @@ const diRoot = path.join(dataBanksRoot, "document_intelligence");
 const registryPath = path.join(dataBanksRoot, "manifest", "bank_registry.any.json");
 const globalDepsPath = path.join(dataBanksRoot, "manifest", "bank_dependencies.any.json");
 const diDepsPath = path.join(diRoot, "manifest", "dependency_graph.any.json");
+const usageManifestPath = path.join(diRoot, "manifest", "usage_manifest.any.json");
 const orphanAllowlistPath = path.join(diRoot, "manifest", "orphan_allowlist.any.json");
+const diBanksServicePath = path.join(
+  repoRoot,
+  "src",
+  "services",
+  "core",
+  "banks",
+  "documentIntelligenceBanks.service.ts",
+);
 
 const strict = process.argv.includes("--strict");
 
@@ -66,6 +75,10 @@ function collectJsonFiles(dir) {
 let passed = 0;
 let warnings = 0;
 let errors = 0;
+
+const NON_REGISTRY_DI_REL_PATHS = new Set([
+  "document_intelligence/__implementation_report.any.json",
+]);
 
 function pass(msg) {
   passed++;
@@ -172,13 +185,23 @@ for (const b of registry.banks || []) {
 }
 
 // Only non-entity-schema DI banks need registry entries.
-const diBanksForRegistry = parsedBanks.filter((b) => !b.isEntitySchema);
+const diBanksForRegistry = parsedBanks.filter(
+  (b) => !b.isEntitySchema && !NON_REGISTRY_DI_REL_PATHS.has(b.relPath),
+);
 
 const missingInRegistry = [];
-for (const { relPath } of diBanksForRegistry) {
-  if (!registryByPath.has(relPath)) {
-    missingInRegistry.push(relPath);
+for (const { relPath, data } of diBanksForRegistry) {
+  if (registryByPath.has(relPath)) continue;
+
+  // Allow canonical filename mirrors (same _meta.id already registered at another path).
+  // This supports strict filename parity files without forcing duplicate registry IDs.
+  const metaId = String(data?._meta?.id || "").trim();
+  const canonicalEntry = metaId ? registryById.get(metaId) : null;
+  if (canonicalEntry?.path && canonicalEntry.path !== relPath) {
+    continue;
   }
+
+  missingInRegistry.push(relPath);
 }
 
 // Registry entries pointing to DI paths that have no file on disk.
@@ -365,8 +388,9 @@ if (depErrors.length) {
 
 // Collect bank IDs from all non-entity-schema DI banks.
 const allDiBankIds = new Set();
-for (const { data, isEntitySchema } of parsedBanks) {
+for (const { data, isEntitySchema, relPath } of parsedBanks) {
   if (isEntitySchema) continue;
+  if (NON_REGISTRY_DI_REL_PATHS.has(relPath)) continue;
   const id = data?._meta?.id;
   if (id) allDiBankIds.add(String(id));
 }
@@ -397,68 +421,80 @@ function isAllowlisted(id) {
   return false;
 }
 
-// Scan TS/MJS source files for bank ID references.
-const srcDirs = [
-  path.join(repoRoot, "src", "services"),
-  path.join(repoRoot, "src", "modules"),
-  path.join(repoRoot, "src", "controllers"),
-  path.join(repoRoot, "src", "bootstrap"),
-  path.join(repoRoot, "src", "entrypoints"),
-  path.join(repoRoot, "src", "queues"),
-  path.join(repoRoot, "src", "workers"),
-];
-
-function collectSourceFiles(dirs) {
-  const files = [];
-  for (const dir of dirs) {
-    if (!fs.existsSync(dir)) continue;
-    const walk = (d) => {
-      for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
-        const full = path.join(d, entry.name);
-        if (entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "node_modules") {
-          walk(full);
-        } else if (
-          entry.isFile() &&
-          (entry.name.endsWith(".ts") || entry.name.endsWith(".mjs") || entry.name.endsWith(".js"))
-        ) {
-          files.push(full);
-        }
-      }
-    };
-    walk(dir);
+let usageManifest = null;
+try {
+  if (fs.existsSync(usageManifestPath)) {
+    usageManifest = readJson(usageManifestPath);
   }
-  return files;
+} catch {
+  // Ignore and continue with empty runtime consumption rules.
 }
 
-const sourceFiles = collectSourceFiles(srcDirs);
-const sourceContents = sourceFiles.map((f) => fs.readFileSync(f, "utf8")).join("\n");
+const consumedIds = new Set(
+  ((usageManifest && usageManifest.consumedBankIds) || []).map((v) =>
+    String(v || "").trim(),
+  ),
+);
+const consumedPrefixes = ((usageManifest && usageManifest.consumedIdPrefixes) || [])
+  .map((v) => String(v || "").trim())
+  .filter(Boolean);
+const consumedPatterns = ((usageManifest && usageManifest.consumedIdPatterns) || [])
+  .map((pattern) => {
+    try {
+      return new RegExp(String(pattern || "").trim());
+    } catch {
+      return null;
+    }
+  })
+  .filter((re) => re != null);
 
-// Also scan data_banks JSON files that consume other banks (e.g. usage_manifest, dependency_graph,
-// bank_dependencies, etc.) so that manifest-level references count as usage.
-const manifestFiles = [
-  orphanAllowlistPath,
+const manifestFilesForUsage = [
+  usageManifestPath,
   diDepsPath,
-  path.join(diRoot, "manifest", "usage_manifest.any.json"),
   path.join(diRoot, "manifest", "runtime_wiring_gates.any.json"),
   path.join(diRoot, "manifest", "bank_schema_registry.any.json"),
   globalDepsPath,
+  path.join(dataBanksRoot, "semantics", "document_intelligence_bank_map.any.json"),
 ];
-let manifestContents = "";
-for (const mf of manifestFiles) {
+const manifestReferencedIds = new Set();
+for (const mf of manifestFilesForUsage) {
+  if (!mf || !fs.existsSync(mf)) continue;
   try {
-    if (fs.existsSync(mf)) manifestContents += fs.readFileSync(mf, "utf8") + "\n";
+    const payload = readJson(mf);
+    const walk = (node) => {
+      if (Array.isArray(node)) {
+        for (const value of node) walk(value);
+        return;
+      }
+      if (node && typeof node === "object") {
+        for (const value of Object.values(node)) walk(value);
+        return;
+      }
+      if (typeof node === "string") {
+        const value = node.trim();
+        if (value && registryById.has(value)) {
+          manifestReferencedIds.add(value);
+        }
+      }
+    };
+    walk(payload);
   } catch {
-    // skip
+    // Ignore individual manifest parse issues here; parser failures are caught elsewhere.
   }
 }
 
-const combinedSearchCorpus = sourceContents + "\n" + manifestContents;
+function isConsumed(id) {
+  if (consumedIds.has(id)) return true;
+  if (consumedPrefixes.some((pfx) => id.startsWith(pfx))) return true;
+  if (consumedPatterns.some((re) => re.test(id))) return true;
+  if (manifestReferencedIds.has(id)) return true;
+  return false;
+}
 
 const orphanBankIds = [];
 for (const id of allDiBankIds) {
   if (isAllowlisted(id)) continue;
-  // Check if the exact ID string appears somewhere in source or manifest files.
-  if (!combinedSearchCorpus.includes(id)) {
+  if (!isConsumed(id)) {
     orphanBankIds.push(id);
   }
 }
@@ -508,6 +544,192 @@ if (domainGaps.length) {
   pass(`Cross-domain consistency OK (${domains.length} domains, ${coreBankFamilies.length} families each)`);
 } else {
   warn("No domain directories found under document_intelligence/domains/");
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 7. DOMAIN TAXONOMY CONSISTENCY
+// ══════════════════════════════════════════════════════════════════════════════
+
+const domainConsistencyErrors = [];
+
+function listUniqueStrings(values) {
+  return [...new Set(values.map((v) => String(v || "").trim()).filter(Boolean))].sort();
+}
+
+function normalizeDomainWithAliases(domain, aliasMap) {
+  let current = String(domain || "").trim();
+  if (!current) return "";
+  const seen = new Set();
+  for (let i = 0; i < 8; i++) {
+    if (seen.has(current)) break;
+    seen.add(current);
+    const next = aliasMap[current];
+    if (!next || next === current) break;
+    current = String(next).trim();
+  }
+  return current;
+}
+
+try {
+  const domainOntology = readJson(
+    path.join(diRoot, "semantics", "domain_ontology.any.json"),
+  );
+  const docTypeOntology = readJson(
+    path.join(diRoot, "semantics", "doc_type_ontology.any.json"),
+  );
+  const sectionOntology = readJson(
+    path.join(diRoot, "semantics", "section_ontology.any.json"),
+  );
+  const entityOntology = readJson(
+    path.join(diRoot, "semantics", "entity_ontology.any.json"),
+  );
+  const metricOntology = readJson(
+    path.join(diRoot, "semantics", "metric_ontology.any.json"),
+  );
+  const abbreviationGlobal = readJson(
+    path.join(diRoot, "language", "abbreviation_global.any.json"),
+  );
+  const mapBank = readJson(
+    path.join(dataBanksRoot, "semantics", "document_intelligence_bank_map.any.json"),
+  );
+
+  const canonicalDomains = listUniqueStrings(
+    (domainOntology.domains || []).map((d) => d?.id),
+  );
+  const domainAliasMap =
+    domainOntology?.config && typeof domainOntology.config === "object"
+      ? Object.fromEntries(
+          Object.entries(domainOntology.config.domainAliases || {}).map(([k, v]) => [
+            String(k || "").trim(),
+            String(v || "").trim(),
+          ]),
+        )
+      : {};
+
+  for (const canonical of Object.values(domainAliasMap)) {
+    if (!canonicalDomains.includes(canonical)) {
+      domainConsistencyErrors.push(
+        `domain_ontology alias points to unknown canonical domain: ${canonical}`,
+      );
+    }
+  }
+
+  const collectedRefs = [];
+  for (const item of docTypeOntology.docTypes || []) {
+    if (item?.domainId) collectedRefs.push({ source: "doc_type_ontology.domainId", value: item.domainId });
+  }
+  for (const item of sectionOntology.sections || []) {
+    for (const domain of item?.domains || []) {
+      collectedRefs.push({ source: "section_ontology.domains", value: domain });
+    }
+  }
+  for (const item of entityOntology.entityTypes || []) {
+    if (item?.domain) collectedRefs.push({ source: "entity_ontology.domain", value: item.domain });
+    for (const domain of item?.domains || []) {
+      collectedRefs.push({ source: "entity_ontology.domains", value: domain });
+    }
+  }
+  for (const item of metricOntology.metrics || []) {
+    if (item?.domain) collectedRefs.push({ source: "metric_ontology.domain", value: item.domain });
+  }
+  for (const item of abbreviationGlobal.abbreviations || []) {
+    if (item?.domain) collectedRefs.push({ source: "abbreviation_global.domain", value: item.domain });
+  }
+  for (const domain of mapBank?.domains || []) {
+    collectedRefs.push({ source: "document_intelligence_bank_map.domains", value: domain });
+  }
+  for (const domain of mapBank?.extendedDomains || []) {
+    collectedRefs.push({ source: "document_intelligence_bank_map.extendedDomains", value: domain });
+  }
+
+  const unknownRefs = [];
+  for (const ref of collectedRefs) {
+    const normalized = normalizeDomainWithAliases(ref.value, domainAliasMap);
+    if (!canonicalDomains.includes(normalized)) {
+      unknownRefs.push(`${ref.source}: ${ref.value}`);
+    }
+  }
+  if (unknownRefs.length) {
+    domainConsistencyErrors.push(
+      `Unknown domain references (${unknownRefs.length}): ${unknownRefs.slice(0, 20).join(", ")}`,
+    );
+  }
+
+  const mapDomains = listUniqueStrings(mapBank?.domains || []);
+  const mapExtendedDomains = listUniqueStrings(mapBank?.extendedDomains || []);
+  const mapUniverse = listUniqueStrings([...mapDomains, ...mapExtendedDomains]).map((d) =>
+    normalizeDomainWithAliases(d, domainAliasMap),
+  );
+  const mapCoverageMissing = canonicalDomains.filter((d) => !mapUniverse.includes(d));
+  if (mapCoverageMissing.length) {
+    domainConsistencyErrors.push(
+      `document_intelligence_bank_map missing canonical domains (domains + extendedDomains): ${mapCoverageMissing.join(", ")}`,
+    );
+  }
+
+  const serviceSource = fs.existsSync(diBanksServicePath)
+    ? fs.readFileSync(diBanksServicePath, "utf8")
+    : "";
+  if (!serviceSource) {
+    domainConsistencyErrors.push(
+      `Cannot read runtime domain source: ${path.relative(repoRoot, diBanksServicePath)}`,
+    );
+  } else {
+    const extractDomainArrayLiterals = (constName) => {
+      const marker = `const ${constName}: DocumentIntelligenceDomain[] = [`;
+      const start = serviceSource.indexOf(marker);
+      if (start < 0) return [];
+      const bodyStart = start + marker.length;
+      const end = serviceSource.indexOf("];", bodyStart);
+      if (end < 0) return [];
+      const body = serviceSource.slice(bodyStart, end);
+      return [...body.matchAll(/\"([a-z_]+)\"/g)].map((m) => m[1]);
+    };
+
+    const coreDomains = extractDomainArrayLiterals("CORE_DOMAINS");
+    const extendedDomains = extractDomainArrayLiterals("EXTENDED_DOMAINS");
+    let serviceDomains = listUniqueStrings([...coreDomains, ...extendedDomains]);
+    if (serviceDomains.length === 0) {
+      serviceDomains = listUniqueStrings(extractDomainArrayLiterals("DOMAINS"));
+    }
+
+    if (serviceDomains.length === 0) {
+      domainConsistencyErrors.push(
+        "Could not parse service domain constants from DocumentIntelligenceBanksService",
+      );
+    } else {
+      const onlyInService = serviceDomains.filter((d) => !canonicalDomains.includes(d));
+      const onlyInOntology = canonicalDomains.filter((d) => !serviceDomains.includes(d));
+      if (onlyInService.length || onlyInOntology.length) {
+        domainConsistencyErrors.push(
+          `Runtime DOMAINS mismatch with domain_ontology: onlyInService=[${onlyInService.join(", ")}] onlyInOntology=[${onlyInOntology.join(", ")}]`,
+        );
+      }
+    }
+  }
+
+  const domainDirs = fs.existsSync(domainsDir)
+    ? fs.readdirSync(domainsDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .map((d) => d.name)
+    : [];
+  const dirNotInOntology = domainDirs.filter((d) => !canonicalDomains.includes(d));
+  if (dirNotInOntology.length) {
+    domainConsistencyErrors.push(
+      `Domain directories missing from domain_ontology: ${dirNotInOntology.join(", ")}`,
+    );
+  }
+} catch (err) {
+  domainConsistencyErrors.push(
+    `Failed to evaluate domain taxonomy consistency: ${err?.message || err}`,
+  );
+}
+
+if (domainConsistencyErrors.length) {
+  fail(`Domain taxonomy consistency issues (${domainConsistencyErrors.length}):`);
+  for (const issue of domainConsistencyErrors) console.log(`    - ${issue}`);
+} else {
+  pass("Domain taxonomy consistency OK across ontology, map, runtime constants, and references");
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
