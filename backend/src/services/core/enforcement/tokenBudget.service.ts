@@ -58,7 +58,7 @@ function readModeMaxFromBank(answerMode: string): number | null {
   if (modeMaxBankCache === undefined) {
     modeMaxBankCache = null;
     try {
-      const bank = getOptionalBank<any>("truncation_and_limits");
+      const bank = getOptionalBank<Record<string, unknown>>("truncation_and_limits");
       const rawLimits = bank?.answerModeLimits;
       if (rawLimits && typeof rawLimits === "object") {
         const next: Record<string, number> = {};
@@ -128,14 +128,17 @@ function resolveModeMax(answerMode: string): number {
   if (bankModeMax) return bankModeMax;
 
   if (answerMode === "nav_pills") return 220;
-  if (answerMode === "rank_disambiguate") return 260;
+  if (answerMode === "rank_disambiguate") return 220;
+  if (answerMode === "rank_autopick") return 400;
   if (answerMode === "doc_grounded_table") return 4000;
   if (answerMode === "doc_grounded_multi") return 3400;
-  if (answerMode === "doc_grounded_single") return 3200;
-  if (answerMode === "doc_grounded_quote") return 1200;
-  if (answerMode === "help_steps") return 1600;
-  if (answerMode === "no_docs" || answerMode === "refusal") return 320;
-  return 3400;
+  if (answerMode === "doc_grounded_single") return 2800;
+  if (answerMode === "doc_grounded_quote") return 1000;
+  if (answerMode === "help_steps") return 1200;
+  if (answerMode === "no_docs") return 600;
+  if (answerMode === "refusal") return 220;
+  if (answerMode === "general_answer") return 3000;
+  return 3000;
 }
 
 function resolveBaseBudget(
@@ -145,14 +148,14 @@ function resolveBaseBudget(
   if (answerMode === "nav_pills") return 180;
   if (answerMode === "rank_disambiguate") return 220;
   if (answerMode === "doc_grounded_table")
-    return routeStage === "final" ? 4000 : 2400;
-  if (answerMode === "doc_grounded_multi") return 3000;
-  if (answerMode === "doc_grounded_single") return 2800;
-  if (answerMode === "doc_grounded_quote") return 900;
-  if (answerMode === "help_steps") return 1200;
+    return routeStage === "final" ? 1500 : 1000;
+  if (answerMode === "doc_grounded_multi") return 1200;
+  if (answerMode === "doc_grounded_single") return 1100;
+  if (answerMode === "doc_grounded_quote") return 550;
+  if (answerMode === "help_steps") return 900;
   if (answerMode === "no_docs") return 280;
   if (answerMode === "refusal") return 220;
-  return routeStage === "final" ? 2200 : 1600;
+  return routeStage === "final" ? 1200 : 900;
 }
 
 function detectComplexity(params: {
@@ -163,6 +166,7 @@ function detectComplexity(params: {
   hasTables: boolean;
 }): BudgetComplexity {
   let score = 0;
+  const normalizedUserText = String(params.userText || "").toLowerCase();
   const words = params.userText
     .split(/\s+/)
     .map((part) => part.trim())
@@ -177,9 +181,22 @@ function detectComplexity(params: {
   if (params.hasTables) score += 2;
   if (params.answerMode === "doc_grounded_multi") score += 1;
   if (params.answerMode === "doc_grounded_table") score += 1;
+  if (params.answerMode === "help_steps") score += 1;
 
   if (params.operator === "quote") score += 1;
   if (params.operator === "locate_docs") score -= 1;
+
+  const deepExtractionCue =
+    /\b(extract|extraction|every|all|detailed|detail|deep(er)?|comprehensive|precision|normalize|normaliz|consistency|line\s*item|fact\s*sheet|verification|checklist|dispute)\b/i.test(
+      normalizedUserText,
+    );
+  if (deepExtractionCue) score += 1;
+
+  const structuredOutputCue =
+    /\b(table|tabela|matrix|matriz|compare|comparison|differences|audit|reconcile|cross[-\s]?check|validate|validation)\b/i.test(
+      normalizedUserText,
+    );
+  if (structuredOutputCue) score += 1;
 
   if (score >= 4) return "high";
   if (score >= 2) return "medium";
