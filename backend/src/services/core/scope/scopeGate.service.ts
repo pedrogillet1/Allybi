@@ -1,5 +1,4 @@
 // scopeGate.service.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * Koda Scope Gate (ChatGPT-parity)
@@ -57,7 +56,7 @@ type ScopeReasonCode =
   | "needs_metric";
 
 export interface BankLoader {
-  getBank<T = any>(bankId: string): T;
+  getBank<T = unknown>(bankId: string): T;
 }
 
 export interface DocMeta {
@@ -341,23 +340,23 @@ export class ScopeGateService {
     }
 
     // 1) Load relevant banks (soft if missing)
-    const scopeHintsBank = this.safeGetBank<any>("scope_hints");
+    const scopeHintsBank = this.safeGetBank<Record<string, unknown>>("scope_hints");
     const scopeResolutionBank =
       this.safeGetBank<ScopeResolutionBank>("scope_resolution");
-    const followupBank = this.safeGetBank<any>("followup_indicators");
-    const discourseBank = this.safeGetBank<any>("discourse_markers");
+    const followupBank = this.safeGetBank<Record<string, unknown>>("followup_indicators");
+    const discourseBank = this.safeGetBank<Record<string, unknown>>("discourse_markers");
     const docAliasesBank =
       this.documentIntelligenceBanks.getMergedDocAliasesBank();
     const docAliasPhrases = this.documentIntelligenceBanks.getDocAliasPhrases();
-    let docTaxonomyBank: any | null = null;
+    let docTaxonomyBank: Record<string, unknown> | null = null;
     try {
       docTaxonomyBank = this.documentIntelligenceBanks.getDocTaxonomy();
     } catch {
       docTaxonomyBank = null;
     }
-    const stopwordsDocnames = this.safeGetBank<any>("stopwords_docnames");
-    const ambiguityPolicies = this.safeGetBank<any>("disambiguation_policies");
-    const rankFeatures = this.safeGetBank<any>("ambiguity_rank_features");
+    const stopwordsDocnames = this.safeGetBank<Record<string, unknown>>("stopwords_docnames");
+    const ambiguityPolicies = this.safeGetBank<Record<string, unknown>>("disambiguation_policies");
+    const rankFeatures = this.safeGetBank<Record<string, unknown>>("ambiguity_rank_features");
     const scopeResolutionEnabled = scopeResolutionBank?.config?.enabled !== false;
     const stageEnabled = (stage: string): boolean =>
       scopeResolutionEnabled &&
@@ -407,9 +406,11 @@ export class ScopeGateService {
     const discourse = input.signals.discourse ?? {};
     let topicShift = Boolean(discourse.isTopicShift);
     const formatShift = Boolean(discourse.isFormatShift);
+    const discourseConfig = discourseBank?.config as Record<string, unknown> | undefined;
+    const discourseActionsContract = discourseConfig?.actionsContract as Record<string, unknown> | undefined;
+    const discourseConflictResolution = discourseActionsContract?.conflictResolution as Record<string, unknown> | undefined;
     const discourseConflictPolicy = String(
-      discourseBank?.config?.actionsContract?.conflictResolution
-        ?.ifFormatShiftAndTopicShift || "",
+      discourseConflictResolution?.ifFormatShiftAndTopicShift || "",
     )
       .trim()
       .toLowerCase();
@@ -419,9 +420,12 @@ export class ScopeGateService {
     }
 
     // Follow-up: allow continuity unless topic shift or explicit new doc ref
+    const followupBankConfig = followupBank?.config as Record<string, unknown> | undefined;
+    const followupActionsContract = followupBankConfig?.actionsContract as Record<string, unknown> | undefined;
+    const followupThresholds = followupActionsContract?.thresholds as Record<string, unknown> | undefined;
     const followupMinScore = Number(
       scopeResolutionBank?.config?.thresholds?.activeDocSoftMin ??
-        followupBank?.config?.actionsContract?.thresholds?.followupScoreMin ??
+        followupThresholds?.followupScoreMin ??
         0.65,
     );
     const followupStrengthScore = followupStrengthToScore(
@@ -440,15 +444,18 @@ export class ScopeGateService {
 
     // 6) Determine whether this turn provides explicit doc reference
     const explicitDocRefFromUpstream = Boolean(input.signals.explicitDocRef);
+    const scopeHintsConfig = scopeHintsBank?.config as Record<string, unknown> | undefined;
+    const scopeHintsActionsContract = scopeHintsConfig?.actionsContract as Record<string, unknown> | undefined;
+    const scopeHintsThresholds = scopeHintsActionsContract?.thresholds as Record<string, unknown> | undefined;
     const minScopeHintConfidence = clamp01(
       Number(
         scopeResolutionBank?.config?.thresholds?.minToApplyHardConstraint ??
-          scopeHintsBank?.config?.actionsContract?.thresholds?.minHintConfidence ??
+          scopeHintsThresholds?.minHintConfidence ??
           0.75,
       ),
     );
     const scopeHintConfidence = clamp01(
-      Number((input.signals as any).scopeHintConfidence ?? 1),
+      Number((input.signals as Record<string, unknown>).scopeHintConfidence ?? 1),
     );
     const explicitDocRefBySignal =
       stageEnabled("apply_explicit_doc_refs") &&
@@ -508,10 +515,10 @@ export class ScopeGateService {
     } else if (
       stageEnabled("apply_user_choice") &&
       !explicitResolved.docId &&
-      String((state as any)?.lastDisambiguation?.chosenDocumentId || "").trim()
+      String((state as Record<string, unknown> & { lastDisambiguation?: { chosenDocumentId?: string } })?.lastDisambiguation?.chosenDocumentId || "").trim()
     ) {
       activeDocId = String(
-        (state as any)?.lastDisambiguation?.chosenDocumentId || "",
+        (state as Record<string, unknown> & { lastDisambiguation?: { chosenDocumentId?: string } })?.lastDisambiguation?.chosenDocumentId || "",
       ).trim();
       hardDocLock = true;
       debug.appliedRules.push("scope_resolution_apply_user_choice");
@@ -572,7 +579,7 @@ export class ScopeGateService {
       // Rule: hard lock applies except discovery
       candidateDocIds = [activeDocId];
     } else if (
-      (input.signals as any).singleDocIntent &&
+      (input.signals as Record<string, unknown>).singleDocIntent &&
       activeDocId &&
       !corpusAllowed
     ) {
@@ -704,7 +711,7 @@ export class ScopeGateService {
       explicitDocResolvedHard ||
       (hardDocLock && activeDocId) ||
       hardSheetLock ||
-      (input.signals as any).hardScopeActive,
+      (input.signals as Record<string, unknown>).hardScopeActive,
     );
 
     return this.finish(state, input, {
@@ -742,8 +749,8 @@ export class ScopeGateService {
     filenameToken: string | null;
     upstreamResolvedDocId: string | null;
     disableDocAliasMatching: boolean;
-    docAliasesBank: any | null;
-    stopwordsDocnames: any | null;
+    docAliasesBank: Record<string, unknown> | null;
+    stopwordsDocnames: Record<string, unknown> | null;
   }): Promise<{
     docId: string | null;
     confidence: number;
@@ -803,7 +810,7 @@ export class ScopeGateService {
     return { docId: null, confidence: 0, method: "none" };
   }
 
-  private docnameTokens(s: string, stopwordsDocnames: any | null): string[] {
+  private docnameTokens(s: string, stopwordsDocnames: Record<string, unknown> | null): string[] {
     // If stopwords_docnames bank exists, we still keep it deterministic and conservative:
     // remove only generic doc terms and status adjectives (as in your bank).
     const toks = simpleTokens(s);
@@ -868,14 +875,14 @@ export class ScopeGateService {
   private matchesAnyDocAliasPhrase(
     query: string,
     phrases: string[],
-    taxonomyBank: any | null,
+    taxonomyBank: Record<string, unknown> | null,
   ): boolean {
     const normalizedQuery = lower(query);
     if (!normalizedQuery) return false;
 
     const taxonomyTokens = Array.isArray(taxonomyBank?.typeDefinitions)
-      ? taxonomyBank.typeDefinitions
-          .flatMap((entry: any) => [
+      ? (taxonomyBank.typeDefinitions as Array<Record<string, unknown>>)
+          .flatMap((entry: Record<string, unknown>) => [
             lower(entry?.id),
             ...(Array.isArray(entry?.aliases)
               ? entry.aliases.map((alias: unknown) =>
@@ -903,8 +910,8 @@ export class ScopeGateService {
   private rankDocCandidatesByName(
     docs: DocMeta[],
     query: string,
-    stopwordsDocnames: any | null,
-    rankFeatures: any | null,
+    stopwordsDocnames: Record<string, unknown> | null,
+    rankFeatures: Record<string, unknown> | null,
   ): ScopeCandidate[] {
     const qTokens = this.docnameTokens(query, stopwordsDocnames);
     const out: ScopeCandidate[] = [];
@@ -957,7 +964,7 @@ export class ScopeGateService {
   // Scope key
   // -----------------------------
 
-  private scopeKey(docIds: string[], extra?: Record<string, any>): string {
+  private scopeKey(docIds: string[], extra?: Record<string, unknown>): string {
     const stable = {
       docs: [...docIds].sort(),
       ...(extra ?? {}),
@@ -989,7 +996,7 @@ export class ScopeGateService {
     return decision;
   }
 
-  private safeGetBank<T = any>(bankId: string): T | null {
+  private safeGetBank<T = unknown>(bankId: string): T | null {
     try {
       return this.bankLoader.getBank<T>(bankId);
     } catch {

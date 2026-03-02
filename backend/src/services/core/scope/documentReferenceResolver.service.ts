@@ -149,7 +149,7 @@ function parseRegexList(patterns: unknown, fallback: string[]): RegExp[] {
 function resolveConfig(): ResolverConfig {
   const loader = getBankLoaderInstance();
   const documentIntelligenceBanks = getDocumentIntelligenceBanksInstance();
-  const memoryPolicy = loader.getBank<any>("memory_policy");
+  const memoryPolicy = loader.getBank<Record<string, unknown>>("memory_policy");
   const docAliases = documentIntelligenceBanks.getMergedDocAliasesBank();
   const aliasThresholds = documentIntelligenceBanks.getDocAliasThresholds();
   const runtime = memoryPolicy?.config?.runtimeTuning?.scopeRuntime || {};

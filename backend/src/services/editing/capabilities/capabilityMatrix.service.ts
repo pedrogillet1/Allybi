@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { safeEditingBank } from "../banks/bankService";
 import { getRuntimeOperatorContract } from "../contracts";
 
-type EditingDomainMatrix = "docx" | "sheets";
+type EditingDomainMatrix = "docx" | "sheets" | "python";
 
 export interface EditingCapabilityRow {
   domain: EditingDomainMatrix;
@@ -37,6 +37,7 @@ function normalizeDomain(raw: unknown): EditingDomainMatrix | null {
   if (value === "docx") return "docx";
   if (value === "excel" || value === "xlsx" || value === "sheets")
     return "sheets";
+  if (value === "python") return "python";
   return null;
 }
 
@@ -99,19 +100,22 @@ export class EditingCapabilityMatrixService {
 
       const runtimeOperator =
         normalizeOperator((entry as any)?.runtimeOperator) || null;
+      const expectedRuntimeDomain =
+        rowDomain === "python" ? "sheets" : rowDomain;
       const contract = runtimeOperator
         ? getRuntimeOperatorContract(runtimeOperator as any)
         : null;
       const bankOps =
         rowDomain === "docx"
           ? docxOperators?.operators || {}
-          : xlsxOperators?.operators || {};
+          : rowDomain === "sheets"
+            ? xlsxOperators?.operators || {}
+            : {};
       const operatorBankEntry = bankOps?.[canonicalOperator] || {};
       const capabilityEntry = capabilityEntries?.[canonicalOperator] || {};
       const declaredSupported = capabilityEntry?.supported !== false;
       const supportedInExecutor = Boolean(
-        contract &&
-        contract.domain === (rowDomain === "sheets" ? "sheets" : rowDomain),
+        contract && contract.domain === expectedRuntimeDomain,
       );
       const supported = declaredSupported && supportedInExecutor;
       const unsupportedReason = supported

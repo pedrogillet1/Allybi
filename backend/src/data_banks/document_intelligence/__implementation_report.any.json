@@ -8,10 +8,10 @@
     ],
     "lastUpdated": "2026-03-02"
   },
-  "generatedAt": "2026-03-02T02:42:05.501Z",
+  "generatedAt": "2026-03-02T23:05:49.543Z",
   "strict": true,
-  "loadedBankCount": 200,
-  "expectedBankCount": 200,
+  "loadedBankCount": 203,
+  "expectedBankCount": 203,
   "coverageByFamily": {
     "taxonomy": {
       "expected": 6,
@@ -49,8 +49,8 @@
       "coverage": 1
     },
     "retrieval": {
-      "expected": 12,
-      "loaded": 12,
+      "expected": 15,
+      "loaded": 15,
       "coverage": 1
     },
     "marketing": {
@@ -71,11 +71,11 @@
   },
   "checks": {
     "strict": true,
-    "requiredCore": 102,
+    "requiredCore": 105,
     "optional": 91,
-    "totalChecked": 193,
-    "loadedBankCount": 200,
-    "schemaValidatedCount": 200,
+    "totalChecked": 196,
+    "loadedBankCount": 203,
+    "schemaValidatedCount": 203,
     "warningCount": 0,
     "failureCount": 0
   },

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import fs from "fs";
 import path from "path";
 
@@ -33,7 +31,7 @@ function resolveDataBanksRoot(): string {
 
 export class DocumentIntelligenceIntegrityService {
   validate(): DocumentIntelligenceIntegrityResult {
-    const mapBank = getOptionalBank<any>("document_intelligence_bank_map");
+    const mapBank = getOptionalBank<Record<string, unknown>>("document_intelligence_bank_map");
 
     if (!mapBank || typeof mapBank !== "object") {
       return {
@@ -71,11 +69,11 @@ export class DocumentIntelligenceIntegrityService {
     const missingBankFiles: string[] = [];
     const missingDependencyNodes: string[] = [];
     const root = resolveDataBanksRoot();
-    const dependencyBank = getOptionalBank<any>("bank_dependencies");
+    const dependencyBank = getOptionalBank<Record<string, unknown>>("bank_dependencies");
     const dependencyNodes = new Set(
       Array.isArray(dependencyBank?.banks)
-        ? dependencyBank.banks
-            .map((node: any) => String(node?.id || "").trim())
+        ? (dependencyBank.banks as unknown[])
+            .map((node: unknown) => String((node as Record<string, unknown>)?.id || "").trim())
             .filter(Boolean)
         : [],
     );
@@ -87,7 +85,7 @@ export class DocumentIntelligenceIntegrityService {
         continue;
       }
 
-      const relPath = String((entry as any)?.path || "").trim();
+      const relPath = String((entry as Record<string, unknown>)?.path || "").trim();
       if (!relPath) {
         missingBankFiles.push(id);
         continue;
@@ -114,10 +112,10 @@ export class DocumentIntelligenceIntegrityService {
       (id) => !getOptionalBank(id),
     );
 
-    const usageManifest = getOptionalBank<any>(
+    const usageManifest = getOptionalBank<Record<string, unknown>>(
       "document_intelligence_usage_manifest",
     );
-    const orphanAllowlist = getOptionalBank<any>(
+    const orphanAllowlist = getOptionalBank<Record<string, unknown>>(
       "document_intelligence_orphan_allowlist",
     );
     const consumedIds = new Set(

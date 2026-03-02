@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "connector_operators",
+    "version": "1.0.0",
+    "description": "Operator definitions for connector lifecycle (Gmail/Outlook/Slack) and email actions. Centralizes operator IDs, detection rules, slot schemas, and guardrails consumed by connectorTurn.handler and turnRoutePolicy.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-02",
+    "owner": "koda-connectors",
+    "dependsOn": [
+      "connectors_routing",
+      "email_routing",
+      "operator_families"
+    ],
+    "usedBy": [
+      "services/chat/handlers/connectorTurn.handler.ts",
+      "services/chat/turnRoutePolicy.service.ts",
+      "services/core/handlers/connectorHandler.service.ts"
+    ],
+    "tests": [
+      "services/chat/handlers/connectorTurn.handler.test.ts",
+      "services/chat/turnRoutePolicy.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "operatorDetection": {
+      "enabled": true,
+      "useRegex": true,
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true,
+      "multipleMatchPolicy": "pick_highest_priority",
+      "maxCandidatesPerMessage": 3,
+      "minConfidence": 0.57,
+      "highConfidence": 0.87
+    },
+    "guardrails": {
+      "requireConnectBeforeSyncOrSearch": true,
+      "neverReadConnectorContentWithoutUserPermission": true,
+      "disconnectAlwaysConfirm": true
+    }
+  },
+  "operators": [
+    {
+      "id": "CONNECT_START",
+      "family": "connectors",
+      "description": "Start a connector authorization flow (Gmail/Outlook/Slack).",
+      "requiresDocs": false,
+      "requiresRetrieval": false,
+      "answerMode": "action_receipt",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook", "slack"]
+    },
+    {
+      "id": "CONNECTOR_SYNC",
+      "family": "connectors",
+      "description": "Kick off a connector sync job.",
+      "requiresDocs": false,
+      "requiresRetrieval": false,
+      "answerMode": "action_receipt",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook", "slack"]
+    },
+    {
+      "id": "CONNECTOR_SEARCH",
+      "family": "connectors",
+      "description": "Search connector-indexed provider content (Gmail/Outlook/Slack).",
+      "requiresDocs": false,
+      "requiresRetrieval": true,
+      "answerMode": "action_receipt",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook", "slack"]
+    },
+    {
+      "id": "CONNECTOR_STATUS",
+      "family": "connectors",
+      "description": "Check connector status and health.",
+      "requiresDocs": false,
+      "requiresRetrieval": false,
+      "answerMode": "action_receipt",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook", "slack"]
+    },
+    {
+      "id": "CONNECTOR_DISCONNECT",
+      "family": "connectors",
+      "description": "Disconnect a connector integration. Always requires user confirmation.",
+      "requiresDocs": false,
+      "requiresRetrieval": false,
+      "answerMode": "action_confirmation",
+      "outputShape": "paragraph",
+      "alwaysConfirm": true,
+      "providers": ["gmail", "outlook", "slack"]
+    },
+    {
+      "id": "EMAIL_LATEST",
+      "family": "email",
+      "description": "Fetch and display the latest email from a connected provider.",
+      "requiresDocs": false,
+      "requiresRetrieval": true,
+      "answerMode": "general_answer",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook"]
+    },
+    {
+      "id": "EMAIL_EXPLAIN_LATEST",
+      "family": "email",
+      "description": "Explain the content of the most recent email.",
+      "requiresDocs": false,
+      "requiresRetrieval": true,
+      "answerMode": "general_answer",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook"]
+    },
+    {
+      "id": "EMAIL_SUMMARIZE_PREVIOUS",
+      "family": "email",
+      "description": "Summarize previous emails in a thread or mailbox.",
+      "requiresDocs": false,
+      "requiresRetrieval": true,
+      "answerMode": "general_answer",
+      "outputShape": "bullets",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook"]
+    },
+    {
+      "id": "EMAIL_DRAFT",
+      "family": "email",
+      "description": "Draft a new email for user review before sending.",
+      "requiresDocs": false,
+      "requiresRetrieval": false,
+      "answerMode": "action_receipt",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook"]
+    },
+    {
+      "id": "EMAIL_SEND",
+      "family": "email",
+      "description": "Send an email. Always requires user confirmation.",
+      "requiresDocs": false,
+      "requiresRetrieval": false,
+      "answerMode": "action_confirmation",
+      "outputShape": "paragraph",
+      "alwaysConfirm": true,
+      "providers": ["gmail", "outlook"]
+    },
+    {
+      "id": "EMAIL_DOC_FUSION",
+      "family": "email",
+      "description": "Combine email content with uploaded document context for a fused answer.",
+      "requiresDocs": true,
+      "requiresRetrieval": true,
+      "answerMode": "general_answer",
+      "outputShape": "paragraph",
+      "alwaysConfirm": false,
+      "providers": ["gmail", "outlook"]
+    }
+  ],
+  "providerAliases": {
+    "google mail": "gmail",
+    "google workspace mail": "gmail",
+    "office365": "outlook",
+    "office 365": "outlook",
+    "microsoft outlook": "outlook",
+    "ms outlook": "outlook"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "CO_0001_all_operators_have_family",
+        "assert": "every operator has a non-empty family field"
+      },
+      {
+        "id": "CO_0002_connector_ops_require_no_docs",
+        "assert": "all connectors family operators have requiresDocs === false"
+      },
+      {
+        "id": "CO_0003_destructive_ops_always_confirm",
+        "assert": "CONNECTOR_DISCONNECT and EMAIL_SEND have alwaysConfirm === true"
+      },
+      {
+        "id": "CO_0004_unique_operator_ids",
+        "assert": "no duplicate operator ids"
+      }
+    ]
+  }
+}

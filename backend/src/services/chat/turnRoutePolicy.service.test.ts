@@ -1017,6 +1017,7 @@ describe("TurnRoutePolicyService", () => {
         "en",
         {
           connectedProviders: { slack: true },
+          hasConnectorReadPermission: true,
         },
       );
 
@@ -1025,6 +1026,174 @@ describe("TurnRoutePolicyService", () => {
       expect(decision?.providerId).toBe("slack");
       expect(decision?.decisionNotes).toContain(
         "guardrail:slack_terms_prefer_connector_search",
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // P0-4: Connector permission guardrail — default-deny semantics
+  // ---------------------------------------------------------------------------
+  describe("P0-4: neverReadConnectorContentWithoutUserPermission default-deny", () => {
+    // Helper: build a connectors bank with a CONNECTOR_SEARCH rule and
+    // configurable guardrails
+    function makeSearchBank(guardrails: Record<string, unknown> = {}) {
+      return {
+        config: {
+          enabled: true,
+          guardrails,
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: {
+            intent: "CONNECTORS",
+            domain: "connectors",
+            scope: "connectors",
+          },
+          thresholds: { minConfidence: 0.57 },
+        },
+        providers: { allowed: ["gmail", "outlook", "slack"] },
+        rules: [
+          {
+            ruleId: "CR_SEARCH",
+            priority: 85,
+            reasonCode: "connector_search_requested",
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: ["\\bsearch\\b.{0,20}\\bgmail\\b"],
+                },
+              ],
+            },
+            then: {
+              intent: "CONNECTORS",
+              operator: "CONNECTOR_SEARCH",
+              domain: "connectors",
+              scope: "connectors",
+            },
+            confidenceBoost: 0.1,
+          },
+        ],
+      };
+    }
+
+    test("guardrail undefined → guardrail ON: reroutes CONNECTOR_SEARCH to CONNECTOR_STATUS when permission not explicitly true", () => {
+      // neverReadConnectorContentWithoutUserPermission is NOT set in guardrails
+      // The default-deny logic treats undefined as active (via !== false check)
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing") return makeSearchBank({}) as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("search gmail", "en", {
+        connectedProviders: { gmail: true },
+        // hasConnectorReadPermission not provided (undefined)
+      });
+
+      expect(decision).not.toBeNull();
+      expect(decision?.operatorId).toBe("CONNECTOR_STATUS");
+      expect(decision?.decisionNotes).toContain(
+        "guardrail:permission_required_for_connector_content",
+      );
+    });
+
+    test("hasConnectorReadPermission undefined → DENIED: reroutes to CONNECTOR_STATUS", () => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing")
+          return makeSearchBank({
+            neverReadConnectorContentWithoutUserPermission: true,
+          }) as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("search gmail", "en", {
+        connectedProviders: { gmail: true },
+        // hasConnectorReadPermission is undefined
+      });
+
+      expect(decision).not.toBeNull();
+      expect(decision?.operatorId).toBe("CONNECTOR_STATUS");
+      expect(decision?.decisionNotes).toContain(
+        "guardrail:permission_required_for_connector_content",
+      );
+    });
+
+    test("hasConnectorReadPermission true → GRANTED: keeps CONNECTOR_SEARCH", () => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing")
+          return makeSearchBank({
+            neverReadConnectorContentWithoutUserPermission: true,
+          }) as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("search gmail", "en", {
+        connectedProviders: { gmail: true },
+        hasConnectorReadPermission: true,
+      });
+
+      expect(decision).not.toBeNull();
+      expect(decision?.operatorId).toBe("CONNECTOR_SEARCH");
+      // Should NOT contain the permission denial note
+      expect(decision?.decisionNotes).not.toContain(
+        "guardrail:permission_required_for_connector_content",
+      );
+    });
+
+    test("hasConnectorReadPermission false → DENIED: reroutes to CONNECTOR_STATUS", () => {
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing")
+          return makeSearchBank({
+            neverReadConnectorContentWithoutUserPermission: true,
+          }) as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("search gmail", "en", {
+        connectedProviders: { gmail: true },
+        hasConnectorReadPermission: false,
+      });
+
+      expect(decision).not.toBeNull();
+      expect(decision?.operatorId).toBe("CONNECTOR_STATUS");
+      expect(decision?.decisionNotes).toContain(
+        "guardrail:permission_required_for_connector_content",
+      );
+    });
+
+    test("guardrail explicitly false → guardrail OFF: allows CONNECTOR_SEARCH without permission", () => {
+      // When neverReadConnectorContentWithoutUserPermission is explicitly false,
+      // the guardrail should be disabled (the !== false check evaluates to false)
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing")
+          return makeSearchBank({
+            neverReadConnectorContentWithoutUserPermission: false,
+          }) as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("search gmail", "en", {
+        connectedProviders: { gmail: true },
+        // No permission given, but guardrail is explicitly disabled
+      });
+
+      expect(decision).not.toBeNull();
+      expect(decision?.operatorId).toBe("CONNECTOR_SEARCH");
+      expect(decision?.decisionNotes).not.toContain(
+        "guardrail:permission_required_for_connector_content",
       );
     });
   });

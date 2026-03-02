@@ -77,7 +77,7 @@ export class LLMClientFactory {
       // An adapter is needed for full parity; for now, cast to allow factory storage.
       this.clients.set(
         "openai",
-        new OpenAIClientService(p.openai.config as any) as unknown as LLMClient,
+        new OpenAIClientService(p.openai.config as Partial<ConstructorParameters<typeof OpenAIClientService>[0]>) as unknown as LLMClient,
       );
     }
 
@@ -89,7 +89,7 @@ export class LLMClientFactory {
     }
 
     if (!this.clients.has("local") && p.local?.enabled) {
-      this.clients.set("local", new LocalClientService(p.local.config as any));
+      this.clients.set("local", new LocalClientService(p.local.config as Partial<ConstructorParameters<typeof LocalClientService>[0]>));
     }
   }
 

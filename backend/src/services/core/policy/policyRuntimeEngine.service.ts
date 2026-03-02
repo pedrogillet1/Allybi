@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 export type PolicyPredicate = {
   path?: string;
   op?:
@@ -55,10 +53,10 @@ function getPath(input: Record<string, unknown>, path: string): unknown {
   const normalized = String(path || "").trim();
   if (!normalized) return undefined;
   const segments = normalized.split(".").filter(Boolean);
-  let cursor: any = input;
+  let cursor: unknown = input;
   for (const segment of segments) {
     if (!cursor || typeof cursor !== "object") return undefined;
-    cursor = cursor[segment];
+    cursor = (cursor as Record<string, unknown>)[segment];
   }
   return cursor;
 }

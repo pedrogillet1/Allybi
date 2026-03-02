@@ -180,22 +180,30 @@ function normalizeText(value) {
     .trim();
 }
 
+function countOccurrences(haystack, needle) {
+  let count = 0, pos = 0;
+  while ((pos = haystack.indexOf(needle, pos)) !== -1) { count++; pos += needle.length; }
+  return count;
+}
+
 function isLikelyPortuguese(text) {
-  const v = String(text || '').toLowerCase();
-  const ptWords = [' de ', ' para ', ' com ', ' não ', ' que ', ' uma ', ' os ', ' as ', ' nos ', ' nas '];
-  const enWords = [' the ', ' with ', ' based on ', ' this ', ' that ', ' for ', ' as an ai ', ' limited information '];
-  const ptCount = ptWords.reduce((acc, w) => acc + (v.includes(w) ? 1 : 0), 0);
-  const enCount = enWords.reduce((acc, w) => acc + (v.includes(w) ? 1 : 0), 0);
-  return ptCount >= enCount;
+  const v = ' ' + String(text || '').toLowerCase() + ' ';
+  if (v.split(/\s+/).length < 8) return false;
+  const ptMarkers = [' não ', ' uma ', ' nas ', ' nos ', ' está ', ' são ', ' também ', ' então ', ' pode ', ' sobre ', ' seus ', ' mais ', ' pela ', ' pelo ', ' isso ', ' este ', ' essa ', ' nao ', ' sao '];
+  const enMarkers = [' the ', ' is ', ' are ', ' was ', ' were ', ' have ', ' has ', ' been ', ' would ', ' should ', ' could ', ' which ', ' their ', ' they ', ' these ', ' those '];
+  const ptScore = ptMarkers.reduce((a, w) => a + countOccurrences(v, w), 0);
+  const enScore = enMarkers.reduce((a, w) => a + countOccurrences(v, w), 0);
+  return ptScore > enScore;
 }
 
 function isLikelyEnglish(text) {
-  const v = String(text || '').toLowerCase();
-  const enWords = [' the ', ' with ', ' this ', ' that ', ' for ', ' and ', ' from ', ' are '];
-  const ptWords = [' de ', ' para ', ' com ', ' não ', ' que ', ' uma ', ' os ', ' as '];
-  const enCount = enWords.reduce((acc, w) => acc + (v.includes(w) ? 1 : 0), 0);
-  const ptCount = ptWords.reduce((acc, w) => acc + (v.includes(w) ? 1 : 0), 0);
-  return enCount >= ptCount;
+  const v = ' ' + String(text || '').toLowerCase() + ' ';
+  if (v.split(/\s+/).length < 8) return false;
+  const enMarkers = [' the ', ' is ', ' are ', ' was ', ' were ', ' have ', ' has ', ' been ', ' would ', ' should ', ' could ', ' which ', ' their ', ' they ', ' these ', ' those '];
+  const ptMarkers = [' não ', ' uma ', ' nas ', ' nos ', ' está ', ' são ', ' também ', ' então ', ' pode ', ' sobre ', ' seus ', ' mais ', ' pela ', ' pelo ', ' nao ', ' sao '];
+  const enScore = enMarkers.reduce((a, w) => a + countOccurrences(v, w), 0);
+  const ptScore = ptMarkers.reduce((a, w) => a + countOccurrences(v, w), 0);
+  return enScore > ptScore;
 }
 
 function looksLikeTruncated(result) {
@@ -204,7 +212,7 @@ function looksLikeTruncated(result) {
     truncationValue === true ||
     (truncationValue &&
       typeof truncationValue === 'object' &&
-      truncationValue.occurred === true);
+      (truncationValue.occurred === true || truncationValue.providerOccurred === true));
   const flag = result.truncated === true || truncationOccurred;
   const text = String(result.responseText || '');
   const marker = text.includes('[truncated]') || text.includes('(Response was truncated)');
@@ -248,6 +256,36 @@ function extractSourceNames(rawSources) {
   return names;
 }
 
+function extractAttachmentSourceDocIds(rawAttachments) {
+  if (!Array.isArray(rawAttachments)) return [];
+  const sourceButtons = rawAttachments.find(
+    (a) => a && typeof a === 'object' && a.type === 'source_buttons' && Array.isArray(a.buttons),
+  );
+  if (!sourceButtons) return [];
+  const ids = [];
+  for (const button of sourceButtons.buttons) {
+    if (!button || typeof button !== 'object') continue;
+    const id = String(button.documentId || button.docId || button.id || '').trim();
+    if (id) ids.push(id);
+  }
+  return ids;
+}
+
+function extractAttachmentSourceNames(rawAttachments) {
+  if (!Array.isArray(rawAttachments)) return [];
+  const sourceButtons = rawAttachments.find(
+    (a) => a && typeof a === 'object' && a.type === 'source_buttons' && Array.isArray(a.buttons),
+  );
+  if (!sourceButtons) return [];
+  const names = [];
+  for (const button of sourceButtons.buttons) {
+    if (!button || typeof button !== 'object') continue;
+    const label = String(button.title || button.filename || '').trim();
+    if (label) names.push(label);
+  }
+  return names;
+}
+
 function normalizeResults(dataset) {
   let results = [];
   let meta = {};
@@ -283,10 +321,23 @@ function normalizeResults(dataset) {
       const query = String(row.query || row.message || '').trim();
       const responseText = String(row.assistantText || row.response || row.answer || '').trim();
       const rawSources = Array.isArray(row.sources) ? row.sources : [];
-      const sourceDocIds = Array.isArray(row.sourceDocIds)
-        ? row.sourceDocIds.map((v) => String(v || '').trim()).filter(Boolean)
-        : extractSourceDocIds(rawSources);
-      const sourceNames = extractSourceNames(rawSources);
+      const rawAttachments = Array.isArray(row.attachments) ? row.attachments : [];
+      const sourceDocIds = Array.from(
+        new Set(
+          Array.isArray(row.sourceDocIds)
+            ? row.sourceDocIds.map((v) => String(v || '').trim()).filter(Boolean)
+            : [
+                ...extractSourceDocIds(rawSources),
+                ...extractAttachmentSourceDocIds(rawAttachments),
+              ],
+        ),
+      );
+      const sourceNames = Array.from(
+        new Set([
+          ...extractSourceNames(rawSources),
+          ...extractAttachmentSourceNames(rawAttachments),
+        ]),
+      );
 
       return {
         index: Number(row.queryNum || row.index || idx + 1),
@@ -294,6 +345,7 @@ function normalizeResults(dataset) {
         expectedLanguage: String(row.expectedLanguage || row.language || '').trim() || null,
         responseText,
         rawSources,
+        rawAttachments,
         sourceDocIds,
         sourceNames,
         answerMode: String(row.answerMode || row.metadata?.answerMode || '').trim() || null,
@@ -355,11 +407,20 @@ function evaluateQuery(row, context) {
     !hasSources &&
     (String(row.answerMode || '').toLowerCase() === 'fallback' ||
       lower.includes('não tive acesso ao conteúdo dos documentos') ||
-      lower.includes('based on limited information'));
+      lower.includes('based on limited information') ||
+      lower.includes("couldn't find a confident answer") ||
+      lower.includes("wasn't able to locate"));
 
+  // Gate C: only hard-fail on semantic truncation, not provider-only (backend repairs those)
+  const truncationValue = row.truncation;
+  const onlyProviderTruncation = truncationValue &&
+    typeof truncationValue === 'object' &&
+    truncationValue.providerOccurred === true &&
+    !truncationValue.occurred &&
+    !String(row.responseText || '').includes('[truncated]');
   const gateA = !(hasDocsAttached && text.length > 0 && !hasSources);
   const gateB = !outOfScope;
-  const gateC = !truncated;
+  const gateC = !(truncated && !onlyProviderTruncation);
   const gateD = !fallbackNoSource;
   const gateE = !languageMismatch;
 
@@ -371,9 +432,9 @@ function evaluateQuery(row, context) {
 
   const hardFail = !gateA || !gateB || !gateC || !gateD || !gateE;
 
-  const multiDocQuery = /(compara|compar|diferen|diverg|entre\s+.+\s+e\s+.+)/i.test(row.query);
-  const tableQuery = /(tabela|matriz|\|)/i.test(row.query);
-  const bulletQuery = /(bullet|bullets|tópicos|checklist|flashcards|perguntas)/i.test(row.query);
+  const multiDocQuery = /(compara|compar|diferen|diverg|entre\s+.+\s+e\s+.+|compare|differ|between|versus|vs\.?)/i.test(row.query);
+  const tableQuery = /(tabela|matriz|table|matrix|\|)/i.test(row.query);
+  const bulletQuery = /(bullet|bullets|tópicos|checklist|flashcards|perguntas|list|summarize|outline|key points)/i.test(row.query);
 
   const sourceCount = row.sourceDocIds.length + row.sourceNames.length;
 
@@ -399,12 +460,12 @@ function evaluateQuery(row, context) {
   const correctness = {
     completeness,
     factualPrecision: hasSources ? 5 : 1,
-    consistency: /\bpor outro lado\b.*\bpor outro lado\b/i.test(lower) ? 2 : 5,
+    consistency: (/\bpor outro lado\b.*\bpor outro lado\b/i.test(lower) || /\bon the other hand\b.*\bon the other hand\b/i.test(lower)) ? 2 : 5,
   };
 
   const reasoning = {
-    synthesis: /\b(portanto|logo|assim|com base|dessa forma|em resumo)\b/i.test(lower) ? 10 : 7,
-    documentTypeAwareness: /(pdf|ppt|imagem|capítulo|anotações|trabalho|deck|one-pager)/i.test(lower) ? 5 : 3,
+    synthesis: /\b(portanto|logo|assim|com base|dessa forma|em resumo|therefore|thus|hence|based on|in summary|consequently|in conclusion|as a result|accordingly)\b/i.test(lower) ? 10 : 7,
+    documentTypeAwareness: /(pdf|ppt|imagem|capítulo|anotações|trabalho|deck|one-pager|chapter|document|page|slide|section|appendix|table|figure|exhibit)/i.test(lower) ? 5 : 3,
   };
 
   const writing = {
@@ -420,8 +481,8 @@ function evaluateQuery(row, context) {
 
   const conversation = {
     clarifications: /\?/g.test(text) ? 3 : 4,
-    followups: /(posso|quer que|se quiser|deseja)/i.test(lower) ? 3 : 2,
-    continuity: /\b(agora|esse|isso|capítulo|documento|anotações|projeto)\b/i.test(lower) ? 3 : 2,
+    followups: /(posso|quer que|se quiser|deseja|would you like|shall i|i can also|let me know|if you'd like|if you want)/i.test(lower) ? 3 : 2,
+    continuity: /\b(agora|esse|isso|capítulo|documento|anotações|projeto|document|chapter|section|file|report|statement|above|previously|earlier)\b/i.test(lower) ? 3 : 2,
   };
 
   let rawScore =

@@ -158,7 +158,7 @@
     {
       "id": "BAN_016_com_base_no",
       "category": "filler_phrases",
-      "regex": "(?i)\\bcom base n[oa]s? (?:informações|contexto|dados) (?:fornecid[oa]s?|disponíveis)\\b",
+      "regex": "(?i)\\bcom base n[oa]s? (?:informações|informacoes|contexto|dados) (?:fornecid[oa]s?|dispon[ií]veis?|limitad[oa]s?(?:\\s+dispon[ií]veis?)?)\\b",
       "action": "strip",
       "languages": ["pt"]
     },

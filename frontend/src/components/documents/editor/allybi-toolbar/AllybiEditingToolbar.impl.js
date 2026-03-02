@@ -65,6 +65,7 @@ export default function AllybiEditingToolbar({
   fileType, // 'word' | 'excel' | 'powerpoint' | 'pdf'
   zoom,
   onZoomChange,
+  hideZoomControls = false,
 
   // Word
   fontFamily,
@@ -372,7 +373,7 @@ export default function AllybiEditingToolbar({
     >
       <div className="allybi-toolbar-left">
         {showWordActions ? (
-          <div className="toolbar-section allybi-word-actions-left" style={{ gap: 6 }}>
+          <div className="toolbar-section allybi-word-actions-left" style={{ gap: 8 }}>
             {wordPrimaryActionLabel ? (
               <button
                 type="button"
@@ -388,7 +389,7 @@ export default function AllybiEditingToolbar({
               : null}
           </div>
         ) : showExcelActions ? (
-          <div className="toolbar-section allybi-word-actions-left" style={{ gap: 6 }}>
+          <div className="toolbar-section allybi-word-actions-left" style={{ gap: 8 }}>
             {excelPrimaryActionLabel ? (
               <button
                 type="button"
@@ -414,7 +415,7 @@ export default function AllybiEditingToolbar({
         )}
       </div>
       {/* Content: centered, file-type specific */}
-      <div className="allybi-toolbar-center">
+      <div className={`allybi-toolbar-center${fileType === 'excel' ? ' allybi-toolbar-center--excel' : ''}`}>
         {showWordControls ? (
           <>
             <div className="toolbar-section">
@@ -603,6 +604,20 @@ export default function AllybiEditingToolbar({
           <div className="allybi-excel-row">
             <div className="allybi-excel-left">
               <div className="allybi-excel-sheet-combo">
+                {excelLogoSrc && onExcelLogoClick ? (
+                  <>
+                    <button
+                      type="button"
+                      className="toolbar-btn icon-btn allybi-excel-logo-btn"
+                      title="Ask Allybi"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => onExcelLogoClick?.()}
+                    >
+                      <img src={excelLogoSrc} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
+                    </button>
+                    {divider()}
+                  </>
+                ) : null}
                 {iconBtn('Undo', UndoIcon, () => onExcelUndo?.(), {
                   disabled: !excelCanUndo,
                 })}
@@ -807,12 +822,8 @@ export default function AllybiEditingToolbar({
                   </div>
                 ) : null}
 
-                <div className="allybi-excel-namebox" title={excelSelectedInfo?.targetId || ''}>
-                  {excelSelectedInfo?.a1 || 'Selection'}
-                </div>
-
-	              <div className="allybi-excel-valuewrap">
-	                <textarea
+		              <div className="allybi-excel-valuewrap">
+		                <textarea
 	                  ref={excelValueRef}
 	                  value={excelDraftValue || ''}
 	                  onChange={(e) => onExcelDraftValueChange?.(e.target.value)}
@@ -852,13 +863,13 @@ export default function AllybiEditingToolbar({
 
 	            </div>
 
-	            <div className="allybi-excel-right">
-	              {excelStatusToShow ? (
+	            {excelStatusToShow ? (
+	              <div className="allybi-excel-right">
 	                <div className="allybi-excel-status" title={excelStatusToShow}>
 	                  {excelStatusToShow}
 	                </div>
-	              ) : null}
-	            </div>
+	              </div>
+	            ) : null}
 	          </div>
 	        ) : null}
 
@@ -936,7 +947,7 @@ export default function AllybiEditingToolbar({
               : null}
           </div>
         ) : null}
-        {!isMobile && (<>
+        {!isMobile && !hideZoomControls && (<>
         <button
           type="button"
           className="toolbar-btn icon-btn"

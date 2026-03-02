@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "id": "viewer_source_navigation_microcopy",
+    "version": "1.0.0",
+    "description": "Viewer source-navigation microcopy for Ask Allybi citation jumps.",
+    "languages": ["en", "pt", "es"],
+    "lastUpdated": "2026-03-02",
+    "owner": "allybi-viewer"
+  },
+  "config": {
+    "enabled": true
+  },
+  "messages": {
+    "jumping": {
+      "en": "Taking you to the cited location…",
+      "pt": "Levando você ao trecho citado…",
+      "es": "Llevándote a la ubicación citada…"
+    },
+    "jumpNotFound": {
+      "en": "I couldn't find that exact location, so I opened the document.",
+      "pt": "Não encontrei exatamente esse ponto, então abri o documento.",
+      "es": "No encontré esa ubicación exacta, así que abrí el documento."
+    },
+    "crossDocument": {
+      "en": "Opening the cited document…",
+      "pt": "Abrindo o documento citado…",
+      "es": "Abriendo el documento citado…"
+    },
+    "unknownType": {
+      "en": "This file type supports chat, but location jump is limited.",
+      "pt": "Este tipo de arquivo suporta chat, mas o salto de localização é limitado.",
+      "es": "Este tipo de archivo admite chat, pero el salto de ubicación es limitado."
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "VSM_0001_has_all_locales",
+        "assert": "messages.jumping/jumpNotFound/crossDocument/unknownType all include en, pt, es"
+      }
+    ]
+  }
+}

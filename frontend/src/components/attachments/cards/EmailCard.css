@@ -14,7 +14,8 @@
 }
 
 .koda-email-card.koda-email-card--compact{
-  max-width: 420px; /* narrower compact card for chat */
+  max-width: 100%;
+  width: 100%;
 }
 
 .koda-email-card.koda-email-card--compact{

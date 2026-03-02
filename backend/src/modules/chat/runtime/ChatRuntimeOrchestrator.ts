@@ -41,6 +41,17 @@ const KNOWN_DOCUMENT_STATUSES: ReadonlySet<DocumentStatus> = new Set([
   "available",
   "completed",
 ]);
+const GENERIC_FILE_TOKENS = new Set([
+  "pdf",
+  "doc",
+  "docx",
+  "xls",
+  "xlsx",
+  "ppt",
+  "pptx",
+  "csv",
+  "txt",
+]);
 
 function filenameFromStorageKey(
   storageKey: string | null | undefined,
@@ -169,6 +180,77 @@ function normSpace(s: string): string {
 
 function lower(s: string): string {
   return normSpace(s).toLowerCase();
+}
+
+function resetRegex(pattern: RegExp): void {
+  pattern.lastIndex = 0;
+}
+
+function matchRegexPatterns(patterns: RegExp[], input: string): string[] {
+  const matches: string[] = [];
+  for (const pattern of patterns) {
+    resetRegex(pattern);
+    if (pattern.global) {
+      let result: RegExpExecArray | null = null;
+      while ((result = pattern.exec(input)) !== null) {
+        for (const chunk of result) {
+          const value = normSpace(String(chunk || ""));
+          if (value) matches.push(value);
+        }
+        if (result[0] === "") {
+          pattern.lastIndex += 1;
+        }
+      }
+    } else {
+      const result = pattern.exec(input);
+      if (!result) continue;
+      for (const chunk of result) {
+        const value = normSpace(String(chunk || ""));
+        if (value) matches.push(value);
+      }
+    }
+  }
+  return matches;
+}
+
+function tokenizeForScope(
+  input: string,
+  config: Pick<ScopeRuntimeMentionConfig, "tokenMinLength" | "stopWords">,
+): string[] {
+  const normalized = lower(input)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ");
+  return normalized
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter(
+      (token) =>
+        token.length >= config.tokenMinLength &&
+        !config.stopWords.has(token) &&
+        !GENERIC_FILE_TOKENS.has(token),
+    );
+}
+
+function lexicalOverlapScore(
+  messageTokens: Set<string>,
+  docTokens: string[],
+): number {
+  if (docTokens.length === 0 || messageTokens.size === 0) return 0;
+  let overlap = 0;
+  for (const token of docTokens) {
+    if (messageTokens.has(token)) overlap += 1;
+  }
+  return overlap / docTokens.length;
+}
+
+function normalizeForExactMention(value: string): string {
+  return lower(String(value || ""))
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9.\s_-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export type RuntimeDelegate = {
@@ -415,6 +497,11 @@ export class ChatRuntimeOrchestrator {
     },
   ): Promise<string[]> {
     if (!message || !userId) return [];
+    const mentionSignals = [
+      ...matchRegexPatterns(this.scopeRuntime.candidateFilenameRegex, message),
+      ...matchRegexPatterns(this.scopeRuntime.candidateDocRefRegex, message),
+    ];
+    if (mentionSignals.length === 0) return [];
     const restrictedDocIds = Array.isArray(options?.restrictToDocumentIds)
       ? options?.restrictToDocumentIds
           .map((id) => String(id || "").trim())
@@ -465,17 +552,66 @@ export class ChatRuntimeOrchestrator {
         filenameFromStorageKey(doc.encryptedFilename),
     }));
     const resolution = resolveDocumentReference(message, referenceDocs);
-    if (!resolution.explicitDocRef) return [];
+    const scopeTokens = new Set(
+      tokenizeForScope(`${message}\n${mentionSignals.join(" ")}`, this.scopeRuntime),
+    );
+    const lexicalMatches = referenceDocs
+      .map((doc) => {
+        const docText = normSpace(`${doc.filename || ""} ${doc.title || ""}`);
+        if (docText.length < this.scopeRuntime.docNameMinLength) return null;
+        const docTokens = tokenizeForScope(docText, this.scopeRuntime);
+        const score = lexicalOverlapScore(scopeTokens, docTokens);
+        if (score < this.scopeRuntime.tokenOverlapThreshold) return null;
+        return { docId: doc.docId, score };
+      })
+      .filter(
+        (entry): entry is { docId: string; score: number } =>
+          Boolean(entry?.docId),
+      )
+      .sort((a, b) => b.score - a.score);
+
+    const lexicalMatchedDocIds = new Set(lexicalMatches.map((entry) => entry.docId));
+    const resolverCandidates = (resolution.matchedDocIds || []).filter(Boolean);
+    const mentionSignalCorpus = normalizeForExactMention(
+      `${message}\n${mentionSignals.join(" ")}`,
+    );
+    const resolverQualifiedDocIds = resolverCandidates.filter((docId) => {
+      const doc = referenceDocs.find((item) => item.docId === docId);
+      if (!doc) return false;
+      const names = [doc.filename, doc.title]
+        .map((value) => normalizeForExactMention(String(value || "")))
+        .filter(Boolean);
+      if (names.length === 0) return false;
+      return names.some((name) => mentionSignalCorpus.includes(name));
+    });
+
+    // Strict acceptance: lexical threshold wins; resolver-only fallback is
+    // allowed only for explicit high-confidence exact mentions.
+    let matched: string[] = Array.from(lexicalMatchedDocIds);
+    if (matched.length === 0) {
+      const resolverOnlyAllowed =
+        resolution.explicitDocRef &&
+        resolution.method === "exact" &&
+        resolution.confidence >= 0.9 &&
+        resolverQualifiedDocIds.length > 0;
+      if (!resolverOnlyAllowed) return [];
+      matched = resolverQualifiedDocIds;
+    }
 
     logger.debug("[Scope] document mention matches", {
-      matchedIds: resolution.matchedDocIds,
+      matchedIds: matched,
+      lexicalMatches: lexicalMatches.map((entry) => ({
+        docId: entry.docId,
+        score: entry.score,
+      })),
       docsChecked: docs.length,
       confidence: resolution.confidence,
       method: resolution.method,
       candidates: resolution.candidates,
+      mentionSignals,
     });
 
-    return resolution.matchedDocIds;
+    return matched;
   }
 
   private async postProcess(

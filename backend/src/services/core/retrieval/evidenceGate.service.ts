@@ -108,7 +108,7 @@ function compileRegexMap(
 }
 
 function resolveEvidenceGateRuntimeConfig(): EvidenceGateRuntimeConfig {
-  const policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
+  const policyBank = getBankLoaderInstance().getBank<Record<string, unknown>>("memory_policy");
   const gate = policyBank?.config?.runtimeTuning?.evidenceGate;
   if (!gate || typeof gate !== "object") {
     throw new Error(

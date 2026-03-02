@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { getBankLoaderInstance } from "./bankLoader.service";
 
 export type DocumentIntelligenceDomain =
@@ -105,8 +103,8 @@ export interface DocumentIntelligenceBankDiagnostics {
 }
 
 interface BankLoaderLike {
-  getBank<T = any>(bankId: string): T;
-  getOptionalBank?<T = any>(bankId: string): T | null;
+  getBank<T = unknown>(bankId: string): T;
+  getOptionalBank?<T = unknown>(bankId: string): T | null;
   listLoaded(): string[];
 }
 
@@ -223,9 +221,10 @@ function lower(value: unknown): string {
     .toLowerCase();
 }
 
-function getArrayCount(bank: any): number {
+function getArrayCount(bank: unknown): number {
   if (!bank || typeof bank !== "object") return 0;
 
+  const record = bank as Record<string, unknown>;
   const candidateArrayKeys = [
     "rules",
     "aliases",
@@ -239,11 +238,11 @@ function getArrayCount(bank: any): number {
   ];
 
   for (const key of candidateArrayKeys) {
-    if (Array.isArray(bank[key])) return bank[key].length;
+    if (Array.isArray(record[key])) return (record[key] as unknown[]).length;
   }
 
-  if (bank.entries && typeof bank.entries === "object") {
-    return Object.keys(bank.entries).length;
+  if (record.entries && typeof record.entries === "object") {
+    return Object.keys(record.entries as Record<string, unknown>).length;
   }
 
   return 0;
@@ -260,7 +259,7 @@ export class DocumentIntelligenceBanksService {
     this.cache.clear();
   }
 
-  private getCachedRequired<T = any>(bankId: string): T {
+  private getCachedRequired<T = unknown>(bankId: string): T {
     if (this.cache.has(bankId)) {
       const cached = this.cache.get(bankId);
       if (cached === MISSING) {
@@ -274,7 +273,7 @@ export class DocumentIntelligenceBanksService {
     return bank;
   }
 
-  private getCachedOptional<T = any>(bankId: string): T | null {
+  private getCachedOptional<T = unknown>(bankId: string): T | null {
     if (this.cache.has(bankId)) {
       const cached = this.cache.get(bankId);
       return cached === MISSING ? null : (cached as T);
@@ -299,8 +298,8 @@ export class DocumentIntelligenceBanksService {
     return bank;
   }
 
-  getDocumentIntelligenceMap(): any | null {
-    return this.getCachedOptional<any>("document_intelligence_bank_map");
+  getDocumentIntelligenceMap(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("document_intelligence_bank_map");
   }
 
   getDocumentIntelligenceDomains(): DocumentIntelligenceDomain[] {
@@ -339,22 +338,22 @@ export class DocumentIntelligenceBanksService {
     return normalized;
   }
 
-  getDocTaxonomy(): any {
-    return this.getCachedRequired<any>("doc_taxonomy");
+  getDocTaxonomy(): Record<string, unknown> {
+    return this.getCachedRequired<Record<string, unknown>>("doc_taxonomy");
   }
 
-  getDocArchetypes(domain: DocumentIntelligenceDomain): any {
+  getDocArchetypes(domain: DocumentIntelligenceDomain): Record<string, unknown> {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocArchetypes");
-    return this.getCachedRequired<any>(`doc_archetypes_${normalized}`);
+    return this.getCachedRequired<Record<string, unknown>>(`doc_archetypes_${normalized}`);
   }
 
-  getDocAliases(domain: DocumentIntelligenceDomain): any {
+  getDocAliases(domain: DocumentIntelligenceDomain): Record<string, unknown> {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocAliases");
-    return this.getCachedRequired<any>(`doc_aliases_${normalized}`);
+    return this.getCachedRequired<Record<string, unknown>>(`doc_aliases_${normalized}`);
   }
 
-  getLegacyDocAliases(): any | null {
-    return this.getCachedOptional<any>("doc_aliases");
+  getLegacyDocAliases(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("doc_aliases");
   }
 
   getDocAliasThresholds(): DocAliasThresholds {
@@ -371,7 +370,7 @@ export class DocumentIntelligenceBanksService {
     );
 
     const domainAliasMins = DOMAINS.map((domain) => {
-      const bank = this.getCachedOptional<any>(`doc_aliases_${domain}`);
+      const bank = this.getCachedOptional<Record<string, unknown>>(`doc_aliases_${domain}`);
       return asNumber(bank?.config?.minAliasConfidence);
     }).filter((v): v is number => v != null);
 
@@ -392,7 +391,7 @@ export class DocumentIntelligenceBanksService {
     const aliases: Array<Record<string, unknown>> = [];
 
     for (const domain of DOMAINS) {
-      const bank = this.getCachedOptional<any>(`doc_aliases_${domain}`);
+      const bank = this.getCachedOptional<Record<string, unknown>>(`doc_aliases_${domain}`);
       if (!bank) continue;
       const bankAliases = Array.isArray(bank.aliases) ? bank.aliases : [];
       for (const entry of bankAliases) {
@@ -426,13 +425,14 @@ export class DocumentIntelligenceBanksService {
     const phrases: string[] = [];
 
     for (const domain of DOMAINS) {
-      const bank = this.getCachedOptional<any>(`doc_aliases_${domain}`);
+      const bank = this.getCachedOptional<Record<string, unknown>>(`doc_aliases_${domain}`);
       if (!bank) continue;
       const aliases = Array.isArray(bank.aliases) ? bank.aliases : [];
       for (const entry of aliases) {
         if (!entry || typeof entry !== "object") continue;
-        const phrase = lower((entry as any).phrase ?? (entry as any).alias);
-        const normalized = lower((entry as any).normalized);
+        const entryRecord = entry as Record<string, unknown>;
+        const phrase = lower(entryRecord.phrase ?? entryRecord.alias);
+        const normalized = lower(entryRecord.normalized);
         if (phrase) phrases.push(phrase);
         if (normalized) phrases.push(normalized);
       }
@@ -444,181 +444,181 @@ export class DocumentIntelligenceBanksService {
   getOperatorPlaybook(
     operator: DocumentIntelligenceOperator,
     domain: DocumentIntelligenceDomain,
-  ): any {
+  ): Record<string, unknown> {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getOperatorPlaybook",
     );
-    return this.getCachedRequired<any>(
+    return this.getCachedRequired<Record<string, unknown>>(
       `operator_playbook_${operator}_${normalized}`,
     );
   }
 
-  getFileActionOperators(): any | null {
-    return this.getCachedOptional<any>("file_action_operators");
+  getFileActionOperators(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("file_action_operators");
   }
 
-  getRetrievalBoostRules(domain: DocumentIntelligenceDomain): any | null {
+  getRetrievalBoostRules(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getRetrievalBoostRules",
     );
-    return this.getCachedOptional<any>(`boost_rules_${normalized}`);
+    return this.getCachedOptional<Record<string, unknown>>(`boost_rules_${normalized}`);
   }
 
-  getQueryRewriteRules(domain: DocumentIntelligenceDomain): any | null {
+  getQueryRewriteRules(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getQueryRewriteRules",
     );
-    return this.getCachedOptional<any>(`query_rewrites_${normalized}`);
+    return this.getCachedOptional<Record<string, unknown>>(`query_rewrites_${normalized}`);
   }
 
-  getSectionPriorityRules(domain: DocumentIntelligenceDomain): any | null {
+  getSectionPriorityRules(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getSectionPriorityRules",
     );
-    return this.getCachedOptional<any>(`section_priority_${normalized}`);
+    return this.getCachedOptional<Record<string, unknown>>(`section_priority_${normalized}`);
   }
 
-  getCrossDocGroundingPolicy(): any | null {
-    return this.getCachedOptional<any>("allybi_crossdoc_grounding");
+  getCrossDocGroundingPolicy(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("allybi_crossdoc_grounding");
   }
 
-  getQualityGateBank(type: DocumentIntelligenceQualityGateType): any | null {
-    return this.getCachedOptional<any>(type);
+  getQualityGateBank(type: DocumentIntelligenceQualityGateType): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>(type);
   }
 
-  getEntityPatterns(type: DocumentIntelligenceEntityPatternType): any {
-    return this.getCachedRequired<any>(type);
+  getEntityPatterns(type: DocumentIntelligenceEntityPatternType): Record<string, unknown> {
+    return this.getCachedRequired<Record<string, unknown>>(type);
   }
 
-  getStructurePatterns(type: DocumentIntelligenceStructurePatternType): any {
-    return this.getCachedRequired<any>(type);
+  getStructurePatterns(type: DocumentIntelligenceStructurePatternType): Record<string, unknown> {
+    return this.getCachedRequired<Record<string, unknown>>(type);
   }
 
-  getExcelNumberFormats(): any {
-    return this.getCachedRequired<any>("excel_number_formats");
+  getExcelNumberFormats(): Record<string, unknown> {
+    return this.getCachedRequired<Record<string, unknown>>("excel_number_formats");
   }
 
-  getDocxHeadingLevels(lang: DocxHeadingLang): any {
-    return this.getCachedRequired<any>(`docx_heading_levels_${lang}`);
+  getDocxHeadingLevels(lang: DocxHeadingLang): Record<string, unknown> {
+    return this.getCachedRequired<Record<string, unknown>>(`docx_heading_levels_${lang}`);
   }
 
-  getMarketingKeywordTaxonomy(domain: DocumentIntelligenceDomain): any | null {
+  getMarketingKeywordTaxonomy(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getMarketingKeywordTaxonomy",
     );
-    return this.getCachedOptional<any>(`keyword_taxonomy_${normalized}`);
+    return this.getCachedOptional<Record<string, unknown>>(`keyword_taxonomy_${normalized}`);
   }
 
-  getMarketingPainPoints(domain: DocumentIntelligenceDomain): any | null {
+  getMarketingPainPoints(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getMarketingPainPoints",
     );
-    return this.getCachedOptional<any>(`pain_points_${normalized}`);
+    return this.getCachedOptional<Record<string, unknown>>(`pain_points_${normalized}`);
   }
 
-  getMarketingPatternLibrary(): any | null {
-    return this.getCachedOptional<any>("pattern_library");
+  getMarketingPatternLibrary(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("pattern_library");
   }
 
-  getRoutingPriority(): any | null {
-    return this.getCachedOptional<any>("routing_priority");
+  getRoutingPriority(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("routing_priority");
   }
 
-  getRoutingBank(bankId: "connectors_routing" | "email_routing"): any | null {
-    return this.getCachedOptional<any>(bankId);
+  getRoutingBank(bankId: "connectors_routing" | "email_routing"): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>(bankId);
   }
 
   // ── Document Intelligence Domain Banks ──────────────────────────────
 
-  getDomainProfile(domain: DocumentIntelligenceDomain): any | null {
+  getDomainProfile(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDomainProfile");
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_domain_profile`,
     );
   }
 
-  getDomainDetectionRules(domain: DocumentIntelligenceDomain): any | null {
+  getDomainDetectionRules(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getDomainDetectionRules",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_domain_detection_rules`,
     );
   }
 
-  getAnswerStyleBank(domain: DocumentIntelligenceDomain): any | null {
+  getAnswerStyleBank(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getAnswerStyleBank",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_answer_style_bank`,
     );
   }
 
-  getEvidenceRequirements(domain: DocumentIntelligenceDomain): any | null {
+  getEvidenceRequirements(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getEvidenceRequirements",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_evidence_requirements`,
     );
   }
 
-  getReasoningScaffolds(domain: DocumentIntelligenceDomain): any | null {
+  getReasoningScaffolds(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getReasoningScaffolds",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_reasoning_scaffolds`,
     );
   }
 
-  getRetrievalStrategies(domain: DocumentIntelligenceDomain): any | null {
+  getRetrievalStrategies(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getRetrievalStrategies",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_retrieval_strategies`,
     );
   }
 
-  getDisclaimerPolicy(domain: DocumentIntelligenceDomain): any | null {
+  getDisclaimerPolicy(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getDisclaimerPolicy",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_disclaimer_policy`,
     );
   }
 
-  getRedactionAndSafetyRules(domain: DocumentIntelligenceDomain): any | null {
+  getRedactionAndSafetyRules(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getRedactionAndSafetyRules",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_redaction_and_safety_rules`,
     );
   }
 
-  getValidationPolicies(domain: DocumentIntelligenceDomain): any | null {
+  getValidationPolicies(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getValidationPolicies",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_validation_policies`,
     );
   }
@@ -626,9 +626,9 @@ export class DocumentIntelligenceBanksService {
   getDomainLexicon(
     domain: DocumentIntelligenceDomain,
     locale: "en" | "pt",
-  ): any | null {
+  ): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDomainLexicon");
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_lexicon_${locale}`,
     );
   }
@@ -636,19 +636,19 @@ export class DocumentIntelligenceBanksService {
   getDomainAbbreviations(
     domain: DocumentIntelligenceDomain,
     locale: "en" | "pt",
-  ): any | null {
+  ): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getDomainAbbreviations",
     );
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_abbreviations_${locale}`,
     );
   }
 
-  getDocTypeCatalog(domain: DocumentIntelligenceDomain): any | null {
+  getDocTypeCatalog(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeCatalog");
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_doc_type_catalog`,
     );
   }
@@ -656,14 +656,14 @@ export class DocumentIntelligenceBanksService {
   getDocTypeSections(
     domain: DocumentIntelligenceDomain,
     docType: string,
-  ): any | null {
+  ): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getDocTypeSections",
     );
     const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
     if (!lookupDocType) return null;
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_${lookupDocType}_sections`,
     );
   }
@@ -671,14 +671,14 @@ export class DocumentIntelligenceBanksService {
   getDocTypeExtractionHints(
     domain: DocumentIntelligenceDomain,
     docType: string,
-  ): any | null {
+  ): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(
       domain,
       "getDocTypeExtractionHints",
     );
     const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
     if (!lookupDocType) return null;
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_${lookupDocType}_extraction_hints`,
     );
   }
@@ -686,11 +686,11 @@ export class DocumentIntelligenceBanksService {
   getDocTypeTables(
     domain: DocumentIntelligenceDomain,
     docType: string,
-  ): any | null {
+  ): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeTables");
     const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
     if (!lookupDocType) return null;
-    return this.getCachedOptional<any>(
+    return this.getCachedOptional<Record<string, unknown>>(
       `${domainBankPrefix(normalized)}_${lookupDocType}_tables`,
     );
   }
@@ -711,42 +711,42 @@ export class DocumentIntelligenceBanksService {
 
   // ── Document Intelligence Ontology Banks ────────────────────────────
 
-  getDiOntology(type: DocumentIntelligenceOntologyType): any | null {
-    return this.getCachedOptional<any>(`di_${type}_ontology`);
+  getDiOntology(type: DocumentIntelligenceOntologyType): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>(`di_${type}_ontology`);
   }
 
-  getDiNormalizationRules(): any | null {
-    return this.getCachedOptional<any>("di_normalization_rules");
+  getDiNormalizationRules(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("di_normalization_rules");
   }
 
-  getDiAbbreviationGlobal(): any | null {
-    return this.getCachedOptional<any>("di_abbreviation_global");
+  getDiAbbreviationGlobal(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("di_abbreviation_global");
   }
 
   // ── Document Intelligence Manifest Banks ────────────────────────────
 
-  getDiSchemaRegistry(): any | null {
-    return this.getCachedOptional<any>("document_intelligence_schema_registry");
+  getDiSchemaRegistry(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("document_intelligence_schema_registry");
   }
 
-  getDiOrphanAllowlist(): any | null {
-    return this.getCachedOptional<any>(
+  getDiOrphanAllowlist(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>(
       "document_intelligence_orphan_allowlist",
     );
   }
 
-  getDiDependencyGraph(): any | null {
-    return this.getCachedOptional<any>(
+  getDiDependencyGraph(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>(
       "document_intelligence_dependency_graph",
     );
   }
 
-  getDiUsageManifest(): any | null {
-    return this.getCachedOptional<any>("document_intelligence_usage_manifest");
+  getDiUsageManifest(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>("document_intelligence_usage_manifest");
   }
 
-  getDiRuntimeWiringGates(): any | null {
-    return this.getCachedOptional<any>(
+  getDiRuntimeWiringGates(): Record<string, unknown> | null {
+    return this.getCachedOptional<Record<string, unknown>>(
       "document_intelligence_runtime_wiring_gates",
     );
   }
@@ -818,7 +818,7 @@ export class DocumentIntelligenceBanksService {
     const validationWarnings: string[] = [];
 
     for (const bankId of bankIds) {
-      const bank = this.getCachedOptional<any>(bankId);
+      const bank = this.getCachedOptional<Record<string, unknown>>(bankId);
       if (!bank) {
         if (requiredIds.includes(bankId)) {
           validationWarnings.push(`Missing required bank: ${bankId}`);

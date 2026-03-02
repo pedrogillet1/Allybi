@@ -33,4 +33,47 @@ describe("chatResultEnvelope", () => {
       },
     });
   });
+
+  test("includes user warning payload in final SSE envelope", () => {
+    const event = toChatFinalEvent({
+      conversationId: "conv-2",
+      userMessageId: "user-2",
+      assistantMessageId: "assistant-2",
+      assistantText: "partial answer",
+      answerMode: "doc_grounded_single",
+      sources: [{ documentId: "doc-1", filename: "report.pdf", mimeType: "application/pdf", page: 1 }],
+      userWarning: {
+        code: "quality_gate_blocked",
+        message: "Not all quality checks passed. Please verify key points against the sources.",
+        severity: "warning",
+        source: "quality_gate",
+      },
+      warnings: [
+        {
+          code: "quality_gate_blocked",
+          message:
+            "Not all quality checks passed. Please verify key points against the sources.",
+          severity: "warning",
+          source: "quality_gate",
+        },
+      ],
+    } as any);
+
+    expect((event as any).userWarning).toEqual({
+      code: "quality_gate_blocked",
+      message:
+        "Not all quality checks passed. Please verify key points against the sources.",
+      severity: "warning",
+      source: "quality_gate",
+    });
+    expect((event as any).warnings).toEqual([
+      {
+        code: "quality_gate_blocked",
+        message:
+          "Not all quality checks passed. Please verify key points against the sources.",
+        severity: "warning",
+        source: "quality_gate",
+      },
+    ]);
+  });
 });

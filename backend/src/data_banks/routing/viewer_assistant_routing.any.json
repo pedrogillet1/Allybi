@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "viewer_assistant_routing",
+    "version": "1.0.0",
+    "description": "Routing contract for Ask Allybi inside document viewer mode. Enforces qa_locked behavior, single-document scope, and deterministic source-jump intent handling.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-02",
+    "owner": "allybi-viewer"
+  },
+  "config": {
+    "enabled": true,
+    "failOpen": false,
+    "defaultViewerIntent": "qa_locked"
+  },
+  "rules": [
+    {
+      "id": "viewer_intent_qa_locked_forces_qa_path",
+      "priority": 100,
+      "when": {
+        "meta.viewerIntent": "qa_locked"
+      },
+      "then": {
+        "path": "qa",
+        "answerMode": "doc_grounded_single",
+        "docScope": "active_document_only",
+        "setSignals": {
+          "explicitDocLock": true,
+          "singleDocIntent": true,
+          "hardScopeActive": true
+        }
+      }
+    },
+    {
+      "id": "viewer_mode_defaults_to_locked_scope",
+      "priority": 90,
+      "when": {
+        "meta.viewerMode": true,
+        "meta.viewerIntent_not": "edit"
+      },
+      "then": {
+        "path": "qa",
+        "answerMode": "doc_grounded_single",
+        "docScope": "active_document_only"
+      }
+    },
+    {
+      "id": "viewer_source_jump_same_document",
+      "priority": 80,
+      "when": {
+        "event": "source_click",
+        "source.documentId_equals_activeDocumentId": true
+      },
+      "then": {
+        "navigation": "same_doc_animated_jump",
+        "preserveChatState": true
+      }
+    },
+    {
+      "id": "viewer_source_jump_cross_document",
+      "priority": 70,
+      "when": {
+        "event": "source_click",
+        "source.documentId_equals_activeDocumentId": false
+      },
+      "then": {
+        "navigation": "open_target_document",
+        "propagateSourceJumpState": true,
+        "carryViewerIntent": "qa_locked"
+      }
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "VR_0001_locked_intent_forces_qa",
+        "assert": "meta.viewerIntent == qa_locked => route.path == qa && docScope == active_document_only"
+      },
+      {
+        "id": "VR_0002_same_doc_source_click_animates",
+        "assert": "source click for active doc triggers same_doc_animated_jump"
+      },
+      {
+        "id": "VR_0003_cross_doc_source_click_navigates",
+        "assert": "source click for non-active doc triggers open_target_document with sourceJump state"
+      }
+    ]
+  }
+}

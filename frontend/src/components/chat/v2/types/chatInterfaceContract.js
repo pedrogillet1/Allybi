@@ -8,6 +8,8 @@ export const CHAT_INTERFACE_PROP_KEYS = [
   "viewerDraftApproval",
   "viewerSelection",
   "viewerContext",
+  "viewerIntent",
+  "onViewerSourceNavigate",
   "onClearViewerSelection",
   "focusNonce",
   "apiRef",

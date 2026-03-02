@@ -160,6 +160,26 @@ describe("ruleInterpreter", () => {
     expect(decision.actualExplicitDocs).toBe(1);
   });
 
+  test("single-document compare stays allowed when scope resolves to one doc", () => {
+    const decision = enforceCrossDocPolicy(
+      baseCtx({
+        explicitDocsCount: 1,
+        explicitDocIds: ["doc-a"],
+        candidateDocIds: ["doc-a"],
+      }),
+      {
+        config: { enabled: true },
+        retrievalPolicy: {
+          maxSourceDocuments: 5,
+        },
+      },
+    );
+
+    expect(decision.allow).toBe(true);
+    expect(decision.reasonCode).toBeNull();
+    expect(decision.allowedCandidateDocIds).toEqual(["doc-a"]);
+  });
+
   test("docset lock with multiple explicit docs is not blocked by docLock gate", () => {
     const decision = enforceCrossDocPolicy(
       baseCtx({

@@ -130,6 +130,20 @@ export default function ChatScreen() {
   }, [location.state]);
 
   useEffect(() => {
+    const routeId = String(urlConversationId || "").trim();
+    if (!routeId || routeId === "new") return;
+    explicitNewChatRef.current = false;
+    hasHydratedFromStorageRef.current = true;
+    setCurrentConversation((prev) => {
+      const prevId = String(prev?.id || "").trim();
+      if (prevId === routeId) {
+        return prev?.isEphemeral ? { ...prev, isEphemeral: false } : prev;
+      }
+      return { id: routeId, title: "Loading…", isEphemeral: false };
+    });
+  }, [urlConversationId]);
+
+  useEffect(() => {
     if (hydratedStorageKeyRef.current !== conversationStorageKey) {
       hydratedStorageKeyRef.current = conversationStorageKey;
       hasHydratedFromStorageRef.current = false;

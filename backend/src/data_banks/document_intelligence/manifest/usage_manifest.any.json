@@ -6,7 +6,18 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-02",
+    "owner": "koda-document-intelligence",
+    "dependsOn": [
+      "bank_registry",
+      "document_intelligence_bank_map"
+    ],
+    "usedBy": [
+      "services/core/banks/documentIntelligenceIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/document-intelligence/docint-orphan-detection.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

@@ -50,6 +50,9 @@
     "test:cert:evidence-fidelity": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/evidence-fidelity.cert.test.ts --runInBand",
     "test:cert:provenance-strictness": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/provenance-strictness.cert.test.ts --runInBand",
     "test:cert:prompt-mode-coverage": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/prompt-mode-coverage.cert.test.ts --runInBand",
+    "test:cert:builder-payload-budget": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/builder-payload-budget.cert.test.ts --runInBand",
+    "test:cert:gateway-json-routing": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/gateway-json-routing.cert.test.ts --runInBand",
+    "test:cert:query-latency": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/query-latency.cert.test.ts --runInBand",
     "test:cert:turn-debug-packet": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/turn-debug-packet.cert.test.ts --runInBand",
     "test:cert:security-auth": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/security-auth.cert.test.ts --runInBand",
     "test:cert:observability-integrity": "jest --config jest.config.cjs --runTestsByPath src/tests/certification/observability-integrity.cert.test.ts --runInBand",
@@ -148,7 +151,12 @@
     "verify:schema": "prisma db push && prisma generate && echo 'Schema synced successfully (safe mode)'",
     "verify:schema:force": "prisma db push --accept-data-loss && prisma generate && echo 'Schema synced successfully (force mode - data may be lost)'",
     "compile:templates": "ts-node --transpile-only scripts/compile-html-templates.ts",
-    "compile:templates:agency": "ts-node --transpile-only scripts/compile-html-templates.ts --pack-dir \"template_packs/koda_agency_pack_v1\" --pack-name \"agency-v1\" --include-variants"
+    "compile:templates:agency": "ts-node --transpile-only scripts/compile-html-templates.ts --pack-dir \"template_packs/koda_agency_pack_v1\" --pack-name \"agency-v1\" --include-variants",
+    "test:cert:operator-gates": "npm run test:cert:wrong-doc && npm run test:cert:evidence-fidelity && npm run test:cert:enforcer-failclosed && npm run test:cert:security-auth",
+    "test:editing:python-semantic": "jest --config jest.config.cjs --runInBand src/tests/editing/xlsx-semantic.test.ts src/tests/editing/bankMutationProof.test.ts",
+    "audit:operators:grade": "node scripts/audit/operator-systems-grade.mjs",
+    "audit:operators:grade:strict": "node scripts/audit/operator-systems-grade.mjs --strict",
+    "audit:operators:a-plus": "npm run test:cert:operator-gates && npm run integrations:agents:grade:strict && npm run audit:routing && npm run audit:editing:strict && npm run test:editing:python-semantic && npm run test:cert:editing-eval && npm run audit:p0:strict && npm run audit:operators:grade:strict"
   },
   "lint-staged": {
     "src/**/*.ts": [

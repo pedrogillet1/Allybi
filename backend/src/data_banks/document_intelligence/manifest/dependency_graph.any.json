@@ -6,7 +6,18 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-02",
+    "owner": "koda-document-intelligence",
+    "dependsOn": [
+      "bank_registry",
+      "document_intelligence_bank_map"
+    ],
+    "usedBy": [
+      "services/core/banks/documentIntelligenceIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -31,6 +42,12 @@
       "id": "assumption_policy",
       "dependsOn": [
         "clarification_policy"
+      ]
+    },
+    {
+      "id": "boost_rules_accounting",
+      "dependsOn": [
+        "doc_archetypes_accounting"
       ]
     },
     {
@@ -1210,6 +1227,12 @@
       ]
     },
     {
+      "id": "query_rewrites_accounting",
+      "dependsOn": [
+        "doc_archetypes_accounting"
+      ]
+    },
+    {
       "id": "query_rewrites_finance",
       "dependsOn": [
         "doc_aliases_finance"
@@ -1231,6 +1254,12 @@
       "id": "query_rewrites_ops",
       "dependsOn": [
         "doc_aliases_ops"
+      ]
+    },
+    {
+      "id": "section_priority_accounting",
+      "dependsOn": [
+        "doc_archetypes_accounting"
       ]
     },
     {

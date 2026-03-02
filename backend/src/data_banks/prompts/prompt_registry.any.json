@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "prompt_registry",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "description": "Canonical runtime prompt registry. Defines layered prompt composition and deterministic task selection.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true,
@@ -40,20 +40,6 @@
       "required": true,
       "purpose": "Editing mode behavior.",
       "appliesTo": { "operators": ["rewrite", "translate", "format", "plan_edit"] }
-    },
-    {
-      "id": "mode_editing_docx",
-      "path": "prompts/mode_editing_docx.any.json",
-      "required": false,
-      "purpose": "Domain-specific editing mode for DOCX agent.",
-      "appliesTo": { "operators": ["plan_docx"] }
-    },
-    {
-      "id": "mode_editing_sheets",
-      "path": "prompts/mode_editing_sheets.any.json",
-      "required": false,
-      "purpose": "Domain-specific editing mode for Sheets agent.",
-      "appliesTo": { "operators": ["plan_xlsx"] }
     },
     {
       "id": "rag_policy",
@@ -127,81 +113,11 @@
     "fallback": ["system_base", "mode_chat", "fallback_prompt", "policy_citations"],
     "tool": ["system_base", "mode_editing", "editing_task_prompts", "task_plan_generation", "policy_citations", "tool_prompts"]
   },
-  "selectionRules": {
-    "_comment": "Deterministic ordering. No unconditional catch-all before specialized rules.",
-    "rulesOrder": [
-      "use_disambiguation_prompt",
-      "use_retrieval_prompt_for_discovery",
-      "use_docx_editing_mode_prompt",
-      "use_sheets_editing_mode_prompt",
-      "use_fallback_prompt",
-      "use_compose_answer_prompt_default"
-    ],
-    "rules": [
-      {
-        "id": "use_disambiguation_prompt",
-        "when": {
-          "any": [
-            { "path": "answerMode", "op": "eq", "value": "rank_disambiguate" },
-            { "path": "signals.needsClarification", "op": "eq", "value": true }
-          ]
-        },
-        "then": { "promptId": "disambiguation_prompt" }
-      },
-      {
-        "id": "use_retrieval_prompt_for_discovery",
-        "when": {
-          "any": [
-            { "path": "operator", "op": "eq", "value": "locate_docs" },
-            { "path": "signals.discoveryQuery", "op": "eq", "value": true }
-          ]
-        },
-        "then": { "promptId": "retrieval_prompt" }
-      },
-      {
-        "id": "use_docx_editing_mode_prompt",
-        "when": {
-          "any": [
-            { "path": "domain", "op": "eq", "value": "docx" },
-            { "path": "editingAgent", "op": "eq", "value": "edit_agent_docx" }
-          ]
-        },
-        "then": { "promptId": "mode_editing_docx" }
-      },
-      {
-        "id": "use_sheets_editing_mode_prompt",
-        "when": {
-          "any": [
-            { "path": "domain", "op": "eq", "value": "sheets" },
-            { "path": "editingAgent", "op": "eq", "value": "edit_agent_sheets" }
-          ]
-        },
-        "then": { "promptId": "mode_editing_sheets" }
-      },
-      {
-        "id": "use_fallback_prompt",
-        "when": {
-          "any": [
-            { "path": "answerMode", "op": "eq", "value": "no_docs" },
-            { "path": "answerMode", "op": "eq", "value": "scoped_not_found" },
-            { "path": "signals.forceFallback", "op": "eq", "value": true },
-            { "path": "retrieval.reasonCode", "op": "in", "value": ["scope_hard_constraints_empty", "no_relevant_chunks_in_scoped_docs", "indexing_in_progress", "extraction_failed"] }
-          ]
-        },
-        "then": { "promptId": "fallback_prompt" }
-      },
-      {
-        "id": "use_compose_answer_prompt_default",
-        "when": { "any": true },
-        "then": { "promptId": "task_answer_with_sources" }
-      }
-    ]
-  },
   "tests": {
     "cases": [
       {
         "id": "PR_1001_registry_has_no_unreachable_rules",
-        "assert": "no selectionRules.rules entry appears after an unconditional any:true rule"
+        "assert": "layersByKind references only existing prompt files"
       },
       {
         "id": "PR_1002_layered_compose_order",

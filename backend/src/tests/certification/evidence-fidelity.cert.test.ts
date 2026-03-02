@@ -3,16 +3,20 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { writeCertificationGateReport } from "./reporting";
 
 const mockGetBank = jest.fn();
+const mockGetOptionalBank = jest.fn();
 
 jest.mock("../../services/core/banks/bankLoader.service", () => ({
   __esModule: true,
   getBank: (...args: unknown[]) => mockGetBank(...args),
+  getOptionalBank: (...args: unknown[]) => mockGetOptionalBank(...args),
 }));
 
 describe("Certification: evidence fidelity", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
+    mockGetOptionalBank.mockReset();
     mockGetBank.mockReturnValue(null);
+    mockGetOptionalBank.mockReturnValue(null);
   });
 
   test("doc-grounded output enforces structured provenance map integrity", async () => {

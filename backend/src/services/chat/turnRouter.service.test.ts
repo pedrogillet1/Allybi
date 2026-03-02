@@ -599,4 +599,154 @@ describe("TurnRouterService.decide()", () => {
       }),
     );
   });
+
+  // -------------------------------------------------------------------------
+  // P0-4: Connector permission default-deny in buildConnectorDecisionContext
+  // -------------------------------------------------------------------------
+  describe("P0-4: hasConnectorReadPermission default-deny", () => {
+    test("hasConnectorReadPermission undefined → passes false to route policy", () => {
+      const routePolicy = {
+        resolveConnectorDecision: jest.fn(() => null),
+        isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+      };
+      const intentConfig = {
+        decide: jest
+          .fn<() => IntentDecisionOutput>()
+          .mockReturnValue(makeDecisionOutput("help")),
+      };
+
+      const router = new TurnRouterService(routePolicy as any, intentConfig);
+      const ctx = makeCtx({
+        messageText: "sync gmail",
+        connectors: {
+          activeConnector: "gmail",
+          connected: { gmail: true },
+        },
+        request: {
+          userId: "user-1",
+          message: "sync gmail",
+          // signals present but hasConnectorReadPermission is undefined
+          context: { signals: {} },
+        },
+      });
+
+      router.decide(ctx);
+
+      expect(routePolicy.resolveConnectorDecision).toHaveBeenCalledWith(
+        "sync gmail",
+        "en",
+        expect.objectContaining({
+          hasConnectorReadPermission: false,
+        }),
+      );
+    });
+
+    test("hasConnectorReadPermission true → passes true to route policy", () => {
+      const routePolicy = {
+        resolveConnectorDecision: jest.fn(() => null),
+        isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+      };
+      const intentConfig = {
+        decide: jest
+          .fn<() => IntentDecisionOutput>()
+          .mockReturnValue(makeDecisionOutput("help")),
+      };
+
+      const router = new TurnRouterService(routePolicy as any, intentConfig);
+      const ctx = makeCtx({
+        messageText: "sync gmail",
+        connectors: {
+          activeConnector: "gmail",
+          connected: { gmail: true },
+        },
+        request: {
+          userId: "user-1",
+          message: "sync gmail",
+          context: { signals: { hasConnectorReadPermission: true } },
+        },
+      });
+
+      router.decide(ctx);
+
+      expect(routePolicy.resolveConnectorDecision).toHaveBeenCalledWith(
+        "sync gmail",
+        "en",
+        expect.objectContaining({
+          hasConnectorReadPermission: true,
+        }),
+      );
+    });
+
+    test("hasConnectorReadPermission false → passes false to route policy", () => {
+      const routePolicy = {
+        resolveConnectorDecision: jest.fn(() => null),
+        isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+      };
+      const intentConfig = {
+        decide: jest
+          .fn<() => IntentDecisionOutput>()
+          .mockReturnValue(makeDecisionOutput("help")),
+      };
+
+      const router = new TurnRouterService(routePolicy as any, intentConfig);
+      const ctx = makeCtx({
+        messageText: "sync gmail",
+        connectors: {
+          activeConnector: "gmail",
+          connected: { gmail: true },
+        },
+        request: {
+          userId: "user-1",
+          message: "sync gmail",
+          context: { signals: { hasConnectorReadPermission: false } },
+        },
+      });
+
+      router.decide(ctx);
+
+      expect(routePolicy.resolveConnectorDecision).toHaveBeenCalledWith(
+        "sync gmail",
+        "en",
+        expect.objectContaining({
+          hasConnectorReadPermission: false,
+        }),
+      );
+    });
+
+    test("no signals object at all → passes false to route policy", () => {
+      const routePolicy = {
+        resolveConnectorDecision: jest.fn(() => null),
+        isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+      };
+      const intentConfig = {
+        decide: jest
+          .fn<() => IntentDecisionOutput>()
+          .mockReturnValue(makeDecisionOutput("help")),
+      };
+
+      const router = new TurnRouterService(routePolicy as any, intentConfig);
+      const ctx = makeCtx({
+        messageText: "sync gmail",
+        connectors: {
+          activeConnector: "gmail",
+          connected: { gmail: true },
+        },
+        request: {
+          userId: "user-1",
+          message: "sync gmail",
+          // no context at all
+        },
+      });
+
+      router.decide(ctx);
+
+      expect(routePolicy.resolveConnectorDecision).toHaveBeenCalledWith(
+        "sync gmail",
+        "en",
+        expect.objectContaining({
+          hasConnectorReadPermission: false,
+        }),
+      );
+    });
+  });
 });

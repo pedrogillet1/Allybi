@@ -24,14 +24,17 @@ function asArray(value: unknown): string[] {
 
 function buildInstruction(input: {
   canonicalOperator: string;
-  domain: "docx" | "sheets";
+  domain: "docx" | "sheets" | "python";
   requiredSlots: string[];
   variant: number;
 }): string {
   const chunks: string[] = [];
   chunks.push(`Apply ${input.canonicalOperator} now.`);
-  if (input.domain === "sheets") {
+  if (input.domain === "sheets" || input.domain === "python") {
     chunks.push(`Use sheet Sheet${(input.variant % 4) + 1}.`);
+    if (input.domain === "python") {
+      chunks.push("Use python-backed spreadsheet operations.");
+    }
   } else {
     chunks.push(`Apply to paragraph docx:p:${(input.variant % 7) + 1}.`);
   }
@@ -48,7 +51,7 @@ function buildInstruction(input: {
     else if (key.includes("language")) chunks.push("Target language pt.");
     else chunks.push(`${slot} is provided.`);
   }
-  if (input.domain === "sheets") {
+  if (input.domain === "sheets" || input.domain === "python") {
     chunks.push("This is a cell/range operation.");
   }
   return chunks.join(" ");
@@ -97,8 +100,11 @@ describe("Certification: editing eval suite", () => {
     let docxPassed = 0;
     let xlsxTotal = 0;
     let xlsxPassed = 0;
+    let pyTotal = 0;
+    let pyPassed = 0;
     const docxLatencies: number[] = [];
     const xlsxLatencies: number[] = [];
+    const pyLatencies: number[] = [];
 
     for (const [canonicalOperatorRaw, entry] of operators) {
       const canonicalOperator = String(canonicalOperatorRaw || "").trim();
@@ -106,12 +112,19 @@ describe("Certification: editing eval suite", () => {
         .trim()
         .toLowerCase();
       const domain =
-        rawDomain === "docx" ? "docx" : rawDomain === "excel" ? "sheets" : null;
+        rawDomain === "docx"
+          ? "docx"
+          : rawDomain === "excel"
+            ? "sheets"
+            : rawDomain === "python"
+              ? "python"
+              : null;
       if (!domain) continue;
       const runtimeOperator = String(
         (entry as any)?.runtimeOperator || "",
       ).trim();
       if (!runtimeOperator) continue;
+      const executionDomain = domain === "docx" ? "docx" : "sheets";
       const requiredSlots = asArray((entry as any)?.requiredSlots);
       for (let variant = 0; variant < 8; variant += 1) {
         const instruction = buildInstruction({
@@ -126,9 +139,10 @@ describe("Certification: editing eval suite", () => {
           operator: runtimeOperator as any,
           canonicalOperator,
           intentSource: "classified",
-          domain,
+          domain: executionDomain,
           documentId: `eval_${domain}_${canonicalOperator}_${variant}`,
-          targetHint: domain === "sheets" ? "Sheet1!A1:B12" : "docx:p:3",
+          targetHint:
+            executionDomain === "sheets" ? "Sheet1!A1:B12" : "docx:p:3",
           requiredEntities: [],
           preserveTokens: [],
         });
@@ -137,6 +151,10 @@ describe("Certification: editing eval suite", () => {
           docxTotal += 1;
           docxLatencies.push(elapsed);
           if (planned.ok) docxPassed += 1;
+        } else if (domain === "python") {
+          pyTotal += 1;
+          pyLatencies.push(elapsed);
+          if (planned.ok) pyPassed += 1;
         } else {
           xlsxTotal += 1;
           xlsxLatencies.push(elapsed);
@@ -147,8 +165,10 @@ describe("Certification: editing eval suite", () => {
 
     const docxPassRate = docxTotal > 0 ? docxPassed / docxTotal : 0;
     const xlsxPassRate = xlsxTotal > 0 ? xlsxPassed / xlsxTotal : 0;
+    const pyPassRate = pyTotal > 0 ? pyPassed / pyTotal : 0;
     const docxP95Ms = percentile(docxLatencies, 95);
     const xlsxP95Ms = percentile(xlsxLatencies, 95);
+    const pyP95Ms = percentile(pyLatencies, 95);
 
     type AdvCase = {
       trustLevel: EditTrustLevel;
@@ -190,6 +210,11 @@ describe("Certification: editing eval suite", () => {
         operator: "EDIT_DOCX_BUNDLE",
         canonicalOperator: "DOCX_FIND_REPLACE",
         domain: "docx",
+      },
+      {
+        operator: "PY_WRITEBACK",
+        canonicalOperator: "PY_WRITEBACK_RESULTS",
+        domain: "sheets",
       },
     ];
     for (const trust of trusts) {
@@ -296,12 +321,17 @@ describe("Certification: editing eval suite", () => {
 
     if (docxTotal < 150) failures.push(`DOCX_CASE_COUNT_LOW:${docxTotal}`);
     if (xlsxTotal < 200) failures.push(`XLSX_CASE_COUNT_LOW:${xlsxTotal}`);
+    if (pyTotal < 250) failures.push(`PY_CASE_COUNT_LOW:${pyTotal}`);
     if (advCases.length < 120)
       failures.push(`ADVERSARIAL_CASE_COUNT_LOW:${advCases.length}`);
     if (docxPassRate < thresholds.docxPassRateMin)
       failures.push(`DOCX_PASS_RATE_LOW:${docxPassRate.toFixed(4)}`);
     if (xlsxPassRate < thresholds.xlsxPassRateMin)
       failures.push(`XLSX_PASS_RATE_LOW:${xlsxPassRate.toFixed(4)}`);
+    if (pyPassRate < thresholds.pyPassRateMin)
+      failures.push(`PY_PASS_RATE_LOW:${pyPassRate.toFixed(4)}`);
+    if (pyP95Ms > thresholds.pyP95MsMax)
+      failures.push(`PY_P95_TOO_HIGH:${pyP95Ms}`);
     if (adversarialPassRate < thresholds.adversarialPassRateMin)
       failures.push(
         `ADVERSARIAL_PASS_RATE_LOW:${adversarialPassRate.toFixed(4)}`,
@@ -318,6 +348,10 @@ describe("Certification: editing eval suite", () => {
         xlsxPassed,
         xlsxPassRate: Number(xlsxPassRate.toFixed(6)),
         xlsxPlanP95Ms: xlsxP95Ms,
+        pyTotal,
+        pyPassed,
+        pyPassRate: Number(pyPassRate.toFixed(6)),
+        pyPlanP95Ms: pyP95Ms,
         adversarialTotal: advCases.length,
         adversarialPassed,
         adversarialPassRate: Number(adversarialPassRate.toFixed(6)),
@@ -326,9 +360,11 @@ describe("Certification: editing eval suite", () => {
       thresholds: {
         minDocxCases: 150,
         minXlsxCases: 200,
+        minPyCases: 250,
         minAdversarialCases: 120,
         docxPassRateMin: thresholds.docxPassRateMin,
         xlsxPassRateMin: thresholds.xlsxPassRateMin,
+        pyPassRateMin: thresholds.pyPassRateMin,
         adversarialPassRateMin: thresholds.adversarialPassRateMin,
       },
       failures,
@@ -336,9 +372,12 @@ describe("Certification: editing eval suite", () => {
 
     expect(docxTotal).toBeGreaterThanOrEqual(150);
     expect(xlsxTotal).toBeGreaterThanOrEqual(200);
+    expect(pyTotal).toBeGreaterThanOrEqual(250);
     expect(advCases.length).toBeGreaterThanOrEqual(120);
     expect(docxPassRate).toBeGreaterThanOrEqual(thresholds.docxPassRateMin);
     expect(xlsxPassRate).toBeGreaterThanOrEqual(thresholds.xlsxPassRateMin);
+    expect(pyPassRate).toBeGreaterThanOrEqual(thresholds.pyPassRateMin);
+    expect(pyP95Ms).toBeLessThanOrEqual(thresholds.pyP95MsMax);
     expect(adversarialPassRate).toBeGreaterThanOrEqual(
       thresholds.adversarialPassRateMin,
     );

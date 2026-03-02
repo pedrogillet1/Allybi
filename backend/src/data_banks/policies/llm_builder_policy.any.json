@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "llm_builder_policy",
+    "version": "1.0.0",
+    "description": "Central policy for LLM request-builder token floors and prompt payload caps.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-02"
+  },
+  "config": {
+    "enabled": true,
+    "docGroundedMinOutputTokensByMode": {
+      "doc_grounded_single": 900,
+      "doc_grounded_multi": 900,
+      "doc_grounded_quote": 700,
+      "doc_grounded_table": 1000
+    },
+    "styleClampModes": ["rank_disambiguate", "scoped_not_found", "refusal"],
+    "payloadCaps": {
+      "memoryCharsDefault": 4800,
+      "memoryCharsDocGrounded": 6800,
+      "userSectionCharsMax": 4200,
+      "toolContextCharsMax": 1400,
+      "totalUserPayloadCharsMax": 18000
+    },
+    "evidenceCapsByMode": {
+      "doc_grounded_single": {
+        "maxItems": 6,
+        "maxSnippetChars": 220,
+        "maxSectionChars": 2600
+      },
+      "doc_grounded_multi": {
+        "maxItems": 10,
+        "maxSnippetChars": 280,
+        "maxSectionChars": 3800
+      },
+      "doc_grounded_quote": {
+        "maxItems": 6,
+        "maxSnippetChars": 240,
+        "maxSectionChars": 2600
+      },
+      "doc_grounded_table": {
+        "maxItems": 8,
+        "maxSnippetChars": 260,
+        "maxSectionChars": 3200
+      }
+    }
+  }
+}

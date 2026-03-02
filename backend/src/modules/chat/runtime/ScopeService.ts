@@ -1,6 +1,7 @@
 import prisma from "../../../config/database";
 import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
 import type { ChatRequest } from "../domain/chat.contracts";
+import { ConversationNotFoundError } from "../domain/chat.contracts";
 
 type ScopeRuntimeConfig = {
   maxScopeDocs: number;
@@ -88,20 +89,30 @@ export class ScopeService {
     docIds: string[],
   ): Promise<void> {
     const normalized = this.normalizeDocIds(docIds);
-    await prisma.conversation.updateMany({
+    const updated = await prisma.conversation.updateMany({
       where: { id: conversationId, userId, isDeleted: false },
       data: { scopeDocumentIds: normalized, updatedAt: new Date() },
     });
+    if (updated.count === 0) {
+      throw new ConversationNotFoundError(
+        "Conversation not found for this account.",
+      );
+    }
   }
 
   async clearConversationScope(
     userId: string,
     conversationId: string,
   ): Promise<void> {
-    await prisma.conversation.updateMany({
+    const updated = await prisma.conversation.updateMany({
       where: { id: conversationId, userId, isDeleted: false },
       data: { scopeDocumentIds: [], updatedAt: new Date() },
     });
+    if (updated.count === 0) {
+      throw new ConversationNotFoundError(
+        "Conversation not found for this account.",
+      );
+    }
   }
 
   shouldClearScope(req: ChatRequest): boolean {

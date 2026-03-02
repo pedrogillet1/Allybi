@@ -1,5 +1,4 @@
 // src/services/llm/providers/openai/openaiClient.service.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * OpenAIClientService (Allybi, ChatGPT-parity, high-detail)
@@ -84,7 +83,7 @@ const DEFAULT_CONFIG: OpenAIConfig = {
 // Helpers
 // ------------------------------
 
-function safeString(x: any): string {
+function safeString(x: unknown): string {
   if (typeof x === "string") return x;
   if (x == null) return "";
   return String(x);
@@ -102,7 +101,7 @@ function capDelta(text: string, maxChars: number): string[] {
 function pickModel(routeModel: string | undefined, cfg: OpenAIConfig): string {
   const m = (routeModel || "").trim();
   if (!m) return cfg.defaultModelFinal;
-  if (cfg.allowedModels.includes(m as any)) return m;
+  if ((cfg.allowedModels as string[]).includes(m)) return m;
   // Deterministic fallback: default final
   return cfg.defaultModelFinal;
 }
@@ -113,8 +112,8 @@ function pickModel(routeModel: string | undefined, cfg: OpenAIConfig): string {
  *  - We support: system, developer, user, assistant, tool
  *  - For multimodal parts, we currently only pass text; images are disallowed by Allybi constraints
  */
-function toOpenAIChatMessages(messages: LlmMessage[]): any[] {
-  const out: any[] = [];
+function toOpenAIChatMessages(messages: LlmMessage[]): Array<Record<string, unknown>> {
+  const out: Array<Record<string, unknown>> = [];
 
   for (const m of messages) {
     const role = m.role;
@@ -126,7 +125,7 @@ function toOpenAIChatMessages(messages: LlmMessage[]): any[] {
         tool_call_id: m.toolCallId || "",
         content:
           m.content ??
-          (m.parts?.find((p) => p.type === "text") as any)?.text ??
+          (m.parts?.find((p) => p.type === "text") as { type: "text"; text: string } | undefined)?.text ??
           "",
       });
       continue;
@@ -155,7 +154,7 @@ function toOpenAIChatMessages(messages: LlmMessage[]): any[] {
  * Allybi tool schemas are provider-agnostic. OpenAI expects:
  *  { type: "function", function: { name, description, parameters } }
  */
-function toOpenAITools(tools: any[] | undefined): any[] | undefined {
+function toOpenAITools(tools: Array<Record<string, unknown>> | undefined): Array<Record<string, unknown>> | undefined {
   if (!Array.isArray(tools) || tools.length === 0) return undefined;
 
   // If tools are already in OpenAI shape, pass through.
@@ -184,11 +183,11 @@ function toOpenAITools(tools: any[] | undefined): any[] | undefined {
  * OpenAI tool_choice normalization:
  * - "auto" | "none" | { name: string }
  */
-function toOpenAIToolChoice(toolChoice: any): any {
+function toOpenAIToolChoice(toolChoice: unknown): Record<string, unknown> | string | undefined {
   if (!toolChoice) return undefined;
   if (toolChoice === "auto" || toolChoice === "none") return toolChoice;
-  if (typeof toolChoice === "object" && toolChoice.name) {
-    return { type: "function", function: { name: toolChoice.name } };
+  if (typeof toolChoice === "object" && (toolChoice as Record<string, unknown>).name) {
+    return { type: "function", function: { name: (toolChoice as Record<string, unknown>).name } };
   }
   return undefined;
 }
@@ -201,7 +200,7 @@ function buildChatCompletionPayload(
   request: LlmRequest,
   cfg: OpenAIConfig,
   streaming: boolean,
-): any {
+): Record<string, unknown> {
   const model = pickModel(request.route?.model, cfg);
 
   const messages = toOpenAIChatMessages(request.messages);
@@ -212,12 +211,12 @@ function buildChatCompletionPayload(
 
   const maxOut = request.options?.maxOutputTokens;
 
-  const tools = cfg.allowTools ? toOpenAITools(request.tools) : undefined;
+  const tools = cfg.allowTools ? toOpenAITools(request.tools as Array<Record<string, unknown>> | undefined) : undefined;
   const tool_choice = cfg.allowTools
     ? toOpenAIToolChoice(request.toolChoice)
     : "none";
 
-  const payload: any = {
+  const payload: Record<string, unknown> = {
     model,
     messages,
     stream: streaming,
@@ -256,19 +255,21 @@ function buildRequestHeaders(request: LlmRequest): Record<string, string> {
  * yield smaller "chunk-like" objects with choices[0].delta.content sliced.
  */
 async function* normalizeOpenAIStreamChunks(
-  rawStream: AsyncIterable<any>,
+  rawStream: AsyncIterable<Record<string, unknown>>,
   maxDeltaCharsSoft: number,
-): AsyncIterable<any> {
+): AsyncIterable<Record<string, unknown>> {
   for await (const chunk of rawStream) {
-    const delta = chunk?.choices?.[0]?.delta?.content;
+    const choices = chunk?.choices as Array<Record<string, unknown>> | undefined;
+    const delta = (choices?.[0]?.delta as Record<string, unknown> | undefined)?.content;
     if (typeof delta === "string" && delta.length > maxDeltaCharsSoft) {
       const pieces = capDelta(delta, maxDeltaCharsSoft);
       for (const p of pieces) {
         // clone chunk but replace delta content with smaller piece
+        const choices = chunk.choices as Array<Record<string, unknown>>;
         const cloned = {
           ...chunk,
-          choices: chunk.choices.map((c: any, idx: number) =>
-            idx === 0 ? { ...c, delta: { ...(c.delta || {}), content: p } } : c,
+          choices: choices.map((c: Record<string, unknown>, idx: number) =>
+            idx === 0 ? { ...c, delta: { ...((c.delta as Record<string, unknown>) || {}), content: p } } : c,
           ),
         };
         yield cloned;
@@ -316,10 +317,10 @@ export class OpenAIClientService implements LlmClient {
     const payload = buildChatCompletionPayload(request, this.cfg, false);
     const headers = buildRequestHeaders(request);
 
-    const raw = await this.client.chat.completions.create(payload, {
-      signal,
-      headers,
-    } as any);
+    const raw = await this.client.chat.completions.create(
+      payload as Parameters<typeof this.client.chat.completions.create>[0],
+      { signal, headers } as Parameters<typeof this.client.chat.completions.create>[1],
+    );
 
     return {
       response: {
@@ -343,14 +344,14 @@ export class OpenAIClientService implements LlmClient {
     const headers = buildRequestHeaders(request);
 
     // OpenAI SDK returns an AsyncIterable for streaming chat completions.
-    const rawStream = await this.client.chat.completions.create(payload, {
-      signal,
-      headers,
-    } as any);
+    const rawStream = await this.client.chat.completions.create(
+      payload as Parameters<typeof this.client.chat.completions.create>[0],
+      { signal, headers } as Parameters<typeof this.client.chat.completions.create>[1],
+    );
 
     // Normalize large deltas into smaller delta chunks (smoother frontend streaming)
     const normalized = normalizeOpenAIStreamChunks(
-      rawStream as any,
+      rawStream as AsyncIterable<Record<string, unknown>>,
       this.cfg.maxDeltaCharsSoft,
     );
 

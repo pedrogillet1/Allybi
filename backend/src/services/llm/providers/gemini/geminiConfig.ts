@@ -120,7 +120,7 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
   region: process.env.GEMINI_REGION || "us-central1",
   baseUrl: process.env.GEMINI_BASE_URL || undefined,
 
-  timeoutMs: Number(process.env.GEMINI_TIMEOUT_MS || 30000),
+  timeoutMs: Number(process.env.GEMINI_TIMEOUT_MS || 20000),
 
   retry: {
     maxAttempts: Number(process.env.GEMINI_RETRY_MAX_ATTEMPTS || 3),

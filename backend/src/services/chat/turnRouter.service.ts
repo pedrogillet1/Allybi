@@ -130,6 +130,7 @@ function mapIntentFamilyToRoute(
 }
 
 export class TurnRouterService {
+  private static _followupMisconfigWarned = false;
   private readonly fileActionBankProvider:
     | Pick<DocumentIntelligenceBanksService, "getFileActionOperators">
     | ((bankId: string) => any | null);
@@ -355,6 +356,10 @@ export class TurnRouterService {
       locale,
     );
     if (overlayPatterns.length === 0) {
+      if (!TurnRouterService._followupMisconfigWarned) {
+        TurnRouterService._followupMisconfigWarned = true;
+        console.warn("[turn-router] followup detection disabled: overlayPatterns is empty for locale", locale);
+      }
       return {
         isFollowup: false,
         confidence: null,
@@ -855,7 +860,7 @@ export class TurnRouterService {
         ...(ctx.connectors?.connected || {}),
       },
       hasConnectorReadPermission:
-        contextSignals.hasConnectorReadPermission !== false,
+        contextSignals.hasConnectorReadPermission === true,
     };
   }
 

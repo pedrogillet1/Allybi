@@ -1,5 +1,4 @@
 // retrievalEngine.service.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * Koda Retrieval Engine (ChatGPT-parity)
@@ -396,7 +395,7 @@ interface RetrievalScopeMetrics {
  * You can wire your existing bankLoader.service.ts here.
  */
 export interface BankLoader {
-  getBank<T = any>(bankId: string): T;
+  getBank<T = unknown>(bankId: string): T;
 }
 
 /**
@@ -481,7 +480,7 @@ function clamp01(x: number): number {
   return Math.max(0, Math.min(1, x));
 }
 
-function safeNumber(x: any, fallback = 0): number {
+function safeNumber(x: unknown, fallback = 0): number {
   const n = Number(x);
   return Number.isFinite(n) ? n : fallback;
 }
@@ -544,16 +543,16 @@ export class RetrievalEngineService {
     }
 
     // 1) Load banks (single source of truth)
-    const semanticCfg = this.getRequiredBank<any>("semantic_search_config");
-    const rankerCfg = this.getRequiredBank<any>("retrieval_ranker_config");
-    const boostsKeyword = this.safeGetBank<any>("keyword_boost_rules");
-    const boostsTitle = this.safeGetBank<any>("doc_title_boost_rules");
-    const boostsType = this.safeGetBank<any>("doc_type_boost_rules");
-    const boostsRecency = this.safeGetBank<any>("recency_boost_rules");
-    const routingPriority = this.safeGetBank<any>("routing_priority");
-    const diversification = this.getRequiredBank<any>("diversification_rules");
-    const negatives = this.getRequiredBank<any>("retrieval_negatives");
-    const packaging = this.getRequiredBank<any>("evidence_packaging");
+    const semanticCfg = this.getRequiredBank<Record<string, unknown>>("semantic_search_config");
+    const rankerCfg = this.getRequiredBank<Record<string, unknown>>("retrieval_ranker_config");
+    const boostsKeyword = this.safeGetBank<Record<string, unknown>>("keyword_boost_rules");
+    const boostsTitle = this.safeGetBank<Record<string, unknown>>("doc_title_boost_rules");
+    const boostsType = this.safeGetBank<Record<string, unknown>>("doc_type_boost_rules");
+    const boostsRecency = this.safeGetBank<Record<string, unknown>>("recency_boost_rules");
+    const routingPriority = this.safeGetBank<Record<string, unknown>>("routing_priority");
+    const diversification = this.getRequiredBank<Record<string, unknown>>("diversification_rules");
+    const negatives = this.getRequiredBank<Record<string, unknown>>("retrieval_negatives");
+    const packaging = this.getRequiredBank<Record<string, unknown>>("evidence_packaging");
     const crossDocGrounding =
       this.documentIntelligenceBanks.getCrossDocGroundingPolicy();
 
@@ -1019,7 +1018,7 @@ export class RetrievalEngineService {
   private async resolveScope(
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    semanticCfg: any,
+    semanticCfg: Record<string, unknown>,
     docsInput?: DocMeta[],
   ): Promise<{
     candidateDocIds: string[];
@@ -1151,7 +1150,7 @@ export class RetrievalEngineService {
   private computeExpansionPolicy(
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    semanticCfg: any,
+    semanticCfg: Record<string, unknown>,
   ): { enabled: boolean } {
     const policy = semanticCfg?.config?.queryExpansionPolicy;
     const enabledByBank = Boolean(policy?.enabled);
@@ -1186,7 +1185,7 @@ export class RetrievalEngineService {
     normalizedQuery: string,
     signals: RetrievalRequest["signals"],
   ): string[] {
-    const synonymBank = this.safeGetBank<any>("synonym_expansion");
+    const synonymBank = this.safeGetBank<Record<string, unknown>>("synonym_expansion");
     if (!synonymBank?.config?.enabled || !synonymBank?.groups) {
       return [normalizedQuery];
     }
@@ -1399,7 +1398,7 @@ export class RetrievalEngineService {
       "travel",
     ];
     try {
-      const provider = this.documentIntelligenceBanks as any;
+      const provider = this.documentIntelligenceBanks as Record<string, unknown>;
       const domains =
         typeof provider.getDocumentIntelligenceDomains === "function"
           ? provider.getDocumentIntelligenceDomains()
@@ -1426,7 +1425,7 @@ export class RetrievalEngineService {
     score: number;
     reasons: string[];
   } | null {
-    const provider = this.documentIntelligenceBanks as any;
+    const provider = this.documentIntelligenceBanks as Record<string, unknown>;
     const catalog =
       typeof provider.getDocTypeCatalog === "function"
         ? provider.getDocTypeCatalog(domain)
@@ -1504,7 +1503,7 @@ export class RetrievalEngineService {
       }> = [];
 
       for (const candidateDomain of domains) {
-        const provider = this.documentIntelligenceBanks as any;
+        const provider = this.documentIntelligenceBanks as Record<string, unknown>;
         const bank =
           typeof provider.getDomainDetectionRules === "function"
             ? provider.getDomainDetectionRules(candidateDomain)
@@ -1585,7 +1584,7 @@ export class RetrievalEngineService {
     // Fallback: infer domain from doc type if domain score was inconclusive.
     if (!domain && docTypeId) {
       for (const candidateDomain of domains) {
-        const provider = this.documentIntelligenceBanks as any;
+        const provider = this.documentIntelligenceBanks as Record<string, unknown>;
         const catalog =
           typeof provider.getDocTypeCatalog === "function"
             ? provider.getDocTypeCatalog(candidateDomain)
@@ -1594,7 +1593,7 @@ export class RetrievalEngineService {
           ? catalog.docTypes
           : [];
         const hasDocType = docTypes.some(
-          (entry: any) => this.normalizeDocType(entry?.id) === docTypeId,
+          (entry: unknown) => this.normalizeDocType((entry as Record<string, unknown>)?.id) === docTypeId,
         );
         if (hasDocType) {
           domain = candidateDomain;
@@ -1629,7 +1628,7 @@ export class RetrievalEngineService {
     const normalizedDocType = this.normalizeDocType(docTypeId);
     if (!normalizedDocType) return null;
 
-    const provider = this.documentIntelligenceBanks as any;
+    const provider = this.documentIntelligenceBanks as Record<string, unknown>;
     const sectionsBank =
       typeof provider.getDocTypeSections === "function"
         ? provider.getDocTypeSections(domain, normalizedDocType)
@@ -1647,15 +1646,17 @@ export class RetrievalEngineService {
     const tables = Array.isArray(tablesBank?.tables) ? tablesBank.tables : [];
 
     const sectionAnchors: string[] = sections
-      .map((section: any): { order: number; values: string[] } => {
-        const order = safeNumber(section?.order, 9999);
-        const sectionId = String(section?.id || "")
+      .map((section: unknown): { order: number; values: string[] } => {
+        const sec = section as Record<string, unknown>;
+        const order = safeNumber(sec?.order, 9999);
+        const sectionId = String(sec?.id || "")
           .trim()
           .toLowerCase();
-        const en = String(section?.name?.en || "")
+        const nameRecord = sec?.name as Record<string, unknown> | undefined;
+        const en = String(nameRecord?.en || "")
           .trim()
           .toLowerCase();
-        const pt = String(section?.name?.pt || "")
+        const pt = String(nameRecord?.pt || "")
           .trim()
           .toLowerCase();
         return {
@@ -1667,18 +1668,21 @@ export class RetrievalEngineService {
       .flatMap((entry: { values: string[] }) => entry.values);
 
     const tableAnchors: string[] = [
-      ...tableMappings.flatMap((mapping: any) => [
-        String(mapping?.canonicalHeader || "")
-          .trim()
-          .toLowerCase(),
-        ...(Array.isArray(mapping?.synonyms)
-          ? mapping.synonyms.map((value: unknown) =>
-              String(value || "")
-                .trim()
-                .toLowerCase(),
-            )
-          : []),
-      ]),
+      ...tableMappings.flatMap((mapping: unknown) => {
+        const m = mapping as Record<string, unknown>;
+        return [
+          String(m?.canonicalHeader || "")
+            .trim()
+            .toLowerCase(),
+          ...(Array.isArray(m?.synonyms)
+            ? (m.synonyms as unknown[]).map((value: unknown) =>
+                String(value || "")
+                  .trim()
+                  .toLowerCase(),
+              )
+            : []),
+        ];
+      }),
       ...tables.flatMap((table: any) => [
         String(table?.id || "")
           .trim()
@@ -1854,16 +1858,16 @@ export class RetrievalEngineService {
   private async runPhases(opts: {
     queryVariants: RetrievalQueryVariant[];
     scopeDocIds: string[];
-    semanticCfg: any;
+    semanticCfg: Record<string, unknown>;
     additionalStructuralAnchors?: string[];
   }): Promise<
-    Array<{ phaseId: string; source: CandidateSource; hits: any[] }>
+    Array<{ phaseId: string; source: CandidateSource; hits: unknown[] }>
   > {
     const phases = opts.semanticCfg?.config?.hybridPhases ?? [];
     const results: Array<{
       phaseId: string;
       source: CandidateSource;
-      hits: any[];
+      hits: unknown[];
     }> = [];
 
     const variants =
@@ -2013,7 +2017,7 @@ export class RetrievalEngineService {
     phaseResults: Array<{
       phaseId: string;
       source: CandidateSource;
-      hits: any[];
+      hits: unknown[];
     }>,
     scope: {
       candidateDocIds: string[];
@@ -2089,9 +2093,9 @@ export class RetrievalEngineService {
           docId,
           docType:
             this.normalizeDocType(
-              (hit as any).docType ??
-                (hit as any).documentType ??
-                (hit as any).mimeType,
+              (hit as Record<string, unknown>).docType ??
+                (hit as Record<string, unknown>).documentType ??
+                (hit as Record<string, unknown>).mimeType,
             ) ?? null,
           title: hit.title ?? null,
           filename: hit.filename ?? null,
@@ -2255,7 +2259,7 @@ export class RetrievalEngineService {
       sheetName?: string | null;
       rangeA1?: string | null;
     },
-    negativesBank: any | null,
+    negativesBank: Record<string, unknown> | null,
     scopeMetrics?: RetrievalScopeMetrics,
   ): CandidateChunk[] {
     if (!negativesBank?.config?.enabled) return candidates;
@@ -2281,7 +2285,7 @@ export class RetrievalEngineService {
         a.toLowerCase(),
       );
       // Load ontology for broader anchor coverage
-      const ontology = this.safeGetBank<any>("entity_role_ontology");
+      const ontology = this.safeGetBank<Record<string, unknown>>("entity_role_ontology");
       if (ontology?.roles) {
         for (const forbiddenRoleId of slotContract.forbidden) {
           const role = ontology.roles.find(
@@ -2300,7 +2304,7 @@ export class RetrievalEngineService {
         }
       }
       // Ranker config for slot extraction penalties
-      const rankerCfg = this.safeGetBank<any>("retrieval_ranker_config");
+      const rankerCfg = this.safeGetBank<Record<string, unknown>>("retrieval_ranker_config");
       confusionPenaltyDefault = safeNumber(
         rankerCfg?.config?.slotExtraction?.forbiddenRolePenalty,
         0.25,
@@ -2351,7 +2355,7 @@ export class RetrievalEngineService {
           );
         } else if (hasTarget) {
           // Boost chunks containing target role anchors
-          const rankerCfg = this.safeGetBank<any>("retrieval_ranker_config");
+          const rankerCfg = this.safeGetBank<Record<string, unknown>>("retrieval_ranker_config");
           const anchorBoost = safeNumber(
             rankerCfg?.config?.slotExtraction?.roleAnchorBoost,
             0.15,
@@ -2377,10 +2381,10 @@ export class RetrievalEngineService {
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
     banks: {
-      boostsKeyword: any | null;
-      boostsTitle: any | null;
-      boostsType: any | null;
-      boostsRecency: any | null;
+      boostsKeyword: Record<string, unknown> | null;
+      boostsTitle: Record<string, unknown> | null;
+      boostsType: Record<string, unknown> | null;
+      boostsRecency: Record<string, unknown> | null;
     },
     docMetaById?: Map<string, DocMeta>,
   ): CandidateChunk[] {
@@ -2658,10 +2662,10 @@ export class RetrievalEngineService {
     const locationTargets = Array.isArray(retrievalPlan.locationTargets)
       ? retrievalPlan.locationTargets
           .map((target) => {
-            const rawType = String((target as any)?.type || "")
+            const rawType = String((target as Record<string, unknown>)?.type || "")
               .trim()
               .toLowerCase();
-            const rawValue = String((target as any)?.value || "")
+            const rawValue = String((target as Record<string, unknown>)?.value || "")
               .trim()
               .toLowerCase();
             if (!rawType || !rawValue) return null;
@@ -2866,8 +2870,8 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    rankerCfg: any,
-    routingPriorityBank?: any,
+    rankerCfg: Record<string, unknown>,
+    routingPriorityBank?: Record<string, unknown>,
   ): CandidateChunk[] {
     const cfg = rankerCfg?.config;
     const weights = cfg?.weights ?? {
@@ -2939,7 +2943,7 @@ export class RetrievalEngineService {
 
   private resolveIntentFamilyPriorityBoost(
     intentFamily: string | null | undefined,
-    routingPriorityBank: any,
+    routingPriorityBank: Record<string, unknown>,
   ): number {
     if (!routingPriorityBank?.config?.enabled) return 0;
     const priorities =
@@ -2974,7 +2978,7 @@ export class RetrievalEngineService {
   }
 
   private resolveRoutingStageWeight(
-    routingPriorityBank: any,
+    routingPriorityBank: Record<string, unknown>,
     stageId: string,
   ): number {
     const stages = Array.isArray(routingPriorityBank?.tiebreakStages)
@@ -3032,7 +3036,7 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    diversificationBank: any | null,
+    diversificationBank: Record<string, unknown> | null,
   ): CandidateChunk[] {
     if (!diversificationBank?.config?.enabled) return candidates;
 
@@ -3129,7 +3133,7 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    packagingBank: any,
+    packagingBank: Record<string, unknown>,
     ctx: {
       queryOriginal: string;
       queryNormalized: string;
@@ -3238,7 +3242,7 @@ export class RetrievalEngineService {
         : null;
     let extractionMinScore = minFinalScore;
     if (isExtraction) {
-      const rankerCfg = this.safeGetBank<any>("retrieval_ranker_config");
+      const rankerCfg = this.safeGetBank<Record<string, unknown>>("retrieval_ranker_config");
       extractionMinScore = safeNumber(
         rankerCfg?.config?.slotExtraction?.scopedMinFinalScoreOverride,
         0.45,
@@ -3524,7 +3528,7 @@ export class RetrievalEngineService {
   // Helpers
   // -----------------------------
 
-  private safeGetBank<T = any>(bankId: string): T | null {
+  private safeGetBank<T = unknown>(bankId: string): T | null {
     try {
       return this.bankLoader.getBank<T>(bankId);
     } catch {
@@ -3532,7 +3536,7 @@ export class RetrievalEngineService {
     }
   }
 
-  private getRequiredBank<T = any>(bankId: string): T {
+  private getRequiredBank<T = unknown>(bankId: string): T {
     return this.bankLoader.getBank<T>(bankId);
   }
 

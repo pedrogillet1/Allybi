@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 const mockGetBank = jest.fn();
+const mockGetOptionalBank = jest.fn();
 
 jest.mock("../banks/bankLoader.service", () => ({
   __esModule: true,
   getBank: (...args: unknown[]) => mockGetBank(...args),
+  getOptionalBank: (...args: unknown[]) => mockGetOptionalBank(...args),
 }));
 
 function bankById(bankId: string): unknown {
@@ -141,7 +143,11 @@ function bankById(bankId: string): unknown {
 describe("ResponseContractEnforcerService nav_pills contract", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
+    mockGetOptionalBank.mockReset();
     mockGetBank.mockImplementation((bankId: string) => bankById(bankId));
+    mockGetOptionalBank.mockImplementation((bankId: string) =>
+      bankById(bankId),
+    );
   });
 
   test("blocks nav_pills response when source_buttons attachment is missing", async () => {
@@ -371,5 +377,97 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     expect(out.enforcement.blocked).toBe(false);
     expect(out.content).toBe("Thanks for your message.");
     expect(out.enforcement.repairs).toContain("BOLDING_SUPPRESSED_FOR_MODE");
+  });
+
+  test("blocks missing provenance even when fail-open flag is enabled", async () => {
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Grounded answer text.",
+        attachments: [],
+      },
+      {
+        answerMode: "doc_grounded_single",
+        language: "en",
+        evidenceRequired: true,
+        allowedDocumentIds: ["doc-1"],
+        provenanceFailOpenWithEvidence: true,
+        provenance: {
+          mode: "hidden_map",
+          required: true,
+          validated: false,
+          failureCode: "missing_provenance",
+          evidenceIdsUsed: [],
+          sourceDocumentIds: ["doc-1"],
+          snippetRefs: [],
+          coverageScore: 0,
+        } as any,
+        evidenceMap: [
+          {
+            evidenceId: "doc-1:loc-1",
+            documentId: "doc-1",
+            locationKey: "loc-1",
+            snippetHash: "hash-1",
+          },
+        ],
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.provenance).toEqual({
+      action: "block",
+      reasonCode: "missing_provenance",
+      severity: "error",
+    });
+    expect(out.enforcement.warnings).not.toContain("PROVENANCE_FAILOPEN_WITH_EVIDENCE");
+  });
+
+  test("keeps strict block for missing provenance when fail-open is disabled", async () => {
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Grounded answer text.",
+        attachments: [],
+      },
+      {
+        answerMode: "doc_grounded_single",
+        language: "en",
+        evidenceRequired: true,
+        allowedDocumentIds: ["doc-1"],
+        provenanceFailOpenWithEvidence: false,
+        provenance: {
+          mode: "hidden_map",
+          required: true,
+          validated: false,
+          failureCode: "missing_provenance",
+          evidenceIdsUsed: [],
+          sourceDocumentIds: ["doc-1"],
+          snippetRefs: [],
+          coverageScore: 0,
+        } as any,
+        evidenceMap: [
+          {
+            evidenceId: "doc-1:loc-1",
+            documentId: "doc-1",
+            locationKey: "loc-1",
+            snippetHash: "hash-1",
+          },
+        ],
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.reasonCode).toBe("missing_provenance");
+    expect(out.enforcement.provenance).toEqual({
+      action: "block",
+      reasonCode: "missing_provenance",
+      severity: "error",
+    });
   });
 });

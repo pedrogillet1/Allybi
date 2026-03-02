@@ -459,4 +459,107 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
       }),
     ).toThrow(/prompt_unresolved_placeholders/);
   });
+
+  test("does not inject no-json guard when disallowJsonOutput is false", () => {
+    const service = new PromptRegistryService(loadPromptBanks());
+    const bundle = service.buildPrompt("retrieval", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "doc_grounded_single",
+      operator: "locate_docs",
+      disallowJsonOutput: false,
+      constraints: { disallowJsonOutput: false },
+      slots: {
+        userQuery: "find total revenue",
+        scope: "{lock:soft}",
+        docContext: "{docs:2}",
+      },
+    } as any);
+    const systemText = bundle.messages
+      .filter((m) => m.role === "system")
+      .map((m) => m.content)
+      .join("\n");
+    expect(systemText).not.toContain("Do NOT output raw JSON to the user");
+  });
+
+  test("fails fast when layersByKind references unknown prompt file ids", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            promptFiles: [{ id: "task_answer_with_sources" }],
+            layersByKind: {
+              compose_answer: ["task_answer_with_sources", "missing_prompt_file"],
+            },
+          } as T;
+        }
+        if (bankId === "task_answer_with_sources") {
+          return {
+            _meta: { id: "task_answer_with_sources", version: "test" },
+            config: { enabled: true },
+            templates: [
+              {
+                id: "answer_with_sources",
+                priority: 100,
+                when: { answerModes: ["doc_grounded_single"] },
+                messages: [{ role: "system", content: { any: "ok" } }],
+              },
+            ],
+          } as T;
+        }
+        return { config: { enabled: true, messages: [] } } as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(/invalid layered configuration/);
+  });
+
+  test("fails fast when layersByKind has duplicate layer ids for one kind", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            promptFiles: [{ id: "task_answer_with_sources" }],
+            layersByKind: {
+              compose_answer: [
+                "task_answer_with_sources",
+                "task_answer_with_sources",
+              ],
+            },
+          } as T;
+        }
+        if (bankId === "task_answer_with_sources") {
+          return {
+            _meta: { id: "task_answer_with_sources", version: "test" },
+            config: { enabled: true },
+            templates: [
+              {
+                id: "answer_with_sources",
+                priority: 100,
+                when: { answerModes: ["doc_grounded_single"] },
+                messages: [{ role: "system", content: { any: "ok" } }],
+              },
+            ],
+          } as T;
+        }
+        return { config: { enabled: true, messages: [] } } as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(/duplicate_layer_id/);
+  });
 });

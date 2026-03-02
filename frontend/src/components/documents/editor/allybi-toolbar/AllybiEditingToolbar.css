@@ -322,6 +322,7 @@
 /* -------------------------------------------------------------------------- */
 
 .formatting-toolbar.allybi-one-line {
+  --allybi-toolbar-gap: 8px;
   position: relative;
   width: 100%;
   height: 36px;
@@ -329,7 +330,7 @@
   border-bottom: none;
   box-shadow: none;
   flex-wrap: nowrap;
-  gap: 16px;
+  gap: var(--allybi-toolbar-gap);
   background: #ffffff;
   color-scheme: light;
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -413,6 +414,12 @@
   overflow: visible; /* allow dropdowns/popovers */
 }
 
+.allybi-toolbar-center.allybi-toolbar-center--excel {
+  max-width: none;
+  margin: 0;
+  justify-content: flex-start;
+}
+
 .allybi-toolbar-side-spacer {
   display: none;
 }
@@ -443,6 +450,10 @@
   gap: 6px;
 }
 
+.allybi-toolbar-zoom:empty {
+  display: none;
+}
+
 .formatting-toolbar.allybi-one-line.allybi-balanced {
   --allybi-toolbar-side-slot: clamp(128px, 12vw, 160px);
 }
@@ -464,7 +475,7 @@
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  margin-right: 14px;
+  margin-right: 0;
 }
 
 .allybi-word-actions-left .toolbar-btn {
@@ -553,27 +564,28 @@
 /* -------------------------------------------------------------------------- */
 
 .allybi-excel-row {
+  --allybi-excel-gap: 8px;
   width: 100%;
   max-width: none;
-  padding: 0 16px;
+  padding: 0 0 0 16px;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--allybi-excel-gap);
   overflow: visible;
 }
 
 .allybi-excel-left {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--allybi-excel-gap);
   flex: 0 0 auto;
 }
 
 .allybi-excel-sheet-combo {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--allybi-excel-gap);
   height: 32px;
   padding: 0 6px;
   border-radius: 10px;
@@ -591,6 +603,10 @@
 .allybi-excel-sheet-combo .toolbar-btn.icon-btn:hover {
   background: rgba(17, 24, 39, 0.06);
   border: none;
+}
+
+.allybi-excel-sheet-combo .toolbar-divider {
+  margin: 0;
 }
 
 .toolbar-select.allybi-excel-sheet-select {
@@ -630,7 +646,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--allybi-excel-gap);
   overflow: visible; /* allow font/color dropdowns to render */
 }
 
@@ -638,8 +654,13 @@
 .allybi-excel-formatting {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
+  gap: var(--allybi-excel-gap);
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.allybi-excel-formatting .toolbar-divider {
+  margin: 0;
 }
 
 /* B / I / U buttons in the Excel toolbar get visible borders to match DOCX style. */
@@ -699,10 +720,10 @@
 
 .allybi-excel-valuewrap {
   position: relative;
-  flex: 0 0 auto;
-  width: 360px;
-  min-width: 280px;
-  max-width: 420px;
+  flex: 1 1 360px;
+  width: auto;
+  min-width: 220px;
+  max-width: none;
   display: flex;
   align-items: center;
 }
@@ -766,7 +787,7 @@
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--allybi-excel-gap);
   justify-content: flex-end;
 }
 
@@ -826,15 +847,16 @@
   .allybi-excel-row {
     min-width: max-content;
     padding: 0;
-    gap: 6px;
+    --allybi-excel-gap: 8px;
+    gap: var(--allybi-excel-gap);
   }
 
   .allybi-excel-center {
-    gap: 6px;
+    gap: var(--allybi-excel-gap);
   }
 
   .allybi-excel-formatting {
-    gap: 6px;
+    gap: var(--allybi-excel-gap);
   }
 
   .toolbar-btn.allybi-font-trigger,
@@ -859,9 +881,9 @@
   }
 
   .allybi-excel-valuewrap {
-    width: 280px;
+    width: auto;
     min-width: 220px;
-    max-width: 280px;
+    max-width: none;
   }
 
   .allybi-excel-status {

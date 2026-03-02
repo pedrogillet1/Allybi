@@ -24,19 +24,35 @@ function requiresProvenance(
 }
 
 function resolveMinCoverage(answerMode?: AnswerMode): number {
+  if (!isProvenanceThresholdsV3Enabled()) {
+    switch (answerMode) {
+      case "doc_grounded_quote":
+        return 0.55;
+      case "doc_grounded_table":
+        return 0.28;
+      case "doc_grounded_multi":
+        return 0.24;
+      case "doc_grounded_single":
+        return 0.22;
+      case "help_steps":
+        return 0.2;
+      default:
+        return 0.22;
+    }
+  }
   switch (answerMode) {
     case "doc_grounded_quote":
-      return 0.55;
+      return 0.4;
     case "doc_grounded_table":
-      return 0.28;
+      return 0.2;
     case "doc_grounded_multi":
-      return 0.24;
+      return 0.18;
     case "doc_grounded_single":
-      return 0.22;
+      return 0.16;
     case "help_steps":
       return 0.2;
     default:
-      return 0.22;
+      return 0.16;
   }
 }
 
@@ -58,20 +74,46 @@ function resolveMinRefCount(answerMode?: AnswerMode): number {
 }
 
 function resolveMinPerRefCoverage(answerMode?: AnswerMode): number {
+  if (!isProvenanceThresholdsV3Enabled()) {
+    switch (answerMode) {
+      case "doc_grounded_quote":
+        return 0.55;
+      case "doc_grounded_table":
+        return 0.25;
+      case "doc_grounded_multi":
+        return 0.2;
+      case "doc_grounded_single":
+        return 0.2;
+      case "help_steps":
+        return 0.18;
+      default:
+        return 0.2;
+    }
+  }
   switch (answerMode) {
     case "doc_grounded_quote":
-      return 0.55;
+      return 0.4;
     case "doc_grounded_table":
-      return 0.25;
+      return 0.2;
     case "doc_grounded_multi":
-      return 0.2;
+      return 0.18;
     case "doc_grounded_single":
-      return 0.2;
+      return 0.16;
     case "help_steps":
       return 0.18;
     default:
-      return 0.2;
+      return 0.16;
   }
+}
+
+function isProvenanceThresholdsV3Enabled(): boolean {
+  const raw = String(process.env.PROVENANCE_THRESHOLDS_V3 || "")
+    .trim()
+    .toLowerCase();
+  if (!raw) return true;
+  if (["1", "true", "on", "yes"].includes(raw)) return true;
+  if (["0", "false", "off", "no"].includes(raw)) return false;
+  return true;
 }
 
 export function validateChatProvenance(params: {

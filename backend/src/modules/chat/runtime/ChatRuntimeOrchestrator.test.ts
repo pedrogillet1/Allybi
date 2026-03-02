@@ -159,7 +159,7 @@ describe("ChatRuntimeOrchestrator", () => {
     // Default Prisma stubs — no documents, no scope
     mockPrismaDocument.mockResolvedValue([]);
     mockPrismaConversationFindFirst.mockResolvedValue(null);
-    mockPrismaConversationUpdateMany.mockResolvedValue({ count: 0 });
+    mockPrismaConversationUpdateMany.mockResolvedValue({ count: 1 });
 
     delegate = makeMockDelegate();
     orchestrator = new ChatRuntimeOrchestrator(delegate);
@@ -469,6 +469,7 @@ describe("ChatRuntimeOrchestrator", () => {
       const capturedReq = (delegate.chat as jest.MockedFunction<any>).mock
         .calls[0][0] as ChatRequest;
       expect(capturedReq.attachedDocumentIds).toEqual([]);
+      expect(mockPrismaDocument).not.toHaveBeenCalled();
     });
 
     test("resolves document mentions when a filename is present in the message", async () => {
@@ -489,6 +490,24 @@ describe("ChatRuntimeOrchestrator", () => {
       const capturedReq = (delegate.chat as jest.MockedFunction<any>).mock
         .calls[0][0] as ChatRequest;
       expect(capturedReq.attachedDocumentIds).toContain("doc-abc");
+    });
+
+    test("does not resolve mentions when overlap is below threshold", async () => {
+      mockPrismaDocument.mockResolvedValue([
+        { id: "doc-abc", filename: "report.pdf", displayTitle: null },
+      ]);
+      delegate.chat.mockResolvedValue(makeChatResult());
+
+      const req = makeChatRequest({
+        message: "Summarise budget.pdf for me",
+        attachedDocumentIds: [],
+        conversationId: undefined,
+      });
+      await orchestrator.chat(req);
+
+      const capturedReq = (delegate.chat as jest.MockedFunction<any>).mock
+        .calls[0][0] as ChatRequest;
+      expect(capturedReq.attachedDocumentIds).toEqual([]);
     });
 
     test("does not widen explicit attached scope when semantic mention matches outside docs", async () => {
@@ -659,6 +678,20 @@ describe("ChatRuntimeOrchestrator", () => {
   // Scope enforcement in postProcess
   // -------------------------------------------------------------------------
   describe("scope enforcement (postProcess)", () => {
+    test("throws when scope persistence update affects zero rows", async () => {
+      mockPrismaConversationUpdateMany.mockResolvedValueOnce({ count: 0 });
+      delegate.chat.mockResolvedValue(makeChatResult({ conversationId: "conv-1" }));
+
+      await expect(
+        orchestrator.chat(
+          makeChatRequest({
+            conversationId: "conv-1",
+            attachedDocumentIds: ["doc-1"],
+          }),
+        ),
+      ).rejects.toThrow("Conversation not found for this account.");
+    });
+
     test("enforces scope — sources from out-of-scope document are stripped", async () => {
       // Conversation has scope locked to doc-allowed
       mockPrismaConversationFindFirst.mockResolvedValue({

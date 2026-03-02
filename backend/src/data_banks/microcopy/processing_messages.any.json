@@ -54,19 +54,19 @@
     },
     "retry": {
       "en": [
-        "Let me try a different approach.",
-        "Trying another method now.",
-        "I will re-check with a safer strategy."
+        "I couldn't find a confident answer from the available documents.",
+        "The information I found wasn't enough to answer reliably.",
+        "I wasn't able to locate a well-supported answer for that."
       ],
       "pt": [
-        "Vou tentar uma abordagem diferente.",
-        "Tentando outro metodo agora.",
-        "Vou revisar com uma estrategia mais segura."
+        "Nao consegui encontrar uma resposta confiavel nos documentos disponiveis.",
+        "A informacao encontrada nao foi suficiente para responder com seguranca.",
+        "Nao foi possivel localizar uma resposta bem fundamentada para isso."
       ],
       "es": [
-        "Voy a intentar un enfoque diferente.",
-        "Probando otro metodo ahora.",
-        "Voy a revisar con una estrategia mas segura."
+        "No pude encontrar una respuesta confiable en los documentos disponibles.",
+        "La informacion encontrada no fue suficiente para responder con seguridad.",
+        "No fue posible localizar una respuesta bien fundamentada para eso."
       ]
     },
     "error": {
@@ -152,6 +152,23 @@
         "Busque en el alcance seleccionado y no encontre coincidencia directa.",
         "No se encontro un pasaje relevante en los documentos del alcance actual.",
         "La busqueda en alcance no encontro secciones coincidentes para esta consulta."
+      ]
+    },
+    "missing_provenance": {
+      "en": [
+        "I found relevant sections in the documents but couldn't verify the answer with enough confidence.\n- Try rephrasing your question to be more specific.\n- Or ask about a particular section or page.",
+        "The documents contain related information, but I wasn't able to build a fully grounded answer.\n- A more targeted question may help me locate the right passages.\n- I can also summarize what I did find if that helps.",
+        "I located potentially relevant content but couldn't confirm it answers your question reliably.\n- Consider narrowing your question to a specific document or topic.\n- I can also list what I found so far."
+      ],
+      "pt": [
+        "Encontrei secoes relevantes nos documentos, mas nao consegui verificar a resposta com confianca suficiente.\n- Tente reformular sua pergunta de forma mais especifica.\n- Ou pergunte sobre uma secao ou pagina em particular.",
+        "Os documentos contem informacoes relacionadas, mas nao consegui construir uma resposta totalmente fundamentada.\n- Uma pergunta mais direcionada pode ajudar a localizar os trechos certos.\n- Tambem posso resumir o que encontrei, se ajudar.",
+        "Localizei conteudo potencialmente relevante, mas nao consegui confirmar que responde sua pergunta com seguranca.\n- Considere restringir a pergunta a um documento ou topico especifico.\n- Posso listar o que encontrei ate agora."
+      ],
+      "es": [
+        "Encontre secciones relevantes en los documentos, pero no pude verificar la respuesta con suficiente confianza.\n- Intenta reformular tu pregunta de manera mas especifica.\n- O pregunta sobre una seccion o pagina en particular.",
+        "Los documentos contienen informacion relacionada, pero no pude construir una respuesta completamente fundamentada.\n- Una pregunta mas dirigida puede ayudarme a localizar los pasajes correctos.\n- Tambien puedo resumir lo que encontre si eso ayuda.",
+        "Localice contenido potencialmente relevante, pero no pude confirmar que responde tu pregunta de manera confiable.\n- Considera limitar la pregunta a un documento o tema especifico.\n- Puedo listar lo que encontre hasta ahora."
       ]
     },
     "indexing_in_progress": {

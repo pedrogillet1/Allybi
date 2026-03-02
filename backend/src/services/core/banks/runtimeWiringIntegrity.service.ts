@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import * as fs from "fs";
 import * as path from "path";
 
@@ -17,7 +15,10 @@ export interface RuntimeWiringIntegrityResult {
   missingOperatorOutputShapes: string[];
   missingEditingCatalogOperators: string[];
   missingEditingCapabilities: string[];
-  unreachablePromptSelectionRules: string[];
+  invalidPromptLayers: string[];
+  invalidPromptTemplateOutputModes: string[];
+  missingBuilderPolicyBank: string[];
+  invalidBuilderPolicy: string[];
   legacyChatRuntimeImports: string[];
   dormantCoreRoutingImports: string[];
   turnRoutePolicyDynamicFallback: string[];
@@ -65,6 +66,9 @@ export const RUNTIME_REQUIRED_BANKS = [
   "intent_patterns_excel_pt",
   "document_intelligence_bank_map",
   "task_answer_with_sources",
+  "task_plan_generation",
+  "editing_task_prompts",
+  "llm_builder_policy",
   "fallback_prompt",
   "fallback_router",
   "fallback_processing",
@@ -84,8 +88,9 @@ export const RUNTIME_REQUIRED_BANKS = [
   "refusal_policy",
 ] as const;
 
-function collectRenderPolicyHookBankIds(bank: any): string[] {
-  const hooks = bank?.config?.integrationHooks;
+function collectRenderPolicyHookBankIds(bank: Record<string, unknown> | null): string[] {
+  const config = bank?.config as Record<string, unknown> | undefined;
+  const hooks = config?.integrationHooks;
   if (!hooks || typeof hooks !== "object") return [];
   const ids = new Set<string>();
   for (const value of Object.values(hooks)) {
@@ -107,10 +112,10 @@ function normalizeUpper(value: unknown): string {
   return asTrimmedString(value).toUpperCase();
 }
 
-function collectOperatorIdsFromIntentConfig(bank: any): Set<string> {
+function collectOperatorIdsFromIntentConfig(bank: Record<string, unknown> | null): Set<string> {
   const out = new Set<string>();
   const families = Array.isArray(bank?.intentFamilies)
-    ? bank.intentFamilies
+    ? (bank.intentFamilies as Array<Record<string, unknown>>)
     : [];
   for (const family of families) {
     const allowed = Array.isArray(family?.operatorsAllowed)
@@ -124,9 +129,9 @@ function collectOperatorIdsFromIntentConfig(bank: any): Set<string> {
   return out;
 }
 
-function collectOperatorIdsFromOperatorFamilies(bank: any): Set<string> {
+function collectOperatorIdsFromOperatorFamilies(bank: Record<string, unknown> | null): Set<string> {
   const out = new Set<string>();
-  const families = Array.isArray(bank?.families) ? bank.families : [];
+  const families = Array.isArray(bank?.families) ? (bank.families as Array<Record<string, unknown>>) : [];
   for (const family of families) {
     const ops = Array.isArray(family?.operators) ? family.operators : [];
     for (const op of ops) {
@@ -137,9 +142,9 @@ function collectOperatorIdsFromOperatorFamilies(bank: any): Set<string> {
   return out;
 }
 
-function collectOperatorIdsFromIntentPatterns(bank: any): Set<string> {
+function collectOperatorIdsFromIntentPatterns(bank: Record<string, unknown> | null): Set<string> {
   const out = new Set<string>();
-  const patterns = Array.isArray(bank?.patterns) ? bank.patterns : [];
+  const patterns = Array.isArray(bank?.patterns) ? (bank.patterns as Array<Record<string, unknown>>) : [];
   for (const pattern of patterns) {
     const op = normalizeLower(pattern?.operator);
     if (op) out.add(op);
@@ -147,12 +152,12 @@ function collectOperatorIdsFromIntentPatterns(bank: any): Set<string> {
   return out;
 }
 
-function collectContractOperatorIds(bank: any): Set<string> {
+function collectContractOperatorIds(bank: Record<string, unknown> | null): Set<string> {
   const out = new Set<string>();
-  const operators = bank?.operators;
+  const operators = bank?.operators as unknown;
   if (Array.isArray(operators)) {
     for (const entry of operators) {
-      const id = normalizeLower(entry?.id);
+      const id = normalizeLower((entry as Record<string, unknown>)?.id);
       if (id) out.add(id);
     }
     return out;
@@ -166,7 +171,7 @@ function collectContractOperatorIds(bank: any): Set<string> {
   return out;
 }
 
-function collectOutputShapeOperatorIds(bank: any): Set<string> {
+function collectOutputShapeOperatorIds(bank: Record<string, unknown> | null): Set<string> {
   const out = new Set<string>();
   const mapping =
     bank?.mapping && typeof bank.mapping === "object" ? bank.mapping : {};
@@ -183,14 +188,14 @@ function collectOutputShapeOperatorIds(bank: any): Set<string> {
   return out;
 }
 
-function collectEditingOpsFromPatternBank(bank: any): Set<string> {
+function collectEditingOpsFromPatternBank(bank: Record<string, unknown> | null): Set<string> {
   const out = new Set<string>();
-  const patterns = Array.isArray(bank?.patterns) ? bank.patterns : [];
+  const patterns = Array.isArray(bank?.patterns) ? (bank.patterns as Array<Record<string, unknown>>) : [];
   for (const pattern of patterns) {
     const operator = normalizeUpper(pattern?.operator);
     if (operator) out.add(operator);
     const planTemplate = Array.isArray(pattern?.planTemplate)
-      ? pattern.planTemplate
+      ? (pattern.planTemplate as Array<Record<string, unknown>>)
       : [];
     for (const step of planTemplate) {
       const op = normalizeUpper(step?.op);
@@ -200,18 +205,116 @@ function collectEditingOpsFromPatternBank(bank: any): Set<string> {
   return out;
 }
 
-function collectPromptRegistryUnreachableRules(promptRegistry: any): string[] {
-  const rules = Array.isArray(promptRegistry?.selectionRules?.rules)
-    ? promptRegistry.selectionRules.rules
+function collectPromptRegistryInvalidLayers(promptRegistry: Record<string, unknown> | null): string[] {
+  const layers =
+    promptRegistry?.layersByKind && typeof promptRegistry.layersByKind === "object"
+      ? (promptRegistry.layersByKind as Record<string, unknown>)
+      : null;
+  if (!layers) return [];
+
+  const promptFiles = Array.isArray(promptRegistry?.promptFiles)
+    ? promptRegistry.promptFiles
     : [];
-  const unreachable: string[] = [];
-  let sawCatchAll = false;
-  for (const rule of rules) {
-    const id = asTrimmedString(rule?.id) || "rule";
-    if (sawCatchAll) unreachable.push(id);
-    if (rule?.when?.any === true) sawCatchAll = true;
+  const knownPromptIds = new Set<string>(
+    promptFiles
+      .map((row: unknown) => asTrimmedString((row as Record<string, unknown>)?.id))
+      .filter((id: string) => id.length > 0),
+  );
+
+  const failures: string[] = [];
+  for (const [kind, rawIds] of Object.entries(layers)) {
+    if (!Array.isArray(rawIds)) {
+      failures.push(`invalid_layer_shape:${kind}`);
+      continue;
+    }
+    const seen = new Set<string>();
+    for (const rawId of rawIds) {
+      const id = asTrimmedString(rawId);
+      if (!id) {
+        failures.push(`empty_layer_id:${kind}`);
+        continue;
+      }
+      if (seen.has(id)) {
+        failures.push(`duplicate_layer_id:${kind}:${id}`);
+        continue;
+      }
+      seen.add(id);
+      if (knownPromptIds.size > 0 && !knownPromptIds.has(id)) {
+        failures.push(`unknown_layer_id:${kind}:${id}`);
+      }
+    }
   }
-  return unreachable;
+
+  return failures;
+}
+
+function collectPromptTemplateOutputModeIssues(
+  bank: Record<string, unknown> | null,
+  bankId: string,
+): string[] {
+  if (!bank || typeof bank !== "object") return [];
+  const templates = Array.isArray(bank.templates) ? (bank.templates as Array<Record<string, unknown>>) : [];
+  const failures: string[] = [];
+  const allowedModes = new Set(["machine_json", "user_text"]);
+  for (const template of templates) {
+    const templateId = asTrimmedString(template?.id) || "template";
+    const outputMode = normalizeLower(template?.outputMode);
+    if (!outputMode) {
+      failures.push(`missing_output_mode:${bankId}:${templateId}`);
+      continue;
+    }
+    if (!allowedModes.has(outputMode)) {
+      failures.push(`invalid_output_mode:${bankId}:${templateId}:${outputMode}`);
+    }
+    if (bankId === "task_plan_generation" && outputMode !== "machine_json") {
+      failures.push(`planner_requires_machine_json:${bankId}:${templateId}`);
+    }
+  }
+  return failures;
+}
+
+function collectBuilderPolicyIssues(policyBank: Record<string, unknown> | null): string[] {
+  if (!policyBank || typeof policyBank !== "object") {
+    return ["missing_llm_builder_policy_bank"];
+  }
+  const config =
+    policyBank.config && typeof policyBank.config === "object"
+      ? (policyBank.config as Record<string, unknown>)
+      : null;
+  if (!config) return ["invalid_llm_builder_policy_config_shape"];
+
+  const failures: string[] = [];
+  const floors = config.docGroundedMinOutputTokensByMode;
+  if (!floors || typeof floors !== "object" || Array.isArray(floors)) {
+    failures.push("invalid_doc_grounded_min_output_tokens_by_mode");
+  }
+  const styleClampModes = config.styleClampModes;
+  if (!Array.isArray(styleClampModes) || styleClampModes.length === 0) {
+    failures.push("invalid_style_clamp_modes");
+  }
+  const payloadCaps = config.payloadCaps;
+  if (!payloadCaps || typeof payloadCaps !== "object" || Array.isArray(payloadCaps)) {
+    failures.push("invalid_payload_caps");
+  } else {
+    const keys = [
+      "memoryCharsDefault",
+      "memoryCharsDocGrounded",
+      "userSectionCharsMax",
+      "toolContextCharsMax",
+      "totalUserPayloadCharsMax",
+    ];
+    for (const key of keys) {
+      const value = Number((payloadCaps as Record<string, unknown>)[key]);
+      if (!Number.isFinite(value) || value <= 0) {
+        failures.push(`invalid_payload_cap:${key}`);
+      }
+    }
+  }
+  const evidenceCaps = config.evidenceCapsByMode;
+  if (!evidenceCaps || typeof evidenceCaps !== "object" || Array.isArray(evidenceCaps)) {
+    failures.push("invalid_evidence_caps_by_mode");
+  }
+  return failures;
 }
 
 function collectLegacyChatRuntimeImports(): string[] {
@@ -385,7 +488,7 @@ function collectRawConsoleRuntimeUsage(): string[] {
       "backend/src/services/creative/creativeOrchestrator.service.ts",
     ),
   ];
-  const loggingPolicy = getOptionalBank<any>("logging_policy");
+  const loggingPolicy = getOptionalBank<Record<string, unknown>>("logging_policy");
   const policyEnabled = loggingPolicy?.config?.enabled !== false;
   const policyPaths = Array.isArray(
     loggingPolicy?.config?.runtimePathsNoRawConsole,
@@ -524,9 +627,9 @@ function collectDormantIntentConfigUsage(): string[] {
   return failures;
 }
 
-function collectComposeAnswerModeTemplateGaps(taskAnswerBank: any): string[] {
+function collectComposeAnswerModeTemplateGaps(taskAnswerBank: Record<string, unknown> | null): string[] {
   const templates = Array.isArray(taskAnswerBank?.templates)
-    ? taskAnswerBank.templates
+    ? (taskAnswerBank.templates as Array<Record<string, unknown>>)
     : [];
   if (templates.length === 0) {
     return ["task_answer_with_sources:templates_missing"];
@@ -534,8 +637,9 @@ function collectComposeAnswerModeTemplateGaps(taskAnswerBank: any): string[] {
 
   const presentModes = new Set<string>();
   for (const template of templates) {
-    const modes = Array.isArray(template?.when?.answerModes)
-      ? template.when.answerModes
+    const when = template?.when as Record<string, unknown> | undefined;
+    const modes = Array.isArray(when?.answerModes)
+      ? when.answerModes
       : [];
     for (const mode of modes) {
       const normalized = asTrimmedString(mode);
@@ -622,22 +726,25 @@ function collectProductHelpRuntimeUsageMissing(): string[] {
 
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
-    const renderPolicy = getOptionalBank<any>("render_policy");
+    const renderPolicy = getOptionalBank<Record<string, unknown>>("render_policy");
     const hookRequiredBanks = collectRenderPolicyHookBankIds(renderPolicy);
     const requiredBanks = Array.from(
       new Set<string>([...RUNTIME_REQUIRED_BANKS, ...hookRequiredBanks]),
     );
     const missingBanks = requiredBanks.filter((id) => !getOptionalBank(id));
 
-    const intentConfig = getOptionalBank<any>("intent_config");
-    const operatorFamilies = getOptionalBank<any>("operator_families");
-    const intentPatterns = getOptionalBank<any>("intent_patterns");
-    const operatorContracts = getOptionalBank<any>("operator_contracts");
-    const operatorOutputShapes = getOptionalBank<any>("operator_output_shapes");
-    const promptRegistry = getOptionalBank<any>("prompt_registry");
-    const taskAnswerWithSources = getOptionalBank<any>(
+    const intentConfig = getOptionalBank<Record<string, unknown>>("intent_config");
+    const operatorFamilies = getOptionalBank<Record<string, unknown>>("operator_families");
+    const intentPatterns = getOptionalBank<Record<string, unknown>>("intent_patterns");
+    const operatorContracts = getOptionalBank<Record<string, unknown>>("operator_contracts");
+    const operatorOutputShapes = getOptionalBank<Record<string, unknown>>("operator_output_shapes");
+    const promptRegistry = getOptionalBank<Record<string, unknown>>("prompt_registry");
+    const taskAnswerWithSources = getOptionalBank<Record<string, unknown>>(
       "task_answer_with_sources",
     );
+    const taskPlanGeneration = getOptionalBank<Record<string, unknown>>("task_plan_generation");
+    const editingTaskPrompts = getOptionalBank<Record<string, unknown>>("editing_task_prompts");
+    const llmBuilderPolicy = getOptionalBank<Record<string, unknown>>("llm_builder_policy");
 
     const routingOps = new Set<string>([
       ...collectOperatorIdsFromIntentConfig(intentConfig),
@@ -655,8 +762,8 @@ export class RuntimeWiringIntegrityService {
       (op) => !outputShapeOps.has(op),
     );
 
-    const operatorCatalog = getOptionalBank<any>("operator_catalog");
-    const allybiCapabilities = getOptionalBank<any>("allybi_capabilities");
+    const operatorCatalog = getOptionalBank<Record<string, unknown>>("operator_catalog");
+    const allybiCapabilities = getOptionalBank<Record<string, unknown>>("allybi_capabilities");
     const catalogOperators = new Set<string>(
       Object.keys(operatorCatalog?.operators || {}).map(normalizeUpper),
     );
@@ -665,10 +772,10 @@ export class RuntimeWiringIntegrityService {
     );
 
     const editingPatternBanks = [
-      getOptionalBank<any>("intent_patterns_docx_en"),
-      getOptionalBank<any>("intent_patterns_docx_pt"),
-      getOptionalBank<any>("intent_patterns_excel_en"),
-      getOptionalBank<any>("intent_patterns_excel_pt"),
+      getOptionalBank<Record<string, unknown>>("intent_patterns_docx_en"),
+      getOptionalBank<Record<string, unknown>>("intent_patterns_docx_pt"),
+      getOptionalBank<Record<string, unknown>>("intent_patterns_excel_en"),
+      getOptionalBank<Record<string, unknown>>("intent_patterns_excel_pt"),
     ];
     const editingOps = new Set<string>();
     for (const bank of editingPatternBanks) {
@@ -684,8 +791,26 @@ export class RuntimeWiringIntegrityService {
       (op) => !capabilityOperators.has(op),
     );
 
-    const unreachablePromptSelectionRules =
-      collectPromptRegistryUnreachableRules(promptRegistry);
+    const invalidPromptLayers = collectPromptRegistryInvalidLayers(promptRegistry);
+    const invalidPromptTemplateOutputModes = [
+      ...collectPromptTemplateOutputModeIssues(
+        taskPlanGeneration,
+        "task_plan_generation",
+      ),
+      ...collectPromptTemplateOutputModeIssues(
+        editingTaskPrompts,
+        "editing_task_prompts",
+      ),
+    ];
+    const builderPolicyIssues = collectBuilderPolicyIssues(llmBuilderPolicy);
+    const missingBuilderPolicyBank = builderPolicyIssues.includes(
+      "missing_llm_builder_policy_bank",
+    )
+      ? ["llm_builder_policy"]
+      : [];
+    const invalidBuilderPolicy = builderPolicyIssues.filter(
+      (issue) => issue !== "missing_llm_builder_policy_bank",
+    );
     const legacyChatRuntimeImports = collectLegacyChatRuntimeImports();
     const dormantCoreRoutingImports = collectDormantCoreRoutingImports();
     const turnRoutePolicyDynamicFallback =
@@ -712,7 +837,10 @@ export class RuntimeWiringIntegrityService {
         missingOperatorOutputShapes.length === 0 &&
         missingEditingCatalogOperators.length === 0 &&
         missingEditingCapabilities.length === 0 &&
-        unreachablePromptSelectionRules.length === 0 &&
+        invalidPromptLayers.length === 0 &&
+        invalidPromptTemplateOutputModes.length === 0 &&
+        missingBuilderPolicyBank.length === 0 &&
+        invalidBuilderPolicy.length === 0 &&
         legacyChatRuntimeImports.length === 0 &&
         dormantCoreRoutingImports.length === 0 &&
         turnRoutePolicyDynamicFallback.length === 0 &&
@@ -730,7 +858,10 @@ export class RuntimeWiringIntegrityService {
       missingOperatorOutputShapes,
       missingEditingCatalogOperators,
       missingEditingCapabilities,
-      unreachablePromptSelectionRules,
+      invalidPromptLayers,
+      invalidPromptTemplateOutputModes,
+      missingBuilderPolicyBank,
+      invalidBuilderPolicy,
       legacyChatRuntimeImports,
       dormantCoreRoutingImports,
       turnRoutePolicyDynamicFallback,

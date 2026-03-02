@@ -269,7 +269,7 @@ export default function ContinueCard({ onUpload }) {
               icon={<ChatBubbleIcon style={{ width: 18, height: 18, filter: 'brightness(0) invert(0.35)' }} />}
               label={chat.title || t('home.continue.untitledChat')}
               subtitle={formatTimeAgo(chat.updatedAt || chat.createdAt, t)}
-              onClick={() => navigate(buildRoute.document(chat.id))}
+              onClick={() => navigate(buildRoute.chat(chat.id))}
             />
           ))}
         </div>

@@ -3,13 +3,13 @@
     "id": "feature_flags",
     "version": "1.0.0",
     "description": "Central feature flag control plane for Koda. Flags gate behavior across routing, retrieval, composition, and UX rendering so changes can be rolled out safely without hardcoding. Supports per-env defaults and optional runtime overrides.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-25"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-02"
   },
-
   "config": {
     "enabled": true,
-
     "_comment": "If a flag is referenced but missing, fail in prod/staging to avoid silent drift.",
     "failOnUnknownFlagByEnv": {
       "production": true,
@@ -17,7 +17,6 @@
       "dev": false,
       "local": false
     },
-
     "_comment2": "Runtime overrides can be supplied by env vars or DB; this bank defines which are allowed.",
     "runtimeOverrides": {
       "enabled": true,
@@ -27,11 +26,16 @@
         "ff.regen_variation_seed",
         "ff.bold_keywords_from_query",
         "ff.short_paragraph_enforcement",
-        "ff.doc_title_keyword_discovery"
+        "ff.doc_title_keyword_discovery",
+        "ff.provenance_user_failopen_with_evidence",
+        "ff.provenance_thresholds_v3",
+        "ff.provenance_telemetry_dual_channel",
+        "ff.viewer_qa_locked_default",
+        "ff.viewer_source_navigation_animation",
+        "ff.viewer_cross_document_source_jump"
       ]
     }
   },
-
   "flags": [
     {
       "id": "ff.nav_pills_sources_ui_contract",
@@ -43,7 +47,11 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["render_policy", "answer_mode_router", "frontend_sources_ui"],
+      "impacts": [
+        "render_policy",
+        "answer_mode_router",
+        "frontend_sources_ui"
+      ],
       "riskLevel": "low"
     },
     {
@@ -56,7 +64,11 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["quality_gates", "fallback_engine", "microcopy"],
+      "impacts": [
+        "quality_gates",
+        "fallback_engine",
+        "microcopy"
+      ],
       "riskLevel": "medium"
     },
     {
@@ -69,7 +81,11 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["answer_composer", "microcopy_picker", "prompt_templates"],
+      "impacts": [
+        "answer_composer",
+        "microcopy_picker",
+        "prompt_templates"
+      ],
       "riskLevel": "medium"
     },
     {
@@ -82,7 +98,10 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["bolding_normalizer", "answer_composer"],
+      "impacts": [
+        "bolding_normalizer",
+        "answer_composer"
+      ],
       "riskLevel": "low"
     },
     {
@@ -95,7 +114,10 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["markdown_normalizer", "answer_style_policy"],
+      "impacts": [
+        "markdown_normalizer",
+        "answer_style_policy"
+      ],
       "riskLevel": "low"
     },
     {
@@ -108,7 +130,11 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["file_inventory", "retrieval_ranker", "intent_patterns"],
+      "impacts": [
+        "file_inventory",
+        "retrieval_ranker",
+        "intent_patterns"
+      ],
       "riskLevel": "high"
     },
     {
@@ -121,8 +147,61 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["provenance", "response_contract_enforcer"],
+      "impacts": [
+        "provenance",
+        "response_contract_enforcer"
+      ],
       "riskLevel": "high"
+    },
+    {
+      "id": "ff.provenance_user_failopen_with_evidence",
+      "description": "When provenance refs are missing but scoped evidence exists, keep user response path and emit hedge telemetry instead of hard fallback.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": [
+        "provenance",
+        "answer_finalization",
+        "telemetry"
+      ],
+      "riskLevel": "high"
+    },
+    {
+      "id": "ff.provenance_thresholds_v3",
+      "description": "Use calibrated provenance lexical/anchor thresholds with normalization for diacritics and localized numeric formatting.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": [
+        "provenance",
+        "retrieval_evidence_matching"
+      ],
+      "riskLevel": "medium"
+    },
+    {
+      "id": "ff.provenance_telemetry_dual_channel",
+      "description": "Emit provenance reason/action telemetry even when user-facing failure is suppressed.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": [
+        "telemetry",
+        "trace_debug",
+        "retrieval_events"
+      ],
+      "riskLevel": "low"
     },
     {
       "id": "ff.quality_gates_enforcing",
@@ -134,7 +213,10 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["quality_gates", "answer_finalization"],
+      "impacts": [
+        "quality_gates",
+        "answer_finalization"
+      ],
       "riskLevel": "high"
     },
     {
@@ -147,7 +229,10 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["language_contract", "answer_finalization"],
+      "impacts": [
+        "language_contract",
+        "answer_finalization"
+      ],
       "riskLevel": "medium"
     },
     {
@@ -160,7 +245,10 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["conversation_memory", "chat_runtime"],
+      "impacts": [
+        "conversation_memory",
+        "chat_runtime"
+      ],
       "riskLevel": "medium"
     },
     {
@@ -173,7 +261,10 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["prompt_registry", "answer_composition"],
+      "impacts": [
+        "prompt_registry",
+        "answer_composition"
+      ],
       "riskLevel": "high"
     },
     {
@@ -186,7 +277,9 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["quality_gates"],
+      "impacts": [
+        "quality_gates"
+      ],
       "riskLevel": "low"
     },
     {
@@ -199,11 +292,61 @@
         "dev": true,
         "local": true
       },
-      "impacts": ["prompt_registry", "orchestrator"],
+      "impacts": [
+        "prompt_registry",
+        "orchestrator"
+      ],
       "riskLevel": "high"
+    },
+    {
+      "id": "ff.viewer_qa_locked_default",
+      "description": "Default Ask Allybi in document viewer to qa_locked intent so responses remain scoped to the active document.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": [
+        "editor_session_routes",
+        "viewer_chat"
+      ],
+      "riskLevel": "medium"
+    },
+    {
+      "id": "ff.viewer_source_navigation_animation",
+      "description": "Enable animated in-document navigation for source pill clicks (pdf page spotlight, sheet selection, slide jump, paragraph jump).",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": [
+        "viewer_sources_ui",
+        "document_viewer"
+      ],
+      "riskLevel": "low"
+    },
+    {
+      "id": "ff.viewer_cross_document_source_jump",
+      "description": "Allow viewer source clicks to open a different document while preserving qa_locked context.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": [
+        "viewer_sources_ui",
+        "routing"
+      ],
+      "riskLevel": "medium"
     }
   ],
-
   "tests": {
     "_comment": "Boot-time validation.",
     "cases": [

@@ -10,6 +10,11 @@ export interface CertificationGateReport {
   gateId: string;
   passed: boolean;
   generatedAt: string;
+  meta?: {
+    commitHash?: string | null;
+    source?: string;
+    lifecycleEvent?: string;
+  };
   metrics: CertificationGateMetrics;
   thresholds: CertificationGateThresholds;
   failures: string[];

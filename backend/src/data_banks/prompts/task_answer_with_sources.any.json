@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "task_answer_with_sources",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "description": "Task-level answer formatting with structured sources contract.",
     "languages": ["any", "en", "pt", "es"],
     "lastUpdated": "2026-03-02"
@@ -18,7 +18,7 @@
         {
           "role": "system",
           "content": {
-            "any": "Answer task contract: produce a concise user-facing answer grounded in provided evidence only. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
+            "any": "Answer task contract: produce a complete, user-facing answer to the specific question using provided evidence only. Keep structure tight and avoid generic overviews. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
           }
         }
       ]
@@ -31,7 +31,7 @@
         {
           "role": "system",
           "content": {
-            "any": "Answer task contract: produce a concise user-facing answer grounded in provided evidence only. Include exact quote(s) from the retrieved snippets when asked. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
+            "any": "Answer task contract: produce a focused, user-facing answer grounded in provided evidence only. Include exact quote(s) from retrieved snippets when requested. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
           }
         }
       ]
@@ -44,7 +44,7 @@
         {
           "role": "system",
           "content": {
-            "any": "Answer task contract: produce user-facing markdown with a compact table grounded in provided evidence only. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
+            "any": "Answer task contract: produce user-facing markdown with a compact, evidence-grounded table for the requested slice. If full output is long, summarize remaining rows clearly. Do NOT include an inline `Sources` section — citations are rendered via source attachments/buttons."
           }
         }
       ]

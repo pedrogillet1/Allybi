@@ -1120,7 +1120,12 @@ export function enforceCrossDocPolicy(
     normalizeStringList(ctx.explicitDocDomains || []),
   );
   const compareIntent = isCompareIntent(ctx);
-  const crossDocRequested = compareIntent || ctx.explicitDocsCount > 1;
+  const compareLikelyIntraDoc =
+    compareIntent &&
+    ctx.explicitDocsCount <= 1 &&
+    candidateDocIds.length <= 1;
+  const crossDocRequested =
+    (!compareLikelyIntraDoc && compareIntent) || ctx.explicitDocsCount > 1;
   const selectedRule = resolveCrossDocRule(ctx, policyBank);
 
   if (!policyBank || typeof policyBank !== "object") {
@@ -1198,7 +1203,11 @@ export function enforceCrossDocPolicy(
     };
   }
 
-  if (compareIntent && ctx.explicitDocsCount < minExplicitForCompare) {
+  if (
+    !compareLikelyIntraDoc &&
+    compareIntent &&
+    ctx.explicitDocsCount < minExplicitForCompare
+  ) {
     return {
       allow: false,
       reasonCode: "cross_doc_compare_needs_explicit_docs",

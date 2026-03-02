@@ -209,16 +209,16 @@
             "type": "regex",
             "locale": "en",
             "patterns": [
-              "\\b(draft|compose|write)\\b.{0,12}\\b(an\\s+)?(email|message)\\b",
-              "\\bdraft\\b.{0,10}\\bemail\\b"
+              "\\b(draft|compose|write|create|craft|generate)\\b.{0,12}\\b(an\\s+)?(email|message)\\b",
+              "\\b(draft|create|craft|generate)\\b.{0,10}\\bemail\\b"
             ]
           },
           {
             "type": "regex",
             "locale": "pt",
             "patterns": [
-              "\\b(redigir|escrever|compor)\\b.{0,12}\\b(um\\s+)?(email|e-mail|mensagem)\\b",
-              "\\bredigir\\b.{0,10}\\bemail\\b"
+              "\\b(redigir|escrever|compor|criar|gerar)\\b.{0,12}\\b(um\\s+)?(email|e-mail|mensagem)\\b",
+              "\\b(redigir|criar|gerar)\\b.{0,10}\\bemail\\b"
             ]
           }
         ]

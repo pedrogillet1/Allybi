@@ -1,5 +1,4 @@
 // languageDetector.service.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * Koda Language Detector (ChatGPT-parity, deterministic)
@@ -33,7 +32,7 @@ type EnvName = "production" | "staging" | "dev" | "local";
 export type LangCode = "any" | "en" | "pt" | "es";
 
 export interface BankLoader {
-  getBank<T = any>(bankId: string): T;
+  getBank<T = unknown>(bankId: string): T;
 }
 
 export interface LanguageDetectionInput {
@@ -105,7 +104,7 @@ function normalizeForDetection(s: string): string {
   return normalizeWhitespace(s).replace(/\s+/g, " ").toLowerCase();
 }
 
-function safeRegExpList(patterns: any): RegExp[] {
+function safeRegExpList(patterns: unknown): RegExp[] {
   if (!Array.isArray(patterns)) return [];
   const out: RegExp[] = [];
   for (const p of patterns) {
@@ -132,7 +131,7 @@ function sha256(s: string): string {
   return crypto.createHash("sha256").update(s, "utf8").digest("hex");
 }
 
-function isLang(x: any): x is LangCode {
+function isLang(x: unknown): x is LangCode {
   return x === "any" || x === "en" || x === "pt" || x === "es";
 }
 
@@ -163,17 +162,18 @@ export class LanguageDetectorService {
     const normalized = normalizeForDetection(raw);
 
     // Load banks (soft if missing)
-    const triggers = this.safeGetBank<any>("language_triggers");
-    const indicators = this.safeGetBank<any>("language_indicators");
+    const triggers = this.safeGetBank<Record<string, unknown>>("language_triggers");
+    const indicators = this.safeGetBank<Record<string, unknown>>("language_indicators");
 
     // Defaults (from banks when present)
-    const envCfg = triggers?.config ?? {};
+    const envCfg = (triggers?.config as Record<string, unknown>) ?? {};
     const defaultLanguage: LangCode =
       envCfg.defaultLanguage && isLang(envCfg.defaultLanguage)
         ? envCfg.defaultLanguage
         : "any";
 
-    const trigThresholds = triggers?.config?.actionsContract?.thresholds ?? {};
+    const actionsContract = envCfg.actionsContract as Record<string, unknown> | undefined;
+    const trigThresholds = (actionsContract?.thresholds as Record<string, unknown>) ?? {};
     const explicitDirectiveConfidence = clamp01(
       Number(trigThresholds.explicitDirectiveConfidence ?? 0.95),
     );
@@ -184,17 +184,19 @@ export class LanguageDetectorService {
       Number(trigThresholds.implicitCueConfidence ?? 0.75),
     );
 
-    const indCfg = indicators?.config ?? {};
+    const indCfg = (indicators?.config as Record<string, unknown>) ?? {};
     const supported: Array<"en" | "pt" | "es"> = Array.isArray(indCfg.supported)
-      ? indCfg.supported.filter(
-          (x: any) => x === "en" || x === "pt" || x === "es",
-        )
+      ? (indCfg.supported as unknown[]).filter(
+          (x: unknown) => x === "en" || x === "pt" || x === "es",
+        ) as Array<"en" | "pt" | "es">
       : ["en", "pt", "es"];
     const minConfidenceToSelect = clamp01(
       Number(indCfg.minConfidenceToSelect ?? 0.75),
     );
+    const indActionsContract = indCfg.actionsContract as Record<string, unknown> | undefined;
+    const indThresholds = (indActionsContract?.thresholds as Record<string, unknown>) ?? {};
     const minConfidenceGap = clamp01(
-      Number(indCfg.actionsContract?.thresholds?.minConfidenceGap ?? 0.15),
+      Number(indThresholds?.minConfidenceGap ?? 0.15),
     );
 
     const debug = {
@@ -335,7 +337,7 @@ export class LanguageDetectorService {
   // -------------------------
 
   private applyLanguageTriggers(
-    triggersBank: any | null,
+    triggersBank: Record<string, unknown> | null,
     normalized: string,
     debug: {
       matchedDirectiveRuleIds: string[];
@@ -354,7 +356,8 @@ export class LanguageDetectorService {
       pt: 0,
       es: 0,
     };
-    if (!triggersBank?.config?.enabled) {
+    const triggerConfig = triggersBank?.config as Record<string, unknown> | undefined;
+    if (!triggerConfig?.enabled) {
       return {
         languageRequested: false,
         languageSelected: null,
@@ -363,7 +366,7 @@ export class LanguageDetectorService {
       };
     }
 
-    const rules = Array.isArray(triggersBank.rules) ? triggersBank.rules : [];
+    const rules = Array.isArray(triggersBank.rules) ? (triggersBank.rules as Array<Record<string, unknown>>) : [];
     let bestExplicit: { lang: Exclude<LangCode, "any">; conf: number } | null =
       null;
     let mixedLanguageHint = false;
@@ -371,7 +374,7 @@ export class LanguageDetectorService {
     // We treat these banks as "pattern + action"; we evaluate triggerPatterns across en/pt/es keys.
     for (const r of rules) {
       const rid = r.id ?? r.ruleId ?? null;
-      const pats = r.triggerPatterns ?? null;
+      const pats = r.triggerPatterns as Record<string, unknown> | null ?? null;
       if (!rid || !pats) continue;
 
       const en = safeRegExpList(pats.en);
@@ -386,7 +389,7 @@ export class LanguageDetectorService {
 
       debug.matchedDirectiveRuleIds.push(String(rid));
 
-      const action = r.action ?? {};
+      const action = (r.action as Record<string, unknown>) ?? {};
       const type = action.type ?? "";
       if (type === "set_language") {
         const lang = action.language as LangCode;
@@ -433,7 +436,7 @@ export class LanguageDetectorService {
   // -------------------------
 
   private applyLanguageIndicators(
-    indicatorsBank: any | null,
+    indicatorsBank: Record<string, unknown> | null,
     normalized: string,
     supported: Array<"en" | "pt" | "es">,
     debug: {
@@ -451,7 +454,8 @@ export class LanguageDetectorService {
     // Default: neutral scores
     const scores: Record<"en" | "pt" | "es", number> = { en: 0, pt: 0, es: 0 };
 
-    if (!indicatorsBank?.config?.enabled) {
+    const indBankConfig = indicatorsBank?.config as Record<string, unknown> | undefined;
+    if (!indBankConfig?.enabled) {
       // fallback heuristic: basic cues
       scores.en = /\b(the|and|please|summary)\b/.test(normalized) ? 0.7 : 0.4;
       scores.pt = /\b(você|não|relatório|página)\b/.test(normalized)
@@ -470,13 +474,13 @@ export class LanguageDetectorService {
     }
 
     const rules = Array.isArray(indicatorsBank.rules)
-      ? indicatorsBank.rules
+      ? (indicatorsBank.rules as Array<Record<string, unknown>>)
       : [];
 
     // Evaluate rule patterns. We interpret actions.score_language with weight.
     for (const r of rules) {
       const rid = r.id ?? r.ruleId ?? null;
-      const pats = r.triggerPatterns ?? null;
+      const pats = r.triggerPatterns as Record<string, unknown> | null ?? null;
       if (!rid || !pats) continue;
 
       const en = safeRegExpList(pats.en);
@@ -493,7 +497,7 @@ export class LanguageDetectorService {
 
       debug.matchedIndicatorRuleIds.push(String(rid));
 
-      const action = r.action ?? {};
+      const action = (r.action as Record<string, unknown>) ?? {};
       const type = action.type ?? "";
       if (type === "score_language") {
         const lang = action.language as string;
@@ -534,7 +538,7 @@ export class LanguageDetectorService {
   // Bank loader
   // -------------------------
 
-  private safeGetBank<T = any>(bankId: string): T | null {
+  private safeGetBank<T = unknown>(bankId: string): T | null {
     try {
       return this.bankLoader.getBank<T>(bankId);
     } catch {

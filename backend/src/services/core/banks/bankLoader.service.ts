@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 /**
  * Koda Bank Loader Service (ChatGPT-parity, orchestrator-friendly)
  * ---------------------------------------------------------------
@@ -29,9 +27,9 @@ import {
 type EnvName = "production" | "staging" | "dev" | "local";
 
 export interface BankLoaderLogger {
-  info: (msg: string, meta?: any) => void;
-  warn: (msg: string, meta?: any) => void;
-  error: (msg: string, meta?: any) => void;
+  info: (msg: string, meta?: Record<string, unknown>) => void;
+  warn: (msg: string, meta?: Record<string, unknown>) => void;
+  error: (msg: string, meta?: Record<string, unknown>) => void;
 }
 
 export interface BankLoaderInitOptions {
@@ -140,10 +138,11 @@ export class BankLoaderService {
         rootDir: opts.rootDir,
         loadedCount: this.loader.listLoadedIds().length,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errRecord = err as Record<string, unknown> | null;
       this.lastError = {
-        name: err?.name ?? "Error",
-        message: err?.message ?? String(err),
+        name: String(errRecord?.name ?? "Error"),
+        message: String(errRecord?.message ?? String(err)),
       };
       logger.error("BankLoader failed to initialize", {
         error: this.lastError,
@@ -179,10 +178,11 @@ export class BankLoaderService {
         env: this.initOpts.env,
         loadedCount: this.loader.listLoadedIds().length,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errRecord = err as Record<string, unknown> | null;
       this.lastError = {
-        name: err?.name ?? "Error",
-        message: err?.message ?? String(err),
+        name: String(errRecord?.name ?? "Error"),
+        message: String(errRecord?.message ?? String(err)),
       };
       logger.error("BankLoader reload failed", { error: this.lastError });
 
@@ -196,16 +196,25 @@ export class BankLoaderService {
    * Get a bank by id (alias resolution supported by underlying loader).
    * Throws if missing.
    */
-  getBank<T = any>(bankId: string): T {
+  getBank<T = unknown>(bankId: string): T {
     this.assertReady();
     return this.loader!.getBank<T>(bankId);
+  }
+
+  /**
+   * Get a bank by id with runtime Zod validation.
+   * Returns the parsed & typed result. Throws on validation failure.
+   */
+  getTypedBank<T>(bankId: string, schema: import("zod").ZodType<T>): T {
+    const raw = this.getBank(bankId);
+    return schema.parse(raw);
   }
 
   /**
    * Get a bank by id; returns null if missing.
    * Useful when you are adding new banks incrementally.
    */
-  getOptionalBank<T = any>(bankId: string): T | null {
+  getOptionalBank<T = unknown>(bankId: string): T | null {
     if (!this.loader) return null;
     try {
       return this.loader.getBank<T>(bankId);
@@ -238,7 +247,7 @@ export class BankLoaderService {
   /**
    * Get registry metadata for a bank (if registry is loaded).
    */
-  getRegistryEntry(bankId: string): any | null {
+  getRegistryEntry(bankId: string): Record<string, unknown> | null {
     this.assertReady();
     return this.loader!.getRegistryEntry(bankId);
   }
@@ -355,14 +364,21 @@ export async function initializeBanks(
 /**
  * Get a bank by ID (convenience wrapper)
  */
-export function getBank<T = any>(bankId: string): T {
+export function getBank<T = unknown>(bankId: string): T {
   return getBankLoaderInstance().getBank<T>(bankId);
+}
+
+/**
+ * Get a bank with Zod schema validation (convenience wrapper)
+ */
+export function getTypedBank<T>(bankId: string, schema: import("zod").ZodType<T>): T {
+  return getBankLoaderInstance().getTypedBank(bankId, schema);
 }
 
 /**
  * Get a bank by ID, returning null if not found
  */
-export function getOptionalBank<T = any>(bankId: string): T | null {
+export function getOptionalBank<T = unknown>(bankId: string): T | null {
   return getBankLoaderInstance().getOptionalBank<T>(bankId);
 }
 

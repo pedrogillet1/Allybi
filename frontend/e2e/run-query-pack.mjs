@@ -108,6 +108,7 @@ function streamChat(body) {
       const events = [];
       let fullText = '';
       let sources = [];
+      let attachments = [];
       let answerMode = null;
       let metadata = {};
       let status = null;
@@ -138,9 +139,14 @@ function streamChat(body) {
               status = status || 'failed';
             }
             if (evt.type === 'final') {
-              if (evt.content) fullText = evt.content;
-              else if (evt.assistantText) fullText = evt.assistantText;
+              // Final event is authoritative — override deltas even when text is empty
+              if ('content' in evt) fullText = evt.content || '';
+              else if ('assistantText' in evt) fullText = evt.assistantText || '';
+              else if ('text' in evt) fullText = evt.text || '';
+              // When backend signals failure with no text, don't keep streamed deltas
+              if (evt.failureCode && !fullText) fullText = '';
               if (Array.isArray(evt.sources)) sources = evt.sources;
+              if (Array.isArray(evt.attachments)) attachments = evt.attachments;
               if (evt.answerMode) answerMode = evt.answerMode;
               if (evt.metadata) metadata = evt.metadata;
               if (evt.status) status = evt.status;
@@ -159,11 +165,47 @@ function streamChat(body) {
       });
 
       res.on('end', () => {
+        const sourcesFromAttachments = (() => {
+          if (!Array.isArray(attachments)) return [];
+          const sourceButtons = attachments.find(
+            (a) => a && typeof a === 'object' && a.type === 'source_buttons' && Array.isArray(a.buttons),
+          );
+          if (!sourceButtons) return [];
+          return sourceButtons.buttons
+            .map((btn) => {
+              if (!btn || typeof btn !== 'object') return null;
+              const location = btn.location && typeof btn.location === 'object' ? btn.location : null;
+              const locationType = String(location?.type || '').toLowerCase();
+              const locationValue = location?.value;
+              const item = {
+                documentId: String(btn.documentId || btn.docId || btn.id || '').trim() || null,
+                filename: String(btn.title || btn.filename || 'Document').trim(),
+                mimeType: btn.mimeType || null,
+                page: null,
+              };
+              if (locationType === 'page' && Number.isFinite(Number(locationValue))) {
+                item.page = Number(locationValue);
+              }
+              if (locationType === 'sheet' && String(locationValue || '').trim()) {
+                item.sheet = String(locationValue || '').trim();
+              }
+              if (locationType === 'slide' && Number.isFinite(Number(locationValue))) {
+                item.slide = Number(locationValue);
+              }
+              return item.documentId ? item : null;
+            })
+            .filter(Boolean);
+        })();
+        const effectiveSources =
+          Array.isArray(sources) && sources.length > 0
+            ? sources
+            : sourcesFromAttachments;
         resolve({
           httpStatus: res.statusCode || 0,
           error: streamError,
           fullText,
-          sources,
+          sources: effectiveSources,
+          attachments,
           answerMode,
           metadata,
           status,
@@ -512,6 +554,7 @@ async function main() {
       assistantTelemetry,
       conversationId: conversationId || null,
       sources: Array.isArray(response.sources) ? response.sources : [],
+      attachments: Array.isArray(response.attachments) ? response.attachments : [],
       answerMode: response.answerMode || null,
       truncation: response.truncation || (Boolean(responseMetadata?.truncation?.occurred || responseMetadata?.truncated === true) ? responseMetadata?.truncation || { occurred: true } : null),
       failureCode: response.failureCode || responseMetadata?.failureCode || null,

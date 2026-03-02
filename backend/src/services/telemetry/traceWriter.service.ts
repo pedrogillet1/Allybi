@@ -150,6 +150,8 @@ export interface TurnDebugPacket {
     required: boolean;
     validated: boolean;
     failureCode: string | null;
+    action?: "allow" | "hedge" | "block" | null;
+    severity?: "warning" | "error" | null;
   };
   budget: {
     requestedMaxOutputTokens: number | null;

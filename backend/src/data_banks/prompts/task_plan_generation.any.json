@@ -1,9 +1,14 @@
 {
   "_meta": {
     "id": "task_plan_generation",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Planner/output-contract prompt for machine-consumed steps.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-03-02"
   },
   "config": {
@@ -17,6 +22,8 @@
         "operators": [
           "plan_edit",
           "plan_multi_intent",
+          "plan_docx",
+          "plan_xlsx",
           "docx_edit_planner",
           "xlsx_edit_planner",
           "sheets_edit_planner",
@@ -31,7 +38,8 @@
             "any": "Planner contract: return only valid JSON matching the required schema. If required fields are missing, return a clarification object instead of free-form prose."
           }
         }
-      ]
+      ],
+      "outputMode": "machine_json"
     }
   ],
   "tests": {
@@ -66,7 +74,11 @@
         },
         "expect": {
           "outputShape": "json_only",
-          "forbidTokens": ["```", "Here is", "Plan:"]
+          "forbidTokens": [
+            "```",
+            "Here is",
+            "Plan:"
+          ]
         }
       },
       {
@@ -79,6 +91,8 @@
           "allowedOperators": [
             "plan_edit",
             "plan_multi_intent",
+            "plan_docx",
+            "plan_xlsx",
             "docx_edit_planner",
             "xlsx_edit_planner",
             "sheets_edit_planner",

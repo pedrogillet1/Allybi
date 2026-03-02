@@ -1587,6 +1587,11 @@ export default function PptxStudio() {
                 pinnedDocuments={doc?.id ? [{ id: doc.id, filename: doc.filename, mimeType: doc.mimeType }] : []}
                 conversationCreateTitle={doc?.filename ? `Studio: ${doc.filename}` : 'Studio'}
                 variant="viewer"
+                viewerIntent="edit"
+                viewerContext={{
+                  activeDocumentId: doc?.id || null,
+                  fileType: 'powerpoint',
+                }}
                 apiRef={chatApiRef}
                 onAssistantFinal={onStudioAssistantFinal}
               />

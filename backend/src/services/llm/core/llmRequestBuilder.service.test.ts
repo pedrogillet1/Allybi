@@ -56,7 +56,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(1600);
+    expect(req.options?.maxOutputTokens).toBe(1200);
   });
 
   test("keeps nav/disambiguation short caps intact", () => {
@@ -70,7 +70,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect((req.options?.maxOutputTokens ?? 0) <= 220).toBe(true);
+    expect((req.options?.maxOutputTokens ?? 0) <= 260).toBe(true);
   });
 
   test("selects fallback prompt kind when fallback is triggered", () => {
@@ -213,7 +213,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(1600);
+    expect(req.options?.maxOutputTokens).toBe(1200);
     const promptCtx = buildPrompt.mock.calls[0]?.[1] as Record<string, any>;
     expect(promptCtx?.runtimeSignals?.styleProfile).toBe("brief");
     expect(promptCtx?.runtimeSignals?.boldingEnabled).toBe(false);
@@ -234,6 +234,54 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(64);
+    expect(req.options?.maxOutputTokens).toBe(256);
+  });
+
+  test("emits resolved token policy metadata for doc-grounded floor", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        options: {
+          maxOutputTokens: 1200,
+        },
+      }),
+    );
+    const meta = req.kodaMeta as Record<string, any>;
+    expect(meta?.resolvedTokenPolicy?.docGroundedFloorApplied).toBe(true);
+    expect(meta?.resolvedTokenPolicy?.docGroundedFloor).toBe(1000);
+    expect(meta?.resolvedTokenPolicy?.finalMaxOutputTokens).toBe(1200);
+  });
+
+  test("caps payload sections and reports payload stats", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_multi",
+        },
+        memoryPack: {
+          contextText: "M".repeat(20000),
+        },
+        evidencePack: {
+          evidence: Array.from({ length: 24 }, (_, idx) => ({
+            docId: `doc_${idx + 1}`,
+            locationKey: `loc_${idx + 1}`,
+            snippet: "S".repeat(1800),
+            evidenceType: "text" as const,
+          })),
+        },
+      }),
+    );
+
+    const userMessage = req.messages.find((msg) => msg.role === "user");
+    expect((userMessage?.content || "").length).toBeLessThanOrEqual(24000);
+
+    const meta = req.kodaMeta as Record<string, any>;
+    const payloadStats = meta?.payloadStats as Record<string, any>;
+    expect(payloadStats?.memoryCharsIncluded).toBeLessThanOrEqual(9000);
+    expect(payloadStats?.evidenceItemsIncluded).toBeLessThanOrEqual(14);
+    expect(payloadStats?.evidenceCharsIncluded).toBeLessThanOrEqual(5600);
+    expect(payloadStats?.estimatedPromptTokens).toBeGreaterThan(0);
   });
 });

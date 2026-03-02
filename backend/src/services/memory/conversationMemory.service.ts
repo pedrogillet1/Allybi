@@ -143,7 +143,9 @@ export class ConversationMemoryService {
               typeof m.metadata === "string"
                 ? JSON.parse(m.metadata)
                 : m.metadata;
-          } catch {}
+          } catch (err: unknown) {
+            console.warn("[conversation-memory] metadata parse failed", { error: (err as Error)?.message ?? String(err) });
+          }
         }
 
         return {
@@ -184,7 +186,8 @@ export class ConversationMemoryService {
 
       this.writeCache(key, context);
       return context;
-    } catch {
+    } catch (err: unknown) {
+      console.error("[conversation-memory] DB query failed", { conversationId, error: (err as Error)?.message ?? String(err) });
       return null;
     }
   }

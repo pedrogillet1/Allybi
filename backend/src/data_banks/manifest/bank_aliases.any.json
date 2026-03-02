@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true,
@@ -405,6 +405,18 @@
       "canonicalId": "compliance_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "connector_operators",
+      "canonicalId": "connector_operators",
+      "type": "runtime_self_alias",
+      "addedAt": "2026-03-02"
+    },
+    {
+      "alias": "connector.operators",
+      "canonicalId": "connector_operators",
+      "type": "compatibility",
+      "addedAt": "2026-03-02"
     },
     {
       "alias": "connectors_routing",
@@ -5719,6 +5731,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "llm_builder_policy",
+      "canonicalId": "llm_builder_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "locale_numeric_date_rules",
       "canonicalId": "locale_numeric_date_rules",
       "source": "runtime_self_alias",
@@ -7993,6 +8011,30 @@
     {
       "alias": "versioning",
       "canonicalId": "versioning",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "viewer_assistant_routing",
+      "canonicalId": "viewer_assistant_routing",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "viewer_locked_chat_policy",
+      "canonicalId": "viewer_locked_chat_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "viewer_source_navigation",
+      "canonicalId": "viewer_source_navigation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "viewer_source_navigation_microcopy",
+      "canonicalId": "viewer_source_navigation_microcopy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },

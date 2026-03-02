@@ -57,6 +57,13 @@ export interface ChatEvidenceState {
   sourceIds: string[];
 }
 
+export interface ChatWarningState {
+  code: string;
+  message: string;
+  severity: "warning" | "error";
+  source?: "runtime" | "quality_gate" | "enforcer" | "provenance";
+}
+
 export interface ChatProvenanceSnippetRefDTO {
   evidenceId: string;
   documentId: string;
@@ -87,9 +94,17 @@ export interface ChatResult {
   provenance?: ChatProvenanceDTO;
   sources?: Array<{
     documentId: string;
+    docId?: string;
     filename: string;
     mimeType: string | null;
     page: number | null;
+    slide?: number | null;
+    sheet?: string | null;
+    cell?: string | null;
+    section?: string | null;
+    locationKey?: string | null;
+    locationLabel?: string | null;
+    snippet?: string | null;
   }>;
   listing?: Array<{
     kind: "file" | "folder";
@@ -110,6 +125,8 @@ export interface ChatResult {
   completion?: ChatCompletionState;
   truncation?: ChatTruncationState;
   evidence?: ChatEvidenceState;
+  userWarning?: ChatWarningState | null;
+  warnings?: ChatWarningState[];
 }
 
 export type EditorSelectionRange = {

@@ -21,6 +21,7 @@ import type {
   ChatProvenanceDTO,
   ChatQualityGateFailure,
   ChatQualityGateState,
+  ChatWarningState,
 } from "../domain/chat.contracts";
 import { ConversationNotFoundError } from "../domain/chat.contracts";
 import type { EncryptedChatRepo } from "../../../services/chat/encryptedChatRepo.service";
@@ -195,9 +196,10 @@ export function applyConversationHistoryDocScopeFallback(params: {
   if (signals.resolvedDocId || signals.singleDocIntent) return signals;
   if (!params.attachedDocumentIds.includes(lastDocumentId)) return signals;
 
-  // With multi-attachment turns, keep docset lock strict; do not narrow to a
-  // single history doc unless the user explicitly referenced a single document.
+  // With multi-attachment turns, keep the full docset lock but set the
+  // activeDocId hint so follow-up queries have a preferred doc context.
   if (params.attachedDocumentIds.length !== 1) {
+    signals.activeDocId = lastDocumentId;
     return signals;
   }
 
@@ -386,6 +388,13 @@ type SourceGroundingOptions = {
   enforceScopedSources?: boolean;
 };
 
+type ProvenanceRuntimeTelemetry = {
+  action: "allow" | "hedge" | "block";
+  reasonCode: string | null;
+  severity: "warning" | "error" | null;
+  stage: "enforcer" | "revalidation";
+};
+
 function isDocGroundedAnswerMode(answerMode: AnswerMode): boolean {
   return String(answerMode || "").startsWith("doc_grounded");
 }
@@ -452,15 +461,43 @@ function buildSourcesFromEvidence(evidence: EvidenceItem[]): ChatSourceEntry[] {
   const out: ChatSourceEntry[] = [];
 
   for (const item of evidence) {
-    if (!item.docId || seen.has(item.docId)) continue;
-    seen.add(item.docId);
+    if (!item.docId) continue;
+    const dedupeKey = [
+      item.docId,
+      String(item.locationKey || "").trim().toLowerCase(),
+      String(item.location.page ?? ""),
+      String(item.location.slide ?? ""),
+      String(item.location.sheet || "").trim().toLowerCase(),
+      String(item.location.sectionKey || "").trim().toLowerCase(),
+    ].join("|");
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    const sectionKey = String(item.location.sectionKey || "").trim();
+    const isCellRef = /^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/.test(sectionKey);
+    const locationLabel = item.location.page
+      ? `Page ${item.location.page}`
+      : item.location.slide
+        ? `Slide ${item.location.slide}`
+        : item.location.sheet && isCellRef
+          ? `${String(item.location.sheet)}!${sectionKey.toUpperCase()}`
+          : item.location.sheet
+            ? String(item.location.sheet)
+            : sectionKey || null;
     out.push({
       documentId: item.docId,
+      docId: item.docId,
       filename: String(
         item.filename || item.title || fallbackSourceLabel(item.docId),
       ),
       mimeType: null,
       page: item.location.page ?? null,
+      slide: item.location.slide ?? null,
+      sheet: item.location.sheet ?? null,
+      cell: isCellRef ? sectionKey : null,
+      section: !isCellRef ? sectionKey || null : null,
+      locationKey: item.locationKey || null,
+      locationLabel,
+      snippet: item.snippet || null,
     });
     if (out.length >= 6) break;
   }
@@ -475,7 +512,9 @@ export function ensureFallbackSourceCoverage(params: {
   retrievalPack: EvidencePack | null;
 }): ChatSourceEntry[] {
   if (params.sources.length > 0) return params.sources;
-  if (params.answerMode !== "fallback") return params.sources;
+  const allowFallbackCoverage =
+    params.answerMode === "fallback" || params.answerMode === "help_steps";
+  if (!allowFallbackCoverage) return params.sources;
 
   const attachedDocIds = (params.attachedDocumentIds || [])
     .map((id) => String(id || "").trim())
@@ -629,6 +668,14 @@ function buildEmptyAssistantText(params: {
   context?: FallbackMessageContext;
   routeHints?: FallbackRouteHints;
 }): string {
+  const reason = String(params.reasonCode || "")
+    .trim()
+    .toLowerCase();
+  // Fail-closed provenance errors should not emit synthetic prose. Returning
+  // empty text prevents ungrounded fallback content when no valid sources exist.
+  if (reason === "missing_provenance") {
+    return "";
+  }
   return resolveRuntimeFallbackMessage({
     language: params.language,
     reasonCode: params.reasonCode,
@@ -1012,30 +1059,18 @@ export function enforceLanguageContract(params: {
     return { text: repaired, adjusted: true, failClosed: false };
   }
 
-  // Preserve the original text rather than replacing with a generic fallback.
-  // A correct answer in the wrong language is more useful than a message
-  // telling the user to retry.  The mismatch is still logged via the
-  // `adjusted` flag for telemetry.
   return {
-    text: normalized,
-    adjusted: false,
-    failClosed: false,
+    text: buildLanguageContractFallback(lang),
+    adjusted: true,
+    failClosed: true,
   };
 }
 
 const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
-  "requested_slot_covered",
-  "forbidden_adjacent_role_absent",
-  "entity_role_consistency",
   "wrong_doc_lock_enforcement",
-  "source_policy_navigation_mode",
-  "numeric_integrity_totals_reconciliation",
-  "no_raw_json",
-  "doc_grounding_minimums",
-  "hallucination_risk",
-  "repetition_and_banned_phrases",
+  "redaction_default_pii_identity_tax_banking",
+  "medical_safety_boundaries",
   "privacy_minimal",
-  "final_consistency",
 ]);
 
 type QualityGatesBank = {
@@ -1093,6 +1128,114 @@ function toQualityGateFailure(
     gateName: gate.gateName,
     severity: resolveQualityGateSeverity(gate.gateName, severityByName),
     reason,
+  };
+}
+
+type RuntimeFailureMode = "fail_closed" | "fail_soft";
+
+const HARD_FAIL_CLOSED_REASON_CODES = new Set<string>([
+  "language_contract_mismatch",
+  "json_not_allowed",
+  "banned_phrase_critical",
+  "empty_after_contract_enforcement",
+  "out_of_scope_provenance",
+  "missing_evidence_map",
+  "policy_refusal_required",
+  "compliance_blocked",
+]);
+
+function normalizeReasonCode(value: unknown): string {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function isHardFailClosedReason(reasonCode: string): boolean {
+  const normalized = normalizeReasonCode(reasonCode);
+  if (!normalized) return false;
+  if (HARD_FAIL_CLOSED_REASON_CODES.has(normalized)) return true;
+  if (normalized.startsWith("policy_")) return true;
+  if (normalized.startsWith("compliance_")) return true;
+  if (normalized.startsWith("security_")) return true;
+  if (normalized.includes("prompt_injection")) return true;
+  if (normalized.includes("jailbreak")) return true;
+  if (normalized.includes("unsafe")) return true;
+  return false;
+}
+
+function resolveRuntimeFailureMode(
+  reasonCode: string,
+  failSoftEnabled: boolean,
+): RuntimeFailureMode {
+  if (isHardFailClosedReason(reasonCode)) return "fail_closed";
+  return failSoftEnabled ? "fail_soft" : "fail_closed";
+}
+
+function buildWarningMessageForReason(params: {
+  reasonCode: string;
+  language: "en" | "pt" | "es";
+}): string {
+  const reason = normalizeReasonCode(params.reasonCode);
+  const lang = params.language;
+  if (reason === "quality_gate_blocked" || reason === "quality_gate_runner_error") {
+    if (lang === "pt")
+      return "Nem todas as verificacoes de qualidade passaram. Revise os pontos importantes com as fontes.";
+    if (lang === "es")
+      return "No se completaron todas las verificaciones de calidad. Revisa los puntos clave con las fuentes.";
+    return "Not all quality checks passed. Please verify key points against the sources.";
+  }
+  if (
+    reason === "missing_provenance" ||
+    reason === "insufficient_provenance_coverage"
+  ) {
+    if (lang === "pt")
+      return "Parte da resposta pode estar sem rastreabilidade completa para as fontes.";
+    if (lang === "es")
+      return "Parte de la respuesta puede no tener trazabilidad completa a las fuentes.";
+    return "Parts of this answer may be missing full source traceability.";
+  }
+  if (reason === "enforcer_runtime_error") {
+    if (lang === "pt")
+      return "Nao consegui aplicar todas as validacoes finais. Revise os detalhes criticos.";
+    if (lang === "es")
+      return "No pude aplicar todas las validaciones finales. Revisa los detalles criticos.";
+    return "I could not apply all final validations. Please review critical details.";
+  }
+  if (reason === "language_contract_mismatch") {
+    if (lang === "pt")
+      return "Nao consegui finalizar com seguranca no idioma solicitado.";
+    if (lang === "es")
+      return "No pude finalizar de forma segura en el idioma solicitado.";
+    return "I could not safely finalize in the requested language.";
+  }
+  if (reason === "table_contract_violation") {
+    if (lang === "pt")
+      return "A resposta pode ter problemas de formatacao de tabela.";
+    if (lang === "es")
+      return "La respuesta puede tener problemas de formato en tablas.";
+    return "This response may contain table formatting issues.";
+  }
+  if (lang === "pt")
+    return "Algumas validacoes nao foram concluídas completamente. Revise os detalhes importantes.";
+  if (lang === "es")
+    return "Algunas validaciones no se completaron totalmente. Revisa los detalles importantes.";
+  return "Some validations did not fully complete. Please review important details.";
+}
+
+function buildWarningEntry(params: {
+  code: string;
+  language: "en" | "pt" | "es";
+  severity?: "warning" | "error";
+  source?: ChatWarningState["source"];
+}): ChatWarningState {
+  return {
+    code: String(params.code || "").trim(),
+    message: buildWarningMessageForReason({
+      reasonCode: params.code,
+      language: params.language,
+    }),
+    severity: params.severity || "warning",
+    ...(params.source ? { source: params.source } : {}),
   };
 }
 
@@ -1185,6 +1328,7 @@ export class CentralizedChatRuntimeDelegate {
     String(process.env.LOW_CONFIDENCE_SURFACE_FALLBACK || "")
       .trim()
       .toLowerCase() === "true";
+  private readonly provenanceUserFailOpenWithEvidence = false;
 
   constructor(
     private readonly engine: ChatEngine,
@@ -1266,6 +1410,7 @@ export class CentralizedChatRuntimeDelegate {
     enforcementBlocked?: boolean;
     enforcementReasonCode?: string | null;
     provenance?: ChatProvenanceDTO | null;
+    provenanceTelemetry?: ProvenanceRuntimeTelemetry | null;
     truncation?: ResolvedTruncationState | null;
   }): TurnDebugPacket {
     const meta = asObject(params.req.meta);
@@ -1329,6 +1474,8 @@ export class CentralizedChatRuntimeDelegate {
         required: Boolean(params.provenance?.required),
         validated: Boolean(params.provenance?.validated),
         failureCode: params.provenance?.failureCode || null,
+        action: params.provenanceTelemetry?.action || null,
+        severity: params.provenanceTelemetry?.severity || null,
       },
       budget: {
         requestedMaxOutputTokens,
@@ -1457,6 +1604,7 @@ export class CentralizedChatRuntimeDelegate {
     enforcementBlocked?: boolean;
     enforcementReasonCode?: string | null;
     provenance?: ChatProvenanceDTO | null;
+    provenanceTelemetry?: ProvenanceRuntimeTelemetry | null;
     truncation?: ChatResult["truncation"] | null;
   }): Promise<void> {
     const distinctDocIds = [
@@ -1562,6 +1710,7 @@ export class CentralizedChatRuntimeDelegate {
         enforcementBlocked: params.enforcementBlocked,
         enforcementReasonCode: params.enforcementReasonCode,
         provenance: params.provenance || null,
+        provenanceTelemetry: params.provenanceTelemetry || null,
         truncation,
       }),
     );
@@ -1570,6 +1719,13 @@ export class CentralizedChatRuntimeDelegate {
     )
       ? params.retrievalPack?.telemetry?.ruleEvents
       : [];
+    const provenanceReasonForTelemetry = String(
+      params.provenanceTelemetry?.reasonCode || "",
+    ).trim();
+    const warningCodes = [
+      fallbackReasonForTelemetry,
+      provenanceReasonForTelemetry || null,
+    ].filter(Boolean) as string[];
     const retrievalRuleEventWrites = ruleEvents.map((event) => {
       const payload = asObject(event?.payload);
       const eventName = String(event?.event || "").trim();
@@ -1670,9 +1826,7 @@ export class CentralizedChatRuntimeDelegate {
         providerTruncationReason: truncation.providerReason,
         failureCode: params.failureCode || null,
         hasErrors: params.status === "failed" || Boolean(params.failureCode),
-        warnings: fallbackReasonForTelemetry
-          ? [fallbackReasonForTelemetry]
-          : [],
+        warnings: warningCodes,
         totalMs: params.totalMs,
         ttft: toPositiveInt(asObject(params.telemetry).firstTokenMs),
         retrievalMs: params.retrievalMs ?? null,
@@ -1723,6 +1877,7 @@ export class CentralizedChatRuntimeDelegate {
               ? fallbackPolicyMeta
               : null,
           fallbackReasonCodeUser: fallbackReasonForUser,
+          provenanceTelemetry: params.provenanceTelemetry || null,
         },
       }),
       ...retrievalRuleEventWrites,
@@ -1848,14 +2003,13 @@ export class CentralizedChatRuntimeDelegate {
 
       // Persist resolved doc for conversation-history follow-up scoping
       const resolvedDocId = retrievalPack?.resolvedDocId ?? null;
-      if (resolvedDocId && resolvedDocId !== lastDocumentId) {
-        prisma.conversation
-          .update({
-            where: { id: conversationId },
-            data: { lastDocumentId: resolvedDocId },
-          })
-          .catch(() => {}); // fire-and-forget, non-blocking
-      }
+      await this.persistResolvedDocScope({
+        traceId,
+        conversationId,
+        previousDocId: lastDocumentId,
+        resolvedDocId,
+        stream: false,
+      });
 
       this.traceWriter.endSpan(traceId, retrievalSpanId, {
         status: "ok",
@@ -2118,6 +2272,13 @@ export class CentralizedChatRuntimeDelegate {
           routeHints: sourceInvariantMicrocopy.routeHints,
         });
       }
+      const assistantTelemetry =
+        (generated.telemetry as Record<string, unknown>) ?? {};
+      if (finalized.provenanceTelemetry) {
+        assistantTelemetry.provenance = finalized.provenanceTelemetry;
+      }
+      const persistedAssistantTelemetry =
+        Object.keys(assistantTelemetry).length > 0 ? assistantTelemetry : null;
 
       const outputSpanId = this.traceWriter.startSpan(
         traceId,
@@ -2129,7 +2290,7 @@ export class CentralizedChatRuntimeDelegate {
         content: assistantText,
         userId: req.userId,
         attachments: attachmentsPayload,
-        telemetry: generated.telemetry ?? null,
+        telemetry: persistedAssistantTelemetry,
         metadata: {
           sources: filteredSources,
           answerMode,
@@ -2142,17 +2303,24 @@ export class CentralizedChatRuntimeDelegate {
               }
             : null,
           fallbackPolicy: fallbackSignal.policyMeta || null,
-          evidenceGate: evidenceGateDecision
-            ? {
-                action: evidenceGateDecision.suggestedAction,
-                strength: evidenceGateDecision.evidenceStrength,
-              }
-            : null,
-          enforcement: finalized.enforcement ?? null,
-          provenance: finalized.provenance ?? null,
-          qualityGates: finalized.qualityGates,
-        },
-      });
+              evidenceGate: evidenceGateDecision
+                ? {
+                    action: evidenceGateDecision.suggestedAction,
+                    strength: evidenceGateDecision.evidenceStrength,
+                  }
+                : null,
+              enforcement: finalized.enforcement ?? null,
+              provenance: finalized.provenance ?? null,
+              provenanceTelemetry: finalized.provenanceTelemetry ?? null,
+              qualityGates: finalized.qualityGates,
+              failureCode:
+                finalized.failureCode || sourceInvariantFailureCode || null,
+              userWarning: finalized.userWarning || null,
+              warnings: Array.isArray(finalized.warnings)
+                ? finalized.warnings
+                : [],
+            },
+          });
       this.traceWriter.endSpan(traceId, outputSpanId, {
         status: "ok",
         metadata: {
@@ -2175,13 +2343,18 @@ export class CentralizedChatRuntimeDelegate {
         detectorVersion: resolvedTruncation.detectorVersion,
       };
       const status =
-        finalized.failureCode || sourceInvariantFailureCode || !assistantTextRaw
+        finalized.failureCode ||
+        sourceInvariantFailureCode ||
+        !assistantTextRaw ||
+        (Array.isArray(finalized.warnings) && finalized.warnings.length > 0)
           ? "partial"
           : "success";
       const failureCode =
         finalized.failureCode ||
         sourceInvariantFailureCode ||
         (assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE");
+      const warnings = Array.isArray(finalized.warnings) ? finalized.warnings : [];
+      const userWarning = finalized.userWarning || warnings[0] || null;
 
       const result: ChatResult = {
         conversationId,
@@ -2190,8 +2363,7 @@ export class CentralizedChatRuntimeDelegate {
         traceId,
         assistantText,
         attachmentsPayload,
-        assistantTelemetry:
-          (generated.telemetry as Record<string, unknown>) ?? undefined,
+        assistantTelemetry: persistedAssistantTelemetry ?? undefined,
         provenance: finalized.provenance,
         sources: [...filteredSources],
         followups: finalized.followups,
@@ -2202,6 +2374,8 @@ export class CentralizedChatRuntimeDelegate {
         status,
         failureCode,
         qualityGates: finalized.qualityGates,
+        userWarning,
+        warnings,
         completion: {
           answered: assistantTextRaw.length > 0,
           missingSlots: [],
@@ -2238,6 +2412,7 @@ export class CentralizedChatRuntimeDelegate {
         enforcementBlocked: Boolean(finalized.failureCode),
         enforcementReasonCode: finalized.failureCode ?? null,
         provenance: finalized.provenance ?? null,
+        provenanceTelemetry: finalized.provenanceTelemetry ?? null,
         truncation,
       }).catch((error) => {
         appLogger.warn("[trace-writer] failed to persist chat trace", {
@@ -2468,14 +2643,13 @@ export class CentralizedChatRuntimeDelegate {
 
       // Persist resolved doc for conversation-history follow-up scoping
       const resolvedDocId = retrievalPack?.resolvedDocId ?? null;
-      if (resolvedDocId && resolvedDocId !== lastDocumentId) {
-        prisma.conversation
-          .update({
-            where: { id: conversationId },
-            data: { lastDocumentId: resolvedDocId },
-          })
-          .catch(() => {}); // fire-and-forget, non-blocking
-      }
+      await this.persistResolvedDocScope({
+        traceId,
+        conversationId,
+        previousDocId: lastDocumentId,
+        resolvedDocId,
+        stream: true,
+      });
 
       this.traceWriter.endSpan(traceId, retrievalSpanId, {
         status: "ok",
@@ -2776,6 +2950,13 @@ export class CentralizedChatRuntimeDelegate {
           routeHints: sourceInvariantMicrocopy.routeHints,
         });
       }
+      const assistantTelemetry =
+        (streamed.telemetry as Record<string, unknown>) ?? {};
+      if (finalized.provenanceTelemetry) {
+        assistantTelemetry.provenance = finalized.provenanceTelemetry;
+      }
+      const persistedAssistantTelemetry =
+        Object.keys(assistantTelemetry).length > 0 ? assistantTelemetry : null;
 
       const outputSpanId = this.traceWriter.startSpan(
         traceId,
@@ -2790,7 +2971,7 @@ export class CentralizedChatRuntimeDelegate {
         content: assistantText,
         userId: req.userId,
         attachments: attachmentsPayload,
-        telemetry: streamed.telemetry ?? null,
+        telemetry: persistedAssistantTelemetry,
         metadata: {
           sources: filteredSources,
           answerMode,
@@ -2803,17 +2984,24 @@ export class CentralizedChatRuntimeDelegate {
               }
             : null,
           fallbackPolicy: fallbackSignal.policyMeta || null,
-          evidenceGate: evidenceGateDecision
-            ? {
-                action: evidenceGateDecision.suggestedAction,
-                strength: evidenceGateDecision.evidenceStrength,
-              }
-            : null,
-          enforcement: finalized.enforcement ?? null,
-          provenance: finalized.provenance ?? null,
-          qualityGates: finalized.qualityGates,
-        },
-      });
+              evidenceGate: evidenceGateDecision
+                ? {
+                    action: evidenceGateDecision.suggestedAction,
+                    strength: evidenceGateDecision.evidenceStrength,
+                  }
+                : null,
+              enforcement: finalized.enforcement ?? null,
+              provenance: finalized.provenance ?? null,
+              provenanceTelemetry: finalized.provenanceTelemetry ?? null,
+              qualityGates: finalized.qualityGates,
+              failureCode:
+                finalized.failureCode || sourceInvariantFailureCode || null,
+              userWarning: finalized.userWarning || null,
+              warnings: Array.isArray(finalized.warnings)
+                ? finalized.warnings
+                : [],
+            },
+          });
       this.traceWriter.endSpan(traceId, outputSpanId, {
         status: "ok",
         metadata: {
@@ -2836,13 +3024,18 @@ export class CentralizedChatRuntimeDelegate {
         detectorVersion: resolvedTruncation.detectorVersion,
       };
       const status =
-        finalized.failureCode || sourceInvariantFailureCode || !assistantTextRaw
+        finalized.failureCode ||
+        sourceInvariantFailureCode ||
+        !assistantTextRaw ||
+        (Array.isArray(finalized.warnings) && finalized.warnings.length > 0)
           ? "partial"
           : "success";
       const failureCode =
         finalized.failureCode ||
         sourceInvariantFailureCode ||
         (assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE");
+      const warnings = Array.isArray(finalized.warnings) ? finalized.warnings : [];
+      const userWarning = finalized.userWarning || warnings[0] || null;
 
       const result: ChatResult = {
         conversationId,
@@ -2851,8 +3044,7 @@ export class CentralizedChatRuntimeDelegate {
         traceId,
         assistantText,
         attachmentsPayload,
-        assistantTelemetry:
-          (streamed.telemetry as Record<string, unknown>) ?? undefined,
+        assistantTelemetry: persistedAssistantTelemetry ?? undefined,
         provenance: finalized.provenance,
         sources: [...filteredSources],
         followups: finalized.followups,
@@ -2863,6 +3055,8 @@ export class CentralizedChatRuntimeDelegate {
         status,
         failureCode,
         qualityGates: finalized.qualityGates,
+        userWarning,
+        warnings,
         completion: {
           answered: assistantTextRaw.length > 0,
           missingSlots: [],
@@ -2899,6 +3093,7 @@ export class CentralizedChatRuntimeDelegate {
         enforcementBlocked: Boolean(finalized.failureCode),
         enforcementReasonCode: finalized.failureCode ?? null,
         provenance: finalized.provenance ?? null,
+        provenanceTelemetry: finalized.provenanceTelemetry ?? null,
         truncation,
       }).catch((error) => {
         appLogger.warn("[trace-writer] failed to persist stream trace", {
@@ -3205,6 +3400,7 @@ export class CentralizedChatRuntimeDelegate {
   }
 
   async createMessage(params: CreateMessageParams): Promise<ChatMessageDTO> {
+    await this.assertConversationAccessForWrite(params.userId, params.conversationId);
     const now = new Date();
     const mergedMetadata: Record<string, unknown> = {
       ...(params.metadata || {}),
@@ -3223,23 +3419,13 @@ export class CentralizedChatRuntimeDelegate {
         : null;
 
     if (this.encryptedRepo && params.userId) {
-      const saved = await this.encryptedRepo.saveMessage(
-        params.userId,
-        params.conversationId,
-        params.role,
-        params.content ?? "",
-      );
-
-      if (metadataJson) {
-        await prisma.message.update({
-          where: { id: saved.id },
-          data: { metadata: metadataJson },
-        });
-      }
-
-      await prisma.conversation.update({
-        where: { id: params.conversationId },
-        data: { updatedAt: now },
+      const saved = await this.encryptedRepo.saveMessageWithMetadata({
+        userId: params.userId,
+        conversationId: params.conversationId,
+        role: params.role,
+        plaintext: params.content ?? "",
+        metadataJson,
+        updatedAt: now,
       });
 
       await this.maybeAutoTitleConversationFromFirstUserMessage({
@@ -3276,26 +3462,30 @@ export class CentralizedChatRuntimeDelegate {
       };
     }
 
-    const created = await prisma.message.create({
-      data: {
-        conversationId: params.conversationId,
-        role: params.role,
-        content: params.content ?? "",
-        createdAt: now,
-        ...(metadataJson ? { metadata: metadataJson } : {}),
-      },
-      select: {
-        id: true,
-        role: true,
-        content: true,
-        createdAt: true,
-        metadata: true,
-      },
-    });
+    const created = await prisma.$transaction(async (tx) => {
+      const message = await tx.message.create({
+        data: {
+          conversationId: params.conversationId,
+          role: params.role,
+          content: params.content ?? "",
+          createdAt: now,
+          ...(metadataJson ? { metadata: metadataJson } : {}),
+        },
+        select: {
+          id: true,
+          role: true,
+          content: true,
+          createdAt: true,
+          metadata: true,
+        },
+      });
 
-    await prisma.conversation.update({
-      where: { id: params.conversationId },
-      data: { updatedAt: now },
+      await tx.conversation.update({
+        where: { id: params.conversationId },
+        data: { updatedAt: now },
+      });
+
+      return message;
     });
 
     await this.maybeAutoTitleConversationFromFirstUserMessage({
@@ -3320,6 +3510,21 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     return toMessageDTO(created);
+  }
+
+  private async assertConversationAccessForWrite(
+    userId: string,
+    conversationId: string,
+  ): Promise<void> {
+    const row = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId, isDeleted: false },
+      select: { id: true },
+    });
+    if (!row) {
+      throw new ConversationNotFoundError(
+        "Conversation not found for this account.",
+      );
+    }
   }
 
   private async maybeAutoTitleConversationFromFirstUserMessage(input: {
@@ -3452,57 +3657,16 @@ export class CentralizedChatRuntimeDelegate {
     if (!semantic.occurred) return text;
 
     const tableLines = lines.filter((line) => line.includes("|"));
-    if (!tableLines.length) {
-      const lang = normalizeChatLanguage(preferredLanguage);
-
-      // Detect truncated bullet lists
-      const bulletLines = lines.filter((line) => /^[-*]\s+/.test(line));
-      if (bulletLines.length >= 2) {
-        if (lang === "pt") {
-          return "A lista foi cortada antes de concluir. Posso reenviar de forma mais concisa para garantir completude.";
-        }
-        if (lang === "es") {
-          return "La lista se interrumpió antes de terminar. Puedo reenviarla de forma más concisa para garantizar completitud.";
-        }
-        return "The list was cut before completion. I can resend it more concisely to guarantee completeness.";
-      }
-
-      // Detect truncated numbered lists
-      const numberedLines = lines.filter((line) => /^\d+\.\s+/.test(line));
-      if (numberedLines.length >= 2) {
-        if (lang === "pt") {
-          return "A lista numerada foi cortada antes de concluir. Posso reenviar de forma mais concisa para garantir completude.";
-        }
-        if (lang === "es") {
-          return "La lista numerada se interrumpió antes de terminar. Puedo reenviarla de forma más concisa para garantizar completitud.";
-        }
-        return "The numbered list was cut before completion. I can resend it more concisely to guarantee completeness.";
-      }
-
-      if (lang === "pt") {
-        return "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.";
-      }
-      if (lang === "es") {
-        return "La respuesta se interrumpió antes de terminar. Puedo reenviarla en viñetas para garantizar completitud.";
-      }
-      return "The response was interrupted before completion. I can resend it as bullets to guarantee completeness.";
-    }
+    // Preserve non-table output even when provider reports length overflow.
+    // A generic replacement here causes repetitive low-information answers.
+    if (!tableLines.length) return text;
 
     const separatorOnly = (line: string): boolean =>
       /^[:\-\|\s]+$/.test(line.replace(/\|/g, ""));
     const contentRows = tableLines.filter((line) => !separatorOnly(line));
     const incompleteTable =
       contentRows.length <= 1 || /\|\s*$/.test(value) || lines.length < 3;
-    if (!incompleteTable) {
-      const lang = normalizeChatLanguage(preferredLanguage);
-      if (lang === "pt") {
-        return "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.";
-      }
-      if (lang === "es") {
-        return "La respuesta se interrumpió antes de terminar. Puedo reenviarla en viñetas para garantizar completitud.";
-      }
-      return "The response was interrupted before completion. I can resend it as bullets to guarantee completeness.";
-    }
+    if (!incompleteTable) return text;
 
     const lang = normalizeChatLanguage(preferredLanguage);
     const narrative = lines
@@ -3516,7 +3680,7 @@ export class CentralizedChatRuntimeDelegate {
           ? "La tabla se interrumpió antes de terminar. Puedo reenviarla en viñetas para evitar cortes."
           : "The table was cut before completion. I can resend it as bullets to avoid truncation.";
 
-    const base = narrative || fallback;
+    const base = narrative.length >= 60 ? narrative : narrative || fallback;
     const punctuated = /[.!?]$/.test(base) ? base : `${base}.`;
     return punctuated;
   }
@@ -3635,12 +3799,49 @@ export class CentralizedChatRuntimeDelegate {
     followups: Array<{ label: string; query: string }>;
     enforcement?: { repairs: string[]; warnings: string[] };
     provenance?: ChatProvenanceDTO;
+    provenanceTelemetry?: ProvenanceRuntimeTelemetry | null;
     failureCode?: string | null;
     qualityGateIssues: string[];
     qualityGates: ChatQualityGateState;
+    userWarning?: ChatWarningState | null;
+    warnings?: ChatWarningState[];
   }> {
     let text = params.assistantText;
     let failureCode: string | null = null;
+    let provenanceTelemetry: ProvenanceRuntimeTelemetry | null = null;
+    const preferredLanguage = normalizeChatLanguage(params.req.preferredLanguage);
+    const warningPayloadEnabled = isRuntimeFlagEnabled(
+      "CHAT_RUNTIME_WARNING_PAYLOAD_ENABLED",
+      true,
+    );
+    const failSoftWarningsEnabled = isRuntimeFlagEnabled(
+      "CHAT_RUNTIME_FAIL_SOFT_WARNINGS",
+      false,
+    );
+    const warningByCode = new Map<string, ChatWarningState>();
+    const addWarning = (params: {
+      code: string;
+      severity?: "warning" | "error";
+      source?: ChatWarningState["source"];
+    }) => {
+      if (!warningPayloadEnabled) return;
+      const code = String(params.code || "").trim();
+      if (!code) return;
+      const entry = buildWarningEntry({
+        code,
+        language: preferredLanguage,
+        severity: params.severity,
+        source: params.source,
+      });
+      const existing = warningByCode.get(code);
+      if (!existing) {
+        warningByCode.set(code, entry);
+        return;
+      }
+      if (existing.severity !== "error" && entry.severity === "error") {
+        warningByCode.set(code, entry);
+      }
+    };
     const sourceDocumentIdsFromSources = Array.from(
       new Set(
         (params.sources || [])
@@ -3772,12 +3973,25 @@ export class CentralizedChatRuntimeDelegate {
             (gate) => gate.severity === "block",
           );
           if (blockingGate) {
-            failureCode = "quality_gate_blocked";
-            text = buildEmptyAssistantText({
-              language: params.req.preferredLanguage,
-              reasonCode: failureCode,
-              seed: `${params.req.userId}:quality_gate:${blockingGate.gateName}`,
-            });
+            const reasonCode = "quality_gate_blocked";
+            const failureMode = resolveRuntimeFailureMode(
+              reasonCode,
+              failSoftWarningsEnabled,
+            );
+            if (failureMode === "fail_closed") {
+              failureCode = reasonCode;
+              text = buildEmptyAssistantText({
+                language: params.req.preferredLanguage,
+                reasonCode: failureCode,
+                seed: `${params.req.userId}:quality_gate:${blockingGate.gateName}`,
+              });
+            } else {
+              addWarning({
+                code: reasonCode,
+                source: "quality_gate",
+                severity: "warning",
+              });
+            }
           }
         }
       }
@@ -3787,12 +4001,24 @@ export class CentralizedChatRuntimeDelegate {
       });
       if (enforceQualityGates && !failureCode) {
         const reasonCode = "quality_gate_runner_error";
-        failureCode = reasonCode;
-        text = buildEmptyAssistantText({
-          language: params.req.preferredLanguage,
+        const failureMode = resolveRuntimeFailureMode(
           reasonCode,
-          seed: `${params.req.userId}:quality_gate:${reasonCode}`,
-        });
+          failSoftWarningsEnabled,
+        );
+        if (failureMode === "fail_closed") {
+          failureCode = reasonCode;
+          text = buildEmptyAssistantText({
+            language: params.req.preferredLanguage,
+            reasonCode,
+            seed: `${params.req.userId}:quality_gate:${reasonCode}`,
+          });
+        } else {
+          addWarning({
+            code: reasonCode,
+            source: "quality_gate",
+            severity: "warning",
+          });
+        }
         qualityGates = {
           allPassed: false,
           failed: [
@@ -3847,6 +4073,7 @@ export class CentralizedChatRuntimeDelegate {
         provenance,
         evidenceMapSchemaVersion: "v1",
         evidenceMap,
+        provenanceFailOpenWithEvidence: this.provenanceUserFailOpenWithEvidence,
         signals: mergedSignals,
         constraints: {
           maxOutputTokens: requestedMaxOutputTokens ?? undefined,
@@ -3861,18 +4088,40 @@ export class CentralizedChatRuntimeDelegate {
         { content: text, attachments: [] },
         enforcerCtx,
       );
+      if (enforced.enforcement.provenance) {
+        provenanceTelemetry = {
+          ...enforced.enforcement.provenance,
+          stage: "enforcer",
+        };
+      }
       if (enforced.enforcement.blocked && enforced.enforcement.reasonCode) {
         appLogger.warn("[finalizeChatTurn] Response blocked by enforcer", {
           reasonCode: enforced.enforcement.reasonCode,
         });
-        failureCode = enforced.enforcement.reasonCode;
-        text =
-          enforced.content ||
-          buildEmptyAssistantText({
-            language: params.req.preferredLanguage,
-            reasonCode: enforced.enforcement.reasonCode,
-            seed: `${params.req.userId}:enforcer:${enforced.enforcement.reasonCode}`,
+        const reasonCode = enforced.enforcement.reasonCode;
+        const failureMode = resolveRuntimeFailureMode(
+          reasonCode,
+          failSoftWarningsEnabled,
+        );
+        if (failureMode === "fail_closed") {
+          failureCode = reasonCode;
+          text =
+            enforced.content ||
+            buildEmptyAssistantText({
+              language: params.req.preferredLanguage,
+              reasonCode,
+              seed: `${params.req.userId}:enforcer:${reasonCode}`,
+            });
+        } else {
+          if (String(enforced.content || "").trim()) {
+            text = enforced.content;
+          }
+          addWarning({
+            code: reasonCode,
+            source: "enforcer",
+            severity: "warning",
           });
+        }
       } else {
         text = enforced.content;
       }
@@ -3880,6 +4129,20 @@ export class CentralizedChatRuntimeDelegate {
         repairs: enforced.enforcement.repairs,
         warnings: enforced.enforcement.warnings,
       };
+      if (
+        (enforcement.warnings || []).some((warning) =>
+          String(warning || "")
+            .trim()
+            .toLowerCase()
+            .includes("table_contract_violation"),
+        )
+      ) {
+        addWarning({
+          code: "table_contract_violation",
+          source: "enforcer",
+          severity: "warning",
+        });
+      }
     } catch (error) {
       const reasonCode = "enforcer_runtime_error";
       const modelName =
@@ -3897,20 +4160,35 @@ export class CentralizedChatRuntimeDelegate {
           : 0,
         error: error instanceof Error ? error.message : String(error),
       });
-      failureCode = reasonCode;
-      text = buildEmptyAssistantText({
-        language: params.req.preferredLanguage,
+      const failureMode = resolveRuntimeFailureMode(
         reasonCode,
-        seed: `${params.req.userId}:enforcer:${reasonCode}`,
-      });
-      enforcement = {
-        repairs: [],
-        warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_CLOSED"],
-      };
+        failSoftWarningsEnabled,
+      );
+      if (failureMode === "fail_closed") {
+        failureCode = reasonCode;
+        text = buildEmptyAssistantText({
+          language: params.req.preferredLanguage,
+          reasonCode,
+          seed: `${params.req.userId}:enforcer:${reasonCode}`,
+        });
+        enforcement = {
+          repairs: [],
+          warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_CLOSED"],
+        };
+      } else {
+        addWarning({
+          code: reasonCode,
+          source: "enforcer",
+          severity: "warning",
+        });
+        enforcement = {
+          repairs: [],
+          warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_OPEN"],
+        };
+      }
     }
 
     if (!failureCode) {
-      const textBeforeOverflowRepair = text;
       text = this.repairProviderOverflowStructuredOutput(
         text,
         (params.telemetry as Record<string, unknown>) ?? null,
@@ -3939,46 +4217,12 @@ export class CentralizedChatRuntimeDelegate {
             : sourceDocumentIdsFromSources,
       };
       if (!revalidated.ok) {
-        // When evidence documents are present the LLM was called with real
-        // snippets and generated a grounded answer.  Lexical provenance
-        // matching can produce false negatives (cross-language answers,
-        // short numeric extractions, paraphrased summaries), so we record
-        // the provenance failure for telemetry but preserve the LLM text
-        // instead of replacing it with generic microcopy.
-        const hasEvidenceBacking =
-          provenance.sourceDocumentIds.length > 0 ||
-          sourceDocumentIdsFromSources.length > 0;
-        if (hasEvidenceBacking) {
-          const demoteMissingProvenance =
-            revalidated.failureCode === "missing_provenance" &&
-            hasEvidenceBacking;
-          if (!demoteMissingProvenance) {
-            failureCode = revalidated.failureCode;
-          }
-          if (
-            revalidated.failureCode === "missing_provenance" &&
-            text !== textBeforeOverflowRepair
-          ) {
-            const provider = classifyProviderTruncation(
-              (params.telemetry as Record<string, unknown>) ?? null,
-            );
-            const semanticBeforeRepair = classifyVisibleTruncation({
-              finalText: textBeforeOverflowRepair,
-              enforcementRepairs: enforcement?.repairs ?? [],
-              providerTruncation: provider,
-            });
-            if (!semanticBeforeRepair.occurred) {
-              text = textBeforeOverflowRepair;
-            }
-          }
-        } else {
-          failureCode = revalidated.failureCode;
-          text = buildEmptyAssistantText({
-            language: params.req.preferredLanguage,
-            reasonCode: revalidated.failureCode,
-            seed: `${params.req.userId}:provenance:${revalidated.failureCode}`,
-          });
-        }
+        failureCode = revalidated.failureCode;
+        text = buildEmptyAssistantText({
+          language: params.req.preferredLanguage,
+          reasonCode: revalidated.failureCode,
+          seed: `${params.req.userId}:provenance:${revalidated.failureCode}:${params.req.messageId || Date.now()}`,
+        });
       }
     }
 
@@ -3998,6 +4242,20 @@ export class CentralizedChatRuntimeDelegate {
       }
     }
 
+    if (failureCode) {
+      addWarning({
+        code: failureCode,
+        source: "runtime",
+        severity: isHardFailClosedReason(failureCode) ? "error" : "warning",
+      });
+    }
+    const warnings = warningPayloadEnabled
+      ? Array.from(warningByCode.values())
+      : [];
+    const userWarning = warningPayloadEnabled
+      ? warnings.find((entry) => entry.severity === "error") || warnings[0] || null
+      : null;
+
     // 4. Generate followups for doc-grounded answers
     const followups = this.generateFollowups(
       params.req,
@@ -4010,9 +4268,12 @@ export class CentralizedChatRuntimeDelegate {
       followups,
       enforcement,
       provenance,
+      provenanceTelemetry,
       failureCode,
       qualityGateIssues,
       qualityGates,
+      userWarning,
+      warnings,
     };
   }
 
@@ -4075,6 +4336,12 @@ export class CentralizedChatRuntimeDelegate {
       answerMode === "general_answer" || answerMode === "help_steps"
         ? "GENERAL"
         : "DOCUMENT";
+    const warning = buildWarningEntry({
+      code: input.code,
+      language: normalizeChatLanguage(req.preferredLanguage),
+      severity: "error",
+      source: "runtime",
+    });
 
     const assistantMessage = await this.createMessage({
       conversationId,
@@ -4085,6 +4352,8 @@ export class CentralizedChatRuntimeDelegate {
         failureCode: input.code,
         answerMode,
         answerClass,
+        userWarning: warning,
+        warnings: [warning],
       },
     });
 
@@ -4103,6 +4372,8 @@ export class CentralizedChatRuntimeDelegate {
       fallbackReasonCode: input.code,
       status: "failed",
       failureCode: input.code,
+      userWarning: warning,
+      warnings: [warning],
       completion: {
         answered: false,
         missingSlots: ["runtime_policy"],
@@ -4194,6 +4465,12 @@ export class CentralizedChatRuntimeDelegate {
       answerMode === "general_answer" || answerMode === "help_steps"
         ? "GENERAL"
         : "DOCUMENT";
+    const warning = buildWarningEntry({
+      code: input.code,
+      language: normalizeChatLanguage(req.preferredLanguage),
+      severity: "error",
+      source: "runtime",
+    });
 
     const assistantMessage = await this.createMessage({
       conversationId,
@@ -4204,6 +4481,8 @@ export class CentralizedChatRuntimeDelegate {
         failureCode: input.code,
         answerMode,
         answerClass,
+        userWarning: warning,
+        warnings: [warning],
       },
     });
 
@@ -4222,6 +4501,8 @@ export class CentralizedChatRuntimeDelegate {
       fallbackReasonCode: input.code,
       status: input.status,
       failureCode: input.code,
+      userWarning: warning,
+      warnings: [warning],
       completion: {
         answered: false,
         missingSlots: [input.code],
@@ -4928,35 +5209,50 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     try {
-      const generated = await this.engine.generateRetrievalPlan({
-        traceId,
-        userId: params.req.userId,
-        conversationId: conversationId || "retrieval_planning",
-        messages: [{ role: "user", content: String(params.req.message || "") }],
-        context: {
-          planner: {
-            scope: {
-              hard: params.docScopeSignals.hardScopeActive === true,
-              explicitDocLock: params.docScopeSignals.explicitDocLock === true,
-              activeDocId: params.docScopeSignals.activeDocId ?? null,
-              resolvedDocId: params.docScopeSignals.resolvedDocId ?? null,
-              allowGlobalScope: params.allowGlobalScope,
+      const plannerTimeoutMs = Math.max(
+        2000,
+        Number(process.env.RETRIEVAL_PLAN_TIMEOUT_MS || 12000),
+      );
+      const generated = await Promise.race([
+        this.engine.generateRetrievalPlan({
+          traceId,
+          userId: params.req.userId,
+          conversationId: conversationId || "retrieval_planning",
+          messages: [
+            { role: "user", content: String(params.req.message || "") },
+          ],
+          context: {
+            planner: {
+              scope: {
+                hard: params.docScopeSignals.hardScopeActive === true,
+                explicitDocLock:
+                  params.docScopeSignals.explicitDocLock === true,
+                activeDocId: params.docScopeSignals.activeDocId ?? null,
+                resolvedDocId: params.docScopeSignals.resolvedDocId ?? null,
+                allowGlobalScope: params.allowGlobalScope,
+              },
+              docContext: {
+                attachedDocumentIds: params.attachedDocumentIds.slice(0, 16),
+                knownDocTitles,
+              },
+              runtimeSignals: params.semanticSignals,
             },
-            docContext: {
-              attachedDocumentIds: params.attachedDocumentIds.slice(0, 16),
-              knownDocTitles,
-            },
-            runtimeSignals: params.semanticSignals,
           },
-        },
-        meta: {
-          intentFamily: params.intentFamily,
-          operator: params.operator,
-          answerMode: params.answerMode,
-          purpose: "retrieval_planning",
-          promptMode: "retrieval_plan",
-        },
-      });
+          meta: {
+            intentFamily: params.intentFamily,
+            operator: params.operator,
+            answerMode: params.answerMode,
+            purpose: "retrieval_planning",
+            promptMode: "retrieval_plan",
+          },
+        }),
+        new Promise<never>((_, reject) => {
+          setTimeout(
+            () => reject(new Error("retrieval_plan_timeout")),
+            plannerTimeoutMs,
+          );
+        }),
+      ]);
 
       const parsed = this.retrievalPlanParser.tryParse(String(generated.text || ""));
       if (!parsed) {
@@ -4991,6 +5287,13 @@ export class CentralizedChatRuntimeDelegate {
         )
       : [];
     const contextSignals = asObject((req.context as any)?.signals || {});
+    // Auto-detect follow-up from conversation history: if a prior document was
+    // resolved in this conversation, the current turn is a follow-up.
+    if (contextSignals.isFollowup == null && lastDocumentId) {
+      contextSignals.isFollowup = true;
+      contextSignals.activeDocId =
+        contextSignals.activeDocId || lastDocumentId;
+    }
     const preferActiveScopeWhenFollowup = Boolean(
       cfg.semanticRetrieval?.preferActiveScopeWhenFollowup,
     );
@@ -5312,7 +5615,7 @@ export class CentralizedChatRuntimeDelegate {
     const hasEvidence = (opts?.evidenceCount ?? 0) > 0;
 
     if (decision.suggestedAction === "clarify") {
-      if (hasAttachedDocs && hasEvidence) {
+      if (hasAttachedDocs) {
         // Don't bypass — let the LLM attempt an answer with the evidence.
         // The hedge mechanism will add uncertainty prefix if needed.
         return null;
@@ -5344,7 +5647,7 @@ export class CentralizedChatRuntimeDelegate {
       // RC8 fix: When documents ARE attached and retrieval returned evidence,
       // do not block entirely — let the LLM hedge instead of refusing.
       // The user already provided documents; a full refusal is a false negative.
-      if (hasAttachedDocs && hasEvidence) {
+      if (hasAttachedDocs) {
         return null;
       }
       const text =
@@ -5370,9 +5673,18 @@ export class CentralizedChatRuntimeDelegate {
     if (decision.suggestedAction !== "hedge") return normalized;
     const prefix = String(decision.hedgePrefix || "").trim();
     if (!prefix) return normalized;
+    const normalizeForCompare = (input: string): string =>
+      String(input || "")
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+    const normalizedText = normalizeForCompare(normalized);
+    const normalizedPrefix = normalizeForCompare(prefix);
     const startsWithPrefix =
-      normalized.toLowerCase().startsWith(prefix.toLowerCase()) ||
-      normalized.toLowerCase().startsWith(`${prefix.toLowerCase()},`);
+      normalizedText.startsWith(normalizedPrefix) ||
+      normalizedText.startsWith(`${normalizedPrefix},`);
     if (startsWithPrefix) return normalized;
     return `${prefix} ${normalized}`.trim();
   }
@@ -5382,6 +5694,7 @@ export class CentralizedChatRuntimeDelegate {
     language?: string,
   ): string | null {
     if (!decision) return null;
+    if (decision.suggestedAction === "hedge") return null;
     const prompt = this.evidenceGate.getPromptModification(
       decision,
       normalizeChatLanguage(language || "en"),
@@ -5695,7 +6008,7 @@ export class CentralizedChatRuntimeDelegate {
       req.message,
       contextSignals,
     );
-    if (operator === "open" || operator === "navigate") {
+    if ((operator === "open" || operator === "navigate") && evidenceCount === 0) {
       return "nav_pills";
     }
     const askForTable =
@@ -5777,20 +6090,73 @@ export class CentralizedChatRuntimeDelegate {
     return USER_FACING_FALLBACK_REASON_CODES.has(normalized);
   }
 
+  private async persistResolvedDocScope(params: {
+    traceId: string;
+    conversationId: string;
+    previousDocId: string | null;
+    resolvedDocId: string | null;
+    stream: boolean;
+  }): Promise<void> {
+    if (!params.resolvedDocId || params.resolvedDocId === params.previousDocId) {
+      return;
+    }
+    try {
+      await prisma.conversation.update({
+        where: { id: params.conversationId },
+        data: { lastDocumentId: params.resolvedDocId },
+      });
+    } catch (error) {
+      appLogger.warn(
+        params.stream
+          ? "[chat-runtime] failed to persist stream lastDocumentId"
+          : "[chat-runtime] failed to persist lastDocumentId",
+        {
+          traceId: params.traceId,
+          conversationId: params.conversationId,
+          lastDocumentId: params.resolvedDocId,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
+    }
+  }
+
   private buildSourceButtonsAttachment(
     retrievalPack: EvidencePack | null,
     preferredLanguage?: string,
   ): unknown | null {
     if (!retrievalPack || retrievalPack.evidence.length === 0) return null;
     const sourceButtonsService = getSourceButtonsService();
+    const toCellReference = (raw: unknown): string | undefined => {
+      const text = String(raw || "").trim();
+      if (!text) return undefined;
+      return /^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/.test(text)
+        ? text.toUpperCase()
+        : undefined;
+    };
+    const toLocationLabel = (item: EvidenceItem): string | undefined => {
+      if (item.location.page) return `Page ${item.location.page}`;
+      if (item.location.slide) return `Slide ${item.location.slide}`;
+      const sectionKey = String(item.location.sectionKey || "").trim();
+      const isCellRef = /^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/.test(sectionKey);
+      if (item.location.sheet && sectionKey && isCellRef) {
+        return `${String(item.location.sheet)}!${sectionKey.toUpperCase()}`;
+      }
+      if (item.location.sheet) return String(item.location.sheet);
+      return sectionKey || undefined;
+    };
     const rawSources = retrievalPack.evidence.map((item) => ({
       documentId: item.docId,
       filename: String(
         item.filename || item.title || fallbackSourceLabel(item.docId),
       ),
+      locationKey: item.locationKey,
       pageNumber: item.location.page ?? undefined,
       sheetName: item.location.sheet ?? undefined,
+      cellReference: toCellReference(item.location.sectionKey),
       slideNumber: item.location.slide ?? undefined,
+      sectionTitle: String(item.location.sectionKey || "").trim() || undefined,
+      locationLabel: toLocationLabel(item),
+      snippet: String(item.snippet || "").trim() || undefined,
       score: item.score.finalScore,
     }));
     return sourceButtonsService.buildSourceButtons(rawSources, {
