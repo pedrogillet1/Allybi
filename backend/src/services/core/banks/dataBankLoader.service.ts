@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 /**
  * Koda Data Bank Loader (ChatGPT-parity, production-safe)
  * ------------------------------------------------------
@@ -28,9 +26,9 @@ export interface DataBankLoaderOptions {
   validateSchemas: boolean; // validate banks against schemaId when possible
   allowEmptyChecksumsInNonProd: boolean;
   logger?: {
-    info: (msg: string, meta?: any) => void;
-    warn: (msg: string, meta?: any) => void;
-    error: (msg: string, meta?: any) => void;
+    info: (msg: string, meta?: Record<string, unknown>) => void;
+    warn: (msg: string, meta?: Record<string, unknown>) => void;
+    error: (msg: string, meta?: Record<string, unknown>) => void;
   };
 }
 
@@ -47,8 +45,8 @@ export interface BankMeta {
 
 export interface BankFile {
   _meta: BankMeta;
-  config: { enabled: boolean; [k: string]: any };
-  [k: string]: any;
+  config: { enabled: boolean; [k: string]: unknown };
+  [k: string]: unknown;
 }
 
 export interface BankRegistryEntry {
@@ -70,18 +68,18 @@ export interface BankRegistryEntry {
 
 export interface BankRegistryFile {
   _meta: BankMeta;
-  config: any;
+  config: Record<string, unknown>;
   schemaMap?: Record<string, string>;
   loadOrder?: string[];
   banks: BankRegistryEntry[];
-  tests?: any;
+  tests?: unknown;
 }
 
 export interface BankAliasesFile {
   _meta: BankMeta;
-  config: any;
+  config: Record<string, unknown>;
   aliases: Record<string, string>;
-  tests?: any;
+  tests?: unknown;
 }
 
 export interface BankDependencyNode {
@@ -92,15 +90,15 @@ export interface BankDependencyNode {
 
 export interface BankDependenciesFile {
   _meta: BankMeta;
-  config: any;
+  config: Record<string, unknown>;
   banks: BankDependencyNode[];
-  tests?: any;
+  tests?: unknown;
 }
 
 export class DataBankError extends Error {
   constructor(
     message: string,
-    public details?: any,
+    public details?: Record<string, unknown>,
   ) {
     super(message);
     this.name = "DataBankError";
@@ -111,15 +109,15 @@ function sha256(input: string): string {
   return crypto.createHash("sha256").update(input, "utf8").digest("hex");
 }
 
-function isEnvName(x: any): x is EnvName {
+function isEnvName(x: unknown): x is EnvName {
   return x === "production" || x === "staging" || x === "dev" || x === "local";
 }
 
 function deepFreeze<T>(obj: T): T {
   if (obj && typeof obj === "object") {
     Object.freeze(obj);
-    for (const key of Object.keys(obj as any)) {
-      const v = (obj as any)[key];
+    for (const key of Object.keys(obj as Record<string, unknown>)) {
+      const v = (obj as Record<string, unknown>)[key];
       if (v && typeof v === "object" && !Object.isFrozen(v)) deepFreeze(v);
     }
   }
@@ -148,15 +146,16 @@ function safeParseJson<T>(raw: string, fileHint: string): T {
   assertNoJsonComments(cleaned, fileHint);
   try {
     return JSON.parse(cleaned) as T;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errRecord = err as Record<string, unknown> | null;
     throw new DataBankError(
-      `Invalid JSON in ${fileHint}: ${err?.message ?? String(err)}`,
+      `Invalid JSON in ${fileHint}: ${errRecord?.message ?? String(err)}`,
       { fileHint },
     );
   }
 }
 
-function requireFields(obj: any, fields: string[], fileHint: string) {
+function requireFields(obj: Record<string, unknown>, fields: string[], fileHint: string) {
   for (const f of fields) {
     if (!(f in obj))
       throw new DataBankError(`Missing required field '${f}' in ${fileHint}`, {
@@ -170,7 +169,7 @@ function normalizeRegistryPath(p: string): string {
   return p.replace(/\\/g, "/").replace(/^\/+/, "");
 }
 
-function ensureEnvMap(map: any, fileHint: string): Record<EnvName, boolean> {
+function ensureEnvMap(map: unknown, fileHint: string): Record<EnvName, boolean> {
   const out: Record<EnvName, boolean> = {
     production: false,
     staging: false,
@@ -194,7 +193,7 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
-function normalizeAliasKey(value: string, options: any): string {
+function normalizeAliasKey(value: string, options: Record<string, unknown>): string {
   let out = String(value || "").trim();
   if (options?.collapseWhitespace !== false) {
     out = out.replace(/\s+/g, " ");
@@ -217,7 +216,7 @@ function toStringList(values: unknown): string[] {
  * Minimal bank-level contract checks (schema-lite).
  * Real schema validation can be enabled via AJV if present.
  */
-function validateMinimalBankContract(bank: any, fileHint: string) {
+function validateMinimalBankContract(bank: Record<string, unknown>, fileHint: string) {
   requireFields(bank, ["_meta", "config"], fileHint);
   requireFields(bank._meta, ["id", "version", "description"], fileHint);
   if (typeof bank._meta.id !== "string" || bank._meta.id.length < 1) {
@@ -244,7 +243,7 @@ function validateMinimalBankContract(bank: any, fileHint: string) {
  * - If AJV is not installed, we fall back to minimal contract checks.
  * - If schema banks are not JSON Schema, you can still keep validateSchemas=false.
  */
-function tryCreateAjv(): any | null {
+function tryCreateAjv(): unknown | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const Ajv = require("ajv");
@@ -285,10 +284,10 @@ export class DataBankLoaderService {
   private loadLog: Array<{ id: string; path: string; loadedAt: string }> = [];
 
   // Schema cache (schemaId -> schema object)
-  private schemaCache = new Map<string, any>();
+  private schemaCache = new Map<string, unknown>();
 
   // AJV instance if available and enabled
-  private ajv: any | null = null;
+  private ajv: unknown | null = null;
 
   constructor(options: DataBankLoaderOptions) {
     this.opts = options;
@@ -400,7 +399,7 @@ export class DataBankLoaderService {
   /**
    * Retrieve a bank by id. Supports alias resolution.
    */
-  getBank<T = any>(id: string): T {
+  getBank<T = unknown>(id: string): T {
     const canonical = this.resolveAlias(id);
     const bank = this.bankCache.get(canonical);
     if (!bank) {
@@ -448,9 +447,9 @@ export class DataBankLoaderService {
       this.opts.rootDir,
       "manifest/bank_registry.any.json",
     );
-    const raw = await fs.readFile(registryPath, "utf8").catch((err: any) => {
+    const raw = await fs.readFile(registryPath, "utf8").catch((err: unknown) => {
       throw new DataBankError(`Missing bank registry at ${registryPath}`, {
-        err,
+        err: String(err),
       });
     });
 
@@ -474,9 +473,9 @@ export class DataBankLoaderService {
     );
     try {
       const raw = await fs.readFile(aliasesPath, "utf8");
-      const parsed = safeParseJson<any>(raw, "manifest/bank_aliases.any.json");
-      validateMinimalBankContract(parsed, "manifest/bank_aliases.any.json");
-      requireFields(parsed, ["aliases"], "manifest/bank_aliases.any.json");
+      const parsed = safeParseJson<BankAliasesFile>(raw, "manifest/bank_aliases.any.json");
+      validateMinimalBankContract(parsed as unknown as Record<string, unknown>, "manifest/bank_aliases.any.json");
+      requireFields(parsed as unknown as Record<string, unknown>, ["aliases"], "manifest/bank_aliases.any.json");
 
       // Convert array format to Record<string, string> for resolveAlias()
       // Array format: [{ alias: "foo", canonicalId: "bar" }, ...]
@@ -550,10 +549,11 @@ export class DataBankLoaderService {
       this.logger.info("Loaded bank dependencies", {
         nodes: parsed.banks.length,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       this.dependencies = null;
+      const errMsg = (err as Record<string, unknown>)?.message || "missing";
       this.logger.warn(
-        `bank_dependencies.any.json not loaded; dependency overlay disabled (${err?.message || "missing"})`,
+        `bank_dependencies.any.json not loaded; dependency overlay disabled (${errMsg})`,
       );
     }
   }
@@ -575,7 +575,7 @@ export class DataBankLoaderService {
         this.opts.rootDir,
         normalizeRegistryPath(entry.path),
       );
-      const bank = await this.readBankFile<any>(filePath, entry.id);
+      const bank = await this.readBankFile<Record<string, unknown>>(filePath, entry.id);
 
       // Minimal schema bank contract
       validateMinimalBankContract(bank, entry.path);
@@ -600,7 +600,7 @@ export class DataBankLoaderService {
     for (const b of this.registry.banks) {
       // Derive filename from path if not explicitly provided
       if (!b.filename && b.path) {
-        (b as any).filename = b.path.split("/").pop() || b.path;
+        (b as { filename: string }).filename = b.path.split("/").pop() || b.path;
       }
 
       if (!b.id || !b.path || !b.category) {
@@ -703,7 +703,7 @@ export class DataBankLoaderService {
     if (!fsSync.existsSync(manifestPath)) return null;
     try {
       const raw = fsSync.readFileSync(manifestPath, "utf8");
-      const parsed = safeParseJson<any>(raw, "manifest/bank_manifest.any.json");
+      const parsed = safeParseJson<Record<string, unknown>>(raw, "manifest/bank_manifest.any.json");
       const allowedCategories = new Set(
         toStringList(parsed?.allowedCategoryIds).map((v) => String(v).trim()),
       );
@@ -952,7 +952,7 @@ export class DataBankLoaderService {
   }
 
   private validateDocumentIntelligenceContracts(): void {
-    const mapBank = this.safeGetBank<any>("document_intelligence_bank_map");
+    const mapBank = this.safeGetBank<Record<string, unknown>>("document_intelligence_bank_map");
     if (!mapBank || typeof mapBank !== "object") return;
 
     const mapRequired = toStringList(mapBank.requiredCoreBankIds);
@@ -1012,7 +1012,7 @@ export class DataBankLoaderService {
   ): void {
     if (!this.registry) return;
 
-    const schemaRegistry = this.safeGetBank<any>(
+    const schemaRegistry = this.safeGetBank<Record<string, unknown>>(
       "document_intelligence_schema_registry",
     );
     if (!schemaRegistry || typeof schemaRegistry !== "object") return;
@@ -1067,12 +1067,12 @@ export class DataBankLoaderService {
       const explicit = explicitAssignments.get(id) ?? "";
       let expected = explicit;
       if (!expected) {
-        const match = familyMappings.find((family: any) => {
-          const prefix = String(family?.pathPrefix || "").trim();
+        const match = familyMappings.find((family: unknown) => {
+          const prefix = String((family as Record<string, unknown>)?.pathPrefix || "").trim();
           if (!prefix) return false;
           return normalizeRegistryPath(entry.path).startsWith(prefix);
         });
-        expected = String(match?.schemaId || "").trim();
+        expected = String((match as Record<string, unknown>)?.schemaId || "").trim();
       }
 
       if (!expected) {
@@ -1132,7 +1132,7 @@ export class DataBankLoaderService {
   }
 
   private validateDocumentIntelligenceRuntimeWiringGates(): void {
-    const gatesBank = this.safeGetBank<any>(
+    const gatesBank = this.safeGetBank<Record<string, unknown>>(
       "document_intelligence_runtime_wiring_gates",
     );
     if (!gatesBank || typeof gatesBank !== "object") return;
@@ -1174,10 +1174,10 @@ export class DataBankLoaderService {
   }
 
   private validateDocumentIntelligenceOrphanPolicy(mapIds: string[]): void {
-    const usageBank = this.safeGetBank<any>(
+    const usageBank = this.safeGetBank<Record<string, unknown>>(
       "document_intelligence_usage_manifest",
     );
-    const orphanAllowlist = this.safeGetBank<any>(
+    const orphanAllowlist = this.safeGetBank<Record<string, unknown>>(
       "document_intelligence_orphan_allowlist",
     );
     if (!usageBank || !orphanAllowlist) return;
@@ -1374,7 +1374,7 @@ export class DataBankLoaderService {
 
   private async validateAgainstSchema(
     entry: BankRegistryEntry,
-    bank: any,
+    bank: Record<string, unknown>,
   ): Promise<void> {
     // If no schemaId defined, fallback to minimal checks only
     const schemaId =
@@ -1570,15 +1570,15 @@ export class DataBankLoaderService {
   // File reading
   // -------------------------
 
-  private async readBankFile<T = any>(
+  private async readBankFile<T = unknown>(
     filePath: string,
     bankId: string,
   ): Promise<T> {
-    const raw = await fs.readFile(filePath, "utf8").catch((err: any) => {
+    const raw = await fs.readFile(filePath, "utf8").catch((err: unknown) => {
       throw new DataBankError(`Missing bank file for ${bankId}: ${filePath}`, {
         bankId,
         filePath,
-        err,
+        err: String(err),
       });
     });
 
@@ -1593,7 +1593,7 @@ export class DataBankLoaderService {
   // Utilities
   // -------------------------
 
-  private safeGetBank<T = any>(bankId: string): T | null {
+  private safeGetBank<T = unknown>(bankId: string): T | null {
     try {
       return this.getBank<T>(bankId);
     } catch {

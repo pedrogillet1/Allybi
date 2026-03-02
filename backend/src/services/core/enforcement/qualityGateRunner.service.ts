@@ -112,11 +112,11 @@ type DocumentIntelligenceQualityBank = {
 
 type DocumentIntelligenceScope = {
   answerMode: string;
-  context: Record<string, any>;
-  output: Record<string, any>;
-  attachments: Record<string, any>;
-  source: Record<string, any>;
-  config: Record<string, any>;
+  context: Record<string, unknown>;
+  output: Record<string, unknown>;
+  attachments: Record<string, unknown>;
+  source: Record<string, unknown>;
+  config: Record<string, unknown>;
 };
 
 // ---------------------------------------------------------------------------
@@ -367,12 +367,12 @@ function normalizeDomain(value: unknown): string {
     .toLowerCase();
 }
 
-function asRecord(value: unknown): Record<string, any> {
+function asRecord(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  return value as Record<string, any>;
+  return value as Record<string, unknown>;
 }
 
-function asArray(value: unknown): any[] {
+function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
@@ -389,11 +389,12 @@ function firstFiniteNumber(values: unknown[]): number | null {
   return null;
 }
 
-function extractComparable(value: any): any {
+function extractComparable(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
-  if (Object.prototype.hasOwnProperty.call(value, "id")) return value.id;
-  if (Object.prototype.hasOwnProperty.call(value, "docId")) return value.docId;
-  if (Object.prototype.hasOwnProperty.call(value, "value")) return value.value;
+  const record = value as Record<string, unknown>;
+  if (Object.prototype.hasOwnProperty.call(record, "id")) return record.id;
+  if (Object.prototype.hasOwnProperty.call(record, "docId")) return record.docId;
+  if (Object.prototype.hasOwnProperty.call(record, "value")) return record.value;
   return value;
 }
 
@@ -402,7 +403,7 @@ function diAny(value: unknown, predicate: unknown): boolean {
   try {
     return value.some((item, idx) => {
       try {
-        return Boolean((predicate as (item: any, idx: number) => unknown)(
+        return Boolean((predicate as (item: unknown, idx: number) => unknown)(
           item,
           idx,
         ));
@@ -562,7 +563,7 @@ function extractDocIdsFromEvidence(
   );
 }
 
-function mergeDeep(baseValue: unknown, overrideValue: unknown): any {
+function mergeDeep(baseValue: unknown, overrideValue: unknown): unknown {
   if (Array.isArray(overrideValue)) {
     return overrideValue.slice();
   }
@@ -574,11 +575,11 @@ function mergeDeep(baseValue: unknown, overrideValue: unknown): any {
     typeof overrideValue === "object" &&
     !Array.isArray(overrideValue)
   ) {
-    const out: Record<string, any> = {
-      ...(baseValue as Record<string, any>),
+    const out: Record<string, unknown> = {
+      ...(baseValue as Record<string, unknown>),
     };
     for (const [key, value] of Object.entries(
-      overrideValue as Record<string, any>,
+      overrideValue as Record<string, unknown>,
     )) {
       out[key] = mergeDeep(out[key], value);
     }
@@ -1550,11 +1551,11 @@ export class QualityGateRunnerService {
         "diLog10",
         `return Boolean(${normalizedExpression});`,
       ) as (
-        context: Record<string, any>,
-        output: Record<string, any>,
-        attachments: Record<string, any>,
-        source: Record<string, any>,
-        config: Record<string, any>,
+        context: Record<string, unknown>,
+        output: Record<string, unknown>,
+        attachments: Record<string, unknown>,
+        source: Record<string, unknown>,
+        config: Record<string, unknown>,
         answerMode: string,
         diAnyFn: typeof diAny,
         diCountFn: typeof diCount,
@@ -1899,7 +1900,7 @@ export class QualityGateRunnerService {
       ) {
         const checks = new Set(
           validationBank.policies
-            .map((policy: any) => String(policy?.check || "").trim())
+            .map((policy: unknown) => String((policy as Record<string, unknown>)?.check || "").trim())
             .filter(Boolean),
         );
 

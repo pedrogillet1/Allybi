@@ -2177,39 +2177,24 @@ export class ResponseContractEnforcerService {
       });
       if (!provenanceCheck.ok) {
         const reasonCode = provenanceCheck.failureCode || "missing_provenance";
-        const hasEvidenceMap = (ctx.evidenceMap || []).length > 0;
-        const softFailure =
-          (reasonCode === "missing_provenance" ||
-            reasonCode === "insufficient_provenance_coverage") &&
-          hasEvidenceMap &&
-          ctx.provenanceFailOpenWithEvidence === true;
-        if (softFailure) {
-          provenanceDecision = {
-            action: "hedge",
+        provenanceDecision = {
+          action: "block",
+          reasonCode,
+          severity: "error",
+        };
+        return {
+          content: "",
+          attachments,
+          enforcement: {
+            repairs,
+            warnings: [...warnings, ...provenanceCheck.warnings],
+            blocked: true,
             reasonCode,
-            severity: "warning",
-          };
-          warnings.push("PROVENANCE_FAILOPEN_WITH_EVIDENCE", ...provenanceCheck.warnings);
-        } else {
-          provenanceDecision = {
-            action: "block",
-            reasonCode,
-            severity: "error",
-          };
-          return {
-            content: "",
-            attachments,
-            enforcement: {
-              repairs,
-              warnings: [...warnings, ...provenanceCheck.warnings],
-              blocked: true,
-              reasonCode,
-              ...(provenanceDecision
-                ? { provenance: provenanceDecision }
-                : {}),
-            },
-          };
-        }
+            ...(provenanceDecision
+              ? { provenance: provenanceDecision }
+              : {}),
+          },
+        };
       }
 
       if (provenanceCheck.ok) {
@@ -2220,43 +2205,24 @@ export class ResponseContractEnforcerService {
         });
         if (!mapCheck.ok) {
           const mapReasonCode = mapCheck.failureCode || "missing_evidence_map";
-          const hasEvidenceMap = (ctx.evidenceMap || []).length > 0;
-          const softMapFailure =
-            (mapReasonCode === "evidence_map_mismatch" ||
-              mapReasonCode === "evidence_map_hash_mismatch" ||
-              mapReasonCode === "missing_evidence_map") &&
-            hasEvidenceMap &&
-            ctx.provenanceFailOpenWithEvidence === true;
-          if (softMapFailure) {
-            provenanceDecision = {
-              action: "hedge",
+          provenanceDecision = {
+            action: "block",
+            reasonCode: mapReasonCode,
+            severity: "error",
+          };
+          return {
+            content: "",
+            attachments,
+            enforcement: {
+              repairs,
+              warnings: [...warnings, ...mapCheck.warnings],
+              blocked: true,
               reasonCode: mapReasonCode,
-              severity: "warning",
-            };
-            warnings.push(
-              "PROVENANCE_MAP_FAILOPEN_WITH_EVIDENCE",
-              ...mapCheck.warnings,
-            );
-          } else {
-            provenanceDecision = {
-              action: "block",
-              reasonCode: mapReasonCode,
-              severity: "error",
-            };
-            return {
-              content: "",
-              attachments,
-              enforcement: {
-                repairs,
-                warnings: [...warnings, ...mapCheck.warnings],
-                blocked: true,
-                reasonCode: mapReasonCode,
-                ...(provenanceDecision
-                  ? { provenance: provenanceDecision }
-                  : {}),
-              },
-            };
-          }
+              ...(provenanceDecision
+                ? { provenance: provenanceDecision }
+                : {}),
+            },
+          };
         }
       }
       provenanceEnforcement = provenanceDecision;

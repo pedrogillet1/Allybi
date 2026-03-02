@@ -84,7 +84,7 @@ export function loadOpenAIConfig(env: EnvName): OpenAIProviderConfig {
     allowTools: process.env.OPENAI_ALLOW_TOOLS !== "false",
 
     preferredApi:
-      (process.env.OPENAI_PREFERRED_API as any) || "chat_completions",
+      (process.env.OPENAI_PREFERRED_API as "responses" | "chat_completions") || "chat_completions",
     supportsDeveloperRole:
       process.env.OPENAI_SUPPORTS_DEVELOPER_ROLE !== "false",
     strictNoImages: process.env.OPENAI_STRICT_NO_IMAGES !== "false",

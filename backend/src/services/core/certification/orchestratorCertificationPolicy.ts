@@ -150,9 +150,10 @@ function asCoverageThresholds(input: unknown): CoverageThreshold[] {
   const rows = Array.isArray(input) ? input : [];
   const out: CoverageThreshold[] = [];
   for (const row of rows) {
-    const suffix = asString((row as any)?.suffix);
-    const linesPct = Number((row as any)?.linesPct);
-    const branchesPct = Number((row as any)?.branchesPct);
+    const rowRecord = row as Record<string, unknown>;
+    const suffix = asString(rowRecord?.suffix);
+    const linesPct = Number(rowRecord?.linesPct);
+    const branchesPct = Number(rowRecord?.branchesPct);
     if (!suffix) {
       throw new Error("Certification coverage threshold is missing suffix.");
     }

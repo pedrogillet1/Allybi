@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { LLMClient, LLMMessage, LLMRequest } from "./llmClient.interface";
 import type { LLMProvider } from "./llmErrors.types";
 import type { LLMStreamingConfig, StreamSink } from "./llmStreaming.types";
@@ -149,6 +147,61 @@ function normalizePromptMode(value: unknown): "compose" | "retrieval_plan" {
   return "compose";
 }
 
+let machineJsonPromptTaskCache: Set<string> | null | undefined;
+
+function isMachineJsonTemplate(template: Record<string, unknown>): boolean {
+  const outputMode = String(template?.outputMode || "")
+    .trim()
+    .toLowerCase();
+  return outputMode === "machine_json";
+}
+
+function collectMachineJsonTaskIdsFromBank(bank: Record<string, unknown> | null): Set<string> {
+  const out = new Set<string>();
+  const templates = Array.isArray(bank?.templates) ? (bank.templates as Array<Record<string, unknown>>) : [];
+  for (const template of templates) {
+    if (!isMachineJsonTemplate(template)) continue;
+    const whenObj = template?.when as Record<string, unknown> | undefined;
+    const operators = Array.isArray(whenObj?.operators)
+      ? (whenObj.operators as unknown[])
+      : [];
+    for (const raw of operators) {
+      const operatorId = String(raw || "")
+        .trim()
+        .toLowerCase();
+      if (operatorId) out.add(operatorId);
+    }
+  }
+  return out;
+}
+
+function getMachineJsonPromptTaskSet(): Set<string> {
+  if (machineJsonPromptTaskCache !== undefined) {
+    return machineJsonPromptTaskCache ?? new Set<string>();
+  }
+
+  try {
+    const resolved = new Set<string>();
+    const bankIds = ["task_plan_generation", "editing_task_prompts"];
+    for (const bankId of bankIds) {
+      const bank = getOptionalBank<Record<string, unknown>>(bankId);
+      const ids = collectMachineJsonTaskIdsFromBank(bank);
+      for (const id of ids) resolved.add(id);
+    }
+    machineJsonPromptTaskCache = resolved;
+    return resolved;
+  } catch {
+    machineJsonPromptTaskCache = new Set<string>();
+    return machineJsonPromptTaskCache;
+  }
+}
+
+function isMachineJsonPromptTask(value: unknown): boolean {
+  const taskId = String(value || "").trim().toLowerCase();
+  if (!taskId) return false;
+  return getMachineJsonPromptTaskSet().has(taskId);
+}
+
 export class LlmGatewayService {
   constructor(
     private readonly llmClient: LLMClient,
@@ -295,7 +348,10 @@ export class LlmGatewayService {
         operator: parsed.operator,
         operatorFamily: parsed.operatorFamily,
         disallowJsonOutput:
-          promptTask || parsed.promptMode === "retrieval_plan" ? false : true,
+          parsed.promptMode === "retrieval_plan" ||
+          isMachineJsonPromptTask(promptTask)
+            ? false
+            : true,
         maxQuestions:
           typeof parsed.styleMaxQuestions === "number"
             ? parsed.styleMaxQuestions
@@ -322,7 +378,7 @@ export class LlmGatewayService {
       toolContext: promptTask
         ? {
             toolName: promptTask,
-            toolArgs: (params.meta?.promptTaskArgs as any) || {},
+            toolArgs: (params.meta?.promptTaskArgs as Record<string, unknown>) || {},
           }
         : undefined,
       options: {
@@ -335,20 +391,22 @@ export class LlmGatewayService {
     };
 
     const built = this.builder.build(buildInput);
+    const kodaMeta = built.kodaMeta as Record<string, unknown> | undefined;
+    const promptTraceObj = kodaMeta?.promptTrace as Record<string, unknown> | undefined;
     const promptTraceRaw =
-      (built.kodaMeta as any)?.promptTrace?.orderedPrompts ?? [];
+      (promptTraceObj?.orderedPrompts as Array<Record<string, unknown>>) ?? [];
     const promptTrace: GatewayPromptTrace = {
       promptIds: promptTraceRaw
-        .map((p: any) => String(p?.bankId || ""))
+        .map((p) => String(p?.bankId || ""))
         .filter(Boolean),
       promptVersions: promptTraceRaw
-        .map((p: any) => String(p?.version || ""))
+        .map((p) => String(p?.version || ""))
         .filter(Boolean),
       promptHashes: promptTraceRaw
-        .map((p: any) => String(p?.hash || ""))
+        .map((p) => String(p?.hash || ""))
         .filter(Boolean),
       promptTemplateIds: promptTraceRaw
-        .map((p: any) => String(p?.templateId || ""))
+        .map((p) => String(p?.templateId || ""))
         .filter(Boolean),
     };
 
@@ -378,13 +436,13 @@ export class LlmGatewayService {
         maxOutputTokens: built.options?.maxOutputTokens,
       },
       purpose: mapPurpose(
-        String((built.kodaMeta as any)?.promptType || "compose_answer"),
+        String(kodaMeta?.promptType || "compose_answer"),
       ),
       meta: {
         ...(params.meta || {}),
         userId: params.userId,
         conversationId: params.conversationId,
-        promptType: (built.kodaMeta as any)?.promptType,
+        promptType: kodaMeta?.promptType as string,
         promptTrace,
         route,
       },
@@ -393,7 +451,7 @@ export class LlmGatewayService {
     return {
       request,
       promptType: String(
-        (built.kodaMeta as any)?.promptType || "compose_answer",
+        kodaMeta?.promptType || "compose_answer",
       ),
       promptTrace,
     };
@@ -445,8 +503,8 @@ export class LlmGatewayService {
     const rawMeta = params.meta || {};
     const rawContext = params.context || {};
     const evidencePack = params.evidencePack ?? undefined;
-    const contextSignals = (rawContext?.signals as any) || {};
-    const metaSignals = (rawMeta?.signals as any) || {};
+    const contextSignals = (rawContext?.signals as Record<string, unknown>) || {};
+    const metaSignals = (rawMeta?.signals as Record<string, unknown>) || {};
     const systemBlocks = history
       .filter((m) => m.role === "system")
       .map((m) => clampText(m.content, this.resolveSystemBlockCharCap()));
@@ -462,7 +520,7 @@ export class LlmGatewayService {
       promptTaskName ||
       firstNonEmptyString(
         rawMeta.operator,
-        (rawContext as any).operator,
+        rawContext.operator,
         contextSignals.operator,
         metaSignals.operator,
       ) ||
@@ -482,6 +540,7 @@ export class LlmGatewayService {
         operatorFamily: familyResolution.operatorFamily,
         operatorFamilyDefaultMode: familyResolution.defaultAnswerMode,
       },
+      userText,
     );
     const disambiguation = this.detectDisambiguation(
       rawMeta,
@@ -492,7 +551,7 @@ export class LlmGatewayService {
       familyResolution.operatorFamily ||
       (answerMode === "nav_pills" ? "file_actions" : null);
     const navType =
-      (rawMeta.navType as any) ??
+      (rawMeta.navType as "open" | "where" | "discover" | null) ??
       (answerMode === "nav_pills" ? "discover" : null);
 
     const reasonCode =
@@ -502,27 +561,27 @@ export class LlmGatewayService {
     const requestedPurpose = asNormalizedCode(
       firstNonEmptyString(
         rawMeta.purpose,
-        (rawContext as any).purpose,
+        rawContext.purpose,
         contextSignals.purpose,
         metaSignals.purpose,
       ),
     );
     const productHelpTopic = firstNonEmptyString(
       rawMeta.productHelpTopic,
-      (rawContext as any).productHelpTopic,
+      rawContext.productHelpTopic,
       contextSignals.productHelpTopic,
       metaSignals.productHelpTopic,
     );
     const productHelpSnippet = firstNonEmptyString(
       rawMeta.productHelpSnippet,
-      (rawContext as any).productHelpSnippet,
+      rawContext.productHelpSnippet,
       contextSignals.productHelpSnippet,
       metaSignals.productHelpSnippet,
     );
     const styleProfile =
       firstNonEmptyString(
         rawMeta.styleProfile,
-        (rawContext as any).styleProfile,
+        rawContext.styleProfile,
         contextSignals.styleProfile,
         metaSignals.styleProfile,
       ) || null;
@@ -530,7 +589,7 @@ export class LlmGatewayService {
       asNonNegativeInt(
         rawMeta.styleMaxQuestions ??
           rawMeta.maxQuestions ??
-          (rawContext as any).styleMaxQuestions ??
+          rawContext.styleMaxQuestions ??
           contextSignals.styleMaxQuestions ??
           contextSignals.maxQuestions ??
           metaSignals.styleMaxQuestions ??
@@ -539,7 +598,7 @@ export class LlmGatewayService {
     const styleMaxChars =
       asNonNegativeInt(
         rawMeta.styleMaxChars ??
-          (rawContext as any).styleMaxChars ??
+          rawContext.styleMaxChars ??
           contextSignals.styleMaxChars ??
           contextSignals.profileMaxChars ??
           metaSignals.styleMaxChars,
@@ -548,8 +607,8 @@ export class LlmGatewayService {
       asBool(
         rawMeta.userRequestedShort ??
           rawMeta.truncationRetry ??
-          (rawContext as any).userRequestedShort ??
-          (rawContext as any).truncationRetry ??
+          rawContext.userRequestedShort ??
+          rawContext.truncationRetry ??
           contextSignals.userRequestedShort ??
           contextSignals.truncationRetry ??
           contextSignals.shortAnswer ??
@@ -559,7 +618,7 @@ export class LlmGatewayService {
       ) === true;
     const boldingEnabledRaw =
       rawMeta.boldingEnabled ??
-      (rawContext as any).boldingEnabled ??
+      rawContext.boldingEnabled ??
       contextSignals.boldingEnabled ??
       metaSignals.boldingEnabled;
     const boldingEnabled =
@@ -567,14 +626,14 @@ export class LlmGatewayService {
     const retrievalPlanningSignal =
       asBool(
         rawMeta.retrievalPlanning ??
-          (rawContext as any).retrievalPlanning ??
+          rawContext.retrievalPlanning ??
           contextSignals.retrievalPlanning ??
           metaSignals.retrievalPlanning,
       ) === true;
     const promptMode = normalizePromptMode(
       firstNonEmptyString(
         rawMeta.promptMode,
-        (rawContext as any).promptMode,
+        rawContext.promptMode,
         contextSignals.promptMode,
         metaSignals.promptMode,
         requestedPurpose === "retrieval_planning" ? "retrieval_plan" : null,
@@ -584,20 +643,20 @@ export class LlmGatewayService {
     const uiSurface =
       firstNonEmptyString(
         rawMeta.uiSurface,
-        (rawContext as any).uiSurface,
+        rawContext.uiSurface,
         contextSignals.uiSurface,
         metaSignals.uiSurface,
       ) || null;
     const usedBy = [
       ...asStringList(rawMeta.usedBy),
-      ...asStringList((rawContext as any).usedBy),
+      ...asStringList(rawContext.usedBy),
       ...asStringList(contextSignals.usedBy),
       ...asStringList(metaSignals.usedBy),
     ];
     const semanticFlagsSet = new Set<string>();
     for (const value of [
       ...asStringList(rawMeta.semanticFlags),
-      ...asStringList((rawContext as any).semanticFlags),
+      ...asStringList(rawContext.semanticFlags),
       ...asStringList(contextSignals.semanticFlags),
       ...asStringList(metaSignals.semanticFlags),
     ]) {
@@ -614,16 +673,16 @@ export class LlmGatewayService {
     const semanticFlags = Array.from(semanticFlagsSet).filter(Boolean);
     const tightenedHistoryForDocGrounded =
       String(answerMode || "").startsWith("doc_grounded") &&
-      dialogueHistory.length > 18;
+      dialogueHistory.length > 12;
     const dialogue = this.buildDialogueContext(dialogueHistory, {
       maxTurns: tightenedHistoryForDocGrounded
-        ? Math.min(this.resolveDialogueTurnLimit(), 12)
+        ? Math.min(this.resolveDialogueTurnLimit(), 8)
         : undefined,
       perMessageCap: tightenedHistoryForDocGrounded
-        ? Math.min(this.resolveDialogueMessageCharCap(), 1000)
+        ? Math.min(this.resolveDialogueMessageCharCap(), 700)
         : undefined,
       charBudget: tightenedHistoryForDocGrounded
-        ? Math.min(this.resolveDialogueCharBudget(), 8000)
+        ? Math.min(this.resolveDialogueCharBudget(), 5000)
         : undefined,
     }).join("\n");
     const memoryParts: string[] = [];
@@ -638,7 +697,7 @@ export class LlmGatewayService {
     }
     const joinedMemory = memoryParts.join("\n\n");
     const memoryPackCharCap = tightenedHistoryForDocGrounded
-      ? Math.min(this.resolveMemoryPackCharCap(), 14000)
+      ? Math.min(this.resolveMemoryPackCharCap(), 9000)
       : this.resolveMemoryPackCharCap();
     const memoryPack = memoryParts.length
       ? {
@@ -802,14 +861,14 @@ export class LlmGatewayService {
   }
 
   private getMemoryPolicyRuntimeTuning(): MemoryPolicyRuntimeTuning {
-    const bank = getOptionalBank<any>("memory_policy");
+    const bank = getOptionalBank<Record<string, unknown>>("memory_policy");
     if (!bank) {
       throw new RuntimePolicyError(
         "RUNTIME_POLICY_MISSING",
         "Required bank missing: memory_policy",
       );
     }
-    return (bank.config?.runtimeTuning || {}) as MemoryPolicyRuntimeTuning;
+    return ((bank.config as Record<string, unknown> | undefined)?.runtimeTuning || {}) as MemoryPolicyRuntimeTuning;
   }
 
   private detectOutputLanguage(
@@ -839,24 +898,25 @@ export class LlmGatewayService {
       operatorFamily?: string | null;
       operatorFamilyDefaultMode?: string | null;
     },
+    queryText?: string | null,
   ): string {
     if (typeof meta.promptTask === "string" && meta.promptTask.trim()) {
       return this.answerModeRouter.decide({
         promptTask: String(meta.promptTask),
       }).answerMode;
     }
-    const contextSignals = (context?.signals as any) || {};
-    const metaSignals = (meta?.signals as any) || {};
+    const contextSignals = (context?.signals as Record<string, unknown>) || {};
+    const metaSignals = (meta?.signals as Record<string, unknown>) || {};
     const needsClarification =
       meta.needsClarification === true ||
-      (context as any)?.needsClarification === true ||
+      context?.needsClarification === true ||
       contextSignals.needsClarification === true ||
       metaSignals.needsClarification === true;
     const disambiguationActive =
-      (meta.disambiguation as any)?.active === true ||
-      (context as any)?.disambiguation?.active === true ||
-      contextSignals?.disambiguation?.active === true ||
-      metaSignals?.disambiguation?.active === true;
+      (meta.disambiguation as Record<string, unknown> | undefined)?.active === true ||
+      (context?.disambiguation as Record<string, unknown> | undefined)?.active === true ||
+      (contextSignals?.disambiguation as Record<string, unknown> | undefined)?.active === true ||
+      (metaSignals?.disambiguation as Record<string, unknown> | undefined)?.active === true;
 
     const evidenceDocCount = evidencePack?.evidence?.length
       ? new Set(evidencePack.evidence.map((e) => e.docId)).size
@@ -870,13 +930,14 @@ export class LlmGatewayService {
       disambiguationActive,
       operator: operatorRouting?.operator,
       operatorFamily:
-        operatorRouting?.operatorFamily || (context as any)?.operatorFamily,
+        operatorRouting?.operatorFamily || (context?.operatorFamily as string),
       intentFamily:
         (meta.intentFamily as string) ||
-        ((context as any)?.intentFamily as string) ||
+        (context?.intentFamily as string) ||
         null,
       evidenceDocCount,
       systemBlocks,
+      queryText: queryText || null,
     }).answerMode;
   }
 
@@ -887,17 +948,17 @@ export class LlmGatewayService {
   ): { operatorFamily: string | null; defaultAnswerMode: string | null } {
     const explicitFamily = firstNonEmptyString(
       meta.operatorFamily,
-      (context as any).operatorFamily,
-      (meta.signals as any)?.operatorFamily,
-      (context.signals as any)?.operatorFamily,
+      context.operatorFamily,
+      (meta.signals as Record<string, unknown> | undefined)?.operatorFamily,
+      (context.signals as Record<string, unknown> | undefined)?.operatorFamily,
     );
-    const familyBank = getOptionalBank<any>("operator_families");
+    const familyBank = getOptionalBank<Record<string, unknown>>("operator_families");
     const families = Array.isArray(familyBank?.families)
-      ? familyBank.families
+      ? (familyBank.families as Array<Record<string, unknown>>)
       : [];
     const findFamilyById = (familyId: string) =>
       families.find(
-        (entry: any) =>
+        (entry) =>
           asNormalizedCode(entry?.id) === asNormalizedCode(familyId),
       ) || null;
 
@@ -905,9 +966,9 @@ export class LlmGatewayService {
     if (!familyEntry && operator) {
       const normalizedOperator = asNormalizedCode(operator);
       familyEntry =
-        families.find((entry: any) =>
+        families.find((entry) =>
           Array.isArray(entry?.operators)
-            ? entry.operators.some(
+            ? (entry.operators as unknown[]).some(
                 (op: unknown) => asNormalizedCode(op) === normalizedOperator,
               )
             : false,
@@ -933,7 +994,7 @@ export class LlmGatewayService {
           )?.[1]
         : null;
     const defaultAnswerMode = String(
-      (hintedMode as any)?.defaultMode || familyEntry.defaultAnswerMode || "",
+      (hintedMode as Record<string, unknown> | undefined)?.defaultMode || familyEntry.defaultAnswerMode || "",
     ).trim();
 
     return {
@@ -947,17 +1008,17 @@ export class LlmGatewayService {
     context: Record<string, unknown>,
     answerMode: string,
   ): GatewayDisambiguation | null {
-    const contextSignals = (context?.signals as any) || {};
-    const metaSignals = (meta?.signals as any) || {};
+    const contextSignals = (context?.signals as Record<string, unknown>) || {};
+    const metaSignals = (meta?.signals as Record<string, unknown>) || {};
     const dm =
-      (meta.disambiguation as any) ||
-      (context.disambiguation as any) ||
-      contextSignals.disambiguation ||
-      metaSignals.disambiguation ||
+      (meta.disambiguation as Record<string, unknown>) ||
+      (context.disambiguation as Record<string, unknown>) ||
+      (contextSignals.disambiguation as Record<string, unknown>) ||
+      (metaSignals.disambiguation as Record<string, unknown>) ||
       null;
     const needsClarification =
       meta.needsClarification === true ||
-      (context as any)?.needsClarification === true ||
+      context?.needsClarification === true ||
       contextSignals.needsClarification === true ||
       metaSignals.needsClarification === true;
     const active =
@@ -967,9 +1028,9 @@ export class LlmGatewayService {
 
     if (!active) return null;
 
-    const rawOptions = Array.isArray(dm?.options) ? dm.options : [];
+    const rawOptions = Array.isArray(dm?.options) ? (dm.options as Array<Record<string, unknown>>) : [];
     const options = rawOptions
-      .map((o: any, idx: number) => ({
+      .map((o: Record<string, unknown>, idx: number) => ({
         id: String(o?.id || `opt_${idx + 1}`),
         label: String(o?.label || o?.title || "").trim(),
         score: typeof o?.score === "number" ? o.score : undefined,

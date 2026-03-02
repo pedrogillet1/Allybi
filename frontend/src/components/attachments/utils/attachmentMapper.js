@@ -43,6 +43,9 @@ function dedupe(items) {
       a.page ?? "",
       a.slide ?? "",
       a.sheet ?? "",
+      a.cell ?? "",
+      a.section ?? "",
+      a.locationKey ?? "",
       a.folderPath || "",
       a.url || "",
     ].join("|");
@@ -70,6 +73,11 @@ export function toCanonicalAttachment(raw) {
       page: raw.page,
       slide: raw.slide,
       sheet: raw.sheet,
+      cell: raw.cell,
+      section: raw.section,
+      locationKey: raw.locationKey,
+      locationLabel: raw.locationLabel,
+      snippet: raw.snippet,
       folderPath: raw.folderPath,
       meta: raw,
     };
@@ -121,15 +129,28 @@ export function mapSourceButtons(sourceButtons) {
 
   const buttons = isArray(sourceButtons.buttons) ? sourceButtons.buttons : [];
   const items = dedupe(
-    buttons.map((b) => ({
-      kind: AttachmentKind.SOURCE,
-      id: b.documentId || b.docId || b.id,
-      title: b.title || b.filename || b.name,
-      filename: b.filename || b.title || b.name,
-      mimeType: b.mimeType,
-      url: b.url,
-      meta: b,
-    }))
+    buttons.map((b) => {
+      const location = b?.location && typeof b.location === "object" ? b.location : null;
+      const locationType = String(location?.type || "").toLowerCase();
+      const locationValue = location?.value;
+      return {
+        kind: AttachmentKind.SOURCE,
+        id: b.documentId || b.docId || b.id,
+        title: b.title || b.filename || b.name,
+        filename: b.filename || b.title || b.name,
+        mimeType: b.mimeType,
+        url: b.url,
+        page: locationType === "page" ? Number(locationValue) || undefined : undefined,
+        slide: locationType === "slide" ? Number(locationValue) || undefined : undefined,
+        sheet: locationType === "sheet" ? locationValue || undefined : undefined,
+        cell: locationType === "cell" ? locationValue || undefined : undefined,
+        section: locationType === "section" ? locationValue || undefined : undefined,
+        locationKey: b.locationKey,
+        locationLabel: location?.label || undefined,
+        snippet: b.snippet || undefined,
+        meta: b,
+      };
+    })
   );
 
   const seeAll = sourceButtons.seeAll || null;

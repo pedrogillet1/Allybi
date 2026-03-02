@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "policy_citations",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Single citation policy contract for runtime outputs.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true,
@@ -12,7 +12,10 @@
       {
         "role": "system",
         "content": {
-          "any": "Citation policy: never render an inline `Sources` section in answer text. When retrieved evidence exists, citations must be represented through source attachments/buttons with human-readable titles and stable locators when available. Never fabricate citations."
+          "en": "Citation policy: never render an inline `Sources` section in answer text. When retrieved evidence exists, citations must be represented through source attachments/buttons with human-readable titles and stable locators when available. Never fabricate citations.",
+          "pt": "Politica de citacoes: nunca renderize uma secao `Sources` inline no texto da resposta. Quando houver evidencia recuperada, citacoes devem ser representadas por anexos/botoes de fonte com titulos legiveis e localizadores estaveis quando disponiveis. Nunca invente citacoes.",
+          "es": "Politica de citas: nunca renderices una seccion `Sources` en linea en el texto de respuesta. Cuando exista evidencia recuperada, las citas deben representarse mediante adjuntos/botones de fuente con titulos legibles y localizadores estables cuando esten disponibles. Nunca fabriques citas.",
+          "any": "Citation policy: do not render inline Sources sections and never fabricate citations."
         }
       }
     ]

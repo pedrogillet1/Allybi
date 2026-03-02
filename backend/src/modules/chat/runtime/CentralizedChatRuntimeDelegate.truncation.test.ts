@@ -52,20 +52,19 @@ describe("CentralizedChatRuntimeDelegate pre-enforcer trim", () => {
 });
 
 describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
-  test("replaces incomplete overflow narrative with complete localized fallback", () => {
+  test("preserves incomplete narrative text instead of replacing with generic fallback", () => {
     const delegate = Object.create(
       CentralizedChatRuntimeDelegate.prototype,
     ) as CentralizedChatRuntimeDelegate;
 
+    const truncatedNarrative = 'Com base no documento "Trabalho_projeto_.';
     const repaired = (delegate as any).repairProviderOverflowStructuredOutput(
-      'Com base no documento "Trabalho_projeto_.',
+      truncatedNarrative,
       { finishReason: "length" },
       "pt",
     );
 
-    expect(repaired).toBe(
-      "A resposta foi interrompida antes de concluir. Posso reenviar em bullets para garantir completude.",
-    );
+    expect(repaired).toBe(truncatedNarrative);
   });
 
   test("does NOT replace enforcer-trimmed text that ends cleanly", () => {
@@ -87,7 +86,7 @@ describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
     expect(repaired).toBe(cleanText);
   });
 
-  test("truncated bullet list returns list-specific fallback", () => {
+  test("truncated bullet list is preserved instead of generic replacement", () => {
     const delegate = Object.create(
       CentralizedChatRuntimeDelegate.prototype,
     ) as CentralizedChatRuntimeDelegate;
@@ -101,10 +100,10 @@ describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
       "en",
     );
 
-    expect(repaired).toContain("list was cut");
+    expect(repaired).toBe(bulletText);
   });
 
-  test("truncated numbered list returns numbered-list-specific fallback", () => {
+  test("truncated numbered list is preserved instead of generic replacement", () => {
     const delegate = Object.create(
       CentralizedChatRuntimeDelegate.prototype,
     ) as CentralizedChatRuntimeDelegate;
@@ -118,10 +117,10 @@ describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
       "en",
     );
 
-    expect(repaired).toContain("numbered list was cut");
+    expect(repaired).toBe(numberedText);
   });
 
-  test("enforcer-trimmed text with surviving unclosed backtick takes enforcer path", () => {
+  test("enforcer-trimmed narrative with unclosed backtick remains intact", () => {
     const delegate = Object.create(
       CentralizedChatRuntimeDelegate.prototype,
     ) as CentralizedChatRuntimeDelegate;
@@ -135,10 +134,7 @@ describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
       ["HARD_MAX_TOKENS_TRIMMED"],
     );
 
-    // The classifier detects enforcer trim + semantic incompleteness
-    // and returns occurred:true with reason "enforcer_trimmed".
-    // Since semantic truncation occurred, the overflow repair DOES fire.
-    expect(repaired).not.toBe(incompleteText);
+    expect(repaired).toBe(incompleteText);
   });
 });
 
@@ -165,7 +161,7 @@ describe("CentralizedChatRuntimeDelegate answer mode routing", () => {
     expect(mode).toBe("nav_pills");
   });
 
-  test("forces nav_pills for navigate operator", () => {
+  test("uses doc-grounded mode for navigate operator when evidence exists", () => {
     const delegate = Object.create(
       CentralizedChatRuntimeDelegate.prototype,
     ) as any;
@@ -184,7 +180,7 @@ describe("CentralizedChatRuntimeDelegate answer mode routing", () => {
       { evidence: [{ docId: "doc-1" }] },
     );
 
-    expect(mode).toBe("nav_pills");
+    expect(mode).toBe("doc_grounded_single");
   });
 });
 
@@ -414,6 +410,39 @@ describe("CentralizedChatRuntimeDelegate fallback source coverage", () => {
     const sources = ensureFallbackSourceCoverage({
       sources: [],
       answerMode: "fallback",
+      attachedDocumentIds: ["doc-1", "doc-2"],
+      retrievalPack: {
+        query: { original: "q", normalized: "q" },
+        scope: {
+          activeDocId: "doc-2",
+          explicitDocLock: true,
+          candidateDocIds: ["doc-2"],
+        },
+        stats: {
+          candidatesConsidered: 0,
+          candidatesAfterNegatives: 0,
+          candidatesAfterBoosts: 0,
+          candidatesAfterDiversification: 0,
+          scopeCandidatesDropped: 0,
+          scopeViolationsDetected: 0,
+          scopeViolationsThrown: 0,
+          evidenceItems: 0,
+          uniqueDocsInEvidence: 0,
+          topScore: null,
+          scoreGap: null,
+        },
+        evidence: [],
+      },
+    });
+
+    expect(sources).toHaveLength(1);
+    expect(sources[0]?.documentId).toBe("doc-2");
+  });
+
+  test("injects scoped source for help_steps turns with attached docs and zero evidence sources", () => {
+    const sources = ensureFallbackSourceCoverage({
+      sources: [],
+      answerMode: "help_steps",
       attachedDocumentIds: ["doc-1", "doc-2"],
       retrievalPack: {
         query: { original: "q", normalized: "q" },

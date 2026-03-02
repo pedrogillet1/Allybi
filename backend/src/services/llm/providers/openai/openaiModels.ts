@@ -88,7 +88,7 @@ export const OPENAI_PRIMARY_MODEL: OpenAIModelId = "gpt-5.2";
 /**
  * Convenience helpers
  */
-export function isOpenAIModelId(x: any): x is OpenAIModelId {
+export function isOpenAIModelId(x: unknown): x is OpenAIModelId {
   return x === "gpt-5-mini" || x === "gpt-5.2";
 }
 

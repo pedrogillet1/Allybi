@@ -356,7 +356,7 @@ export default function AttachmentsRenderer({
                 key={`${a.id || "src"}-${a.locationKey || idx}`}
                 source={a}
                 variant={variant}
-                onClick={() => {
+                onOpen={() => {
                   // Prefer URL if present, otherwise call onFileClick
                   if (a.url) window.open(a.url, "_blank", "noopener,noreferrer");
                   else onFileClick?.(a);
@@ -371,7 +371,7 @@ export default function AttachmentsRenderer({
                 key={`${a.id || "folder"}-${idx}`}
                 folder={a}
                 variant={variant}
-                onClick={() => onFolderClick?.(a)}
+                onOpen={() => onFolderClick?.(a)}
               />
             );
           }
@@ -382,7 +382,7 @@ export default function AttachmentsRenderer({
                 key={`${a.id || "file"}-${idx}`}
                 file={a}
                 variant={variant}
-                onClick={() => {
+                onOpen={() => {
                   if (a.url) window.open(a.url, "_blank", "noopener,noreferrer");
                   else onFileClick?.(a);
                 }}

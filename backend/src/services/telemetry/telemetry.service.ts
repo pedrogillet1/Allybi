@@ -187,8 +187,8 @@ export class TelemetryService {
       } else {
         await (this.prisma as any).ingestionEvent.create({ data: item.data });
       }
-    } catch {
-      // swallow
+    } catch (err: unknown) {
+      console.warn("[telemetry] safeCreateOne failed:", (err as Error)?.message ?? String(err));
     }
   }
 
@@ -205,8 +205,8 @@ export class TelemetryService {
         data: rows,
         skipDuplicates: true,
       });
-    } catch {
-      // swallow
+    } catch (err: unknown) {
+      console.warn("[telemetry] safeCreateMany failed:", (err as Error)?.message ?? String(err));
     }
   }
 }

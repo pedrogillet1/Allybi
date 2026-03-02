@@ -60,7 +60,11 @@ function makeCleanBanks(): Record<string, unknown> {
       mapping: { op_a: {} },
     },
     prompt_registry: {
-      selectionRules: { rules: [] },
+      promptFiles: [{ id: "system_base" }, { id: "task_answer_with_sources" }],
+      layersByKind: {
+        compose_answer: ["task_answer_with_sources"],
+        system: ["system_base"],
+      },
     },
     language_triggers: { triggers: [] },
     processing_messages: { messages: [] },
@@ -87,6 +91,54 @@ function makeCleanBanks(): Record<string, unknown> {
         when: { answerModes: [mode] },
         messages: [{ role: "system", content: "ok" }],
       })),
+    },
+    task_plan_generation: {
+      templates: [
+        {
+          id: "planner_json_contract",
+          outputMode: "machine_json",
+          when: { operators: ["plan_edit"] },
+          messages: [{ role: "system", content: "json" }],
+        },
+      ],
+    },
+    editing_task_prompts: {
+      templates: [
+        {
+          id: "rewrite_paragraph",
+          outputMode: "user_text",
+          when: { operators: ["rewrite_paragraph"] },
+          messages: [{ role: "system", content: "text" }],
+        },
+        {
+          id: "docx_line_rewrite",
+          outputMode: "machine_json",
+          when: { operators: ["docx_line_rewrite"] },
+          messages: [{ role: "system", content: "json" }],
+        },
+      ],
+    },
+    llm_builder_policy: {
+      config: {
+        docGroundedMinOutputTokensByMode: {
+          doc_grounded_single: 1600,
+        },
+        styleClampModes: ["rank_disambiguate"],
+        payloadCaps: {
+          memoryCharsDefault: 6000,
+          memoryCharsDocGrounded: 9000,
+          userSectionCharsMax: 5000,
+          toolContextCharsMax: 1400,
+          totalUserPayloadCharsMax: 24000,
+        },
+        evidenceCapsByMode: {
+          doc_grounded_single: {
+            maxItems: 8,
+            maxSnippetChars: 260,
+            maxSectionChars: 3400,
+          },
+        },
+      },
     },
     fallback_prompt: { templates: [] },
     fallback_router: { rules: [] },
@@ -169,7 +221,10 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
       "missingOperatorOutputShapes",
       "missingEditingCatalogOperators",
       "missingEditingCapabilities",
-      "unreachablePromptSelectionRules",
+      "invalidPromptLayers",
+      "invalidPromptTemplateOutputModes",
+      "missingBuilderPolicyBank",
+      "invalidBuilderPolicy",
       "legacyChatRuntimeImports",
       "dormantCoreRoutingImports",
       "turnRoutePolicyDynamicFallback",
@@ -423,25 +478,21 @@ describe("RuntimeWiringIntegrityService – editing catalog cross-checks", () =>
 });
 
 // ==============================================================================
-// 6. Prompt registry unreachable rules
+// 6. Prompt registry layered integrity
 // ==============================================================================
 
-describe("RuntimeWiringIntegrityService – unreachable prompt selection rules", () => {
-  test("unreachablePromptSelectionRules is empty when no catch-all rule exists", () => {
+describe("RuntimeWiringIntegrityService – prompt registry layered integrity", () => {
+  test("invalidPromptLayers is empty for valid prompt-layer wiring", () => {
     wireCleanBanks();
     const result = buildService().validate();
-    expect(result.unreachablePromptSelectionRules).toHaveLength(0);
+    expect(result.invalidPromptLayers).toHaveLength(0);
   });
 
-  test("rules after a catch-all (when.any = true) are reported as unreachable", () => {
+  test("unknown layer ids are reported when layer references missing prompt files", () => {
     const banks = makeCleanBanks();
-    (banks["prompt_registry"] as any).selectionRules = {
-      rules: [
-        { id: "rule_normal", when: { any: false } },
-        { id: "catch_all_rule", when: { any: true } },
-        { id: "dead_rule_1", when: {} },
-        { id: "dead_rule_2", when: {} },
-      ],
+    (banks["prompt_registry"] as any).layersByKind = {
+      compose_answer: ["task_answer_with_sources", "missing_prompt_id"],
+      retrieval: ["system_base"],
     };
 
     mockedGetOptionalBank.mockImplementation(
@@ -450,19 +501,16 @@ describe("RuntimeWiringIntegrityService – unreachable prompt selection rules",
 
     const result = buildService().validate();
 
-    expect(result.unreachablePromptSelectionRules).toContain("dead_rule_1");
-    expect(result.unreachablePromptSelectionRules).toContain("dead_rule_2");
-    expect(result.unreachablePromptSelectionRules).not.toContain(
-      "catch_all_rule",
+    expect(result.invalidPromptLayers).toContain(
+      "unknown_layer_id:compose_answer:missing_prompt_id",
     );
-    expect(result.unreachablePromptSelectionRules).not.toContain("rule_normal");
     expect(result.ok).toBe(false);
   });
 
-  test("the catch-all rule itself is not reported as unreachable", () => {
+  test("duplicate layer ids are reported per kind", () => {
     const banks = makeCleanBanks();
-    (banks["prompt_registry"] as any).selectionRules = {
-      rules: [{ id: "only_catch_all", when: { any: true } }],
+    (banks["prompt_registry"] as any).layersByKind = {
+      compose_answer: ["task_answer_with_sources", "task_answer_with_sources"],
     };
 
     mockedGetOptionalBank.mockImplementation(
@@ -471,12 +519,83 @@ describe("RuntimeWiringIntegrityService – unreachable prompt selection rules",
 
     const result = buildService().validate();
 
-    expect(result.unreachablePromptSelectionRules).toHaveLength(0);
+    expect(result.invalidPromptLayers).toContain(
+      "duplicate_layer_id:compose_answer:task_answer_with_sources",
+    );
   });
 });
 
 // ==============================================================================
-// 7. Legacy chat runtime import check
+// 7. Prompt output mode + builder policy integrity
+// ==============================================================================
+
+describe("RuntimeWiringIntegrityService – output mode and builder policy integrity", () => {
+  test("invalidPromptTemplateOutputModes is empty when prompt templates declare valid outputMode", () => {
+    wireCleanBanks();
+    const result = buildService().validate();
+    expect(result.invalidPromptTemplateOutputModes).toHaveLength(0);
+  });
+
+  test("flags missing outputMode in editing task templates", () => {
+    const banks = makeCleanBanks();
+    (banks["editing_task_prompts"] as any).templates = [
+      {
+        id: "rewrite_paragraph",
+        when: { operators: ["rewrite_paragraph"] },
+        messages: [{ role: "system", content: "text" }],
+      },
+    ];
+
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.invalidPromptTemplateOutputModes).toContain(
+      "missing_output_mode:editing_task_prompts:rewrite_paragraph",
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  test("flags non-machine-json outputMode for planner templates", () => {
+    const banks = makeCleanBanks();
+    (banks["task_plan_generation"] as any).templates = [
+      {
+        id: "planner_json_contract",
+        outputMode: "user_text",
+        when: { operators: ["plan_edit"] },
+        messages: [{ role: "system", content: "text" }],
+      },
+    ];
+
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.invalidPromptTemplateOutputModes).toContain(
+      "planner_requires_machine_json:task_plan_generation:planner_json_contract",
+    );
+  });
+
+  test("flags invalid builder policy config", () => {
+    const banks = makeCleanBanks();
+    (banks["llm_builder_policy"] as any).config = {
+      styleClampModes: [],
+      payloadCaps: { memoryCharsDefault: 0 },
+    };
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.invalidBuilderPolicy.length).toBeGreaterThan(0);
+    expect(result.ok).toBe(false);
+  });
+});
+
+// ==============================================================================
+// 8. Legacy chat runtime import check
 // ==============================================================================
 
 describe("RuntimeWiringIntegrityService – legacyChatRuntimeImports", () => {

@@ -204,7 +204,12 @@ function resolveOperator(req: ChatRequest): ConnectorOperator | null {
   if (text.includes("send") && text.includes("email")) {
     return "EMAIL_SEND";
   }
-  if (text.includes("draft") && text.includes("email")) {
+  if (
+    /\b(draft|compose|write|create|craft|generate|redigir|escrever|criar|gerar)\b/i.test(
+      text,
+    ) &&
+    /\b(email|e-mail|message|mensagem)\b/i.test(text)
+  ) {
     return "EMAIL_DRAFT";
   }
   if (
@@ -263,7 +268,7 @@ function inferDraftSubject(body: string): string {
 
   let subject = normalizedTypos
     .replace(
-      /^(please\s+)?(?:ask(?:ing)?|write(?:ing)?|compose|draft|send)\s+(?:them|him|her|the team)?\s*/i,
+      /^(please\s+)?(?:ask(?:ing)?|write(?:ing)?|compose|draft|create|craft|generate|send)\s+(?:them|him|her|the team)?\s*/i,
       "",
     )
     .trim();
@@ -319,7 +324,10 @@ function parseEmailDraft(text: string): {
 
   let bodyHint = raw
     .replace(/\s+/g, " ")
-    .replace(/\b(send|draft|compose|write|enviar|redigir|escrever)\b/gi, "")
+    .replace(
+      /\b(send|draft|compose|write|create|craft|generate|enviar|redigir|escrever|criar|gerar)\b/gi,
+      "",
+    )
     .replace(/\b(an?\s+)?email\b/gi, "")
     .replace(EMAIL_RE_GLOBAL, "")
     .replace(/\bto\b|\bpara\b/gi, "")
@@ -371,15 +379,15 @@ export class ConnectorTurnHandler {
     sink?: StreamSink;
     streamingConfig?: LLMStreamingConfig;
   }): Promise<ChatResult> {
+    const operator = resolveOperator(params.ctx.request);
     const base =
-      params.sink && params.streamingConfig
+      params.sink && params.streamingConfig && !operator
         ? await this.executor.streamChat({
             req: params.ctx.request,
             sink: params.sink,
             streamingConfig: params.streamingConfig,
           })
         : await this.executor.chat(params.ctx.request);
-    const operator = resolveOperator(params.ctx.request);
     if (!operator) return base;
 
     let result: ChatResult;
@@ -438,6 +446,11 @@ export class ConnectorTurnHandler {
       navType: next.navType ?? existingMeta.navType ?? null,
       sources: Array.isArray(next.sources) ? next.sources : [],
     };
+    delete mergedMeta.fallbackReasonCode;
+    delete mergedMeta.fallbackTelemetry;
+    delete mergedMeta.fallbackPolicy;
+    delete mergedMeta.fallbackReasonCodeUser;
+    delete mergedMeta.promptType;
 
     const data: Record<string, unknown> = {
       metadata: JSON.stringify(mergedMeta),
@@ -506,10 +519,11 @@ export class ConnectorTurnHandler {
     },
   ): ChatResult {
     const text = String(patch.assistantText || "").trim();
-    return {
+    const next: ChatResult = {
       ...base,
       assistantText: text,
       attachmentsPayload: Array.isArray(patch.attachments) ? patch.attachments : [],
+      assistantTelemetry: undefined,
       sources: [],
       followups: [],
       answerMode: (patch.answerMode as any) || "action_receipt",
@@ -539,6 +553,12 @@ export class ConnectorTurnHandler {
         detectorVersion: null,
       },
     };
+    const mutable = next as unknown as Record<string, unknown>;
+    delete mutable.fallbackReasonCode;
+    delete mutable.fallbackTelemetry;
+    delete mutable.fallbackPolicy;
+    delete mutable.promptType;
+    return next;
   }
 
   private promptForProvider(
@@ -846,8 +866,11 @@ export class ConnectorTurnHandler {
     req: ChatRequest,
     base: ChatResult,
   ): Promise<ChatResult> {
-    const provider = this.resolveProvider(req, EMAIL_PROVIDERS);
-    if (!provider || provider === "slack") {
+    let provider = this.resolveProvider(req, EMAIL_PROVIDERS);
+    if (!provider) {
+      provider = await this.resolveSingleConnectedEmailProvider(req, base);
+    }
+    if (!provider) {
       return this.promptForProvider(base, req, EMAIL_PROVIDERS, "send");
     }
 
@@ -1013,6 +1036,28 @@ export class ConnectorTurnHandler {
         },
       ],
     });
+  }
+
+  private async resolveSingleConnectedEmailProvider(
+    req: ChatRequest,
+    base: ChatResult,
+  ): Promise<EmailProvider | null> {
+    const connected: EmailProvider[] = [];
+    for (const candidate of EMAIL_PROVIDERS) {
+      try {
+        const status = await this.withConnectorTimeout(
+          `${providerLabel(candidate)} status check`,
+          () => this.resolveProviderStatus(req, base, candidate),
+        );
+        if (status.ok && status.data?.connected) {
+          connected.push(candidate);
+          if (connected.length > 1) return null;
+        }
+      } catch {
+        continue;
+      }
+    }
+    return connected.length === 1 ? connected[0] : null;
   }
 
   private async handleConnectorOperator(params: {

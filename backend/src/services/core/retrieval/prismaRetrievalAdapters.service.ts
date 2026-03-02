@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 import prisma from "../../../config/database";
 import { DocumentCryptoService } from "../../documents/documentCrypto.service";
@@ -133,16 +133,16 @@ function getChunkCryptoServiceSafe(): ChunkCryptoService | null {
   try {
     const encryption = new EncryptionService();
     const envelope = new EnvelopeService(encryption);
-    const tenantKeys = new TenantKeyService(prisma as any, encryption);
+    const tenantKeys = new TenantKeyService(prisma as unknown as PrismaClient, encryption);
     const docKeys = new DocumentKeyService(
-      prisma as any,
+      prisma as unknown as PrismaClient,
       encryption,
       tenantKeys,
       envelope,
     );
     const docCrypto = new DocumentCryptoService(encryption);
     chunkCryptoServiceSingleton = new ChunkCryptoService(
-      prisma as any,
+      prisma as unknown as PrismaClient,
       docKeys,
       docCrypto,
     );
@@ -742,7 +742,7 @@ class PrismaRetrievalUserAdapter
       chunkIndex: number;
       content: string;
       similarity: number;
-      metadata: Record<string, any>;
+      metadata: Record<string, unknown>;
       document: {
         id: string;
         filename: string;
@@ -911,7 +911,7 @@ class PrismaRetrievalUserAdapter
       documentId: string;
       chunkIndex: number;
       content: string;
-      metadata: Record<string, any>;
+      metadata: Record<string, unknown>;
     }>,
   ): Promise<
     Map<string, { chunkId: string; text: string; page: number | null }>

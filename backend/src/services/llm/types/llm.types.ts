@@ -76,7 +76,7 @@ export interface LlmMessage {
   /**
    * Non-user-visible metadata for tracing/debug
    */
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 /**
@@ -91,7 +91,7 @@ export interface LlmUsage {
   /**
    * Optional provider-specific usage (kept non-breaking)
    */
-  providerUsage?: Record<string, any>;
+  providerUsage?: Record<string, unknown>;
 }
 
 /**
@@ -136,7 +136,7 @@ export interface LlmSafetyReport {
   /**
    * Provider-native block details (kept server-side)
    */
-  providerDetail?: any;
+  providerDetail?: unknown;
 }
 
 /**
@@ -174,7 +174,7 @@ export interface LlmTelemetry {
   /**
    * Non-user-visible debug crumbs
    */
-  debug?: Record<string, any>;
+  debug?: Record<string, unknown>;
 }
 
 /**
@@ -223,7 +223,7 @@ export interface LlmResponse {
   /**
    * Provider-native raw response (optional, NEVER user-visible).
    */
-  raw?: any;
+  raw?: unknown;
 }
 
 /**
@@ -263,7 +263,7 @@ export type LlmStreamEvent =
       code: string;
       message: string;
       retryable?: boolean;
-      detail?: any;
+      detail?: unknown;
     }
   | {
       type: "heartbeat";
@@ -355,7 +355,7 @@ export interface LlmRequest {
    * Tools are defined in llmTools.types.ts — we keep it open-ended here
    * to avoid import cycles.
    */
-  tools?: any[];
+  tools?: unknown[];
 
   /**
    * Tool choice hint. Provider adapters map this to native APIs.
@@ -376,7 +376,7 @@ export interface LlmRequest {
    * Allybi-level metadata (never user-visible).
    * Example: pipeline stage, reason codes, active doc lock state.
    */
-  kodaMeta?: Record<string, any>;
+  kodaMeta?: Record<string, unknown>;
 }
 
 /**

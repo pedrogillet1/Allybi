@@ -7,8 +7,18 @@ import type {
 import type { EvidencePack } from "../../../../services/core/retrieval/retrievalEngine.service";
 
 function normalizeText(input: string): string {
-  return String(input || "")
+  const normalized = String(input || "")
     .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "");
+  let compactNumbers = normalized;
+  let prev = "";
+  while (compactNumbers !== prev) {
+    prev = compactNumbers;
+    compactNumbers = compactNumbers.replace(/(\d)[,.](\d{3}\b)/g, "$1$2");
+  }
+  return compactNumbers
+    .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -36,6 +46,7 @@ function anchoredSnippetCoverage(
   normalizedSnippet: string,
 ): number {
   if (!normalizedAnswer || !normalizedSnippet) return 0;
+  const compactAnswer = normalizedAnswer.replace(/\s+/g, "");
   const anchors: string[] = [];
   if (normalizedSnippet.length >= 20) {
     anchors.push(
@@ -46,9 +57,14 @@ function anchoredSnippetCoverage(
     anchors.push(normalizedSnippet.slice(-90));
   }
   if (anchors.length === 0) return 0;
-  const matched = anchors.filter((anchor) =>
-    normalizedAnswer.includes(anchor),
-  ).length;
+  const matched = anchors.filter((anchor) => {
+    if (normalizedAnswer.includes(anchor)) return true;
+    const compactAnchor = anchor.replace(/\s+/g, "");
+    if (compactAnchor.length < 24) return false;
+    return compactAnswer.includes(
+      compactAnchor.slice(0, Math.min(120, compactAnchor.length)),
+    );
+  }).length;
   return matched / anchors.length;
 }
 
@@ -69,19 +85,35 @@ function round3(value: number): number {
 }
 
 function resolveMinSnippetCoverage(answerMode?: AnswerMode): number {
+  if (!isProvenanceThresholdsV3Enabled()) {
+    switch (answerMode) {
+      case "doc_grounded_quote":
+        return 0.55;
+      case "doc_grounded_table":
+        return 0.28;
+      case "doc_grounded_multi":
+        return 0.24;
+      case "doc_grounded_single":
+        return 0.22;
+      case "help_steps":
+        return 0.2;
+      default:
+        return 0.22;
+    }
+  }
   switch (answerMode) {
     case "doc_grounded_quote":
-      return 0.55;
+      return 0.4;
     case "doc_grounded_table":
-      return 0.28;
+      return 0.2;
     case "doc_grounded_multi":
-      return 0.24;
+      return 0.18;
     case "doc_grounded_single":
-      return 0.22;
+      return 0.16;
     case "help_steps":
       return 0.2;
     default:
-      return 0.22;
+      return 0.16;
   }
 }
 
@@ -91,6 +123,16 @@ function isStrictProvenanceV2Enabled(): boolean {
     .toLowerCase();
   if (!raw) return true;
   return !["0", "false", "off", "no"].includes(raw);
+}
+
+function isProvenanceThresholdsV3Enabled(): boolean {
+  const raw = String(process.env.PROVENANCE_THRESHOLDS_V3 || "")
+    .trim()
+    .toLowerCase();
+  if (!raw) return true;
+  if (["1", "true", "on", "yes"].includes(raw)) return true;
+  if (["0", "false", "off", "no"].includes(raw)) return false;
+  return true;
 }
 
 export function buildChatProvenance(params: {

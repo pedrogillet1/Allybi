@@ -564,11 +564,17 @@ router.post(
           ? language
           : undefined;
       const runId = clientMessageId;
+      const rawMeta =
+        body.meta && typeof body.meta === "object"
+          ? (body.meta as Record<string, unknown>)
+          : {};
+      const viewerIntent = asString(rawMeta.viewerIntent).toLowerCase();
+      const forcedQaPath = viewerIntent === "qa_locked";
       const qaPath = shouldUseQaPath({
         message,
         domain,
         rawOperator: body.operator,
-      });
+      }) || forcedQaPath;
 
       if (qaPath) {
         const preferredLanguage = resolveChatPreferredLanguage(
@@ -576,10 +582,6 @@ router.post(
           message,
         );
         const chat = getChatService(req);
-        const rawMeta =
-          body.meta && typeof body.meta === "object"
-            ? (body.meta as Record<string, unknown>)
-            : {};
         const rawContext =
           body.context && typeof body.context === "object"
             ? (body.context as Record<string, unknown>)
@@ -595,6 +597,7 @@ router.post(
 
         const qaRequestMeta: Record<string, unknown> = {
           ...rawMeta,
+          ...(forcedQaPath ? { viewerIntent: "qa_locked" } : {}),
           viewerMode: true,
           intentFamily: "documents",
           operator: "extract",

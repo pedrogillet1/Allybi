@@ -1,5 +1,4 @@
 // src/services/llm/prompts/promptRegistry.service.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as crypto from "crypto";
 
@@ -17,7 +16,7 @@ export type PromptKind =
 export type LlmRole = "system" | "developer" | "user";
 
 export interface BankLoader {
-  getBank<T = any>(bankId: string): T;
+  getBank<T = unknown>(bankId: string): T;
 }
 
 export interface PromptMessage {
@@ -57,7 +56,7 @@ export interface PromptContext {
   uiSurface?: string | null;
   usedBy?: string[] | null;
   semanticFlags?: string[] | null;
-  runtimeSignals?: Record<string, any> | null;
+  runtimeSignals?: Record<string, unknown> | null;
 
   maxQuestions?: number;
   maxOptions?: number;
@@ -85,7 +84,7 @@ export interface PromptContext {
     toolHint?: string;
   };
 
-  slots?: Record<string, any>;
+  slots?: Record<string, unknown>;
 }
 
 function isProd(env: EnvName): boolean {
@@ -100,13 +99,13 @@ function isPromptCoverageStrictEnabled(): boolean {
   return !["0", "false", "off", "no"].includes(raw);
 }
 
-function clampInt(n: any, min: number, max: number, fallback: number): number {
+function clampInt(n: unknown, min: number, max: number, fallback: number): number {
   const x = Number(n);
   if (!Number.isFinite(x)) return fallback;
   return Math.max(min, Math.min(max, Math.floor(x)));
 }
 
-function safeStr(x: any): string {
+function safeStr(x: unknown): string {
   if (typeof x === "string") return x;
   if (x == null) return "";
   return String(x);
@@ -124,12 +123,13 @@ function normalizeWs(s: string): string {
     .trim();
 }
 
-function localizedText(value: any, lang: LangCode): string {
+function localizedText(value: unknown, lang: LangCode): string {
   if (typeof value === "string") return value;
   if (Array.isArray(value)) return value.join("\n");
   if (!value || typeof value !== "object") return "";
+  const obj = value as Record<string, unknown>;
   const selected =
-    value[lang] ?? value.any ?? value.en ?? value.pt ?? value.es ?? "";
+    obj[lang] ?? obj.any ?? obj.en ?? obj.pt ?? obj.es ?? "";
   if (Array.isArray(selected)) return selected.join("\n");
   if (typeof selected === "string") return selected;
   if (selected == null) return "";
@@ -138,7 +138,7 @@ function localizedText(value: any, lang: LangCode): string {
 
 function interpolate(
   template: string,
-  slots: Record<string, any>,
+  slots: Record<string, unknown>,
   slotsFilled: string[],
 ): string {
   let out = template;
@@ -162,7 +162,7 @@ function hasUnresolvedTemplateToken(content: string): boolean {
   return /\{\{[^}]+\}\}/.test(content) || /\$\{[^}]+\}/.test(content);
 }
 
-function asSlotString(value: any): string {
+function asSlotString(value: unknown): string {
   if (value == null) return "";
   if (typeof value === "string") return value;
   if (
@@ -179,7 +179,7 @@ function asSlotString(value: any): string {
   }
 }
 
-function asStringArray(value: any): string[] {
+function asStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value
       .map((entry) => safeStr(entry).trim())
@@ -189,7 +189,7 @@ function asStringArray(value: any): string[] {
   return one ? [one] : [];
 }
 
-function toBool(value: any): boolean {
+function toBool(value: unknown): boolean {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return Number.isFinite(value) && value !== 0;
   if (typeof value === "string") {
@@ -200,16 +200,16 @@ function toBool(value: any): boolean {
   return false;
 }
 
-function parseJsonObject(value: unknown): Record<string, any> | null {
+function parseJsonObject(value: unknown): Record<string, unknown> | null {
   if (!value) return null;
   if (typeof value === "object" && !Array.isArray(value)) {
-    return value as Record<string, any>;
+    return value as Record<string, unknown>;
   }
   if (typeof value !== "string") return null;
   try {
     const parsed = JSON.parse(value);
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-      return parsed as Record<string, any>;
+      return parsed as Record<string, unknown>;
     }
     return null;
   } catch {
@@ -219,11 +219,11 @@ function parseJsonObject(value: unknown): Record<string, any> | null {
 
 function collectSignalTags(ctx: PromptContext): Set<string> {
   const tags = new Set<string>();
-  for (const flag of asStringArray((ctx as any).semanticFlags)) {
+  for (const flag of asStringArray(ctx.semanticFlags)) {
     tags.add(flag);
   }
-  const signals = parseJsonObject((ctx as any).runtimeSignals)
-    ?? parseJsonObject((ctx as any).slots?.runtimeSignals);
+  const signals = parseJsonObject(ctx.runtimeSignals)
+    ?? parseJsonObject(ctx.slots?.runtimeSignals);
   if (!signals) return tags;
 
   for (const [key, value] of Object.entries(signals)) {
@@ -236,65 +236,66 @@ function collectSignalTags(ctx: PromptContext): Set<string> {
   return tags;
 }
 
-function matchesWhen(when: any, ctx: PromptContext): boolean {
+function matchesWhen(when: unknown, ctx: PromptContext): boolean {
   if (!when || typeof when !== "object") return true;
+  const w = when as Record<string, unknown>;
 
   const am = safeStr(ctx.answerMode || "");
   const op = safeStr(ctx.operator || "");
   const of = safeStr(ctx.operatorFamily || "");
   const inf = safeStr(ctx.intentFamily || "");
-  const uiSurface = safeStr((ctx as any).uiSurface || "");
-  const usedBy = new Set(asStringArray((ctx as any).usedBy));
+  const uiSurface = safeStr(ctx.uiSurface || "");
+  const usedBy = new Set(asStringArray(ctx.usedBy));
   const signalTags = collectSignalTags(ctx);
 
-  if (Array.isArray(when.answerModes) && when.answerModes.length) {
-    if (!when.answerModes.includes(am)) return false;
+  if (Array.isArray(w.answerModes) && w.answerModes.length) {
+    if (!w.answerModes.includes(am)) return false;
   }
-  if (typeof when.answerModeEquals === "string" && when.answerModeEquals) {
-    if (when.answerModeEquals !== am) return false;
+  if (typeof w.answerModeEquals === "string" && w.answerModeEquals) {
+    if (w.answerModeEquals !== am) return false;
   }
-  if (Array.isArray(when.operators) && when.operators.length) {
-    if (!when.operators.includes(op)) return false;
+  if (Array.isArray(w.operators) && w.operators.length) {
+    if (!w.operators.includes(op)) return false;
   }
-  if (Array.isArray(when.operatorFamilies) && when.operatorFamilies.length) {
-    if (!when.operatorFamilies.includes(of)) return false;
+  if (Array.isArray(w.operatorFamilies) && w.operatorFamilies.length) {
+    if (!w.operatorFamilies.includes(of)) return false;
   }
-  if (Array.isArray(when.intentFamilies) && when.intentFamilies.length) {
-    if (!when.intentFamilies.includes(inf)) return false;
+  if (Array.isArray(w.intentFamilies) && w.intentFamilies.length) {
+    if (!w.intentFamilies.includes(inf)) return false;
   }
-  if (typeof when.uiSurfaceEquals === "string" && when.uiSurfaceEquals) {
-    if (safeStr(when.uiSurfaceEquals) !== uiSurface) return false;
+  if (typeof w.uiSurfaceEquals === "string" && w.uiSurfaceEquals) {
+    if (safeStr(w.uiSurfaceEquals) !== uiSurface) return false;
   }
-  if (Array.isArray(when.uiSurfaces) && when.uiSurfaces.length > 0) {
-    if (!when.uiSurfaces.includes(uiSurface)) return false;
+  if (Array.isArray(w.uiSurfaces) && (w.uiSurfaces as unknown[]).length > 0) {
+    if (!(w.uiSurfaces as unknown[]).includes(uiSurface)) return false;
   }
-  if (Array.isArray(when.usedByAny) && when.usedByAny.length > 0) {
-    const candidates = new Set(asStringArray(when.usedByAny));
+  if (Array.isArray(w.usedByAny) && (w.usedByAny as unknown[]).length > 0) {
+    const candidates = new Set(asStringArray(w.usedByAny));
     const match = Array.from(usedBy).some((value) => candidates.has(value));
     if (!match) return false;
   }
-  if (Array.isArray(when.signalsAny) && when.signalsAny.length > 0) {
-    const candidates = new Set(asStringArray(when.signalsAny));
+  if (Array.isArray(w.signalsAny) && (w.signalsAny as unknown[]).length > 0) {
+    const candidates = new Set(asStringArray(w.signalsAny));
     const match = Array.from(signalTags).some((value) => candidates.has(value));
     if (!match) return false;
   }
-  if (typeof when.fallbackTriggered === "boolean") {
-    if (Boolean(ctx.fallback?.triggered) !== Boolean(when.fallbackTriggered)) {
+  if (typeof w.fallbackTriggered === "boolean") {
+    if (Boolean(ctx.fallback?.triggered) !== Boolean(w.fallbackTriggered)) {
       return false;
     }
   }
-  if (typeof when.fallbackReasonCodeEquals === "string") {
-    const expected = safeStr(when.fallbackReasonCodeEquals).toLowerCase();
+  if (typeof w.fallbackReasonCodeEquals === "string") {
+    const expected = safeStr(w.fallbackReasonCodeEquals).toLowerCase();
     const actual = safeStr(ctx.fallback?.reasonCode ?? "").toLowerCase();
     if (!expected || actual !== expected) return false;
   }
   if (
-    Array.isArray(when.fallbackReasonCodes) &&
-    when.fallbackReasonCodes.length > 0
+    Array.isArray(w.fallbackReasonCodes) &&
+    (w.fallbackReasonCodes as unknown[]).length > 0
   ) {
     const allowed = new Set(
-      when.fallbackReasonCodes
-        .map((value: any) => safeStr(value).toLowerCase())
+      (w.fallbackReasonCodes as unknown[])
+        .map((value: unknown) => safeStr(value).toLowerCase())
         .filter(Boolean),
     );
     const actual = safeStr(ctx.fallback?.reasonCode ?? "").toLowerCase();
@@ -332,11 +333,11 @@ export class PromptRegistryService {
     const slotsFilled: string[] = [];
     const appliedGuards: string[] = [];
 
-    const registry = this.safeGetBank<any>("prompt_registry");
+    const registry = this.safeGetBank<Record<string, unknown>>("prompt_registry");
     if (registry) {
       usedBankIds.push("prompt_registry");
       if (!this.registryValidated) {
-        this.assertNoUnreachableSelectionRules(registry);
+        this.assertPromptRegistryLayersValid(registry);
         this.registryValidated = true;
       }
     }
@@ -348,8 +349,8 @@ export class PromptRegistryService {
     let messages: PromptMessage[] = [];
 
     for (const bankId of bankIds) {
-      const bank = this.safeGetBank<any>(bankId);
-      if (!bank?.config?.enabled) continue;
+      const bank = this.safeGetBank<Record<string, unknown>>(bankId);
+      if (!(bank?.config as Record<string, unknown> | undefined)?.enabled) continue;
       usedBankIds.push(bankId);
 
       const selection = this.selectTemplate(bank, kind, ctx);
@@ -369,7 +370,7 @@ export class PromptRegistryService {
       selectedTemplateIds.push(selection.templateId);
 
       const compiled = selection.messages
-        .map((m: any) => {
+        .map((m: Record<string, unknown>) => {
           const role: LlmRole = (m.role ?? "system") as LlmRole;
           const contentRaw = localizedText(m.content, ctx.outputLanguage);
           const content = normalizeWs(
@@ -389,7 +390,7 @@ export class PromptRegistryService {
 
       orderedPrompts.push({
         bankId,
-        version: safeStr(bank?._meta?.version || "0.0.0"),
+        version: safeStr((bank?._meta as Record<string, unknown> | undefined)?.version || "0.0.0"),
         templateId: selection.templateId,
         hash: sha256(
           compiled.map((m) => `${m.role}:${m.content}`).join("\n\n"),
@@ -432,35 +433,54 @@ export class PromptRegistryService {
     };
   }
 
-  private assertNoUnreachableSelectionRules(registry: any): void {
-    const rules = Array.isArray(registry?.selectionRules?.rules)
-      ? registry.selectionRules.rules
-      : [];
-    if (!rules.length) return;
+  private assertPromptRegistryLayersValid(registry: Record<string, unknown>): void {
+    const layers =
+      registry?.layersByKind && typeof registry.layersByKind === "object"
+        ? (registry.layersByKind as Record<string, unknown>)
+        : null;
+    if (!layers) return;
 
-    let sawCatchAll = false;
-    const unreachable: string[] = [];
-
-    for (const rule of rules) {
-      const id = safeStr(rule?.id || "rule");
-      if (sawCatchAll) {
-        unreachable.push(id);
+    const promptFileIds = new Set(
+      Array.isArray(registry?.promptFiles)
+        ? (registry.promptFiles as Array<Record<string, unknown>>)
+            .map((row) => safeStr(row?.id))
+            .filter((id: string) => id.length > 0)
+        : [],
+    );
+    const failures: string[] = [];
+    for (const [kind, rawIds] of Object.entries(layers)) {
+      if (!Array.isArray(rawIds)) {
+        failures.push(`invalid_layer_shape:${kind}`);
+        continue;
       }
-      if (rule?.when?.any === true) {
-        sawCatchAll = true;
+      const seen = new Set<string>();
+      for (const rawId of rawIds) {
+        const layerId = safeStr(rawId).trim();
+        if (!layerId) {
+          failures.push(`empty_layer_id:${kind}`);
+          continue;
+        }
+        if (seen.has(layerId)) {
+          failures.push(`duplicate_layer_id:${kind}:${layerId}`);
+          continue;
+        }
+        seen.add(layerId);
+        if (promptFileIds.size > 0 && !promptFileIds.has(layerId)) {
+          failures.push(`unknown_layer_id:${kind}:${layerId}`);
+        }
       }
     }
 
-    if (unreachable.length) {
+    if (failures.length > 0) {
       throw new Error(
-        `prompt_registry.any.json has unreachable selection rules: ${unreachable.join(", ")}`,
+        `prompt_registry.any.json has invalid layered configuration: ${failures.join(", ")}`,
       );
     }
   }
 
   private resolveBankIdsForKind(
     kind: PromptKind,
-    registry: any | null,
+    registry: Record<string, unknown> | null,
     _ctx: PromptContext,
   ): string[] {
     const defaults: Record<PromptKind, string[]> = {
@@ -485,10 +505,10 @@ export class PromptRegistryService {
       ],
     };
 
-    const fromRegistry = registry?.layersByKind?.[kind];
+    const fromRegistry = (registry?.layersByKind as Record<string, unknown> | undefined)?.[kind];
     if (
       Array.isArray(fromRegistry) &&
-      fromRegistry.every((v: any) => typeof v === "string" && v.trim())
+      fromRegistry.every((v: unknown) => typeof v === "string" && (v as string).trim())
     ) {
       return uniq(fromRegistry.map((v: string) => v.trim()));
     }
@@ -496,23 +516,25 @@ export class PromptRegistryService {
     if (
       registry?.map &&
       typeof registry.map === "object" &&
-      typeof registry.map[kind] === "string"
+      typeof (registry.map as Record<string, unknown>)[kind] === "string"
     ) {
-      return [registry.map[kind]];
+      return [(registry.map as Record<string, string>)[kind]];
     }
 
     return defaults[kind];
   }
 
   private selectTemplate(
-    bank: any,
+    bank: Record<string, unknown>,
     kind: PromptKind,
     ctx: PromptContext,
-  ): { templateId: string; messages: any[] } {
-    if (Array.isArray(bank?.config?.messages)) {
+  ): { templateId: string; messages: Array<Record<string, unknown>> } {
+    const bankConfig = bank?.config as Record<string, unknown> | undefined;
+    const bankMeta = bank?._meta as Record<string, unknown> | undefined;
+    if (Array.isArray(bankConfig?.messages)) {
       return {
-        templateId: `${safeStr(bank?._meta?.id || kind)}:config.messages`,
-        messages: bank.config.messages,
+        templateId: `${safeStr(bankMeta?.id || kind)}:config.messages`,
+        messages: bankConfig.messages as Array<Record<string, unknown>>,
       };
     }
 
@@ -520,22 +542,22 @@ export class PromptRegistryService {
 
     if (templates && templates.length) {
       const candidates = templates
-        .filter((t: any) => t?.enabled !== false)
-        .filter((t: any) => matchesWhen(t.when, ctx))
-        .map((t: any) => ({
+        .filter((t) => t?.enabled !== false)
+        .filter((t) => matchesWhen(t.when, ctx))
+        .map((t) => ({
           id: safeStr(t.id || "template"),
           priority: Number.isFinite(Number(t.priority))
             ? Number(t.priority)
             : 50,
           messages: Array.isArray(t.messages)
-            ? t.messages
+            ? (t.messages as Array<Record<string, unknown>>)
             : Array.isArray(t.blocks)
-              ? this.blocksToMessages(t.blocks)
+              ? this.blocksToMessages(t.blocks as Array<Record<string, unknown>>)
               : [],
         }))
-        .filter((t: any) => t.messages.length > 0);
+        .filter((t) => t.messages.length > 0);
 
-      candidates.sort((a: any, b: any) => {
+      candidates.sort((a, b) => {
         if (b.priority !== a.priority) return b.priority - a.priority;
         return a.id.localeCompare(b.id);
       });
@@ -545,19 +567,21 @@ export class PromptRegistryService {
     }
 
     // templates locale shape: templates.{lang}.{system|developer|user}
+    const bankTemplates = bank?.templates as Record<string, unknown> | undefined;
     const langBlock =
-      bank?.templates?.[ctx.outputLanguage] ??
-      bank?.templates?.any ??
-      bank?.templates?.en;
+      bankTemplates?.[ctx.outputLanguage] ??
+      bankTemplates?.any ??
+      bankTemplates?.en;
     if (langBlock && typeof langBlock === "object") {
       const out: PromptMessage[] = [];
+      const langObj = langBlock as Record<string, unknown>;
       const roles: Array<{ key: string; role: LlmRole }> = [
         { key: "system", role: "system" },
         { key: "developer", role: "developer" },
         { key: "user", role: "user" },
       ];
       for (const { key, role } of roles) {
-        const val = (langBlock as any)[key];
+        const val = langObj[key];
         if (Array.isArray(val)) {
           out.push(...toArrayMessage(role, val.join("\n")));
         } else if (typeof val === "string") {
@@ -566,7 +590,7 @@ export class PromptRegistryService {
       }
       if (out.length) {
         return {
-          templateId: `${safeStr(bank?._meta?.id || kind)}:templates.${ctx.outputLanguage}`,
+          templateId: `${safeStr(bankMeta?.id || kind)}:templates.${ctx.outputLanguage}`,
           messages: out,
         };
       }
@@ -574,38 +598,39 @@ export class PromptRegistryService {
 
     // compose variants shape: variants.{variantId}.template[]
     const defaultVariant = safeStr(
-      bank?.config?.defaultVariant || bank?.defaultVariant || "",
+      bankConfig?.defaultVariant || bank?.defaultVariant || "",
     );
-    const variant = defaultVariant ? bank?.variants?.[defaultVariant] : null;
+    const bankVariants = bank?.variants as Record<string, unknown> | undefined;
+    const variant = defaultVariant ? bankVariants?.[defaultVariant] as Record<string, unknown> | undefined : null;
     if (variant && Array.isArray(variant?.template)) {
       return {
-        templateId: `${safeStr(bank?._meta?.id || kind)}:variant.${defaultVariant}`,
-        messages: [{ role: "system", content: variant.template.join("\n") }],
+        templateId: `${safeStr(bankMeta?.id || kind)}:variant.${defaultVariant}`,
+        messages: [{ role: "system", content: (variant.template as string[]).join("\n") }],
       };
     }
 
     return {
-      templateId: `${safeStr(bank?._meta?.id || kind)}:meta.description`,
-      messages: [{ role: "system", content: bank?._meta?.description ?? "" }],
+      templateId: `${safeStr(bankMeta?.id || kind)}:meta.description`,
+      messages: [{ role: "system", content: (bankMeta?.description as string) ?? "" }],
     };
   }
 
-  private blocksToMessages(blocks: any[]): any[] {
-    const out: any[] = [];
+  private blocksToMessages(blocks: Array<Record<string, unknown>>): Array<Record<string, unknown>> {
+    const out: Array<Record<string, unknown>> = [];
     for (const b of blocks) {
       const role = b?.role ?? "system";
       const text =
         typeof b?.text === "string"
           ? b.text
           : Array.isArray(b?.lines)
-            ? b.lines.join("\n")
+            ? (b.lines as string[]).join("\n")
             : "";
       out.push({ role, content: text });
     }
     return out;
   }
 
-  private buildSlots(ctx: PromptContext): Record<string, any> {
+  private buildSlots(ctx: PromptContext): Record<string, unknown> {
     const maxQuestions = clampInt(ctx.maxQuestions ?? 1, 0, 3, 1);
     const maxOptions = clampInt(ctx.maxOptions ?? 4, 2, 6, 4);
     const customSlots =
@@ -614,30 +639,33 @@ export class PromptRegistryService {
             Object.entries(ctx.slots).map(([k, v]) => [k, asSlotString(v)]),
           )
         : {};
+    // The ctx object may carry extended properties beyond PromptContext
+    // (e.g. scope, docContext, userQuery) when built by LlmRequestBuilderService.
+    const ext = ctx as unknown as Record<string, unknown>;
     const scope =
-      (ctx as any).scope ??
+      ext.scope ??
       customSlots.scope ??
       customSlots.scopeSummary ??
       "";
     const docContext =
-      (ctx as any).docContext ??
+      ext.docContext ??
       customSlots.docContext ??
       customSlots.docScopeSummary ??
       "";
     const userQuery =
-      (ctx as any).userQuery ?? (ctx as any).query ?? customSlots.userQuery ?? "";
+      ext.userQuery ?? ext.query ?? customSlots.userQuery ?? "";
     const candidates =
-      (ctx as any).candidates ??
+      ext.candidates ??
       customSlots.candidates ??
       customSlots.disambiguationOptions ??
       "";
     const candidateCount =
-      (ctx as any).candidateCount ??
+      ext.candidateCount ??
       customSlots.candidateCount ??
-      (ctx as any).disambiguation?.options?.length ??
+      ctx.disambiguation?.options?.length ??
       0;
     const runtimeSignals =
-      (ctx as any).runtimeSignals ?? customSlots.runtimeSignals ?? "";
+      ctx.runtimeSignals ?? customSlots.runtimeSignals ?? "";
 
     return {
       env: ctx.env,
@@ -657,28 +685,28 @@ export class PromptRegistryService {
       toolName: ctx.tool?.toolName ?? "",
       toolHint: ctx.tool?.toolHint ?? "",
       userQuery: asSlotString(userQuery),
-      domainId: asSlotString((ctx as any).domainId ?? customSlots.domainId ?? ""),
+      domainId: asSlotString(ext.domainId ?? customSlots.domainId ?? ""),
       scope: asSlotString(scope),
       docContext: asSlotString(docContext),
       candidates: asSlotString(candidates),
       candidateCount: asSlotString(candidateCount),
       selectedDoc: asSlotString(
-        (ctx as any).selectedDoc ?? customSlots.selectedDoc ?? "",
+        ext.selectedDoc ?? customSlots.selectedDoc ?? "",
       ),
       fileListMeta: asSlotString(
-        (ctx as any).fileListMeta ?? customSlots.fileListMeta ?? "",
+        ext.fileListMeta ?? customSlots.fileListMeta ?? "",
       ),
-      topic: asSlotString((ctx as any).topic ?? customSlots.topic ?? ""),
-      format: asSlotString((ctx as any).format ?? customSlots.format ?? ""),
-      navType: asSlotString((ctx as any).navType ?? customSlots.navType ?? ""),
+      topic: asSlotString(ext.topic ?? customSlots.topic ?? ""),
+      format: asSlotString(ext.format ?? customSlots.format ?? ""),
+      navType: asSlotString(ext.navType ?? customSlots.navType ?? ""),
       uiSurface: asSlotString(
-        (ctx as any).uiSurface ?? customSlots.uiSurface ?? "",
+        ctx.uiSurface ?? customSlots.uiSurface ?? "",
       ),
-      usedBy: asSlotString((ctx as any).usedBy ?? customSlots.usedBy ?? ""),
+      usedBy: asSlotString(ctx.usedBy ?? customSlots.usedBy ?? ""),
       semanticFlags: asSlotString(
-        (ctx as any).semanticFlags ?? customSlots.semanticFlags ?? "",
+        ctx.semanticFlags ?? customSlots.semanticFlags ?? "",
       ),
-      state: asSlotString((ctx as any).state ?? customSlots.state ?? ""),
+      state: asSlotString(ext.state ?? customSlots.state ?? ""),
       runtimeSignals: asSlotString(runtimeSignals),
       ...customSlots,
     };
@@ -690,29 +718,47 @@ export class PromptRegistryService {
     applied: string[],
   ): PromptMessage[] {
     const guards: string[] = [];
+    const extCtx = ctx as unknown as Record<string, unknown>;
+    const ctxConstraints =
+      extCtx.constraints && typeof extCtx.constraints === "object"
+        ? (extCtx.constraints as Record<string, unknown>)
+        : null;
+    const disallowJsonOutput =
+      (ctxConstraints?.disallowJsonOutput as boolean | undefined) ??
+      ctx.disallowJsonOutput;
+    const machineJsonMode = disallowJsonOutput === false;
 
-    if (ctx.disallowJsonOutput !== false) {
+    if (!machineJsonMode) {
       guards.push(
         "- Do NOT output raw JSON to the user. Use normal text, bullets, or tables instead.",
       );
     }
 
-    const maxQ = clampInt(ctx.maxQuestions ?? 1, 0, 3, 1);
+    const maxQ = clampInt(
+      (ctxConstraints?.maxQuestions as number | undefined) ?? ctx.maxQuestions ?? 1,
+      0,
+      3,
+      1,
+    );
     guards.push(
       `- Ask at most ${maxQ} question if you are blocked. Otherwise answer directly.`,
     );
-    guards.push(
-      '- Never output the phrase "No relevant information found" (or equivalents).',
-    );
+    if (!machineJsonMode) {
+      guards.push(
+        '- Never output the phrase "No relevant information found" (or equivalents).',
+      );
+    }
     guards.push(
       "- Use only the provided evidence/context. Do not invent sources or details.",
     );
-    guards.push(
-      "- Do NOT include a Sources section in the text — sources are provided separately via UI buttons.",
-    );
-    guards.push(
-      "- Never emit control/protocol wrappers like [KODA_...] blocks in user-facing output.",
-    );
+    if (!machineJsonMode) {
+      guards.push(
+        "- Do NOT include a Sources section in the text — sources are provided separately via UI buttons.",
+      );
+      guards.push(
+        "- Never emit control/protocol wrappers like [KODA_...] blocks in user-facing output.",
+      );
+    }
     const reasoningGuidance = String(
       (ctx.slots as Record<string, unknown> | undefined)
         ?.reasoningPolicyGuidance || "",
@@ -773,7 +819,7 @@ export class PromptRegistryService {
     return base.join("\n");
   }
 
-  private safeGetBank<T = any>(bankId: string): T | null {
+  private safeGetBank<T = unknown>(bankId: string): T | null {
     try {
       return this.bankLoader.getBank<T>(bankId);
     } catch {
@@ -781,20 +827,20 @@ export class PromptRegistryService {
     }
   }
 
-  private resolveTemplateEntries(bank: any): any[] | null {
-    if (Array.isArray(bank?.templates)) return bank.templates;
-    if (Array.isArray(bank?.rules)) return bank.rules;
+  private resolveTemplateEntries(bank: Record<string, unknown>): Array<Record<string, unknown>> | null {
+    if (Array.isArray(bank?.templates)) return bank.templates as Array<Record<string, unknown>>;
+    if (Array.isArray(bank?.rules)) return bank.rules as Array<Record<string, unknown>>;
     if (Array.isArray(bank?.tools)) {
-      return this.convertToolEntriesToTemplates(bank.tools);
+      return this.convertToolEntriesToTemplates(bank.tools as Array<Record<string, unknown>>);
     }
     return null;
   }
 
-  private convertToolEntriesToTemplates(tools: any[]): any[] {
+  private convertToolEntriesToTemplates(tools: Array<Record<string, unknown>>): Array<Record<string, unknown>> {
     return tools
       .filter((entry) => entry && typeof entry === "object")
       .map((entry, index) => {
-        const appliesTo = entry.appliesTo || {};
+        const appliesTo = (entry.appliesTo as Record<string, unknown>) || {};
         const appliesToKeys = Object.keys(appliesTo);
         const supportedKeys = new Set([
           "operators",
@@ -812,7 +858,7 @@ export class PromptRegistryService {
             `prompt_tool_applies_to_unsupported_keys:${safeStr(entry.id || `tool_template_${index + 1}`)}:${unsupported.sort().join(",")}`,
           );
         }
-        const when: Record<string, any> = {};
+        const when: Record<string, unknown> = {};
         const operators = asStringArray(appliesTo.operators);
         if (operators.length > 0) {
           when.operators = operators;

@@ -35,6 +35,21 @@ function loadPromptBanks() {
 }
 
 describe("Certification: prompt mode coverage", () => {
+  test("registry prompt file references exist on disk", () => {
+    const promptRoot = path.resolve(process.cwd(), "src/data_banks/prompts");
+    const registry = JSON.parse(
+      fs.readFileSync(path.join(promptRoot, "prompt_registry.any.json"), "utf8"),
+    );
+    const missing: string[] = [];
+    for (const row of registry?.promptFiles || []) {
+      const relPath = String(row?.path || "").trim();
+      if (!relPath) continue;
+      const abs = path.join(process.cwd(), "src/data_banks", relPath);
+      if (!fs.existsSync(abs)) missing.push(relPath);
+    }
+    expect(missing).toEqual([]);
+  });
+
   test("compose-answer prompt selection covers all active runtime modes", () => {
     const service = new PromptRegistryService(loadPromptBanks());
     const activeModes = [...COMPOSE_ANSWER_TEMPLATE_MODES];

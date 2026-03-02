@@ -70,24 +70,27 @@ export class EvidenceValidator {
       Boolean(nextProvenance?.required) &&
       (nextProvenance?.snippetRefs?.length ?? 0) === 0;
 
-    // Lexical snippetRefs can be empty even for grounded answers (cross-language
-    // paraphrases, numeric extracts). If scoped sources remain, do not surface a
-    // hard missing_provenance failure.
-    if (evidenceRequired && !hasScopedSources) {
+    if (evidenceRequired && (!hasScopedSources || provenanceMissing)) {
       next.status = "partial";
+      const missingSlots: string[] = [];
+      if (provenanceMissing) missingSlots.push("provenance");
+      if (!hasScopedSources) missingSlots.push("scoped_source");
       next.failureCode =
         next.failureCode ||
         (provenanceMissing ? "missing_provenance" : "MISSING_EVIDENCE");
       next.completion = {
         answered: false,
         missingSlots:
-          next.completion?.missingSlots ||
-          (provenanceMissing ? ["provenance"] : ["scoped_source"]),
+          Array.isArray(next.completion?.missingSlots) &&
+          next.completion!.missingSlots.length > 0
+            ? next.completion!.missingSlots
+            : missingSlots,
         nextAction:
           next.completion?.nextAction ||
-          (provenanceMissing
-            ? "Please ask a more specific question so I can anchor the answer to your document snippets."
-            : "Attach or select the exact document scope for this question."),
+          (!hasScopedSources
+            ? "Attach or select the exact document scope for this question."
+            : "Please ask a more specific question so I can anchor the answer to your document snippets."
+          ),
       };
     }
 

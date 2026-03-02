@@ -3,7 +3,12 @@
     "id": "editing_task_prompts",
     "version": "1.1.0",
     "description": "Task-specific prompts for editing, helper generation, and utility model calls.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-03-02"
   },
   "config": {
@@ -13,178 +18,258 @@
     {
       "id": "conversation_title",
       "priority": 300,
-      "when": { "operators": ["conversation_title"] },
+      "when": {
+        "operators": [
+          "conversation_title"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Generate a short chat title from `firstMessage`. Output only the title text. Constraints: 3-7 words, Title Case, no quotes/markdown/prefixes, no personal data, and no file extensions."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "email_qa",
       "priority": 300,
-      "when": { "operators": ["email_qa"] },
+      "when": {
+        "operators": [
+          "email_qa"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Answer only from `emailContext`. Be precise and concise. If detail is missing, state it explicitly. Do not invent facts."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "email_explain",
       "priority": 300,
-      "when": { "operators": ["email_explain"] },
+      "when": {
+        "operators": [
+          "email_explain"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Explain the provided email context clearly. Output format: 1-2 sentence summary, then bullets for key points/action items/deadlines, and a short suggested reply when helpful. Do not invent details."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "provisional_indexing_answer",
       "priority": 300,
-      "when": { "operators": ["provisional_indexing_answer"] },
+      "when": {
+        "operators": [
+          "provisional_indexing_answer"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Answer only using `documentExtracts`. If information is missing, explicitly state what is missing. Never invent facts. Follow `language`."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "nav_reasoning_summary",
       "priority": 300,
-      "when": { "operators": ["nav_reasoning_summary"] },
+      "when": {
+        "operators": [
+          "nav_reasoning_summary"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Use `folderTreeContext` to answer `question` in one short paragraph (2-3 sentences). No lists, no markdown lists, no raw file paths, no backticks, and no bold wrappers."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "docx_bullet_enhance",
       "priority": 200,
-      "when": { "operators": ["docx_bullet_enhance"] },
+      "when": {
+        "operators": [
+          "docx_bullet_enhance"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Improve bullet clarity while preserving meaning and entities (names, numbers, dates, terms). Return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}] with one output per input bullet."
         }
-      ]
+      ],
+      "outputMode": "machine_json"
     },
     {
       "id": "docx_line_rewrite",
       "priority": 200,
-      "when": { "operators": ["docx_line_rewrite"] },
+      "when": {
+        "operators": [
+          "docx_line_rewrite"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Rewrite each line independently using `instruction`. Keep one output per input paragraphId, preserve ordering and meaning, and return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]."
         }
-      ]
+      ],
+      "outputMode": "machine_json"
     },
     {
       "id": "docx_list_to_paragraph",
       "priority": 200,
-      "when": { "operators": ["docx_list_to_paragraph"] },
+      "when": {
+        "operators": [
+          "docx_list_to_paragraph"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Convert bullets into one cohesive paragraph. Respect `wantsSummary`. Preserve facts and entities. Do not mention instructions/tasks/headings. Return JSON only: {\"paragraph\":\"...\"}."
         }
-      ]
+      ],
+      "outputMode": "machine_json"
     },
     {
       "id": "docx_section_to_paragraph",
       "priority": 200,
-      "when": { "operators": ["docx_section_to_paragraph"] },
+      "when": {
+        "operators": [
+          "docx_section_to_paragraph"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Rewrite section lines into one cohesive paragraph while preserving facts and entities. Do not mention editing mechanics. Return JSON only: {\"paragraph\":\"...\"}."
         }
-      ]
+      ],
+      "outputMode": "machine_json"
     },
     {
       "id": "docx_translate_batch",
       "priority": 220,
-      "when": { "operators": ["docx_translate_batch"] },
+      "when": {
+        "operators": [
+          "docx_translate_batch"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Translate each paragraph into `targetLanguage`. Preserve names, numbers, dates, acronyms, and meaning. Return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]."
         }
-      ]
+      ],
+      "outputMode": "machine_json"
     },
     {
       "id": "docx_translate_retry",
       "priority": 220,
-      "when": { "operators": ["docx_translate_retry"] },
+      "when": {
+        "operators": [
+          "docx_translate_retry"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Retry translation with strict alignment. Return one item per input paragraph, keep paragraphId unchanged, and return JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]."
         }
-      ]
+      ],
+      "outputMode": "machine_json"
     },
     {
       "id": "docx_translate_single",
       "priority": 220,
-      "when": { "operators": ["docx_translate_single"] },
+      "when": {
+        "operators": [
+          "docx_translate_single"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Translate `paragraph` into `targetLanguage`. Preserve entities and punctuation style. Output only translated text, with no JSON, quotes, or markdown."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "paragraph_to_bullets",
       "priority": 200,
-      "when": { "operators": ["paragraph_to_bullets"] },
+      "when": {
+        "operators": [
+          "paragraph_to_bullets"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Convert `paragraph` into concise bullet lines. Each bullet should capture one key point. Output only lines prefixed with '• '."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "rewrite_paragraph",
       "priority": 200,
-      "when": { "operators": ["rewrite_paragraph"] },
+      "when": {
+        "operators": [
+          "rewrite_paragraph"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Rewrite `originalText` following `instruction`. Preserve facts and tone. Output only rewritten text, no markdown or commentary."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "rewrite_span",
       "priority": 200,
-      "when": { "operators": ["rewrite_span"] },
+      "when": {
+        "operators": [
+          "rewrite_span"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Rewrite only `selectedText` using `instruction` and context from `paragraphText`. Never echo instruction text. If `strict` is true, apply tighter anti-echo behavior. Output only replacement text."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     },
     {
       "id": "insert_paragraph_below_list",
       "priority": 200,
-      "when": { "operators": ["insert_paragraph_below_list"] },
+      "when": {
+        "operators": [
+          "insert_paragraph_below_list"
+        ]
+      },
       "messages": [
         {
           "role": "system",
           "content": "Write one paragraph to insert below a bullet list using `instruction`, `section`, and `bullets`. Preserve names/numbers and do not add facts. Output only the paragraph."
         }
-      ]
+      ],
+      "outputMode": "user_text"
     }
   ],
   "tests": {
@@ -200,7 +285,12 @@
           "minWords": 3,
           "maxWords": 7,
           "titleCase": true,
-          "forbidTokens": ["\"", "`", ".pdf", ".docx"]
+          "forbidTokens": [
+            "\"",
+            "`",
+            ".pdf",
+            ".docx"
+          ]
         }
       },
       {
@@ -212,7 +302,9 @@
         },
         "expect": {
           "outputShape": "plain_text",
-          "mustNotContain": ["make this more formal"]
+          "mustNotContain": [
+            "make this more formal"
+          ]
         }
       },
       {
@@ -221,13 +313,22 @@
           "templateId": "docx_translate_batch",
           "targetLanguage": "pt",
           "paragraphs": [
-            { "paragraphId": "p1", "text": "Hello team." },
-            { "paragraphId": "p2", "text": "Meeting is tomorrow." }
+            {
+              "paragraphId": "p1",
+              "text": "Hello team."
+            },
+            {
+              "paragraphId": "p2",
+              "text": "Meeting is tomorrow."
+            }
           ]
         },
         "expect": {
           "outputShape": "json_array",
-          "preserveParagraphIds": ["p1", "p2"],
+          "preserveParagraphIds": [
+            "p1",
+            "p2"
+          ],
           "sameItemCountAsInput": true
         }
       },
@@ -235,11 +336,16 @@
         "id": "ETP_1004_list_to_paragraph_json_contract",
         "input": {
           "templateId": "docx_list_to_paragraph",
-          "bullets": ["Point A", "Point B"]
+          "bullets": [
+            "Point A",
+            "Point B"
+          ]
         },
         "expect": {
           "outputShape": "json_object",
-          "requiredKeys": ["paragraph"],
+          "requiredKeys": [
+            "paragraph"
+          ],
           "forbidAdditionalWrapperText": true
         }
       },
@@ -250,7 +356,10 @@
           "emailContext": "Need approval by Friday. Owner: Ana."
         },
         "expect": {
-          "summarySentenceCount": { "min": 1, "max": 2 },
+          "summarySentenceCount": {
+            "min": 1,
+            "max": 2
+          },
           "requiresKeyPointsSection": true,
           "allowsSuggestedReply": true
         }

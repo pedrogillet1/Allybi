@@ -100,11 +100,26 @@ export interface ChatEvidenceState {
   sourceIds: string[];
 }
 
+export interface ChatWarningState {
+  code: string;
+  message: string;
+  severity: "warning" | "error";
+  source?: "runtime" | "quality_gate" | "enforcer" | "provenance";
+}
+
 export interface ChatSourceDTO {
   documentId: string;
+  docId?: string;
   filename: string;
   mimeType: string | null;
   page: number | null;
+  slide?: number | null;
+  sheet?: string | null;
+  cell?: string | null;
+  section?: string | null;
+  locationKey?: string | null;
+  locationLabel?: string | null;
+  snippet?: string | null;
 }
 
 export interface ChatProvenanceSnippetRefDTO {
@@ -185,6 +200,8 @@ export interface ChatResult {
   truncation?: ChatTruncationState;
   evidence?: ChatEvidenceState;
   qualityGates?: ChatQualityGateState;
+  userWarning?: ChatWarningState | null;
+  warnings?: ChatWarningState[];
 }
 
 export interface ChatEngine {

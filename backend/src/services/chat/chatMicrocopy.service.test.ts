@@ -32,7 +32,29 @@ function mockBanks(params: {
     }
     if (bankId === "fallback_router") {
       return {
-        config: { enabled: true, defaults: { action: "ask_one_question" } },
+        config: {
+          enabled: true,
+          canonicalReasonCodes: [
+            "no_docs_indexed",
+            "scope_hard_constraints_empty",
+            "no_relevant_chunks_in_scoped_docs",
+            "indexing_in_progress",
+            "extraction_failed",
+            "low_confidence",
+            "doc_ambiguous",
+            "needs_doc_choice",
+            "explicit_doc_not_found",
+            "safety_block",
+            "privacy_block",
+            "timeout",
+            "network",
+            "provider_down",
+            "rate_limit",
+            "bad_request",
+            "unknown",
+          ],
+          defaults: { action: "ask_one_question" },
+        },
         rules: params.routerRules,
         maps: {
           reasonCodeToTelemetryReason: params.telemetryMap || {},
@@ -246,6 +268,24 @@ describe("resolveRuntimeFallbackMessage", () => {
     });
 
     expect(out).toBe("Which document should I use: Q1-Finance.pdf, Q2-Finance.pdf?");
+  });
+
+  test("uses error microcopy for non-canonical internal failure codes", () => {
+    mockBanks({
+      messages: {
+        retry: { en: ["retry message"] },
+        error: { en: ["error message"] },
+      },
+      routerRules: [],
+    });
+
+    const out = resolveRuntimeFallbackMessage({
+      language: "en",
+      reasonCode: "quality_gate_blocked",
+      seed: "seed-5",
+    });
+
+    expect(out).toBe("error message");
   });
 });
 

@@ -633,7 +633,7 @@ export class ConnectorHandlerService {
     const result = await Promise.resolve(
       // Client services have provider-specific param shapes (Outlook attachments are nested, Gmail uses raw MIME).
       // Keep this loosely typed at the boundary.
-      (sendFn as (token: string, params: any) => unknown).call(
+      (sendFn as (token: string, params: Record<string, unknown>) => unknown).call(
         clientService,
         accessToken,
         {
@@ -683,8 +683,8 @@ export class ConnectorHandlerService {
 
     if (provider === "gmail") {
       const svc = clientService as {
-        listMessages?: (token: string, params: Record<string, unknown>) => Promise<any>;
-        getMessage?: (token: string, messageId: string) => Promise<any>;
+        listMessages?: (token: string, params: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        getMessage?: (token: string, messageId: string) => Promise<Record<string, unknown>>;
       };
       if (typeof svc.listMessages !== "function") return [];
 
@@ -695,7 +695,7 @@ export class ConnectorHandlerService {
       });
       const msgs = Array.isArray(list?.messages) ? list.messages : [];
       const ids: string[] = msgs
-        .map((m: any) => String(m?.id || "").trim())
+        .map((m: unknown) => String((m as Record<string, unknown>)?.id || "").trim())
         .filter(Boolean)
         .slice(0, take);
 
@@ -725,7 +725,7 @@ export class ConnectorHandlerService {
 
     if (provider === "outlook") {
       const svc = clientService as {
-        listMessages?: (input: Record<string, unknown>) => Promise<any>;
+        listMessages?: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
         getMessageText?: (message: Record<string, unknown>) => string;
       };
       if (typeof svc.listMessages !== "function") return [];
@@ -736,14 +736,17 @@ export class ConnectorHandlerService {
       });
       const values = Array.isArray(response?.value) ? response.value : [];
       const needle = query.toLowerCase();
-      const filtered = values.filter((item: any) => {
+      const filtered = values.filter((item: unknown) => {
+        const itemRecord = item as Record<string, unknown>;
+        const fromRecord = itemRecord?.from as Record<string, unknown> | undefined;
+        const emailAddress = fromRecord?.emailAddress as Record<string, unknown> | undefined;
         const text = [
-          String(item?.subject || ""),
-          String(item?.bodyPreview || ""),
-          String(item?.from?.emailAddress?.address || ""),
-          String(item?.from?.emailAddress?.name || ""),
+          String(itemRecord?.subject || ""),
+          String(itemRecord?.bodyPreview || ""),
+          String(emailAddress?.address || ""),
+          String(emailAddress?.name || ""),
           typeof svc.getMessageText === "function"
-            ? String(svc.getMessageText(item))
+            ? String(svc.getMessageText(itemRecord as Record<string, unknown>))
             : "",
         ]
           .join(" ")
@@ -751,25 +754,26 @@ export class ConnectorHandlerService {
         return text.includes(needle);
       });
 
-      return filtered.slice(0, take).map((item: any) => {
+      return filtered.slice(0, take).map((item: unknown) => {
+        const itemRecord = item as Record<string, unknown>;
         const snippetRaw =
           (typeof svc.getMessageText === "function"
-            ? svc.getMessageText(item)
-            : String(item?.bodyPreview || "")) || "";
+            ? svc.getMessageText(itemRecord as Record<string, unknown>)
+            : String(itemRecord?.bodyPreview || "")) || "";
         return {
-          documentId: `outlook:${String(item?.id || "")}`,
-          title: String(item?.subject || "(no subject)"),
+          documentId: `outlook:${String(itemRecord?.id || "")}`,
+          title: String(itemRecord?.subject || "(no subject)"),
           snippet: this.buildSnippet(String(snippetRaw || ""), query),
           source: provider,
-          providerMessageId: String(item?.id || ""),
+          providerMessageId: String(itemRecord?.id || ""),
         };
       });
     }
 
     if (provider === "slack") {
       const svc = clientService as {
-        listConversations?: (input: Record<string, unknown>) => Promise<any>;
-        getConversationHistory?: (input: Record<string, unknown>) => Promise<any>;
+        listConversations?: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+        getConversationHistory?: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
         extractMessageText?: (message: Record<string, unknown>) => string;
       };
       if (
@@ -830,9 +834,10 @@ export class ConnectorHandlerService {
     return [];
   }
 
-  private gmailSubjectFromMessage(message: any): string {
-    const headers = Array.isArray(message?.payload?.headers)
-      ? message.payload.headers
+  private gmailSubjectFromMessage(message: Record<string, unknown>): string {
+    const payload = message?.payload as Record<string, unknown> | undefined;
+    const headers = Array.isArray(payload?.headers)
+      ? (payload.headers as Array<Record<string, unknown>>)
       : [];
     for (const header of headers) {
       const name = String(header?.name || "").toLowerCase();
@@ -963,8 +968,8 @@ export class ConnectorHandlerService {
       timer = setTimeout(() => {
         reject(new Error(`${label} timed out after ${timeoutMs}ms.`));
       }, timeoutMs);
-      if (typeof (timer as any)?.unref === "function") {
-        (timer as any).unref();
+      if (typeof (timer as unknown as Record<string, unknown>)?.unref === "function") {
+        (timer as unknown as { unref: () => void }).unref();
       }
 
       run()

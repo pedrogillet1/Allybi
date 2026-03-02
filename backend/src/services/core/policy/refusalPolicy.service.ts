@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { getOptionalBank } from "../banks/bankLoader.service";
 import { PolicyRuntimeEngine, type PolicyRule } from "./policyRuntimeEngine.service";
 
@@ -46,7 +44,7 @@ function extractPolicySignals(input: Record<string, unknown>): Record<string, un
   const policySignals = asObject(meta.policy);
 
   return {
-    selfHarm: asBoolean(policySignals.selfHarm) || asBoolean((contextSignals as any).selfHarm),
+    selfHarm: asBoolean(policySignals.selfHarm) || asBoolean(contextSignals.selfHarm),
     suicide: asBoolean(policySignals.suicide),
     sexualMinors: asBoolean(policySignals.sexualMinors),
     malware: asBoolean(policySignals.malware),

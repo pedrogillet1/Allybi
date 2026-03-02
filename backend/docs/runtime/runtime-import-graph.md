@@ -1,27 +1,28 @@
 # Runtime Import Graph Audit
 
-Generated: 2026-03-01T17:01:34.036Z
+Generated: 2026-03-02T23:06:16.272Z
 Seeds: src/server.ts, src/main/server.ts, src/app.ts, src/workers/document-worker.ts, src/entrypoints/workers/document.worker.ts, src/entrypoints/workers/jobs.worker.ts
 
 ## Totals
 
-- Source files: 545
-- Reachable from runtime seeds: 411
-- Unreachable from runtime seeds: 134
-- Import edges: 1112
+- Source files: 609
+- Reachable from runtime seeds: 420
+- Unreachable from runtime seeds: 189
+- Import edges: 1152
 - Missing local refs: 0
 
 ## Runtime Totals (Strict Denominator)
 
-- Runtime source files: 383
-- Runtime reachable from seeds: 382
-- Runtime unreachable from seeds: 1
-- Runtime coverage: 99.74%
+- Runtime source files: 394
+- Runtime reachable from seeds: 391
+- Runtime unreachable from seeds: 3
+- Runtime coverage: 99.24%
 
 ## Top-Level Bucket Reachability
 
 | Bucket | Total | Reachable | Unreachable |
 |---|---:|---:|---:|
+| _full_test.js | 1 | 0 | 1 |
 | admin | 21 | 12 | 9 |
 | analytics | 16 | 0 | 16 |
 | app | 2 | 2 | 0 |
@@ -29,19 +30,19 @@ Seeds: src/server.ts, src/main/server.ts, src/app.ts, src/workers/document-worke
 | bootstrap | 3 | 3 | 0 |
 | config | 9 | 9 | 0 |
 | controllers | 14 | 13 | 1 |
-| data_banks | 5 | 0 | 5 |
+| data_banks | 4 | 0 | 4 |
 | entrypoints | 27 | 26 | 1 |
 | jobs | 1 | 1 | 0 |
 | main | 1 | 1 | 0 |
 | middleware | 13 | 13 | 0 |
-| modules | 28 | 19 | 9 |
+| modules | 31 | 19 | 12 |
 | platform | 4 | 4 | 0 |
 | queues | 3 | 3 | 0 |
 | routes | 2 | 2 | 0 |
 | schemas | 1 | 1 | 0 |
 | server.ts | 1 | 1 | 0 |
-| services | 299 | 254 | 45 |
-| tests | 46 | 0 | 46 |
+| services | 350 | 263 | 87 |
+| tests | 56 | 0 | 56 |
 | types | 8 | 7 | 1 |
 | utils | 36 | 36 | 0 |
 | workers | 4 | 3 | 1 |

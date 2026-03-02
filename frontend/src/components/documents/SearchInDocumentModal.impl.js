@@ -3,7 +3,7 @@ import closeIcon from '../../assets/x-close.svg';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 
-const SearchInDocumentModal = ({ documentId, document, onClose }) => {
+const SearchInDocumentModal = ({ documentId, document: _viewerDocument, onClose }) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentMatch, setCurrentMatch] = useState(0);
@@ -49,7 +49,7 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
     highlightedElements.forEach(el => {
       const parent = el.parentNode;
       if (parent) {
-        parent.replaceChild(document.createTextNode(el.textContent), el);
+        parent.replaceChild(window.document.createTextNode(el.textContent), el);
         parent.normalize();
       }
     });
@@ -68,7 +68,7 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Search directly in the DOM (works for PDFs with text layer)
-      const textNodes = getTextNodes(document.body);
+      const textNodes = getTextNodes(window.document.body);
       const lowerQuery = searchQuery.toLowerCase();
       let matchCount = 0;
 
@@ -106,7 +106,7 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
   const highlightMatches = () => {
     try {
       const newHighlightedElements = [];
-      const textNodes = getTextNodes(document.body);
+      const textNodes = getTextNodes(window.document.body);
       const lowerQuery = searchQuery.toLowerCase();
 
       textNodes.forEach((node) => {
@@ -115,19 +115,19 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
         let index = lowerText.indexOf(lowerQuery);
 
         if (index !== -1) {
-          const fragment = document.createDocumentFragment();
+          const fragment = window.document.createDocumentFragment();
           let lastIndex = 0;
 
           while (index !== -1) {
             // Add text before match
             if (index > lastIndex) {
               fragment.appendChild(
-                document.createTextNode(text.substring(lastIndex, index))
+                window.document.createTextNode(text.substring(lastIndex, index))
               );
             }
 
             // Add highlighted match
-            const span = document.createElement('span');
+            const span = window.document.createElement('span');
             span.className = 'search-highlight';
             span.textContent = text.substring(index, index + searchQuery.length);
             span.style.backgroundColor = '#fef08a';
@@ -143,7 +143,7 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
 
           // Add remaining text
           if (lastIndex < text.length) {
-            fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+            fragment.appendChild(window.document.createTextNode(text.substring(lastIndex)));
           }
 
           // Replace original text node with fragment
@@ -163,12 +163,12 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
     const textNodes = [];
 
     // Specifically target PDF text layer elements
-    const pdfTextLayers = document.querySelectorAll('.react-pdf__Page__textContent');
+    const pdfTextLayers = window.document.querySelectorAll('.react-pdf__Page__textContent');
 
     if (pdfTextLayers.length > 0) {
       // Search within PDF text layers
       pdfTextLayers.forEach((layer) => {
-        const walker = document.createTreeWalker(
+        const walker = window.document.createTreeWalker(
           layer,
           NodeFilter.SHOW_TEXT,
           {
@@ -189,7 +189,7 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
       });
     } else {
       // Fallback to searching entire document
-      const walker = document.createTreeWalker(
+      const walker = window.document.createTreeWalker(
         element,
         NodeFilter.SHOW_TEXT,
         {

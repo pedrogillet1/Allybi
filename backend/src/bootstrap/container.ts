@@ -133,7 +133,10 @@ class KodaV3Container {
               wiring.missingOperatorOutputShapes,
               wiring.missingEditingCatalogOperators,
               wiring.missingEditingCapabilities,
-              wiring.unreachablePromptSelectionRules,
+              wiring.invalidPromptLayers,
+              wiring.invalidPromptTemplateOutputModes,
+              wiring.missingBuilderPolicyBank,
+              wiring.invalidBuilderPolicy,
               wiring.legacyChatRuntimeImports,
               wiring.dormantCoreRoutingImports,
               wiring.turnRoutePolicyDynamicFallback,
@@ -148,8 +151,11 @@ class KodaV3Container {
               missingEditingCatalogOperators:
                 wiring.missingEditingCatalogOperators,
               missingEditingCapabilities: wiring.missingEditingCapabilities,
-              unreachablePromptSelectionRules:
-                wiring.unreachablePromptSelectionRules,
+              invalidPromptLayers: wiring.invalidPromptLayers,
+              invalidPromptTemplateOutputModes:
+                wiring.invalidPromptTemplateOutputModes,
+              missingBuilderPolicyBank: wiring.missingBuilderPolicyBank,
+              invalidBuilderPolicy: wiring.invalidBuilderPolicy,
               legacyChatRuntimeImports: wiring.legacyChatRuntimeImports,
               dormantCoreRoutingImports: wiring.dormantCoreRoutingImports,
               turnRoutePolicyDynamicFallback:

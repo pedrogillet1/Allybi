@@ -24,6 +24,7 @@ type ProcessingMessagesBank = {
 type FallbackRouterBank = {
   config?: {
     enabled?: boolean;
+    canonicalReasonCodes?: string[];
     defaults?: {
       action?: string;
       telemetryReason?: string;
@@ -312,6 +313,21 @@ function resolveFallbackKindFromRouter(
   const normalized = normalizeFallbackReasonCode(reasonCode);
   if (!normalized) return "error";
 
+  const router = getOptionalBank<FallbackRouterBank>("fallback_router");
+  const canonicalReasonCodes = new Set(
+    Array.isArray(router?.config?.canonicalReasonCodes)
+      ? router.config!.canonicalReasonCodes
+          .map((value) => normalizeFallbackReasonCode(String(value || "")))
+          .filter((value) => value.length > 0)
+      : [],
+  );
+
+  // Internal/runtime failure codes (for example quality_gate_blocked) are not
+  // part of fallback_router canonical reasons and should not emit "retry" copy.
+  if (canonicalReasonCodes.size > 0 && !canonicalReasonCodes.has(normalized)) {
+    return "error";
+  }
+
   const decision = resolveFallbackRouterDecision(normalized);
   if (decision?.action) {
     const action = decision.action;
@@ -330,7 +346,6 @@ function resolveFallbackKindFromRouter(
     }
   }
 
-  const router = getOptionalBank<FallbackRouterBank>("fallback_router");
   const map = router?.maps?.reasonCodeToTelemetryReason || {};
   const mapped = String(decision?.telemetryReason || "")
     .trim()

@@ -18,7 +18,7 @@ import SourcePill from '../../attachments/pills/SourcePill';
  * - content: string (markdown)
  * - isStreaming: boolean (show cursor)
  * - className?: string
- * - onSourceClick?: (source: { docId, filename, mimeType, page }) => void
+ * - onSourceClick?: (source: { docId, filename, mimeType, page, slide, sheet, cell, section, locationKey }) => void
  */
 
 /**
@@ -36,11 +36,39 @@ function parseKodaSourceHref(href) {
       filename: p.get('filename') || undefined,
       mimeType: p.get('mime') || undefined,
       page: p.get('page') ? Number(p.get('page')) : undefined,
+      slide: p.get('slide') ? Number(p.get('slide')) : undefined,
+      sheet: p.get('sheet') || undefined,
+      cell: p.get('cell') || undefined,
+      section: p.get('section') || undefined,
+      locationKey: p.get('loc') || undefined,
+      locationLabel: p.get('label') || undefined,
+      snippet: p.get('snippet') || undefined,
     };
   } catch {
     return null;
   }
 }
+
+function resolveBooleanFlag(raw, defaultValue) {
+  const value = String(raw || '').trim().toLowerCase();
+  if (!value) return defaultValue;
+  if (['1', 'true', 'yes', 'on'].includes(value)) return true;
+  if (['0', 'false', 'no', 'off'].includes(value)) return false;
+  return defaultValue;
+}
+
+const PRESERVE_TABLE_SOURCE_COLUMNS = (() => {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.__KODA_CHAT_PRESERVE_TABLE_SOURCE_COLUMNS__ === 'boolean'
+  ) {
+    return window.__KODA_CHAT_PRESERVE_TABLE_SOURCE_COLUMNS__;
+  }
+  return resolveBooleanFlag(
+    process.env.REACT_APP_CHAT_PRESERVE_TABLE_SOURCE_COLUMNS,
+    true
+  );
+})();
 
 const cursorStyles = `
   @keyframes kodaBlinkCursor {
@@ -71,8 +99,10 @@ function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
   // 3. Remove inline backticks — keep inner text
   t = t.replace(/`([^`]+)`/g, '$1');
 
-  // Strip source/reference columns from markdown tables (sources are rendered via pills).
-  t = stripSourceColumnsFromMarkdownTables(t);
+  // Preserve model table columns by default; legacy behavior can be re-enabled by flag.
+  if (!PRESERVE_TABLE_SOURCE_COLUMNS) {
+    t = stripSourceColumnsFromMarkdownTables(t);
+  }
   // Remove leaked inline retrieval markers from model text.
   t = stripInlineCitationArtifacts(t);
 
@@ -255,6 +285,13 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
                 filename: src.filename,
                 mimeType: src.mimeType,
                 page: src.page,
+                slide: Number.isFinite(Number(src.slide)) ? Number(src.slide) : undefined,
+                sheet: src.sheet,
+                cell: src.cell,
+                section: src.section,
+                locationKey: src.locationKey,
+                locationLabel: src.locationLabel,
+                snippet: src.snippet,
               }}
               onOpen={onSourceClick}
               style={{ display: 'inline-flex', verticalAlign: 'middle' }}
@@ -373,8 +410,7 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
   return (
     <>
       <style>{cursorStyles}</style>
-
-      <div className={className} style={{ width: '100%' }}>
+      <div className={['koda-markdown', className].filter(Boolean).join(' ')} style={{ width: '100%' }}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           // Important: do NOT enable rehypeRaw (keeps HTML from executing)

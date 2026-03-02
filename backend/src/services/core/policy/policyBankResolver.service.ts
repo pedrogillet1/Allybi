@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import * as fs from "fs";
 import * as path from "path";
 
@@ -19,7 +17,7 @@ function resolvePolicyPath(filename: string): string | null {
   return null;
 }
 
-export function resolvePolicyBank<T = any>(
+export function resolvePolicyBank<T = unknown>(
   bankId: string,
   filename: string,
 ): T | null {

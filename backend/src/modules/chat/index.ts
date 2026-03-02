@@ -15,6 +15,7 @@ export type {
   ChatCompletionState,
   ChatTruncationState,
   ChatEvidenceState,
+  ChatWarningState,
   ChatSourceDTO,
   ChatResult,
   ChatEngine,

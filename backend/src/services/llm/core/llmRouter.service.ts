@@ -1,5 +1,4 @@
 // src/services/llm/core/llmRouter.service.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * LlmRouterService (Allybi, ChatGPT-parity)
@@ -41,7 +40,7 @@ import type {
 } from "../types/llm.types";
 
 export interface BankLoader {
-  getBank<T = any>(bankId: string): T;
+  getBank<T = unknown>(bankId: string): T;
 }
 
 export interface ProviderHealth {
@@ -121,7 +120,7 @@ type CapProvider = {
 };
 
 type ProviderCapabilitiesBank = {
-  _meta?: any;
+  _meta?: Record<string, unknown>;
   config?: { enabled?: boolean };
   defaults?: {
     draft?: { provider: LlmProviderId; model: LlmModelId };
@@ -131,7 +130,7 @@ type ProviderCapabilitiesBank = {
 };
 
 type ProviderFallbacksBank = {
-  _meta?: any;
+  _meta?: Record<string, unknown>;
   config?: { enabled?: boolean };
   fallbacks?: Array<{
     when: {
@@ -145,16 +144,16 @@ type ProviderFallbacksBank = {
 };
 
 type FeatureFlagsBank = {
-  _meta?: any;
+  _meta?: Record<string, unknown>;
   config?: { enabled?: boolean };
-  flags?: Record<string, any>;
+  flags?: Record<string, unknown>;
 };
 
 function uniq(arr: string[] = []) {
   return Array.from(new Set(arr));
 }
 
-function bool(v: any): boolean {
+function bool(v: unknown): boolean {
   return v === true;
 }
 
@@ -506,7 +505,7 @@ export class LlmRouterService {
   // Bank loader safety
   // -----------------------------
 
-  private safeGetBank<T = any>(bankId: string): T | null {
+  private safeGetBank<T = unknown>(bankId: string): T | null {
     try {
       return this.bankLoader.getBank<T>(bankId);
     } catch {

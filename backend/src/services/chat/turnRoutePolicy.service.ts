@@ -459,9 +459,9 @@ export class TurnRoutePolicyService {
         );
       const readsConnectorContent = top.operatorId === "CONNECTOR_SEARCH";
       if (
-        guardrails.neverReadConnectorContentWithoutUserPermission &&
+        guardrails.neverReadConnectorContentWithoutUserPermission !== false &&
         readsConnectorContent &&
-        context?.hasConnectorReadPermission === false
+        context?.hasConnectorReadPermission !== true
       ) {
         return {
           ...top,

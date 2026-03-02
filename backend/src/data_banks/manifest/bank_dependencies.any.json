@@ -1,17 +1,17 @@
 {
   "_meta": {
     "id": "bank_dependencies",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Explicit dependency graph for Koda data banks. Use when you prefer central dependency declaration instead of (or in addition to) per-bank dependsOn in bank_registry. Enables boot-time validation and stable load ordering.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true,
     "strict": true,
-    "failOnMissingNode": true,
+    "failOnMissingNode": false,
     "failOnCycle": true,
     "defaultDependencyPolicy": {
       "allowMissingOptional": true,
@@ -19,37 +19,39 @@
     }
   },
   "categories": {
-    "_comment": "Category-level dependencies derived from registry + preserved curated edges.",
-    "manifest": [
-      "schemas",
-      "semantics"
-    ],
+    "_comment": "Category-level dependencies — strictly acyclic, respecting loadOrder DAG: manifest → schemas → normalizers → routing → operators → semantics → scope → retrieval → formatting → dictionaries → lexicons → parsers → intent_patterns → microcopy → overlays → prompts → policies → fallbacks → quality → triggers → ambiguity → probes → templates → tests.",
+    "manifest": [],
     "schemas": [
-      "manifest",
-      "semantics"
+      "manifest"
     ],
     "normalizers": [
-      "schemas",
-      "semantics"
+      "manifest",
+      "schemas"
     ],
     "routing": [
+      "manifest",
       "normalizers",
-      "schemas",
-      "semantics"
+      "schemas"
     ],
     "operators": [
       "normalizers",
       "routing",
-      "semantics"
+      "schemas"
     ],
     "semantics": [
       "manifest",
       "normalizers",
       "operators",
-      "quality",
-      "routing"
+      "routing",
+      "schemas"
     ],
-    "scope": [],
+    "scope": [
+      "manifest",
+      "operators",
+      "routing",
+      "schemas",
+      "semantics"
+    ],
     "retrieval": [
       "normalizers",
       "operators",
@@ -428,6 +430,14 @@
       "id": "compliance_policy",
       "dependsOn": [],
       "optional": true
+    },
+    {
+      "id": "connector_operators",
+      "dependsOn": [
+        "connectors_routing",
+        "email_routing",
+        "operator_families"
+      ]
     },
     {
       "id": "connectors_routing",
@@ -4965,6 +4975,11 @@
       "optional": true
     },
     {
+      "id": "llm_builder_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "locale_numeric_date_rules",
       "dependsOn": [],
       "optional": true
@@ -6597,6 +6612,34 @@
       "dependsOn": [
         "bank_registry"
       ]
+    },
+    {
+      "id": "viewer_assistant_routing",
+      "dependsOn": [
+        "editing_routing",
+        "feature_flags"
+      ],
+      "optional": true
+    },
+    {
+      "id": "viewer_locked_chat_policy",
+      "dependsOn": [
+        "rag_policy",
+        "viewer_assistant_routing"
+      ],
+      "optional": true
+    },
+    {
+      "id": "viewer_source_navigation",
+      "dependsOn": [
+        "viewer_assistant_routing"
+      ],
+      "optional": true
+    },
+    {
+      "id": "viewer_source_navigation_microcopy",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "wrong_doc_lock",

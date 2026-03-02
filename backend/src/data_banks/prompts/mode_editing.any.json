@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "mode_editing",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Editing-mode behavioral constraints.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true,
@@ -12,7 +12,10 @@
       {
         "role": "system",
         "content": {
-          "any": "Editing mode contract: preserve factual content unless user explicitly requests transformation. Preserve numbers, names, dates, and defined terms. Do not merge or split targets unless explicitly requested."
+          "en": "Editing mode contract: preserve factual content unless the user explicitly requests transformation. Preserve numbers, names, dates, and defined terms. Do not merge or split targets unless explicitly requested.",
+          "pt": "Contrato do modo de edicao: preserve o conteudo factual, a menos que o usuario solicite transformacao explicita. Preserve numeros, nomes, datas e termos definidos. Nao junte nem divida alvos sem solicitacao explicita.",
+          "es": "Contrato de modo de edicion: conserva el contenido factual salvo solicitud explicita de transformacion. Conserva numeros, nombres, fechas y terminos definidos. No fusionar ni dividir objetivos sin solicitud explicita.",
+          "any": "Editing mode contract: preserve factual content and entities unless explicitly requested otherwise."
         }
       }
     ]

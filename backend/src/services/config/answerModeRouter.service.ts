@@ -10,6 +10,7 @@ export interface AnswerModeRouterInput {
   intentFamily?: string | null;
   evidenceDocCount?: number;
   systemBlocks?: string[];
+  queryText?: string | null;
 }
 
 export interface AnswerModeRouterOutput {
@@ -23,8 +24,21 @@ function low(value: unknown): string {
     .toLowerCase();
 }
 
-function byIntentFamily(intentFamily: string): string | null {
+const ANALYTICAL_QUERY_PATTERN =
+  /\b(what|how|why|explain|describe|compare|analy[sz]e|summar|detail|tell me|list all|list the|extract|calculate|compute|difference|overview|breakdown|which .{3,} (is|are|was|were|has|have))\b/i;
+
+function queryRequiresExplanation(queryText: string | null | undefined): boolean {
+  const text = String(queryText || "").trim();
+  if (!text || text.length < 8) return false;
+  return ANALYTICAL_QUERY_PATTERN.test(text);
+}
+
+function byIntentFamily(
+  intentFamily: string,
+  queryText?: string | null,
+): string | null {
   if (intentFamily === "file_actions" || intentFamily === "doc_discovery") {
+    if (queryRequiresExplanation(queryText)) return null;
     return "nav_pills";
   }
   if (
@@ -70,7 +84,7 @@ export class AnswerModeRouterService {
       return { answerMode: modeFromFamily, reasonCodes: reasons };
     }
 
-    const intentMode = byIntentFamily(low(input.intentFamily));
+    const intentMode = byIntentFamily(low(input.intentFamily), input.queryText);
     if (intentMode) {
       reasons.push("intent_family_default");
       return { answerMode: intentMode, reasonCodes: reasons };

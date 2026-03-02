@@ -383,7 +383,7 @@ const UploadHub = () => {
                     Math.min(Number(file.fileCount || file.totalFiles || 0), newProcessedCount),
                   ),
                   progress: folderProgress,
-                  stage: `Processing... (${newProcessedCount}/${file.totalFiles})`,
+                  stage: "Processing...",
                   lastActivityAt: Date.now(),
                 };
               }
@@ -579,7 +579,7 @@ const UploadHub = () => {
               return {
                 ...f,
                 progress: next,
-                stage: `Processing (${doneCount}/${totalCount})...`,
+                stage: "Processing...",
                 uploadedFiles: Math.min(
                   Number(f.fileCount || 0),
                   Math.max(
@@ -1116,7 +1116,7 @@ const UploadHub = () => {
                     return {
                       ...f,
                       progress: next,
-                      stage: `Uploading (${completed}/${total})...`,
+                      stage: "Uploading...",
                       status: 'uploading',
                       uploadedFiles,
                       processedFiles: uploadedFiles,
@@ -2232,14 +2232,6 @@ const UploadHub = () => {
     (sum, item) => sum + fileUnitsForQueueItem(item),
     0,
   );
-  const uploadedVisibleCount = uploadingFiles.reduce((sum, item) => {
-    if (item?.isFolder) {
-      const total = fileUnitsForQueueItem(item);
-      const uploaded = Math.min(total, Math.max(0, Number(item.uploadedFiles || 0)));
-      return sum + uploaded;
-    }
-    return sum + (item.status === 'completed' ? 1 : 0);
-  }, 0);
   const hasFiles = uploadingFiles.length > 0;
 
   useEffect(() => {
@@ -3424,11 +3416,6 @@ const UploadHub = () => {
                     <h3 style={{ margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px' }}>
                       {hasFiles ? t('uploadHub.filesCount', { count: queuedFileCount }) : t('uploadHub.files')}
                     </h3>
-                    {hasFiles && (
-                      <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px' }}>
-                        {`${uploadedVisibleCount}/${queuedFileCount} uploaded`}
-                      </p>
-                    )}
                     {subtitle && (
                       <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px' }}>
                         {subtitle}
@@ -3536,21 +3523,8 @@ const UploadHub = () => {
                   const folderTotalFiles = f.isFolder
                     ? Math.max(0, Number(f.fileCount || f.files?.length || 0))
                     : 0;
-                  const folderUploadedFiles = f.isFolder
-                    ? Math.min(
-                        folderTotalFiles,
-                        Math.max(
-                          0,
-                          Number(f.uploadedFiles || 0),
-                          isComplete ? folderTotalFiles : 0,
-                        ),
-                      )
-                    : 0;
-                  const folderUploadCountLabel = folderTotalFiles > 0
-                    ? `${folderUploadedFiles}/${folderTotalFiles}`
-                    : '0/0';
                   const folderMetaText = f.isFolder
-                    ? `${folderTotalFiles} file${folderTotalFiles !== 1 ? 's' : ''} \u00B7 ${folderUploadCountLabel} uploaded \u00B7 ${formatFileSize(f.totalSize)}`
+                    ? `${folderTotalFiles} file${folderTotalFiles !== 1 ? 's' : ''} \u00B7 ${formatFileSize(f.totalSize)}`
                     : '';
 
                   let chipLabel = t('uploadHub.ready');
@@ -3558,13 +3532,7 @@ const UploadHub = () => {
                   let chipBg = '#F5F5F5';
                   if (isError) { chipLabel = t('uploadHub.error'); chipColor = '#D92D20'; chipBg = '#FEF3F2'; }
                   else if (isComplete) { chipLabel = t('uploadHub.done'); chipColor = '#34A853'; chipBg = '#F0FDF4'; }
-                  else if (isUploading) {
-                    chipLabel = f.isFolder
-                      ? folderUploadCountLabel
-                      : `${Math.round(progressWidth)}%`;
-                    chipColor = '#181818';
-                    chipBg = '#F5F5F5';
-                  }
+                  else if (isUploading) { chipLabel = `${Math.round(progressWidth)}%`; chipColor = '#181818'; chipBg = '#F5F5F5'; }
 
                   const rowKey = f.uploadItemId || `upload-row-${index}`;
                   return (

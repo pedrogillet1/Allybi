@@ -9,6 +9,10 @@ function makeBaseResult(): ChatResult {
     userMessageId: "msg-user-1",
     assistantMessageId: "msg-assistant-1",
     assistantText: "fallback",
+    assistantTelemetry: { promptType: "fallback" },
+    fallbackReasonCode: "extraction_failed",
+    status: "partial",
+    failureCode: "extraction_failed",
   };
 }
 
@@ -49,7 +53,7 @@ function makeCtx(req: ChatRequest): TurnContext {
 }
 
 describe("ConnectorTurnHandler", () => {
-  test("uses stream execution path when stream params are present", async () => {
+  test("uses non-stream base execution for connector operators even when stream params are present", async () => {
     const executor = {
       chat: jest.fn(async () => makeBaseResult()),
       streamChat: jest.fn(async () => makeBaseResult()),
@@ -94,8 +98,8 @@ describe("ConnectorTurnHandler", () => {
       streamingConfig: {} as any,
     });
 
-    expect(executor.streamChat).toHaveBeenCalledTimes(1);
-    expect(executor.chat).not.toHaveBeenCalled();
+    expect(executor.chat).toHaveBeenCalledTimes(1);
+    expect(executor.streamChat).not.toHaveBeenCalled();
   });
 
   test("returns connector email attachment for EMAIL_LATEST", async () => {
@@ -152,6 +156,8 @@ describe("ConnectorTurnHandler", () => {
     expect((attachments[0] as any).type).toBe("connector_email_ref");
     expect((attachments[0] as any).messageId).toBe("gmail-msg-1");
     expect(result.assistantText).toContain("Latest email in Gmail");
+    expect(result.fallbackReasonCode).toBeUndefined();
+    expect(result.assistantTelemetry).toBeUndefined();
   });
 
   test("returns email draft card attachments for EMAIL_SEND without confirmation token", async () => {
@@ -211,6 +217,149 @@ describe("ConnectorTurnHandler", () => {
     expect(draft?.to).toBe("pedrogillet@icloud.com");
     expect(draft?.subject).toBe("How is your day?");
     expect(draft?.body).toBe("How is your day?");
+    expect(result.fallbackReasonCode).toBeUndefined();
+    expect(result.assistantTelemetry).toBeUndefined();
+  });
+
+  test("auto-selects the single connected email provider when connectorContext is stale", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeBaseResult()),
+      streamChat: jest.fn(async () => makeBaseResult()),
+    };
+
+    const execute = jest.fn(async (input: any) => {
+      if (String(input?.action) !== "status") {
+        return { ok: false, error: "unexpected action" };
+      }
+      if (String(input?.provider) === "gmail") {
+        return {
+          ok: true,
+          action: "status",
+          provider: "gmail",
+          data: { connected: true, indexedDocuments: 3 },
+        };
+      }
+      return {
+        ok: true,
+        action: "status",
+        provider: "outlook",
+        data: { connected: false, indexedDocuments: 0 },
+      };
+    });
+
+    const handler = new ConnectorTurnHandler(executor as any, {
+      connectorHandler: { execute } as any,
+      tokenVault: { getValidAccessToken: jest.fn(async () => "tok") } as any,
+      gmailOAuth: { refreshAccessToken: jest.fn(async () => ({ accessToken: "tok" })) } as any,
+      outlookOAuth: { refreshAccessToken: jest.fn(async () => ({ accessToken: "tok" })) } as any,
+      slackOAuth: { refreshAccessToken: jest.fn(async () => ({ accessToken: "tok" })) } as any,
+      gmailClient: {
+        listMessages: jest.fn(async () => ({ messages: [] })),
+        getMessage: jest.fn(),
+      } as any,
+      graphClient: {
+        listMessages: jest.fn(async () => ({ value: [] })),
+        getMessageText: jest.fn(() => ""),
+      } as any,
+      slackClient: {
+        listConversations: jest.fn(async () => ({ channels: [] })),
+        getConversationHistory: jest.fn(async () => ({ messages: [] })),
+        extractMessageText: jest.fn(() => ""),
+      } as any,
+    });
+
+    const result = await handler.handle({
+      ctx: makeCtx(
+        makeRequest({
+          message: "create an email with a short intro for project handoff",
+          meta: { operator: "EMAIL_SEND", requestId: "req-stale-ctx" },
+          connectorContext: {
+            activeProvider: null,
+            activeProviders: [],
+            gmail: { connected: false, canSend: false },
+            outlook: { connected: false, canSend: false },
+            slack: { connected: false, canSend: false },
+          },
+        }),
+      ),
+    });
+
+    expect(result.answerMode).toBe("action_confirmation");
+    const attachments = Array.isArray(result.attachmentsPayload)
+      ? result.attachmentsPayload
+      : [];
+    const draft = attachments.find(
+      (a: any) => a?.type === "email_draft_snapshot",
+    ) as any;
+    expect(draft?.provider).toBe("gmail");
+    expect(result.fallbackReasonCode).toBeUndefined();
+    expect(result.assistantTelemetry).toBeUndefined();
+  });
+
+  test("infers EMAIL_DRAFT from 'create an email' phrasing and returns a draft card", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeBaseResult()),
+      streamChat: jest.fn(async () => makeBaseResult()),
+    };
+
+    const handler = new ConnectorTurnHandler(executor as any, {
+      connectorHandler: {
+        execute: jest.fn(async () => ({
+          ok: true,
+          action: "status",
+          provider: "gmail",
+          data: { connected: true, indexedDocuments: 0 },
+        })),
+      } as any,
+      tokenVault: { getValidAccessToken: jest.fn(async () => "tok") } as any,
+      gmailOAuth: {
+        refreshAccessToken: jest.fn(async () => ({ accessToken: "tok" })),
+      } as any,
+      outlookOAuth: {
+        refreshAccessToken: jest.fn(async () => ({ accessToken: "tok" })),
+      } as any,
+      slackOAuth: {
+        refreshAccessToken: jest.fn(async () => ({ accessToken: "tok" })),
+      } as any,
+      gmailClient: {
+        listMessages: jest.fn(async () => ({ messages: [] })),
+        getMessage: jest.fn(),
+      } as any,
+      graphClient: {
+        listMessages: jest.fn(async () => ({ value: [] })),
+        getMessageText: jest.fn(() => ""),
+      } as any,
+      slackClient: {
+        listConversations: jest.fn(async () => ({ channels: [] })),
+        getConversationHistory: jest.fn(async () => ({ messages: [] })),
+        extractMessageText: jest.fn(() => ""),
+      } as any,
+    });
+
+    const result = await handler.handle({
+      ctx: makeCtx(
+        makeRequest({
+          message:
+            "Create an email with a short intro and a bullet list of 5 action items for a project handoff.",
+          meta: {},
+          confirmationToken: undefined,
+        }),
+      ),
+    });
+
+    expect(result.answerMode).toBe("action_confirmation");
+    expect(result.assistantText).toContain("Draft ready");
+
+    const attachments = Array.isArray(result.attachmentsPayload)
+      ? result.attachmentsPayload
+      : [];
+    const draft = attachments.find(
+      (a: any) => a?.type === "email_draft_snapshot",
+    ) as any;
+    expect(draft).toBeTruthy();
+    expect(String(draft?.body || "")).toContain("short intro");
+    expect(result.fallbackReasonCode).toBeUndefined();
+    expect(result.assistantTelemetry).toBeUndefined();
   });
 
   test("extracts multiple recipients for EMAIL_SEND draft snapshots", async () => {

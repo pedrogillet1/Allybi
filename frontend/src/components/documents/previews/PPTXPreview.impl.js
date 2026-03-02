@@ -35,7 +35,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@$
  * - pptx-pending: PDF being generated, show loading + poll
  * - pptx: Fallback to text-only slides (LibreOffice unavailable)
  */
-const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate }) => {
+const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate, jumpRequest = null }) => {
   const { t } = useTranslation();
   const API_BASE = getApiBaseUrl();
 
@@ -94,6 +94,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   const preloadAbortRef = useRef(false); // Track whether image preloading should be aborted
   const canvasRef = useRef(null); // ✅ FIX: Ref to canvas area for accurate width measurement
   const pageHostRef = useRef(null); // ✅ FIX: Ref to page surface host for precise width measurement
+  const lastHandledJumpRef = useRef('');
 
   // ✅ FIX: Container width state for proper sizing (PDF mode + slides mode)
   const [containerWidth, setContainerWidth] = useState(null);
@@ -830,6 +831,27 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   const globalIndex = (currentPageNum - 1) * pageSize + currentSlideIndex;
   const isFirstSlide = globalIndex <= 0;
   const isLastSlide = globalIndex >= totalSlides - 1;
+
+  useEffect(() => {
+    const slide = Number(jumpRequest?.slide || 0);
+    if (!Number.isFinite(slide) || slide < 1) return;
+
+    const nonce = Number(jumpRequest?.nonce || 0);
+    const modeKey = pdfMode ? 'pdf' : 'slides';
+    const key = `${modeKey}:${slide}:${Number.isFinite(nonce) ? nonce : 0}`;
+    if (key === lastHandledJumpRef.current) return;
+
+    if (pdfMode) {
+      if (!Number.isFinite(numPages) || numPages < 1) return;
+      lastHandledJumpRef.current = key;
+      setCurrentPage(Math.max(1, Math.min(slide, numPages || 1)));
+      return;
+    }
+
+    if (!Number.isFinite(totalSlides) || totalSlides < 1) return;
+    lastHandledJumpRef.current = key;
+    void goToGlobalSlide(slide);
+  }, [jumpRequest, pdfMode, numPages, totalSlides, goToGlobalSlide]);
 
   if (loading) {
     return (

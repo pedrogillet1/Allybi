@@ -1,0 +1,60 @@
+{
+  "_meta": {
+    "id": "viewer_locked_chat_policy",
+    "version": "1.0.0",
+    "description": "Policy contract for Ask Allybi in document viewer. Keeps answers grounded to the active document by default and defines scope relax behavior.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-02",
+    "owner": "allybi-viewer"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true
+  },
+  "policy": {
+    "defaultViewerIntent": "qa_locked",
+    "defaultAnswerMode": "doc_grounded_single",
+    "scope": {
+      "lockToActiveDocument": true,
+      "allowCrossDocumentWhen": [
+        "explicit_user_request",
+        "source_click_cross_document"
+      ],
+      "emitScopeSignals": [
+        "explicitDocLock",
+        "singleDocIntent",
+        "hardScopeActive"
+      ]
+    },
+    "citations": {
+      "requireSourceButtons": true,
+      "dedupeBy": "document_plus_location",
+      "includeLocationMetadata": [
+        "page",
+        "slide",
+        "sheet",
+        "cell",
+        "section",
+        "locationKey",
+        "locationLabel",
+        "snippet"
+      ]
+    },
+    "fallback": {
+      "onMissingLocation": "open_document_top",
+      "onUnknownFileType": "disable_editor_actions_but_allow_chat"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "VLCP_0001_default_locked_mode",
+        "assert": "viewer mode defaults to qa_locked + doc_grounded_single"
+      },
+      {
+        "id": "VLCP_0002_sources_include_location_metadata",
+        "assert": "source payload contains locationKey/locationLabel and typed location fields when available"
+      }
+    ]
+  }
+}

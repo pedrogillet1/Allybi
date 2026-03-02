@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "bank_registry",
-    "version": "4.0.1",
+    "version": "4.1.0",
     "description": "Canonical, exhaustive registry for all Koda data banks. Single source of truth for loading, validation, dependency resolution, environment gating, schema enforcement, and ChatGPT-parity behavioral guarantees.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true,
@@ -125,7 +125,8 @@
         "local": false
       },
       "checksumSha256": "c8a1f57272422ec17aac842e4435cefedcd9606b2a5af7d13dab220db350a399",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_chart_spec_bank",
@@ -148,7 +149,8 @@
         "local": false
       },
       "checksumSha256": "fc3fce52fcedc589628e5b18c1a434464db1f16cfe9b0c7b03685c600d6b4c8d",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_connector_permissions",
@@ -171,7 +173,8 @@
         "local": false
       },
       "checksumSha256": "c142b27d99d79a662fbe5ec31f3ac38335c0c5cc5cdbebebacbec9954040bdfc",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_crossdoc_grounding",
@@ -194,7 +197,8 @@
         "local": false
       },
       "checksumSha256": "bb5d2702fc4033bcb83d26969e4390374d84e81ed33a20d6b7b85cd9e82d96ad",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_docx_operators",
@@ -217,7 +221,8 @@
         "local": false
       },
       "checksumSha256": "b0070129d1848706e640c10f9e7e327d20bd08ff49ce06ae276433aace5ee987",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_docx_resolvers",
@@ -240,7 +245,8 @@
         "local": false
       },
       "checksumSha256": "46669cebeb140b71572f007ee32fed3c4c9a8f917fd3018b0652c2386b1a8297",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_font_aliases",
@@ -263,7 +269,8 @@
         "local": false
       },
       "checksumSha256": "2e2da233bc03674786fc7836bfe01bdf3fd3c0ed4edb292fc911d77970a612ff",
-      "lastUpdated": "2026-02-17"
+      "lastUpdated": "2026-02-17",
+      "dependsOn": []
     },
     {
       "id": "allybi_formula_bank",
@@ -286,7 +293,8 @@
         "local": false
       },
       "checksumSha256": "391343b578b8a040fc64eb4554853f7d7bd89842bb8348141db414d9da441501",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_intents",
@@ -309,7 +317,8 @@
         "local": false
       },
       "checksumSha256": "99123111d2377aa6f1aed63bfe53286f15afdf16ae7566733f2d19d73c9153e0",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_language_triggers",
@@ -332,7 +341,8 @@
         "local": false
       },
       "checksumSha256": "fb3b22d8b744f47bd50db0da9a559cd7568621124927c9a22b37ea55f819b209",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_render_cards",
@@ -355,7 +365,8 @@
         "local": false
       },
       "checksumSha256": "98ef1a0632887bfdc512809e1d15f363b56927fbb695e4e0250eafb218f93aab",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_response_style",
@@ -378,7 +389,8 @@
         "local": false
       },
       "checksumSha256": "ee0f9a2e97cd6b06b1ebc06a884908a89f9c29b8c1f3a87d260ba24ed634cde8",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_xlsx_operators",
@@ -401,7 +413,8 @@
         "local": false
       },
       "checksumSha256": "417dbb82a5d08f04a7997609409ba820c42d4cd533e531cc54b6e1fee6987518",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "allybi_xlsx_resolvers",
@@ -424,7 +437,8 @@
         "local": false
       },
       "checksumSha256": "98875f8aaeb4d071f9ce60f00062c7a65a78baf3798ade1882e3f23f1a9e27f8",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "ambiguity_questions",
@@ -460,7 +474,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "b855576a2a0bc29bea8cb5149e2b0e5e644f3754e3e41c00250ac941d13a52b6"
+      "checksumSha256": "b855576a2a0bc29bea8cb5149e2b0e5e644f3754e3e41c00250ac941d13a52b6",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "answer_style_policy",
@@ -470,7 +497,20 @@
       "version": "6.1.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "7b35454ddc3944b85f75ceb48472744d47d34a9c2b36b6779b9dc6d7cfb89858"
+      "checksumSha256": "d552ef56b22ce6d3c34ba41a4b99424eb99ab2bc5374155b14d9c7620cf4959b",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "answer_style_schema",
@@ -547,7 +587,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "82c66785ed9eaf83dd4176fc19eaf7263978b641e923e3fcdccddf1d232a2eec",
+      "checksumSha256": "ba344013eb65cc430eee7433bad3fb0d6af60226c52de5d7e70c15c4515e00dd",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -558,7 +598,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "07ecc023c4ae9d4be1157322b7e64f8813ad1508e876fe034715576878aef70e"
+      "checksumSha256": "07ecc023c4ae9d4be1157322b7e64f8813ad1508e876fe034715576878aef70e",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "bank_dependencies",
@@ -568,7 +621,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "e6a918810cf9f5c5074a0014a5cbc6e4238970f94892762b9d149a05642cb9ac"
+      "checksumSha256": "5a20e2b347eadc50e14cadfde531f9132bfa027fbea13e9413b4fc92ff391584",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "bank_manifest",
@@ -591,7 +657,8 @@
         "local": true
       },
       "checksumSha256": "ca7c2cfaaba409da3d5848f0f7fa8fc2c1d39bb6dfb87782d2666615337f3f33",
-      "lastUpdated": "2026-01-25"
+      "lastUpdated": "2026-01-25",
+      "dependsOn": []
     },
     {
       "id": "bank_registry",
@@ -653,7 +720,20 @@
       "version": "2.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "ed424f48d8f7c1b836ff2654fda5e44a897a34264fb96316d5f878f77cd4de74"
+      "checksumSha256": "b72b301c13a1223df56c0712581370fa698bd4f343885bd2a22bd971d3e5d327",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "bolding_rules",
@@ -663,7 +743,20 @@
       "version": "2.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "1f01a212808240cd3f3a8e0b74a899887381402ed51fdc804505e2795fa3d722"
+      "checksumSha256": "1f01a212808240cd3f3a8e0b74a899887381402ed51fdc804505e2795fa3d722",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "boost_rules_accounting",
@@ -680,13 +773,14 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
       },
       "checksumSha256": "e80200afd7ff9f615768fd937125f0174784abd17ce2c5fc76fbb3106f067ab2",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "boost_rules_finance",
@@ -800,7 +894,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "d955c519737c4c00ae1700c89cfd8363438f8e3f04d3dde12e1a536ce5ce4fec"
+      "checksumSha256": "d955c519737c4c00ae1700c89cfd8363438f8e3f04d3dde12e1a536ce5ce4fec",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "calc_intent_patterns_en",
@@ -1015,7 +1122,8 @@
         "local": false
       },
       "lastUpdated": "2026-02-27",
-      "checksumSha256": "21a08f683770cde2270c8e415f6aa896e0ef3ab70b09a383d96600900197e45a"
+      "checksumSha256": "21a08f683770cde2270c8e415f6aa896e0ef3ab70b09a383d96600900197e45a",
+      "dependsOn": []
     },
     {
       "id": "chart_types_pt",
@@ -1038,7 +1146,32 @@
         "local": false
       },
       "lastUpdated": "2026-02-27",
-      "checksumSha256": "46dbb06f13353dfe641f2e40b36031ffb98c5ce96b7c3906f517e4d362d74d2a"
+      "checksumSha256": "46dbb06f13353dfe641f2e40b36031ffb98c5ce96b7c3906f517e4d362d74d2a",
+      "dependsOn": []
+    },
+    {
+      "id": "citation_styles",
+      "category": "semantics",
+      "path": "formatting/citation_styles.any.json",
+      "filename": "citation_styles.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "c7f3dc7ceac1c7dd269abf6690e6aee6903e78d751df2b8a9954a4a7091561cb",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "clarification_phrases",
@@ -1048,7 +1181,20 @@
       "version": "1.1.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "44bb90a9dc84bca7315a48a40b3281f68b0e5ef27908744dd9907b864202c1ae"
+      "checksumSha256": "44bb90a9dc84bca7315a48a40b3281f68b0e5ef27908744dd9907b864202c1ae",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "clarification_policy",
@@ -1058,7 +1204,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "1f9eae6319e025096d3e045e29d9c71d343a39af2decb4712e5174a109142518"
+      "checksumSha256": "1f9eae6319e025096d3e045e29d9c71d343a39af2decb4712e5174a109142518",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "clarification_policy_excel_calc",
@@ -1108,7 +1267,8 @@
         "local": false
       },
       "checksumSha256": "5fe4e5ff06f28fefb8bc4b1b2de257d633b7e9a665181f079529ecebb79bf3a4",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "colors_pt",
@@ -1131,7 +1291,8 @@
         "local": false
       },
       "checksumSha256": "534867f2f8d57b665319146ee37f7e7b15ad1c0309bb3e1431f20b7910568765",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "column_semantics_ontology",
@@ -1154,7 +1315,8 @@
         "local": false
       },
       "checksumSha256": "90f4f55da1400c4c3a7f9cfe633076887a897acb1ce3a2b19a4a4b65315e1a03",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
     },
     {
       "id": "common_en",
@@ -1177,7 +1339,8 @@
         "local": false
       },
       "checksumSha256": "229c37aae6e3a8a7d18cddf771d0a6355352dc4bfd9c8ae8e858476acf23ed93",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "common_pt",
@@ -1200,7 +1363,60 @@
         "local": false
       },
       "checksumSha256": "5b7921d7bf5b505413cc1073aef7013d4aa4cf5cbb5770254cba6d05a4bb6b70",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
+    },
+    {
+      "id": "compliance_policy",
+      "category": "semantics",
+      "path": "policies/compliance_policy.any.json",
+      "filename": "compliance_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "d7dff2c2452c4d95dbf60ab7d2a72c89ef734450bb46bf464aef671d21c18900",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "connector_operators",
+      "category": "operators",
+      "path": "operators/connector_operators.any.json",
+      "filename": "connector_operators.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "connectors_routing",
+        "email_routing",
+        "operator_families"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "37de95e17a1d781ff6c7c42fbce4ef650dc4476e7fbcc8a2cfec93ff16a961df",
+      "lastUpdated": "2026-03-02"
     },
     {
       "id": "connectors_routing",
@@ -1391,6 +1607,30 @@
       "lastUpdated": "2026-02-27"
     },
     {
+      "id": "dedupe_and_repetition",
+      "category": "semantics",
+      "path": "quality/dedupe_and_repetition.any.json",
+      "filename": "dedupe_and_repetition.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "9a4441a778e5e59313859e6411288074dc3b8d0a6a4a7e8288328501c3a81be1",
+      "lastUpdated": "2026-02-27"
+    },
+    {
       "id": "di_abbreviation_global",
       "category": "normalizers",
       "path": "document_intelligence/language/abbreviation_global.any.json",
@@ -1411,7 +1651,8 @@
         "local": false
       },
       "checksumSha256": "a9f5ef90f1b0fd7e8640b13e147e53f6437e9a4516672d72a5e41b75b9096bb2",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_accounting_abbreviations_en",
@@ -1590,7 +1831,8 @@
         "local": false
       },
       "checksumSha256": "b3c98744cf1d6f453e1028b692be1c54aae49c29fb1d7d260427ed43f5aba89d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_accounting_evidence_requirements",
@@ -3667,7 +3909,8 @@
         "local": false
       },
       "checksumSha256": "8f57d2eee3368c2acd119a2a29577a95e69f4d08bd932c43267bb77619d20b70",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_abbreviations_pt",
@@ -3690,7 +3933,8 @@
         "local": false
       },
       "checksumSha256": "c149660ec3fb2afbce4d77c8902db4510b621dc75e1c87c31a59b3fcc02340b9",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_answer_style_bank",
@@ -3713,7 +3957,8 @@
         "local": false
       },
       "checksumSha256": "0551497652af29bd87a29b364443937ade8ae4b49a689ea1c6a24b9e47c5841e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_disclaimer_policy",
@@ -3736,7 +3981,8 @@
         "local": false
       },
       "checksumSha256": "e058f2acf881e4e2044e07b736826ef63c2f7506f25a0c2bfcdffd7426d9b550",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_doc_type_catalog",
@@ -3759,7 +4005,8 @@
         "local": false
       },
       "checksumSha256": "89d58448dbd25dce9ae5e49f5817c56e54898d1d1b1879ddf76229515e8fabe6",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_domain_detection_rules",
@@ -3782,7 +4029,8 @@
         "local": false
       },
       "checksumSha256": "9c8a786bf80feca4d579e10c2034e636c1becf8f79feeeb62a384f783ca439aa",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_domain_profile",
@@ -3805,7 +4053,8 @@
         "local": false
       },
       "checksumSha256": "53aaa1b5c1ffb134cd1df22c0025f1dd42d314bbdda529b05b572a8ae47aa29d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_evidence_requirements",
@@ -3828,7 +4077,8 @@
         "local": false
       },
       "checksumSha256": "1ffb5a9fce3639be296a9c01d7803411e170ee952e0393ef8db31a5b572a2ddf",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_extraction_banking_bank_statement",
@@ -3955,7 +4205,8 @@
         "local": false
       },
       "checksumSha256": "b12cd88293a2bf9e3f2d3e9c62f4eae1bd0b4337d48c36f90b4ab0d0414fc0a6",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_lexicon_pt",
@@ -3978,7 +4229,8 @@
         "local": false
       },
       "checksumSha256": "cfc4a19815720304c2616a2e48b64244ce2d9c48b42a03b65a096db4362eef0f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_reasoning_scaffolds",
@@ -4001,7 +4253,8 @@
         "local": false
       },
       "checksumSha256": "bd4bc2fcdc5320ba777290c86aacd279450a94435e111f5faf37c7c48febddd8",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_redaction_and_safety_rules",
@@ -4024,7 +4277,8 @@
         "local": false
       },
       "checksumSha256": "15a7e99f2ec7615599d3e2566285263b9326ce8078a738950ccccd3be92163b1",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_retrieval_strategies",
@@ -4047,7 +4301,8 @@
         "local": false
       },
       "checksumSha256": "8900ee510e5c2b4f81082b906902a2a2e6d1bf37740df42cf1fcd7e16a90c107",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_banking_sections_banking_bank_statement",
@@ -4278,7 +4533,8 @@
         "local": false
       },
       "checksumSha256": "955687515b435085a7aee42ae9ab48815a076a66d1901ed556c7d6b80949aa20",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_abbreviations_en",
@@ -4301,7 +4557,8 @@
         "local": false
       },
       "checksumSha256": "4a81ef08da61f7f32bfec159f2ae5343144d68116dcf7f26ff7fcdc5b857ac90",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_abbreviations_pt",
@@ -4324,7 +4581,8 @@
         "local": false
       },
       "checksumSha256": "5dcc268a029b6260d5812e47cebc41555af9857cc4a6fd62524deda2f068fefd",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_answer_style_bank",
@@ -4347,7 +4605,8 @@
         "local": false
       },
       "checksumSha256": "78b72e01952c77d7d5020d20ffa6ea2fec08c2a76d5d977d7b4db49233f34a19",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_disclaimer_policy",
@@ -4370,7 +4629,8 @@
         "local": false
       },
       "checksumSha256": "b7b04b92f1f39ef58c636e249fc0ea3d26c67b684b2558c6f99b1f91a1967295",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_doc_type_catalog",
@@ -4393,7 +4653,8 @@
         "local": false
       },
       "checksumSha256": "4ac933e44c57624dcce1070a215a6cdacf58c5be0906dd2b4cffda347c732711",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_domain_detection_rules",
@@ -4416,7 +4677,8 @@
         "local": false
       },
       "checksumSha256": "2ca1bf0fe496f29cd1681465977651a79e23407b47a54a6df98dc634550fc09c",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_domain_profile",
@@ -4439,7 +4701,8 @@
         "local": false
       },
       "checksumSha256": "d593578ab9f97fa6e763d3844141a698a11c696857b66f5e26c35466be261c3d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_evidence_requirements",
@@ -4462,7 +4725,8 @@
         "local": false
       },
       "checksumSha256": "525a9db2eacdd13e0dddd6a12730340e3a8362408d85b6d270b714b26172be62",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_extraction_billing_electricity_bill",
@@ -4641,7 +4905,8 @@
         "local": false
       },
       "checksumSha256": "0146f05482b760b4abb482299009425d76138c5841d59a53be2c95b55a0844ea",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_lexicon_pt",
@@ -4664,7 +4929,8 @@
         "local": false
       },
       "checksumSha256": "cf8552ba21e32276a2caa0b01e3def5843f972b9f1a83968153c3044de00630d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_reasoning_scaffolds",
@@ -4687,7 +4953,8 @@
         "local": false
       },
       "checksumSha256": "d41e48ad7219d430a088484fade8baa173b87017bb37dc82cf66eb66adb045a9",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_redaction_and_safety_rules",
@@ -4710,7 +4977,8 @@
         "local": false
       },
       "checksumSha256": "2657395bf9655baecbda5b90ff27d15aca1e2e5e107acb550a8e622f12fc1e6e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_retrieval_strategies",
@@ -4733,7 +5001,8 @@
         "local": false
       },
       "checksumSha256": "560844e34cb62bda2875d6e5fe1cd5e5870624e075e0a6bbf8d7e4ab6ae6e696",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_billing_sections_billing_electricity_bill",
@@ -5068,7 +5337,8 @@
         "local": false
       },
       "checksumSha256": "7de6bd21a86a0ad140bd02a4ebeb1ee099fbacca99d004963a52880e02949da7",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_doc_type_ontology",
@@ -5091,7 +5361,8 @@
         "local": false
       },
       "checksumSha256": "d79ea790e1f9a8eeee2117a51d5db586ed2a7382228e62fa82d3b64d63947320",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_domain_ontology",
@@ -5114,7 +5385,8 @@
         "local": false
       },
       "checksumSha256": "2a8f9e3113fc741cf758c6cf0f7c897f618ad8c4c35d163e6041620872434821",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_abbreviations_en",
@@ -5137,7 +5409,8 @@
         "local": false
       },
       "checksumSha256": "15eafbb36b710d2863efd3b82ab94ea28d02c08f29ce14267f7f1727108d1f9e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_abbreviations_pt",
@@ -5160,7 +5433,8 @@
         "local": false
       },
       "checksumSha256": "5f0600984f6a15ec18efac9fc8bd489576f0a1c92dab44c874c080010847563e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_answer_style_bank",
@@ -5183,7 +5457,8 @@
         "local": false
       },
       "checksumSha256": "047cea6e05c96666d03f9e509b2eea31e65a36b962ccaf32c5c4261d60ba7b74",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_disclaimer_policy",
@@ -5206,7 +5481,8 @@
         "local": false
       },
       "checksumSha256": "31c8fcfb9431b400ed745b152f7ae06199a2ef38897665cd1019c8989bf0a5c0",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_doc_type_catalog",
@@ -5229,7 +5505,8 @@
         "local": false
       },
       "checksumSha256": "026a1234d4044967ff7fbf3ea86f2183ceeffea5f8da959e4864779352e0aec4",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_domain_detection_rules",
@@ -5252,7 +5529,8 @@
         "local": false
       },
       "checksumSha256": "01fa066a20816067212e4c6b92ed5da9411f5f5982c223b68868e5d842837ba3",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_domain_profile",
@@ -5275,7 +5553,8 @@
         "local": false
       },
       "checksumSha256": "5f67b999be4c0183e25e10a7fef6e109ad396eeccdef84ae8dc7919281fc26c7",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_evidence_requirements",
@@ -5298,7 +5577,8 @@
         "local": false
       },
       "checksumSha256": "d1353e83343c7ecb0a7733f93a153abd5c34d4475237abc452fb80c2d74c95b0",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_extraction_edu_course_syllabus",
@@ -5477,7 +5757,8 @@
         "local": false
       },
       "checksumSha256": "b691ed6d8eff81cbef4e3b4e3f7a4bcdd64b7ac23d6e2b9439c169bbdf4a1852",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_lexicon_pt",
@@ -5500,7 +5781,8 @@
         "local": false
       },
       "checksumSha256": "e7217d4dd30439436f10826432e6bd4b52b2013b65804e1aac307df302f78e7b",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_reasoning_scaffolds",
@@ -5523,7 +5805,8 @@
         "local": false
       },
       "checksumSha256": "0cb0e144544096778213cd3ffcc8a51af29e0957c26817720426358ffdac0a6a",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_redaction_and_safety_rules",
@@ -5546,7 +5829,8 @@
         "local": false
       },
       "checksumSha256": "69ecddb881380616f5dd7594ef553fa11aea480c266602767692e14d1f21a24b",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_retrieval_strategies",
@@ -5569,7 +5853,8 @@
         "local": false
       },
       "checksumSha256": "d39b5e38d39c1c8d593da7ea04bd51f58c6bf4378f1146041632dbb93303d1e4",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_education_sections_edu_course_syllabus",
@@ -5904,7 +6189,8 @@
         "local": false
       },
       "checksumSha256": "4a79c632bc87d8887fb98b0e3038d55fef2b0567db9aa96400768d4070c321d0",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_entity_ontology",
@@ -5927,7 +6213,8 @@
         "local": false
       },
       "checksumSha256": "7528a8a95923a72530fab7da11bb4eb65305ca71a660c2af6ed6ad94f22835c6",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_finance_abbreviations_en",
@@ -6106,7 +6393,8 @@
         "local": false
       },
       "checksumSha256": "2c7896ca854dc5afe5ea05c5e72734714ef90a7e42e5e26622ef6db161148c69",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_finance_evidence_requirements",
@@ -8261,7 +8549,8 @@
         "local": false
       },
       "checksumSha256": "339b5e57d0e5cc2b4b68370293092576d008a7a0e1b98976b6f8d64b02fbce0c",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_abbreviations_pt",
@@ -8284,7 +8573,8 @@
         "local": false
       },
       "checksumSha256": "51c3cf8f7018ea5a4b4820fd8ca267e8b4df3bc257a6303e5e4c863bf4946dbc",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_answer_style_bank",
@@ -8307,7 +8597,8 @@
         "local": false
       },
       "checksumSha256": "799d5cc3b1876d2e1591f5f19cba55044d76988cd14e47ff4d08e645e27ae239",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_disclaimer_policy",
@@ -8330,7 +8621,8 @@
         "local": false
       },
       "checksumSha256": "3b4c21d85d89bb9dbff8820e61bb494ff28aad0212425fbcf49200fb3cd53a1a",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_doc_type_catalog",
@@ -8353,7 +8645,8 @@
         "local": false
       },
       "checksumSha256": "bbce3b4380d80e1c5abe3fac352a55abe01b7e359bb97f6648bc68bf2b8b748c",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_domain_detection_rules",
@@ -8376,7 +8669,8 @@
         "local": false
       },
       "checksumSha256": "02ebe3b9fc9f71f12a5826433bec01d0c346f58f674a9bbe8644bb5c94e38cd0",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_domain_profile",
@@ -8399,7 +8693,8 @@
         "local": false
       },
       "checksumSha256": "aa22f34a722fdb47a15667639784b6b963e6d78b55677424ece54466d70b2886",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_evidence_requirements",
@@ -8422,7 +8717,8 @@
         "local": false
       },
       "checksumSha256": "c0247fe71f8b50eff998253f2b5a13014db1d496fe19340441cf27be64aa502f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_extraction_housing_hoa_statement",
@@ -8601,7 +8897,8 @@
         "local": false
       },
       "checksumSha256": "381ed8098264427e1680726d170174696c6c62693febbe6aeb5799ddd699f202",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_lexicon_pt",
@@ -8624,7 +8921,8 @@
         "local": false
       },
       "checksumSha256": "7636d49bb1b5dff62fc394b546e33d4737655f1ccf9f66b4734461a251dd8e0d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_reasoning_scaffolds",
@@ -8647,7 +8945,8 @@
         "local": false
       },
       "checksumSha256": "204dc774204f12cfddbd237d39ce87d40ee48f1521bc5ac26905e3c8c704208d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_redaction_and_safety_rules",
@@ -8670,7 +8969,8 @@
         "local": false
       },
       "checksumSha256": "755afd325e4fe2cf598950a0af2fb1c9f867e877582bada91784829148333312",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_retrieval_strategies",
@@ -8693,7 +8993,8 @@
         "local": false
       },
       "checksumSha256": "49e07289825b5dfdce851485d9513fcb2a611b25e987f49135f659e32dbf55e1",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_housing_sections_housing_hoa_statement",
@@ -9028,7 +9329,8 @@
         "local": false
       },
       "checksumSha256": "13426120f671c2c651d965b0da50cc67099f49cfeb829c739b2281526c5ed44d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_abbreviations_en",
@@ -9051,7 +9353,8 @@
         "local": false
       },
       "checksumSha256": "1155bdd5956c36619835c0316414767f0662df062bfb2e41d559528037247918",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_abbreviations_pt",
@@ -9074,7 +9377,8 @@
         "local": false
       },
       "checksumSha256": "25b299189955f014a3f889ea68e4a6021b9b810c6a0ba175e3c790388fb8936f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_answer_style_bank",
@@ -9097,7 +9401,8 @@
         "local": false
       },
       "checksumSha256": "e65b4d9d2dfe3ecdf5b59f7d908ab7297396e2d49e2dc0d6023cbfc430658c85",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_disclaimer_policy",
@@ -9120,7 +9425,8 @@
         "local": false
       },
       "checksumSha256": "894e7bbd0a3c8d965e387ab39389d00d0fb305b5373da1e6e204c957ec9016e9",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_doc_type_catalog",
@@ -9143,7 +9449,8 @@
         "local": false
       },
       "checksumSha256": "9fa0efcb7a8b2f0cee2ce71569c0fa4f8e10c8fec5728e2c820d34750fcc7d6a",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_domain_detection_rules",
@@ -9166,7 +9473,8 @@
         "local": false
       },
       "checksumSha256": "c44c7390ab66787112af51d4d349bf42c5bc04c71616a8c142d004933eefe0e3",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_domain_profile",
@@ -9189,7 +9497,8 @@
         "local": false
       },
       "checksumSha256": "2269eb5be5d7fc52297933da030a8b4fce8dbf63178c291892ee8e4b652d9d0d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_evidence_requirements",
@@ -9212,7 +9521,8 @@
         "local": false
       },
       "checksumSha256": "9b9feca308b1343f28323c88747ea618a44bcb8a678f71ddd12feba563bf5f0e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_extraction_hr_benefits_enrollment_summary",
@@ -9365,7 +9675,8 @@
         "local": false
       },
       "checksumSha256": "351eb910b43b97c1d8aaa8b8c93053d60a2666e1d8f7729a8530e6348e5242df",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_lexicon_pt",
@@ -9388,7 +9699,8 @@
         "local": false
       },
       "checksumSha256": "7f8d1aed7cb97ff8be2932e18fdbfcc775d47b8b9c96d241177f14f5a17e538e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_reasoning_scaffolds",
@@ -9411,7 +9723,8 @@
         "local": false
       },
       "checksumSha256": "48c91743b238d590fd34fda9c18855aebd47e1429507d2ae08ebcc6f50153cdb",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_redaction_and_safety_rules",
@@ -9434,7 +9747,8 @@
         "local": false
       },
       "checksumSha256": "eb1058e9de232b0f8874def760878a629d88bb1f8fcfebd3c1afffe1f1dec8d4",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_retrieval_strategies",
@@ -9457,7 +9771,8 @@
         "local": false
       },
       "checksumSha256": "a735de882e114026f8cbc69fb83d37d87eebcfb84eb0a86fa7ae3ac480cfa0c1",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_hr_payroll_sections_hr_benefits_enrollment_summary",
@@ -9740,7 +10055,8 @@
         "local": false
       },
       "checksumSha256": "2bd261bd29a61d4687ea3b4bec7263a8e2f0dd04ed620d028853e4577c66f3cb",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_abbreviations_en",
@@ -9763,7 +10079,8 @@
         "local": false
       },
       "checksumSha256": "0cc63439469a02cb22fdc1bea59b8849db5f1cf26f08776b4e0da7e9031f8ea2",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_abbreviations_pt",
@@ -9786,7 +10103,8 @@
         "local": false
       },
       "checksumSha256": "150b8c82ac695fad4a1e63f3845dd8ed4b51f828c9606221ba1628fdc99d2be0",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_answer_style_bank",
@@ -9809,7 +10127,8 @@
         "local": false
       },
       "checksumSha256": "01e5528f3352ffdfef81e8ee982c1cdca2c76e9e5c0b9ab96dc6a27c0a425034",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_disclaimer_policy",
@@ -9832,7 +10151,8 @@
         "local": false
       },
       "checksumSha256": "424ba9fd3a57b62f6a38ecf789f80fea467111d55495eaa6d4ca76674afa6445",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_doc_type_catalog",
@@ -9855,7 +10175,8 @@
         "local": false
       },
       "checksumSha256": "02ed44a9d031b1e6f0ea6cc250e62f352cb5cf3469b4909c84e19d902beda988",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_domain_detection_rules",
@@ -9878,7 +10199,8 @@
         "local": false
       },
       "checksumSha256": "6690524d18d839cb77d76ebe9b788745d4492f44db750ded846a95afc4312fcd",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_domain_profile",
@@ -9901,7 +10223,8 @@
         "local": false
       },
       "checksumSha256": "84ed11a788a1c6dc904d8225adb56bf21bca0f461596697aa2d541ece0863b07",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_evidence_requirements",
@@ -9924,7 +10247,8 @@
         "local": false
       },
       "checksumSha256": "0f79992bcd8efcc4d22cf4b8c5da70fd571bea7a6aa4987e156fac08e2c1093e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_extraction_id_business_registration_certificate",
@@ -10051,7 +10375,8 @@
         "local": false
       },
       "checksumSha256": "17d0ff8d9fb2419da094b872d45be59ec4af91a5fa37c4df343400fe8a98e17e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_lexicon_pt",
@@ -10074,7 +10399,8 @@
         "local": false
       },
       "checksumSha256": "769bcc2328eafd6dfa714a3f76e23277845677cc9efa8d7fb2fb20dd69884f0a",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_reasoning_scaffolds",
@@ -10097,7 +10423,8 @@
         "local": false
       },
       "checksumSha256": "e6c214cd536d533a79338461f4118aafaaa638c9fcc97b49cd02cc8f3bc1c2ac",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_redaction_and_safety_rules",
@@ -10120,7 +10447,8 @@
         "local": false
       },
       "checksumSha256": "5f694d7d48ee66cfecf28a1cd6c24b6affdc53498dcf2021010d99322c31523f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_retrieval_strategies",
@@ -10143,7 +10471,8 @@
         "local": false
       },
       "checksumSha256": "452c196b1cca75e564a04159b297af8b541da5c045183d7e8b00b3bb7ef8845c",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_identity_sections_id_business_registration_certificate",
@@ -10374,7 +10703,8 @@
         "local": false
       },
       "checksumSha256": "8ff6da4725627337a349b6eecf4d810c603fb68fdd21efbed2508260985e2aac",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_abbreviations_en",
@@ -10397,7 +10727,8 @@
         "local": false
       },
       "checksumSha256": "4e3102e5ed047c18c211c55dafee008dd9085aa60577e749f33530264b2ece4d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_abbreviations_pt",
@@ -10420,7 +10751,8 @@
         "local": false
       },
       "checksumSha256": "ab92d297389d34c177a23f9197d9e2ef7b06ed6f652342cacee79f5d0dcde07d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_answer_style_bank",
@@ -10443,7 +10775,8 @@
         "local": false
       },
       "checksumSha256": "4f6267175061a755ae9f1f83875842fde05bfe18c5dcb07e95e6adae46d65e5e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_disclaimer_policy",
@@ -10466,7 +10799,8 @@
         "local": false
       },
       "checksumSha256": "319762466662a80b34239e5e6327664ab47725e0c68d955012b48a24442a630e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_doc_type_catalog",
@@ -10489,7 +10823,8 @@
         "local": false
       },
       "checksumSha256": "647222f01f45d2722f88bf6557d07bc3ab3c16cbf0faedd11741473fe06076ea",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_domain_detection_rules",
@@ -10512,7 +10847,8 @@
         "local": false
       },
       "checksumSha256": "a234780b33ad403712855dc2ed3996c3e9a8d7f9b83bfb141a62a6979fe0c00f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_domain_profile",
@@ -10535,7 +10871,8 @@
         "local": false
       },
       "checksumSha256": "93cb08a88c83cad35c16b87291c8ad922635a3905b7915d047f99e8ef1a3658b",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_evidence_requirements",
@@ -10558,7 +10895,8 @@
         "local": false
       },
       "checksumSha256": "7418e83f4107d9dfc540a4ebdc840f00ff4eff72b0c0f1ee5cd50aefc80d2e1e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_extraction_ins_claim_submission",
@@ -10685,7 +11023,8 @@
         "local": false
       },
       "checksumSha256": "39526c32dd38d0ac3835ec9bb8cc7c4ef2ff16e10a4dc57fe101866e45514d15",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_lexicon_pt",
@@ -10708,7 +11047,8 @@
         "local": false
       },
       "checksumSha256": "6765ea9e386e825720b0b67d85d6df7aace389456f9fdb0885f8e11dd0b89fc5",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_reasoning_scaffolds",
@@ -10731,7 +11071,8 @@
         "local": false
       },
       "checksumSha256": "d52b7d76b2a77a8e60b67e2ca41653d49e436b5b39b6b50762aff823b7e3e344",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_redaction_and_safety_rules",
@@ -10754,7 +11095,8 @@
         "local": false
       },
       "checksumSha256": "cf6c22585ee7f5829d904742b004d3ac214dbbcd5367e448be1227101721509e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_retrieval_strategies",
@@ -10777,7 +11119,8 @@
         "local": false
       },
       "checksumSha256": "b513f2d980a0e6f8ef9ab6805ff2973e299edb4b472152797f378c0793d80fdf",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_insurance_sections_ins_claim_submission",
@@ -11008,7 +11351,8 @@
         "local": false
       },
       "checksumSha256": "26e099b85a0c173f888220236e21a71612a3cd10cf862b05c46c32868f4da436",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_metric_ontology",
@@ -11031,7 +11375,8 @@
         "local": false
       },
       "checksumSha256": "a22086779271e1e15587d238ed60882ef0e79d8decaf32dba23d5e45e98ca322",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_normalization_rules",
@@ -11054,6 +11399,811 @@
         "local": false
       },
       "checksumSha256": "46c0697322ba5fdb38b34dc995058219cc2bb3fb3b458486e741fe87bf33d141",
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
+    },
+    {
+      "id": "di_ops_abbreviations_en",
+      "category": "dictionaries",
+      "path": "document_intelligence/domains/ops/abbreviations/ops.en.any.json",
+      "filename": "ops.en.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "dc152376d17c1511a9424ae0c361de74426aed182667733c6024cc0510d32a10",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_abbreviations_pt",
+      "category": "dictionaries",
+      "path": "document_intelligence/domains/ops/abbreviations/ops.pt.any.json",
+      "filename": "ops.pt.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f2ef3113a62fe2ef77fa3469f705852fd669642efdb77355922342ef08e63808",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_answer_style_bank",
+      "category": "formatting",
+      "path": "document_intelligence/domains/ops/answer_style_bank.any.json",
+      "filename": "answer_style_bank.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "c66f82a2f7725b7e6062cc7984919df1ee9ca288b8a5dd23f636a250a3d9c135",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_disclaimer_policy",
+      "category": "policies",
+      "path": "document_intelligence/domains/ops/disclaimer_policy.any.json",
+      "filename": "disclaimer_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "ec2ab5ec4dc05ac67b96091f1da5de6b81c5a135b0e0336a99badcabc6efaf05",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_doc_type_catalog",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/doc_type_catalog.any.json",
+      "filename": "doc_type_catalog.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "28642ceea1e079ef44d0e126bc5c567f935fd32f9e9ceb38ccef596c63be28c2",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_domain_detection_rules",
+      "category": "routing",
+      "path": "document_intelligence/domains/ops/domain_detection_rules.any.json",
+      "filename": "domain_detection_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "44eb4a9b2fd1550b22ac5a35ef2b5d77036b6c2cc38346a34b362b543f43a8bb",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_domain_profile",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/domain_profile.any.json",
+      "filename": "domain_profile.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "d6ba85c744c4135d34235c13241c37b824bbe756847ac66f123faee80fd50049",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_evidence_requirements",
+      "category": "quality",
+      "path": "document_intelligence/domains/ops/evidence_requirements.any.json",
+      "filename": "evidence_requirements.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "2e787abc47b5c810b1d8ef4ee15d15c608d8eed110e3766ae90d6db132b56148",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_extraction_ops_incident_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_incident_report.extraction_hints.any.json",
+      "filename": "ops_incident_report.extraction_hints.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "9d617a46700a727812facb9f068c07cd53ff6acf7bdab4403be0e6ce6e128b16",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_extraction_ops_maintenance_log",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_maintenance_log.extraction_hints.any.json",
+      "filename": "ops_maintenance_log.extraction_hints.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "08ae2a319c4d01e8d62f87d7f3ec6df094523f4569406e67acfa149419895ff3",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_extraction_ops_quality_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_quality_report.extraction_hints.any.json",
+      "filename": "ops_quality_report.extraction_hints.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "8a2e393f3be6add1b36a26682b082b9c72d253ccd57894edc8e3bac58aa4bec8",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_extraction_ops_shipping_manifest",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_shipping_manifest.extraction_hints.any.json",
+      "filename": "ops_shipping_manifest.extraction_hints.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "893e63efd78ec5b54137676b9a608d2095fd495c0324e48f9c2669b8bcbb19ff",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_extraction_ops_sla_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_sla_report.extraction_hints.any.json",
+      "filename": "ops_sla_report.extraction_hints.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "31e5c4e465e9c2e0138bb5d47757fe8ae14c693a084b97b779bf6c58353035a7",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_extraction_ops_work_order",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_work_order.extraction_hints.any.json",
+      "filename": "ops_work_order.extraction_hints.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "e238bd8dcdec4d07ba6ab0533b42e01b4454b303be698c4cfd31c765d2979513",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_lexicon_en",
+      "category": "lexicons",
+      "path": "document_intelligence/domains/ops/lexicons/ops.en.any.json",
+      "filename": "ops.en.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "eb8142fc542322d3bce0b441196b3ded52cf404bc9b0ea0f6b4ae070b8656652",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_lexicon_pt",
+      "category": "lexicons",
+      "path": "document_intelligence/domains/ops/lexicons/ops.pt.any.json",
+      "filename": "ops.pt.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "5a8eab7bf30e18b5c7c8e5888e29bbfb4ea10b243961b7f6758ed48a148eea3e",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_reasoning_scaffolds",
+      "category": "policies",
+      "path": "document_intelligence/domains/ops/reasoning_scaffolds.any.json",
+      "filename": "reasoning_scaffolds.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "52d0c000e389cf77cf7e9417f80b9ba73a7e008d78cda3867d5acf9bbeece80e",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_redaction_and_safety_rules",
+      "category": "policies",
+      "path": "document_intelligence/domains/ops/redaction_and_safety_rules.any.json",
+      "filename": "redaction_and_safety_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "a9b86cca2e62b81c0db226d0d501dbeb511ceb0f4d075abd515610a8a982e757",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_retrieval_strategies",
+      "category": "retrieval",
+      "path": "document_intelligence/domains/ops/retrieval_strategies.any.json",
+      "filename": "retrieval_strategies.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "cc741b622af65ed9dafcceed99540ff924166ea6da39669e27dec1b37ddd5b31",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_sections_ops_incident_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/sections/ops_incident_report.sections.any.json",
+      "filename": "ops_incident_report.sections.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "ce71f110f363c769aad6d2ba42c4e514d5a3c1f0abf8c0c8dd0b5a9029a766d1",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_sections_ops_maintenance_log",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/sections/ops_maintenance_log.sections.any.json",
+      "filename": "ops_maintenance_log.sections.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f95e92cf66ccfd9aa9477759c6770d45b1470ff3b55adb9bc507b60d4de67a96",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_sections_ops_quality_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/sections/ops_quality_report.sections.any.json",
+      "filename": "ops_quality_report.sections.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "af6a7411ef02e7c67127deed384a7cf5c4b5e1ddcf4170f7338bb5d4047307fd",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_sections_ops_shipping_manifest",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/sections/ops_shipping_manifest.sections.any.json",
+      "filename": "ops_shipping_manifest.sections.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "7ca668f267a1afba53eb60189e877346e0e1131cfee21a7772f518f02f89a4e3",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_sections_ops_sla_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/sections/ops_sla_report.sections.any.json",
+      "filename": "ops_sla_report.sections.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "07b8bd966a5f1662a3e68cdb6e9a2d0c2eaec8a961e5c7f594472f147d757a98",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_sections_ops_work_order",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/sections/ops_work_order.sections.any.json",
+      "filename": "ops_work_order.sections.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "190cd32e42c294b79979fb7380a221fee8e0e8c4c6b9b992b754e0e7ad6b5e0d",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_tables_ops_incident_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/tables/ops_incident_report.tables.any.json",
+      "filename": "ops_incident_report.tables.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "cdd8ee5eb8c67bc63f159c5e299cd3f1f7cf5d224c381c1151c60c74a9612034",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_tables_ops_maintenance_log",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/tables/ops_maintenance_log.tables.any.json",
+      "filename": "ops_maintenance_log.tables.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "57352353eb10f119b1e7b8d596433d6217fd2a97d5875c6fcd7ac693a16a71d4",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_tables_ops_quality_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/tables/ops_quality_report.tables.any.json",
+      "filename": "ops_quality_report.tables.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "dd46607c6ce4702f4bbb91bc7b44daeff984511de7bf4f2693b4a698b3b3260a",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_tables_ops_shipping_manifest",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/tables/ops_shipping_manifest.tables.any.json",
+      "filename": "ops_shipping_manifest.tables.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "33019d68474e36715c731688fa1b9728871d262010c4d97ffb8f8efb396aa90b",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_tables_ops_sla_report",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/tables/ops_sla_report.tables.any.json",
+      "filename": "ops_sla_report.tables.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0e1909591a8b503a27e2fdec9740e6f83813432fba5943eec1d3836c011acb46",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_tables_ops_work_order",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/doc_types/tables/ops_work_order.tables.any.json",
+      "filename": "ops_work_order.tables.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "54d37fbf18f075f7c7d4e07e2d785e3363f661362a48b7f93a5e9698b6571731",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "di_ops_validation_policies",
+      "category": "quality",
+      "path": "document_intelligence/domains/ops/validation_policies.any.json",
+      "filename": "validation_policies.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "39d8a306b0c3a328baf34d7b4c7a7a2646feda3ed5a5d33e32c245058ec867fc",
       "lastUpdated": "2026-02-27"
     },
     {
@@ -11077,7 +12227,8 @@
         "local": false
       },
       "checksumSha256": "4ab34816e1bd21d4851abd5a029cd5644492dbf73eefc7a6d8f4785aa569e543",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_abbreviations_en",
@@ -11100,7 +12251,8 @@
         "local": false
       },
       "checksumSha256": "a446c2d8caf8424098f91d7022126af6dc96b02a3284b10d0d76ee0479d9a51f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_abbreviations_pt",
@@ -11123,7 +12275,8 @@
         "local": false
       },
       "checksumSha256": "627f429206a076e8d7331b2e2a79c94dd3cc9e11b70e902ac25d9259be86c966",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_answer_style_bank",
@@ -11146,7 +12299,8 @@
         "local": false
       },
       "checksumSha256": "3868ed250617fae4816af10e9f52e15a806006858e76fad37a758dc441211cdb",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_disclaimer_policy",
@@ -11169,7 +12323,8 @@
         "local": false
       },
       "checksumSha256": "54d8237248b14bbdf48264d8b93cb06d5ee0403bc8e5af2de4206da4dd5b9ce1",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_doc_type_catalog",
@@ -11192,7 +12347,8 @@
         "local": false
       },
       "checksumSha256": "12f3e2aeb39fd6a5727e53822d2980b75a4a15b83435b8b63be79d35782cb7fd",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_domain_detection_rules",
@@ -11215,7 +12371,8 @@
         "local": false
       },
       "checksumSha256": "07a98bb78d8b435dca22b89972c7618e6ab02893953c52f75cfdaa7291019464",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_domain_profile",
@@ -11238,7 +12395,8 @@
         "local": false
       },
       "checksumSha256": "e4c1bb015952c47848875aa40ccbca68ee0d74a1c2128dbeb9e9e7d3c06e34a2",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_evidence_requirements",
@@ -11261,7 +12419,8 @@
         "local": false
       },
       "checksumSha256": "d15ee19b5245186750b4eab7d914ebf09f2920fed0832222b51e37530fd57693",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_extraction_tax_assessment_notice",
@@ -11388,7 +12547,8 @@
         "local": false
       },
       "checksumSha256": "d05fdc485ed91c5aa2d6acb752406ef9d7b07d63d9947e0f34314c77fb10f064",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_lexicon_pt",
@@ -11411,7 +12571,8 @@
         "local": false
       },
       "checksumSha256": "f1e270f31e73e3ef74662f5d689e86f77b29344f1619f3cb173ab8549ee3e8b4",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_reasoning_scaffolds",
@@ -11434,7 +12595,8 @@
         "local": false
       },
       "checksumSha256": "ca4f1d52e4b358d959e5cc95fff7017ae407c174b4c515868cb5590d2a14f4e2",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_redaction_and_safety_rules",
@@ -11457,7 +12619,8 @@
         "local": false
       },
       "checksumSha256": "7982bc9635811599e81e89fbb501322206e6a6859a1d322354dc3cc7ecd440af",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_retrieval_strategies",
@@ -11480,7 +12643,8 @@
         "local": false
       },
       "checksumSha256": "2d017793324fc447861a996a7447cd73e5fe19354c08bb05bf4158f46fb7dc57",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_tax_sections_tax_assessment_notice",
@@ -11711,7 +12875,8 @@
         "local": false
       },
       "checksumSha256": "df88bee173d7bf3e5d8e0fe07b5d2f9712db4c388d94558f8217925b71b647c0",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_abbreviations_en",
@@ -11734,7 +12899,8 @@
         "local": false
       },
       "checksumSha256": "3646bc2af2ac1a44ebe78c63480c84941e750e9761d6f80d212898e16a66299b",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_abbreviations_pt",
@@ -11757,7 +12923,8 @@
         "local": false
       },
       "checksumSha256": "271093c20e5e4253860fbbaf5417f9aa5df880d2db75c033f1c2706edb6b7d8e",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_answer_style_bank",
@@ -11780,7 +12947,8 @@
         "local": false
       },
       "checksumSha256": "a2a5903de9e06aa92c4f76bd4afe78c1d808c6aec876e724c444bb4dc9526868",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_disclaimer_policy",
@@ -11803,7 +12971,8 @@
         "local": false
       },
       "checksumSha256": "c073d1b774f2ee7cd014bdef0a748933b1075ad6fa23ebc4090cd5f6744732cc",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_doc_type_catalog",
@@ -11826,7 +12995,8 @@
         "local": false
       },
       "checksumSha256": "bcee823d17ff1c3aef4bc39b6120f8cfaae864141ac1802668f84e386e9f687c",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_domain_detection_rules",
@@ -11849,7 +13019,8 @@
         "local": false
       },
       "checksumSha256": "3db0a09a2294717171e69a6fd8e47feafaeaecde2e03ac56fd2a9e005f604593",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_domain_profile",
@@ -11872,7 +13043,8 @@
         "local": false
       },
       "checksumSha256": "575fa71b73e1f04c53f02cebdcad6098edafe8376434e4b0b49d0ffa97dba716",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_evidence_requirements",
@@ -11895,7 +13067,8 @@
         "local": false
       },
       "checksumSha256": "cac6a30aab89561440efe29fcd540bd80ba0bcce8f04ccd1fb8434f7f4ab6645",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_extraction_travel_boarding_pass",
@@ -12074,7 +13247,8 @@
         "local": false
       },
       "checksumSha256": "9083c497d126bc5bc238a05cb7d4cfecf4a5599beb1e0bd96edbda5a72dd5801",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_lexicon_pt",
@@ -12097,7 +13271,8 @@
         "local": false
       },
       "checksumSha256": "a5b46d2d9dc040b42734a218398d0107250825a02f3b499c39d5d6fd60ed745a",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_reasoning_scaffolds",
@@ -12120,7 +13295,8 @@
         "local": false
       },
       "checksumSha256": "8fd7d23ce2a0b839d423d2a1857a7e80ad53897735471487bba3ad50d1cdeb26",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_redaction_and_safety_rules",
@@ -12143,7 +13319,8 @@
         "local": false
       },
       "checksumSha256": "07af1a2dc0309314f7435e50f77c62b69d960de23217c768dc659b5914172688",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_retrieval_strategies",
@@ -12166,7 +13343,8 @@
         "local": false
       },
       "checksumSha256": "9be7ad350c95839733b87d748003a451239b96a433bbaf11aad53db535ee493f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_travel_sections_travel_boarding_pass",
@@ -12501,7 +13679,8 @@
         "local": false
       },
       "checksumSha256": "1efed1291039545f7b13d40ca64626aebbebde7087dbcd24e9cf40f472555cb3",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "di_unit_and_measurement_ontology",
@@ -12524,7 +13703,8 @@
         "local": false
       },
       "checksumSha256": "e7f8f9c50029ce60fc530931ad2e53249656b5b57138e4dd8da440c20f61137f",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "disambiguation_microcopy",
@@ -12534,7 +13714,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "fddcb3f8b83127d0ec09fdde06a051f3397699e094e073868fd55165cb4240fc"
+      "checksumSha256": "fddcb3f8b83127d0ec09fdde06a051f3397699e094e073868fd55165cb4240fc",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "disambiguation_policies",
@@ -12544,7 +13737,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "0c0d7e9c81126603a50ec099f4492c6954d9b007c9c2f34c12bff519ecd0641b"
+      "checksumSha256": "0c0d7e9c81126603a50ec099f4492c6954d9b007c9c2f34c12bff519ecd0641b",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "disambiguation_prompt",
@@ -12554,7 +13760,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "56e4af97369100cae5016f0e4476211378a9aaee2fde4d42e87838a295f883f9"
+      "checksumSha256": "56e4af97369100cae5016f0e4476211378a9aaee2fde4d42e87838a295f883f9",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "discourse_markers",
@@ -12564,7 +13783,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "6efd977fac15346964ae8aacff7314e2af4fb24c46d2676594fc02f2fb14dd1c"
+      "checksumSha256": "6efd977fac15346964ae8aacff7314e2af4fb24c46d2676594fc02f2fb14dd1c",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "distribution_ontology",
@@ -12587,7 +13819,8 @@
         "local": false
       },
       "checksumSha256": "4c8018ee13ad0cacf8d6ad01411c5cfb880f0a592d71b03ff0f10a8a80dbaadf",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
     },
     {
       "id": "diversification_rules",
@@ -12636,7 +13869,8 @@
         "local": true
       },
       "checksumSha256": "132797f42d9a9cb4b28ad40f2d66acb03e3bbe139b2a37a233c394fa7771210c",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "dependsOn": []
     },
     {
       "id": "doc_aliases_accounting",
@@ -12685,7 +13919,8 @@
         "local": false
       },
       "checksumSha256": "cccd3fbc5489f720f310f323c8cb7dd057c427378eecf7fa32e6c0407c6127c7",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "doc_aliases_billing",
@@ -12708,7 +13943,8 @@
         "local": false
       },
       "checksumSha256": "5e81e27ecca8d4d489db071c5677c6f742bcca3ea94681e2d1f6fa6641a371a5",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "doc_aliases_finance",
@@ -12757,7 +13993,8 @@
         "local": false
       },
       "checksumSha256": "4fd94a160fd4e6890092f068107bf93004391136271b15ea9b82e7af3fe5b218",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "doc_aliases_identity",
@@ -12780,7 +14017,8 @@
         "local": false
       },
       "checksumSha256": "b162070be4c1c0ce9f6a1fcaef2dc69969e1ccd8992e12084b1e58994883e735",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "doc_aliases_insurance",
@@ -12803,7 +14041,8 @@
         "local": false
       },
       "checksumSha256": "e93e3d090cd135c49966adb59edfb6c5cea3b6ea631406f119fd6f4eb48643b4",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "doc_aliases_legal",
@@ -12904,7 +14143,8 @@
         "local": false
       },
       "checksumSha256": "54e6246e781542f29af140db7f4a6290b093b51cc60ba4c3e5bdb61c7c3963d8",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "doc_archetypes",
@@ -12927,7 +14167,8 @@
         "local": false
       },
       "checksumSha256": "d48e79e4bf4d8aef68bee47cf47be43b1b6dacd560769ec01444f284ca073793",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "doc_archetypes_accounting",
@@ -13060,6 +14301,30 @@
       "lastUpdated": "2026-02-27"
     },
     {
+      "id": "doc_grounding_checks",
+      "category": "semantics",
+      "path": "quality/doc_grounding_checks.any.json",
+      "filename": "doc_grounding_checks.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "8d938169eedbeec132b5b708c50bcc10ebd4724bb6080356ed9f69eb0a50c40e",
+      "lastUpdated": "2026-02-27"
+    },
+    {
       "id": "doc_identity_schema",
       "category": "schemas",
       "path": "schemas/doc_identity_schema.any.json",
@@ -13106,7 +14371,8 @@
         "local": true
       },
       "checksumSha256": "818bcabbd903e16feb36d976c48003938a7d48280e3f38a4fe338e5fd4358b59",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "doc_title_boost_rules",
@@ -13116,7 +14382,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "ca053a102585eaf340d2624b4101ff3aa76b7be80bf36923cec7e1d130b604cb"
+      "checksumSha256": "ca053a102585eaf340d2624b4101ff3aa76b7be80bf36923cec7e1d130b604cb",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "doc_type_boost_rules",
@@ -13126,7 +14405,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "51919d2cd378c72820f6d46b8f84c1b9497ce819d6c16b7c9e9b5bbae3cd60ef"
+      "checksumSha256": "51919d2cd378c72820f6d46b8f84c1b9497ce819d6c16b7c9e9b5bbae3cd60ef",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "doc_type_catalog_schema",
@@ -13175,7 +14467,8 @@
         "local": false
       },
       "checksumSha256": "5f373a0c833750adf31a3ad8f10a920a9bc37905dd82835c67bae0aff48d68ac",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "document_intelligence_bank_map",
@@ -13200,7 +14493,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "ac9b28006e2283fb12fe8a88ad5fa06663d856d180e3bd32cdbe551bd7966db4",
+      "checksumSha256": "4a107a7acee9dd78d2578e5000399ba0eb84a18f734a3d438b2ce864472a3ade",
       "lastUpdated": "2026-03-01"
     },
     {
@@ -13226,7 +14519,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "20db129bf7eea23d48b32262e62685f9f0194fc983837df285b9a76c871934f7",
+      "checksumSha256": "74c7e879d62e76c20639ab03f2819fa4cf902890aa0f9c22a4e737d0a3d607c3",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -13279,7 +14572,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "6467ad4834ebe103238727d895e1c6c950c9f580716611f1a2298cd54799d28e",
+      "checksumSha256": "b11027c2f20257c7652ee438101202ece9d25df000ce3119b964b6a032a37735",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -13306,7 +14599,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "fe5bc9ef431937cfcaf451f0c3ab76fc934ef2c047e3e2323feff655f5d86c3a",
+      "checksumSha256": "9f07d86863a9cf8c0694e79bc48d6a4f60b1478f98061df6ef5f0e5cb19e2c21",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -13333,7 +14626,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "a3a7d98aa7479815fb6f5c829c3df3211ee76468d7bb3615aa94a72a00839c1e",
+      "checksumSha256": "adf9be6d2135cce219cb2bf65160711479432a3290bc84af8c2a2755ccec8696",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -13360,7 +14653,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "39ce9fbc7f4927186c960f452cc73693e345e5e083c5436df412240aa491b869",
+      "checksumSha256": "1e1f8391dcf7a026c4f5feb747e39e1520cdfd038c7eb0d334ce7a31f82046c1",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -13384,7 +14677,8 @@
         "local": false
       },
       "checksumSha256": "d38dcdcb792de70b3496953ec556d471ed5005d3f1b2558938f66004c961a004",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "docx_heading_levels_en",
@@ -13407,7 +14701,8 @@
         "local": false
       },
       "checksumSha256": "8d992af00c4cc5bc98e3fae7aae155103c525d77e32d84f48832d4d6507e4c72",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "docx_heading_levels_pt",
@@ -13430,7 +14725,8 @@
         "local": false
       },
       "checksumSha256": "21000ce43ebe3ceeddbc3ff5aabe1570bc05c87e7c089e08c11cfdce6ae64dd3",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "docx_pt",
@@ -13453,7 +14749,8 @@
         "local": false
       },
       "checksumSha256": "3a2ad3c0aa92e2b132e644628c27faa0b4fcbd413fec6254b838cbdff82b258b",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "domain_detection_schema",
@@ -13502,7 +14799,8 @@
         "local": true
       },
       "checksumSha256": "14acfd45a62c34cdc04b2cad443c9c135b176aa69bd84a36a73f5a5cad97b83f",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "dependsOn": []
     },
     {
       "id": "domain_profile_schema",
@@ -13551,7 +14849,8 @@
         "local": true
       },
       "checksumSha256": "39437715cabdb01c368ed962dd052c116aa44e26d35cc8700405f4dad7323192",
-      "lastUpdated": "2026-02-17"
+      "lastUpdated": "2026-02-17",
+      "dependsOn": []
     },
     {
       "id": "editing_agent_policy",
@@ -13561,7 +14860,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-27",
-      "checksumSha256": "02bd4fb284fe3da5d861506970311d7c788ea65ea4ed54351f653d4c3a0a9eaa"
+      "checksumSha256": "02bd4fb284fe3da5d861506970311d7c788ea65ea4ed54351f653d4c3a0a9eaa",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "editing_microcopy",
@@ -13571,7 +14883,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-07",
-      "checksumSha256": "5b14988dbeab070f918b2c689f701a81127ca2ae28ecaeb92137626443f3df16"
+      "checksumSha256": "5b14988dbeab070f918b2c689f701a81127ca2ae28ecaeb92137626443f3df16",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "editing_policy",
@@ -13581,7 +14906,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-07",
-      "checksumSha256": "01b8ca5e23f7a1841a1f6e3f1ff9c938c935c3d8d79e6736d4e84f0e4867ed4e"
+      "checksumSha256": "01b8ca5e23f7a1841a1f6e3f1ff9c938c935c3d8d79e6736d4e84f0e4867ed4e",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "editing_routing",
@@ -13604,7 +14942,8 @@
         "local": true
       },
       "checksumSha256": "04aaa651cef7b9f60bd6c9076dfc9885fe2548c4e146a4d925f16650bfc08c69",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "editing_task_prompts",
@@ -13613,8 +14952,21 @@
       "filename": "editing_task_prompts.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19",
-      "checksumSha256": "7048350902bb5bfcf7e4bdda321676749d70e44048ad1e42d03015a14d84b21e"
+      "lastUpdated": "2026-03-02",
+      "checksumSha256": "a33b8535d77c747ef3bfc5e4aa5816c491d8e7faf5c9969c408657b1d44d5cb0",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "editing_ux",
@@ -13624,7 +14976,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-27",
-      "checksumSha256": "7a9d5407afd1d130303b387a5b1f8ece1f89eb132478e326d7352f653f7578b2"
+      "checksumSha256": "7a9d5407afd1d130303b387a5b1f8ece1f89eb132478e326d7352f653f7578b2",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "email_routing",
@@ -13650,7 +15015,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "a72ad4fbea3f4d3686f31ed2ebb9a0ebaeff9bfb8fd39d6fcb2f65650eaab55f",
+      "checksumSha256": "f6e6895cfd688e37085c4596425e1479dd3cf6acf708d467d4ff5b395ba934ef",
       "lastUpdated": "2026-02-09"
     },
     {
@@ -13674,7 +15039,8 @@
         "local": false
       },
       "lastUpdated": "2026-02-20",
-      "checksumSha256": "221c0e41b5ab2a782ed63bd60e55007bd04eb2deff17dc781c0f32d83ce28feb"
+      "checksumSha256": "221c0e41b5ab2a782ed63bd60e55007bd04eb2deff17dc781c0f32d83ce28feb",
+      "dependsOn": []
     },
     {
       "id": "environments",
@@ -13710,7 +15076,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "e2872cf71c67c156265f2d0bb0b9dd62aff2bbb8f1208d4f084eea493ce49fc2"
+      "checksumSha256": "e2872cf71c67c156265f2d0bb0b9dd62aff2bbb8f1208d4f084eea493ce49fc2",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "evidence_requirements_schema",
@@ -13759,7 +15138,8 @@
         "local": false
       },
       "checksumSha256": "01c75a08db557f9ccae6b9d024dbf3f17cf3b71f4c9767285dbcb7f6741ed143",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "excel_chart_types_en",
@@ -13782,7 +15162,8 @@
         "local": false
       },
       "checksumSha256": "f9b23a2a483ac0f98aeb2a5ac5493b254737e90ac482cef2a5377ec1af03b959",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "excel_chart_types_pt",
@@ -13805,7 +15186,8 @@
         "local": false
       },
       "checksumSha256": "9cea35fadac6c21eb80803b05cce196c11182a7144aa9ba1cd0abf8f228147ab",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "excel_edit_regression",
@@ -13828,7 +15210,8 @@
         "local": false
       },
       "checksumSha256": "ef924535dc86acdd171970358cdec3505dbc92ef3ab979223b75334a61b2934d",
-      "lastUpdated": "2026-02-13"
+      "lastUpdated": "2026-02-13",
+      "dependsOn": []
     },
     {
       "id": "excel_en",
@@ -13851,7 +15234,8 @@
         "local": false
       },
       "checksumSha256": "69208ea9eb8aab5439411010467a6b2866438b33defa220c4af3e30bcf9cb4ae",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "excel_formula_catalog",
@@ -13874,7 +15258,8 @@
         "local": false
       },
       "checksumSha256": "211ecda60c686eabc5c46334fa1c5ed2c25b81b006bf2c2c82239e60b2a5268d",
-      "lastUpdated": "2026-02-13"
+      "lastUpdated": "2026-02-13",
+      "dependsOn": []
     },
     {
       "id": "excel_function_catalog",
@@ -13897,7 +15282,8 @@
         "local": false
       },
       "checksumSha256": "b77dc6271321c7ed5fe5e03f94a4b41c916a6b11089027e01294576af33fdbbe",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "excel_functions_pt_to_en",
@@ -13920,7 +15306,8 @@
         "local": false
       },
       "checksumSha256": "8f22f99cabbe88c3559eb76041c619662913c16016a2244d3d9e0564147e9a81",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "excel_number_formats",
@@ -13943,7 +15330,8 @@
         "local": false
       },
       "checksumSha256": "d9213caa51e9fadd7530fb0699c30d836f9dc5102aea0ec1f36c8234e6deef05",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "excel_number_formats_structure",
@@ -13992,7 +15380,8 @@
         "local": false
       },
       "checksumSha256": "f788e76169ec4e2b3dea5af8f9f5ca27087df45be606de9167e487114beec2da",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "excel_shortcuts",
@@ -14015,7 +15404,8 @@
         "local": false
       },
       "checksumSha256": "6472a5039d79f932de97cae0cf8dbc4d2704013d6fbb1067da695afd79fc0bf8",
-      "lastUpdated": "2026-02-13"
+      "lastUpdated": "2026-02-13",
+      "dependsOn": []
     },
     {
       "id": "explain_style_accounting",
@@ -14038,7 +15428,8 @@
         "local": false
       },
       "checksumSha256": "5457eb68203c84d6556d71095aec32d7f9ff6a70f4cdedf6724f793b816c40be",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "explain_style_finance",
@@ -14179,7 +15570,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "cc66383ddd0d698aeea8b8d035a8bed493cfc37e6ff4629465963423e86b392e"
+      "checksumSha256": "cc66383ddd0d698aeea8b8d035a8bed493cfc37e6ff4629465963423e86b392e",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "fallback_not_found_scope",
@@ -14189,7 +15593,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "70b32fb831690413ab3c6c851f16042ed747f3d7c79b331144fdd37908f9ec0c"
+      "checksumSha256": "70b32fb831690413ab3c6c851f16042ed747f3d7c79b331144fdd37908f9ec0c",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "fallback_policy",
@@ -14199,7 +15616,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "f7d165b1027788cff2734b82ed94400e5e6211aa8716d86f94bd362cfff0d8d5"
+      "checksumSha256": "f7d165b1027788cff2734b82ed94400e5e6211aa8716d86f94bd362cfff0d8d5",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "fallback_processing",
@@ -14209,7 +15639,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "2cb6ed3bf06a34b6a03c5c8923cd6b8e3a752d1c8afb3d4b945352feaf54ea80"
+      "checksumSha256": "2cb6ed3bf06a34b6a03c5c8923cd6b8e3a752d1c8afb3d4b945352feaf54ea80",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "fallback_prompt",
@@ -14219,7 +15662,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "49ac3d783fbd43f4297abd00d63b89cc94b7ce6a4117bd9d4adea11b9aea3672"
+      "checksumSha256": "49ac3d783fbd43f4297abd00d63b89cc94b7ce6a4117bd9d4adea11b9aea3672",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "fallback_router",
@@ -14229,7 +15685,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-27",
-      "checksumSha256": "6d17ee98034d1b8595e17f6c2829a10d88f75f475378226a9e6a198ece9f34b2"
+      "checksumSha256": "6d17ee98034d1b8595e17f6c2829a10d88f75f475378226a9e6a198ece9f34b2",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "fallback_scope_empty",
@@ -14239,7 +15708,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "f3db0e0de14d09edb57d9179b0fa2e27e0f84012dcde75f2f8e2de837e45eee0"
+      "checksumSha256": "f3db0e0de14d09edb57d9179b0fa2e27e0f84012dcde75f2f8e2de837e45eee0",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "feature_flags",
@@ -14264,7 +15746,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "1e5e03cf0e2d7255a7bb2ed3e76a83146a9d46bd465de330580b55a3a78cfb46",
+      "checksumSha256": "b919fca7a919a5d7f9109116b73e63428913633351dd7c79170879be937e643b",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -14353,7 +15835,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "bbd8c57808925eb606d4d198bc4541b4290584a508486f9332ddf34db4b96be6"
+      "checksumSha256": "bbd8c57808925eb606d4d198bc4541b4290584a508486f9332ddf34db4b96be6",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "followup_suggestions",
@@ -14400,7 +15895,32 @@
         "local": false
       },
       "checksumSha256": "ddd13be331c50d83f913b0e52cf4ff2214578f1cbd327b8bc344f364a1e88b71",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
+    },
+    {
+      "id": "hallucination_guards",
+      "category": "semantics",
+      "path": "quality/hallucination_guards.any.json",
+      "filename": "hallucination_guards.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "81d39c47705001b28bf88625f844b469d086a525cd5ecd02789fa44c4ff91ac3",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "headings_map",
@@ -14527,7 +16047,8 @@
         "local": false
       },
       "checksumSha256": "9963aebdb0067ae3192cb7677aad00926e578ae7690674ff7d4db4ea1f1f5bb6",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "intent_patterns_docx_pt",
@@ -14550,7 +16071,8 @@
         "local": false
       },
       "checksumSha256": "1129370df6352367f2dee726f498fca0510c6e2c427b952af687e969504fbeb3",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "intent_patterns_excel_en",
@@ -14573,7 +16095,8 @@
         "local": false
       },
       "checksumSha256": "ee40cb36c718b13081eadf2850f66d6b8d5141ae17d746fb2d963d9546771ef0",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "intent_patterns_excel_pt",
@@ -14596,7 +16119,8 @@
         "local": false
       },
       "checksumSha256": "9f06bc544e9a4e5565217948b17a81d799043af0db94a8818b5f6d74ab2152b4",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "keyword_boost_rules",
@@ -14606,7 +16130,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "cf0519b489b704cd81693bec4c801a04d71d22c0b21b3e527fb30eae13e4ee93"
+      "checksumSha256": "cf0519b489b704cd81693bec4c801a04d71d22c0b21b3e527fb30eae13e4ee93",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "keyword_taxonomy_finance",
@@ -14723,7 +16260,19 @@
         "capabilities_catalog"
       ],
       "lastUpdated": "2026-03-01",
-      "checksumSha256": "c9d994758a76c3f9f37b09cf81915b58ea28106d34dbf72213f95fedd4986d99"
+      "checksumSha256": "c9d994758a76c3f9f37b09cf81915b58ea28106d34dbf72213f95fedd4986d99",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "language_indicators",
@@ -15968,7 +17517,8 @@
         "local": false
       },
       "checksumSha256": "b11d1db6fe75c4f2510bfe1767f3abfb387d15373125613ff48536b80516ebe0",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "legal_dpa_extraction_hints",
@@ -17999,6 +19549,53 @@
       "lastUpdated": "2026-02-27"
     },
     {
+      "id": "list_styles",
+      "category": "semantics",
+      "path": "formatting/list_styles.any.json",
+      "filename": "list_styles.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "ad4160c043e7d542b8f990bea449482837393da82083f3ffe21074b6372296f4",
+      "lastUpdated": "2026-02-27"
+    },
+    {
+      "id": "llm_builder_policy",
+      "category": "policies",
+      "path": "policies/llm_builder_policy.any.json",
+      "filename": "llm_builder_policy.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-03-02",
+      "checksumSha256": "3a33a326ea6b936adad0129793c47c09fd47e52601edc50db284ac4f8a10760d",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
+    },
+    {
       "id": "locale_numeric_date_rules",
       "category": "semantics",
       "path": "agents/excel_calc/semantics/locale_numeric_date_rules.any.json",
@@ -18019,7 +19616,32 @@
         "local": false
       },
       "checksumSha256": "965d452ef17b1fd8a222c96b207d0d94c07549a7fc0b709880cc7021ef4b3e9b",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
+    },
+    {
+      "id": "logging_policy",
+      "category": "semantics",
+      "path": "policies/logging_policy.any.json",
+      "filename": "logging_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "7b4bcf816bf21f8f09d7ec3232dcb648ff5c68934d1be028d628f423a995f559",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "marketing_probe_schema",
@@ -18380,7 +20002,8 @@
         "local": false
       },
       "checksumSha256": "b5abeb39c0444d5d3019cff4f178cf59c472546dde8f4f857b5b4be22da83ec2",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "medical_evidence_requirements",
@@ -20834,7 +22457,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "61fdb14705befd220b4f639475eb69883082b199443a1195568cfc6c22f3409e"
+      "checksumSha256": "f660c0d2205eef76cbfe57fd7bcf544eecab370f1f6b2c867c055bc53de58504",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "memory_policy_tests",
@@ -20856,7 +22492,8 @@
         "local": false
       },
       "checksumSha256": "a73250c21deb191c984d4d62cfcd21550d73b771d859e77098ac4d8a8c5f4d0e",
-      "lastUpdated": "2026-02-20"
+      "lastUpdated": "2026-02-20",
+      "dependsOn": []
     },
     {
       "id": "memory_semantic_continuity",
@@ -20878,7 +22515,8 @@
         "local": false
       },
       "checksumSha256": "6dde0ac4894dfaf61f49e2241d39484f861b3031dfb60421420637e0c90eefcf",
-      "lastUpdated": "2026-02-26"
+      "lastUpdated": "2026-02-26",
+      "dependsOn": []
     },
     {
       "id": "mode_chat",
@@ -20888,7 +22526,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "b0ab26b51e6d70e627a73b8329fd30909c552aa6cc9c38152aeee697fa85654b"
+      "checksumSha256": "0d326fafd3af2a031024d76d6c5bd9711efb4981865880d8fc411daae8367254",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "mode_editing",
@@ -20898,7 +22549,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "29bb9b2263cf3602190259d6e1e8c8108db6f4339f6e225a7329add82cac1311"
+      "checksumSha256": "1cfcb0f06f44e2b8554e17dbc760d384769388a4689665abfeaf8e66b2cecc8b",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "money_patterns",
@@ -20934,7 +22598,20 @@
       "version": "4.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "8a2c040cc8bf356b86b3913d99051bed7ad501be89406d16ab4fece5e68ea076"
+      "checksumSha256": "8a2c040cc8bf356b86b3913d99051bed7ad501be89406d16ab4fece5e68ea076",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "numeric_integrity",
@@ -20983,7 +22660,8 @@
         "local": false
       },
       "checksumSha256": "69fc56786de9765888d0dbb25c2ecd6ecf5c9ff698bf73a91186c6b4ad3776ee",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
     },
     {
       "id": "ontology_schema",
@@ -21032,7 +22710,8 @@
         "local": false
       },
       "checksumSha256": "bb639b4588ed4f0e2dd21b7f54863d22c2157d0c07149606f1ab7f62fd33c9ba",
-      "lastUpdated": "2026-02-12"
+      "lastUpdated": "2026-02-12",
+      "dependsOn": []
     },
     {
       "id": "operator_collision_matrix",
@@ -21082,7 +22761,8 @@
         "local": true
       },
       "checksumSha256": "e821ffe56a18f73ddca32b264cb5b6696beb71775d2c20f228866fb93856672b",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "operator_families",
@@ -22466,7 +24146,8 @@
         "local": false
       },
       "checksumSha256": "e7c804b4d886f812d552af91a8a3ade3f681582073a2c1de7f44c1214b45ce46",
-      "lastUpdated": "2026-02-20"
+      "lastUpdated": "2026-02-20",
+      "dependsOn": []
     },
     {
       "id": "pain_points_finance",
@@ -22651,6 +24332,30 @@
       "lastUpdated": "2026-02-27"
     },
     {
+      "id": "pii_field_labels",
+      "category": "semantics",
+      "path": "quality/pii_field_labels.any.json",
+      "filename": "pii_field_labels.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "ecadc8637dd383f8683b73ebabffc60d0089e56c91f4ae22c7a21308c8a31829",
+      "lastUpdated": "2026-02-27"
+    },
+    {
       "id": "policy_citations",
       "category": "prompts",
       "path": "prompts/policy_citations.any.json",
@@ -22658,7 +24363,44 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "051e762efd5ccf2bca25a31df807af22f05aedcf4c8eb4ca1297a2f09e4c9a86"
+      "checksumSha256": "e424a379338d22776f03f4ae27864ba7cfeb059a4b10b0eec0fb53d84c138803",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
+    },
+    {
+      "id": "privacy_minimal_rules",
+      "category": "semantics",
+      "path": "quality/privacy_minimal_rules.any.json",
+      "filename": "privacy_minimal_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0c68d629b054f621dcf3cfabe8998fd456d0eed5dd595d1dec7e3b165d894391",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "processing_messages",
@@ -22668,7 +24410,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "05cdbff27c030d330e355c19c0b6f73c61d5fe625f198eee139573576d4600dc"
+      "checksumSha256": "5bdfa21563165bbb16309d34078c50e6f53400d02e394b68306a3a34e5ddcd1a",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "prompt_registry",
@@ -22678,7 +24433,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-27",
-      "checksumSha256": "5d1c6f3b3a08e69ed2c7e05cd5ca99d7250eaa2b726de9f4b05fbe8512a5a504"
+      "checksumSha256": "6364bf4ccfade318772aca1224f3f9f7912c9850f44e24e3ad77a132fc5c5c3d",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "python_chart_recipes",
@@ -22701,7 +24469,8 @@
         "local": false
       },
       "lastUpdated": "2026-02-27",
-      "checksumSha256": "f53a94edfbe9ff9039a1329a43dfc1a184018524df9c213a561096c0e517fb71"
+      "checksumSha256": "f53a94edfbe9ff9039a1329a43dfc1a184018524df9c213a561096c0e517fb71",
+      "dependsOn": []
     },
     {
       "id": "python_recipe_catalog",
@@ -22756,7 +24525,8 @@
         "local": false
       },
       "lastUpdated": "2026-02-27",
-      "checksumSha256": "1b4b539481690d7df4f4d178f48bffaf1673deb66d50077831f460b29046b63e"
+      "checksumSha256": "1b4b539481690d7df4f4d178f48bffaf1673deb66d50077831f460b29046b63e",
+      "dependsOn": []
     },
     {
       "id": "quality_document_intelligence_schema",
@@ -22792,7 +24562,20 @@
       "version": "3.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "ad3a6f992eeae00f2ad2eb1c024b75a8fa11e498149dd6a07ac79212f3d5df75"
+      "checksumSha256": "efbadd49fe8b421ef220d8178feecef3fbc1087ff31ed09526a7b79e81c9460b",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "query_rewrites_accounting",
@@ -22809,13 +24592,14 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
       },
       "checksumSha256": "3ad3f12d2a224d731fec564a064ccb15bb37295e238c115cf43d54a468cab623",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "query_rewrites_finance",
@@ -22968,7 +24752,32 @@
         "local": false
       },
       "lastUpdated": "2026-02-20",
-      "checksumSha256": "4b46ff088e636ddf328098040451529eb1a91051803da23d858363f9ecf193af"
+      "checksumSha256": "4b46ff088e636ddf328098040451529eb1a91051803da23d858363f9ecf193af",
+      "dependsOn": []
+    },
+    {
+      "id": "quote_styles",
+      "category": "semantics",
+      "path": "formatting/quote_styles.any.json",
+      "filename": "quote_styles.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "8935ff721f94b39289de9b0db3bdc3f7775860bdf68c92ca6be568e6029986c4",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "rag_policy",
@@ -22978,7 +24787,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "9d73d835f3cc2f95fb73482ebd926c5fd33d5b5888965dde7fd99533500dc32c"
+      "checksumSha256": "e2f2da6e5d03b0f9ab735dc9d58e0e0b2e278ae581db824a172aa7bbc496e3fe",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "range_resolution_rules",
@@ -23001,7 +24823,32 @@
         "local": false
       },
       "checksumSha256": "b632ee1f1ea8b230c5a150a092081e994ae770c672a3697b0da3a10db5cab33b",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
+    },
+    {
+      "id": "rate_limit_policy",
+      "category": "semantics",
+      "path": "policies/rate_limit_policy.any.json",
+      "filename": "rate_limit_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "fa7be0568c71af7fcb407adc8b7fcf9b40d78db5224ff84090218cd251d764fb",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "reasoning_policy_schema",
@@ -23037,7 +24884,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "9522d56186d2865b8ac88c2e353c86b716b60996c568185cc81e070f53afa934"
+      "checksumSha256": "9522d56186d2865b8ac88c2e353c86b716b60996c568185cc81e070f53afa934",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "refusal_phrases",
@@ -23047,7 +24907,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "7a9bdc6149d73e80ff5c2e73b2c2bba0c7e782264f24269872ac07ee241dfaf6"
+      "checksumSha256": "7a9bdc6149d73e80ff5c2e73b2c2bba0c7e782264f24269872ac07ee241dfaf6",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "refusal_policy",
@@ -23057,7 +24930,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "c4fd32a22a2e74911054f7054aab40841d2b2f95df3d5a6fbce014ee53aad905"
+      "checksumSha256": "c4fd32a22a2e74911054f7054aab40841d2b2f95df3d5a6fbce014ee53aad905",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "render_policy",
@@ -23067,7 +24953,20 @@
       "version": "6.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "dd4e5fba2049cef5883c28095ef7b87d60174f9d81551b6fcaa513ece08ae62d"
+      "checksumSha256": "dd4e5fba2049cef5883c28095ef7b87d60174f9d81551b6fcaa513ece08ae62d",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "result_verification_policy",
@@ -23090,7 +24989,8 @@
         "local": false
       },
       "checksumSha256": "bef370b8d2f46bbfd5ff50ea0aeb6e9e0600745cd8c9c70406626c0daa8fed70",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
     },
     {
       "id": "retrieval_document_intelligence_schema",
@@ -23139,7 +25039,8 @@
         "local": true
       },
       "checksumSha256": "e148efb5952cdd8518df7ff45e2757d152af30bf15455e1a4129d930a23dd3ed",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "dependsOn": []
     },
     {
       "id": "retrieval_prompt",
@@ -23149,7 +25050,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "ebe18b2c1cbd81eb0557a9467c27c7e185f7e1336a490fe8240854ce6223927f"
+      "checksumSha256": "ebe18b2c1cbd81eb0557a9467c27c7e185f7e1336a490fe8240854ce6223927f",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "retrieval_ranker_config",
@@ -23159,7 +25073,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "d00ebe53748bf873ad5ccf6bbf4661299573b78e824643533257805f7cc6e4df"
+      "checksumSha256": "d303d6ec858eb9f215262e9cc455023d7843f6db51ee0ac13512e4dbb5512d69",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "routing_priority",
@@ -23181,7 +25108,8 @@
         "local": false
       },
       "checksumSha256": "ad96022ff93d35597e36c7d0b3b772a4ea311be96edbb93ba18de2b57e55c233",
-      "lastUpdated": "2026-02-20"
+      "lastUpdated": "2026-02-20",
+      "dependsOn": []
     },
     {
       "id": "scope_hints",
@@ -23191,7 +25119,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "d2943ef2ccc21d43f05ce4ad85916e4a2f196621948f48397b82981a5729c3f5"
+      "checksumSha256": "d2943ef2ccc21d43f05ce4ad85916e4a2f196621948f48397b82981a5729c3f5",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "scope_resolution",
@@ -23201,7 +25142,20 @@
       "version": "2.2.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-25",
-      "checksumSha256": "c1e15da4f5755f14ed92b2fdc65731d1ed45a959a6223fb9838a5cf8f0a11e8d"
+      "checksumSha256": "c1e15da4f5755f14ed92b2fdc65731d1ed45a959a6223fb9838a5cf8f0a11e8d",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "scoped_not_found_messages",
@@ -23211,7 +25165,20 @@
       "version": "3.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "e6255d128558d6ecb299e5a08173663751b27e9bba73fe829cd2a6a262f0c88c"
+      "checksumSha256": "e6255d128558d6ecb299e5a08173663751b27e9bba73fe829cd2a6a262f0c88c",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "section_priority_accounting",
@@ -23228,13 +25195,14 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
       },
       "checksumSha256": "7b84f22113d05e8a74f8b0787abb89ce05cbe08a03a6349d319af6a049c9586d",
-      "lastUpdated": "2026-02-27"
+      "lastUpdated": "2026-02-27",
+      "dependsOn": []
     },
     {
       "id": "section_priority_finance",
@@ -23348,7 +25316,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "ae26fdaa3cd92e539e92cba743ae212bd568a896c06b910340697f6dbc9a8387"
+      "checksumSha256": "f8e1bfe06f35dc394b8e3ef9144b8cb52432b5e374875c88fd490551fd28a5c6",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "sheetname_patterns",
@@ -23396,7 +25377,8 @@
         "local": false
       },
       "checksumSha256": "fcc28aeff25c9b3cf1609b06b7a33b357e9b8c09f41afa4c3a888c856def1017",
-      "lastUpdated": "2026-02-26"
+      "lastUpdated": "2026-02-26",
+      "dependsOn": []
     },
     {
       "id": "slot_schemas_excel_calc",
@@ -23419,7 +25401,8 @@
         "local": false
       },
       "checksumSha256": "a4f8e5fdc87b071e9f40cc58278555851d2fb2d178cc1627db11ec1625f923d7",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
     },
     {
       "id": "source_engine",
@@ -23429,7 +25412,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-04",
-      "checksumSha256": "f7cd21ae5e1742f5eca28490423d9c69be3c1c522a357bf5bc3c3f312c4e2381"
+      "checksumSha256": "f7cd21ae5e1742f5eca28490423d9c69be3c1c522a357bf5bc3c3f312c4e2381",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "source_policy",
@@ -23478,7 +25474,8 @@
         "local": false
       },
       "lastUpdated": "2026-03-01",
-      "checksumSha256": "45c96a4f5a370263deb1d7dcd24e74cc3c3def14e88d7c2d6bceed02036256ba"
+      "checksumSha256": "45c96a4f5a370263deb1d7dcd24e74cc3c3def14e88d7c2d6bceed02036256ba",
+      "dependsOn": []
     },
     {
       "id": "stats_method_ontology",
@@ -23501,7 +25498,8 @@
         "local": false
       },
       "checksumSha256": "563faff1c998687b467c42114e508834da7a0e85a1c61601052535c4eb8c88cb",
-      "lastUpdated": "2026-02-28"
+      "lastUpdated": "2026-02-28",
+      "dependsOn": []
     },
     {
       "id": "stopwords_docnames",
@@ -23524,7 +25522,8 @@
         "local": true
       },
       "checksumSha256": "780a3a57d62430d9c828577de5c0efeeaa26aa8e7ae1da7c3e47b5967eda0571",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "dependsOn": []
     },
     {
       "id": "synonym_expansion",
@@ -23547,7 +25546,8 @@
         "local": true
       },
       "checksumSha256": "d7be277135f91b631b2de16fa12a4b039c8bf0ac838b1cf127b86068fd9f92d4",
-      "lastUpdated": "2026-01-26"
+      "lastUpdated": "2026-01-26",
+      "dependsOn": []
     },
     {
       "id": "system_base",
@@ -23557,7 +25557,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "6d527355a8de093f3aea51429f11a7c73b653bb68dec26726a73a92662e3baaf"
+      "checksumSha256": "2646ea0a66bfd68511111a0f4c6ca1d81ddcf465daa088073d60f6f0ea2df013",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "table_header_ontology_accounting",
@@ -23606,7 +25619,8 @@
         "local": false
       },
       "checksumSha256": "e0ce1d9c218fd496a05eee84a9f90e1c4643eccd2b131617495ac9451b8dddc8",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "table_header_ontology_billing",
@@ -23629,7 +25643,8 @@
         "local": false
       },
       "checksumSha256": "655bebb15c3411c1d0c521f6050a553cbb7d13496b2b09fe10f9c4a09581d6a0",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "table_header_ontology_finance",
@@ -23678,7 +25693,8 @@
         "local": false
       },
       "checksumSha256": "afbaba9309b25d21436b7bf35f456a3aee32e79cbe93a3ba339a40d1e01f82ca",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "table_header_ontology_legal",
@@ -23779,7 +25795,8 @@
         "local": false
       },
       "checksumSha256": "ac38c4cd83738383e0ea9b546c7dbf9d3241953d1bcb9b5611fe1eda6f91cc59",
-      "lastUpdated": "2026-03-01"
+      "lastUpdated": "2026-03-01",
+      "dependsOn": []
     },
     {
       "id": "table_rules",
@@ -23789,7 +25806,44 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "d308ab1e082b7d0190f15fe42db5db12f3c3cd87925211df08d24c24c1ef36c3"
+      "checksumSha256": "d308ab1e082b7d0190f15fe42db5db12f3c3cd87925211df08d24c24c1ef36c3",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
+    },
+    {
+      "id": "table_styles",
+      "category": "semantics",
+      "path": "formatting/table_styles.any.json",
+      "filename": "table_styles.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0a8b8a47de12d9c8a02005e430c881b079400e7fb0d7cf8034d6829f131a0a88",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "task_answer_with_sources",
@@ -23799,7 +25853,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-02-19",
-      "checksumSha256": "3bcc3e6e6228f82e4197b5bab86f7f4b49d16df09234938329a5b2459d43c3df"
+      "checksumSha256": "3d12a138e36b8195bcfecf269ee42da5bb5c70854a2aec12e4c8f917cb5d10ec",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "task_plan_generation",
@@ -23808,8 +25875,21 @@
       "filename": "task_plan_generation.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-19",
-      "checksumSha256": "32aa1abbfdac0adc5ae215c0e8410d64b6f493c03f5541d6b07b0b9abca79d93"
+      "lastUpdated": "2026-03-02",
+      "checksumSha256": "42ad8be4e6520bbc56212f1d13121b3a3a5a40ecc97ffce184fbbbe9407c75f1",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "tool_prompts",
@@ -23819,7 +25899,20 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "e58b8956e394230cf0b85252be5a8495435b5c8d8883680704984bbd22df4189"
+      "checksumSha256": "e58b8956e394230cf0b85252be5a8495435b5c8d8883680704984bbd22df4189",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "truncation_and_limits",
@@ -23829,7 +25922,20 @@
       "version": "2.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "03d180163e4a5783f2bd7eb216bc5fffbad2cf778011b54c545a466d5104cf06"
+      "checksumSha256": "d4049ff9caa9134133deb5a2fa137458c51d6cea51cbd1fd81a32745433f0b86",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
     },
     {
       "id": "ui_contracts",
@@ -23839,7 +25945,44 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "57de4bde81ea19bb358d01fee62f31300c2baa2966cc82f67a77d80dc857fb35"
+      "checksumSha256": "57de4bde81ea19bb358d01fee62f31300c2baa2966cc82f67a77d80dc857fb35",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
+    },
+    {
+      "id": "unused_bank_lifecycle",
+      "category": "manifest",
+      "path": "manifest/unused_bank_lifecycle.any.json",
+      "filename": "unused_bank_lifecycle.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "81c347cd7914cf26e33b3e6a268f20d78ad60c58916ff6b5e14748886c37b5c9",
+      "lastUpdated": "2026-02-27"
     },
     {
       "id": "versioning",
@@ -23868,6 +26011,110 @@
       "lastUpdated": "2026-01-25"
     },
     {
+      "id": "viewer_assistant_routing",
+      "category": "routing",
+      "path": "routing/viewer_assistant_routing.any.json",
+      "filename": "viewer_assistant_routing.any.json",
+      "version": "1.0.0",
+      "contentType": "routing",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "editing_routing",
+        "feature_flags"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "92fbb4bb25ab7fa5fa377ecd77749578c909ccfd85a1ba2644621fb3aa018d1a",
+      "lastUpdated": "2026-03-02"
+    },
+    {
+      "id": "viewer_locked_chat_policy",
+      "category": "policies",
+      "path": "policies/viewer_locked_chat_policy.any.json",
+      "filename": "viewer_locked_chat_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "viewer_assistant_routing",
+        "rag_policy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "e7433af14ed5f4072e461041a74962261421916986072534d68946ab0c49843f",
+      "lastUpdated": "2026-03-02"
+    },
+    {
+      "id": "viewer_source_navigation",
+      "category": "retrieval",
+      "path": "retrieval/viewer_source_navigation.any.json",
+      "filename": "viewer_source_navigation.any.json",
+      "version": "1.0.0",
+      "contentType": "retrieval",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "viewer_assistant_routing"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "109b518fd78680e66d55e179d3ad8c2a6e520440076ff9f0c9917efa4a7786fe",
+      "lastUpdated": "2026-03-02"
+    },
+    {
+      "id": "viewer_source_navigation_microcopy",
+      "category": "microcopy",
+      "path": "microcopy/viewer_source_navigation_microcopy.any.json",
+      "filename": "viewer_source_navigation_microcopy.any.json",
+      "version": "1.0.0",
+      "contentType": "microcopy",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "006997a7acfc2cc5de9bb40673ef2db5680247b681d289030b1a1687f87d3f3e",
+      "lastUpdated": "2026-03-02"
+    },
+    {
       "id": "wrong_doc_lock",
       "category": "quality",
       "path": "quality/document_intelligence/wrong_doc_lock.any.json",
@@ -23891,1122 +26138,6 @@
         "local": true
       },
       "checksumSha256": "0db69944f4611a4e8b98fda5ceb9bc13e5f0d1a22adefc35260c9a74c03a5145",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_abbreviations_en",
-      "category": "dictionaries",
-      "path": "document_intelligence/domains/ops/abbreviations/ops.en.any.json",
-      "filename": "ops.en.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "dc152376d17c1511a9424ae0c361de74426aed182667733c6024cc0510d32a10",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_abbreviations_pt",
-      "category": "dictionaries",
-      "path": "document_intelligence/domains/ops/abbreviations/ops.pt.any.json",
-      "filename": "ops.pt.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "f2ef3113a62fe2ef77fa3469f705852fd669642efdb77355922342ef08e63808",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_answer_style_bank",
-      "category": "formatting",
-      "path": "document_intelligence/domains/ops/answer_style_bank.any.json",
-      "filename": "answer_style_bank.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "c66f82a2f7725b7e6062cc7984919df1ee9ca288b8a5dd23f636a250a3d9c135",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_disclaimer_policy",
-      "category": "policies",
-      "path": "document_intelligence/domains/ops/disclaimer_policy.any.json",
-      "filename": "disclaimer_policy.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "ec2ab5ec4dc05ac67b96091f1da5de6b81c5a135b0e0336a99badcabc6efaf05",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_doc_type_catalog",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/doc_type_catalog.any.json",
-      "filename": "doc_type_catalog.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "28642ceea1e079ef44d0e126bc5c567f935fd32f9e9ceb38ccef596c63be28c2",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_extraction_ops_incident_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_incident_report.extraction_hints.any.json",
-      "filename": "ops_incident_report.extraction_hints.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "9d617a46700a727812facb9f068c07cd53ff6acf7bdab4403be0e6ce6e128b16",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_extraction_ops_maintenance_log",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_maintenance_log.extraction_hints.any.json",
-      "filename": "ops_maintenance_log.extraction_hints.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "08ae2a319c4d01e8d62f87d7f3ec6df094523f4569406e67acfa149419895ff3",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_extraction_ops_quality_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_quality_report.extraction_hints.any.json",
-      "filename": "ops_quality_report.extraction_hints.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "8a2e393f3be6add1b36a26682b082b9c72d253ccd57894edc8e3bac58aa4bec8",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_extraction_ops_shipping_manifest",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_shipping_manifest.extraction_hints.any.json",
-      "filename": "ops_shipping_manifest.extraction_hints.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "893e63efd78ec5b54137676b9a608d2095fd495c0324e48f9c2669b8bcbb19ff",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_extraction_ops_sla_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_sla_report.extraction_hints.any.json",
-      "filename": "ops_sla_report.extraction_hints.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "31e5c4e465e9c2e0138bb5d47757fe8ae14c693a084b97b779bf6c58353035a7",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_extraction_ops_work_order",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/extraction/ops_work_order.extraction_hints.any.json",
-      "filename": "ops_work_order.extraction_hints.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "e238bd8dcdec4d07ba6ab0533b42e01b4454b303be698c4cfd31c765d2979513",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_sections_ops_incident_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/sections/ops_incident_report.sections.any.json",
-      "filename": "ops_incident_report.sections.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "ce71f110f363c769aad6d2ba42c4e514d5a3c1f0abf8c0c8dd0b5a9029a766d1",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_sections_ops_maintenance_log",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/sections/ops_maintenance_log.sections.any.json",
-      "filename": "ops_maintenance_log.sections.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "f95e92cf66ccfd9aa9477759c6770d45b1470ff3b55adb9bc507b60d4de67a96",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_sections_ops_quality_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/sections/ops_quality_report.sections.any.json",
-      "filename": "ops_quality_report.sections.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "af6a7411ef02e7c67127deed384a7cf5c4b5e1ddcf4170f7338bb5d4047307fd",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_sections_ops_shipping_manifest",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/sections/ops_shipping_manifest.sections.any.json",
-      "filename": "ops_shipping_manifest.sections.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "7ca668f267a1afba53eb60189e877346e0e1131cfee21a7772f518f02f89a4e3",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_sections_ops_sla_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/sections/ops_sla_report.sections.any.json",
-      "filename": "ops_sla_report.sections.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "07b8bd966a5f1662a3e68cdb6e9a2d0c2eaec8a961e5c7f594472f147d757a98",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_sections_ops_work_order",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/sections/ops_work_order.sections.any.json",
-      "filename": "ops_work_order.sections.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "190cd32e42c294b79979fb7380a221fee8e0e8c4c6b9b992b754e0e7ad6b5e0d",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_tables_ops_incident_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/tables/ops_incident_report.tables.any.json",
-      "filename": "ops_incident_report.tables.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "cdd8ee5eb8c67bc63f159c5e299cd3f1f7cf5d224c381c1151c60c74a9612034",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_tables_ops_maintenance_log",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/tables/ops_maintenance_log.tables.any.json",
-      "filename": "ops_maintenance_log.tables.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "57352353eb10f119b1e7b8d596433d6217fd2a97d5875c6fcd7ac693a16a71d4",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_tables_ops_quality_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/tables/ops_quality_report.tables.any.json",
-      "filename": "ops_quality_report.tables.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "dd46607c6ce4702f4bbb91bc7b44daeff984511de7bf4f2693b4a698b3b3260a",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_tables_ops_shipping_manifest",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/tables/ops_shipping_manifest.tables.any.json",
-      "filename": "ops_shipping_manifest.tables.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "33019d68474e36715c731688fa1b9728871d262010c4d97ffb8f8efb396aa90b",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_tables_ops_sla_report",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/tables/ops_sla_report.tables.any.json",
-      "filename": "ops_sla_report.tables.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "0e1909591a8b503a27e2fdec9740e6f83813432fba5943eec1d3836c011acb46",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_tables_ops_work_order",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/doc_types/tables/ops_work_order.tables.any.json",
-      "filename": "ops_work_order.tables.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [
-        "di_ops_doc_type_catalog"
-      ],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "54d37fbf18f075f7c7d4e07e2d785e3363f661362a48b7f93a5e9698b6571731",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_domain_detection_rules",
-      "category": "routing",
-      "path": "document_intelligence/domains/ops/domain_detection_rules.any.json",
-      "filename": "domain_detection_rules.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "44eb4a9b2fd1550b22ac5a35ef2b5d77036b6c2cc38346a34b362b543f43a8bb",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_domain_profile",
-      "category": "semantics",
-      "path": "document_intelligence/domains/ops/domain_profile.any.json",
-      "filename": "domain_profile.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "d6ba85c744c4135d34235c13241c37b824bbe756847ac66f123faee80fd50049",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_evidence_requirements",
-      "category": "quality",
-      "path": "document_intelligence/domains/ops/evidence_requirements.any.json",
-      "filename": "evidence_requirements.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "2e787abc47b5c810b1d8ef4ee15d15c608d8eed110e3766ae90d6db132b56148",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_lexicon_en",
-      "category": "lexicons",
-      "path": "document_intelligence/domains/ops/lexicons/ops.en.any.json",
-      "filename": "ops.en.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "eb8142fc542322d3bce0b441196b3ded52cf404bc9b0ea0f6b4ae070b8656652",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_lexicon_pt",
-      "category": "lexicons",
-      "path": "document_intelligence/domains/ops/lexicons/ops.pt.any.json",
-      "filename": "ops.pt.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "5a8eab7bf30e18b5c7c8e5888e29bbfb4ea10b243961b7f6758ed48a148eea3e",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_reasoning_scaffolds",
-      "category": "policies",
-      "path": "document_intelligence/domains/ops/reasoning_scaffolds.any.json",
-      "filename": "reasoning_scaffolds.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "52d0c000e389cf77cf7e9417f80b9ba73a7e008d78cda3867d5acf9bbeece80e",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_redaction_and_safety_rules",
-      "category": "policies",
-      "path": "document_intelligence/domains/ops/redaction_and_safety_rules.any.json",
-      "filename": "redaction_and_safety_rules.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "a9b86cca2e62b81c0db226d0d501dbeb511ceb0f4d075abd515610a8a982e757",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_retrieval_strategies",
-      "category": "retrieval",
-      "path": "document_intelligence/domains/ops/retrieval_strategies.any.json",
-      "filename": "retrieval_strategies.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "cc741b622af65ed9dafcceed99540ff924166ea6da39669e27dec1b37ddd5b31",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "di_ops_validation_policies",
-      "category": "quality",
-      "path": "document_intelligence/domains/ops/validation_policies.any.json",
-      "filename": "validation_policies.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "39d8a306b0c3a328baf34d7b4c7a7a2646feda3ed5a5d33e32c245058ec867fc",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "citation_styles",
-      "category": "semantics",
-      "path": "formatting/citation_styles.any.json",
-      "filename": "citation_styles.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "c7f3dc7ceac1c7dd269abf6690e6aee6903e78d751df2b8a9954a4a7091561cb",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "list_styles",
-      "category": "semantics",
-      "path": "formatting/list_styles.any.json",
-      "filename": "list_styles.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "ad4160c043e7d542b8f990bea449482837393da82083f3ffe21074b6372296f4",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "quote_styles",
-      "category": "semantics",
-      "path": "formatting/quote_styles.any.json",
-      "filename": "quote_styles.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "8935ff721f94b39289de9b0db3bdc3f7775860bdf68c92ca6be568e6029986c4",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "table_styles",
-      "category": "semantics",
-      "path": "formatting/table_styles.any.json",
-      "filename": "table_styles.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "0a8b8a47de12d9c8a02005e430c881b079400e7fb0d7cf8034d6829f131a0a88",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "unused_bank_lifecycle",
-      "category": "manifest",
-      "path": "manifest/unused_bank_lifecycle.any.json",
-      "filename": "unused_bank_lifecycle.any.json",
-      "version": "1.1.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "81c347cd7914cf26e33b3e6a268f20d78ad60c58916ff6b5e14748886c37b5c9",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "compliance_policy",
-      "category": "semantics",
-      "path": "policies/compliance_policy.any.json",
-      "filename": "compliance_policy.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "d7dff2c2452c4d95dbf60ab7d2a72c89ef734450bb46bf464aef671d21c18900",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "logging_policy",
-      "category": "semantics",
-      "path": "policies/logging_policy.any.json",
-      "filename": "logging_policy.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "7b4bcf816bf21f8f09d7ec3232dcb648ff5c68934d1be028d628f423a995f559",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "rate_limit_policy",
-      "category": "semantics",
-      "path": "policies/rate_limit_policy.any.json",
-      "filename": "rate_limit_policy.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "fa7be0568c71af7fcb407adc8b7fcf9b40d78db5224ff84090218cd251d764fb",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "dedupe_and_repetition",
-      "category": "semantics",
-      "path": "quality/dedupe_and_repetition.any.json",
-      "filename": "dedupe_and_repetition.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "9a4441a778e5e59313859e6411288074dc3b8d0a6a4a7e8288328501c3a81be1",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "doc_grounding_checks",
-      "category": "semantics",
-      "path": "quality/doc_grounding_checks.any.json",
-      "filename": "doc_grounding_checks.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "8d938169eedbeec132b5b708c50bcc10ebd4724bb6080356ed9f69eb0a50c40e",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "hallucination_guards",
-      "category": "semantics",
-      "path": "quality/hallucination_guards.any.json",
-      "filename": "hallucination_guards.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "81d39c47705001b28bf88625f844b469d086a525cd5ecd02789fa44c4ff91ac3",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "pii_field_labels",
-      "category": "semantics",
-      "path": "quality/pii_field_labels.any.json",
-      "filename": "pii_field_labels.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "ecadc8637dd383f8683b73ebabffc60d0089e56c91f4ae22c7a21308c8a31829",
-      "lastUpdated": "2026-02-27"
-    },
-    {
-      "id": "privacy_minimal_rules",
-      "category": "semantics",
-      "path": "quality/privacy_minimal_rules.any.json",
-      "filename": "privacy_minimal_rules.any.json",
-      "version": "1.0.0",
-      "contentType": "json",
-      "schemaId": "bank_schema",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "0c68d629b054f621dcf3cfabe8998fd456d0eed5dd595d1dec7e3b165d894391",
       "lastUpdated": "2026-02-27"
     }
   ],

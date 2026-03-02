@@ -1,105 +1,145 @@
 # Certification Summary
 
-- Generated: 2026-02-28T18:06:33.320Z
-- Passed: yes
-- Passed gates: 16/16
+- Generated: 2026-03-02T20:04:44.363Z
+- Strict mode: yes
+- Auto refresh: yes
+- Commit hash: a07e8dc474d35008af818b6115dcc7dce440442b
+- Passed: no
+- Passed gates: 18/19
 
-| Gate | Passed | Failures |
-|---|---:|---:|
-| wrong-doc | yes | 0 |
-| truncation | yes | 0 |
-| persistence-restart | yes | 0 |
-| editing-roundtrip | yes | 0 |
-| editing-capabilities | yes | 0 |
-| editing-eval-suite | yes | 0 |
-| editing-slo | yes | 0 |
-| runtime-wiring | yes | 0 |
-| enforcer-failclosed | yes | 0 |
-| evidence-fidelity | yes | 0 |
-| provenance-strictness | yes | 0 |
-| prompt-mode-coverage | yes | 0 |
-| turn-debug-packet | yes | 0 |
-| security-auth | yes | 0 |
-| observability-integrity | yes | 0 |
-| retrieval-behavioral | yes | 0 |
+| Gate | Passed | Fresh | Failures |
+|---|---:|---:|---:|
+| wrong-doc | yes | yes | 0 |
+| truncation | yes | yes | 0 |
+| persistence-restart | yes | yes | 0 |
+| editing-roundtrip | yes | yes | 0 |
+| editing-capabilities | yes | yes | 0 |
+| editing-eval-suite | yes | yes | 0 |
+| editing-slo | yes | yes | 0 |
+| runtime-wiring | yes | yes | 0 |
+| enforcer-failclosed | yes | yes | 0 |
+| evidence-fidelity | yes | yes | 0 |
+| provenance-strictness | yes | yes | 0 |
+| prompt-mode-coverage | yes | yes | 0 |
+| builder-payload-budget | yes | yes | 0 |
+| gateway-json-routing | yes | yes | 0 |
+| query-latency | no | yes | 1 |
+| turn-debug-packet | yes | yes | 0 |
+| security-auth | yes | yes | 0 |
+| observability-integrity | yes | yes | 0 |
+| retrieval-behavioral | yes | yes | 0 |
 
 ## wrong-doc
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"totalCases":120,"outOfScopeCases":0,"wrongDocRate":0,"emptyEvidenceCases":0,"emptyEvidenceRate":0,"multiDocsetCases":30,"multiDocsetOutOfScopeCases":0,"multiDocsetWrongDocRate":0}`
 
 ## truncation
 - Passed: yes
+- Freshness: fresh
 - Failures: none
-- Metrics: `{"estimatedTokens":2098,"hardLimit":4320,"rowLines":122,"blocked":false,"hasOverlongDashRun":false}`
+- Metrics: `{"estimatedTokens":1041,"hardLimit":2525,"rowLines":62,"blocked":false,"hasOverlongDashRun":false}`
 
 ## persistence-restart
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"durableTokenVault":true,"prismaNoopFallbackDetected":false,"chatRepoDurable":true,"messageSchemaComplete":true,"documentRevisionDurable":true,"conversationKeyWrapped":true,"paginationDeterministic":true,"failureCount":0}`
 
 ## editing-roundtrip
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"failures":0,"docxRestored":true,"xlsxRestored":true}`
 
 ## editing-capabilities
 - Passed: yes
+- Freshness: fresh
 - Failures: none
-- Metrics: `{"totalRows":78,"supportedRows":72,"unsupportedRows":6,"docxRows":36,"xlsxRows":42,"versionHash":"09848adea0d70de69e1ab2e67df9393047fd2dded016382e15b51de7c3e15151"}`
+- Metrics: `{"totalRows":119,"supportedRows":115,"unsupportedRows":4,"docxRows":36,"xlsxRows":42,"versionHash":"4676304ccc7aebd2428c3232ecdd0c622b9a850617c9a4e1ed38d9006e6b6229"}`
 
 ## editing-eval-suite
 - Passed: yes
+- Freshness: fresh
 - Failures: none
-- Metrics: `{"docxTotal":256,"docxPassed":256,"docxPassRate":1,"docxPlanP95Ms":0,"xlsxTotal":328,"xlsxPassed":328,"xlsxPassRate":1,"xlsxPlanP95Ms":0,"adversarialTotal":192,"adversarialPassed":192,"adversarialPassRate":1,"adversarialP95Ms":0}`
+- Metrics: `{"docxTotal":264,"docxPassed":264,"docxPassRate":1,"docxPlanP95Ms":0,"xlsxTotal":336,"xlsxPassed":336,"xlsxPassRate":1,"xlsxPlanP95Ms":0,"pyTotal":328,"pyPassed":328,"pyPassRate":1,"pyPlanP95Ms":0,"adversarialTotal":252,"adversarialPassed":252,"adversarialPassRate":1,"adversarialP95Ms":0}`
 
 ## editing-slo
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"profile":"balanced","docxPassRate":1,"xlsxPassRate":1,"adversarialPassRate":1,"docxPlanP95Ms":0,"xlsxPlanP95Ms":0}`
 
 ## runtime-wiring
 - Passed: yes
+- Freshness: fresh
 - Failures: none
-- Metrics: `{"commandStatus":0,"reachableFiles":410,"reachableRuntimeFiles":381,"runtimeCoverage":1,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
+- Metrics: `{"commandStatus":0,"reachableFiles":421,"reachableRuntimeFiles":392,"runtimeCoverage":0.9975,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
 
 ## enforcer-failclosed
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"failureCode":"enforcer_runtime_error","outputChanged":true,"hasWarning":true}`
 
 ## evidence-fidelity
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"missingMapBlocked":true,"missingMapReasonCode":"missing_evidence_map","hashMismatchBlocked":true,"hashMismatchReasonCode":"evidence_map_hash_mismatch","validMapPasses":true}`
 
 ## provenance-strictness
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"weakOverlapBlocked":true,"strongOverlapAccepted":true}`
 
 ## prompt-mode-coverage
 - Passed: yes
+- Freshness: fresh
 - Failures: none
-- Metrics: `{"coveredModes":8,"totalModes":8}`
+- Metrics: `{"coveredModes":11,"totalModes":11}`
+
+## builder-payload-budget
+- Passed: yes
+- Freshness: fresh
+- Failures: none
+- Metrics: `{"estimatedPromptTokens":2291,"evidenceItemsIncluded":6,"userPayloadChars":9134}`
+
+## gateway-json-routing
+- Passed: yes
+- Freshness: fresh
+- Failures: none
+- Metrics: `{"task_plan_generationTemplateCount":1,"task_plan_generationMachineJsonCount":1,"editing_task_promptsTemplateCount":16,"editing_task_promptsMachineJsonCount":6}`
+
+## query-latency
+- Passed: no
+- Freshness: fresh
+- Failures: P95_LATENCY_EXCEEDED
+- Metrics: `{"reportPath":"/Users/pg/Desktop/koda-webapp/frontend/e2e/reports/latest/per_query.json","totalQueries":50,"p95LatencyMs":24218,"runtimeErrorCount":0,"qualityFailCount":50,"errorRate":0,"timeoutRate":0,"qualityFailRate":1}`
 
 ## turn-debug-packet
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"hasPacket":true,"docScopeMode":"docset","allowedDocumentIdsCount":2,"retrievalCandidates":12,"retrievalSelected":2,"hasEvidenceMapHash":true,"hasTokenBudget":true}`
 
 ## security-auth
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"missingTokenRejected":true,"forgedHeaderRejected":true,"forgedHeaderDidNotSetUser":true,"headerTrustPathPresent":false,"jwtVerificationUsed":true,"expiredTokenRejected":true,"revokedSessionRejected":true,"tokenVersionMismatchRejected":true,"crossUserSessionRejected":true,"unguardedDevCodeLogging":false,"unmaskedPhoneLogging":false,"plaintextWritePathCount":0}`
 
 ## observability-integrity
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"requiredStepCount":6,"traceTypeMissingCount":0,"delegateSpanMissingCount":0,"strictModeWiringPresent":true}`
 
 ## retrieval-behavioral
 - Passed: yes
+- Freshness: fresh
 - Failures: none
 - Metrics: `{"totalCases":120,"wrongDocCount":0,"wrongDocRate":0,"missCount":0,"missRate":0,"passCount":120,"passRate":1}`
 

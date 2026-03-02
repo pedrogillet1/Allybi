@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "document_intelligence_bank_map",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "description": "Canonical map of all document-intelligence banks, required coverage, and domain/operator matrix.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true,
@@ -143,6 +143,9 @@
     "wrong_doc_lock",
     "source_policy",
     "ambiguity_questions",
+    "query_rewrites_accounting",
+    "boost_rules_accounting",
+    "section_priority_accounting",
     "query_rewrites_finance",
     "boost_rules_finance",
     "section_priority_finance",
@@ -348,6 +351,9 @@
       "ambiguity_questions"
     ],
     "retrieval": [
+      "query_rewrites_accounting",
+      "boost_rules_accounting",
+      "section_priority_accounting",
       "query_rewrites_finance",
       "boost_rules_finance",
       "section_priority_finance",

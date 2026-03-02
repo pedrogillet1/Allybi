@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { getOptionalBank } from "../banks/bankLoader.service";
 
 export type ReasoningGuidance = {
@@ -31,24 +29,25 @@ export class ReasoningPolicyService {
     answerMode?: string | null;
     outputLanguage?: string | null;
   }): ReasoningGuidance {
-    const assumptionPolicy = getOptionalBank<any>("assumption_policy");
+    const assumptionPolicy = getOptionalBank<Record<string, unknown>>("assumption_policy");
+    const apConfig = assumptionPolicy?.config as Record<string, unknown> | undefined;
     const assumptionsLimit = clampInt(
-      assumptionPolicy?.config?.maxAssumptionsPerAnswer,
+      apConfig?.maxAssumptionsPerAnswer,
       2,
     );
 
     const domain = normalizeDomain(input.domain);
     const decisionSupport = domain
-      ? getOptionalBank<any>(`decision_support_${domain}`)
+      ? getOptionalBank<Record<string, unknown>>(`decision_support_${domain}`)
       : null;
     const explainStyle = domain
-      ? getOptionalBank<any>(`explain_style_${domain}`)
+      ? getOptionalBank<Record<string, unknown>>(`explain_style_${domain}`)
       : null;
 
     const lines: string[] = [];
     lines.push(`- Maximum explicit assumptions: ${assumptionsLimit}.`);
 
-    const framework = decisionSupport?.framework;
+    const framework = decisionSupport?.framework as Record<string, unknown> | undefined;
     if (framework?.requireOptions) lines.push("- Provide at least 2 options when recommending a decision.");
     if (framework?.requireRiskTradeoffs) lines.push("- Include explicit risk tradeoffs.");
     if (framework?.requireEvidenceSummary) lines.push("- Include a concise evidence-bounded summary.");
@@ -58,7 +57,7 @@ export class ReasoningPolicyService {
       lines.push("- Include what evidence would change the recommendation.");
 
     const template = Array.isArray(explainStyle?.templates)
-      ? explainStyle.templates.find((item: any) => {
+      ? (explainStyle.templates as Array<Record<string, unknown>>).find((item: Record<string, unknown>) => {
           const depth = String(item?.depth || "").trim().toLowerCase();
           const language = String(item?.language || "").trim().toLowerCase();
           const requested = String(input.outputLanguage || "en")

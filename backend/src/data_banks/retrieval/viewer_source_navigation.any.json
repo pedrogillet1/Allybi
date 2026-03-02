@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "id": "viewer_source_navigation",
+    "version": "1.0.0",
+    "description": "Location parsing and navigation behavior for source pills/citations in document viewer mode.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-02",
+    "owner": "allybi-viewer"
+  },
+  "config": {
+    "enabled": true,
+    "preferStructuredLocation": true,
+    "allowSnippetFallback": true
+  },
+  "locationResolvers": {
+    "priorityOrder": [
+      "page",
+      "slide",
+      "sheet+cell",
+      "section",
+      "locationKey",
+      "snippet"
+    ],
+    "pdf": {
+      "primary": ["page", "locationKey:p"],
+      "fallback": ["snippet"]
+    },
+    "powerpoint": {
+      "primary": ["slide", "locationKey:slide", "locationKey:p"],
+      "fallback": ["snippet"]
+    },
+    "excel": {
+      "primary": ["sheet+cell", "sheet+section", "locationKey"],
+      "fallback": ["snippet"]
+    },
+    "word": {
+      "primary": ["section", "locationKey:section", "locationKey:paragraph"],
+      "fallback": ["snippet"]
+    }
+  },
+  "animation": {
+    "pdf": {
+      "scrollBehavior": "smooth",
+      "block": "center",
+      "spotlightMs": 1600
+    },
+    "powerpoint": {
+      "transition": "slide_jump",
+      "durationMs": 240
+    },
+    "excel": {
+      "scrollBehavior": "smooth",
+      "block": "center",
+      "inline": "center"
+    },
+    "word": {
+      "scrollBehavior": "smooth",
+      "block": "center"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "VSN_0001_pdf_page_resolution",
+        "assert": "pdf source with page or locationKey:p resolves to pendingPdfScrollPage"
+      },
+      {
+        "id": "VSN_0002_excel_cell_resolution",
+        "assert": "excel source with sheet+cell yields selectionHint domain=sheets"
+      },
+      {
+        "id": "VSN_0003_docx_snippet_fallback",
+        "assert": "docx source without section/locationKey may resolve via snippet search"
+      }
+    ]
+  }
+}

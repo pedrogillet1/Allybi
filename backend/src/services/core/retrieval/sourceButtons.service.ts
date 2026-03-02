@@ -14,6 +14,8 @@
  * - Doc-grounded intents: content + source_buttons attachment
  * - File actions: NO content, ONLY source_buttons attachment
  */
+import { getOptionalBank } from "../banks/bankLoader.service";
+
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -44,6 +46,8 @@ export interface SourceButton {
     value: string | number;
     label?: string; // e.g., "Page 3", "Sheet: Q4 2024"
   };
+  locationKey?: string;
+  snippet?: string;
 }
 
 /**
@@ -102,7 +106,26 @@ export interface RawSource {
   cellReference?: string;
   slideNumber?: number;
   sectionTitle?: string;
+  locationKey?: string;
+  locationLabel?: string;
+  snippet?: string;
   score?: number; // relevance score for sorting
+}
+
+type SourceButtonsLanguage = "en" | "pt" | "es";
+
+interface SourceEngineDataBank {
+  sourceButtons?: {
+    qaMaxButtons?: number;
+    fileActionMaxButtons?: number;
+    fileListMaxButtons?: number;
+    seeAllLabels?: Partial<Record<SourceButtonsLanguage, string>>;
+  };
+  sourceFiltering?: {
+    citationRules?: {
+      maxCitations?: number;
+    };
+  };
 }
 
 // =============================================================================
@@ -123,6 +146,30 @@ const MAX_FILE_LIST_BUTTONS = 10;
 // =============================================================================
 
 export class SourceButtonsService {
+  private readonly sourceEngineBank =
+    getOptionalBank<SourceEngineDataBank>("source_engine");
+
+  getDefaultMaxButtons(context: "qa" | "file_action" | "file_list"): number {
+    if (context === "file_action") {
+      return (
+        this.toPositiveInt(this.sourceEngineBank?.sourceButtons?.fileActionMaxButtons) ??
+        MAX_SOURCE_BUTTONS_FILE_ACTION
+      );
+    }
+    if (context === "file_list") {
+      return (
+        this.toPositiveInt(this.sourceEngineBank?.sourceButtons?.fileListMaxButtons) ??
+        MAX_FILE_LIST_BUTTONS
+      );
+    }
+    return (
+      this.toPositiveInt(
+        this.sourceEngineBank?.sourceButtons?.qaMaxButtons ??
+          this.sourceEngineBank?.sourceFiltering?.citationRules?.maxCitations,
+      ) ?? MAX_SOURCE_BUTTONS_QA
+    );
+  }
+
   /**
    * Build source buttons attachment from raw sources.
    * This is THE central function for all source generation.
@@ -139,22 +186,23 @@ export class SourceButtonsService {
       /** Context: 'qa' for document QA, 'file_action' for file operations */
       context?: "qa" | "file_action";
       /** Language for labels */
-      language?: "en" | "pt" | "es";
+      language?: SourceButtonsLanguage;
     } = {},
   ): SourceButtonsAttachment | null {
-    const {
-      maxButtons = options.context === "file_action"
-        ? MAX_SOURCE_BUTTONS_FILE_ACTION
-        : MAX_SOURCE_BUTTONS_QA,
-      language = "en",
-    } = options;
+    const context = options.context || "qa";
+    const maxButtons =
+      this.toPositiveInt(options.maxButtons) ||
+      this.getDefaultMaxButtons(
+        context === "file_action" ? "file_action" : "qa",
+      );
+    const language = options.language || "en";
 
     if (!sources || sources.length === 0) {
       return null;
     }
 
-    // 1. Dedupe by documentId (keep highest scoring if duplicates)
-    const deduped = this.dedupeByDocumentId(sources);
+    // 1. Dedupe by documentId + location (keep highest scoring if duplicates)
+    const deduped = this.dedupeByDocumentAndLocation(sources);
 
     // 2. Sort by relevance score (if available)
     const sorted = deduped.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
@@ -184,10 +232,11 @@ export class SourceButtonsService {
   buildFileListAttachment(
     files: Array<{ id: string; filename: string; mimeType?: string }>,
     totalCount: number,
-    language: "en" | "pt" | "es" = "en",
+    language: SourceButtonsLanguage = "en",
   ): FileListAttachment {
-    const displayFiles = files.slice(0, MAX_FILE_LIST_BUTTONS);
-    const hasMore = totalCount > MAX_FILE_LIST_BUTTONS;
+    const maxButtons = this.getDefaultMaxButtons("file_list");
+    const displayFiles = files.slice(0, maxButtons);
+    const hasMore = totalCount > maxButtons;
 
     const buttons: SourceButton[] = displayFiles.map((f) => ({
       documentId: f.id,
@@ -195,20 +244,25 @@ export class SourceButtonsService {
       mimeType: f.mimeType,
     }));
 
-    const seeAllLabels: Record<string, string> = {
+    const fallbackSeeAllLabels: Record<SourceButtonsLanguage, string> = {
       en: "See all",
       pt: "Ver todos",
       es: "Ver todos",
     };
+    const bankSeeAllLabels = this.sourceEngineBank?.sourceButtons?.seeAllLabels;
 
     return {
       type: "file_list",
       buttons,
       ...(hasMore && {
         seeAll: {
-          label: seeAllLabels[language] || seeAllLabels.en,
+          label:
+            bankSeeAllLabels?.[language] ||
+            bankSeeAllLabels?.en ||
+            fallbackSeeAllLabels[language] ||
+            fallbackSeeAllLabels.en,
           totalCount,
-          remainingCount: totalCount - MAX_FILE_LIST_BUTTONS,
+          remainingCount: totalCount - maxButtons,
         },
       }),
     };
@@ -243,6 +297,8 @@ export class SourceButtonsService {
   buildFromChunks(
     chunks: Array<{
       documentId?: string;
+      locationKey?: string;
+      snippet?: string;
       metadata?: {
         documentId?: string;
         filename?: string;
@@ -251,11 +307,16 @@ export class SourceButtonsService {
         folderSegments?: string[];
         pageNumber?: number;
         sheetName?: string;
+        cellReference?: string;
         slideNumber?: number;
+        sectionTitle?: string;
+        locationKey?: string;
+        locationLabel?: string;
+        snippet?: string;
       };
       score?: number;
     }>,
-    language: "en" | "pt" | "es" = "en",
+    language: SourceButtonsLanguage = "en",
   ): SourceButtonsAttachment | null {
     const fallbackTitle = (documentId: string): string =>
       `Document ${String(documentId || "").slice(0, 8)}`;
@@ -273,7 +334,15 @@ export class SourceButtonsService {
           folderSegments: chunk.metadata?.folderSegments,
           pageNumber: chunk.metadata?.pageNumber,
           sheetName: chunk.metadata?.sheetName,
+          cellReference: chunk.metadata?.cellReference,
           slideNumber: chunk.metadata?.slideNumber,
+          sectionTitle: chunk.metadata?.sectionTitle,
+          locationKey:
+            chunk.locationKey ||
+            chunk.metadata?.locationKey ||
+            undefined,
+          locationLabel: chunk.metadata?.locationLabel,
+          snippet: chunk.snippet || chunk.metadata?.snippet,
           score: chunk.score,
         };
       });
@@ -288,13 +357,23 @@ export class SourceButtonsService {
   /**
    * Dedupe sources by documentId, keeping highest score.
    */
-  private dedupeByDocumentId(sources: RawSource[]): RawSource[] {
+  private dedupeByDocumentAndLocation(sources: RawSource[]): RawSource[] {
     const seen = new Map<string, RawSource>();
 
     for (const source of sources) {
-      const existing = seen.get(source.documentId);
+      const locationKey = String(source.locationKey || "").trim().toLowerCase();
+      const locationFingerprint = [
+        locationKey,
+        source.pageNumber ?? "",
+        source.slideNumber ?? "",
+        String(source.sheetName || "").trim().toLowerCase(),
+        String(source.cellReference || "").trim().toLowerCase(),
+        String(source.sectionTitle || "").trim().toLowerCase(),
+      ].join("|");
+      const dedupeKey = `${source.documentId}|${locationFingerprint}`;
+      const existing = seen.get(dedupeKey);
       if (!existing || (source.score ?? 0) > (existing.score ?? 0)) {
-        seen.set(source.documentId, source);
+        seen.set(dedupeKey, source);
       }
     }
 
@@ -311,6 +390,8 @@ export class SourceButtonsService {
       mimeType: source.mimeType,
       folderPath: source.folderPath,
       folderSegments: source.folderSegments,
+      locationKey: source.locationKey,
+      snippet: source.snippet,
     };
 
     // Add location if available
@@ -318,35 +399,42 @@ export class SourceButtonsService {
       button.location = {
         type: "page",
         value: source.pageNumber,
-        label: `Page ${source.pageNumber}`,
+        label: source.locationLabel || `Page ${source.pageNumber}`,
       };
     } else if (source.slideNumber) {
       button.location = {
         type: "slide",
         value: source.slideNumber,
-        label: `Slide ${source.slideNumber}`,
-      };
-    } else if (source.sheetName) {
-      button.location = {
-        type: "sheet",
-        value: source.sheetName,
-        label: source.sheetName,
+        label: source.locationLabel || `Slide ${source.slideNumber}`,
       };
     } else if (source.cellReference) {
       button.location = {
         type: "cell",
         value: source.cellReference,
-        label: source.cellReference,
+        label: source.locationLabel || source.cellReference,
+      };
+    } else if (source.sheetName) {
+      button.location = {
+        type: "sheet",
+        value: source.sheetName,
+        label: source.locationLabel || source.sheetName,
       };
     } else if (source.sectionTitle) {
       button.location = {
         type: "section",
         value: source.sectionTitle,
-        label: source.sectionTitle,
+        label: source.locationLabel || source.sectionTitle,
       };
     }
 
     return button;
+  }
+
+  private toPositiveInt(value: unknown): number | null {
+    if (typeof value !== "number" || !Number.isFinite(value)) return null;
+    const normalized = Math.floor(value);
+    if (normalized <= 0) return null;
+    return normalized;
   }
 }
 
@@ -423,7 +511,7 @@ export interface StandardResponse {
 export function buildDocGroundedResponse(
   content: string,
   sources: RawSource[],
-  language: "en" | "pt" | "es" = "en",
+  language: SourceButtonsLanguage = "en",
 ): StandardResponse {
   const service = getSourceButtonsService();
   const sourceButtons = service.buildSourceButtons(sources, {
@@ -446,14 +534,15 @@ export function buildDocGroundedResponse(
  */
 export function buildFileActionResponse(
   files: Array<{ id: string; filename: string; mimeType?: string }>,
-  _language: "en" | "pt" | "es" = "en",
+  _language: SourceButtonsLanguage = "en",
 ): StandardResponse {
   const service = getSourceButtonsService();
+  const maxButtons = service.getDefaultMaxButtons("file_action");
 
   // For single file: use source_buttons
   // For multiple files: use source_buttons with multiple items
   const buttons: SourceButton[] = files
-    .slice(0, MAX_SOURCE_BUTTONS_FILE_ACTION)
+    .slice(0, maxButtons)
     .map((f) => ({
       documentId: f.id,
       title: f.filename,
@@ -482,7 +571,7 @@ export function buildFileListResponse(
   files: Array<{ id: string; filename: string; mimeType?: string }>,
   totalCount: number,
   introText: string = "",
-  language: "en" | "pt" | "es" = "en",
+  language: SourceButtonsLanguage = "en",
 ): StandardResponse {
   const service = getSourceButtonsService();
   const fileList = service.buildFileListAttachment(files, totalCount, language);

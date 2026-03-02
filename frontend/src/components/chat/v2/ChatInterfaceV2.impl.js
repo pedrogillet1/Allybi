@@ -42,6 +42,7 @@ import MessageActions from "../messages/MessageActions";
 import useStageLabel from "../messages/useStageLabel";
 import FollowUpChips from "../followups/FollowUpChips";
 import StreamingWelcomeMessage from "../streaming/StreamingWelcomeMessage";
+import { ANSWER_TIMING } from "../streaming/timing";
 import KeyboardShortcutsModal from "../../shared/KeyboardShortcutsModal";
 import kodaIconBlack from "../../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../../assets/koda-animation-final.mp4";
@@ -70,6 +71,27 @@ import "./styles/chatV2.css";
 
 const kodaIcon = "/allybi-icon.svg";
 
+function resolveChatBooleanFlag(raw, defaultValue) {
+  const value = String(raw || "").trim().toLowerCase();
+  if (!value) return defaultValue;
+  if (["1", "true", "yes", "on"].includes(value)) return true;
+  if (["0", "false", "no", "off"].includes(value)) return false;
+  return defaultValue;
+}
+
+const CHAT_WARNING_SURFACE_ENABLED = (() => {
+  if (
+    typeof window !== "undefined" &&
+    typeof window.__KODA_CHAT_WARNING_SURFACE_ENABLED__ === "boolean"
+  ) {
+    return window.__KODA_CHAT_WARNING_SURFACE_ENABLED__;
+  }
+  return resolveChatBooleanFlag(
+    process.env.REACT_APP_CHAT_WARNING_SURFACE_ENABLED,
+    true,
+  );
+})();
+
 /**
  * ChatInterface.jsx (ChatGPT-parity, cleaned)
  * ------------------------------------------
@@ -96,14 +118,6 @@ const kodaIcon = "/allybi-icon.svg";
  *
  * If your backend currently uses /api/rag/query/stream, set ENDPOINT below.
  */
-
-// Streaming cadence (frontend smoothing)
-const STREAM = {
-  FLUSH_INTERVAL_MS: 33, // ~30fps
-  TARGET_CHARS_PER_SEC: 75,
-  MAX_CHARS_PER_FLUSH: 12,
-  RAMP_MS: 350,
-};
 
 const CONNECTOR_OPTIONS = [
   { provider: "gmail", label: "Gmail", family: "email", icon: gmailSvg },
@@ -412,6 +426,75 @@ function stripSlidesDeckBoilerplate(text) {
     return true;
   });
   return filtered.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function normalizeWarningEntries(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const code = String(entry.code || "").trim();
+      const message = String(entry.message || "").trim();
+      if (!code && !message) return null;
+      return {
+        code: code || null,
+        message: message || null,
+        severity: String(entry.severity || "warning").trim().toLowerCase(),
+      };
+    })
+    .filter(Boolean);
+}
+
+function mapFailureCodeToWarningMessage(code) {
+  const normalized = String(code || "").trim().toLowerCase();
+  if (!normalized || normalized === "none") return null;
+  if (normalized === "quality_gate_blocked" || normalized === "quality_gate_runner_error") {
+    return "Not all quality checks passed. Please verify key points against the sources.";
+  }
+  if (normalized === "missing_provenance" || normalized === "insufficient_provenance_coverage") {
+    return "Parts of this answer may be missing full source traceability.";
+  }
+  if (normalized === "table_contract_violation") {
+    return "This response may contain table formatting issues.";
+  }
+  if (normalized === "language_contract_mismatch") {
+    return "I could not safely finalize in the requested language.";
+  }
+  if (normalized === "enforcer_runtime_error") {
+    return "I could not apply all final validations. Please review critical details.";
+  }
+  return "Some validations did not fully complete. Please review important details.";
+}
+
+function deriveRenderableWarning(message) {
+  if (!message || typeof message !== "object") return null;
+  const userWarning =
+    message.userWarning && typeof message.userWarning === "object"
+      ? message.userWarning
+      : null;
+  if (userWarning) {
+    const warningText = String(userWarning.message || "").trim();
+    if (warningText) {
+      return {
+        code: String(userWarning.code || "").trim() || null,
+        message: warningText,
+      };
+    }
+  }
+  const warnings = normalizeWarningEntries(message.warnings);
+  if (warnings.length > 0 && warnings[0]?.message) {
+    return {
+      code: warnings[0].code,
+      message: warnings[0].message,
+    };
+  }
+  const fallbackCode = String(message.failureCode || "").trim();
+  const fallbackMessage = mapFailureCodeToWarningMessage(fallbackCode);
+  if (!fallbackMessage) return null;
+  return {
+    code: fallbackCode || null,
+    message: fallbackMessage,
+  };
 }
 
 /** Clean source filename for display */
@@ -1441,6 +1524,8 @@ export default function ChatInterface({
   viewerDraftApproval = null,
   viewerSelection = null,
   viewerContext = null,
+  viewerIntent = "qa_locked",
+  onViewerSourceNavigate = null,
   onClearViewerSelection,
   focusNonce = 0,
   apiRef,
@@ -1580,6 +1665,10 @@ export default function ChatInterface({
   const clearViewerSelectionWithCache = useCallback(() => {
     lastViewerSelectionRef.current = { selection: null, at: 0 };
     try { onClearViewerSelection?.(); } catch {}
+    // Defensive second clear: viewer/canvas selection events can re-emit briefly.
+    window.setTimeout(() => {
+      try { onClearViewerSelection?.(); } catch {}
+    }, 120);
   }, [onClearViewerSelection]);
 
   const getViewerSelectionForSend = useCallback(() => {
@@ -1657,6 +1746,7 @@ export default function ChatInterface({
         onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          clearViewerSelectionWithCache();
         }}
         onClick={() => {
           clearViewerSelectionWithCache();
@@ -2187,6 +2277,19 @@ export default function ChatInterface({
   const streamStartRef = useRef(0);
   const streamLastFlushRef = useRef(0);
   const rafRef = useRef(null);
+  const streamFlushStatsRef = useRef({ flushCount: 0, flushIntervalTotalMs: 0, charsFlushed: 0 });
+  const stageFallbackCountRef = useRef(0);
+
+  const publishTimingDebug = useCallback((patch = {}) => {
+    if (process.env.NODE_ENV === "production" || typeof window === "undefined") return;
+    const current = (window.__KODA_DEBUG_TIMING__ && typeof window.__KODA_DEBUG_TIMING__ === "object")
+      ? window.__KODA_DEBUG_TIMING__
+      : {};
+    window.__KODA_DEBUG_TIMING__ = {
+      ...current,
+      ...patch,
+    };
+  }, []);
 
   // Prevent unnecessary reload clearing (hot reload / same id)
   const prevConversationIdRef = useRef(null);
@@ -2364,6 +2467,13 @@ export default function ChatInterface({
             answerMode: m.answerMode || meta.answerMode || "general_answer",
             answerClass: m.answerClass || meta.answerClass || null,
             navType: m.navType || meta.navType || null,
+            failureCode: m.failureCode || meta.failureCode || null,
+            userWarning: m.userWarning || meta.userWarning || null,
+            warnings: Array.isArray(m.warnings)
+              ? m.warnings
+              : Array.isArray(meta.warnings)
+                ? meta.warnings
+                : [],
             sources: existingSources,
             followups: deriveRenderableFollowups(
               {
@@ -2530,11 +2640,19 @@ export default function ChatInterface({
     }
 
     const elapsed = now - (streamStartRef.current || now);
-    const ramp = clamp(elapsed / STREAM.RAMP_MS, 0, 1);
-    const targetCps = STREAM.TARGET_CHARS_PER_SEC * (0.35 + 0.65 * ramp);
+    const ramp = clamp(elapsed / ANSWER_TIMING.STREAMING.RAMP_MS, 0, 1);
+    const targetCps = ANSWER_TIMING.STREAMING.TARGET_CHARS_PER_SEC * (0.35 + 0.65 * ramp);
 
-    const dt = Math.max(1, now - (streamLastFlushRef.current || now));
-    const budgetChars = clamp(Math.floor((dt / 1000) * targetCps), 1, STREAM.MAX_CHARS_PER_FLUSH);
+    const dt = Math.max(0, now - (streamLastFlushRef.current || now));
+    if (dt < ANSWER_TIMING.STREAMING.MIN_FRAME_MS) {
+      rafRef.current = requestAnimationFrame(flushLoop);
+      return;
+    }
+    const budgetChars = clamp(
+      Math.floor((dt / 1000) * targetCps),
+      1,
+      ANSWER_TIMING.STREAMING.MAX_CHARS_PER_FLUSH
+    );
 
     const chunk = buf.slice(0, budgetChars);
     streamBufRef.current = buf.slice(budgetChars);
@@ -2544,6 +2662,17 @@ export default function ChatInterface({
       setMessages((prev) =>
         prev.map((m) => (m.id === id ? { ...m, content: (m.content || "") + chunk, status: "streaming" } : m))
       );
+      const stats = streamFlushStatsRef.current;
+      stats.flushCount += 1;
+      stats.flushIntervalTotalMs += dt;
+      stats.charsFlushed += chunk.length;
+      const elapsedMs = Math.max(1, now - (streamStartRef.current || now));
+      publishTimingDebug({
+        isStreaming: true,
+        avgFlushIntervalMs: Number((stats.flushIntervalTotalMs / Math.max(1, stats.flushCount)).toFixed(2)),
+        charsFlushed: stats.charsFlushed,
+        effectiveCharsPerSec: Number(((stats.charsFlushed / elapsedMs) * 1000).toFixed(2)),
+      });
       // Keep the newest answer visible while streaming if the user hasn't scrolled up.
       if (!scrollLockRef.current && atBottomRef.current) {
         requestAnimationFrame(() => {
@@ -2555,7 +2684,7 @@ export default function ChatInterface({
     }
 
     rafRef.current = requestAnimationFrame(flushLoop);
-  }, []);
+  }, [publishTimingDebug]);
 
   const ensureFlush = useCallback(() => {
     if (!mountedRef.current) return;
@@ -2575,10 +2704,17 @@ export default function ChatInterface({
     setIsStreaming(false);
     if (soft) {
       setStage({ stage: "stopped", message: "Stopped generating", key: null, params: null });
-      setTimeout(() => setStage({ stage: "thinking", message: "", key: null, params: null }), 1200);
+      setTimeout(
+        () => setStage({ stage: "thinking", message: "", key: null, params: null }),
+        ANSWER_TIMING.STAGE.STOPPED_STATE_RESET_MS
+      );
     } else {
       setStage({ stage: "thinking", message: "", key: null, params: null });
     }
+    publishTimingDebug({
+      isStreaming: false,
+      lastStreamCompletion: soft ? "stopped" : "cancelled",
+    });
 
     streamBufRef.current = "";
     activeAssistantIdRef.current = null;
@@ -2599,7 +2735,7 @@ export default function ChatInterface({
         prev.map((m) => (m.status === "streaming" && m.role === "assistant" ? { ...m, status: "done" } : m))
       );
     }
-  }, []);
+  }, [publishTimingDebug]);
 
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -3056,6 +3192,9 @@ export default function ChatInterface({
         status: "streaming",
         answerMode: "doc_grounded_single",
         navType: null,
+        failureCode: null,
+        userWarning: null,
+        warnings: [],
         sources: [],
         followups: [],
         attachments: [],
@@ -3063,10 +3202,23 @@ export default function ChatInterface({
         worklog: null,
       },
     ]);
+    streamFlushStatsRef.current = {
+      flushCount: 0,
+      flushIntervalTotalMs: 0,
+      charsFlushed: 0,
+    };
+    publishTimingDebug({
+      isStreaming: true,
+      stageFallbackCount: stageFallbackCountRef.current,
+      avgFlushIntervalMs: 0,
+      charsFlushed: 0,
+      effectiveCharsPerSec: 0,
+      lastStreamCompletion: "in_progress",
+    });
 
     ensureFlush();
     return id;
-  }, [ensureFlush]);
+  }, [ensureFlush, publishTimingDebug]);
 
   const createConversationIfNeeded = useCallback(async () => {
     // Viewer/editor panel chat is session-local; avoid creating persisted conversations.
@@ -3125,6 +3277,10 @@ export default function ChatInterface({
       if (stageHasBackendEventRef.current) return;
       if (!mountedRef.current) return;
       if (activeAssistantIdRef.current !== assistantId) return;
+      stageFallbackCountRef.current += 1;
+      publishTimingDebug({
+        stageFallbackCount: stageFallbackCountRef.current,
+      });
       if (isViewerVariant) {
         setStage({ stage: "editing", message: "", key: "allybi.stage.edit.progress", params: null });
       } else {
@@ -3135,7 +3291,7 @@ export default function ChatInterface({
           params: null,
         });
       }
-    }, 900);
+    }, ANSWER_TIMING.STAGE.BACKEND_EVENT_FALLBACK_MS);
 
     let realConversationId = conversationId;
     try {
@@ -3143,6 +3299,10 @@ export default function ChatInterface({
     } catch {
       setStreamError("Couldn't start a new chat.");
       setIsStreaming(false);
+      publishTimingDebug({
+        isStreaming: false,
+        lastStreamCompletion: "start_error",
+      });
       setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
       return;
     }
@@ -3184,6 +3344,7 @@ export default function ChatInterface({
       isViewerVariant
         ? {
             viewerMode: true,
+            viewerIntent: String(viewerIntent || "").trim() || "qa_locked",
             viewerHistory: (() => {
               const history = (Array.isArray(messages) ? messages : [])
                 .filter((m) => m && (m.role === "user" || m.role === "assistant"))
@@ -3222,6 +3383,7 @@ export default function ChatInterface({
       const next = rawMeta ? { ...rawMeta } : undefined;
       if (!next) return undefined;
       if (!isViewerVariant) {
+        delete next.viewerIntent;
         delete next.viewerContext;
         delete next.viewerSelection;
         delete next.viewerHistory;
@@ -3486,9 +3648,15 @@ export default function ChatInterface({
               ).trim();
               // The backend final payload is authoritative because it already
               // passed server-side enforcement/repair. Keep buffered text only
-              // as a fallback when final payload text is absent.
+              // as a fallback when final payload text is absent AND no failure
+              // was signaled by the backend (no failureCode).
+              const hasBackendRejection = Boolean(
+                msg.failureCode || evt.failureCode ||
+                msg.status === "failed" || evt.status === "failed"
+              );
               const merged = normalizeWhitespace(
-                finalTextFromPayload || ((m.content || "") + buffered)
+                finalTextFromPayload ||
+                  (hasBackendRejection ? "" : ((m.content || "") + buffered))
               );
               const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
               const finalListing = Array.isArray(msg.listing) ? msg.listing : (Array.isArray(evt.listing) ? evt.listing : null);
@@ -3498,6 +3666,12 @@ export default function ChatInterface({
               const finalNavType = msg.navType || evt.navType || m.navType || null;
               const finalResponseStatus = msg.status || evt.status || "success";
               const finalFailureCode = msg.failureCode || evt.failureCode || null;
+              const finalUserWarning = msg.userWarning || evt.userWarning || null;
+              const finalWarnings = Array.isArray(msg.warnings)
+                ? msg.warnings
+                : Array.isArray(evt.warnings)
+                  ? evt.warnings
+                  : [];
               const finalCompletion = msg.completion || evt.completion || null;
               const finalTruncation = msg.truncation || evt.truncation || null;
               const finalEvidence = msg.evidence || evt.evidence || null;
@@ -3567,6 +3741,8 @@ export default function ChatInterface({
                 navType: finalNavType,
                 responseStatus: finalResponseStatus,
                 failureCode: finalFailureCode,
+                userWarning: finalUserWarning,
+                warnings: finalWarnings,
                 completion: finalCompletion,
                 truncation: finalTruncation,
                 evidence: finalEvidence,
@@ -3590,6 +3766,10 @@ export default function ChatInterface({
           }
 
           setIsStreaming(false);
+          publishTimingDebug({
+            isStreaming: false,
+            lastStreamCompletion: "final",
+          });
           abortRef.current = null;
 
           try {
@@ -3647,6 +3827,10 @@ export default function ChatInterface({
             )
           );
           setIsStreaming(false);
+          publishTimingDebug({
+            isStreaming: false,
+            lastStreamCompletion: "error",
+          });
           abortRef.current = null;
 
           if (rafRef.current) {
@@ -3708,6 +3892,10 @@ export default function ChatInterface({
         }
 
         setIsStreaming(false);
+        publishTimingDebug({
+          isStreaming: false,
+          lastStreamCompletion: "fallback",
+        });
       }
     } catch (e) {
       if (controller.signal.aborted) {
@@ -3718,6 +3906,10 @@ export default function ChatInterface({
               : m
           )
         );
+        publishTimingDebug({
+          isStreaming: false,
+          lastStreamCompletion: "aborted",
+        });
       } else {
         setStreamError("Stream interrupted.");
         setMessages((prev) =>
@@ -3727,6 +3919,10 @@ export default function ChatInterface({
               : m
           )
         );
+        publishTimingDebug({
+          isStreaming: false,
+          lastStreamCompletion: "exception",
+        });
       }
       setIsStreaming(false);
       abortRef.current = null;
@@ -3747,6 +3943,7 @@ export default function ChatInterface({
     messages,
     onConversationUpdate,
     onAssistantFinal,
+    publishTimingDebug,
     slidesIncludeVisuals,
     viewerContext,
     viewerSelection,
@@ -4029,6 +4226,38 @@ export default function ChatInterface({
       }
     }
 
+    const sourcePayload = {
+      documentId: docId || null,
+      docId: docId || null,
+      filename,
+      mimeType: src?.mimeType || "application/octet-stream",
+      page: Number.isFinite(Number(src?.page)) ? Number(src.page) : null,
+      slide: Number.isFinite(Number(src?.slide)) ? Number(src.slide) : null,
+      sheet: src?.sheet != null ? String(src.sheet) : null,
+      cell: src?.cell != null ? String(src.cell) : null,
+      section: src?.section != null ? String(src.section) : null,
+      locationKey: src?.locationKey ? String(src.locationKey) : null,
+      locationLabel: src?.locationLabel ? String(src.locationLabel) : null,
+      snippet: src?.snippet ? String(src.snippet) : null,
+    };
+    const activeViewerDocId = String(viewerContext?.activeDocumentId || "").trim();
+    const sourceDocId = String(sourcePayload.documentId || "").trim();
+    if (isViewerVariant && sourceDocId && activeViewerDocId && sourceDocId === activeViewerDocId && typeof onViewerSourceNavigate === "function") {
+      onViewerSourceNavigate(sourcePayload);
+      return;
+    }
+    if (isViewerVariant && sourceDocId && sourceDocId !== activeViewerDocId) {
+      const qs = new URLSearchParams();
+      if (sourcePayload.page && sourcePayload.page > 0) qs.set("page", String(sourcePayload.page));
+      if (sourcePayload.slide && sourcePayload.slide > 0) qs.set("slide", String(sourcePayload.slide));
+      if (sourcePayload.sheet) qs.set("sheet", sourcePayload.sheet);
+      if (sourcePayload.cell) qs.set("cell", sourcePayload.cell);
+      if (sourcePayload.locationKey) qs.set("loc", sourcePayload.locationKey);
+      const route = `${buildRoute.document(sourceDocId)}${qs.toString() ? `?${qs.toString()}` : ""}`;
+      navigate(route, { state: { sourceJump: sourcePayload } });
+      return;
+    }
+
     setPreviewDocument({
       id: docId,
       filename,
@@ -4036,10 +4265,40 @@ export default function ChatInterface({
       fileSize: src?.fileSize,
       initialPage: src?.page || 1,
     });
-  }, [openFolderPreview, documents]);
+  }, [openFolderPreview, documents, isViewerVariant, onViewerSourceNavigate, viewerContext?.activeDocumentId, navigate]);
 
   const renderSources = (m) => {
+    const mapSourceButtonsToSources = (attachments) => {
+      if (!Array.isArray(attachments)) return [];
+      const sourceAttachment = attachments.find(
+        (att) => att && att.type === "source_buttons" && Array.isArray(att.buttons)
+      );
+      if (!sourceAttachment) return [];
+      return sourceAttachment.buttons
+        .map((btn) => {
+          if (!btn || typeof btn !== "object") return null;
+          const location = btn.location && typeof btn.location === "object" ? btn.location : null;
+          const type = String(location?.type || "").toLowerCase();
+          const value = location?.value;
+          return {
+            documentId: btn.documentId || btn.docId || btn.id || null,
+            filename: btn.title || btn.filename || "Document",
+            mimeType: btn.mimeType || null,
+            page: type === "page" && Number.isFinite(Number(value)) ? Number(value) : null,
+            slide: type === "slide" && Number.isFinite(Number(value)) ? Number(value) : null,
+            sheet: type === "sheet" && value != null ? String(value) : null,
+            cell: type === "cell" && value != null ? String(value) : null,
+            section: type === "section" && value != null ? String(value) : null,
+            locationKey: btn.locationKey ? String(btn.locationKey) : null,
+            locationLabel: location?.label ? String(location.label) : null,
+          };
+        })
+        .filter(Boolean);
+    };
     let sources = Array.isArray(m.sources) ? m.sources : [];
+    if (!sources.length) {
+      sources = mapSourceButtonsToSources(m.attachments);
+    }
     // Hide connector-generated email artifacts like: "outlook <messageId>.txt".
     sources = sources.filter((s) => {
       const name = s?.filename || s?.title || s?.name || "";
@@ -4062,11 +4321,19 @@ export default function ChatInterface({
       return raw || "Document";
     };
 
-    // Deduplicate by document ID (stable), fallback to display name
+    // Deduplicate by document + location so multiple citations within same file remain navigable.
     const seen = new Set();
     const unique = [];
     for (const s of sources) {
-      const key = (s.docId || s.documentId || s.id || resolveSourceDisplayName(s)).toString().toLowerCase();
+      const key = [
+        String(s.docId || s.documentId || s.id || resolveSourceDisplayName(s)).toLowerCase(),
+        String(s.locationKey || "").toLowerCase(),
+        String(s.page ?? ""),
+        String(s.slide ?? ""),
+        String(s.sheet ?? "").toLowerCase(),
+        String(s.cell ?? "").toLowerCase(),
+        String(s.section ?? "").toLowerCase(),
+      ].join("|");
       if (key && !seen.has(key)) {
         seen.add(key);
         unique.push(s);
@@ -4095,7 +4362,11 @@ export default function ChatInterface({
           page: s.page,
           slide: s.slide,
           sheet: s.sheet,
+          cell: s.cell,
+          section: s.section,
           locationKey: s.locationKey,
+          locationLabel: s.locationLabel,
+          snippet: s.snippet,
         }))}
         variant={isNav ? "pills" : "inline"}
         navType={isNav ? navType : null}
@@ -4213,6 +4484,11 @@ export default function ChatInterface({
             const payload = evt.message || evt.payload || evt;
             const finalContent = payload.content || payload.text || "";
             const finalSources = payload.sources || [];
+            const finalFailureCode = payload.failureCode || null;
+            const finalUserWarning = payload.userWarning || null;
+            const finalWarnings = Array.isArray(payload.warnings)
+              ? payload.warnings
+              : [];
             const isSent = /\bemail sent\b/i.test(String(finalContent || ""));
             setMessages((prev) =>
               prev.map((msg) =>
@@ -4225,6 +4501,9 @@ export default function ChatInterface({
                       actionStatus: isSent ? "sent" : (msg.actionStatus || null),
                       attachments: [confirmation],
                       emailDraftSnapshot: msg.emailDraftSnapshot,
+                      failureCode: finalFailureCode,
+                      userWarning: finalUserWarning,
+                      warnings: finalWarnings,
                     }
                   : msg
               )
@@ -4860,7 +5139,7 @@ export default function ChatInterface({
           {messages.length === 0 && (loadingChat || (!isEphemeral && authLoading)) ? (
             /* Switching to an existing chat or auth resolving — show subtle loader, not the welcome screen */
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', opacity: 0.5 }}>
-              <img src={kodaIcon} alt="" style={{ width: 40, height: 40, animation: 'pulse 1.2s ease-in-out infinite' }} />
+              <img src={kodaIcon} alt="" style={{ width: 40, height: 40, animation: 'kodaAnswerPulse 1.2s ease-in-out infinite' }} />
             </div>
           ) : messages.length === 0 ? (
             isViewerVariant ? (
@@ -5006,6 +5285,24 @@ export default function ChatInterface({
                   sources: m.sources,
                   answerText: assistantCleanText,
                 });
+                const assistantAttachments = Array.isArray(m.attachments) ? m.attachments : [];
+                const hasConnectorCardsInMessage =
+                  isAssistant &&
+                  assistantAttachments.some((x) => isConnectorCardAttachment(x));
+                const hasEmailDraftCardInMessage =
+                  isAssistant &&
+                  (assistantAttachments.some(
+                    (x) =>
+                      x &&
+                      x.type === "action_confirmation" &&
+                      String(x.operator || "").trim().toUpperCase() === "EMAIL_SEND",
+                  ) ||
+                    assistantAttachments.some((x) => x && x.type === "email_draft_snapshot"));
+                const assistantContentMaxWidth = isMobile
+                  ? "100%"
+                  : hasConnectorCardsInMessage || hasEmailDraftCardInMessage
+                    ? "min(100%, 860px)"
+                    : "min(100%, 720px)";
 
                 return (
                   <div
@@ -5024,7 +5321,7 @@ export default function ChatInterface({
                             width: 28,
                             height: 28,
                             opacity: isStreamingMsg && !m.content ? 0 : 1,
-                            transition: 'opacity 0.3s ease',
+                            transition: `opacity ${ANSWER_TIMING.ANIMATION.ASSISTANT_AVATAR_CROSSFADE_MS}ms ease`,
                           }} />
                           {isStreamingMsg && !m.content && (
                             <ChromaKeyVideo
@@ -5038,7 +5335,7 @@ export default function ChatInterface({
                             />
                           )}
                         </div>
-                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: isMobile ? '100%' : 'min(100%, 720px)', marginTop: suppressPlainFileMatch ? -2 : 0}}>
+                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: assistantContentMaxWidth, marginTop: suppressPlainFileMatch ? -2 : 0}}>
                           {(() => {
                             const dp = m.deckProgress || null;
                             const hasDeckProgress = Boolean(dp && (dp.total || dp.deck));
@@ -5068,6 +5365,12 @@ export default function ChatInterface({
                           {(() => {
                             const wl = m.worklog || null;
                             if (!wl) return null;
+                            // Worklog cards are disabled by default. Keep assistant progress
+                            // as plain chat text/phrases instead of a separate status card.
+                            const enableWorklogCard =
+                              typeof window !== "undefined" &&
+                              window.__KODA_ENABLE_WORKLOG_CARD__ === true;
+                            if (!enableWorklogCard) return null;
                             // Progress/worklog cards are only shown in viewer/editor screens.
                             if (!isViewerVariant) return null;
                             const steps = Array.isArray(wl.steps) ? wl.steps : [];
@@ -5483,7 +5786,7 @@ export default function ChatInterface({
                                     const attachments = Array.isArray(m.attachments) ? m.attachments : [];
                                     const leadWithConnectorCards = attachments.some((x) => isConnectorCardAttachment(x));
                                     if (!leadWithConnectorCards) return null;
-                                    return renderAssistantAttachments(m, { onlyConnectorCards: true, marginTop: 16 });
+                                    return renderAssistantAttachments(m, { onlyConnectorCards: true, marginTop: 2 });
                                   })()}
                                   {(() => {
                                     const attachments = Array.isArray(m.attachments) ? m.attachments : [];
@@ -5527,6 +5830,7 @@ export default function ChatInterface({
                                         userSelect: 'text',
                                         WebkitUserSelect: 'text',
                                         cursor: 'text',
+                                        '--koda-answer-cursor-blink-ms': `${ANSWER_TIMING.ANIMATION.CURSOR_BLINK_MS}ms`,
                                       }}>
                                         <StreamingMarkdown
                                           content={mdContent}
@@ -5604,7 +5908,7 @@ export default function ChatInterface({
                                   }}
                                   isRegenerating={isStreaming && m.id === lastAssistant?.id}
                                 />
-                                {m.truncation?.occurred && (
+                                {(m.truncation?.occurred || m.truncation?.providerOccurred) && (
                                   <span style={{ display: 'block', fontSize: 12, color: '#888', marginTop: 4 }}>
                                     (Response was truncated)
                                     {!isStreaming && (
@@ -5633,7 +5937,15 @@ export default function ChatInterface({
                                     )}
                                   </span>
                                 )}
-                                {m.failureCode && m.failureCode !== 'none' && <span style={{ display: 'block', fontSize: 12, color: '#c9760c', marginTop: 4 }}>Warning: {m.failureCode}</span>}
+                                {CHAT_WARNING_SURFACE_ENABLED && (() => {
+                                  const warning = deriveRenderableWarning(m);
+                                  if (!warning?.message) return null;
+                                  return (
+                                    <span style={{ display: "block", fontSize: 12, color: "#c9760c", marginTop: 4 }}>
+                                      {warning.message}
+                                    </span>
+                                  );
+                                })()}
                                 {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? renderSources(m) : null}
                               </div>
                               {(() => {

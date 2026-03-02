@@ -48,23 +48,47 @@ export class TenantKeyService {
         meta: (user.tenantKeyMeta as any) ?? {},
       };
     } else {
+      // Generate a new tenant key optimistically.
       const generated = await this.keyManager.generateTenantKey();
-      envelope = generated.envelope;
 
-      await this.prisma.user.update({
-        where: { id: userId },
+      // Conditional update: only write if no other call has written first.
+      // This eliminates the TOCTOU race where two concurrent calls both see
+      // tenantKeyEncrypted = null and each generate a different root key.
+      const { count } = await this.prisma.user.updateMany({
+        where: { id: userId, tenantKeyEncrypted: null },
         data: {
-          tenantKeyEncrypted: envelope.encryptedKey,
-          tenantKeyProvider: envelope.provider,
-          tenantKeyMeta: envelope.meta ?? {},
+          tenantKeyEncrypted: generated.envelope.encryptedKey,
+          tenantKeyProvider: generated.envelope.provider,
+          tenantKeyMeta: generated.envelope.meta ?? {},
         },
       });
 
-      this.cache.set(userId, {
-        key: generated.plaintextKey,
-        expiresAt: this.now() + this.ttlMs,
+      if (count === 1) {
+        // We won the race — our key was persisted.
+        this.cache.set(userId, {
+          key: generated.plaintextKey,
+          expiresAt: this.now() + this.ttlMs,
+        });
+        return generated.plaintextKey;
+      }
+
+      // count === 0: another call wrote first. Re-read the winner's key.
+      const winner = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          tenantKeyEncrypted: true,
+          tenantKeyProvider: true,
+          tenantKeyMeta: true,
+        },
       });
-      return generated.plaintextKey;
+      if (!winner?.tenantKeyEncrypted || !winner.tenantKeyProvider) {
+        throw new Error("Tenant key disappeared after concurrent write");
+      }
+      envelope = {
+        provider: winner.tenantKeyProvider as any,
+        encryptedKey: winner.tenantKeyEncrypted,
+        meta: (winner.tenantKeyMeta as any) ?? {},
+      };
     }
 
     const tk = await this.keyManager.decryptTenantKey(envelope);

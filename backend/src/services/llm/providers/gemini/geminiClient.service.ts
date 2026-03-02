@@ -87,7 +87,6 @@ interface GeminiGenerateRequest {
     temperature?: number;
     topP?: number;
     maxOutputTokens?: number;
-    // NOTE: Gemini supports other settings; keep minimal.
   };
   // safetySettings intentionally not forced here; handled by safety gate elsewhere
 }
@@ -618,6 +617,8 @@ export class GeminiClientService implements LLMClient {
     const toolCalls: ProviderToolCall[] = [];
 
     for (const p of content.parts) {
+      // Skip thinking/thought parts — only include actual response text
+      if ((p as Record<string, unknown>).thought === true) continue;
       if ("text" in p && typeof p.text === "string") {
         text += p.text;
       } else if ("functionCall" in p && p.functionCall?.name) {
@@ -650,7 +651,7 @@ export class GeminiClientService implements LLMClient {
 
 /* ----------------------------- utils ----------------------------- */
 
-function safeJsonParse(s: string): any | null {
+function safeJsonParse(s: string): unknown {
   try {
     return JSON.parse(s);
   } catch {

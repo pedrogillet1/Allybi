@@ -2610,7 +2610,22 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const sheetCount = sheets.length || Object.keys(sheetData).length;
 
   return (
-    <div ref={rootRef} className="excel-preview-container" style={{ position: 'relative' }}>
+    <div
+      ref={rootRef}
+      className="excel-preview-container"
+      style={{
+        position: hideToolbar ? 'absolute' : 'relative',
+        top: hideToolbar ? 0 : undefined,
+        right: hideToolbar ? 0 : undefined,
+        bottom: hideToolbar ? 0 : undefined,
+        left: hideToolbar ? 0 : undefined,
+        width: '100%',
+        height: '100%',
+        flex: '1 1 auto',
+        minWidth: 0,
+        minHeight: 0,
+      }}
+    >
       {userHasSelected && activeAskBubble?.rect && activeAskBubble?.selection ? (
         <div
           data-ask-allybi-bubble

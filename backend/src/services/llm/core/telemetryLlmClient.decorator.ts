@@ -77,8 +77,9 @@ export class TelemetryLLMClient implements LLMClient {
     try {
       response = await this.inner.complete(req);
       return response;
-    } catch (err: any) {
-      errorCode = err.code || err.message?.slice(0, 100) || "UNKNOWN";
+    } catch (err: unknown) {
+      const e = err as Record<string, unknown>;
+      errorCode = String(e.code || (e.message as string)?.slice(0, 100) || "UNKNOWN");
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
@@ -142,8 +143,9 @@ export class TelemetryLLMClient implements LLMClient {
         sink: wrappedSink,
       });
       return response;
-    } catch (err: any) {
-      errorCode = err.code || err.message?.slice(0, 100) || "UNKNOWN";
+    } catch (err: unknown) {
+      const e = err as Record<string, unknown>;
+      errorCode = String(e.code || (e.message as string)?.slice(0, 100) || "UNKNOWN");
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;

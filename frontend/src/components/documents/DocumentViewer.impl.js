@@ -440,6 +440,10 @@ const DocumentViewer = () => {
   // Parse ?page=X query param for jump-to-page support
   const searchParams = new URLSearchParams(location.search);
   const initialPageParam = parseInt(searchParams.get('page'), 10) || 1;
+  const initialSlideParam = parseInt(searchParams.get('slide'), 10) || 1;
+  const initialSheetParam = String(searchParams.get('sheet') || '').trim();
+  const initialCellParam = String(searchParams.get('cell') || '').trim();
+  const initialLocParam = String(searchParams.get('loc') || '').trim();
   const initialTargetParam = String(searchParams.get('target') || '').trim();
   const initialEditOpenParam = String(searchParams.get('edit') || '').trim() === '1';
   const initialTabParam = String(searchParams.get('tab') || '').trim(); // ask|targets|changes
@@ -467,6 +471,10 @@ const DocumentViewer = () => {
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(initialPageParam);
   const [pendingInitialPage, setPendingInitialPage] = useState(initialPageParam);
+  const [pendingPdfScrollPage, setPendingPdfScrollPage] = useState(initialPageParam);
+  const [pdfSpotlightPage, setPdfSpotlightPage] = useState(0);
+  const [pptxJumpRequest, setPptxJumpRequest] = useState(() => ({ slide: initialSlideParam, nonce: 0 }));
+  const [pendingDocxSourceTargetId, setPendingDocxSourceTargetId] = useState('');
   const [showExtractedText, setShowExtractedText] = useState(false);
   // PDF: default preview is the real PDF. Editing is done via "working copy" conversion to DOCX.
   const [pdfCanEditText, setPdfCanEditText] = useState(null); // null=unknown, true, false
@@ -482,6 +490,7 @@ const DocumentViewer = () => {
     if (!document?.filename && !document?.mimeType) return 'unknown';
     return getFileType(document?.filename, document?.mimeType);
   }, [document?.filename, document?.mimeType]);
+  const supportsAssistantInViewer = currentFileType !== 'unknown';
   const supportsViewerEditing = currentFileType === 'word' || currentFileType === 'excel';
 
   // ---------------------------------------------------------------------------
@@ -501,6 +510,7 @@ const DocumentViewer = () => {
   const [viewerFocusNonce, setViewerFocusNonce] = useState(0);
   const viewerConvIdRef = useRef('');
   const viewerChatApiRef = useRef(null);
+  const consumedSourceJumpRef = useRef('');
 
   const [injectedEditSession, setInjectedEditSession] = useState(() => {
     if (!initialEditSessionParam) return null;
@@ -547,12 +557,17 @@ const DocumentViewer = () => {
     setViewerFocusNonce(0);
     setSelectionOverlay({ rects: [], frozen: false });
     setFrozenSelection(null);
+    setPendingPdfScrollPage(initialPageParam);
+    setPdfSpotlightPage(0);
+    setPptxJumpRequest({ slide: initialSlideParam, nonce: 0 });
+    setPendingDocxSourceTargetId('');
+    consumedSourceJumpRef.current = '';
   }, [documentId, makeEphemeralConversation]);
 
   // Deep-link behavior: open editor + choose tab
   useEffect(() => {
     if (!initialEditOpenParam) return;
-    if (!supportsViewerEditing) {
+    if (!supportsAssistantInViewer) {
       showInfo(t('documentViewer.comingSoon'));
       return;
     }
@@ -564,7 +579,7 @@ const DocumentViewer = () => {
     }
     setViewerFocusNonce((n) => n + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialEditOpenParam, initialTabParam, documentId, supportsViewerEditing, showInfo, t]);
+  }, [initialEditOpenParam, initialTabParam, documentId, supportsAssistantInViewer, showInfo, t]);
 
   // Deep-link behavior: load an edit_session into the viewer canvas/queue without
   // injecting an edit card into chat (viewer chat stays clean; Changes tab is the review surface).
@@ -1807,19 +1822,19 @@ const DocumentViewer = () => {
   const handleAskAllybiClick = useCallback((event) => {
     if (event?.preventDefault) event.preventDefault();
     if (event?.stopPropagation) event.stopPropagation();
-    if (!supportsViewerEditing) {
+    if (!supportsAssistantInViewer) {
       showInfo(t('documentViewer.comingSoon'));
       return false;
     }
     return true;
-  }, [supportsViewerEditing, showInfo, t]);
+  }, [supportsAssistantInViewer, showInfo, t]);
 
   const toggleEditingPanel = useCallback((options = {}) => {
     const source = String(options?.source || 'toggle_button').trim() || 'toggle_button';
     const wasOpen = editingOpenRef.current;
     const next = !wasOpen;
 
-    if (next && !supportsViewerEditing) {
+    if (next && !supportsAssistantInViewer) {
       showInfo(t('documentViewer.comingSoon'));
       return;
     }
@@ -1922,10 +1937,10 @@ const DocumentViewer = () => {
         setFrozenSelection(null);
       }
     }
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsViewerEditing, showInfo, t, trackAskAllybiOpen]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay, supportsAssistantInViewer, showInfo, t, trackAskAllybiOpen]);
 
   const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true, trackOpenClick = false, source = 'ask_button' } = {}) => {
-    if (!supportsViewerEditing) {
+    if (!supportsAssistantInViewer) {
       showInfo(t('documentViewer.comingSoon'));
       return;
     }
@@ -2050,7 +2065,7 @@ const DocumentViewer = () => {
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, refreshFrozenOverlay, supportsViewerEditing, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t, trackAskAllybiOpen]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, docxBlocks, refreshFrozenOverlay, supportsAssistantInViewer, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, showInfo, t, trackAskAllybiOpen]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -2243,12 +2258,36 @@ const DocumentViewer = () => {
   useEffect(() => {
     const newPageParam = parseInt(new URLSearchParams(location.search).get('page'), 10) || 1;
     setPendingInitialPage(newPageParam);
+    setPendingPdfScrollPage(newPageParam);
     if (numPages && numPages > 0) {
       const targetPage = Math.max(1, Math.min(newPageParam, numPages));
       setCurrentPage(targetPage);
       setPageNumber(targetPage);
     }
   }, [location.search, numPages]);
+
+  useEffect(() => {
+    if (currentFileType !== 'pdf') return;
+    const requested = Number(pendingPdfScrollPage);
+    if (!Number.isFinite(requested) || requested <= 0) return;
+    const clamped = numPages && numPages > 0 ? Math.max(1, Math.min(requested, numPages)) : Math.max(1, requested);
+    const target = pageRefs.current?.[clamped];
+    if (!target) return;
+    try {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch {}
+    setCurrentPage(clamped);
+    setPageNumber(clamped);
+    setPdfSpotlightPage(clamped);
+  }, [currentFileType, pendingPdfScrollPage, numPages]);
+
+  useEffect(() => {
+    if (!pdfSpotlightPage) return;
+    const timer = window.setTimeout(() => {
+      setPdfSpotlightPage(0);
+    }, 1600);
+    return () => window.clearTimeout(timer);
+  }, [pdfSpotlightPage]);
 
   // State to hold the actual document URL (with backend URL prepended for API endpoints)
   const [actualDocumentUrl, setActualDocumentUrl] = useState(null);
@@ -2881,6 +2920,67 @@ const DocumentViewer = () => {
     setPptxDraftText((prev) => (!prev || prev === String(selected.text || '') ? String(selected.text || '') : prev));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFileType, slidesSelectedAnchorId]);
+
+  useEffect(() => {
+    if (currentFileType !== 'word') return;
+    const targetId = String(pendingDocxSourceTargetId || '').trim();
+    if (!targetId) return;
+    if (!Array.isArray(docxBlocks) || !docxBlocks.length) return;
+    const exists = docxBlocks.some((block) => String(block?.paragraphId || '').trim() === targetId);
+    if (!exists) return;
+    setDocxSelectedId(targetId);
+    setPendingDocxSourceTargetId('');
+  }, [currentFileType, pendingDocxSourceTargetId, docxBlocks]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const slideParam = parseInt(params.get('slide'), 10) || 0;
+    const sheetParam = String(params.get('sheet') || '').trim();
+    const cellParam = String(params.get('cell') || '').trim();
+    const locParam = String(params.get('loc') || '').trim();
+
+    if (currentFileType === 'powerpoint' && slideParam > 0) {
+      setPptxJumpRequest((prev) => ({
+        slide: slideParam,
+        nonce: Number(prev?.nonce || 0) + 1,
+      }));
+      return;
+    }
+
+    if (currentFileType === 'excel' && (sheetParam || cellParam || locParam)) {
+      onViewerSourceNavigate({
+        sheet: sheetParam || null,
+        cell: cellParam || null,
+        locationKey: locParam || null,
+      });
+      return;
+    }
+
+    if (currentFileType === 'word' && locParam) {
+      onViewerSourceNavigate({ locationKey: locParam });
+    }
+  }, [location.search, currentFileType]);
+
+  useEffect(() => {
+    const sourceJump = location.state?.sourceJump;
+    if (!sourceJump || typeof sourceJump !== 'object') return;
+    const sourceDocId = String(sourceJump?.documentId || sourceJump?.docId || '').trim();
+    const activeDocId = String(document?.id || '').trim();
+    if (sourceDocId && activeDocId && sourceDocId !== activeDocId) return;
+
+    const key = [
+      sourceDocId || activeDocId,
+      String(sourceJump?.locationKey || ''),
+      String(sourceJump?.page || ''),
+      String(sourceJump?.slide || ''),
+      String(sourceJump?.sheet || ''),
+      String(sourceJump?.cell || ''),
+      String(sourceJump?.section || ''),
+    ].join('|');
+    if (!key || key === consumedSourceJumpRef.current) return;
+    consumedSourceJumpRef.current = key;
+    onViewerSourceNavigate(sourceJump);
+  }, [location.state, document?.id, currentFileType, docxBlocks]);
 
   if (loading) {
     return (
@@ -3923,6 +4023,155 @@ const DocumentViewer = () => {
     })();
   };
 
+  function parseDocPageFromLocationKey(locationKey) {
+    const text = String(locationKey || '').trim();
+    if (!text) return null;
+    const match = text.match(/(?:^|\|)p:(-?\d+)(?:\||$)/i);
+    if (!match) return null;
+    const value = Number(match[1]);
+    if (!Number.isFinite(value) || value <= 0) return null;
+    return value;
+  }
+
+  function parseSlideFromLocationKey(locationKey) {
+    const text = String(locationKey || '').trim();
+    if (!text) return null;
+    const explicitSlide = text.match(/(?:^|\|)(?:s|slide):(-?\d+)(?:\||$)/i);
+    if (explicitSlide) {
+      const value = Number(explicitSlide[1]);
+      if (Number.isFinite(value) && value > 0) return value;
+    }
+    const legacyPage = parseDocPageFromLocationKey(text);
+    return legacyPage && legacyPage > 0 ? legacyPage : null;
+  }
+
+  function parseSheetRangeFromSource(source) {
+    const normalizeSheetName = (raw) => {
+      const s = String(raw || '').trim();
+      if (!s) return '';
+      if (s.startsWith("'") && s.endsWith("'") && s.length >= 2) {
+        return s.slice(1, -1).replace(/''/g, "'");
+      }
+      return s;
+    };
+    const parseRange = (raw) => {
+      const text = String(raw || '').trim();
+      if (!text) return null;
+      const cleaned = text.replace(/^xlsx:/i, '').replace(/^sheets:/i, '');
+      const bang = cleaned.indexOf('!');
+      if (bang > 0) {
+        const sheetName = normalizeSheetName(cleaned.slice(0, bang));
+        const rangeA1 = String(cleaned.slice(bang + 1) || '').trim();
+        if (!rangeA1) return null;
+        return { sheetName, rangeA1 };
+      }
+      if (/^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/i.test(cleaned)) {
+        return { sheetName: '', rangeA1: cleaned.toUpperCase() };
+      }
+      return null;
+    };
+
+    const locationKey = String(source?.locationKey || '').trim();
+    const sourceSheet = normalizeSheetName(source?.sheet);
+    const fromCell = parseRange(source?.cell);
+    const fromLoc = parseRange(locationKey);
+    const fromSection = parseRange(source?.section);
+    const preferred = fromCell || fromLoc || fromSection;
+    const sheetName = normalizeSheetName(preferred?.sheetName || sourceSheet || '');
+    const rangeA1 = String(preferred?.rangeA1 || '').trim();
+
+    if (rangeA1) return { sheetName, rangeA1 };
+    if (sheetName) return { sheetName, rangeA1: 'A1' };
+    return null;
+  }
+
+  function onViewerSourceNavigate(source) {
+    const locationKey = String(source?.locationKey || '').trim();
+    const snippet = String(source?.snippet || '').trim();
+    const sourcePage = Number.isFinite(Number(source?.page)) ? Number(source.page) : parseDocPageFromLocationKey(locationKey);
+    const sourceSlide = Number.isFinite(Number(source?.slide)) ? Number(source.slide) : parseSlideFromLocationKey(locationKey);
+
+    if (currentFileType === 'pdf') {
+      if (Number.isFinite(sourcePage) && sourcePage > 0) {
+        setPendingPdfScrollPage(sourcePage);
+      }
+      return;
+    }
+
+    if (currentFileType === 'powerpoint') {
+      if (Number.isFinite(sourceSlide) && sourceSlide > 0) {
+        setPptxJumpRequest((prev) => ({
+          slide: sourceSlide,
+          nonce: Number(prev?.nonce || 0) + 1,
+        }));
+      }
+      return;
+    }
+
+    if (currentFileType === 'excel') {
+      const hintedRange = parseSheetRangeFromSource(source);
+      if (!hintedRange) return;
+      const quoteSheet = (name) => {
+        const normalized = String(name || '').trim();
+        if (!normalized) return '';
+        return /^[A-Za-z0-9_]+$/.test(normalized)
+          ? normalized
+          : `'${normalized.replace(/'/g, "''")}'`;
+      };
+      const preview = `${quoteSheet(hintedRange.sheetName) || 'Sheet1'}!${hintedRange.rangeA1}`;
+      const nextSelection = {
+        domain: 'sheets',
+        text: preview,
+        preview,
+        sheetName: hintedRange.sheetName || null,
+        rangeA1: hintedRange.rangeA1,
+        selectionKind: String(hintedRange.rangeA1 || '').includes(':') ? 'range' : 'cell',
+        ranges: [{ sheetName: hintedRange.sheetName || null, rangeA1: hintedRange.rangeA1 }],
+      };
+      setFrozenSelection(nextSelection);
+      setLiveViewerSelection(nextSelection);
+      setSelectionOverlay({ rects: [], frozen: false });
+      return;
+    }
+
+    if (currentFileType !== 'word') return;
+
+    let targetId = String(source?.section || '').trim();
+    if (!targetId) {
+      const keyMatch = locationKey.match(/(?:paragraph|para|section)[:=]([A-Za-z0-9:_-]+)/i);
+      if (keyMatch) targetId = String(keyMatch[1] || '').trim();
+    }
+
+    if (!targetId && snippet && Array.isArray(docxBlocks) && docxBlocks.length) {
+      const needle = snippet.toLowerCase();
+      const hit = docxBlocks.find((block) => String(block?.text || '').toLowerCase().includes(needle));
+      if (hit?.paragraphId) {
+        targetId = String(hit.paragraphId).trim();
+      }
+    }
+
+    if (targetId) {
+      setPendingDocxSourceTargetId(targetId);
+      setDocxSelectedId(targetId);
+      setSelectionOverlay({ rects: [], frozen: false });
+      return;
+    }
+
+    if (!snippet) return;
+    try {
+      const root = documentContainerRef.current;
+      if (!root) return;
+      const loweredSnippet = snippet.toLowerCase();
+      const nodes = Array.from(root.querySelectorAll('[data-paragraph-id]'));
+      const targetNode = nodes.find((node) => String(node?.textContent || '').toLowerCase().includes(loweredSnippet));
+      const nextTargetId = String(targetNode?.getAttribute?.('data-paragraph-id') || '').trim();
+      if (!nextTargetId) return;
+      setPendingDocxSourceTargetId(nextTargetId);
+      setDocxSelectedId(nextTargetId);
+      setSelectionOverlay({ rects: [], frozen: false });
+    } catch {}
+  }
+
   // NOTE: These are computed inline (no hooks) because DocumentViewer has early returns.
   const editorAskTab = (
     <div style={{ height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
@@ -3933,6 +4182,7 @@ const DocumentViewer = () => {
         pinnedDocuments={pinnedDocsForChat}
         conversationCreateTitle={viewerConversationTitle}
         variant="viewer"
+        viewerIntent="qa_locked"
         viewerSelection={(() => {
           const expectedDomain = String(currentFileType || "").toLowerCase() === "excel" ? "sheets" : "docx";
           const hasSel = (s) => Boolean(
@@ -3957,6 +4207,7 @@ const DocumentViewer = () => {
           fileType: currentFileType || null,
         }}
         onClearViewerSelection={() => clearFrozenSelection()}
+        onViewerSourceNavigate={onViewerSourceNavigate}
         focusNonce={viewerFocusNonce}
         onAssistantFinal={onEditorAssistantFinal}
         apiRef={viewerChatApiRef}
@@ -4229,6 +4480,7 @@ const DocumentViewer = () => {
         fileType={toolbarType}
         zoom={zoom}
         onZoomChange={setZoom}
+        hideZoomControls={Boolean(editingOpen && toolbarType === 'excel')}
 
         fontFamily={docxFontFamily}
         onFontFamilyChange={setDocxFontFamily}
@@ -4428,9 +4680,9 @@ const DocumentViewer = () => {
         minWidth: 0,
         minHeight: 0,
         padding: currentFileType === 'excel' ? 0 : (isMobile ? 8 : 24),
-        overflow: 'auto',
-        overflowX: 'auto',
-        overflowY: 'auto',
+        overflow: currentFileType === 'excel' ? 'hidden' : 'auto',
+        overflowX: currentFileType === 'excel' ? 'hidden' : 'auto',
+        overflowY: currentFileType === 'excel' ? 'hidden' : 'auto',
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: currentFileType === 'excel' ? 'stretch' : 'center',
@@ -4531,9 +4783,20 @@ const DocumentViewer = () => {
 
                 case 'excel': // XLSX - always editable; Ask Allybi only toggles the assistant panel
                   return (
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                    <div
+                      style={{
+                        width: '100%',
+                        flex: '1 1 auto',
+                        minWidth: 0,
+                        minHeight: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'stretch',
+                        position: 'relative',
+                      }}
+                    >
                       <Suspense fallback={null}>
-	                        <ExcelEditCanvas
+		                        <ExcelEditCanvas
 	                          ref={excelCanvasRef}
 	                          document={document}
 	                          zoom={zoom}
@@ -4563,7 +4826,13 @@ const DocumentViewer = () => {
                 case 'powerpoint': // PPTX - show with PPTXPreview component
                   return (
                     <Suspense fallback={null}>
-                      <PPTXPreview document={document} zoom={zoom} version={previewVersion} onCountUpdate={setChildPreviewCount} />
+                      <PPTXPreview
+                        document={document}
+                        zoom={zoom}
+                        version={previewVersion}
+                        onCountUpdate={setChildPreviewCount}
+                        jumpRequest={pptxJumpRequest}
+                      />
                     </Suspense>
                   );
 
@@ -4602,7 +4871,9 @@ const DocumentViewer = () => {
                               Rendering a fake page then expanding to N pages can trigger pdf.js DOM errors
                               like "Node cannot be found in the current page." */}
                           {hasNumPages ? (
-                            Array.from(new Array(numPages), (el, index) => (
+                            Array.from(new Array(numPages), (el, index) => {
+                              const isSpotlit = Number(pdfSpotlightPage) === index + 1;
+                              return (
                               <div
                                 key={`page_${index + 1}`}
                                 data-page-number={index + 1}
@@ -4611,10 +4882,11 @@ const DocumentViewer = () => {
                                 }}
                                 style={{
                                   marginBottom: 20,
-                                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                  boxShadow: isSpotlit ? '0 0 0 4px rgba(17,24,39,0.16), 0 10px 24px rgba(17,24,39,0.18)' : '0 4px 12px rgba(0,0,0,0.1)',
                                   borderRadius: 8,
                                   overflow: 'hidden',
-                                  background: 'white'
+                                  background: 'white',
+                                  transition: 'box-shadow 280ms ease'
                                 }}
                               >
                                 <Page
@@ -4629,7 +4901,8 @@ const DocumentViewer = () => {
                                   }
                                 />
                               </div>
-                            ))
+                              );
+                            })
                           ) : null}
                         </Document>
                       ) : null}
@@ -5538,12 +5811,14 @@ const DocumentViewer = () => {
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             {/* Toolbar */}
-            <div style={{
-              alignSelf: 'stretch',
-              paddingLeft: (editingOpen && !isMobile) ? 24 : (isMobile ? 8 : 24),
-              paddingRight: (editingOpen && !isMobile) ? 24 : (isMobile ? 8 : 24),
-              paddingTop: (editingOpen && !isMobile) ? 13 : (isMobile ? 4 : 4),
-              paddingBottom: (editingOpen && !isMobile) ? 13 : (isMobile ? 4 : 4),
+	            <div style={{
+	              alignSelf: 'stretch',
+	              paddingLeft: (editingOpen && !isMobile) ? 24 : (isMobile ? 8 : 24),
+	              paddingRight: (editingOpen && !isMobile)
+	                ? (currentFileType === 'excel' ? 0 : 24)
+	                : (isMobile ? 8 : 24),
+	              paddingTop: (editingOpen && !isMobile) ? 13 : (isMobile ? 4 : 4),
+	              paddingBottom: (editingOpen && !isMobile) ? 13 : (isMobile ? 4 : 4),
               background: 'white',
               borderBottom: '1px #E6E6EC solid',
               justifyContent: 'flex-start',
