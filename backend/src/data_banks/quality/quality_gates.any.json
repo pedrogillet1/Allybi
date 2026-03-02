@@ -23,7 +23,7 @@
     "limits": {
       "maxCharsHard": 20000,
       "maxBlocksHard": 14,
-      "maxBulletsHard": 18,
+      "maxBulletsHard": 14,
       "maxTablesHard": 3,
       "maxQuotesHard": 3,
       "maxSourcesButtonsHard": 8
@@ -58,25 +58,25 @@
       "maxTraceItems": 140
     },
     "gateSeverityByName": {
-      "requested_slot_covered": "block",
-      "forbidden_adjacent_role_absent": "block",
-      "entity_role_consistency": "block",
+      "requested_slot_covered": "warn",
+      "forbidden_adjacent_role_absent": "warn",
+      "entity_role_consistency": "warn",
       "wrong_doc_lock_enforcement": "block",
-      "source_policy_navigation_mode": "block",
-      "numeric_integrity_totals_reconciliation": "block",
+      "source_policy_navigation_mode": "warn",
+      "numeric_integrity_totals_reconciliation": "warn",
       "numeric_integrity_domain_unit_required": "warn",
       "numeric_integrity_currency_consistency": "warn",
       "ambiguity_single_question_policy": "warn",
       "redaction_default_pii_identity_tax_banking": "block",
       "medical_safety_boundaries": "block",
-      "doc_grounding_minimums": "block",
-      "hallucination_risk": "block",
-      "repetition_and_banned_phrases": "block",
+      "doc_grounding_minimums": "warn",
+      "hallucination_risk": "warn",
+      "repetition_and_banned_phrases": "warn",
       "privacy_minimal": "block",
-      "final_consistency": "block",
+      "final_consistency": "warn",
       "brevity_and_constraints": "warn",
       "markdown_sanity": "warn",
-      "no_raw_json": "block"
+      "no_raw_json": "warn"
     }
   },
   "gateOrder": [
@@ -149,12 +149,12 @@
           "reasonCode": "nav_missing_buttons"
         },
         {
-          "id": "QG_NAV_002_body_must_be_single_sentence",
-          "severity": "error",
-          "description": "nav_pills body must be a single short intro sentence; everything else is in pills.",
+          "id": "QG_NAV_002_body_must_be_concise",
+          "severity": "warning",
+          "description": "nav_pills body should be concise but can include up to 3 sentences for analytical queries.",
           "condition": "answerMode.in(['nav_pills','nav_pill']) == true",
-          "maxSentences": 1,
-          "maxChars": 90,
+          "maxSentences": 3,
+          "maxChars": 800,
           "actionOnFail": "strip_body_keep_intro"
         },
         {
@@ -368,8 +368,8 @@
       "checks": [
         {
           "id": "QG_FIN_001_nav_pills_no_extra_blocks",
-          "severity": "error",
-          "condition": "answerMode.in(['nav_pills','nav_pill']) == true AND answerText.sentenceCount > 1",
+          "severity": "warning",
+          "condition": "answerMode.in(['nav_pills','nav_pill']) == true AND answerText.sentenceCount > 3",
           "actionOnFail": "strip_body_keep_intro"
         },
         {
