@@ -21,6 +21,7 @@
  */
 
 import crypto from "crypto";
+import { logger } from "../../../utils/logger";
 import {
   resolveDocScopeLockFromSignals,
   type DocScopeLock,
@@ -1749,7 +1750,15 @@ export class RetrievalEngineService {
     requiredTerms: string[];
     maxVariants: number;
   }): RetrievalQueryVariant[] {
-    const maxVariants = Math.max(1, Math.floor(Number(opts.maxVariants || 12)));
+    const requestedMaxVariants = Math.max(
+      1,
+      Math.floor(Number(opts.maxVariants || 6)),
+    );
+    const runtimeMaxVariants = Math.max(
+      1,
+      Math.floor(safeNumber(process.env.RETRIEVAL_MAX_QUERY_VARIANTS, 6)),
+    );
+    const maxVariants = Math.min(requestedMaxVariants, runtimeMaxVariants);
     const base: RetrievalQueryVariant = {
       text: opts.baseQuery,
       weight: 1,
@@ -1868,21 +1877,76 @@ export class RetrievalEngineService {
               reason: "default",
             },
           ];
+    const perCallTimeoutMs = Math.max(
+      1000,
+      Math.floor(
+        safeNumber(process.env.RETRIEVAL_PHASE_CALL_TIMEOUT_MS, 8000),
+      ),
+    );
+    const totalPhaseBudgetMs = Math.max(
+      3000,
+      Math.floor(safeNumber(process.env.RETRIEVAL_PHASE_BUDGET_MS, 25000)),
+    );
+    const extraVariantStrategy = String(
+      process.env.RETRIEVAL_EXTRA_VARIANT_PHASES || "semantic_only",
+    )
+      .trim()
+      .toLowerCase();
+    const runWithTimeout = async <T>(
+      operation: Promise<T>,
+      fallback: T,
+      label: string,
+    ): Promise<T> => {
+      let timer: NodeJS.Timeout | null = null;
+      const guarded = operation.catch((err) => {
+        logger.warn("[retrieval-engine] %s failed", label, { error: err?.message || String(err) });
+        return fallback;
+      });
+      const timed = new Promise<T>((resolve) => {
+        timer = setTimeout(() => {
+          logger.warn("[retrieval-engine] %s timed out after %dms", label, perCallTimeoutMs);
+          resolve(fallback);
+        }, perCallTimeoutMs);
+      });
+      const output = await Promise.race([guarded, timed]);
+      if (timer) clearTimeout(timer);
+      return output;
+    };
+    const retrievalStartedAt = Date.now();
 
-    for (const variant of variants) {
+    for (let variantIdx = 0; variantIdx < variants.length; variantIdx += 1) {
+      const variant = variants[variantIdx];
+      const isBaseVariant =
+        variantIdx === 0 || variant.sourceRuleId === "base_query";
+
       for (const phase of phases) {
         if (!phase?.enabled) continue;
+        if (
+          !isBaseVariant &&
+          extraVariantStrategy !== "all" &&
+          phase.type !== "semantic"
+        ) {
+          continue;
+        }
+
+        if (Date.now() - retrievalStartedAt >= totalPhaseBudgetMs) {
+          return results;
+        }
 
         if (phase.type === "semantic") {
           const k = safeNumber(phase.k, 80);
-          const hits = await this.semanticIndex.search({
-            query: variant.text,
-            docIds: opts.scopeDocIds,
-            k,
-          });
+          const hits = await runWithTimeout(
+            this.semanticIndex.search({
+              query: variant.text,
+              docIds: opts.scopeDocIds,
+              k,
+            }),
+            [],
+            "semantic_search",
+          );
           results.push({
             phaseId: `${phase.id ?? "phase_semantic"}::${variant.sourceRuleId}`,
-            source: "semantic",
+            source: "semantic" as CandidateSource,
             hits: hits.map((hit) => ({
               ...hit,
               score: clamp01(safeNumber(hit.score, 0) * variant.weight),
@@ -1890,14 +1954,18 @@ export class RetrievalEngineService {
           });
         } else if (phase.type === "lexical") {
           const k = safeNumber(phase.k, 120);
-          const hits = await this.lexicalIndex.search({
-            query: variant.text,
-            docIds: opts.scopeDocIds,
-            k,
-          });
+          const hits = await runWithTimeout(
+            this.lexicalIndex.search({
+              query: variant.text,
+              docIds: opts.scopeDocIds,
+              k,
+            }),
+            [],
+            "lexical_search",
+          );
           results.push({
             phaseId: `${phase.id ?? "phase_lexical"}::${variant.sourceRuleId}`,
-            source: "lexical",
+            source: "lexical" as CandidateSource,
             hits: hits.map((hit) => ({
               ...hit,
               score: clamp01(safeNumber(hit.score, 0) * variant.weight),
@@ -1916,15 +1984,19 @@ export class RetrievalEngineService {
                 : []),
             ]),
           ).slice(0, 24);
-          const hits = await this.structuralIndex.search({
-            query: variant.text,
-            docIds: opts.scopeDocIds,
-            k,
-            anchors,
-          });
+          const hits = await runWithTimeout(
+            this.structuralIndex.search({
+              query: variant.text,
+              docIds: opts.scopeDocIds,
+              k,
+              anchors,
+            }),
+            [],
+            "structural_search",
+          );
           results.push({
             phaseId: `${phase.id ?? "phase_structural"}::${variant.sourceRuleId}`,
-            source: "structural",
+            source: "structural" as CandidateSource,
             hits: hits.map((hit) => ({
               ...hit,
               score: clamp01(safeNumber(hit.score, 0) * variant.weight),
@@ -3151,7 +3223,7 @@ export class RetrievalEngineService {
       : maxNearDuplicatesPerDocPackaging;
     const minFinalScore = safeNumber(
       cfg.actionsContract?.thresholds?.minFinalScore,
-      0.58,
+      0.28,
     );
 
     // When extraction query is active, apply a lower threshold for scoped docs
