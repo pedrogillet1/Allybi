@@ -1,4 +1,5 @@
 import prisma from "../../../config/database";
+import { downloadFile } from "../../../config/storage";
 import {
   getConnector,
   getConnectorCapabilities,
@@ -36,6 +37,7 @@ export interface ConnectorHandlerRequest {
   confirmationId?: string;
   cc?: string;
   bcc?: string;
+  attachmentDocumentIds?: string[];
   attachments?: Array<{ filename: string; mimeType: string; content: Buffer }>;
 }
 
@@ -44,6 +46,9 @@ export interface ConnectorSearchHit {
   title: string;
   snippet: string;
   source: ConnectorProvider;
+  providerMessageId?: string;
+  providerChannelId?: string;
+  providerMessageTs?: string;
 }
 
 export interface ConnectorHandlerResult {
@@ -129,7 +134,7 @@ export class ConnectorHandlerService {
           module.oauthService,
           req,
         );
-      return await this.search(provider, req);
+      return await this.search(provider, module.clientService, req);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Connector action failed";
@@ -140,9 +145,9 @@ export class ConnectorHandlerService {
   private isValidContext(ctx: ConnectorHandlerContext): boolean {
     return Boolean(
       ctx?.userId?.trim() &&
-        ctx?.conversationId?.trim() &&
-        ctx?.correlationId?.trim() &&
-        ctx?.clientMessageId?.trim(),
+      ctx?.conversationId?.trim() &&
+      ctx?.correlationId?.trim() &&
+      ctx?.clientMessageId?.trim(),
     );
   }
 
@@ -424,6 +429,7 @@ export class ConnectorHandlerService {
 
   private async search(
     provider: ConnectorProvider,
+    clientService: unknown,
     req: ConnectorHandlerRequest,
   ): Promise<ConnectorHandlerResult> {
     const connected = await this.ensureConnected(
@@ -489,13 +495,39 @@ export class ConnectorHandlerService {
       source: provider,
     }));
 
+    if (hits.length > 0) {
+      return {
+        ok: true,
+        action: "search",
+        provider,
+        hits,
+        data: {
+          count: hits.length,
+          source: "indexed_documents",
+        },
+      };
+    }
+
+    const liveHits = await this.withLiveSearchTimeout(
+      `${provider} live search`,
+      () =>
+        this.searchLiveProvider(
+          provider,
+          clientService,
+          connected.accessToken || "",
+          q,
+          take,
+        ),
+    ).catch(() => []);
+
     return {
       ok: true,
       action: "search",
       provider,
-      hits,
+      hits: liveHits,
       data: {
-        count: hits.length,
+        count: liveHits.length,
+        source: "provider_live",
       },
     };
   }
@@ -590,6 +622,14 @@ export class ConnectorHandlerService {
       };
     }
 
+    const resolvedAttachments =
+      Array.isArray(req.attachments) && req.attachments.length
+        ? req.attachments
+        : await this.loadAttachmentsFromDocuments(
+            req.context.userId,
+            req.attachmentDocumentIds || [],
+          );
+
     const result = await Promise.resolve(
       // Client services have provider-specific param shapes (Outlook attachments are nested, Gmail uses raw MIME).
       // Keep this loosely typed at the boundary.
@@ -602,7 +642,7 @@ export class ConnectorHandlerService {
           body: req.body || "",
           cc: req.cc,
           bcc: req.bcc,
-          attachments: req.attachments,
+          attachments: resolvedAttachments,
         },
       ),
     );
@@ -630,6 +670,310 @@ export class ConnectorHandlerService {
     const start = Math.max(0, idx - 80);
     const end = Math.min(rawText.length, idx + query.length + 120);
     return rawText.slice(start, end);
+  }
+
+  private async searchLiveProvider(
+    provider: ConnectorProvider,
+    clientService: unknown,
+    accessToken: string,
+    query: string,
+    take: number,
+  ): Promise<ConnectorSearchHit[]> {
+    if (!clientService || !accessToken.trim()) return [];
+
+    if (provider === "gmail") {
+      const svc = clientService as {
+        listMessages?: (token: string, params: Record<string, unknown>) => Promise<any>;
+        getMessage?: (token: string, messageId: string) => Promise<any>;
+      };
+      if (typeof svc.listMessages !== "function") return [];
+
+      const list = await svc.listMessages(accessToken, {
+        q: query,
+        maxResults: take,
+        includeSpamTrash: false,
+      });
+      const msgs = Array.isArray(list?.messages) ? list.messages : [];
+      const ids: string[] = msgs
+        .map((m: any) => String(m?.id || "").trim())
+        .filter(Boolean)
+        .slice(0, take);
+
+      const hits: ConnectorSearchHit[] = [];
+      for (const id of ids) {
+        let title = id;
+        let snippet = "";
+        if (typeof svc.getMessage === "function") {
+          try {
+            const full = await svc.getMessage(accessToken, id);
+            title = this.gmailSubjectFromMessage(full) || id;
+            snippet = String(full?.snippet || "").trim();
+          } catch {
+            snippet = "";
+          }
+        }
+        hits.push({
+          documentId: `gmail:${id}`,
+          title,
+          snippet: snippet ? this.buildSnippet(snippet, query) : "",
+          source: provider,
+          providerMessageId: id,
+        });
+      }
+      return hits;
+    }
+
+    if (provider === "outlook") {
+      const svc = clientService as {
+        listMessages?: (input: Record<string, unknown>) => Promise<any>;
+        getMessageText?: (message: Record<string, unknown>) => string;
+      };
+      if (typeof svc.listMessages !== "function") return [];
+      const response = await svc.listMessages({
+        accessToken,
+        top: Math.max(take * 3, 10),
+        folder: "Inbox",
+      });
+      const values = Array.isArray(response?.value) ? response.value : [];
+      const needle = query.toLowerCase();
+      const filtered = values.filter((item: any) => {
+        const text = [
+          String(item?.subject || ""),
+          String(item?.bodyPreview || ""),
+          String(item?.from?.emailAddress?.address || ""),
+          String(item?.from?.emailAddress?.name || ""),
+          typeof svc.getMessageText === "function"
+            ? String(svc.getMessageText(item))
+            : "",
+        ]
+          .join(" ")
+          .toLowerCase();
+        return text.includes(needle);
+      });
+
+      return filtered.slice(0, take).map((item: any) => {
+        const snippetRaw =
+          (typeof svc.getMessageText === "function"
+            ? svc.getMessageText(item)
+            : String(item?.bodyPreview || "")) || "";
+        return {
+          documentId: `outlook:${String(item?.id || "")}`,
+          title: String(item?.subject || "(no subject)"),
+          snippet: this.buildSnippet(String(snippetRaw || ""), query),
+          source: provider,
+          providerMessageId: String(item?.id || ""),
+        };
+      });
+    }
+
+    if (provider === "slack") {
+      const svc = clientService as {
+        listConversations?: (input: Record<string, unknown>) => Promise<any>;
+        getConversationHistory?: (input: Record<string, unknown>) => Promise<any>;
+        extractMessageText?: (message: Record<string, unknown>) => string;
+      };
+      if (
+        typeof svc.listConversations !== "function" ||
+        typeof svc.getConversationHistory !== "function"
+      ) {
+        return [];
+      }
+
+      const list = await svc.listConversations({
+        accessToken,
+        excludeArchived: true,
+        types: ["public_channel", "private_channel", "im", "mpim"],
+        limit: 20,
+      });
+      const channels = Array.isArray(list?.channels) ? list.channels : [];
+      const needle = query.toLowerCase();
+      const hits: ConnectorSearchHit[] = [];
+
+      for (const channel of channels.slice(0, 8)) {
+        const channelId = String(channel?.id || "").trim();
+        if (!channelId) continue;
+        let history;
+        try {
+          history = await svc.getConversationHistory({
+            accessToken,
+            channelId,
+            limit: 12,
+          });
+        } catch {
+          continue;
+        }
+        const messages = Array.isArray(history?.messages) ? history.messages : [];
+        for (const message of messages) {
+          const text =
+            (typeof svc.extractMessageText === "function"
+              ? svc.extractMessageText(message)
+              : String(message?.text || "")
+            ).trim();
+          if (!text || !text.toLowerCase().includes(needle)) continue;
+          const ts = String(message?.ts || "").trim();
+          hits.push({
+            documentId: ts ? `slack:${channelId}:${ts}` : `slack:${channelId}`,
+            title: channel?.name
+              ? `#${String(channel.name)}`
+              : `Channel ${channelId}`,
+            snippet: this.buildSnippet(text, query),
+            source: provider,
+            providerChannelId: channelId,
+            providerMessageTs: ts || undefined,
+          });
+          if (hits.length >= take) return hits;
+        }
+      }
+      return hits;
+    }
+
+    return [];
+  }
+
+  private gmailSubjectFromMessage(message: any): string {
+    const headers = Array.isArray(message?.payload?.headers)
+      ? message.payload.headers
+      : [];
+    for (const header of headers) {
+      const name = String(header?.name || "").toLowerCase();
+      if (name !== "subject") continue;
+      return String(header?.value || "").trim();
+    }
+    return "";
+  }
+
+  private async loadAttachmentsFromDocuments(
+    userId: string,
+    attachmentDocumentIds: string[],
+  ): Promise<Array<{ filename: string; mimeType: string; content: Buffer }>> {
+    if (!Array.isArray(attachmentDocumentIds) || !attachmentDocumentIds.length) {
+      return [];
+    }
+
+    const ids = Array.from(
+      new Set(
+        attachmentDocumentIds
+          .filter((id) => typeof id === "string" && id.trim())
+          .map((id) => id.trim()),
+      ),
+    ).slice(0, 6);
+    if (!ids.length) return [];
+
+    const docs = await prisma.document.findMany({
+      where: {
+        userId,
+        id: { in: ids },
+        parentVersionId: null,
+        encryptedFilename: { not: { contains: "/connectors/" } },
+      },
+      select: {
+        id: true,
+        filename: true,
+        mimeType: true,
+        fileSize: true,
+        encryptedFilename: true,
+      },
+    });
+
+    const byId = new Map(docs.map((doc) => [doc.id, doc]));
+    const attachments: Array<{
+      filename: string;
+      mimeType: string;
+      content: Buffer;
+    }> = [];
+    const maxPerFileBytes = this.resolveAttachmentMaxPerFileBytes();
+    const maxTotalBytes = this.resolveAttachmentMaxTotalBytes();
+    let totalBytes = 0;
+
+    for (const id of ids) {
+      const doc = byId.get(id);
+      if (!doc) {
+        throw new Error(`Attachment document ${id} was not found for this user.`);
+      }
+      if (!doc.encryptedFilename) {
+        throw new Error(
+          `Attachment document ${id} has no storage key and cannot be sent.`,
+        );
+      }
+
+      const fileSize = Number(doc.fileSize || 0);
+      if (Number.isFinite(fileSize) && fileSize > maxPerFileBytes) {
+        throw new Error(
+          `Attachment "${doc.filename || id}" exceeds the per-file size limit.`,
+        );
+      }
+      if (
+        Number.isFinite(fileSize) &&
+        fileSize > 0 &&
+        totalBytes + fileSize > maxTotalBytes
+      ) {
+        throw new Error(
+          `Attachments exceed the total allowed payload size.`,
+        );
+      }
+
+      const content = await downloadFile(doc.encryptedFilename);
+      if (content.length > maxPerFileBytes) {
+        throw new Error(
+          `Attachment "${doc.filename || id}" exceeds the per-file size limit.`,
+        );
+      }
+      if (totalBytes + content.length > maxTotalBytes) {
+        throw new Error("Attachments exceed the total allowed payload size.");
+      }
+
+      totalBytes += content.length;
+      attachments.push({
+        filename: doc.filename || `${id}.bin`,
+        mimeType: doc.mimeType || "application/octet-stream",
+        content,
+      });
+    }
+
+    return attachments;
+  }
+
+  private resolveAttachmentMaxPerFileBytes(): number {
+    const raw = Number(process.env.CONNECTOR_SEND_ATTACHMENT_MAX_BYTES);
+    if (!Number.isFinite(raw) || raw <= 0) return 10 * 1024 * 1024; // 10 MB
+    return Math.min(Math.floor(raw), 50 * 1024 * 1024);
+  }
+
+  private resolveAttachmentMaxTotalBytes(): number {
+    const raw = Number(process.env.CONNECTOR_SEND_ATTACHMENT_MAX_TOTAL_BYTES);
+    if (!Number.isFinite(raw) || raw <= 0) return 20 * 1024 * 1024; // 20 MB
+    return Math.min(Math.floor(raw), 100 * 1024 * 1024);
+  }
+
+  private resolveLiveSearchTimeoutMs(): number {
+    const raw = Number(process.env.CONNECTOR_LIVE_SEARCH_TIMEOUT_MS);
+    if (!Number.isFinite(raw)) return 8_000;
+    const normalized = Math.floor(raw);
+    return Math.max(1_000, Math.min(30_000, normalized));
+  }
+
+  private async withLiveSearchTimeout<T>(
+    label: string,
+    run: () => Promise<T>,
+  ): Promise<T> {
+    const timeoutMs = this.resolveLiveSearchTimeoutMs();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    return new Promise<T>((resolve, reject) => {
+      timer = setTimeout(() => {
+        reject(new Error(`${label} timed out after ${timeoutMs}ms.`));
+      }, timeoutMs);
+      if (typeof (timer as any)?.unref === "function") {
+        (timer as any).unref();
+      }
+
+      run()
+        .then(resolve, reject)
+        .finally(() => {
+          if (timer) clearTimeout(timer);
+          timer = null;
+        });
+    });
   }
 
   private getRefreshFn(

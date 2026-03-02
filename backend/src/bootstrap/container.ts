@@ -70,9 +70,8 @@ class KodaV3Container {
     // ========================================================================
     if (!this._banksInitialized) {
       try {
-        const { initializeBanks } = await import(
-          "../services/core/banks/bankLoader.service"
-        );
+        const { initializeBanks } =
+          await import("../services/core/banks/bankLoader.service");
 
         const env = coerceEnvName(process.env.NODE_ENV);
         const rootDir = resolveDataBanksRootDir();
@@ -91,9 +90,8 @@ class KodaV3Container {
         });
 
         try {
-          const { BankIntegrityService } = await import(
-            "../services/editing/banks/bankIntegrity.service"
-          );
+          const { BankIntegrityService } =
+            await import("../services/editing/banks/bankIntegrity.service");
           const integrity = new BankIntegrityService().validateEditingBanks();
           if (!integrity.ok) {
             const env = coerceEnvName(process.env.NODE_ENV);
@@ -124,9 +122,8 @@ class KodaV3Container {
         }
 
         try {
-          const { RuntimeWiringIntegrityService } = await import(
-            "../services/core/banks/runtimeWiringIntegrity.service"
-          );
+          const { RuntimeWiringIntegrityService } =
+            await import("../services/core/banks/runtimeWiringIntegrity.service");
           const wiring = new RuntimeWiringIntegrityService().validate();
           if (!wiring.ok) {
             const env = coerceEnvName(process.env.NODE_ENV);
@@ -178,9 +175,8 @@ class KodaV3Container {
         }
 
         try {
-          const { DocumentIntelligenceIntegrityService } = await import(
-            "../services/core/banks/documentIntelligenceIntegrity.service"
-          );
+          const { DocumentIntelligenceIntegrityService } =
+            await import("../services/core/banks/documentIntelligenceIntegrity.service");
           const docInt = new DocumentIntelligenceIntegrityService().validate();
           if (!docInt.ok) {
             const env = coerceEnvName(process.env.NODE_ENV);
@@ -221,9 +217,8 @@ class KodaV3Container {
         console.log("[Container] Banks initialized successfully");
 
         try {
-          const { getDocumentIntelligenceBanksInstance } = await import(
-            "../services/core/banks/documentIntelligenceBanks.service"
-          );
+          const { getDocumentIntelligenceBanksInstance } =
+            await import("../services/core/banks/documentIntelligenceBanks.service");
           const diagnostics =
             getDocumentIntelligenceBanksInstance().listDiagnostics();
           const sampleIds = diagnostics.loadedBankIds.slice(0, 20);
@@ -298,20 +293,17 @@ class KodaV3Container {
     // ========================================================================
     if (this._banksInitialized) {
       await this.tryLoad("languageDetector", async () => {
-        const { getBankLoaderInstance } = await import(
-          "../services/core/banks/bankLoader.service"
-        );
+        const { getBankLoaderInstance } =
+          await import("../services/core/banks/bankLoader.service");
         const bankLoader = getBankLoaderInstance();
-        const mod = await import(
-          "../services/core/inputs/languageDetector.service"
-        );
+        const mod =
+          await import("../services/core/inputs/languageDetector.service");
         return new mod.LanguageDetectorService(bankLoader);
       });
 
       await this.tryLoad("retrievalEngine", async () => {
-        const { PrismaRetrievalAdapterFactory } = await import(
-          "../services/core/retrieval/prismaRetrievalAdapters.service"
-        );
+        const { PrismaRetrievalAdapterFactory } =
+          await import("../services/core/retrieval/prismaRetrievalAdapters.service");
         const db = (await import("../config/database")).default;
         return {
           id: "centralized_retrieval_runtime",

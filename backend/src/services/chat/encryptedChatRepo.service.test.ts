@@ -43,12 +43,7 @@ describe("EncryptedChatRepo listMessagesDecrypted", () => {
       } as any,
     );
 
-    const rows = await repo.listMessagesDecrypted(
-      "user-1",
-      "conv-1",
-      2,
-      true,
-    );
+    const rows = await repo.listMessagesDecrypted("user-1", "conv-1", 2, true);
 
     expect(prisma.message.findMany).toHaveBeenCalledWith(
       expect.objectContaining({

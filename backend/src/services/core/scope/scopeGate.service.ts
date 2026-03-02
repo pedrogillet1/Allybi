@@ -214,6 +214,30 @@ export interface ScopeDecision {
   };
 }
 
+type ScopeResolutionBank = {
+  config?: {
+    enabled?: boolean;
+    policy?: {
+      preferActiveDocOnFollowup?: boolean;
+      preferExplicitDocRefOverState?: boolean;
+    };
+    thresholds?: {
+      minToApplyHardConstraint?: number;
+      explicitFilenameHardMin?: number;
+      explicitDocIdHardMin?: number;
+      activeDocSoftMin?: number;
+    };
+    limits?: {
+      maxDocAllowlist?: number;
+    };
+  };
+  resolution?: {
+    [stage: string]: {
+      enabled?: boolean;
+    };
+  };
+};
+
 // -----------------------------
 // Helpers
 // -----------------------------
@@ -237,6 +261,15 @@ function lower(s: string): string {
 
 function isProd(env: EnvName): boolean {
   return env === "production";
+}
+
+function followupStrengthToScore(
+  strength: "weak" | "medium" | "strong" | null | undefined,
+): number {
+  if (strength === "strong") return 0.9;
+  if (strength === "medium") return 0.75;
+  if (strength === "weak") return 0.55;
+  return 0;
 }
 
 function detectFilenameToken(q: string): string | null {
@@ -309,6 +342,8 @@ export class ScopeGateService {
 
     // 1) Load relevant banks (soft if missing)
     const scopeHintsBank = this.safeGetBank<any>("scope_hints");
+    const scopeResolutionBank =
+      this.safeGetBank<ScopeResolutionBank>("scope_resolution");
     const followupBank = this.safeGetBank<any>("followup_indicators");
     const discourseBank = this.safeGetBank<any>("discourse_markers");
     const docAliasesBank =
@@ -323,6 +358,10 @@ export class ScopeGateService {
     const stopwordsDocnames = this.safeGetBank<any>("stopwords_docnames");
     const ambiguityPolicies = this.safeGetBank<any>("disambiguation_policies");
     const rankFeatures = this.safeGetBank<any>("ambiguity_rank_features");
+    const scopeResolutionEnabled = scopeResolutionBank?.config?.enabled !== false;
+    const stageEnabled = (stage: string): boolean =>
+      scopeResolutionEnabled &&
+      scopeResolutionBank?.resolution?.[stage]?.enabled !== false;
 
     // 2) Doc inventory
     const docs = input.overrides?.forceNoDocsIndexed
@@ -366,12 +405,31 @@ export class ScopeGateService {
 
     // Discourse: topic shift breaks continuity; correction can still be follow-up but may change target
     const discourse = input.signals.discourse ?? {};
-    const topicShift = Boolean(discourse.isTopicShift);
+    let topicShift = Boolean(discourse.isTopicShift);
     const formatShift = Boolean(discourse.isFormatShift);
+    const discourseConflictPolicy = String(
+      discourseBank?.config?.actionsContract?.conflictResolution
+        ?.ifFormatShiftAndTopicShift || "",
+    )
+      .trim()
+      .toLowerCase();
+    if (topicShift && formatShift && discourseConflictPolicy === "format_shift_wins") {
+      topicShift = false;
+      debug.appliedRules.push("discourse_format_shift_wins_over_topic_shift");
+    }
 
     // Follow-up: allow continuity unless topic shift or explicit new doc ref
-    const isFollowup = Boolean(input.signals.isFollowup);
-    const followupStrength = input.signals.followupStrength ?? null;
+    const followupMinScore = Number(
+      scopeResolutionBank?.config?.thresholds?.activeDocSoftMin ??
+        followupBank?.config?.actionsContract?.thresholds?.followupScoreMin ??
+        0.65,
+    );
+    const followupStrengthScore = followupStrengthToScore(
+      input.signals.followupStrength,
+    );
+    const isFollowup =
+      Boolean(input.signals.isFollowup) ||
+      followupStrengthScore >= clamp01(followupMinScore);
 
     // 4) Extract explicit filename token if present
     const filenameToken = detectFilenameToken(qNorm);
@@ -382,14 +440,29 @@ export class ScopeGateService {
 
     // 6) Determine whether this turn provides explicit doc reference
     const explicitDocRefFromUpstream = Boolean(input.signals.explicitDocRef);
+    const minScopeHintConfidence = clamp01(
+      Number(
+        scopeResolutionBank?.config?.thresholds?.minToApplyHardConstraint ??
+          scopeHintsBank?.config?.actionsContract?.thresholds?.minHintConfidence ??
+          0.75,
+      ),
+    );
+    const scopeHintConfidence = clamp01(
+      Number((input.signals as any).scopeHintConfidence ?? 1),
+    );
+    const explicitDocRefBySignal =
+      stageEnabled("apply_explicit_doc_refs") &&
+      explicitDocRefFromUpstream &&
+      scopeHintConfidence >= minScopeHintConfidence;
     const resolvedDocIdFromUpstream = input.signals.resolvedDocId ?? null;
 
     // If upstream resolved an explicit docId, treat as explicit doc ref
     const explicitDocRef =
-      explicitDocRefFromUpstream ||
-      Boolean(resolvedDocIdFromUpstream) ||
-      Boolean(filenameToken) ||
-      this.matchesAnyDocAliasPhrase(qLower, docAliasPhrases, docTaxonomyBank);
+      stageEnabled("apply_explicit_doc_refs") &&
+      (explicitDocRefBySignal ||
+        Boolean(resolvedDocIdFromUpstream) ||
+        Boolean(filenameToken) ||
+        this.matchesAnyDocAliasPhrase(qLower, docAliasPhrases, docTaxonomyBank));
 
     // 7) Resolve explicit doc reference to a docId if needed
     const explicitResolved = await this.resolveExplicitDocRef({
@@ -410,20 +483,59 @@ export class ScopeGateService {
     // - Otherwise retain existing lock unless topic shift (topic shift does NOT auto-unlock; it only reduces continuity)
     let hardDocLock = stateHardDocLock;
     let activeDocId = stateActiveDocId;
+    const preferExplicitDocRefOverState =
+      scopeResolutionBank?.config?.policy?.preferExplicitDocRefOverState !==
+      false;
+    const explicitDocConfidenceFloor = clamp01(
+      Number(
+        explicitResolved.method === "filename"
+          ? scopeResolutionBank?.config?.thresholds?.explicitFilenameHardMin ?? 0.8
+          : explicitResolved.method === "upstream"
+            ? scopeResolutionBank?.config?.thresholds?.explicitDocIdHardMin ?? 0.85
+            : scopeResolutionBank?.config?.thresholds?.minToApplyHardConstraint ??
+                0.74,
+      ),
+    );
+    const explicitDocResolvedHard =
+      stageEnabled("apply_explicit_doc_refs") &&
+      Boolean(explicitResolved.docId) &&
+      explicitResolved.confidence >= explicitDocConfidenceFloor;
 
-    if (explicitResolved.docId) {
-      debug.appliedRules.push("explicit_doc_required_precedence");
+    if (explicitDocResolvedHard && preferExplicitDocRefOverState) {
+      debug.appliedRules.push("scope_resolution_apply_explicit_doc_refs");
       activeDocId = explicitResolved.docId;
       hardDocLock = true;
-    } else if (input.signals.explicitDocLock === true) {
-      debug.appliedRules.push("explicit_doc_lock_set");
+    } else if (
+      stageEnabled("apply_user_choice") &&
+      !explicitResolved.docId &&
+      String((state as any)?.lastDisambiguation?.chosenDocumentId || "").trim()
+    ) {
+      activeDocId = String(
+        (state as any)?.lastDisambiguation?.chosenDocumentId || "",
+      ).trim();
+      hardDocLock = true;
+      debug.appliedRules.push("scope_resolution_apply_user_choice");
+    } else if (
+      stageEnabled("apply_lock_request") &&
+      input.signals.explicitDocLock === true
+    ) {
+      debug.appliedRules.push("scope_resolution_apply_lock_request");
       hardDocLock = true;
     }
 
     // If no active doc in state and no explicit doc, we stay unlocked.
     // If follow-up is strong and no topic shift and we have active doc, we keep it as soft continuity.
-    if (!explicitResolved.docId && isFollowup && !topicShift && activeDocId) {
-      debug.appliedRules.push("followup_continuity");
+    const preferActiveDocOnFollowup =
+      scopeResolutionBank?.config?.policy?.preferActiveDocOnFollowup !== false;
+    if (
+      stageEnabled("apply_followup_active_doc") &&
+      preferActiveDocOnFollowup &&
+      !explicitResolved.docId &&
+      isFollowup &&
+      !topicShift &&
+      activeDocId
+    ) {
+      debug.appliedRules.push("scope_resolution_apply_followup_active_doc");
       // do nothing: keep activeDocId
     }
 
@@ -451,11 +563,12 @@ export class ScopeGateService {
 
     // 10) Candidate doc IDs determination
     let candidateDocIds: string[] = docs.map((d) => d.docId);
+    const hardLockStageActive = stageEnabled("apply_hard_locked_doc");
 
     // Rule: explicit doc ref -> single doc scope
-    if (explicitResolved.docId) {
+    if (explicitDocResolvedHard && explicitResolved.docId) {
       candidateDocIds = [explicitResolved.docId];
-    } else if (hardDocLock && activeDocId && !corpusAllowed) {
+    } else if (hardLockStageActive && hardDocLock && activeDocId && !corpusAllowed) {
       // Rule: hard lock applies except discovery
       candidateDocIds = [activeDocId];
     } else if (
@@ -473,11 +586,23 @@ export class ScopeGateService {
     ) {
       // Soft continuity: narrow to active doc ONLY if we have no explicit doc ref and not discovery
       // This is a ChatGPT-like bias, not a hard lock.
-      debug.appliedRules.push("followup_soft_narrow_to_active_doc");
+      debug.appliedRules.push("scope_resolution_followup_soft_narrow_to_active_doc");
       candidateDocIds = [activeDocId];
     } else {
       // corpus-wide (default)
       candidateDocIds = docs.map((d) => d.docId);
+    }
+
+    const maxDocAllowlist = Math.max(
+      1,
+      Math.floor(
+        Number(scopeResolutionBank?.config?.limits?.maxDocAllowlist ?? 8),
+      ),
+    );
+    const shouldCapAllowlist = candidateDocIds.length > 1 && !corpusAllowed;
+    if (shouldCapAllowlist && candidateDocIds.length > maxDocAllowlist) {
+      candidateDocIds = candidateDocIds.slice(0, maxDocAllowlist);
+      debug.appliedRules.push("scope_resolution_cap_doc_allowlist");
     }
 
     // 11) Ambiguity handling: if user clearly referenced "a doc" but we cannot resolve it safely
@@ -576,17 +701,17 @@ export class ScopeGateService {
 
     // 14) Normal allow path
     const hardScopeActive = Boolean(
-      explicitResolved.docId ||
-        (hardDocLock && activeDocId) ||
-        hardSheetLock ||
-        (input.signals as any).hardScopeActive,
+      explicitDocResolvedHard ||
+      (hardDocLock && activeDocId) ||
+      hardSheetLock ||
+      (input.signals as any).hardScopeActive,
     );
 
     return this.finish(state, input, {
       action: "allow",
       severity: "info",
       reasonCodes: [
-        ...(explicitResolved.docId ? ["explicit_doc_required"] : []),
+        ...(explicitDocResolvedHard ? ["explicit_doc_required"] : []),
         ...(isDiscovery ? ["discovery_mode"] : []),
         ...(continuityAllowed && isFollowup ? ["followup_continuity"] : []),
       ] as ScopeReasonCode[],

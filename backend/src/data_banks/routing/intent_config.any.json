@@ -73,6 +73,9 @@
         "CREATE_CHART",
         "COMPUTE",
         "COMPUTE_BUNDLE",
+        "PY_COMPUTE",
+        "PY_CHART",
+        "PY_WRITEBACK",
         "ADD_SLIDE",
         "REWRITE_SLIDE_TEXT",
         "REPLACE_SLIDE_IMAGE"
@@ -262,6 +265,26 @@
         "id": "IC_0004_doc_stats_requires_docs_true",
         "input": { "intentFamily": "doc_stats" },
         "expect": { "requiresDocs": true }
+      },
+      {
+        "id": "IC_0005_connectors_family_allows_connector_search",
+        "input": { "intentFamily": "connectors", "operator": "CONNECTOR_SEARCH" },
+        "expect": { "allowed": true }
+      },
+      {
+        "id": "IC_0006_email_family_allows_email_latest",
+        "input": { "intentFamily": "email", "operator": "EMAIL_LATEST" },
+        "expect": { "allowed": true }
+      },
+      {
+        "id": "IC_0007_connectors_family_disallows_email_send",
+        "input": { "intentFamily": "connectors", "operator": "EMAIL_SEND" },
+        "expect": { "allowed": false }
+      },
+      {
+        "id": "IC_0008_email_family_disallows_connector_disconnect",
+        "input": { "intentFamily": "email", "operator": "CONNECTOR_DISCONNECT" },
+        "expect": { "allowed": false }
       }
     ]
   }

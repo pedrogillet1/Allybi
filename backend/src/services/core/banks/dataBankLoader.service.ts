@@ -15,6 +15,7 @@
  */
 
 import * as fs from "fs/promises";
+import * as fsSync from "fs";
 import * as path from "path";
 import crypto from "crypto";
 
@@ -352,15 +353,23 @@ export class DataBankLoaderService {
       // Minimal contract
       validateMinimalBankContract(bank, entry.path);
 
-      // Ensure id matches registry id
+      // Ensure id matches registry id. In non-strict mode, tolerate legacy ids
+      // and normalize to registry id so runtime lookups remain deterministic.
       if (bank._meta?.id !== entry.id) {
-        throw new DataBankError(
-          `Bank _meta.id mismatch for ${entry.id}. Registry id=${entry.id}, file _meta.id=${bank._meta?.id}`,
-          {
+        const mismatchMessage = `Bank _meta.id mismatch for ${entry.id}. Registry id=${entry.id}, file _meta.id=${bank._meta?.id}`;
+        if (this.opts.strict) {
+          throw new DataBankError(mismatchMessage, {
             entry,
             fileMetaId: bank._meta?.id,
-          },
-        );
+          });
+        }
+        this.logger.warn(mismatchMessage, {
+          entryId: entry.id,
+          fileMetaId: bank._meta?.id,
+          path: entry.path,
+          strict: this.opts.strict,
+        });
+        bank._meta.id = entry.id;
       }
 
       // Validate checksum policy (optional)
@@ -630,10 +639,41 @@ export class DataBankLoaderService {
         );
     }
 
+    const categories = new Set(this.registry.banks.map((b) => b.category));
+    const manifestPolicy = this.loadManifestCategoryPolicy();
+    if (
+      manifestPolicy?.strictCategories &&
+      manifestPolicy?.failOnUnknownCategory
+    ) {
+      const unknownCategories = [...categories]
+        .filter((category) => !manifestPolicy.allowedCategories.has(category))
+        .sort((a, b) => a.localeCompare(b));
+      if (unknownCategories.length > 0) {
+        throw new DataBankError(
+          "Registry contains categories not allowed by bank_manifest",
+          { unknownCategories },
+        );
+      }
+    }
+
     // Validate loadOrder categories exist
     const loadOrder = this.registry.loadOrder ?? [];
     if (Array.isArray(loadOrder) && loadOrder.length) {
-      const categories = new Set(this.registry.banks.map((b) => b.category));
+      const loadOrderSet = new Set(loadOrder);
+      const missingCategoriesInLoadOrder = [...categories]
+        .filter((category) => !loadOrderSet.has(category))
+        .sort((a, b) => a.localeCompare(b));
+      if (missingCategoriesInLoadOrder.length > 0) {
+        const details = { missingCategoriesInLoadOrder };
+        if (this.opts.strict) {
+          throw new DataBankError(
+            "Registry categories missing from loadOrder",
+            details,
+          );
+        }
+        this.logger.warn("Registry categories missing from loadOrder", details);
+      }
+
       for (const c of loadOrder) {
         if (!categories.has(c)) {
           // allow categories with no banks only if explicitly intended; we warn instead of failing
@@ -648,6 +688,38 @@ export class DataBankLoaderService {
     // If you register it, it must not cause bootstrap paradox; loader handles bootstrap anyway.
 
     this.logger.info("Registry integrity checks passed");
+  }
+
+  private loadManifestCategoryPolicy(): {
+    strictCategories: boolean;
+    failOnUnknownCategory: boolean;
+    allowedCategories: Set<string>;
+  } | null {
+    const manifestPath = path.join(
+      this.opts.rootDir,
+      "manifest",
+      "bank_manifest.any.json",
+    );
+    if (!fsSync.existsSync(manifestPath)) return null;
+    try {
+      const raw = fsSync.readFileSync(manifestPath, "utf8");
+      const parsed = safeParseJson<any>(raw, "manifest/bank_manifest.any.json");
+      const allowedCategories = new Set(
+        toStringList(parsed?.allowedCategoryIds).map((v) => String(v).trim()),
+      );
+      return {
+        strictCategories: parsed?.config?.strictCategories === true,
+        failOnUnknownCategory: parsed?.config?.failOnUnknownCategory === true,
+        allowedCategories,
+      };
+    } catch {
+      if (this.opts.strict) {
+        throw new DataBankError(
+          "Failed to parse manifest/bank_manifest.any.json for category policy",
+        );
+      }
+      return null;
+    }
   }
 
   private validateAliasIntegrity(): void {
@@ -805,6 +877,77 @@ export class DataBankLoaderService {
         throw new DataBankError("Dependency graph cycle detected", details);
       }
       this.logger.warn("Dependency graph cycle detected (non-fatal)", details);
+    }
+
+    if (this.registry) {
+      const registryIds = new Set(this.registry.banks.map((bank) => bank.id));
+      const dependencyIds = new Set(byId.keys());
+      const failOnMissingNode = Boolean(
+        this.dependencies?.config?.failOnMissingNode,
+      );
+
+      const missingNodes = [...registryIds]
+        .filter((id) => !dependencyIds.has(id))
+        .sort((a, b) => a.localeCompare(b));
+      if (missingNodes.length > 0) {
+        const details = {
+          missingNodes: missingNodes.slice(0, 200),
+          total: missingNodes.length,
+        };
+        if (failOnMissingNode || this.opts.strict) {
+          throw new DataBankError(
+            "Dependency graph missing nodes for registered banks",
+            details,
+          );
+        }
+        this.logger.warn(
+          "Dependency graph missing nodes for registered banks (non-fatal)",
+          details,
+        );
+      }
+
+      const unknownNodes = [...dependencyIds]
+        .filter((id) => !registryIds.has(id))
+        .sort((a, b) => a.localeCompare(b));
+      if (unknownNodes.length > 0) {
+        const details = { unknownNodes };
+        if (failOnMissingNode || this.opts.strict) {
+          throw new DataBankError(
+            "Dependency graph contains unknown node ids",
+            details,
+          );
+        }
+        this.logger.warn(
+          "Dependency graph contains unknown node ids (non-fatal)",
+          details,
+        );
+      }
+
+      const unknownEdges: Array<{ id: string; dependsOn: string }> = [];
+      for (const [id, node] of byId.entries()) {
+        for (const depRaw of toStringList(node?.dependsOn)) {
+          const dep = this.resolveAlias(depRaw);
+          if (!registryIds.has(dep)) {
+            unknownEdges.push({ id, dependsOn: depRaw });
+          }
+        }
+      }
+      if (unknownEdges.length > 0) {
+        const details = {
+          unknownEdges: unknownEdges.slice(0, 200),
+          total: unknownEdges.length,
+        };
+        if (failOnMissingNode || this.opts.strict) {
+          throw new DataBankError(
+            "Dependency graph references unknown dependencies",
+            details,
+          );
+        }
+        this.logger.warn(
+          "Dependency graph references unknown dependencies (non-fatal)",
+          details,
+        );
+      }
     }
   }
 

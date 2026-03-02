@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "id": "di_ops_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Retrieval strategies for operations domain documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "maxBoostRules": 15,
+    "maxQueryExpansionTerms": 12
+  },
+  "domain": "ops",
+  "sectionPriority": [
+    {
+      "section": "summary",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "section": "measurements",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "section": "work_description",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "locate",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "scheduling",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "compare"
+      ]
+    },
+    {
+      "section": "parts_and_materials",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "section": "incident_details",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "header",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "section": "footer_metadata",
+      "weight": 1.6,
+      "operators": [
+        "validate"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "ops_boost_001_sla_compliance",
+      "priority": 95,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "condition": "query asks about SLA compliance or KPI targets",
+      "boostSections": [
+        "summary",
+        "measurements",
+        "kpi_table"
+      ]
+    },
+    {
+      "id": "ops_boost_002_incident_timeline",
+      "priority": 92,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "evaluate"
+      ],
+      "condition": "query asks about incident timeline or root cause",
+      "boostSections": [
+        "incident_details",
+        "work_description",
+        "corrective_actions"
+      ]
+    },
+    {
+      "id": "ops_boost_003_maintenance_schedule",
+      "priority": 91,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "compare"
+      ],
+      "condition": "query asks about maintenance due dates or overdue tasks",
+      "boostSections": [
+        "scheduling",
+        "work_description",
+        "parts_and_materials"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    {
+      "trigger": "\\bwork\\s+order\\b",
+      "expansions": [
+        "service order",
+        "maintenance request",
+        "ordem de servico"
+      ]
+    },
+    {
+      "trigger": "\\bmaintenance\\b",
+      "expansions": [
+        "preventive maintenance",
+        "corrective maintenance",
+        "manutencao",
+        "repair"
+      ]
+    },
+    {
+      "trigger": "\\bincident\\b",
+      "expansions": [
+        "occurrence",
+        "failure",
+        "breakdown",
+        "ocorrencia",
+        "incidente"
+      ]
+    },
+    {
+      "trigger": "\\bshipment\\b",
+      "expansions": [
+        "shipping manifest",
+        "bill of lading",
+        "packing list",
+        "romaneio"
+      ]
+    },
+    {
+      "trigger": "\\bquality\\b",
+      "expansions": [
+        "inspection",
+        "non-conformance",
+        "quality control",
+        "inspecao",
+        "qualidade"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "id": "di_ops_extraction_ops_incident_report",
+    "version": "1.0.0",
+    "description": "Extraction hints for incident report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_incident_report"
+  },
+  "hints": [
+    {
+      "id": "hint_01_docType",
+      "entity": "docType",
+      "anchors": [
+        "incident report",
+        "occurrence report",
+        "ops_incident_report"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_incidentNumber",
+      "entity": "incidentNumber",
+      "anchors": [
+        "incident no",
+        "report number",
+        "numero do incidente"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_03_incidentDate",
+      "entity": "incidentDate",
+      "anchors": [
+        "incident date",
+        "occurrence date",
+        "data do incidente"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_04_reportDate",
+      "entity": "reportDate",
+      "anchors": [
+        "report date",
+        "filed on",
+        "data do relatorio"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_05_severity",
+      "entity": "severity",
+      "anchors": [
+        "severity",
+        "classification",
+        "gravidade"
+      ],
+      "location": "header",
+      "extractionMethod": "enum_match"
+    },
+    {
+      "id": "hint_06_locationName",
+      "entity": "locationName",
+      "anchors": [
+        "location",
+        "area",
+        "site",
+        "local"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_07_equipmentId",
+      "entity": "equipmentId",
+      "anchors": [
+        "equipment id",
+        "asset id",
+        "codigo equipamento"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_08_reportedBy",
+      "entity": "reportedBy",
+      "anchors": [
+        "reported by",
+        "reporter",
+        "relatado por"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_09_incidentDescription",
+      "entity": "incidentDescription",
+      "anchors": [
+        "description",
+        "narrative",
+        "details",
+        "descricao"
+      ],
+      "location": "incident_details",
+      "extractionMethod": "block_capture"
+    },
+    {
+      "id": "hint_10_rootCause",
+      "entity": "rootCause",
+      "anchors": [
+        "root cause",
+        "cause analysis",
+        "causa raiz"
+      ],
+      "location": "root_cause_analysis",
+      "extractionMethod": "block_capture"
+    },
+    {
+      "id": "hint_11_correctiveActions",
+      "entity": "correctiveActions",
+      "anchors": [
+        "corrective action",
+        "remediation",
+        "acao corretiva"
+      ],
+      "location": "corrective_actions",
+      "extractionMethod": "list_capture"
+    },
+    {
+      "id": "hint_12_downtimeHours",
+      "entity": "downtimeHours",
+      "anchors": [
+        "downtime",
+        "hours lost",
+        "tempo de parada"
+      ],
+      "location": "impact_assessment",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_13_estimatedCost",
+      "entity": "estimatedCost",
+      "anchors": [
+        "estimated cost",
+        "financial impact",
+        "custo estimado"
+      ],
+      "location": "impact_assessment",
+      "extractionMethod": "amount_parse"
+    }
+  ]
+}

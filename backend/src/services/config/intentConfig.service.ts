@@ -213,7 +213,7 @@ const FALLBACK_BANK: IntentConfigBank = {
     intentFamilies: {
       documents: { id: "documents", defaultOperator: "extract" },
       file_actions: { id: "file_actions", defaultOperator: "list" },
-      help: { id: "help", defaultOperator: "how_to" },
+      help: { id: "help", defaultOperator: "capabilities" },
     },
     intents: {
       documents: {
@@ -226,7 +226,7 @@ const FALLBACK_BANK: IntentConfigBank = {
         family: "file_actions",
         defaultOperator: "list",
       },
-      help: { id: "help", family: "help", defaultOperator: "how_to" },
+      help: { id: "help", family: "help", defaultOperator: "capabilities" },
     },
   },
 };
@@ -518,8 +518,10 @@ export class IntentConfigService {
     >;
     const sourceOperatorOverrides = (sourceConfig.operatorOverrides ||
       {}) as Record<string, string>;
-    const sourceIntentFamilies = Array.isArray(sourceConfig.intentFamilies)
-      ? sourceConfig.intentFamilies.reduce(
+    const sourceIntentFamiliesRaw =
+      sourceConfig.intentFamilies ?? (bank as any).intentFamilies ?? {};
+    const sourceIntentFamilies = Array.isArray(sourceIntentFamiliesRaw)
+      ? sourceIntentFamiliesRaw.reduce(
           (acc, entry) => {
             const id = String(entry?.id || "").trim();
             if (!id) return acc;
@@ -545,7 +547,7 @@ export class IntentConfigService {
             }
           >,
         )
-      : ((sourceConfig.intentFamilies || {}) as Record<
+      : (sourceIntentFamiliesRaw as Record<
           string,
           {
             id: string;
@@ -553,8 +555,10 @@ export class IntentConfigService {
             allowedOperators?: string[];
           }
         >);
-    const sourceIntents = Array.isArray(sourceConfig.intents)
-      ? sourceConfig.intents.reduce(
+    const sourceIntentsRaw =
+      sourceConfig.intents ?? (bank as any).intents ?? {};
+    const sourceIntents = Array.isArray(sourceIntentsRaw)
+      ? sourceIntentsRaw.reduce(
           (acc, entry) => {
             const id = String(entry?.id || "").trim();
             if (!id) return acc;
@@ -578,7 +582,7 @@ export class IntentConfigService {
             }
           >,
         )
-      : ((sourceConfig.intents || {}) as Record<
+      : (sourceIntentsRaw as Record<
           string,
           {
             id: string;

@@ -1,137 +1,2314 @@
 {
   "_meta": {
     "id": "table_header_ontology_accounting",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for accounting — journal entries, trial balance, chart of accounts, reconciliation.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "accounting"
+    "domain": "accounting",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "accounting",
   "headers": [
-    { "canonical": "account_balance", "synonyms": ["account balance", "balance", "acct balance", "saldo da conta", "saldo contabil", "saldo"], "related": ["debit_balance", "credit_balance"] },
-    { "canonical": "account_class", "synonyms": ["account class", "class of account", "account classification", "classe da conta", "classificacao da conta"], "related": ["account_type", "account_group"] },
-    { "canonical": "account_code", "synonyms": ["account code", "acct code", "gl code", "codigo da conta", "cod conta"], "related": ["account_name", "gl_account"] },
-    { "canonical": "account_currency", "synonyms": ["account currency", "acct currency", "currency of account", "moeda da conta", "divisa da conta"], "related": ["functional_currency", "account_code"] },
-    { "canonical": "account_group", "synonyms": ["account group", "acct group", "grouping", "grupo da conta", "agrupamento contabil"], "related": ["account_class", "account_level"] },
-    { "canonical": "account_level", "synonyms": ["account level", "acct level", "hierarchy level", "nivel da conta", "nivel hierarquico"], "related": ["parent_account", "sub_account"] },
-    { "canonical": "account_name", "synonyms": ["account name", "account description", "acct name", "nome da conta", "descricao da conta"], "related": ["account_code", "account_type"] },
-    { "canonical": "account_nature", "synonyms": ["account nature", "nature of account", "debit credit nature", "natureza da conta", "natureza contabil"], "related": ["normal_balance", "account_type"] },
-    { "canonical": "account_type", "synonyms": ["account type", "acct type", "type of account", "tipo de conta", "natureza da conta"], "related": ["account_code", "account_class"] },
-    { "canonical": "accumulated_depreciation", "synonyms": ["accumulated depreciation", "accum depr", "total depreciation", "depreciacao acumulada", "depr acumulada"], "related": ["net_book_value", "depreciation_rate"] },
-    { "canonical": "accrual_amount", "synonyms": ["accrual amount", "accrued amount", "accrual", "valor de competencia", "valor provisionado", "accrual"], "related": ["deferral_amount", "close_date"] },
-    { "canonical": "acquisition_cost", "synonyms": ["acquisition cost", "purchase cost", "original cost", "custo de aquisicao", "valor de aquisicao"], "related": ["asset_number", "net_book_value"] },
-    { "canonical": "acquisition_date", "synonyms": ["acquisition date", "purchase date", "date acquired", "data de aquisicao", "data da compra"], "related": ["asset_number", "acquisition_cost"] },
-    { "canonical": "actual_cost", "synonyms": ["actual cost", "real cost", "incurred cost", "custo real", "custo efetivo", "custo incorrido"], "related": ["standard_cost", "cost_element"] },
-    { "canonical": "adjusted_balance", "synonyms": ["adjusted balance", "adjusted bal", "post-adjustment balance", "saldo ajustado", "saldo apos ajuste"], "related": ["unadjusted_balance", "reclassification"] },
-    { "canonical": "allocated_amount", "synonyms": ["allocated amount", "allocation amount", "apportioned amount", "valor alocado", "valor rateado", "montante alocado"], "related": ["allocation_rate", "allocation_base"] },
-    { "canonical": "allocation_base", "synonyms": ["allocation base", "apportionment base", "driver", "base de rateio", "base de alocacao", "direcionador"], "related": ["allocation_rate", "cost_center_code"] },
-    { "canonical": "allocation_rate", "synonyms": ["allocation rate", "apportionment rate", "distribution rate", "taxa de rateio", "taxa de alocacao"], "related": ["allocation_base", "allocated_amount"] },
-    { "canonical": "approved_by", "synonyms": ["approved by", "approver", "authorized by", "aprovado por", "aprovador", "autorizado por"], "related": ["created_by", "journal_number"] },
-    { "canonical": "asset_class", "synonyms": ["asset class", "asset category", "asset group", "classe do ativo", "categoria do ativo", "grupo do ativo"], "related": ["asset_number", "depreciation_method"] },
-    { "canonical": "asset_description", "synonyms": ["asset description", "asset name", "asset detail", "descricao do ativo", "nome do ativo"], "related": ["asset_number", "asset_class"] },
-    { "canonical": "asset_number", "synonyms": ["asset number", "asset id", "asset tag", "numero do ativo", "codigo do ativo", "patrimonio"], "related": ["asset_description", "asset_class"] },
-    { "canonical": "audit_action", "synonyms": ["audit action", "action type", "event type", "acao de auditoria", "tipo de acao", "evento"], "related": ["audit_trail_id", "audit_user"] },
-    { "canonical": "audit_timestamp", "synonyms": ["audit timestamp", "event timestamp", "log time", "data/hora da auditoria", "timestamp do evento", "carimbo de tempo"], "related": ["audit_trail_id", "audit_action"] },
-    { "canonical": "audit_trail_id", "synonyms": ["audit trail id", "audit id", "trail number", "id da trilha de auditoria", "codigo de auditoria", "id do log"], "related": ["audit_timestamp", "audit_user"] },
-    { "canonical": "audit_user", "synonyms": ["audit user", "user name", "changed by", "usuario de auditoria", "usuario responsavel", "alterado por"], "related": ["audit_trail_id", "audit_action"] },
-    { "canonical": "bank_reference", "synonyms": ["bank reference", "bank ref", "bank transaction id", "referencia bancaria", "ref bancaria", "id transacao bancaria"], "related": ["statement_balance", "reconciliation_date"] },
-    { "canonical": "batch_number", "synonyms": ["batch number", "batch id", "batch no", "numero do lote", "id do lote", "lote"], "related": ["journal_number", "posting_date"] },
-    { "canonical": "book_balance", "synonyms": ["book balance", "ledger balance", "gl balance", "saldo contabil", "saldo do razao", "saldo nos livros"], "related": ["statement_balance", "unreconciled_difference"] },
-    { "canonical": "cleared_items", "synonyms": ["cleared items", "cleared transactions", "matched items", "itens compensados", "transacoes conciliadas", "itens baixados"], "related": ["outstanding_items", "reconciliation_date"] },
-    { "canonical": "clearing_date", "synonyms": ["clearing date", "clearance date", "match date", "data de compensacao", "data de baixa", "data da conciliacao"], "related": ["reconciliation_date", "cleared_items"] },
-    { "canonical": "close_date", "synonyms": ["close date", "closing date", "period close date", "data de fechamento", "data de encerramento"], "related": ["close_status", "period_end"] },
-    { "canonical": "close_status", "synonyms": ["close status", "period status", "closing status", "status do fechamento", "situacao do encerramento", "status do periodo"], "related": ["close_date", "soft_close"] },
-    { "canonical": "closing_balance", "synonyms": ["closing balance", "end balance", "period end balance", "saldo de fechamento", "saldo final", "saldo de encerramento"], "related": ["opening_balance", "period_activity"] },
-    { "canonical": "consolidation_code", "synonyms": ["consolidation code", "consol code", "elimination code", "codigo de consolidacao", "cod consolidacao", "codigo de eliminacao"], "related": ["reporting_entity", "ic_elimination"] },
-    { "canonical": "cost_center_code", "synonyms": ["cost center code", "cc code", "cost center id", "codigo do centro de custo", "cod cc", "id centro de custo"], "related": ["cost_center_name", "cost_element"] },
-    { "canonical": "cost_center_name", "synonyms": ["cost center name", "cc name", "cost center description", "nome do centro de custo", "descricao do cc"], "related": ["cost_center_code", "cost_object"] },
-    { "canonical": "cost_element", "synonyms": ["cost element", "cost type", "nature of cost", "elemento de custo", "tipo de custo", "natureza do custo"], "related": ["cost_center_code", "cost_object"] },
-    { "canonical": "cost_object", "synonyms": ["cost object", "cost bearer", "cost collector", "objeto de custo", "portador de custo", "ordem de custo"], "related": ["cost_element", "cost_center_code"] },
-    { "canonical": "counterparty_account", "synonyms": ["counterparty account", "offset account", "contra account", "conta de contrapartida", "conta offset", "contrapartida"], "related": ["transaction_id", "gl_account"] },
-    { "canonical": "created_by", "synonyms": ["created by", "creator", "entered by", "criado por", "criador", "lancado por"], "related": ["approved_by", "journal_date"] },
-    { "canonical": "credit_amount", "synonyms": ["credit amount", "credit", "cr amount", "valor a credito", "credito", "montante creditado"], "related": ["debit_amount", "net_amount"] },
-    { "canonical": "credit_balance", "synonyms": ["credit balance", "creditor balance", "cr balance", "saldo credor", "saldo a credito"], "related": ["debit_balance", "account_balance"] },
-    { "canonical": "debit_amount", "synonyms": ["debit amount", "debit", "dr amount", "valor a debito", "debito", "montante debitado"], "related": ["credit_amount", "net_amount"] },
-    { "canonical": "debit_balance", "synonyms": ["debit balance", "debtor balance", "dr balance", "saldo devedor", "saldo a debito"], "related": ["credit_balance", "account_balance"] },
-    { "canonical": "deferral_amount", "synonyms": ["deferral amount", "deferred amount", "deferral", "valor diferido", "diferimento", "montante diferido"], "related": ["accrual_amount", "close_date"] },
-    { "canonical": "deposit_in_transit", "synonyms": ["deposit in transit", "uncleared deposit", "float deposit", "deposito em transito", "deposito nao compensado", "deposito pendente"], "related": ["outstanding_items", "statement_balance"] },
-    { "canonical": "depreciation_method", "synonyms": ["depreciation method", "depr method", "method of depreciation", "metodo de depreciacao", "criterio de depreciacao", "tipo de depreciacao"], "related": ["depreciation_rate", "useful_life"] },
-    { "canonical": "depreciation_rate", "synonyms": ["depreciation rate", "depr rate", "annual depr rate", "taxa de depreciacao", "aliquota de depreciacao", "taxa anual de depreciacao"], "related": ["depreciation_method", "accumulated_depreciation"] },
-    { "canonical": "direct_cost", "synonyms": ["direct cost", "direct expense", "traceable cost", "custo direto", "despesa direta", "custo rastreavel"], "related": ["indirect_cost", "cost_element"] },
-    { "canonical": "disposal_date", "synonyms": ["disposal date", "retirement date", "date disposed", "data de baixa", "data de alienacao", "data de descarte"], "related": ["asset_number", "net_book_value"] },
-    { "canonical": "document_number", "synonyms": ["document number", "doc number", "doc no", "numero do documento", "num documento", "nro documento"], "related": ["document_type", "transaction_id"] },
-    { "canonical": "document_type", "synonyms": ["document type", "doc type", "voucher type", "tipo de documento", "tipo doc", "tipo de comprovante"], "related": ["document_number", "transaction_source"] },
-    { "canonical": "elimination", "synonyms": ["elimination", "elimination entry", "consol elimination", "eliminacao", "lancamento de eliminacao", "eliminacao de consolidacao"], "related": ["reclassification", "ic_elimination"] },
-    { "canonical": "entry_type", "synonyms": ["entry type", "journal type", "posting type", "tipo de lancamento", "tipo de partida", "natureza do lancamento"], "related": ["journal_number", "reversal_flag"] },
-    { "canonical": "exempt_amount", "synonyms": ["exempt amount", "tax-exempt amount", "non-taxable amount", "valor isento", "montante isento", "valor nao tributavel"], "related": ["taxable_amount", "tax_code"] },
-    { "canonical": "fiscal_period", "synonyms": ["fiscal period", "accounting period", "period number", "periodo fiscal", "periodo contabil", "competencia"], "related": ["fiscal_year", "posting_period"] },
-    { "canonical": "fiscal_year", "synonyms": ["fiscal year", "financial year", "fy", "ano fiscal", "exercicio fiscal", "exercicio"], "related": ["fiscal_period", "period_start"] },
-    { "canonical": "functional_currency", "synonyms": ["functional currency", "local currency", "reporting currency", "moeda funcional", "moeda local", "moeda de reporte"], "related": ["account_currency", "translation_adjustment"] },
-    { "canonical": "gl_account", "synonyms": ["gl account", "general ledger account", "ledger account", "conta contabil", "conta do razao", "conta GL"], "related": ["account_code", "account_name"] },
-    { "canonical": "hard_close", "synonyms": ["hard close", "final close", "definitive close", "fechamento definitivo", "encerramento final", "close definitivo"], "related": ["soft_close", "close_status"] },
-    { "canonical": "ic_account", "synonyms": ["ic account", "intercompany account", "interco account", "conta intercompany", "conta interempresa", "conta IC"], "related": ["ic_partner", "ic_amount"] },
-    { "canonical": "ic_amount", "synonyms": ["ic amount", "intercompany amount", "interco amount", "valor intercompany", "montante interempresa", "valor IC"], "related": ["ic_account", "ic_currency"] },
-    { "canonical": "ic_currency", "synonyms": ["ic currency", "intercompany currency", "interco currency", "moeda intercompany", "moeda interempresa", "divisa IC"], "related": ["ic_amount", "ic_partner"] },
-    { "canonical": "ic_elimination", "synonyms": ["ic elimination", "intercompany elimination", "consol elimination", "eliminacao intercompany", "eliminacao interempresa", "eliminacao IC"], "related": ["ic_amount", "consolidation_code"] },
-    { "canonical": "ic_partner", "synonyms": ["ic partner", "intercompany partner", "trading partner", "parceiro intercompany", "empresa parceira", "parceiro IC"], "related": ["ic_account", "ic_amount"] },
-    { "canonical": "ic_reference", "synonyms": ["ic reference", "intercompany reference", "interco ref", "referencia intercompany", "ref interempresa", "ref IC"], "related": ["ic_partner", "ic_amount"] },
-    { "canonical": "indirect_cost", "synonyms": ["indirect cost", "indirect expense", "unallocated cost", "custo indireto", "despesa indireta", "custo nao alocado"], "related": ["direct_cost", "overhead_rate"] },
-    { "canonical": "intercompany_partner", "synonyms": ["intercompany partner", "ic partner", "related entity", "parceiro intercompany", "entidade relacionada", "empresa coligada"], "related": ["counterparty_account", "ic_elimination"] },
-    { "canonical": "is_active", "synonyms": ["is active", "active flag", "account status", "ativo", "flag ativo", "status da conta", "conta ativa"], "related": ["account_code", "account_name"] },
-    { "canonical": "journal_date", "synonyms": ["journal date", "entry date", "je date", "data do lancamento", "data da partida", "data do diario"], "related": ["journal_number", "posting_date"] },
-    { "canonical": "journal_number", "synonyms": ["journal number", "journal id", "je number", "numero do lancamento", "id do diario", "num partida"], "related": ["journal_date", "entry_type"] },
-    { "canonical": "last_reconciled", "synonyms": ["last reconciled", "last recon date", "previous reconciliation", "ultima conciliacao", "data da ultima conciliacao", "conciliacao anterior"], "related": ["reconciliation_date", "reconciled_by"] },
-    { "canonical": "line_number", "synonyms": ["line number", "line no", "line item", "numero da linha", "num linha", "item de linha"], "related": ["journal_number", "debit_amount"] },
-    { "canonical": "memo", "synonyms": ["memo", "description", "narration", "memorando", "descricao", "historico", "observacao"], "related": ["reference", "journal_number"] },
-    { "canonical": "net_amount", "synonyms": ["net amount", "net value", "balance amount", "valor liquido", "montante liquido", "valor resultante"], "related": ["debit_amount", "credit_amount"] },
-    { "canonical": "net_book_value", "synonyms": ["net book value", "nbv", "carrying amount", "valor contabil liquido", "valor residual contabil", "VCL"], "related": ["acquisition_cost", "accumulated_depreciation"] },
-    { "canonical": "normal_balance", "synonyms": ["normal balance", "natural balance", "expected balance side", "saldo normal", "saldo natural", "lado do saldo"], "related": ["account_nature", "account_type"] },
-    { "canonical": "opening_balance", "synonyms": ["opening balance", "beginning balance", "start balance", "saldo de abertura", "saldo inicial", "saldo de inicio"], "related": ["closing_balance", "period_activity"] },
-    { "canonical": "outstanding_items", "synonyms": ["outstanding items", "open items", "pending items", "itens pendentes", "itens em aberto", "partidas abertas"], "related": ["cleared_items", "unreconciled_difference"] },
-    { "canonical": "overhead_rate", "synonyms": ["overhead rate", "burden rate", "indirect rate", "taxa de overhead", "taxa de rateio indireto", "taxa de carga"], "related": ["indirect_cost", "allocation_rate"] },
-    { "canonical": "parent_account", "synonyms": ["parent account", "parent acct", "superior account", "conta pai", "conta superior", "conta mae"], "related": ["sub_account", "account_level"] },
-    { "canonical": "period_activity", "synonyms": ["period activity", "period movement", "monthly activity", "movimento do periodo", "movimentacao mensal", "atividade do periodo"], "related": ["opening_balance", "closing_balance"] },
-    { "canonical": "period_end", "synonyms": ["period end", "end of period", "period end date", "fim do periodo", "data final do periodo", "encerramento do periodo"], "related": ["period_start", "close_date"] },
-    { "canonical": "period_start", "synonyms": ["period start", "start of period", "period start date", "inicio do periodo", "data inicial do periodo", "abertura do periodo"], "related": ["period_end", "fiscal_period"] },
-    { "canonical": "posting_date", "synonyms": ["posting date", "post date", "effective date", "data de contabilizacao", "data de postagem", "data efetiva"], "related": ["journal_date", "posting_period"] },
-    { "canonical": "posting_period", "synonyms": ["posting period", "post period", "accounting period", "periodo de contabilizacao", "periodo de postagem", "periodo contabil"], "related": ["fiscal_period", "posting_date"] },
-    { "canonical": "prior_period", "synonyms": ["prior period", "previous period", "last period", "periodo anterior", "periodo precedente", "competencia anterior"], "related": ["ytd_balance", "period_activity"] },
-    { "canonical": "provision_amount", "synonyms": ["provision amount", "provision", "reserve amount", "valor da provisao", "provisao", "montante provisionado"], "related": ["accrual_amount", "write_off_amount"] },
-    { "canonical": "reclassification", "synonyms": ["reclassification", "reclass", "reclassification entry", "reclassificacao", "reclass", "lancamento de reclassificacao"], "related": ["adjusted_balance", "elimination"] },
-    { "canonical": "reconciled_by", "synonyms": ["reconciled by", "reconciler", "performed by", "conciliado por", "responsavel pela conciliacao", "executado por"], "related": ["reconciliation_date", "last_reconciled"] },
-    { "canonical": "reconciliation_date", "synonyms": ["reconciliation date", "recon date", "date reconciled", "data de conciliacao", "data da conciliacao", "data do recon"], "related": ["statement_date", "reconciled_by"] },
-    { "canonical": "reference", "synonyms": ["reference", "ref", "reference number", "referencia", "ref", "numero de referencia"], "related": ["memo", "document_number"] },
-    { "canonical": "reporting_entity", "synonyms": ["reporting entity", "entity", "reporting unit", "entidade de reporte", "unidade de reporte", "entidade contabil"], "related": ["consolidation_code", "functional_currency"] },
-    { "canonical": "revaluation_amount", "synonyms": ["revaluation amount", "revaluation", "revaluation adjustment", "valor de reavaliacao", "reavaliacao", "ajuste de reavaliacao"], "related": ["translation_adjustment", "close_date"] },
-    { "canonical": "reversal_date", "synonyms": ["reversal date", "reverse date", "date reversed", "data de estorno", "data da reversao", "data do estorno"], "related": ["reversal_flag", "journal_number"] },
-    { "canonical": "reversal_flag", "synonyms": ["reversal flag", "reversed", "is reversal", "flag de estorno", "estornado", "indicador de reversao"], "related": ["reversal_date", "entry_type"] },
-    { "canonical": "salvage_value", "synonyms": ["salvage value", "residual value", "scrap value", "valor residual", "valor de sucata", "valor de salvamento"], "related": ["useful_life", "net_book_value"] },
-    { "canonical": "soft_close", "synonyms": ["soft close", "preliminary close", "tentative close", "fechamento preliminar", "pre-fechamento", "close provisorio"], "related": ["hard_close", "close_status"] },
-    { "canonical": "source_module", "synonyms": ["source module", "originating module", "system module", "modulo de origem", "modulo fonte", "sistema de origem"], "related": ["transaction_source", "document_type"] },
-    { "canonical": "standard_cost", "synonyms": ["standard cost", "budgeted cost", "planned cost", "custo padrao", "custo orcado", "custo planejado"], "related": ["actual_cost", "cost_element"] },
-    { "canonical": "statement_balance", "synonyms": ["statement balance", "bank statement balance", "stmt balance", "saldo do extrato", "saldo bancario", "saldo do demonstrativo"], "related": ["book_balance", "reconciliation_date"] },
-    { "canonical": "statement_date", "synonyms": ["statement date", "bank statement date", "stmt date", "data do extrato", "data do demonstrativo", "data do extrato bancario"], "related": ["reconciliation_date", "statement_balance"] },
-    { "canonical": "sub_account", "synonyms": ["sub account", "sub-account", "child account", "subconta", "conta filha", "conta analitica"], "related": ["parent_account", "account_level"] },
-    { "canonical": "tax_amount", "synonyms": ["tax amount", "tax value", "tax total", "valor do imposto", "montante tributario", "total de impostos"], "related": ["taxable_amount", "tax_rate"] },
-    { "canonical": "tax_code", "synonyms": ["tax code", "tax id", "tax indicator", "codigo do imposto", "cod tributario", "indicador fiscal"], "related": ["tax_rate", "tax_jurisdiction"] },
-    { "canonical": "tax_jurisdiction", "synonyms": ["tax jurisdiction", "tax authority", "tax region", "jurisdicao fiscal", "autoridade tributaria", "regiao fiscal"], "related": ["tax_code", "tax_rate"] },
-    { "canonical": "tax_rate", "synonyms": ["tax rate", "rate of tax", "tax percentage", "aliquota do imposto", "taxa tributaria", "percentual do imposto"], "related": ["tax_code", "tax_amount"] },
-    { "canonical": "taxable_amount", "synonyms": ["taxable amount", "tax base", "assessable amount", "base de calculo", "valor tributavel", "montante tributavel"], "related": ["tax_amount", "exempt_amount"] },
-    { "canonical": "transaction_date", "synonyms": ["transaction date", "txn date", "date of transaction", "data da transacao", "data da operacao", "data do movimento"], "related": ["transaction_id", "posting_date"] },
-    { "canonical": "transaction_description", "synonyms": ["transaction description", "txn description", "narrative", "descricao da transacao", "historico da transacao", "narrativa"], "related": ["transaction_id", "memo"] },
-    { "canonical": "transaction_id", "synonyms": ["transaction id", "txn id", "transaction number", "id da transacao", "numero da transacao", "cod transacao"], "related": ["transaction_date", "document_number"] },
-    { "canonical": "transaction_source", "synonyms": ["transaction source", "txn source", "origin", "origem da transacao", "fonte da transacao", "sistema de origem"], "related": ["source_module", "document_type"] },
-    { "canonical": "translation_adjustment", "synonyms": ["translation adjustment", "currency translation", "cta", "ajuste de conversao", "variacao cambial", "ajuste de traducao"], "related": ["revaluation_amount", "functional_currency"] },
-    { "canonical": "unadjusted_balance", "synonyms": ["unadjusted balance", "pre-adjustment balance", "raw balance", "saldo nao ajustado", "saldo pre-ajuste", "saldo bruto"], "related": ["adjusted_balance", "account_balance"] },
-    { "canonical": "unreconciled_difference", "synonyms": ["unreconciled difference", "recon difference", "discrepancy", "diferenca nao conciliada", "diferenca de conciliacao", "discrepancia"], "related": ["book_balance", "statement_balance"] },
-    { "canonical": "useful_life", "synonyms": ["useful life", "economic life", "expected life", "vida util", "vida economica", "vida util estimada"], "related": ["depreciation_method", "salvage_value"] },
-    { "canonical": "withholding_amount", "synonyms": ["withholding amount", "withheld amount", "amount withheld", "valor retido", "montante retido", "valor da retencao"], "related": ["withholding_rate", "tax_amount"] },
-    { "canonical": "withholding_rate", "synonyms": ["withholding rate", "retention rate", "wht rate", "taxa de retencao", "aliquota de retencao", "taxa de withholding"], "related": ["withholding_amount", "tax_rate"] },
-    { "canonical": "write_off_amount", "synonyms": ["write-off amount", "write off", "written off amount", "valor de baixa", "montante baixado", "valor da perda"], "related": ["provision_amount", "close_date"] },
-    { "canonical": "ytd_balance", "synonyms": ["ytd balance", "year-to-date balance", "cumulative balance", "saldo acumulado no ano", "saldo ytd", "saldo acumulado"], "related": ["prior_period", "closing_balance"] }
+    {
+      "canonical": "account_balance",
+      "synonyms": [
+        "account balance",
+        "balance",
+        "acct balance",
+        "saldo da conta",
+        "saldo contabil",
+        "saldo"
+      ],
+      "related": [
+        "debit_balance",
+        "credit_balance"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_balance",
+      "curationReason": "weighted:account_balance:domain_general"
+    },
+    {
+      "canonical": "account_class",
+      "synonyms": [
+        "account class",
+        "class of account",
+        "account classification",
+        "classe da conta",
+        "classificacao da conta"
+      ],
+      "related": [
+        "account_type",
+        "account_group"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_class",
+      "curationReason": "weighted:account_class:domain_general"
+    },
+    {
+      "canonical": "account_code",
+      "synonyms": [
+        "account code",
+        "acct code",
+        "gl code",
+        "codigo da conta",
+        "cod conta"
+      ],
+      "related": [
+        "account_name",
+        "gl_account"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_code",
+      "curationReason": "weighted:account_code:domain_general"
+    },
+    {
+      "canonical": "account_currency",
+      "synonyms": [
+        "account currency",
+        "acct currency",
+        "currency of account",
+        "moeda da conta",
+        "divisa da conta"
+      ],
+      "related": [
+        "functional_currency",
+        "account_code"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_currency",
+      "curationReason": "weighted:account_currency:domain_general"
+    },
+    {
+      "canonical": "account_group",
+      "synonyms": [
+        "account group",
+        "acct group",
+        "grouping",
+        "grupo da conta",
+        "agrupamento contabil"
+      ],
+      "related": [
+        "account_class",
+        "account_level"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_group",
+      "curationReason": "weighted:account_group:domain_general"
+    },
+    {
+      "canonical": "account_level",
+      "synonyms": [
+        "account level",
+        "acct level",
+        "hierarchy level",
+        "nivel da conta",
+        "nivel hierarquico"
+      ],
+      "related": [
+        "parent_account",
+        "sub_account"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_level",
+      "curationReason": "weighted:account_level:domain_general"
+    },
+    {
+      "canonical": "account_name",
+      "synonyms": [
+        "account name",
+        "account description",
+        "acct name",
+        "nome da conta",
+        "descricao da conta"
+      ],
+      "related": [
+        "account_code",
+        "account_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_name",
+      "curationReason": "weighted:account_name:domain_general"
+    },
+    {
+      "canonical": "account_nature",
+      "synonyms": [
+        "account nature",
+        "nature of account",
+        "debit credit nature",
+        "natureza da conta",
+        "natureza contabil"
+      ],
+      "related": [
+        "normal_balance",
+        "account_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_nature",
+      "curationReason": "weighted:account_nature:domain_general"
+    },
+    {
+      "canonical": "account_type",
+      "synonyms": [
+        "account type",
+        "acct type",
+        "type of account",
+        "tipo de conta",
+        "natureza da conta"
+      ],
+      "related": [
+        "account_code",
+        "account_class"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_account_type",
+      "curationReason": "weighted:account_type:domain_general"
+    },
+    {
+      "canonical": "accumulated_depreciation",
+      "synonyms": [
+        "accumulated depreciation",
+        "accum depr",
+        "total depreciation",
+        "depreciacao acumulada",
+        "depr acumulada"
+      ],
+      "related": [
+        "net_book_value",
+        "depreciation_rate"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_accumulated_depreciation",
+      "curationReason": "weighted:accumulated_depreciation:domain_general"
+    },
+    {
+      "canonical": "accrual_amount",
+      "synonyms": [
+        "accrual amount",
+        "accrued amount",
+        "accrual",
+        "valor de competencia",
+        "valor provisionado",
+        "accrual"
+      ],
+      "related": [
+        "deferral_amount",
+        "close_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_accrual_amount",
+      "curationReason": "weighted:accrual_amount:domain_general"
+    },
+    {
+      "canonical": "acquisition_cost",
+      "synonyms": [
+        "acquisition cost",
+        "purchase cost",
+        "original cost",
+        "custo de aquisicao",
+        "valor de aquisicao"
+      ],
+      "related": [
+        "asset_number",
+        "net_book_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_acquisition_cost",
+      "curationReason": "weighted:acquisition_cost:domain_general"
+    },
+    {
+      "canonical": "acquisition_date",
+      "synonyms": [
+        "acquisition date",
+        "purchase date",
+        "date acquired",
+        "data de aquisicao",
+        "data da compra"
+      ],
+      "related": [
+        "asset_number",
+        "acquisition_cost"
+      ],
+      "priority": 720,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_acquisition_date",
+      "curationReason": "weighted:acquisition_date:domain_general"
+    },
+    {
+      "canonical": "actual_cost",
+      "synonyms": [
+        "actual cost",
+        "real cost",
+        "incurred cost",
+        "custo real",
+        "custo efetivo",
+        "custo incorrido"
+      ],
+      "related": [
+        "standard_cost",
+        "cost_element"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_actual_cost",
+      "curationReason": "weighted:actual_cost:domain_general"
+    },
+    {
+      "canonical": "adjusted_balance",
+      "synonyms": [
+        "adjusted balance",
+        "adjusted bal",
+        "post-adjustment balance",
+        "saldo ajustado",
+        "saldo apos ajuste"
+      ],
+      "related": [
+        "unadjusted_balance",
+        "reclassification"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_balance",
+      "curationReason": "weighted:adjusted_balance:domain_general"
+    },
+    {
+      "canonical": "allocated_amount",
+      "synonyms": [
+        "allocated amount",
+        "allocation amount",
+        "apportioned amount",
+        "valor alocado",
+        "valor rateado",
+        "montante alocado"
+      ],
+      "related": [
+        "allocation_rate",
+        "allocation_base"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_allocated_amount",
+      "curationReason": "weighted:allocated_amount:domain_general"
+    },
+    {
+      "canonical": "allocation_base",
+      "synonyms": [
+        "allocation base",
+        "apportionment base",
+        "driver",
+        "base de rateio",
+        "base de alocacao",
+        "direcionador"
+      ],
+      "related": [
+        "allocation_rate",
+        "cost_center_code"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_allocation_base",
+      "curationReason": "weighted:allocation_base:domain_general"
+    },
+    {
+      "canonical": "allocation_rate",
+      "synonyms": [
+        "allocation rate",
+        "apportionment rate",
+        "distribution rate",
+        "taxa de rateio",
+        "taxa de alocacao"
+      ],
+      "related": [
+        "allocation_base",
+        "allocated_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_allocation_rate",
+      "curationReason": "weighted:allocation_rate:domain_general"
+    },
+    {
+      "canonical": "approved_by",
+      "synonyms": [
+        "approved by",
+        "approver",
+        "authorized by",
+        "aprovado por",
+        "aprovador",
+        "autorizado por"
+      ],
+      "related": [
+        "created_by",
+        "journal_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_by",
+      "curationReason": "weighted:approved_by:domain_general"
+    },
+    {
+      "canonical": "asset_class",
+      "synonyms": [
+        "asset class",
+        "asset category",
+        "asset group",
+        "classe do ativo",
+        "categoria do ativo",
+        "grupo do ativo"
+      ],
+      "related": [
+        "asset_number",
+        "depreciation_method"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_class",
+      "curationReason": "weighted:asset_class:domain_general"
+    },
+    {
+      "canonical": "asset_description",
+      "synonyms": [
+        "asset description",
+        "asset name",
+        "asset detail",
+        "descricao do ativo",
+        "nome do ativo"
+      ],
+      "related": [
+        "asset_number",
+        "asset_class"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_description",
+      "curationReason": "weighted:asset_description:domain_general"
+    },
+    {
+      "canonical": "asset_number",
+      "synonyms": [
+        "asset number",
+        "asset id",
+        "asset tag",
+        "numero do ativo",
+        "codigo do ativo",
+        "patrimonio"
+      ],
+      "related": [
+        "asset_description",
+        "asset_class"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_number",
+      "curationReason": "weighted:asset_number:domain_general"
+    },
+    {
+      "canonical": "audit_action",
+      "synonyms": [
+        "audit action",
+        "action type",
+        "event type",
+        "acao de auditoria",
+        "tipo de acao",
+        "evento"
+      ],
+      "related": [
+        "audit_trail_id",
+        "audit_user"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_action",
+      "curationReason": "weighted:audit_action:domain_general"
+    },
+    {
+      "canonical": "audit_timestamp",
+      "synonyms": [
+        "audit timestamp",
+        "event timestamp",
+        "log time",
+        "data/hora da auditoria",
+        "timestamp do evento",
+        "carimbo de tempo"
+      ],
+      "related": [
+        "audit_trail_id",
+        "audit_action"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_timestamp",
+      "curationReason": "weighted:audit_timestamp:domain_general"
+    },
+    {
+      "canonical": "audit_trail_id",
+      "synonyms": [
+        "audit trail id",
+        "audit id",
+        "trail number",
+        "id da trilha de auditoria",
+        "codigo de auditoria",
+        "id do log"
+      ],
+      "related": [
+        "audit_timestamp",
+        "audit_user"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_trail_id",
+      "curationReason": "weighted:audit_trail_id:domain_general"
+    },
+    {
+      "canonical": "audit_user",
+      "synonyms": [
+        "audit user",
+        "user name",
+        "changed by",
+        "usuario de auditoria",
+        "usuario responsavel",
+        "alterado por"
+      ],
+      "related": [
+        "audit_trail_id",
+        "audit_action"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_user",
+      "curationReason": "weighted:audit_user:domain_general"
+    },
+    {
+      "canonical": "bank_reference",
+      "synonyms": [
+        "bank reference",
+        "bank ref",
+        "bank transaction id",
+        "referencia bancaria",
+        "ref bancaria",
+        "id transacao bancaria"
+      ],
+      "related": [
+        "statement_balance",
+        "reconciliation_date"
+      ],
+      "priority": 426,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_reference",
+      "curationReason": "weighted:bank_reference:domain_general"
+    },
+    {
+      "canonical": "batch_number",
+      "synonyms": [
+        "batch number",
+        "batch id",
+        "batch no",
+        "numero do lote",
+        "id do lote",
+        "lote"
+      ],
+      "related": [
+        "journal_number",
+        "posting_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_batch_number",
+      "curationReason": "weighted:batch_number:domain_general"
+    },
+    {
+      "canonical": "book_balance",
+      "synonyms": [
+        "book balance",
+        "ledger balance",
+        "gl balance",
+        "saldo contabil",
+        "saldo do razao",
+        "saldo nos livros"
+      ],
+      "related": [
+        "statement_balance",
+        "unreconciled_difference"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_book_balance",
+      "curationReason": "weighted:book_balance:domain_general"
+    },
+    {
+      "canonical": "cleared_items",
+      "synonyms": [
+        "cleared items",
+        "cleared transactions",
+        "matched items",
+        "itens compensados",
+        "transacoes conciliadas",
+        "itens baixados"
+      ],
+      "related": [
+        "outstanding_items",
+        "reconciliation_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_cleared_items",
+      "curationReason": "weighted:cleared_items:domain_general"
+    },
+    {
+      "canonical": "clearing_date",
+      "synonyms": [
+        "clearing date",
+        "clearance date",
+        "match date",
+        "data de compensacao",
+        "data de baixa",
+        "data da conciliacao"
+      ],
+      "related": [
+        "reconciliation_date",
+        "cleared_items"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_clearing_date",
+      "curationReason": "weighted:clearing_date:domain_general"
+    },
+    {
+      "canonical": "close_date",
+      "synonyms": [
+        "close date",
+        "closing date",
+        "period close date",
+        "data de fechamento",
+        "data de encerramento"
+      ],
+      "related": [
+        "close_status",
+        "period_end"
+      ],
+      "priority": 720,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_close_date",
+      "curationReason": "weighted:close_date:domain_general"
+    },
+    {
+      "canonical": "close_status",
+      "synonyms": [
+        "close status",
+        "period status",
+        "closing status",
+        "status do fechamento",
+        "situacao do encerramento",
+        "status do periodo"
+      ],
+      "related": [
+        "close_date",
+        "soft_close"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_close_status",
+      "curationReason": "weighted:close_status:domain_general"
+    },
+    {
+      "canonical": "closing_balance",
+      "synonyms": [
+        "closing balance",
+        "end balance",
+        "period end balance",
+        "saldo de fechamento",
+        "saldo final",
+        "saldo de encerramento"
+      ],
+      "related": [
+        "opening_balance",
+        "period_activity"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_closing_balance",
+      "curationReason": "weighted:closing_balance:domain_general"
+    },
+    {
+      "canonical": "consolidation_code",
+      "synonyms": [
+        "consolidation code",
+        "consol code",
+        "elimination code",
+        "codigo de consolidacao",
+        "cod consolidacao",
+        "codigo de eliminacao"
+      ],
+      "related": [
+        "reporting_entity",
+        "ic_elimination"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_consolidation_code",
+      "curationReason": "weighted:consolidation_code:domain_general"
+    },
+    {
+      "canonical": "cost_center_code",
+      "synonyms": [
+        "cost center code",
+        "cc code",
+        "cost center id",
+        "codigo do centro de custo",
+        "cod cc",
+        "id centro de custo"
+      ],
+      "related": [
+        "cost_center_name",
+        "cost_element"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_center_code",
+      "curationReason": "weighted:cost_center_code:domain_general"
+    },
+    {
+      "canonical": "cost_center_name",
+      "synonyms": [
+        "cost center name",
+        "cc name",
+        "cost center description",
+        "nome do centro de custo",
+        "descricao do cc"
+      ],
+      "related": [
+        "cost_center_code",
+        "cost_object"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_center_name",
+      "curationReason": "weighted:cost_center_name:domain_general"
+    },
+    {
+      "canonical": "cost_element",
+      "synonyms": [
+        "cost element",
+        "cost type",
+        "nature of cost",
+        "elemento de custo",
+        "tipo de custo",
+        "natureza do custo"
+      ],
+      "related": [
+        "cost_center_code",
+        "cost_object"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_element",
+      "curationReason": "weighted:cost_element:domain_general"
+    },
+    {
+      "canonical": "cost_object",
+      "synonyms": [
+        "cost object",
+        "cost bearer",
+        "cost collector",
+        "objeto de custo",
+        "portador de custo",
+        "ordem de custo"
+      ],
+      "related": [
+        "cost_element",
+        "cost_center_code"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_object",
+      "curationReason": "weighted:cost_object:domain_general"
+    },
+    {
+      "canonical": "counterparty_account",
+      "synonyms": [
+        "counterparty account",
+        "offset account",
+        "contra account",
+        "conta de contrapartida",
+        "conta offset",
+        "contrapartida"
+      ],
+      "related": [
+        "transaction_id",
+        "gl_account"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_counterparty_account",
+      "curationReason": "weighted:counterparty_account:domain_general"
+    },
+    {
+      "canonical": "created_by",
+      "synonyms": [
+        "created by",
+        "creator",
+        "entered by",
+        "criado por",
+        "criador",
+        "lancado por"
+      ],
+      "related": [
+        "approved_by",
+        "journal_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_created_by",
+      "curationReason": "weighted:created_by:domain_general"
+    },
+    {
+      "canonical": "credit_amount",
+      "synonyms": [
+        "credit amount",
+        "credit",
+        "cr amount",
+        "valor a credito",
+        "credito",
+        "montante creditado"
+      ],
+      "related": [
+        "debit_amount",
+        "net_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_amount",
+      "curationReason": "weighted:credit_amount:domain_general"
+    },
+    {
+      "canonical": "credit_balance",
+      "synonyms": [
+        "credit balance",
+        "creditor balance",
+        "cr balance",
+        "saldo credor",
+        "saldo a credito"
+      ],
+      "related": [
+        "debit_balance",
+        "account_balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_balance",
+      "curationReason": "weighted:credit_balance:domain_general"
+    },
+    {
+      "canonical": "debit_amount",
+      "synonyms": [
+        "debit amount",
+        "debit",
+        "dr amount",
+        "valor a debito",
+        "debito",
+        "montante debitado"
+      ],
+      "related": [
+        "credit_amount",
+        "net_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_debit_amount",
+      "curationReason": "weighted:debit_amount:domain_general"
+    },
+    {
+      "canonical": "debit_balance",
+      "synonyms": [
+        "debit balance",
+        "debtor balance",
+        "dr balance",
+        "saldo devedor",
+        "saldo a debito"
+      ],
+      "related": [
+        "credit_balance",
+        "account_balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_debit_balance",
+      "curationReason": "weighted:debit_balance:domain_general"
+    },
+    {
+      "canonical": "deferral_amount",
+      "synonyms": [
+        "deferral amount",
+        "deferred amount",
+        "deferral",
+        "valor diferido",
+        "diferimento",
+        "montante diferido"
+      ],
+      "related": [
+        "accrual_amount",
+        "close_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_deferral_amount",
+      "curationReason": "weighted:deferral_amount:domain_general"
+    },
+    {
+      "canonical": "deposit_in_transit",
+      "synonyms": [
+        "deposit in transit",
+        "uncleared deposit",
+        "float deposit",
+        "deposito em transito",
+        "deposito nao compensado",
+        "deposito pendente"
+      ],
+      "related": [
+        "outstanding_items",
+        "statement_balance"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_deposit_in_transit",
+      "curationReason": "weighted:deposit_in_transit:domain_general"
+    },
+    {
+      "canonical": "depreciation_method",
+      "synonyms": [
+        "depreciation method",
+        "depr method",
+        "method of depreciation",
+        "metodo de depreciacao",
+        "criterio de depreciacao",
+        "tipo de depreciacao"
+      ],
+      "related": [
+        "depreciation_rate",
+        "useful_life"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_depreciation_method",
+      "curationReason": "weighted:depreciation_method:domain_general"
+    },
+    {
+      "canonical": "depreciation_rate",
+      "synonyms": [
+        "depreciation rate",
+        "depr rate",
+        "annual depr rate",
+        "taxa de depreciacao",
+        "aliquota de depreciacao",
+        "taxa anual de depreciacao"
+      ],
+      "related": [
+        "depreciation_method",
+        "accumulated_depreciation"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_depreciation_rate",
+      "curationReason": "weighted:depreciation_rate:domain_general"
+    },
+    {
+      "canonical": "direct_cost",
+      "synonyms": [
+        "direct cost",
+        "direct expense",
+        "traceable cost",
+        "custo direto",
+        "despesa direta",
+        "custo rastreavel"
+      ],
+      "related": [
+        "indirect_cost",
+        "cost_element"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_direct_cost",
+      "curationReason": "weighted:direct_cost:domain_general"
+    },
+    {
+      "canonical": "disposal_date",
+      "synonyms": [
+        "disposal date",
+        "retirement date",
+        "date disposed",
+        "data de baixa",
+        "data de alienacao",
+        "data de descarte"
+      ],
+      "related": [
+        "asset_number",
+        "net_book_value"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_disposal_date",
+      "curationReason": "weighted:disposal_date:domain_general"
+    },
+    {
+      "canonical": "document_number",
+      "synonyms": [
+        "document number",
+        "doc number",
+        "doc no",
+        "numero do documento",
+        "num documento",
+        "nro documento"
+      ],
+      "related": [
+        "document_type",
+        "transaction_id"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_document_number",
+      "curationReason": "weighted:document_number:domain_general"
+    },
+    {
+      "canonical": "document_type",
+      "synonyms": [
+        "document type",
+        "doc type",
+        "voucher type",
+        "tipo de documento",
+        "tipo doc",
+        "tipo de comprovante"
+      ],
+      "related": [
+        "document_number",
+        "transaction_source"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_document_type",
+      "curationReason": "weighted:document_type:domain_general"
+    },
+    {
+      "canonical": "elimination",
+      "synonyms": [
+        "elimination",
+        "elimination entry",
+        "consol elimination",
+        "eliminacao",
+        "lancamento de eliminacao",
+        "eliminacao de consolidacao"
+      ],
+      "related": [
+        "reclassification",
+        "ic_elimination"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_elimination",
+      "curationReason": "weighted:elimination:domain_general"
+    },
+    {
+      "canonical": "entry_type",
+      "synonyms": [
+        "entry type",
+        "journal type",
+        "posting type",
+        "tipo de lancamento",
+        "tipo de partida",
+        "natureza do lancamento"
+      ],
+      "related": [
+        "journal_number",
+        "reversal_flag"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_entry_type",
+      "curationReason": "weighted:entry_type:domain_general"
+    },
+    {
+      "canonical": "exempt_amount",
+      "synonyms": [
+        "exempt amount",
+        "tax-exempt amount",
+        "non-taxable amount",
+        "valor isento",
+        "montante isento",
+        "valor nao tributavel"
+      ],
+      "related": [
+        "taxable_amount",
+        "tax_code"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_exempt_amount",
+      "curationReason": "weighted:exempt_amount:domain_general"
+    },
+    {
+      "canonical": "fiscal_period",
+      "synonyms": [
+        "fiscal period",
+        "accounting period",
+        "period number",
+        "periodo fiscal",
+        "periodo contabil",
+        "competencia"
+      ],
+      "related": [
+        "fiscal_year",
+        "posting_period"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_fiscal_period",
+      "curationReason": "weighted:fiscal_period:domain_general"
+    },
+    {
+      "canonical": "fiscal_year",
+      "synonyms": [
+        "fiscal year",
+        "financial year",
+        "fy",
+        "ano fiscal",
+        "exercicio fiscal",
+        "exercicio"
+      ],
+      "related": [
+        "fiscal_period",
+        "period_start"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_fiscal_year",
+      "curationReason": "weighted:fiscal_year:domain_general"
+    },
+    {
+      "canonical": "functional_currency",
+      "synonyms": [
+        "functional currency",
+        "local currency",
+        "reporting currency",
+        "moeda funcional",
+        "moeda local",
+        "moeda de reporte"
+      ],
+      "related": [
+        "account_currency",
+        "translation_adjustment"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_functional_currency",
+      "curationReason": "weighted:functional_currency:domain_general"
+    },
+    {
+      "canonical": "gl_account",
+      "synonyms": [
+        "gl account",
+        "general ledger account",
+        "ledger account",
+        "conta contabil",
+        "conta do razao",
+        "conta GL"
+      ],
+      "related": [
+        "account_code",
+        "account_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_gl_account",
+      "curationReason": "weighted:gl_account:domain_general"
+    },
+    {
+      "canonical": "hard_close",
+      "synonyms": [
+        "hard close",
+        "final close",
+        "definitive close",
+        "fechamento definitivo",
+        "encerramento final",
+        "close definitivo"
+      ],
+      "related": [
+        "soft_close",
+        "close_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_hard_close",
+      "curationReason": "weighted:hard_close:domain_general"
+    },
+    {
+      "canonical": "ic_account",
+      "synonyms": [
+        "ic account",
+        "intercompany account",
+        "interco account",
+        "conta intercompany",
+        "conta interempresa",
+        "conta IC"
+      ],
+      "related": [
+        "ic_partner",
+        "ic_amount"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_ic_account",
+      "curationReason": "weighted:ic_account:domain_general"
+    },
+    {
+      "canonical": "ic_amount",
+      "synonyms": [
+        "ic amount",
+        "intercompany amount",
+        "interco amount",
+        "valor intercompany",
+        "montante interempresa",
+        "valor IC"
+      ],
+      "related": [
+        "ic_account",
+        "ic_currency"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_ic_amount",
+      "curationReason": "weighted:ic_amount:domain_general"
+    },
+    {
+      "canonical": "ic_currency",
+      "synonyms": [
+        "ic currency",
+        "intercompany currency",
+        "interco currency",
+        "moeda intercompany",
+        "moeda interempresa",
+        "divisa IC"
+      ],
+      "related": [
+        "ic_amount",
+        "ic_partner"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_ic_currency",
+      "curationReason": "weighted:ic_currency:domain_general"
+    },
+    {
+      "canonical": "ic_elimination",
+      "synonyms": [
+        "ic elimination",
+        "intercompany elimination",
+        "consol elimination",
+        "eliminacao intercompany",
+        "eliminacao interempresa",
+        "eliminacao IC"
+      ],
+      "related": [
+        "ic_amount",
+        "consolidation_code"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_ic_elimination",
+      "curationReason": "weighted:ic_elimination:domain_general"
+    },
+    {
+      "canonical": "ic_partner",
+      "synonyms": [
+        "ic partner",
+        "intercompany partner",
+        "trading partner",
+        "parceiro intercompany",
+        "empresa parceira",
+        "parceiro IC"
+      ],
+      "related": [
+        "ic_account",
+        "ic_amount"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_ic_partner",
+      "curationReason": "weighted:ic_partner:domain_general"
+    },
+    {
+      "canonical": "ic_reference",
+      "synonyms": [
+        "ic reference",
+        "intercompany reference",
+        "interco ref",
+        "referencia intercompany",
+        "ref interempresa",
+        "ref IC"
+      ],
+      "related": [
+        "ic_partner",
+        "ic_amount"
+      ],
+      "priority": 426,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_ic_reference",
+      "curationReason": "weighted:ic_reference:domain_general"
+    },
+    {
+      "canonical": "indirect_cost",
+      "synonyms": [
+        "indirect cost",
+        "indirect expense",
+        "unallocated cost",
+        "custo indireto",
+        "despesa indireta",
+        "custo nao alocado"
+      ],
+      "related": [
+        "direct_cost",
+        "overhead_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_indirect_cost",
+      "curationReason": "weighted:indirect_cost:domain_general"
+    },
+    {
+      "canonical": "intercompany_partner",
+      "synonyms": [
+        "intercompany partner",
+        "ic partner",
+        "related entity",
+        "parceiro intercompany",
+        "entidade relacionada",
+        "empresa coligada"
+      ],
+      "related": [
+        "counterparty_account",
+        "ic_elimination"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_intercompany_partner",
+      "curationReason": "weighted:intercompany_partner:domain_general"
+    },
+    {
+      "canonical": "is_active",
+      "synonyms": [
+        "is active",
+        "active flag",
+        "account status",
+        "ativo",
+        "flag ativo",
+        "status da conta",
+        "conta ativa"
+      ],
+      "related": [
+        "account_code",
+        "account_name"
+      ],
+      "priority": 552,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_is_active",
+      "curationReason": "weighted:is_active:domain_general"
+    },
+    {
+      "canonical": "journal_date",
+      "synonyms": [
+        "journal date",
+        "entry date",
+        "je date",
+        "data do lancamento",
+        "data da partida",
+        "data do diario"
+      ],
+      "related": [
+        "journal_number",
+        "posting_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_journal_date",
+      "curationReason": "weighted:journal_date:domain_general"
+    },
+    {
+      "canonical": "journal_number",
+      "synonyms": [
+        "journal number",
+        "journal id",
+        "je number",
+        "numero do lancamento",
+        "id do diario",
+        "num partida"
+      ],
+      "related": [
+        "journal_date",
+        "entry_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_journal_number",
+      "curationReason": "weighted:journal_number:domain_general"
+    },
+    {
+      "canonical": "last_reconciled",
+      "synonyms": [
+        "last reconciled",
+        "last recon date",
+        "previous reconciliation",
+        "ultima conciliacao",
+        "data da ultima conciliacao",
+        "conciliacao anterior"
+      ],
+      "related": [
+        "reconciliation_date",
+        "reconciled_by"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_last_reconciled",
+      "curationReason": "weighted:last_reconciled:domain_general"
+    },
+    {
+      "canonical": "line_number",
+      "synonyms": [
+        "line number",
+        "line no",
+        "line item",
+        "numero da linha",
+        "num linha",
+        "item de linha"
+      ],
+      "related": [
+        "journal_number",
+        "debit_amount"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_line_number",
+      "curationReason": "weighted:line_number:domain_general"
+    },
+    {
+      "canonical": "memo",
+      "synonyms": [
+        "memo",
+        "description",
+        "narration",
+        "memorando",
+        "descricao",
+        "historico",
+        "observacao"
+      ],
+      "related": [
+        "reference",
+        "journal_number"
+      ],
+      "priority": 552,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_memo",
+      "curationReason": "weighted:memo:domain_general"
+    },
+    {
+      "canonical": "net_amount",
+      "synonyms": [
+        "net amount",
+        "net value",
+        "balance amount",
+        "valor liquido",
+        "montante liquido",
+        "valor resultante"
+      ],
+      "related": [
+        "debit_amount",
+        "credit_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_net_amount",
+      "curationReason": "weighted:net_amount:domain_general"
+    },
+    {
+      "canonical": "net_book_value",
+      "synonyms": [
+        "net book value",
+        "nbv",
+        "carrying amount",
+        "valor contabil liquido",
+        "valor residual contabil",
+        "VCL"
+      ],
+      "related": [
+        "acquisition_cost",
+        "accumulated_depreciation"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_net_book_value",
+      "curationReason": "weighted:net_book_value:domain_general"
+    },
+    {
+      "canonical": "normal_balance",
+      "synonyms": [
+        "normal balance",
+        "natural balance",
+        "expected balance side",
+        "saldo normal",
+        "saldo natural",
+        "lado do saldo"
+      ],
+      "related": [
+        "account_nature",
+        "account_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_normal_balance",
+      "curationReason": "weighted:normal_balance:domain_general"
+    },
+    {
+      "canonical": "opening_balance",
+      "synonyms": [
+        "opening balance",
+        "beginning balance",
+        "start balance",
+        "saldo de abertura",
+        "saldo inicial",
+        "saldo de inicio"
+      ],
+      "related": [
+        "closing_balance",
+        "period_activity"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_opening_balance",
+      "curationReason": "weighted:opening_balance:domain_general"
+    },
+    {
+      "canonical": "outstanding_items",
+      "synonyms": [
+        "outstanding items",
+        "open items",
+        "pending items",
+        "itens pendentes",
+        "itens em aberto",
+        "partidas abertas"
+      ],
+      "related": [
+        "cleared_items",
+        "unreconciled_difference"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_outstanding_items",
+      "curationReason": "weighted:outstanding_items:domain_general"
+    },
+    {
+      "canonical": "overhead_rate",
+      "synonyms": [
+        "overhead rate",
+        "burden rate",
+        "indirect rate",
+        "taxa de overhead",
+        "taxa de rateio indireto",
+        "taxa de carga"
+      ],
+      "related": [
+        "indirect_cost",
+        "allocation_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_overhead_rate",
+      "curationReason": "weighted:overhead_rate:domain_general"
+    },
+    {
+      "canonical": "parent_account",
+      "synonyms": [
+        "parent account",
+        "parent acct",
+        "superior account",
+        "conta pai",
+        "conta superior",
+        "conta mae"
+      ],
+      "related": [
+        "sub_account",
+        "account_level"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_parent_account",
+      "curationReason": "weighted:parent_account:domain_general"
+    },
+    {
+      "canonical": "period_activity",
+      "synonyms": [
+        "period activity",
+        "period movement",
+        "monthly activity",
+        "movimento do periodo",
+        "movimentacao mensal",
+        "atividade do periodo"
+      ],
+      "related": [
+        "opening_balance",
+        "closing_balance"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_period_activity",
+      "curationReason": "weighted:period_activity:domain_general"
+    },
+    {
+      "canonical": "period_end",
+      "synonyms": [
+        "period end",
+        "end of period",
+        "period end date",
+        "fim do periodo",
+        "data final do periodo",
+        "encerramento do periodo"
+      ],
+      "related": [
+        "period_start",
+        "close_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_period_end",
+      "curationReason": "weighted:period_end:domain_general"
+    },
+    {
+      "canonical": "period_start",
+      "synonyms": [
+        "period start",
+        "start of period",
+        "period start date",
+        "inicio do periodo",
+        "data inicial do periodo",
+        "abertura do periodo"
+      ],
+      "related": [
+        "period_end",
+        "fiscal_period"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_period_start",
+      "curationReason": "weighted:period_start:domain_general"
+    },
+    {
+      "canonical": "posting_date",
+      "synonyms": [
+        "posting date",
+        "post date",
+        "effective date",
+        "data de contabilizacao",
+        "data de postagem",
+        "data efetiva"
+      ],
+      "related": [
+        "journal_date",
+        "posting_period"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_posting_date",
+      "curationReason": "weighted:posting_date:domain_general"
+    },
+    {
+      "canonical": "posting_period",
+      "synonyms": [
+        "posting period",
+        "post period",
+        "accounting period",
+        "periodo de contabilizacao",
+        "periodo de postagem",
+        "periodo contabil"
+      ],
+      "related": [
+        "fiscal_period",
+        "posting_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_posting_period",
+      "curationReason": "weighted:posting_period:domain_general"
+    },
+    {
+      "canonical": "prior_period",
+      "synonyms": [
+        "prior period",
+        "previous period",
+        "last period",
+        "periodo anterior",
+        "periodo precedente",
+        "competencia anterior"
+      ],
+      "related": [
+        "ytd_balance",
+        "period_activity"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_prior_period",
+      "curationReason": "weighted:prior_period:domain_general"
+    },
+    {
+      "canonical": "provision_amount",
+      "synonyms": [
+        "provision amount",
+        "provision",
+        "reserve amount",
+        "valor da provisao",
+        "provisao",
+        "montante provisionado"
+      ],
+      "related": [
+        "accrual_amount",
+        "write_off_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_provision_amount",
+      "curationReason": "weighted:provision_amount:domain_general"
+    },
+    {
+      "canonical": "reclassification",
+      "synonyms": [
+        "reclassification",
+        "reclass",
+        "reclassification entry",
+        "reclassificacao",
+        "reclass",
+        "lancamento de reclassificacao"
+      ],
+      "related": [
+        "adjusted_balance",
+        "elimination"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_reclassification",
+      "curationReason": "weighted:reclassification:domain_general"
+    },
+    {
+      "canonical": "reconciled_by",
+      "synonyms": [
+        "reconciled by",
+        "reconciler",
+        "performed by",
+        "conciliado por",
+        "responsavel pela conciliacao",
+        "executado por"
+      ],
+      "related": [
+        "reconciliation_date",
+        "last_reconciled"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_reconciled_by",
+      "curationReason": "weighted:reconciled_by:domain_general"
+    },
+    {
+      "canonical": "reconciliation_date",
+      "synonyms": [
+        "reconciliation date",
+        "recon date",
+        "date reconciled",
+        "data de conciliacao",
+        "data da conciliacao",
+        "data do recon"
+      ],
+      "related": [
+        "statement_date",
+        "reconciled_by"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_reconciliation_date",
+      "curationReason": "weighted:reconciliation_date:domain_general"
+    },
+    {
+      "canonical": "reference",
+      "synonyms": [
+        "reference",
+        "ref",
+        "reference number",
+        "referencia",
+        "ref",
+        "numero de referencia"
+      ],
+      "related": [
+        "memo",
+        "document_number"
+      ],
+      "priority": 426,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_reference",
+      "curationReason": "weighted:reference:domain_general"
+    },
+    {
+      "canonical": "reporting_entity",
+      "synonyms": [
+        "reporting entity",
+        "entity",
+        "reporting unit",
+        "entidade de reporte",
+        "unidade de reporte",
+        "entidade contabil"
+      ],
+      "related": [
+        "consolidation_code",
+        "functional_currency"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_reporting_entity",
+      "curationReason": "weighted:reporting_entity:domain_general"
+    },
+    {
+      "canonical": "revaluation_amount",
+      "synonyms": [
+        "revaluation amount",
+        "revaluation",
+        "revaluation adjustment",
+        "valor de reavaliacao",
+        "reavaliacao",
+        "ajuste de reavaliacao"
+      ],
+      "related": [
+        "translation_adjustment",
+        "close_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_revaluation_amount",
+      "curationReason": "weighted:revaluation_amount:domain_general"
+    },
+    {
+      "canonical": "reversal_date",
+      "synonyms": [
+        "reversal date",
+        "reverse date",
+        "date reversed",
+        "data de estorno",
+        "data da reversao",
+        "data do estorno"
+      ],
+      "related": [
+        "reversal_flag",
+        "journal_number"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_reversal_date",
+      "curationReason": "weighted:reversal_date:domain_general"
+    },
+    {
+      "canonical": "reversal_flag",
+      "synonyms": [
+        "reversal flag",
+        "reversed",
+        "is reversal",
+        "flag de estorno",
+        "estornado",
+        "indicador de reversao"
+      ],
+      "related": [
+        "reversal_date",
+        "entry_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_reversal_flag",
+      "curationReason": "weighted:reversal_flag:domain_general"
+    },
+    {
+      "canonical": "salvage_value",
+      "synonyms": [
+        "salvage value",
+        "residual value",
+        "scrap value",
+        "valor residual",
+        "valor de sucata",
+        "valor de salvamento"
+      ],
+      "related": [
+        "useful_life",
+        "net_book_value"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_salvage_value",
+      "curationReason": "weighted:salvage_value:domain_general"
+    },
+    {
+      "canonical": "soft_close",
+      "synonyms": [
+        "soft close",
+        "preliminary close",
+        "tentative close",
+        "fechamento preliminar",
+        "pre-fechamento",
+        "close provisorio"
+      ],
+      "related": [
+        "hard_close",
+        "close_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_soft_close",
+      "curationReason": "weighted:soft_close:domain_general"
+    },
+    {
+      "canonical": "source_module",
+      "synonyms": [
+        "source module",
+        "originating module",
+        "system module",
+        "modulo de origem",
+        "modulo fonte",
+        "sistema de origem"
+      ],
+      "related": [
+        "transaction_source",
+        "document_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_source_module",
+      "curationReason": "weighted:source_module:domain_general"
+    },
+    {
+      "canonical": "standard_cost",
+      "synonyms": [
+        "standard cost",
+        "budgeted cost",
+        "planned cost",
+        "custo padrao",
+        "custo orcado",
+        "custo planejado"
+      ],
+      "related": [
+        "actual_cost",
+        "cost_element"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_standard_cost",
+      "curationReason": "weighted:standard_cost:domain_general"
+    },
+    {
+      "canonical": "statement_balance",
+      "synonyms": [
+        "statement balance",
+        "bank statement balance",
+        "stmt balance",
+        "saldo do extrato",
+        "saldo bancario",
+        "saldo do demonstrativo"
+      ],
+      "related": [
+        "book_balance",
+        "reconciliation_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_statement_balance",
+      "curationReason": "weighted:statement_balance:domain_general"
+    },
+    {
+      "canonical": "statement_date",
+      "synonyms": [
+        "statement date",
+        "bank statement date",
+        "stmt date",
+        "data do extrato",
+        "data do demonstrativo",
+        "data do extrato bancario"
+      ],
+      "related": [
+        "reconciliation_date",
+        "statement_balance"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_statement_date",
+      "curationReason": "weighted:statement_date:domain_general"
+    },
+    {
+      "canonical": "sub_account",
+      "synonyms": [
+        "sub account",
+        "sub-account",
+        "child account",
+        "subconta",
+        "conta filha",
+        "conta analitica"
+      ],
+      "related": [
+        "parent_account",
+        "account_level"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_sub_account",
+      "curationReason": "weighted:sub_account:domain_general"
+    },
+    {
+      "canonical": "tax_amount",
+      "synonyms": [
+        "tax amount",
+        "tax value",
+        "tax total",
+        "valor do imposto",
+        "montante tributario",
+        "total de impostos"
+      ],
+      "related": [
+        "taxable_amount",
+        "tax_rate"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_tax_amount",
+      "curationReason": "weighted:tax_amount:domain_general"
+    },
+    {
+      "canonical": "tax_code",
+      "synonyms": [
+        "tax code",
+        "tax id",
+        "tax indicator",
+        "codigo do imposto",
+        "cod tributario",
+        "indicador fiscal"
+      ],
+      "related": [
+        "tax_rate",
+        "tax_jurisdiction"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_tax_code",
+      "curationReason": "weighted:tax_code:domain_general"
+    },
+    {
+      "canonical": "tax_jurisdiction",
+      "synonyms": [
+        "tax jurisdiction",
+        "tax authority",
+        "tax region",
+        "jurisdicao fiscal",
+        "autoridade tributaria",
+        "regiao fiscal"
+      ],
+      "related": [
+        "tax_code",
+        "tax_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_tax_jurisdiction",
+      "curationReason": "weighted:tax_jurisdiction:domain_general"
+    },
+    {
+      "canonical": "tax_rate",
+      "synonyms": [
+        "tax rate",
+        "rate of tax",
+        "tax percentage",
+        "aliquota do imposto",
+        "taxa tributaria",
+        "percentual do imposto"
+      ],
+      "related": [
+        "tax_code",
+        "tax_amount"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_tax_rate",
+      "curationReason": "weighted:tax_rate:domain_general"
+    },
+    {
+      "canonical": "taxable_amount",
+      "synonyms": [
+        "taxable amount",
+        "tax base",
+        "assessable amount",
+        "base de calculo",
+        "valor tributavel",
+        "montante tributavel"
+      ],
+      "related": [
+        "tax_amount",
+        "exempt_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_taxable_amount",
+      "curationReason": "weighted:taxable_amount:domain_general"
+    },
+    {
+      "canonical": "transaction_date",
+      "synonyms": [
+        "transaction date",
+        "txn date",
+        "date of transaction",
+        "data da transacao",
+        "data da operacao",
+        "data do movimento"
+      ],
+      "related": [
+        "transaction_id",
+        "posting_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_transaction_date",
+      "curationReason": "weighted:transaction_date:domain_general"
+    },
+    {
+      "canonical": "transaction_description",
+      "synonyms": [
+        "transaction description",
+        "txn description",
+        "narrative",
+        "descricao da transacao",
+        "historico da transacao",
+        "narrativa"
+      ],
+      "related": [
+        "transaction_id",
+        "memo"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_transaction_description",
+      "curationReason": "weighted:transaction_description:domain_general"
+    },
+    {
+      "canonical": "transaction_id",
+      "synonyms": [
+        "transaction id",
+        "txn id",
+        "transaction number",
+        "id da transacao",
+        "numero da transacao",
+        "cod transacao"
+      ],
+      "related": [
+        "transaction_date",
+        "document_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_transaction_id",
+      "curationReason": "weighted:transaction_id:domain_general"
+    },
+    {
+      "canonical": "transaction_source",
+      "synonyms": [
+        "transaction source",
+        "txn source",
+        "origin",
+        "origem da transacao",
+        "fonte da transacao",
+        "sistema de origem"
+      ],
+      "related": [
+        "source_module",
+        "document_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_transaction_source",
+      "curationReason": "weighted:transaction_source:domain_general"
+    },
+    {
+      "canonical": "translation_adjustment",
+      "synonyms": [
+        "translation adjustment",
+        "currency translation",
+        "cta",
+        "ajuste de conversao",
+        "variacao cambial",
+        "ajuste de traducao"
+      ],
+      "related": [
+        "revaluation_amount",
+        "functional_currency"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_translation_adjustment",
+      "curationReason": "weighted:translation_adjustment:domain_general"
+    },
+    {
+      "canonical": "unadjusted_balance",
+      "synonyms": [
+        "unadjusted balance",
+        "pre-adjustment balance",
+        "raw balance",
+        "saldo nao ajustado",
+        "saldo pre-ajuste",
+        "saldo bruto"
+      ],
+      "related": [
+        "adjusted_balance",
+        "account_balance"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_unadjusted_balance",
+      "curationReason": "weighted:unadjusted_balance:domain_general"
+    },
+    {
+      "canonical": "unreconciled_difference",
+      "synonyms": [
+        "unreconciled difference",
+        "recon difference",
+        "discrepancy",
+        "diferenca nao conciliada",
+        "diferenca de conciliacao",
+        "discrepancia"
+      ],
+      "related": [
+        "book_balance",
+        "statement_balance"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_unreconciled_difference",
+      "curationReason": "weighted:unreconciled_difference:domain_general"
+    },
+    {
+      "canonical": "useful_life",
+      "synonyms": [
+        "useful life",
+        "economic life",
+        "expected life",
+        "vida util",
+        "vida economica",
+        "vida util estimada"
+      ],
+      "related": [
+        "depreciation_method",
+        "salvage_value"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_useful_life",
+      "curationReason": "weighted:useful_life:domain_general"
+    },
+    {
+      "canonical": "withholding_amount",
+      "synonyms": [
+        "withholding amount",
+        "withheld amount",
+        "amount withheld",
+        "valor retido",
+        "montante retido",
+        "valor da retencao"
+      ],
+      "related": [
+        "withholding_rate",
+        "tax_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_withholding_amount",
+      "curationReason": "weighted:withholding_amount:domain_general"
+    },
+    {
+      "canonical": "withholding_rate",
+      "synonyms": [
+        "withholding rate",
+        "retention rate",
+        "wht rate",
+        "taxa de retencao",
+        "aliquota de retencao",
+        "taxa de withholding"
+      ],
+      "related": [
+        "withholding_amount",
+        "tax_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_withholding_rate",
+      "curationReason": "weighted:withholding_rate:domain_general"
+    },
+    {
+      "canonical": "write_off_amount",
+      "synonyms": [
+        "write-off amount",
+        "write off",
+        "written off amount",
+        "valor de baixa",
+        "montante baixado",
+        "valor da perda"
+      ],
+      "related": [
+        "provision_amount",
+        "close_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_write_off_amount",
+      "curationReason": "weighted:write_off_amount:domain_general"
+    },
+    {
+      "canonical": "ytd_balance",
+      "synonyms": [
+        "ytd balance",
+        "year-to-date balance",
+        "cumulative balance",
+        "saldo acumulado no ano",
+        "saldo ytd",
+        "saldo acumulado"
+      ],
+      "related": [
+        "prior_period",
+        "closing_balance"
+      ],
+      "priority": 546,
+      "scope": "table_header:accounting",
+      "disambiguationRuleId": "headers_disambiguation_general_ytd_balance",
+      "curationReason": "weighted:ytd_balance:domain_general"
+    }
   ]
 }

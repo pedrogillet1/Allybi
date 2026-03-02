@@ -1,0 +1,165 @@
+{
+  "_meta": {
+    "id": "di_ops_entities_ops_quality_report",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for quality report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_quality_report"
+  },
+  "entities": [
+    {
+      "id": "docType",
+      "type": "string",
+      "required": true,
+      "description": "Detected document type identifier"
+    },
+    {
+      "id": "reportNumber",
+      "type": "string",
+      "required": true,
+      "description": "Quality report or inspection number"
+    },
+    {
+      "id": "inspectionDate",
+      "type": "date",
+      "required": true,
+      "description": "Date the inspection was performed"
+    },
+    {
+      "id": "reportDate",
+      "type": "date",
+      "required": false,
+      "description": "Date the report was issued"
+    },
+    {
+      "id": "inspectionType",
+      "type": "enum",
+      "required": false,
+      "description": "Type of quality inspection",
+      "values": [
+        "incoming",
+        "in_process",
+        "final",
+        "audit",
+        "unknown"
+      ]
+    },
+    {
+      "id": "overallResult",
+      "type": "enum",
+      "required": true,
+      "description": "Overall inspection result",
+      "values": [
+        "pass",
+        "fail",
+        "conditional",
+        "unknown"
+      ]
+    },
+    {
+      "id": "productName",
+      "type": "string",
+      "required": false,
+      "description": "Product or batch being inspected"
+    },
+    {
+      "id": "batchNumber",
+      "type": "string",
+      "required": false,
+      "description": "Batch or lot number"
+    },
+    {
+      "id": "supplierName",
+      "type": "string",
+      "required": false,
+      "description": "Supplier name for incoming inspections"
+    },
+    {
+      "id": "inspectorName",
+      "type": "string",
+      "required": false,
+      "description": "Inspector or auditor name"
+    },
+    {
+      "id": "locationName",
+      "type": "string",
+      "required": false,
+      "description": "Inspection location or line"
+    },
+    {
+      "id": "sampleSize",
+      "type": "number",
+      "required": false,
+      "description": "Number of units sampled"
+    },
+    {
+      "id": "defectsFound",
+      "type": "number",
+      "required": false,
+      "description": "Number of defects or non-conformances found"
+    },
+    {
+      "id": "defectRate",
+      "type": "number",
+      "required": false,
+      "description": "Defect rate as percentage"
+    },
+    {
+      "id": "standardReference",
+      "type": "string",
+      "required": false,
+      "description": "Quality standard referenced (ISO, internal spec)"
+    },
+    {
+      "id": "nonConformanceIds",
+      "type": "array_string",
+      "required": false,
+      "description": "List of NCR numbers raised"
+    },
+    {
+      "id": "disposition",
+      "type": "enum",
+      "required": false,
+      "description": "Disposition decision for failed items",
+      "values": [
+        "accept",
+        "reject",
+        "rework",
+        "concession",
+        "scrap",
+        "unknown"
+      ]
+    },
+    {
+      "id": "languageDetected",
+      "type": "enum",
+      "required": true,
+      "description": "Detected language",
+      "values": [
+        "en",
+        "pt",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "documentPages",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidenceScore",
+      "type": "number",
+      "required": false,
+      "description": "Overall extraction confidence"
+    }
+  ]
+}

@@ -1,15 +1,22 @@
 {
   "_meta": {
     "id": "identifier_patterns",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Cross-domain identifier extraction patterns for everyday documents (billing, banking, tax, insurance, identity, education, travel, HR/payroll, housing).",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "medium",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
   },
   "rules": [
     {
@@ -22,7 +29,15 @@
         "REF-2024-12345678"
       ],
       "entityType": "document_id",
-      "notes": "Alphanumeric prefix-year-sequence pattern"
+      "notes": "Alphanumeric prefix-year-sequence pattern",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_002",
@@ -33,7 +48,15 @@
         "INV-001-XYZ"
       ],
       "entityType": "document_id",
-      "notes": "Triple-segment alphanumeric identifier"
+      "notes": "Triple-segment alphanumeric identifier",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_003",
@@ -44,7 +67,15 @@
         "Acct No. 9876-5432-10"
       ],
       "entityType": "bank_id",
-      "notes": "English bank account number"
+      "notes": "English bank account number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_004",
@@ -56,7 +87,15 @@
         "Agencia: 0001"
       ],
       "entityType": "bank_id",
-      "notes": "Brazilian bank branch (agencia)"
+      "notes": "Brazilian bank branch (agencia)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_005",
@@ -67,7 +106,15 @@
         "Conta: 123456789-0"
       ],
       "entityType": "bank_id",
-      "notes": "Brazilian bank account (conta)"
+      "notes": "Brazilian bank account (conta)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_006",
@@ -78,7 +125,15 @@
         "IBAN DE89370400440532013000"
       ],
       "entityType": "bank_id",
-      "notes": "International bank account number"
+      "notes": "International bank account number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_007",
@@ -89,7 +144,15 @@
         "Routing#021000021"
       ],
       "entityType": "bank_id",
-      "notes": "US bank routing number"
+      "notes": "US bank routing number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "bank_statement_id",
@@ -100,7 +163,15 @@
       ],
       "entityType": "bank_statement_id",
       "notes": "Bank statement identifier",
-      "id": "ident_008"
+      "id": "ident_008",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_009",
@@ -111,7 +182,15 @@
         "SWIFT BOFAUS3N"
       ],
       "entityType": "bank_id",
-      "notes": "SWIFT/BIC code"
+      "notes": "SWIFT/BIC code",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "bank_transaction_reference",
@@ -121,7 +200,15 @@
       ],
       "entityType": "transaction_id",
       "notes": "Bank transaction reference code",
-      "id": "ident_010"
+      "id": "ident_010",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_011",
@@ -133,7 +220,15 @@
         "BL No. MSKU1234567"
       ],
       "entityType": "shipping_id",
-      "notes": "Bill of lading number"
+      "notes": "Bill of lading number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "billing_account_number",
@@ -144,7 +239,15 @@
       ],
       "entityType": "billing_account_id",
       "notes": "Billing account identifier",
-      "id": "ident_012"
+      "id": "ident_012",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "boarding_pass_sequence",
@@ -155,7 +258,15 @@
       ],
       "entityType": "travel_id",
       "notes": "Boarding-pass identifier",
-      "id": "ident_013"
+      "id": "ident_013",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_014",
@@ -166,7 +277,15 @@
         "CREA/SP 1234567"
       ],
       "entityType": "professional_id",
-      "notes": "Brazilian engineering council (CREA)"
+      "notes": "Brazilian engineering council (CREA)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_015",
@@ -177,7 +296,15 @@
         "CRF/SP 12345"
       ],
       "entityType": "professional_id",
-      "notes": "Brazilian pharmacy council (CRF)"
+      "notes": "Brazilian pharmacy council (CRF)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_016",
@@ -189,7 +316,15 @@
         "CRM/SP 123456"
       ],
       "entityType": "professional_id",
-      "notes": "Brazilian medical license (CRM)"
+      "notes": "Brazilian medical license (CRM)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_017",
@@ -201,7 +336,15 @@
         "OAB/SP 123456"
       ],
       "entityType": "professional_id",
-      "notes": "Brazilian bar association (OAB)"
+      "notes": "Brazilian bar association (OAB)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_018",
@@ -212,7 +355,15 @@
         "RENAVAM: 98765432101"
       ],
       "entityType": "vehicle_id",
-      "notes": "Brazilian vehicle registration (RENAVAM)"
+      "notes": "Brazilian vehicle registration (RENAVAM)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_019",
@@ -223,7 +374,15 @@
         "Docket No. 12345"
       ],
       "entityType": "case_id",
-      "notes": "Court docket number"
+      "notes": "Court docket number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_020",
@@ -234,7 +393,15 @@
         "Case No. CV-2024-001"
       ],
       "entityType": "case_id",
-      "notes": "English case number"
+      "notes": "English case number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_021",
@@ -245,7 +412,15 @@
         "Processo 1234567-89.2024.8.26.0100"
       ],
       "entityType": "case_id",
-      "notes": "Brazilian court case number"
+      "notes": "Brazilian court case number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_022",
@@ -257,7 +432,15 @@
         "Certificate No. CERT-2024-001"
       ],
       "entityType": "certificate_id",
-      "notes": "Certificate number"
+      "notes": "Certificate number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_023",
@@ -268,7 +451,15 @@
         "Claim No. CLM-2024-001"
       ],
       "entityType": "claim_id",
-      "notes": "English claim number"
+      "notes": "English claim number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_024",
@@ -279,7 +470,15 @@
         "Sinistro No. 2024-001"
       ],
       "entityType": "claim_id",
-      "notes": "Portuguese claim/sinistro number"
+      "notes": "Portuguese claim/sinistro number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_025",
@@ -289,7 +488,15 @@
         "1234567-89.2024.8.26.0100"
       ],
       "entityType": "case_id",
-      "notes": "Brazilian CNJ standardized case number format"
+      "notes": "Brazilian CNJ standardized case number format",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_026",
@@ -300,7 +507,15 @@
         "Contract #12345"
       ],
       "entityType": "contract_id",
-      "notes": "English contract number"
+      "notes": "English contract number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_027",
@@ -311,7 +526,15 @@
         "Contrato 12345"
       ],
       "entityType": "contract_id",
-      "notes": "Portuguese contract number"
+      "notes": "Portuguese contract number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "credit_card_statement_id",
@@ -322,7 +545,15 @@
       ],
       "entityType": "bank_statement_id",
       "notes": "Credit-card statement identifier",
-      "id": "ident_028"
+      "id": "ident_028",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "diploma_registry_id",
@@ -332,7 +563,15 @@
       ],
       "entityType": "education_id",
       "notes": "Diploma registry identifier",
-      "id": "ident_029"
+      "id": "ident_029",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "document_hash_sha256",
@@ -342,7 +581,15 @@
       ],
       "entityType": "document_id",
       "notes": "Document SHA-256 fingerprint",
-      "id": "ident_030"
+      "id": "ident_030",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "driver_license_number",
@@ -353,7 +600,15 @@
       ],
       "entityType": "identity_id",
       "notes": "Driver-license identifier",
-      "id": "ident_031"
+      "id": "ident_031",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "education_degree_code",
@@ -364,7 +619,15 @@
       ],
       "entityType": "education_id",
       "notes": "Academic program/degree code",
-      "id": "ident_032"
+      "id": "ident_032",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "employee_id",
@@ -375,7 +638,15 @@
       ],
       "entityType": "hr_id",
       "notes": "Employee identifier",
-      "id": "ident_033"
+      "id": "ident_033",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_034",
@@ -386,7 +657,15 @@
         "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
       ],
       "entityType": "guid",
-      "notes": "Generic GUID/UUID pattern"
+      "notes": "Generic GUID/UUID pattern",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "hotel_confirmation_id",
@@ -396,7 +675,15 @@
       ],
       "entityType": "travel_id",
       "notes": "Hotel confirmation identifier",
-      "id": "ident_035"
+      "id": "ident_035",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "housing_unit_identifier",
@@ -407,7 +694,15 @@
       ],
       "entityType": "housing_id",
       "notes": "Housing unit identifier",
-      "id": "ident_036"
+      "id": "ident_036",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "hr_cost_center_code",
@@ -418,7 +713,15 @@
       ],
       "entityType": "hr_id",
       "notes": "HR/payroll cost center id",
-      "id": "ident_037"
+      "id": "ident_037",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "iata_airline_ticket_prefix",
@@ -428,7 +731,15 @@
       ],
       "entityType": "travel_id",
       "notes": "IATA ticket number format",
-      "id": "ident_038"
+      "id": "ident_038",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "imei_number",
@@ -439,7 +750,15 @@
       ],
       "entityType": "device_id",
       "notes": "Mobile device IMEI",
-      "id": "ident_039"
+      "id": "ident_039",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "imsi_number",
@@ -449,7 +768,15 @@
       ],
       "entityType": "device_id",
       "notes": "Mobile IMSI",
-      "id": "ident_040"
+      "id": "ident_040",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "insurance_claim_line_id",
@@ -460,7 +787,15 @@
       ],
       "entityType": "insurance_id",
       "notes": "Insurance claim line identifier",
-      "id": "ident_041"
+      "id": "ident_041",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_042",
@@ -471,7 +806,15 @@
         "Group#12345"
       ],
       "entityType": "insurance_id",
-      "notes": "Insurance group number"
+      "notes": "Insurance group number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_043",
@@ -483,7 +826,15 @@
         "Subscriber ID: SUB-001"
       ],
       "entityType": "insurance_id",
-      "notes": "Insurance member/subscriber/plan ID"
+      "notes": "Insurance member/subscriber/plan ID",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "insurance_member_group_combo",
@@ -493,7 +844,15 @@
       ],
       "entityType": "insurance_id",
       "notes": "Member + group combined pattern",
-      "id": "ident_044"
+      "id": "ident_044",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "insurance_policy_schedule_id",
@@ -504,7 +863,15 @@
       ],
       "entityType": "insurance_id",
       "notes": "Insurance policy schedule id",
-      "id": "ident_045"
+      "id": "ident_045",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "insurance_policyholder_id",
@@ -515,7 +882,15 @@
       ],
       "entityType": "insurance_id",
       "notes": "Policyholder identifier",
-      "id": "ident_046"
+      "id": "ident_046",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "insurance_preauth_id",
@@ -526,7 +901,15 @@
       ],
       "entityType": "insurance_id",
       "notes": "Insurance pre-authorization id",
-      "id": "ident_047"
+      "id": "ident_047",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_048",
@@ -537,7 +920,15 @@
         "CUSIP: 594918104"
       ],
       "entityType": "securities_id",
-      "notes": "CUSIP securities identifier (US/Canada)"
+      "notes": "CUSIP securities identifier (US/Canada)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_049",
@@ -548,7 +939,15 @@
         "DUNS 12-345-6789"
       ],
       "entityType": "business_id",
-      "notes": "Dun & Bradstreet DUNS number"
+      "notes": "Dun & Bradstreet DUNS number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_050",
@@ -559,7 +958,15 @@
         "ISIN: BR0000000001"
       ],
       "entityType": "securities_id",
-      "notes": "International Securities Identification Number"
+      "notes": "International Securities Identification Number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_051",
@@ -570,7 +977,15 @@
         "LEI: 5493001KJTIIGC8Y1R12"
       ],
       "entityType": "business_id",
-      "notes": "Legal Entity Identifier (LEI)"
+      "notes": "Legal Entity Identifier (LEI)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_052",
@@ -581,7 +996,15 @@
         "SEDOL: B0YBKJ7"
       ],
       "entityType": "securities_id",
-      "notes": "SEDOL securities identifier (UK)"
+      "notes": "SEDOL securities identifier (UK)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_053",
@@ -592,7 +1015,15 @@
         "Fatura #12345"
       ],
       "entityType": "invoice_id",
-      "notes": "Portuguese/Brazilian invoice (fatura)"
+      "notes": "Portuguese/Brazilian invoice (fatura)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_054",
@@ -604,7 +1035,15 @@
         "Invoice #12345"
       ],
       "entityType": "invoice_id",
-      "notes": "English invoice number with common prefixes"
+      "notes": "English invoice number with common prefixes",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_055",
@@ -616,7 +1055,15 @@
         "Nota Fiscal 12345"
       ],
       "entityType": "invoice_id",
-      "notes": "Brazilian nota fiscal"
+      "notes": "Brazilian nota fiscal",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "irs_submission_id",
@@ -626,7 +1073,15 @@
       ],
       "entityType": "tax_return_id",
       "notes": "IRS submission identifier",
-      "id": "ident_056"
+      "id": "ident_056",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "lease_contract_id",
@@ -636,7 +1091,15 @@
       ],
       "entityType": "housing_id",
       "notes": "Lease agreement identifier",
-      "id": "ident_057"
+      "id": "ident_057",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_058",
@@ -647,7 +1110,15 @@
         "License #12345"
       ],
       "entityType": "license_id",
-      "notes": "English license number"
+      "notes": "English license number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_059",
@@ -658,7 +1129,15 @@
         "Licenca 12345"
       ],
       "entityType": "license_id",
-      "notes": "Portuguese license/permit"
+      "notes": "Portuguese license/permit",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "loan_statement_id",
@@ -669,7 +1148,15 @@
       ],
       "entityType": "loan_id",
       "notes": "Loan statement identifier",
-      "id": "ident_060"
+      "id": "ident_060",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_061",
@@ -681,7 +1168,15 @@
         "Lote 12345"
       ],
       "entityType": "lot_id",
-      "notes": "Lot/batch number"
+      "notes": "Lot/batch number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "mobile_line_number",
@@ -692,7 +1187,15 @@
       ],
       "entityType": "telecom_line_id",
       "notes": "Telecom line identifier",
-      "id": "ident_062"
+      "id": "ident_062",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "mortgage_contract_id",
@@ -702,7 +1205,15 @@
       ],
       "entityType": "housing_id",
       "notes": "Mortgage identifier",
-      "id": "ident_063"
+      "id": "ident_063",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_064",
@@ -713,7 +1224,15 @@
         "MRN #12345"
       ],
       "entityType": "medical_record_id",
-      "notes": "English medical record number"
+      "notes": "English medical record number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_065",
@@ -724,7 +1243,15 @@
         "Prontuario No. 2024-001"
       ],
       "entityType": "medical_record_id",
-      "notes": "Portuguese medical record (prontuario)"
+      "notes": "Portuguese medical record (prontuario)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "national_id_number",
@@ -735,7 +1262,15 @@
       ],
       "entityType": "identity_id",
       "notes": "National identity document number",
-      "id": "ident_066"
+      "id": "ident_066",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_067",
@@ -745,7 +1280,15 @@
         "35240112345678000190550010000012341123456789"
       ],
       "entityType": "nfe_key",
-      "notes": "Brazilian NF-e 44-digit access key"
+      "notes": "Brazilian NF-e 44-digit access key",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "passport_number_generic",
@@ -756,7 +1299,15 @@
       ],
       "entityType": "identity_id",
       "notes": "Passport identifier",
-      "id": "ident_068"
+      "id": "ident_068",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_069",
@@ -767,7 +1318,15 @@
         "PID: PAT-2024-001"
       ],
       "entityType": "patient_id",
-      "notes": "English patient identifier"
+      "notes": "English patient identifier",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "payroll_run_id",
@@ -778,7 +1337,15 @@
       ],
       "entityType": "hr_id",
       "notes": "Payroll run identifier",
-      "id": "ident_070"
+      "id": "ident_070",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "payslip_id",
@@ -789,7 +1356,15 @@
       ],
       "entityType": "hr_id",
       "notes": "Payroll slip identifier",
-      "id": "ident_071"
+      "id": "ident_071",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_072",
@@ -800,7 +1375,15 @@
         "Permit No. PER-2024-001"
       ],
       "entityType": "permit_id",
-      "notes": "Permit number"
+      "notes": "Permit number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "pix_e2e_id",
@@ -810,7 +1393,15 @@
       ],
       "entityType": "transaction_id",
       "notes": "PIX end-to-end id",
-      "id": "ident_073"
+      "id": "ident_073",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "pnr_locator",
@@ -821,7 +1412,15 @@
       ],
       "entityType": "travel_id",
       "notes": "Travel booking locator",
-      "id": "ident_074"
+      "id": "ident_074",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_075",
@@ -833,7 +1432,15 @@
         "Purchase Order No. A-9876"
       ],
       "entityType": "purchase_order_id",
-      "notes": "English purchase order number"
+      "notes": "English purchase order number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_076",
@@ -844,7 +1451,15 @@
         "Pedido de Compra 12345"
       ],
       "entityType": "purchase_order_id",
-      "notes": "Portuguese purchase order"
+      "notes": "Portuguese purchase order",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_077",
@@ -855,7 +1470,15 @@
         "Policy No. INS-2024-001"
       ],
       "entityType": "policy_id",
-      "notes": "English insurance policy number"
+      "notes": "English insurance policy number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_078",
@@ -866,7 +1489,15 @@
         "Apolice 12345"
       ],
       "entityType": "policy_id",
-      "notes": "Portuguese insurance policy"
+      "notes": "Portuguese insurance policy",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_079",
@@ -877,7 +1508,15 @@
         "Receituario No. 2024-001"
       ],
       "entityType": "prescription_id",
-      "notes": "Portuguese prescription"
+      "notes": "Portuguese prescription",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_080",
@@ -888,7 +1527,15 @@
         "Rx#12345"
       ],
       "entityType": "prescription_id",
-      "notes": "English prescription number"
+      "notes": "English prescription number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "property_registration_id",
@@ -899,7 +1546,15 @@
       ],
       "entityType": "housing_id",
       "notes": "Property registration identifier",
-      "id": "ident_081"
+      "id": "ident_081",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_082",
@@ -910,7 +1565,15 @@
         "Protocolo No. 2024.001.234"
       ],
       "entityType": "protocol_id",
-      "notes": "Portuguese protocol number"
+      "notes": "Portuguese protocol number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_083",
@@ -922,7 +1585,15 @@
         "Referencia 12345"
       ],
       "entityType": "reference_id",
-      "notes": "Generic reference number"
+      "notes": "Generic reference number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_084",
@@ -934,7 +1605,15 @@
         "Registro 12345"
       ],
       "entityType": "registration_id",
-      "notes": "Registration number"
+      "notes": "Registration number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_085",
@@ -946,7 +1625,15 @@
         "SN: XYZ789"
       ],
       "entityType": "serial_id",
-      "notes": "Serial number"
+      "notes": "Serial number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_086",
@@ -957,7 +1644,15 @@
         "Numero de Serie: ABC-123"
       ],
       "entityType": "serial_id",
-      "notes": "Portuguese serial number"
+      "notes": "Portuguese serial number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "sim_iccid",
@@ -967,7 +1662,15 @@
       ],
       "entityType": "device_id",
       "notes": "SIM ICCID identifier",
-      "id": "ident_087"
+      "id": "ident_087",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "student_course_code",
@@ -978,7 +1681,15 @@
       ],
       "entityType": "education_id",
       "notes": "Course code identifier",
-      "id": "ident_088"
+      "id": "ident_088",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "student_id_number",
@@ -989,7 +1700,15 @@
       ],
       "entityType": "education_id",
       "notes": "Education enrollment identifier",
-      "id": "ident_089"
+      "id": "ident_089",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "swift_mt_reference",
@@ -999,7 +1718,15 @@
       ],
       "entityType": "transaction_id",
       "notes": "SWIFT message reference",
-      "id": "ident_090"
+      "id": "ident_090",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_091",
@@ -1010,7 +1737,15 @@
         "CNPJ: 12345678000190"
       ],
       "entityType": "tax_id",
-      "notes": "Brazilian company tax ID (CNPJ)"
+      "notes": "Brazilian company tax ID (CNPJ)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_092",
@@ -1021,7 +1756,15 @@
         "CPF: 12345678900"
       ],
       "entityType": "tax_id",
-      "notes": "Brazilian individual tax ID (CPF)"
+      "notes": "Brazilian individual tax ID (CPF)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_093",
@@ -1032,7 +1775,15 @@
         "EIN: 123456789"
       ],
       "entityType": "tax_id",
-      "notes": "US employer identification number"
+      "notes": "US employer identification number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_094",
@@ -1043,7 +1794,15 @@
         "ITIN: 912345678"
       ],
       "entityType": "tax_id",
-      "notes": "US individual taxpayer ID"
+      "notes": "US individual taxpayer ID",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_095",
@@ -1054,7 +1813,15 @@
         "NIF No. 987654321"
       ],
       "entityType": "tax_id",
-      "notes": "Portuguese/Spanish tax number"
+      "notes": "Portuguese/Spanish tax number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_096",
@@ -1065,7 +1832,15 @@
         "SSN: 123456789"
       ],
       "entityType": "tax_id",
-      "notes": "US social security number"
+      "notes": "US social security number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_097",
@@ -1076,7 +1851,15 @@
         "VAT No. DE123456789"
       ],
       "entityType": "tax_id",
-      "notes": "European VAT number"
+      "notes": "European VAT number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "tax_notice_number",
@@ -1087,7 +1870,15 @@
       ],
       "entityType": "tax_notice_id",
       "notes": "Tax authority notice identifier",
-      "id": "ident_098"
+      "id": "ident_098",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "tax_return_protocol",
@@ -1098,7 +1889,15 @@
       ],
       "entityType": "tax_return_id",
       "notes": "Tax-return processing protocol",
-      "id": "ident_099"
+      "id": "ident_099",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "ticket_electronic_number",
@@ -1108,7 +1907,15 @@
       ],
       "entityType": "travel_id",
       "notes": "Airline e-ticket number",
-      "id": "ident_100"
+      "id": "ident_100",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_101",
@@ -1120,7 +1927,15 @@
         "TKT-2024-001"
       ],
       "entityType": "ticket_id",
-      "notes": "English support ticket/incident number"
+      "notes": "English support ticket/incident number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_102",
@@ -1131,7 +1946,15 @@
         "Chamado 12345"
       ],
       "entityType": "ticket_id",
-      "notes": "Portuguese support ticket"
+      "notes": "Portuguese support ticket",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "timesheet_id",
@@ -1142,7 +1965,15 @@
       ],
       "entityType": "hr_id",
       "notes": "Timesheet identifier",
-      "id": "ident_103"
+      "id": "ident_103",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_104",
@@ -1154,7 +1985,15 @@
         "Tracking#12345678"
       ],
       "entityType": "tracking_id",
-      "notes": "Shipping tracking number"
+      "notes": "Shipping tracking number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "transcript_id",
@@ -1165,7 +2004,15 @@
       ],
       "entityType": "education_id",
       "notes": "Academic transcript identifier",
-      "id": "ident_105"
+      "id": "ident_105",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "travel_booking_id",
@@ -1176,7 +2023,15 @@
       ],
       "entityType": "travel_id",
       "notes": "Travel booking identifier",
-      "id": "ident_106"
+      "id": "ident_106",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "utility_barcode_digits",
@@ -1186,7 +2041,15 @@
       ],
       "entityType": "billing_reference_id",
       "notes": "Long utility payment barcode digits",
-      "id": "ident_107"
+      "id": "ident_107",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "utility_installation_number",
@@ -1197,7 +2060,15 @@
       ],
       "entityType": "utility_id",
       "notes": "Utility installation id",
-      "id": "ident_108"
+      "id": "ident_108",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_109",
@@ -1207,7 +2078,15 @@
         "550e8400-e29b-41d4-a716-446655440000"
       ],
       "entityType": "uuid",
-      "notes": "UUID version 4 pattern"
+      "notes": "UUID version 4 pattern",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "name": "vat_registration_id",
@@ -1218,7 +2097,15 @@
       ],
       "entityType": "tax_id",
       "notes": "VAT/state registration",
-      "id": "ident_110"
+      "id": "ident_110",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_111",
@@ -1231,7 +2118,15 @@
         "Version 3.0"
       ],
       "entityType": "version_id",
-      "notes": "English version/revision number"
+      "notes": "English version/revision number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_112",
@@ -1242,7 +2137,15 @@
         "Versao 2.1"
       ],
       "entityType": "version_id",
-      "notes": "Portuguese version/revision"
+      "notes": "Portuguese version/revision",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_113",
@@ -1253,7 +2156,15 @@
         "Work Order No. WO-2024-001"
       ],
       "entityType": "work_order_id",
-      "notes": "English work order number"
+      "notes": "English work order number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     },
     {
       "id": "ident_114",
@@ -1264,7 +2175,15 @@
         "OS-2024-001"
       ],
       "entityType": "work_order_id",
-      "notes": "Portuguese work order (ordem de servico)"
+      "notes": "Portuguese work order (ordem de servico)",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
     }
   ]
 }

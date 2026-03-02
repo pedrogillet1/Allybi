@@ -557,8 +557,9 @@ export class PineconeService {
         filter,
       } as any);
 
-      const ids = [...new Set((res?.matches || []).map((m: any) => String(m?.id)))]
-        .filter(Boolean);
+      const ids = [
+        ...new Set((res?.matches || []).map((m: any) => String(m?.id))),
+      ].filter(Boolean);
       if (ids.length === 0) return;
       await this.deleteIdsInBatches(index, ids);
       if (ids.length < 10000) return;
@@ -602,7 +603,9 @@ export class PineconeService {
         filter,
       } as any);
 
-      const ids = [...new Set((res?.matches || []).map((m: any) => String(m?.id)))]
+      const ids = [
+        ...new Set((res?.matches || []).map((m: any) => String(m?.id))),
+      ]
         .filter(Boolean)
         .sort((a, b) => a.localeCompare(b));
       if (!ids.length) return deleted;
@@ -715,12 +718,11 @@ export class PineconeService {
     return {
       success,
       count,
-      message:
-        success
-          ? `OK: found ${count} vectors`
-          : expectedCount != null && count !== expectedCount
-            ? `Vector count mismatch: found ${count}, expected ${expectedCount}`
-            : "No embeddings found in Pinecone",
+      message: success
+        ? `OK: found ${count} vectors`
+        : expectedCount != null && count !== expectedCount
+          ? `Vector count mismatch: found ${count}, expected ${expectedCount}`
+          : "No embeddings found in Pinecone",
     };
   }
 }

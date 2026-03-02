@@ -1,15 +1,22 @@
 {
   "_meta": {
     "id": "date_patterns",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Cross-domain date extraction patterns with normalization hints for everyday document families.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "high",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
   },
   "rules": [
     {
@@ -24,7 +31,15 @@
       ],
       "normalization": "day_of_week_en",
       "locale": "en",
-      "notes": "Abbreviated English day of week"
+      "notes": "Abbreviated English day of week",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_002",
@@ -38,7 +53,15 @@
       ],
       "normalization": "day_of_week_pt",
       "locale": "pt",
-      "notes": "Abbreviated Portuguese day of week"
+      "notes": "Abbreviated Portuguese day of week",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "academic_term_en",
@@ -50,7 +73,15 @@
       "normalization": "academic_term",
       "locale": "en",
       "notes": "Academic term label in English",
-      "id": "date_003"
+      "id": "date_003",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "academic_term_pt",
@@ -62,7 +93,15 @@
       "normalization": "academic_term",
       "locale": "pt",
       "notes": "Academic term label in Portuguese",
-      "id": "date_004"
+      "id": "date_004",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "academic_year_range",
@@ -74,7 +113,18 @@
       "normalization": "academic_year",
       "locale": "any",
       "notes": "Academic year range",
-      "id": "date_005"
+      "id": "date_005",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "ano_calendario_pt",
@@ -85,7 +135,15 @@
       "normalization": "tax_year",
       "locale": "pt",
       "notes": "Brazilian tax-calendar year marker",
-      "id": "date_006"
+      "id": "date_006",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "ate_data_pt",
@@ -96,7 +154,15 @@
       "normalization": "end_date",
       "locale": "pt",
       "notes": "Until date phrase in Portuguese",
-      "id": "date_007"
+      "id": "date_007",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "billing_cycle_mm_yyyy",
@@ -108,7 +174,18 @@
       "normalization": "MM/YYYY",
       "locale": "any",
       "notes": "Billing cycle month/year",
-      "id": "date_008"
+      "id": "date_008",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "billing_cycle_week_number",
@@ -119,7 +196,18 @@
       "normalization": "cycle_week",
       "locale": "any",
       "notes": "Billing cycle week index",
-      "id": "date_009"
+      "id": "date_009",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "bimestre_label_pt",
@@ -130,7 +218,15 @@
       "normalization": "bimester",
       "locale": "pt",
       "notes": "Bimester expression in Portuguese",
-      "id": "date_010"
+      "id": "date_010",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "checkin_checkout_en",
@@ -142,7 +238,15 @@
       "normalization": "travel_date",
       "locale": "en",
       "notes": "Travel check-in/check-out date",
-      "id": "date_011"
+      "id": "date_011",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "competencia_pt",
@@ -153,7 +257,15 @@
       "normalization": "MM/YYYY",
       "locale": "pt",
       "notes": "Payroll/tax competence month",
-      "id": "date_012"
+      "id": "date_012",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "cycle_cutoff_date",
@@ -165,7 +277,18 @@
       "normalization": "cycle_cutoff",
       "locale": "any",
       "notes": "Billing/card cycle cutoff date",
-      "id": "date_013"
+      "id": "date_013",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "date_compact_ddmmyyyy",
@@ -177,7 +300,18 @@
       "normalization": "DDMMYYYY_or_MMDDYYYY_context",
       "locale": "universal",
       "notes": "Compact day-month-year candidate",
-      "id": "date_014"
+      "id": "date_014",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "ask_clarification",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:notes_ambiguity+auto_or_universal_locale"
+      }
     },
     {
       "name": "date_compact_yyyymmdd",
@@ -189,7 +323,18 @@
       "normalization": "YYYYMMDD",
       "locale": "universal",
       "notes": "Compact numeric date",
-      "id": "date_015"
+      "id": "date_015",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_016",
@@ -202,7 +347,15 @@
       ],
       "normalization": "deadline_date",
       "locale": "pt",
-      "notes": "Portuguese deadline phrasing"
+      "notes": "Portuguese deadline phrasing",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_017",
@@ -214,7 +367,15 @@
       ],
       "normalization": "deadline_date",
       "locale": "en",
-      "notes": "English deadline phrasing"
+      "notes": "English deadline phrasing",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "document_expiry_en",
@@ -225,7 +386,15 @@
       "normalization": "expiry_date",
       "locale": "en",
       "notes": "Document expiry date",
-      "id": "date_018"
+      "id": "date_018",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "document_validade_pt",
@@ -236,7 +405,15 @@
       "normalization": "expiry_date",
       "locale": "pt",
       "notes": "Document validity/expiry date",
-      "id": "date_019"
+      "id": "date_019",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "due_date_label_en",
@@ -247,7 +424,15 @@
       "normalization": "deadline_date",
       "locale": "en",
       "notes": "Due date with English label",
-      "id": "date_020"
+      "id": "date_020",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_021",
@@ -260,7 +445,15 @@
       ],
       "normalization": "duration_years",
       "locale": "pt",
-      "notes": "Duration in years (Portuguese)"
+      "notes": "Duration in years (Portuguese)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_022",
@@ -273,7 +466,15 @@
       ],
       "normalization": "duration_days",
       "locale": "en",
-      "notes": "Duration in days (English)"
+      "notes": "Duration in days (English)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_023",
@@ -286,7 +487,15 @@
       ],
       "normalization": "duration_days",
       "locale": "pt",
-      "notes": "Duration in days (Portuguese)"
+      "notes": "Duration in days (Portuguese)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_024",
@@ -299,7 +508,15 @@
       ],
       "normalization": "duration_months",
       "locale": "pt",
-      "notes": "Duration in months (Portuguese)"
+      "notes": "Duration in months (Portuguese)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_025",
@@ -312,7 +529,15 @@
       ],
       "normalization": "duration_months",
       "locale": "en",
-      "notes": "Duration in months (English)"
+      "notes": "Duration in months (English)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_026",
@@ -325,7 +550,15 @@
       ],
       "normalization": "duration_years",
       "locale": "en",
-      "notes": "Duration in years (English)"
+      "notes": "Duration in years (English)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "effective_from_en",
@@ -336,7 +569,15 @@
       "normalization": "start_date",
       "locale": "en",
       "notes": "Effective-from phrase",
-      "id": "date_027"
+      "id": "date_027",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "embarque_desembarque_pt",
@@ -347,7 +588,15 @@
       "normalization": "travel_date",
       "locale": "pt",
       "notes": "Travel embark/disembark date",
-      "id": "date_028"
+      "id": "date_028",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_029",
@@ -359,7 +608,15 @@
       ],
       "normalization": "DD-MM-YYYY",
       "locale": "eu",
-      "notes": "European dash-separated date"
+      "notes": "European dash-separated date",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_030",
@@ -372,7 +629,15 @@
       ],
       "normalization": "DD.MM.YYYY",
       "locale": "de",
-      "notes": "European dot-separated date (German, Swiss)"
+      "notes": "European dot-separated date (German, Swiss)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_031",
@@ -385,7 +650,18 @@
       ],
       "normalization": "DD/MM/YYYY",
       "locale": "pt-BR",
-      "notes": "European/Brazilian format DD/MM/YYYY (ambiguous with US, context-dependent)"
+      "notes": "European/Brazilian format DD/MM/YYYY (ambiguous with US, context-dependent)",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:notes_ambiguity+date_format_collision"
+      }
     },
     {
       "id": "date_032",
@@ -398,7 +674,18 @@
       ],
       "normalization": "fiscal_half",
       "locale": "universal",
-      "notes": "Fiscal half-year H1/H2"
+      "notes": "Fiscal half-year H1/H2",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_033",
@@ -411,7 +698,18 @@
       ],
       "normalization": "fiscal_quarter",
       "locale": "universal",
-      "notes": "Quarter number prefix format"
+      "notes": "Quarter number prefix format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_034",
@@ -424,7 +722,18 @@
       ],
       "normalization": "fiscal_quarter",
       "locale": "universal",
-      "notes": "Fiscal quarter Q1-Q4 with 4-digit year"
+      "notes": "Fiscal quarter Q1-Q4 with 4-digit year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "fiscal_quarter_written_en",
@@ -435,7 +744,15 @@
       "normalization": "fiscal_quarter",
       "locale": "en",
       "notes": "Written quarter expression",
-      "id": "date_035"
+      "id": "date_035",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_036",
@@ -448,7 +765,15 @@
       ],
       "normalization": "fiscal_half",
       "locale": "pt",
-      "notes": "Portuguese semester format"
+      "notes": "Portuguese semester format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_037",
@@ -461,7 +786,15 @@
       ],
       "normalization": "fiscal_quarter",
       "locale": "pt",
-      "notes": "Portuguese trimester format"
+      "notes": "Portuguese trimester format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "fiscal_week_fw",
@@ -472,7 +805,18 @@
       "normalization": "fiscal_week",
       "locale": "universal",
       "notes": "Fiscal week label",
-      "id": "date_038"
+      "id": "date_038",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_039",
@@ -485,7 +829,18 @@
       ],
       "normalization": "calendar_year",
       "locale": "universal",
-      "notes": "Calendar year with CY prefix"
+      "notes": "Calendar year with CY prefix",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_040",
@@ -498,7 +853,18 @@
       ],
       "normalization": "fiscal_year",
       "locale": "universal",
-      "notes": "Fiscal year with FY prefix"
+      "notes": "Fiscal year with FY prefix",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "flight_datetime_local",
@@ -509,7 +875,15 @@
       "normalization": "travel_local_datetime",
       "locale": "en",
       "notes": "Flight local datetime notation",
-      "id": "date_041"
+      "id": "date_041",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_042",
@@ -521,7 +895,18 @@
       ],
       "normalization": "YYYY-MM-DD",
       "locale": "universal",
-      "notes": "ISO 8601 standard date format"
+      "notes": "ISO 8601 standard date format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_043",
@@ -533,7 +918,18 @@
       ],
       "normalization": "YYYY-MM-DDTHH:mm:ss",
       "locale": "universal",
-      "notes": "ISO 8601 with time component"
+      "notes": "ISO 8601 with time component",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_044",
@@ -545,7 +941,18 @@
       ],
       "normalization": "YYYY-MM-DDTHH:mm:ssTZ",
       "locale": "universal",
-      "notes": "ISO 8601 with timezone offset"
+      "notes": "ISO 8601 with timezone offset",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_045",
@@ -556,7 +963,18 @@
       ],
       "normalization": "YYYY-MM-DDTHH:mm:ssZ",
       "locale": "universal",
-      "notes": "ISO 8601 with UTC Z suffix"
+      "notes": "ISO 8601 with UTC Z suffix",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "iso_week_date",
@@ -567,7 +985,18 @@
       "normalization": "iso_week_date",
       "locale": "universal",
       "notes": "ISO week-date format",
-      "id": "date_046"
+      "id": "date_046",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "lancado_em_pt",
@@ -578,7 +1007,15 @@
       "normalization": "posting_date",
       "locale": "pt",
       "notes": "Posting date phrase in Portuguese",
-      "id": "date_047"
+      "id": "date_047",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "loan_maturity_label",
@@ -589,7 +1026,18 @@
       "normalization": "loan_maturity_date",
       "locale": "any",
       "notes": "Loan maturity date",
-      "id": "date_048"
+      "id": "date_048",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "month_name_en_abbrev_alt",
@@ -600,7 +1048,15 @@
       "normalization": "Mon/YYYY",
       "locale": "en",
       "notes": "English abbreviated month with slash",
-      "id": "date_049"
+      "id": "date_049",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "month_name_pt_abbrev_alt",
@@ -612,7 +1068,15 @@
       "normalization": "Mon/YYYY",
       "locale": "pt",
       "notes": "Portuguese abbreviated month with dot",
-      "id": "date_050"
+      "id": "date_050",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_051",
@@ -625,7 +1089,15 @@
       ],
       "normalization": "Mon YYYY",
       "locale": "en",
-      "notes": "Abbreviated English month + year"
+      "notes": "Abbreviated English month + year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_052",
@@ -637,7 +1109,15 @@
       ],
       "normalization": "Month YYYY",
       "locale": "en",
-      "notes": "English full month + year"
+      "notes": "English full month + year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_053",
@@ -650,7 +1130,18 @@
       ],
       "normalization": "MM/YYYY",
       "locale": "universal",
-      "notes": "Numeric month/year"
+      "notes": "Numeric month/year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_054",
@@ -663,7 +1154,18 @@
       ],
       "normalization": "period_mtd",
       "locale": "universal",
-      "notes": "Month-to-date indicator"
+      "notes": "Month-to-date indicator",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "night_of_en",
@@ -674,7 +1176,15 @@
       "normalization": "specific_night",
       "locale": "en",
       "notes": "Night-of phrasing",
-      "id": "date_055"
+      "id": "date_055",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "noite_de_pt",
@@ -685,7 +1195,15 @@
       "normalization": "specific_night",
       "locale": "pt",
       "notes": "Night-of phrasing in Portuguese",
-      "id": "date_056"
+      "id": "date_056",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "payroll_period_en",
@@ -696,7 +1214,15 @@
       "normalization": "date_range",
       "locale": "en",
       "notes": "Payroll period range",
-      "id": "date_057"
+      "id": "date_057",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "period_label_p1",
@@ -708,7 +1234,18 @@
       "normalization": "accounting_period",
       "locale": "universal",
       "notes": "Accounting period label P## YYYY",
-      "id": "date_058"
+      "id": "date_058",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "policy_effective_expiry_range",
@@ -719,7 +1256,18 @@
       "normalization": "coverage_range",
       "locale": "any",
       "notes": "Policy effective-to-expiry range",
-      "id": "date_059"
+      "id": "date_059",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "posted_on_en",
@@ -730,7 +1278,15 @@
       "normalization": "posting_date",
       "locale": "en",
       "notes": "Transaction posting date phrase",
-      "id": "date_060"
+      "id": "date_060",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "prazo_entrega_pt",
@@ -741,7 +1297,15 @@
       "normalization": "deadline_date",
       "locale": "pt",
       "notes": "Tax filing deadline in Portuguese",
-      "id": "date_061"
+      "id": "date_061",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "processing_window_range",
@@ -752,7 +1316,18 @@
       "normalization": "time_range",
       "locale": "any",
       "notes": "Processing time window",
-      "id": "date_062"
+      "id": "date_062",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_063",
@@ -765,7 +1340,18 @@
       ],
       "normalization": "period_qtd",
       "locale": "universal",
-      "notes": "Quarter-to-date indicator"
+      "notes": "Quarter-to-date indicator",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "quarter_label_en_ext",
@@ -776,7 +1362,15 @@
       "normalization": "fiscal_quarter",
       "locale": "en",
       "notes": "Quarter label with slash",
-      "id": "date_064"
+      "id": "date_064",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "quarter_label_pt_ext",
@@ -787,7 +1381,15 @@
       "normalization": "fiscal_quarter",
       "locale": "pt",
       "notes": "Quarter label with slash",
-      "id": "date_065"
+      "id": "date_065",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_066",
@@ -799,7 +1401,15 @@
       ],
       "normalization": "date_range_pt_de_a",
       "locale": "pt",
-      "notes": "Portuguese de/a month range"
+      "notes": "Portuguese de/a month range",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_067",
@@ -812,7 +1422,15 @@
       ],
       "normalization": "date_range_month",
       "locale": "en",
-      "notes": "English month range with year"
+      "notes": "English month range with year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_068",
@@ -824,7 +1442,15 @@
       ],
       "normalization": "date_range_en_from_to",
       "locale": "en",
-      "notes": "English from/to month range"
+      "notes": "English from/to month range",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_069",
@@ -836,7 +1462,18 @@
       ],
       "normalization": "date_range_full",
       "locale": "auto_detect",
-      "notes": "Full date range with dash"
+      "notes": "Full date range with dash",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_070",
@@ -848,7 +1485,18 @@
       ],
       "normalization": "date_range_numeric",
       "locale": "universal",
-      "notes": "Numeric month/year range"
+      "notes": "Numeric month/year range",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_071",
@@ -859,7 +1507,15 @@
       ],
       "normalization": "relative_plus_1_day",
       "locale": "pt",
-      "notes": "Portuguese: tomorrow"
+      "notes": "Portuguese: tomorrow",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "relative_em_30_dias_pt",
@@ -870,7 +1526,15 @@
       "normalization": "relative_plus_30_days",
       "locale": "pt",
       "notes": "Relative date phrase in Portuguese",
-      "id": "date_072"
+      "id": "date_072",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_073",
@@ -881,7 +1545,15 @@
       ],
       "normalization": "relative_current_date",
       "locale": "pt",
-      "notes": "Portuguese: today"
+      "notes": "Portuguese: today",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "relative_in_30_days_en",
@@ -892,7 +1564,15 @@
       "normalization": "relative_plus_30_days",
       "locale": "en",
       "notes": "Relative date phrase",
-      "id": "date_074"
+      "id": "date_074",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_075",
@@ -903,7 +1583,15 @@
       ],
       "normalization": "relative_minus_1_month",
       "locale": "en",
-      "notes": "Relative: last month"
+      "notes": "Relative: last month",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_076",
@@ -915,7 +1603,15 @@
       ],
       "normalization": "relative_minus_1_week",
       "locale": "en",
-      "notes": "Relative: last week"
+      "notes": "Relative: last week",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_077",
@@ -926,7 +1622,15 @@
       ],
       "normalization": "relative_minus_1_year",
       "locale": "en",
-      "notes": "Relative: last year"
+      "notes": "Relative: last year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_078",
@@ -937,7 +1641,15 @@
       ],
       "normalization": "relative_minus_1_month",
       "locale": "pt",
-      "notes": "Portuguese: last month"
+      "notes": "Portuguese: last month",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_079",
@@ -948,7 +1660,15 @@
       ],
       "normalization": "relative_plus_1_month",
       "locale": "en",
-      "notes": "Relative: next month"
+      "notes": "Relative: next month",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_080",
@@ -960,7 +1680,15 @@
       ],
       "normalization": "relative_plus_1_week",
       "locale": "en",
-      "notes": "Relative: next week"
+      "notes": "Relative: next week",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_081",
@@ -971,7 +1699,15 @@
       ],
       "normalization": "relative_plus_1_year",
       "locale": "en",
-      "notes": "Relative: next year"
+      "notes": "Relative: next year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_082",
@@ -982,7 +1718,15 @@
       ],
       "normalization": "relative_minus_1_day",
       "locale": "pt",
-      "notes": "Portuguese: yesterday"
+      "notes": "Portuguese: yesterday",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_083",
@@ -993,7 +1737,15 @@
       ],
       "normalization": "relative_plus_1_week",
       "locale": "pt",
-      "notes": "Portuguese: next week"
+      "notes": "Portuguese: next week",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_084",
@@ -1004,7 +1756,15 @@
       ],
       "normalization": "relative_plus_1_month",
       "locale": "pt",
-      "notes": "Portuguese: next month"
+      "notes": "Portuguese: next month",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_085",
@@ -1015,7 +1775,15 @@
       ],
       "normalization": "relative_minus_1_week",
       "locale": "pt",
-      "notes": "Portuguese: last week"
+      "notes": "Portuguese: last week",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_086",
@@ -1026,7 +1794,15 @@
       ],
       "normalization": "relative_current_date",
       "locale": "en",
-      "notes": "Relative date: today"
+      "notes": "Relative date: today",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_087",
@@ -1037,7 +1813,15 @@
       ],
       "normalization": "relative_plus_1_day",
       "locale": "en",
-      "notes": "Relative date: tomorrow"
+      "notes": "Relative date: tomorrow",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_088",
@@ -1048,7 +1832,15 @@
       ],
       "normalization": "relative_minus_1_day",
       "locale": "en",
-      "notes": "Relative date: yesterday"
+      "notes": "Relative date: yesterday",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "report_generated_on",
@@ -1060,7 +1852,18 @@
       "normalization": "issue_date",
       "locale": "any",
       "notes": "Report generation date",
-      "id": "date_089"
+      "id": "date_089",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "rfc_2822_datetime",
@@ -1071,7 +1874,18 @@
       "normalization": "RFC2822",
       "locale": "universal",
       "notes": "RFC 2822 email date time",
-      "id": "date_090"
+      "id": "date_090",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "rolling_12_months",
@@ -1083,7 +1897,18 @@
       "normalization": "relative_12_month_window",
       "locale": "any",
       "notes": "Rolling 12-month window phrase",
-      "id": "date_091"
+      "id": "date_091",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "semana_inicio_pt",
@@ -1094,7 +1919,15 @@
       "normalization": "week_start_date",
       "locale": "pt",
       "notes": "Week start phrase in Portuguese",
-      "id": "date_092"
+      "id": "date_092",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "semester_label_en",
@@ -1106,7 +1939,15 @@
       "normalization": "semester",
       "locale": "en",
       "notes": "Semester label",
-      "id": "date_093"
+      "id": "date_093",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "statement_month_label",
@@ -1117,7 +1958,18 @@
       "normalization": "statement_month",
       "locale": "any",
       "notes": "Statement month textual label",
-      "id": "date_094"
+      "id": "date_094",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "statement_period_range_text",
@@ -1128,7 +1980,18 @@
       "normalization": "date_range",
       "locale": "any",
       "notes": "Statement period date range",
-      "id": "date_095"
+      "id": "date_095",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "tax_filing_deadline_en",
@@ -1139,7 +2002,15 @@
       "normalization": "deadline_date",
       "locale": "en",
       "notes": "Tax filing deadline",
-      "id": "date_096"
+      "id": "date_096",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "tax_year_en",
@@ -1150,7 +2021,15 @@
       "normalization": "tax_year",
       "locale": "en",
       "notes": "Tax year marker",
-      "id": "date_097"
+      "id": "date_097",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_098",
@@ -1163,7 +2042,15 @@
       ],
       "normalization": "HH:mm_12h",
       "locale": "en",
-      "notes": "12-hour time with AM/PM"
+      "notes": "12-hour time with AM/PM",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_099",
@@ -1176,7 +2063,18 @@
       ],
       "normalization": "HH:mm:ss_24h",
       "locale": "universal",
-      "notes": "24-hour time format"
+      "notes": "24-hour time format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "time_hhmmss_comma",
@@ -1187,7 +2085,18 @@
       "normalization": "HH:mm:ss,SSS",
       "locale": "universal",
       "notes": "Time with millisecond comma separator",
-      "id": "date_100"
+      "id": "date_100",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "time_with_timezone_abbrev",
@@ -1199,7 +2108,18 @@
       "normalization": "HH:mm_TZ",
       "locale": "any",
       "notes": "Time with timezone abbreviation",
-      "id": "date_101"
+      "id": "date_101",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "trimestre_escrito_pt",
@@ -1210,7 +2130,15 @@
       "normalization": "fiscal_quarter",
       "locale": "pt",
       "notes": "Written Portuguese quarter expression",
-      "id": "date_102"
+      "id": "date_102",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "unix_timestamp_millis",
@@ -1221,7 +2149,18 @@
       "normalization": "unix_milliseconds",
       "locale": "universal",
       "notes": "Unix timestamp in milliseconds",
-      "id": "date_103"
+      "id": "date_103",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "unix_timestamp_seconds",
@@ -1232,7 +2171,18 @@
       "normalization": "unix_seconds",
       "locale": "universal",
       "notes": "Unix timestamp in seconds",
-      "id": "date_104"
+      "id": "date_104",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "until_date_en",
@@ -1243,7 +2193,15 @@
       "normalization": "end_date",
       "locale": "en",
       "notes": "Until date phrase",
-      "id": "date_105"
+      "id": "date_105",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_106",
@@ -1255,7 +2213,15 @@
       ],
       "normalization": "MM-DD-YYYY",
       "locale": "en-US",
-      "notes": "US date with dashes"
+      "notes": "US date with dashes",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_107",
@@ -1268,7 +2234,18 @@
       ],
       "normalization": "MM/DD/YY",
       "locale": "en-US",
-      "notes": "US date format with 2-digit year"
+      "notes": "US date format with 2-digit year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:date_format_collision"
+      }
     },
     {
       "id": "date_108",
@@ -1281,7 +2258,18 @@
       ],
       "normalization": "MM/DD/YYYY",
       "locale": "en-US",
-      "notes": "US date format with 4-digit year"
+      "notes": "US date format with 4-digit year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:date_format_collision"
+      }
     },
     {
       "name": "value_date_label",
@@ -1292,7 +2280,18 @@
       "normalization": "value_date",
       "locale": "any",
       "notes": "Banking value date",
-      "id": "date_109"
+      "id": "date_109",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "vencimento_label_pt",
@@ -1303,7 +2302,15 @@
       "normalization": "deadline_date",
       "locale": "pt",
       "notes": "Due date with Portuguese label",
-      "id": "date_110"
+      "id": "date_110",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "vigente_desde_pt",
@@ -1314,7 +2321,15 @@
       "normalization": "start_date",
       "locale": "pt",
       "notes": "Effective-from phrase in Portuguese",
-      "id": "date_111"
+      "id": "date_111",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "name": "week_commencing_en",
@@ -1325,7 +2340,15 @@
       "normalization": "week_start_date",
       "locale": "en",
       "notes": "Week commencing phrase",
-      "id": "date_112"
+      "id": "date_112",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_113",
@@ -1337,7 +2360,15 @@
       ],
       "normalization": "week_number_en",
       "locale": "en",
-      "notes": "English week number"
+      "notes": "English week number",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_114",
@@ -1350,7 +2381,18 @@
       ],
       "normalization": "calendar_week",
       "locale": "universal",
-      "notes": "Calendar week CW format"
+      "notes": "Calendar week CW format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_115",
@@ -1362,7 +2404,15 @@
       ],
       "normalization": "week_number_pt",
       "locale": "pt",
-      "notes": "Portuguese week number"
+      "notes": "Portuguese week number",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_116",
@@ -1375,7 +2425,18 @@
       ],
       "normalization": "week_number",
       "locale": "universal",
-      "notes": "ISO week number W## format"
+      "notes": "ISO week number W## format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_117",
@@ -1388,7 +2449,15 @@
       ],
       "normalization": "Mon DD, YYYY",
       "locale": "en",
-      "notes": "Abbreviated English month + day + year"
+      "notes": "Abbreviated English month + day + year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_118",
@@ -1401,7 +2470,15 @@
       ],
       "normalization": "DD Mon YYYY",
       "locale": "en",
-      "notes": "Day + abbreviated English month + year"
+      "notes": "Day + abbreviated English month + year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_119",
@@ -1414,7 +2491,15 @@
       ],
       "normalization": "DD Month YYYY",
       "locale": "en",
-      "notes": "English ordinal day + full month + year"
+      "notes": "English ordinal day + full month + year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_120",
@@ -1426,7 +2511,15 @@
       ],
       "normalization": "Month DD, YYYY",
       "locale": "en",
-      "notes": "Full English month name with day and year"
+      "notes": "Full English month name with day and year",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_121",
@@ -1438,7 +2531,15 @@
       ],
       "normalization": "DD/Mon/YYYY",
       "locale": "pt",
-      "notes": "Portuguese abbreviated month with slashes"
+      "notes": "Portuguese abbreviated month with slashes",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_122",
@@ -1450,7 +2551,15 @@
       ],
       "normalization": "DD de Month de YYYY",
       "locale": "pt",
-      "notes": "Full Portuguese date format"
+      "notes": "Full Portuguese date format",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_123",
@@ -1462,7 +2571,15 @@
       ],
       "normalization": "Month de YYYY",
       "locale": "pt",
-      "notes": "Portuguese month-year only"
+      "notes": "Portuguese month-year only",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_temporal"
+      }
     },
     {
       "id": "date_124",
@@ -1475,7 +2592,18 @@
       ],
       "normalization": "YYYY",
       "locale": "universal",
-      "notes": "4-digit year only"
+      "notes": "4-digit year only",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "date_125",
@@ -1488,7 +2616,18 @@
       ],
       "normalization": "period_ytd",
       "locale": "universal",
-      "notes": "Year-to-date indicator"
+      "notes": "Year-to-date indicator",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "date_locale",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     }
   ]
 }

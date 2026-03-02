@@ -71,7 +71,101 @@ function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
   // 3. Remove inline backticks — keep inner text
   t = t.replace(/`([^`]+)`/g, '$1');
 
+  // Strip source/reference columns from markdown tables (sources are rendered via pills).
+  t = stripSourceColumnsFromMarkdownTables(t);
+  // Remove leaked inline retrieval markers from model text.
+  t = stripInlineCitationArtifacts(t);
+
   return t;
+}
+
+function splitPipeCells(line) {
+  return String(line || '')
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map((c) => c.trim());
+}
+
+function normalizeHeaderKey(input) {
+  return String(input || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function stripSourceColumnsFromMarkdownTables(text) {
+  const lines = String(text || '').split('\n');
+  const out = [];
+  const isSep = (line) => /^[:\-\|\s]+$/.test(String(line || '').trim());
+  const sourcePatterns = ['source', 'sources', 'fonte', 'fontes', 'documento fonte', 'evidencia', 'evidence'];
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    const next = lines[i + 1] || '';
+    const startsTable = line.includes('|') && next.includes('|') && isSep(next);
+    if (!startsTable) {
+      out.push(line);
+      continue;
+    }
+
+    const block = [line, next];
+    let j = i + 2;
+    while (j < lines.length && lines[j].includes('|')) {
+      block.push(lines[j]);
+      j += 1;
+    }
+    i = j - 1;
+
+    const headers = splitPipeCells(block[0]);
+    if (headers.length < 2) {
+      out.push(...block);
+      continue;
+    }
+    const sourceIndexes = new Set();
+    headers.forEach((h, idx) => {
+      const key = normalizeHeaderKey(h);
+      if (sourcePatterns.some((p) => key.includes(p))) sourceIndexes.add(idx);
+    });
+    if (sourceIndexes.size === 0) {
+      out.push(...block);
+      continue;
+    }
+
+    const colCount = headers.length;
+    const rewrite = (row) => {
+      const cells = splitPipeCells(row);
+      const padded = cells.length >= colCount
+        ? [...cells.slice(0, colCount - 1), cells.slice(colCount - 1).join(' | ').trim()]
+        : [...cells, ...Array.from({ length: colCount - cells.length }, () => '')];
+      const filtered = padded.filter((_, idx) => !sourceIndexes.has(idx));
+      return `| ${filtered.join(' | ')} |`;
+    };
+
+    const header = rewrite(block[0]);
+    const cols = splitPipeCells(header).length;
+    out.push(header);
+    out.push(`| ${Array.from({ length: cols }, () => '---').join(' | ')} |`);
+    for (let k = 2; k < block.length; k += 1) out.push(rewrite(block[k]));
+  }
+  return out.join('\n');
+}
+
+function stripInlineCitationArtifacts(text) {
+  let t = String(text || '');
+  const marker =
+    /d:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\|p:-?\d+\|c:\d+/gi;
+  t = t.replace(new RegExp(`\\(\\s*${marker.source}\\s*\\)`, 'gi'), '');
+  t = t.replace(marker, '');
+  t = t
+    .replace(/\(\s*[,;]+\s*\)/g, '')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/[ \t]{2,}/g, ' ');
+  return t.trim();
 }
 
 
@@ -206,7 +300,7 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
               fontFamily: 'Plus Jakarta Sans',
               fontSize: 13,
               color: '#1F2937',
-              tableLayout: 'auto',
+              tableLayout: 'fixed',
             }}
           >
             {children}
@@ -226,14 +320,26 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
             textTransform: 'uppercase',
             letterSpacing: 0.4,
             color: '#6B7280',
-            whiteSpace: 'nowrap',
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
           }}
         >
           {children}
         </th>
       ),
       td: ({ children }) => (
-        <td style={{ padding: '10px 14px', borderBottom: '1px solid #F3F4F6', borderRight: '1px solid #F3F4F6', verticalAlign: 'top', minWidth: 80 }}>{children}</td>
+        <td
+          style={{
+            padding: '10px 14px',
+            borderBottom: '1px solid #F3F4F6',
+            borderRight: '1px solid #F3F4F6',
+            verticalAlign: 'top',
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+          }}
+        >
+          {children}
+        </td>
       ),
       tr: ({ children }) => <tr>{children}</tr>,
 

@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_ops_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for operations domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "language": "pt"
+  },
+  "domain": "ops",
+  "abbreviations": [
+    {
+      "abbr": "SLA",
+      "expansion": "Acordo de Nivel de Servico"
+    },
+    {
+      "abbr": "KPI",
+      "expansion": "Indicador-Chave de Desempenho"
+    },
+    {
+      "abbr": "MTBF",
+      "expansion": "Tempo Medio Entre Falhas"
+    },
+    {
+      "abbr": "MTTR",
+      "expansion": "Tempo Medio Para Reparo"
+    },
+    {
+      "abbr": "WO",
+      "expansion": "Ordem de Servico"
+    },
+    {
+      "abbr": "PM",
+      "expansion": "Manutencao Preventiva"
+    },
+    {
+      "abbr": "QC",
+      "expansion": "Controle de Qualidade"
+    },
+    {
+      "abbr": "QA",
+      "expansion": "Garantia de Qualidade"
+    },
+    {
+      "abbr": "BOM",
+      "expansion": "Lista de Materiais"
+    },
+    {
+      "abbr": "BOL",
+      "expansion": "Conhecimento de Embarque"
+    },
+    {
+      "abbr": "PO",
+      "expansion": "Ordem de Compra"
+    },
+    {
+      "abbr": "MRO",
+      "expansion": "Manutencao, Reparo e Operacoes"
+    },
+    {
+      "abbr": "ERP",
+      "expansion": "Planejamento de Recursos Empresariais"
+    },
+    {
+      "abbr": "OEE",
+      "expansion": "Eficiencia Global do Equipamento"
+    },
+    {
+      "abbr": "COGS",
+      "expansion": "Custo dos Produtos Vendidos"
+    },
+    {
+      "abbr": "SKU",
+      "expansion": "Unidade de Manutencao de Estoque"
+    },
+    {
+      "abbr": "WMS",
+      "expansion": "Sistema de Gestao de Armazem"
+    },
+    {
+      "abbr": "TMS",
+      "expansion": "Sistema de Gestao de Transporte"
+    },
+    {
+      "abbr": "FIFO",
+      "expansion": "Primeiro a Entrar, Primeiro a Sair"
+    },
+    {
+      "abbr": "JIT",
+      "expansion": "Just In Time"
+    }
+  ]
+}

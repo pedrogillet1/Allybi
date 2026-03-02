@@ -29,6 +29,156 @@ function envAll(value: boolean) {
 }
 
 describe("DataBankLoaderService hardening", () => {
+  test("rejects unknown registry categories when bank_manifest strict category policy is enabled", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "koda-banks-cats-"));
+
+    writeJson(path.join(root, "manifest/bank_manifest.any.json"), {
+      _meta: makeMeta("bank_manifest"),
+      config: {
+        enabled: true,
+        strictCategories: true,
+        failOnUnknownCategory: true,
+      },
+      allowedCategoryIds: ["manifest"],
+    });
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["manifest", "mystery"],
+      banks: [
+        {
+          id: "mystery_bank",
+          category: "mystery",
+          path: "mystery/mystery_bank.any.json",
+          filename: "mystery_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(false),
+        },
+      ],
+    });
+
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: true,
+      validateSchemas: false,
+      allowEmptyChecksumsInNonProd: true,
+    });
+
+    await expect(loader.loadAll()).rejects.toThrow(
+      /categories not allowed by bank_manifest/i,
+    );
+  });
+
+  test("rejects registry categories missing from loadOrder in strict mode", async () => {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), "koda-banks-loadorder-"),
+    );
+
+    writeJson(path.join(root, "manifest/bank_manifest.any.json"), {
+      _meta: makeMeta("bank_manifest"),
+      config: {
+        enabled: true,
+        strictCategories: true,
+        failOnUnknownCategory: true,
+      },
+      allowedCategoryIds: ["manifest", "semantics"],
+    });
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["manifest"],
+      banks: [
+        {
+          id: "semantic_bank",
+          category: "semantics",
+          path: "semantics/semantic_bank.any.json",
+          filename: "semantic_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(false),
+        },
+      ],
+    });
+
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: true,
+      validateSchemas: false,
+      allowEmptyChecksumsInNonProd: true,
+    });
+
+    await expect(loader.loadAll()).rejects.toThrow(
+      /categories missing from loadOrder/i,
+    );
+  });
+
+  test("rejects dependency overlays missing registry nodes in strict mode", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "koda-banks-deps-"));
+
+    writeJson(path.join(root, "manifest/bank_manifest.any.json"), {
+      _meta: makeMeta("bank_manifest"),
+      config: {
+        enabled: true,
+        strictCategories: true,
+        failOnUnknownCategory: true,
+      },
+      allowedCategoryIds: ["manifest", "semantics"],
+    });
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["manifest", "semantics"],
+      banks: [
+        {
+          id: "alpha_bank",
+          category: "semantics",
+          path: "semantics/alpha_bank.any.json",
+          filename: "alpha_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(false),
+        },
+        {
+          id: "beta_bank",
+          category: "semantics",
+          path: "semantics/beta_bank.any.json",
+          filename: "beta_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(false),
+        },
+      ],
+    });
+
+    writeJson(path.join(root, "manifest/bank_dependencies.any.json"), {
+      _meta: makeMeta("bank_dependencies"),
+      config: {
+        enabled: true,
+        failOnMissingNode: true,
+        failOnCycle: true,
+      },
+      banks: [{ id: "alpha_bank", dependsOn: [] }],
+    });
+
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: true,
+      validateSchemas: false,
+      allowEmptyChecksumsInNonProd: true,
+    });
+
+    await expect(loader.loadAll()).rejects.toThrow(
+      /missing nodes for registered banks/i,
+    );
+  });
+
   test("rejects registry entries that point to _deprecated paths", async () => {
     const root = fs.mkdtempSync(
       path.join(os.tmpdir(), "koda-banks-deprecated-"),
@@ -258,8 +408,27 @@ describe("DataBankLoaderService hardening", () => {
     writeJson(path.join(root, "manifest/bank_registry.any.json"), {
       _meta: makeMeta("bank_registry"),
       config: { enabled: true },
-      loadOrder: ["manifest", "semantics"],
+      loadOrder: ["manifest", "schemas", "semantics"],
       banks: [
+        {
+          id: "bank_schema",
+          category: "schemas",
+          path: "schemas/bank_schema.any.json",
+          filename: "bank_schema.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+        {
+          id: "document_intelligence_manifest_schema",
+          category: "schemas",
+          path: "schemas/document_intelligence_manifest_schema.any.json",
+          filename: "document_intelligence_manifest_schema.any.json",
+          version: "1.0.0",
+          schemaId: "bank_schema",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
         {
           id: "document_intelligence_bank_map",
           category: "semantics",
@@ -275,6 +444,26 @@ describe("DataBankLoaderService hardening", () => {
           category: "semantics",
           path: "semantics/doc_taxonomy.any.json",
           filename: "doc_taxonomy.any.json",
+          version: "1.0.0",
+          schemaId: "bank_schema",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+        {
+          id: "document_intelligence_schema_registry",
+          category: "manifest",
+          path: "manifest/document_intelligence_schema_registry.any.json",
+          filename: "document_intelligence_schema_registry.any.json",
+          version: "1.0.0",
+          schemaId: "bank_schema",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+        {
+          id: "document_intelligence_dependency_graph",
+          category: "manifest",
+          path: "manifest/document_intelligence_dependency_graph.any.json",
+          filename: "document_intelligence_dependency_graph.any.json",
           version: "1.0.0",
           schemaId: "bank_schema",
           enabledByEnv: envAll(true),
@@ -300,6 +489,16 @@ describe("DataBankLoaderService hardening", () => {
           enabledByEnv: envAll(true),
           requiredByEnv: envAll(true),
         },
+        {
+          id: "document_intelligence_runtime_wiring_gates",
+          category: "manifest",
+          path: "manifest/document_intelligence_runtime_wiring_gates.any.json",
+          filename: "document_intelligence_runtime_wiring_gates.any.json",
+          version: "1.0.0",
+          schemaId: "bank_schema",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
       ],
     });
 
@@ -316,6 +515,7 @@ describe("DataBankLoaderService hardening", () => {
         failOnMissingNode: true,
       },
       banks: [
+        { id: "bank_schema", dependsOn: [] },
         { id: "doc_taxonomy", dependsOn: [] },
         { id: "document_intelligence_bank_map", dependsOn: [] },
         { id: "document_intelligence_manifest_schema", dependsOn: [] },
@@ -341,6 +541,79 @@ describe("DataBankLoaderService hardening", () => {
       config: { enabled: true },
       typeDefinitions: [{ id: "invoice" }],
     });
+    writeJson(path.join(root, "schemas/bank_schema.any.json"), {
+      _meta: makeMeta("bank_schema"),
+      config: { enabled: true },
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      type: "object",
+      required: ["_meta", "config"],
+      additionalProperties: true,
+    });
+    writeJson(
+      path.join(root, "schemas/document_intelligence_manifest_schema.any.json"),
+      {
+        _meta: makeMeta("document_intelligence_manifest_schema"),
+        config: { enabled: true },
+        schema: {
+          $schema: "https://json-schema.org/draft/2020-12/schema",
+          type: "object",
+          additionalProperties: true,
+        },
+      },
+    );
+    writeJson(
+      path.join(
+        root,
+        "manifest/document_intelligence_schema_registry.any.json",
+      ),
+      {
+        _meta: makeMeta("document_intelligence_schema_registry"),
+        config: {
+          enabled: true,
+          failOnMissingAssignmentsInStrict: true,
+          failOnSchemaMismatchInStrict: true,
+        },
+        schemaFamilies: [],
+        schemaAssignments: [
+          { bankId: "doc_taxonomy", schemaId: "bank_schema" },
+          {
+            bankId: "document_intelligence_manifest_schema",
+            schemaId: "bank_schema",
+          },
+          {
+            bankId: "document_intelligence_schema_registry",
+            schemaId: "bank_schema",
+          },
+          {
+            bankId: "document_intelligence_dependency_graph",
+            schemaId: "bank_schema",
+          },
+          {
+            bankId: "document_intelligence_usage_manifest",
+            schemaId: "bank_schema",
+          },
+          {
+            bankId: "document_intelligence_orphan_allowlist",
+            schemaId: "bank_schema",
+          },
+          {
+            bankId: "document_intelligence_runtime_wiring_gates",
+            schemaId: "bank_schema",
+          },
+        ],
+      },
+    );
+    writeJson(
+      path.join(
+        root,
+        "manifest/document_intelligence_dependency_graph.any.json",
+      ),
+      {
+        _meta: makeMeta("document_intelligence_dependency_graph"),
+        config: { enabled: true },
+        edges: [],
+      },
+    );
     writeJson(
       path.join(root, "manifest/document_intelligence_usage_manifest.any.json"),
       {
@@ -363,6 +636,22 @@ describe("DataBankLoaderService hardening", () => {
         allowlistedBankIds: [],
         allowlistedIdPrefixes: [],
         allowlistedIdPatterns: [],
+      },
+    );
+    writeJson(
+      path.join(
+        root,
+        "manifest/document_intelligence_runtime_wiring_gates.any.json",
+      ),
+      {
+        _meta: makeMeta("document_intelligence_runtime_wiring_gates"),
+        config: { enabled: true },
+        gates: [
+          {
+            id: "gate_doc_taxonomy_loaded",
+            requiredBanks: ["doc_taxonomy"],
+          },
+        ],
       },
     );
 

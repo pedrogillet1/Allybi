@@ -1,16 +1,29 @@
 {
   "_meta": {
     "id": "table_header_ontology_insurance",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for insurance documents with multilingual synonym coverage.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "insurance"
+    "domain": "insurance",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "insurance",
   "headers": [
@@ -33,7 +46,11 @@
         "accident_date_code",
         "accident_date_quantity",
         "accident_date_type"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_amount",
+      "curationReason": "weighted:accident_date_amount:domain_general"
     },
     {
       "canonical": "accident_date_code",
@@ -52,7 +69,11 @@
         "accident_date_count",
         "accident_date_rate",
         "accident_date_unit"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_code",
+      "curationReason": "weighted:accident_date_code:domain_general"
     },
     {
       "canonical": "accident_date_count",
@@ -71,7 +92,11 @@
         "accident_date_end_date",
         "accident_date_start_date",
         "amount_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_count",
+      "curationReason": "weighted:accident_date_count:domain_general"
     },
     {
       "canonical": "accident_date_end_date",
@@ -90,7 +115,11 @@
         "accident_date_id",
         "accident_date_status",
         "amount_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_end_date",
+      "curationReason": "weighted:accident_date_end_date:domain_general"
     },
     {
       "canonical": "accident_date_id",
@@ -109,7 +138,11 @@
         "accident_date_name",
         "accident_date_subtotal",
         "amount_count"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_id",
+      "curationReason": "weighted:accident_date_id:domain_general"
     },
     {
       "canonical": "accident_date_name",
@@ -128,7 +161,11 @@
         "accident_date_number",
         "accident_date_total",
         "amount_date"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_name",
+      "curationReason": "weighted:accident_date_name:domain_general"
     },
     {
       "canonical": "accident_date_number",
@@ -148,7 +185,11 @@
         "accident_date_quantity",
         "accident_date_type",
         "amount_end_date"
-      ]
+      ],
+      "priority": 755,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_number",
+      "curationReason": "weighted:accident_date_number:domain_general"
     },
     {
       "canonical": "accident_date_quantity",
@@ -168,7 +209,11 @@
         "accident_date_rate",
         "accident_date_unit",
         "amount_id"
-      ]
+      ],
+      "priority": 755,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_quantity",
+      "curationReason": "weighted:accident_date_quantity:domain_general"
     },
     {
       "canonical": "accident_date_rate",
@@ -187,7 +232,11 @@
         "accident_date_start_date",
         "amount_amount",
         "amount_name"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_rate",
+      "curationReason": "weighted:accident_date_rate:domain_general"
     },
     {
       "canonical": "accident_date_start_date",
@@ -206,7 +255,11 @@
         "accident_date_status",
         "amount_code",
         "amount_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_start_date",
+      "curationReason": "weighted:accident_date_start_date:domain_general"
     },
     {
       "canonical": "accident_date_status",
@@ -225,7 +278,11 @@
         "accident_date_subtotal",
         "amount_count",
         "amount_quantity"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_status",
+      "curationReason": "weighted:accident_date_status:domain_general"
     },
     {
       "canonical": "accident_date_subtotal",
@@ -244,7 +301,11 @@
         "accident_date_total",
         "amount_date",
         "amount_rate"
-      ]
+      ],
+      "priority": 1099,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_subtotal",
+      "curationReason": "weighted:accident_date_subtotal:domain_general"
     },
     {
       "canonical": "accident_date_total",
@@ -263,7 +324,11 @@
         "accident_date_type",
         "amount_end_date",
         "amount_start_date"
-      ]
+      ],
+      "priority": 1099,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_total",
+      "curationReason": "weighted:accident_date_total:domain_general"
     },
     {
       "canonical": "accident_date_type",
@@ -282,7 +347,11 @@
         "accident_date_unit",
         "amount_id",
         "amount_status"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_type",
+      "curationReason": "weighted:accident_date_type:domain_general"
     },
     {
       "canonical": "accident_date_unit",
@@ -301,7 +370,11 @@
         "amount_amount",
         "amount_name",
         "amount_subtotal"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_accident_date_unit",
+      "curationReason": "weighted:accident_date_unit:domain_general"
     },
     {
       "canonical": "amount_amount",
@@ -322,7 +395,11 @@
         "amount_code",
         "amount_number",
         "amount_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_amount",
+      "curationReason": "weighted:amount_amount:domain_general"
     },
     {
       "canonical": "amount_code",
@@ -343,7 +420,11 @@
         "amount_count",
         "amount_quantity",
         "amount_type"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_code",
+      "curationReason": "weighted:amount_code:domain_general"
     },
     {
       "canonical": "amount_count",
@@ -364,7 +445,11 @@
         "amount_date",
         "amount_rate",
         "amount_unit"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_count",
+      "curationReason": "weighted:amount_count:domain_general"
     },
     {
       "canonical": "amount_date",
@@ -385,7 +470,11 @@
         "amount_end_date",
         "amount_start_date",
         "approved_amount_amount"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_date",
+      "curationReason": "weighted:amount_date:domain_general"
     },
     {
       "canonical": "amount_end_date",
@@ -406,7 +495,11 @@
         "amount_id",
         "amount_status",
         "approved_amount_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_end_date",
+      "curationReason": "weighted:amount_end_date:domain_general"
     },
     {
       "canonical": "amount_id",
@@ -427,7 +520,11 @@
         "amount_name",
         "amount_subtotal",
         "approved_amount_count"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_id",
+      "curationReason": "weighted:amount_id:domain_general"
     },
     {
       "canonical": "amount_name",
@@ -448,7 +545,11 @@
         "amount_number",
         "amount_total",
         "approved_amount_date"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_name",
+      "curationReason": "weighted:amount_name:domain_general"
     },
     {
       "canonical": "amount_number",
@@ -470,7 +571,11 @@
         "amount_quantity",
         "amount_type",
         "approved_amount_end_date"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_number",
+      "curationReason": "weighted:amount_number:domain_general"
     },
     {
       "canonical": "amount_quantity",
@@ -492,7 +597,11 @@
         "amount_rate",
         "amount_unit",
         "approved_amount_id"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_quantity",
+      "curationReason": "weighted:amount_quantity:domain_general"
     },
     {
       "canonical": "amount_rate",
@@ -513,7 +622,11 @@
         "amount_start_date",
         "approved_amount_amount",
         "approved_amount_name"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_rate",
+      "curationReason": "weighted:amount_rate:domain_general"
     },
     {
       "canonical": "amount_start_date",
@@ -534,7 +647,11 @@
         "amount_status",
         "approved_amount_code",
         "approved_amount_number"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_start_date",
+      "curationReason": "weighted:amount_start_date:domain_general"
     },
     {
       "canonical": "amount_status",
@@ -555,7 +672,11 @@
         "amount_subtotal",
         "approved_amount_count",
         "approved_amount_quantity"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_status",
+      "curationReason": "weighted:amount_status:domain_general"
     },
     {
       "canonical": "amount_subtotal",
@@ -576,7 +697,11 @@
         "amount_total",
         "approved_amount_date",
         "approved_amount_rate"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_subtotal",
+      "curationReason": "weighted:amount_subtotal:domain_general"
     },
     {
       "canonical": "amount_total",
@@ -597,7 +722,11 @@
         "amount_type",
         "approved_amount_end_date",
         "approved_amount_start_date"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_total",
+      "curationReason": "weighted:amount_total:domain_general"
     },
     {
       "canonical": "amount_type",
@@ -618,7 +747,11 @@
         "amount_unit",
         "approved_amount_id",
         "approved_amount_status"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_type",
+      "curationReason": "weighted:amount_type:domain_general"
     },
     {
       "canonical": "amount_unit",
@@ -639,7 +772,11 @@
         "approved_amount_amount",
         "approved_amount_name",
         "approved_amount_subtotal"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_unit",
+      "curationReason": "weighted:amount_unit:domain_general"
     },
     {
       "canonical": "approved_amount_amount",
@@ -660,7 +797,11 @@
         "approved_amount_code",
         "approved_amount_number",
         "approved_amount_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_amount",
+      "curationReason": "weighted:approved_amount_amount:domain_general"
     },
     {
       "canonical": "approved_amount_code",
@@ -681,7 +822,11 @@
         "approved_amount_count",
         "approved_amount_quantity",
         "approved_amount_type"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_code",
+      "curationReason": "weighted:approved_amount_code:domain_general"
     },
     {
       "canonical": "approved_amount_count",
@@ -702,7 +847,11 @@
         "approved_amount_date",
         "approved_amount_rate",
         "approved_amount_unit"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_count",
+      "curationReason": "weighted:approved_amount_count:domain_general"
     },
     {
       "canonical": "approved_amount_date",
@@ -723,7 +872,11 @@
         "approved_amount_end_date",
         "approved_amount_start_date",
         "beneficiary_amount"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_date",
+      "curationReason": "weighted:approved_amount_date:domain_general"
     },
     {
       "canonical": "approved_amount_end_date",
@@ -744,7 +897,11 @@
         "approved_amount_id",
         "approved_amount_status",
         "beneficiary_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_end_date",
+      "curationReason": "weighted:approved_amount_end_date:domain_general"
     },
     {
       "canonical": "approved_amount_id",
@@ -765,7 +922,11 @@
         "approved_amount_name",
         "approved_amount_subtotal",
         "beneficiary_count"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_id",
+      "curationReason": "weighted:approved_amount_id:domain_general"
     },
     {
       "canonical": "approved_amount_name",
@@ -786,7 +947,11 @@
         "approved_amount_number",
         "approved_amount_total",
         "beneficiary_date"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_name",
+      "curationReason": "weighted:approved_amount_name:domain_general"
     },
     {
       "canonical": "approved_amount_number",
@@ -808,7 +973,11 @@
         "approved_amount_quantity",
         "approved_amount_type",
         "beneficiary_end_date"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_number",
+      "curationReason": "weighted:approved_amount_number:domain_general"
     },
     {
       "canonical": "approved_amount_quantity",
@@ -830,7 +999,11 @@
         "approved_amount_rate",
         "approved_amount_unit",
         "beneficiary_id"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_quantity",
+      "curationReason": "weighted:approved_amount_quantity:domain_general"
     },
     {
       "canonical": "approved_amount_rate",
@@ -851,7 +1024,11 @@
         "approved_amount_start_date",
         "beneficiary_amount",
         "beneficiary_name"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_rate",
+      "curationReason": "weighted:approved_amount_rate:domain_general"
     },
     {
       "canonical": "approved_amount_start_date",
@@ -872,7 +1049,11 @@
         "approved_amount_status",
         "beneficiary_code",
         "beneficiary_number"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_start_date",
+      "curationReason": "weighted:approved_amount_start_date:domain_general"
     },
     {
       "canonical": "approved_amount_status",
@@ -893,7 +1074,11 @@
         "approved_amount_subtotal",
         "beneficiary_count",
         "beneficiary_quantity"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_status",
+      "curationReason": "weighted:approved_amount_status:domain_general"
     },
     {
       "canonical": "approved_amount_subtotal",
@@ -914,7 +1099,11 @@
         "approved_amount_total",
         "beneficiary_date",
         "beneficiary_rate"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_subtotal",
+      "curationReason": "weighted:approved_amount_subtotal:domain_general"
     },
     {
       "canonical": "approved_amount_total",
@@ -935,7 +1124,11 @@
         "approved_amount_type",
         "beneficiary_end_date",
         "beneficiary_start_date"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_total",
+      "curationReason": "weighted:approved_amount_total:domain_general"
     },
     {
       "canonical": "approved_amount_type",
@@ -956,7 +1149,11 @@
         "approved_amount_unit",
         "beneficiary_id",
         "beneficiary_status"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_type",
+      "curationReason": "weighted:approved_amount_type:domain_general"
     },
     {
       "canonical": "approved_amount_unit",
@@ -977,7 +1174,11 @@
         "beneficiary_amount",
         "beneficiary_name",
         "beneficiary_subtotal"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_approved_amount_unit",
+      "curationReason": "weighted:approved_amount_unit:domain_general"
     },
     {
       "canonical": "beneficiary_amount",
@@ -998,7 +1199,11 @@
         "beneficiary_code",
         "beneficiary_number",
         "beneficiary_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_amount",
+      "curationReason": "weighted:beneficiary_amount:domain_general"
     },
     {
       "canonical": "beneficiary_code",
@@ -1017,7 +1222,11 @@
         "beneficiary_count",
         "beneficiary_quantity",
         "beneficiary_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_code",
+      "curationReason": "weighted:beneficiary_code:domain_general"
     },
     {
       "canonical": "beneficiary_count",
@@ -1034,7 +1243,11 @@
         "beneficiary_date",
         "beneficiary_rate",
         "beneficiary_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_count",
+      "curationReason": "weighted:beneficiary_count:domain_general"
     },
     {
       "canonical": "beneficiary_date",
@@ -1053,7 +1266,11 @@
         "beneficiary_end_date",
         "beneficiary_start_date",
         "broker_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_date",
+      "curationReason": "weighted:beneficiary_date:domain_general"
     },
     {
       "canonical": "beneficiary_end_date",
@@ -1072,7 +1289,11 @@
         "beneficiary_id",
         "beneficiary_status",
         "broker_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_end_date",
+      "curationReason": "weighted:beneficiary_end_date:domain_general"
     },
     {
       "canonical": "beneficiary_id",
@@ -1089,7 +1310,11 @@
         "beneficiary_name",
         "beneficiary_subtotal",
         "broker_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_id",
+      "curationReason": "weighted:beneficiary_id:domain_general"
     },
     {
       "canonical": "beneficiary_name",
@@ -1108,7 +1333,11 @@
         "beneficiary_number",
         "beneficiary_total",
         "broker_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_name",
+      "curationReason": "weighted:beneficiary_name:domain_general"
     },
     {
       "canonical": "beneficiary_number",
@@ -1128,7 +1357,11 @@
         "beneficiary_quantity",
         "beneficiary_type",
         "broker_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_number",
+      "curationReason": "weighted:beneficiary_number:domain_general"
     },
     {
       "canonical": "beneficiary_quantity",
@@ -1148,7 +1381,11 @@
         "beneficiary_rate",
         "beneficiary_unit",
         "broker_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_quantity",
+      "curationReason": "weighted:beneficiary_quantity:domain_general"
     },
     {
       "canonical": "beneficiary_rate",
@@ -1167,7 +1404,11 @@
         "beneficiary_start_date",
         "broker_amount",
         "broker_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_rate",
+      "curationReason": "weighted:beneficiary_rate:domain_general"
     },
     {
       "canonical": "beneficiary_start_date",
@@ -1186,7 +1427,11 @@
         "beneficiary_status",
         "broker_code",
         "broker_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_start_date",
+      "curationReason": "weighted:beneficiary_start_date:domain_general"
     },
     {
       "canonical": "beneficiary_status",
@@ -1203,7 +1448,11 @@
         "beneficiary_subtotal",
         "broker_count",
         "broker_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_status",
+      "curationReason": "weighted:beneficiary_status:domain_general"
     },
     {
       "canonical": "beneficiary_subtotal",
@@ -1220,7 +1469,11 @@
         "beneficiary_total",
         "broker_date",
         "broker_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_subtotal",
+      "curationReason": "weighted:beneficiary_subtotal:domain_general"
     },
     {
       "canonical": "beneficiary_total",
@@ -1237,7 +1490,11 @@
         "beneficiary_type",
         "broker_end_date",
         "broker_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_total",
+      "curationReason": "weighted:beneficiary_total:domain_general"
     },
     {
       "canonical": "beneficiary_type",
@@ -1256,7 +1513,11 @@
         "beneficiary_unit",
         "broker_id",
         "broker_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_type",
+      "curationReason": "weighted:beneficiary_type:domain_general"
     },
     {
       "canonical": "beneficiary_unit",
@@ -1275,7 +1536,11 @@
         "broker_amount",
         "broker_name",
         "broker_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_unit",
+      "curationReason": "weighted:beneficiary_unit:domain_general"
     },
     {
       "canonical": "broker_amount",
@@ -1296,7 +1561,11 @@
         "broker_code",
         "broker_number",
         "broker_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_amount",
+      "curationReason": "weighted:broker_amount:domain_general"
     },
     {
       "canonical": "broker_code",
@@ -1315,7 +1584,11 @@
         "broker_count",
         "broker_quantity",
         "broker_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_code",
+      "curationReason": "weighted:broker_code:domain_general"
     },
     {
       "canonical": "broker_count",
@@ -1332,7 +1605,11 @@
         "broker_date",
         "broker_rate",
         "broker_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_count",
+      "curationReason": "weighted:broker_count:domain_general"
     },
     {
       "canonical": "broker_date",
@@ -1351,7 +1628,11 @@
         "broker_end_date",
         "broker_start_date",
         "claim_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_date",
+      "curationReason": "weighted:broker_date:domain_general"
     },
     {
       "canonical": "broker_end_date",
@@ -1370,7 +1651,11 @@
         "broker_id",
         "broker_status",
         "claim_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_end_date",
+      "curationReason": "weighted:broker_end_date:domain_general"
     },
     {
       "canonical": "broker_id",
@@ -1387,7 +1672,11 @@
         "broker_name",
         "broker_subtotal",
         "claim_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_id",
+      "curationReason": "weighted:broker_id:domain_general"
     },
     {
       "canonical": "broker_name",
@@ -1406,7 +1695,11 @@
         "broker_number",
         "broker_total",
         "claim_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_name",
+      "curationReason": "weighted:broker_name:domain_general"
     },
     {
       "canonical": "broker_number",
@@ -1426,7 +1719,11 @@
         "broker_quantity",
         "broker_type",
         "claim_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_number",
+      "curationReason": "weighted:broker_number:domain_general"
     },
     {
       "canonical": "broker_quantity",
@@ -1446,7 +1743,11 @@
         "broker_rate",
         "broker_unit",
         "claim_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_quantity",
+      "curationReason": "weighted:broker_quantity:domain_general"
     },
     {
       "canonical": "broker_rate",
@@ -1465,7 +1766,11 @@
         "broker_start_date",
         "claim_amount",
         "claim_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_rate",
+      "curationReason": "weighted:broker_rate:domain_general"
     },
     {
       "canonical": "broker_start_date",
@@ -1484,7 +1789,11 @@
         "broker_status",
         "claim_code",
         "claim_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_start_date",
+      "curationReason": "weighted:broker_start_date:domain_general"
     },
     {
       "canonical": "broker_status",
@@ -1501,7 +1810,11 @@
         "broker_subtotal",
         "claim_count",
         "claim_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_status",
+      "curationReason": "weighted:broker_status:domain_general"
     },
     {
       "canonical": "broker_subtotal",
@@ -1518,7 +1831,11 @@
         "broker_total",
         "claim_date",
         "claim_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_subtotal",
+      "curationReason": "weighted:broker_subtotal:domain_general"
     },
     {
       "canonical": "broker_total",
@@ -1535,7 +1852,11 @@
         "broker_type",
         "claim_end_date",
         "claim_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_total",
+      "curationReason": "weighted:broker_total:domain_general"
     },
     {
       "canonical": "broker_type",
@@ -1554,7 +1875,11 @@
         "broker_unit",
         "claim_id",
         "claim_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_type",
+      "curationReason": "weighted:broker_type:domain_general"
     },
     {
       "canonical": "broker_unit",
@@ -1573,7 +1898,11 @@
         "claim_amount",
         "claim_name",
         "claim_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_broker_unit",
+      "curationReason": "weighted:broker_unit:domain_general"
     },
     {
       "canonical": "claim_amount",
@@ -1594,7 +1923,11 @@
         "claim_code",
         "claim_number",
         "claim_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_amount",
+      "curationReason": "weighted:claim_amount:domain_general"
     },
     {
       "canonical": "claim_code",
@@ -1613,7 +1946,11 @@
         "claim_count",
         "claim_quantity",
         "claim_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_code",
+      "curationReason": "weighted:claim_code:domain_general"
     },
     {
       "canonical": "claim_count",
@@ -1632,7 +1969,11 @@
         "claim_date",
         "claim_rate",
         "claim_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_count",
+      "curationReason": "weighted:claim_count:domain_general"
     },
     {
       "canonical": "claim_date",
@@ -1651,7 +1992,11 @@
         "claim_end_date",
         "claim_start_date",
         "claimant_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_date",
+      "curationReason": "weighted:claim_date:domain_general"
     },
     {
       "canonical": "claim_end_date",
@@ -1670,7 +2015,11 @@
         "claim_id",
         "claim_status",
         "claimant_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_end_date",
+      "curationReason": "weighted:claim_end_date:domain_general"
     },
     {
       "canonical": "claim_id",
@@ -1689,7 +2038,11 @@
         "claim_name",
         "claim_subtotal",
         "claimant_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_id",
+      "curationReason": "weighted:claim_id:domain_general"
     },
     {
       "canonical": "claim_name",
@@ -1708,7 +2061,11 @@
         "claim_number",
         "claim_total",
         "claimant_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_name",
+      "curationReason": "weighted:claim_name:domain_general"
     },
     {
       "canonical": "claim_number",
@@ -1728,7 +2085,11 @@
         "claim_quantity",
         "claim_type",
         "claimant_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_number",
+      "curationReason": "weighted:claim_number:domain_general"
     },
     {
       "canonical": "claim_quantity",
@@ -1748,7 +2109,11 @@
         "claim_rate",
         "claim_unit",
         "claimant_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_quantity",
+      "curationReason": "weighted:claim_quantity:domain_general"
     },
     {
       "canonical": "claim_rate",
@@ -1767,7 +2132,11 @@
         "claim_start_date",
         "claimant_amount",
         "claimant_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_rate",
+      "curationReason": "weighted:claim_rate:domain_general"
     },
     {
       "canonical": "claim_start_date",
@@ -1786,7 +2155,11 @@
         "claim_status",
         "claimant_code",
         "claimant_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_start_date",
+      "curationReason": "weighted:claim_start_date:domain_general"
     },
     {
       "canonical": "claim_status",
@@ -1805,7 +2178,11 @@
         "claim_subtotal",
         "claimant_count",
         "claimant_quantity"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_status",
+      "curationReason": "weighted:claim_status:domain_general"
     },
     {
       "canonical": "claim_subtotal",
@@ -1824,7 +2201,11 @@
         "claim_total",
         "claimant_date",
         "claimant_rate"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_subtotal",
+      "curationReason": "weighted:claim_subtotal:domain_general"
     },
     {
       "canonical": "claim_total",
@@ -1843,7 +2224,11 @@
         "claim_type",
         "claimant_end_date",
         "claimant_start_date"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_total",
+      "curationReason": "weighted:claim_total:domain_general"
     },
     {
       "canonical": "claim_type",
@@ -1862,7 +2247,11 @@
         "claim_unit",
         "claimant_id",
         "claimant_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_type",
+      "curationReason": "weighted:claim_type:domain_general"
     },
     {
       "canonical": "claim_unit",
@@ -1881,7 +2270,11 @@
         "claimant_amount",
         "claimant_name",
         "claimant_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_unit",
+      "curationReason": "weighted:claim_unit:domain_general"
     },
     {
       "canonical": "claimant_amount",
@@ -1902,7 +2295,11 @@
         "claimant_code",
         "claimant_number",
         "claimant_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_amount",
+      "curationReason": "weighted:claimant_amount:domain_general"
     },
     {
       "canonical": "claimant_code",
@@ -1921,7 +2318,11 @@
         "claimant_count",
         "claimant_quantity",
         "claimant_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_code",
+      "curationReason": "weighted:claimant_code:domain_general"
     },
     {
       "canonical": "claimant_count",
@@ -1938,7 +2339,11 @@
         "claimant_date",
         "claimant_rate",
         "claimant_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_count",
+      "curationReason": "weighted:claimant_count:domain_general"
     },
     {
       "canonical": "claimant_date",
@@ -1957,7 +2362,11 @@
         "claimant_end_date",
         "claimant_start_date",
         "coinsurance_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_date",
+      "curationReason": "weighted:claimant_date:domain_general"
     },
     {
       "canonical": "claimant_end_date",
@@ -1976,7 +2385,11 @@
         "claimant_id",
         "claimant_status",
         "coinsurance_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_end_date",
+      "curationReason": "weighted:claimant_end_date:domain_general"
     },
     {
       "canonical": "claimant_id",
@@ -1993,7 +2406,11 @@
         "claimant_name",
         "claimant_subtotal",
         "coinsurance_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_id",
+      "curationReason": "weighted:claimant_id:domain_general"
     },
     {
       "canonical": "claimant_name",
@@ -2012,7 +2429,11 @@
         "claimant_number",
         "claimant_total",
         "coinsurance_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_name",
+      "curationReason": "weighted:claimant_name:domain_general"
     },
     {
       "canonical": "claimant_number",
@@ -2032,7 +2453,11 @@
         "claimant_quantity",
         "claimant_type",
         "coinsurance_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_number",
+      "curationReason": "weighted:claimant_number:domain_general"
     },
     {
       "canonical": "claimant_quantity",
@@ -2052,7 +2477,11 @@
         "claimant_rate",
         "claimant_unit",
         "coinsurance_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_quantity",
+      "curationReason": "weighted:claimant_quantity:domain_general"
     },
     {
       "canonical": "claimant_rate",
@@ -2071,7 +2500,11 @@
         "claimant_start_date",
         "coinsurance_amount",
         "coinsurance_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_rate",
+      "curationReason": "weighted:claimant_rate:domain_general"
     },
     {
       "canonical": "claimant_start_date",
@@ -2090,7 +2523,11 @@
         "claimant_status",
         "coinsurance_code",
         "coinsurance_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_start_date",
+      "curationReason": "weighted:claimant_start_date:domain_general"
     },
     {
       "canonical": "claimant_status",
@@ -2107,7 +2544,11 @@
         "claimant_subtotal",
         "coinsurance_count",
         "coinsurance_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_status",
+      "curationReason": "weighted:claimant_status:domain_general"
     },
     {
       "canonical": "claimant_subtotal",
@@ -2124,7 +2565,11 @@
         "claimant_total",
         "coinsurance_date",
         "coinsurance_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_subtotal",
+      "curationReason": "weighted:claimant_subtotal:domain_general"
     },
     {
       "canonical": "claimant_total",
@@ -2141,7 +2586,11 @@
         "claimant_type",
         "coinsurance_end_date",
         "coinsurance_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_total",
+      "curationReason": "weighted:claimant_total:domain_general"
     },
     {
       "canonical": "claimant_type",
@@ -2160,7 +2609,11 @@
         "claimant_unit",
         "coinsurance_id",
         "coinsurance_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_type",
+      "curationReason": "weighted:claimant_type:domain_general"
     },
     {
       "canonical": "claimant_unit",
@@ -2179,7 +2632,11 @@
         "coinsurance_amount",
         "coinsurance_name",
         "coinsurance_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_claimant_unit",
+      "curationReason": "weighted:claimant_unit:domain_general"
     },
     {
       "canonical": "coinsurance_amount",
@@ -2200,7 +2657,11 @@
         "coinsurance_code",
         "coinsurance_number",
         "coinsurance_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_amount",
+      "curationReason": "weighted:coinsurance_amount:domain_general"
     },
     {
       "canonical": "coinsurance_code",
@@ -2219,7 +2680,11 @@
         "coinsurance_count",
         "coinsurance_quantity",
         "coinsurance_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_code",
+      "curationReason": "weighted:coinsurance_code:domain_general"
     },
     {
       "canonical": "coinsurance_count",
@@ -2236,7 +2701,11 @@
         "coinsurance_date",
         "coinsurance_rate",
         "coinsurance_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_count",
+      "curationReason": "weighted:coinsurance_count:domain_general"
     },
     {
       "canonical": "coinsurance_date",
@@ -2255,7 +2724,11 @@
         "coinsurance_end_date",
         "coinsurance_start_date",
         "copay_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_date",
+      "curationReason": "weighted:coinsurance_date:domain_general"
     },
     {
       "canonical": "coinsurance_end_date",
@@ -2274,7 +2747,11 @@
         "coinsurance_id",
         "coinsurance_status",
         "copay_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_end_date",
+      "curationReason": "weighted:coinsurance_end_date:domain_general"
     },
     {
       "canonical": "coinsurance_id",
@@ -2291,7 +2768,11 @@
         "coinsurance_name",
         "coinsurance_subtotal",
         "copay_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_id",
+      "curationReason": "weighted:coinsurance_id:domain_general"
     },
     {
       "canonical": "coinsurance_name",
@@ -2310,7 +2791,11 @@
         "coinsurance_number",
         "coinsurance_total",
         "copay_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_name",
+      "curationReason": "weighted:coinsurance_name:domain_general"
     },
     {
       "canonical": "coinsurance_number",
@@ -2330,7 +2815,11 @@
         "coinsurance_quantity",
         "coinsurance_type",
         "copay_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_number",
+      "curationReason": "weighted:coinsurance_number:domain_general"
     },
     {
       "canonical": "coinsurance_quantity",
@@ -2350,7 +2839,11 @@
         "accident_date_amount",
         "coinsurance_rate",
         "coinsurance_unit"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_quantity",
+      "curationReason": "weighted:coinsurance_quantity:domain_general"
     },
     {
       "canonical": "coinsurance_rate",
@@ -2369,7 +2862,11 @@
         "accident_date_code",
         "coinsurance_start_date",
         "copay_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_rate",
+      "curationReason": "weighted:coinsurance_rate:domain_general"
     },
     {
       "canonical": "coinsurance_start_date",
@@ -2388,7 +2885,11 @@
         "accident_date_count",
         "coinsurance_status",
         "copay_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_start_date",
+      "curationReason": "weighted:coinsurance_start_date:domain_general"
     },
     {
       "canonical": "coinsurance_status",
@@ -2405,7 +2906,11 @@
         "accident_date_end_date",
         "coinsurance_subtotal",
         "copay_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_status",
+      "curationReason": "weighted:coinsurance_status:domain_general"
     },
     {
       "canonical": "coinsurance_subtotal",
@@ -2422,7 +2927,11 @@
         "accident_date_id",
         "coinsurance_total",
         "copay_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_subtotal",
+      "curationReason": "weighted:coinsurance_subtotal:domain_general"
     },
     {
       "canonical": "coinsurance_total",
@@ -2439,7 +2948,11 @@
         "accident_date_name",
         "coinsurance_type",
         "copay_end_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_total",
+      "curationReason": "weighted:coinsurance_total:domain_general"
     },
     {
       "canonical": "coinsurance_type",
@@ -2458,7 +2971,11 @@
         "accident_date_amount",
         "accident_date_number",
         "coinsurance_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_type",
+      "curationReason": "weighted:coinsurance_type:domain_general"
     },
     {
       "canonical": "coinsurance_unit",
@@ -2477,7 +2994,11 @@
         "accident_date_code",
         "accident_date_quantity",
         "copay_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_coinsurance_unit",
+      "curationReason": "weighted:coinsurance_unit:domain_general"
     },
     {
       "canonical": "copay_amount",
@@ -2498,7 +3019,11 @@
         "accident_date_count",
         "accident_date_rate",
         "copay_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_copay_amount",
+      "curationReason": "weighted:copay_amount:domain_general"
     },
     {
       "canonical": "copay_code",
@@ -2517,7 +3042,11 @@
         "accident_date_end_date",
         "accident_date_start_date",
         "copay_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_copay_code",
+      "curationReason": "weighted:copay_code:domain_general"
     },
     {
       "canonical": "copay_count",
@@ -2536,7 +3065,11 @@
         "accident_date_id",
         "accident_date_status",
         "copay_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_copay_count",
+      "curationReason": "weighted:copay_count:domain_general"
     },
     {
       "canonical": "copay_date",
@@ -2555,7 +3088,11 @@
         "accident_date_name",
         "accident_date_subtotal",
         "copay_end_date"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_copay_date",
+      "curationReason": "weighted:copay_date:domain_general"
     },
     {
       "canonical": "copay_end_date",
@@ -2574,7 +3111,11 @@
         "accident_date_amount",
         "accident_date_number",
         "accident_date_total"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:insurance",
+      "disambiguationRuleId": "headers_disambiguation_general_copay_end_date",
+      "curationReason": "weighted:copay_end_date:domain_general"
     }
   ]
 }

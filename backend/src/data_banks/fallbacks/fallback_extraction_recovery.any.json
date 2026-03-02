@@ -68,6 +68,111 @@
       },
       "reasonCode": "extraction_failed",
       "severity": "high"
+    },
+    {
+      "id": "fer_ocr_degraded_quality",
+      "priority": 115,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.ocrConfidence",
+            "op": "lt",
+            "value": 0.7
+          }
+        ]
+      },
+      "action": {
+        "type": "recovery",
+        "recoveryType": "ocr_degraded",
+        "strategy": "warn_with_answer"
+      },
+      "reasonCode": "ocr_degraded_quality",
+      "severity": "medium"
+    },
+    {
+      "id": "fer_password_protected_extraction",
+      "priority": 125,
+      "when": {
+        "all": [
+          {
+            "path": "signals.isPasswordProtected",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "recovery",
+        "recoveryType": "password_protected",
+        "strategy": "specific_error_message"
+      },
+      "reasonCode": "password_protected_extraction",
+      "severity": "high"
+    },
+    {
+      "id": "fer_unsupported_format_extraction",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "signals.isUnsupportedFormat",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "recovery",
+        "recoveryType": "unsupported_format",
+        "strategy": "specific_error_message"
+      },
+      "reasonCode": "unsupported_format_extraction",
+      "severity": "high"
+    },
+    {
+      "id": "fer_partial_page_extraction",
+      "priority": 112,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.pagesExtracted",
+            "op": "lt",
+            "value": "metrics.totalPages"
+          },
+          {
+            "path": "metrics.pagesExtracted",
+            "op": "gte",
+            "value": 1
+          }
+        ]
+      },
+      "action": {
+        "type": "recovery",
+        "recoveryType": "partial_page",
+        "strategy": "partial_answer_with_notice"
+      },
+      "reasonCode": "partial_page_extraction",
+      "severity": "medium"
+    },
+    {
+      "id": "fer_table_extraction_degraded",
+      "priority": 113,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.tableExtractionConfidence",
+            "op": "lt",
+            "value": 0.7
+          }
+        ]
+      },
+      "action": {
+        "type": "recovery",
+        "recoveryType": "table_degraded",
+        "strategy": "warn_with_answer"
+      },
+      "reasonCode": "table_extraction_degraded",
+      "severity": "medium"
     }
   ]
 }

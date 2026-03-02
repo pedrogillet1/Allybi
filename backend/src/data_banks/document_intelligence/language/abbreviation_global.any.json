@@ -1,14 +1,24 @@
 {
   "_meta": {
     "id": "di_abbreviation_global",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Global abbreviation dictionary used by document intelligence normalization and entity extraction.",
     "owner": "document_intelligence",
-    "languages": ["en", "pt"],
-    "dependsOn": ["di_domain_ontology"],
-    "usedBy": ["di_normalization_rules", "di_entity_ontology"],
-    "tests": ["SSOT_ABBREV_001"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "di_domain_ontology"
+    ],
+    "usedBy": [
+      "di_normalization_rules",
+      "di_entity_ontology"
+    ],
+    "tests": [
+      "SSOT_ABBREV_001"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -743,7 +753,7 @@
         "en": "Business Continuity Plan",
         "pt": "Plano de Continuidade de Negocios"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -755,7 +765,7 @@
         "en": "Continuous Integration / Continuous Delivery",
         "pt": "Integracao Continua / Entrega Continua"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "technology",
       "ambiguous": false,
       "disambiguationHint": null
@@ -767,7 +777,7 @@
         "en": "Configuration Management Database",
         "pt": "Banco de Dados de Gerenciamento de Configuracao"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "technology",
       "ambiguous": false,
       "disambiguationHint": null
@@ -779,7 +789,7 @@
         "en": "Disaster Recovery",
         "pt": "Recuperacao de Desastres"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": true,
       "disambiguationHint": "In operations context means Disaster Recovery; in medical context may mean Doctor"
@@ -791,7 +801,7 @@
         "en": "Disaster Recovery Plan",
         "pt": "Plano de Recuperacao de Desastres"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -803,7 +813,7 @@
         "en": "Estimated Time of Arrival",
         "pt": "Tempo Estimado de Chegada"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "general",
       "ambiguous": false,
       "disambiguationHint": null
@@ -815,7 +825,7 @@
         "en": "Information Technology Infrastructure Library",
         "pt": "Biblioteca de Infraestrutura de Tecnologia da Informacao"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "technology",
       "ambiguous": false,
       "disambiguationHint": null
@@ -827,7 +837,7 @@
         "en": "Mean Time Between Failures",
         "pt": "Tempo Medio Entre Falhas"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -839,7 +849,7 @@
         "en": "Mean Time to Repair",
         "pt": "Tempo Medio de Reparo"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -851,7 +861,7 @@
         "en": "Objectives and Key Results",
         "pt": "Objetivos e Resultados-Chave"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "general",
       "ambiguous": false,
       "disambiguationHint": null
@@ -863,7 +873,7 @@
         "en": "Operational Level Agreement",
         "pt": "Acordo de Nivel Operacional"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -875,7 +885,7 @@
         "en": "Project Manager",
         "pt": "Gerente de Projeto"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "general",
       "ambiguous": true,
       "disambiguationHint": "In operations context means Project Manager; in time context may mean Post Meridiem (afternoon)"
@@ -887,7 +897,7 @@
         "en": "Quality Assurance",
         "pt": "Garantia de Qualidade"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -899,7 +909,7 @@
         "en": "Root Cause Analysis",
         "pt": "Analise de Causa Raiz"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -911,7 +921,7 @@
         "en": "Request for Change",
         "pt": "Solicitacao de Mudanca"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -923,7 +933,7 @@
         "en": "Service Level Agreement",
         "pt": "Acordo de Nivel de Servico"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -935,7 +945,7 @@
         "en": "Service Level Objective",
         "pt": "Objetivo de Nivel de Servico"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -947,7 +957,7 @@
         "en": "Standard Operating Procedure",
         "pt": "Procedimento Operacional Padrao"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null
@@ -959,7 +969,7 @@
         "en": "User Acceptance Testing",
         "pt": "Teste de Aceitacao do Usuario"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "technology",
       "ambiguous": false,
       "disambiguationHint": null
@@ -971,7 +981,7 @@
         "en": "Work Breakdown Structure",
         "pt": "Estrutura Analitica do Projeto"
       },
-      "domain": "operations",
+      "domain": "ops",
       "category": "operational",
       "ambiguous": false,
       "disambiguationHint": null

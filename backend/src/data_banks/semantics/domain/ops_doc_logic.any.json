@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "ops_doc_logic",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Operations document logic with document type semantics, structural expectations, and deterministic interpretation rules.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "ops"
+    "domain": "ops",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "ops",
   "definitions": [
@@ -2321,6 +2336,21 @@
           "en": "Verify the access control matrix covers all critical systems and follows the principle of least privilege.",
           "pt": "Verifique se a matriz de controle de acesso cobre todos os sistemas críticos e segue o princípio do menor privilégio."
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+summarize",
+          "check:access_matrix_completeness_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2364,6 +2394,21 @@
           "en": "What is the current status of this ADR (proposed, accepted, deprecated, or superseded)?",
           "pt": "Qual é o status atual deste ADR (proposto, aceito, depreciado ou substituído)?"
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+extract",
+          "check:adr_status_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2407,6 +2452,21 @@
           "en": "Check whether any endpoints referenced in this API documentation have been deprecated or sunset.",
           "pt": "Verifique se algum endpoint referenciado nesta documentação de API foi depreciado ou descontinuado."
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+extract",
+          "check:deprecation_notice_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2449,6 +2509,21 @@
           "en": "What is the lifecycle status of these assets (active, approaching EOL, or end of support)?",
           "pt": "Qual é o status do ciclo de vida destes ativos (ativo, próximo do fim de vida, ou fim de suporte)?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+validate",
+          "check:lifecycle_status_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2490,6 +2565,21 @@
           "en": "Which environment does this backup schedule apply to (production, staging, or development)?",
           "pt": "A qual ambiente este cronograma de backup se aplica (produção, staging ou desenvolvimento)?"
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract+validate",
+          "check:environment_context_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2533,6 +2623,21 @@
           "en": "When was this Business Continuity Plan last tested? I need the test date to validate its currency.",
           "pt": "Quando este Plano de Continuidade de Negócios foi testado pela última vez? Preciso da data do teste para validar sua atualidade."
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:last_tested_date_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2577,6 +2682,21 @@
           "en": "What is the baseline date for these capacity projections? Projections are only valid relative to their baseline.",
           "pt": "Qual é a data base para essas projeções de capacidade? Projeções são válidas apenas em relação à sua data base."
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+summarize",
+          "check:baseline_date_for_projection_validity",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2620,6 +2740,21 @@
           "en": "Certificate expiry data may be outdated. Verify tracker was updated recently before relying on these dates.",
           "pt": "Dados de expiração de certificados podem estar desatualizados. Verifique se o rastreador foi atualizado recentemente antes de confiar nessas datas."
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+monitor+extract",
+          "check:expiry_date_currency_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2663,6 +2798,21 @@
           "en": "I cannot confirm this change request's validity without verifying the approval chain. Please provide the approval status.",
           "pt": "Não posso confirmar a validade desta solicitação de mudança sem verificar a cadeia de aprovação. Forneça o status de aprovação."
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+summarize",
+          "check:approval_chain_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2703,6 +2853,21 @@
           "en": "The change impact assessment may be incomplete. Confirm all affected systems have been identified.",
           "pt": "A avaliação de impacto da mudança pode estar incompleta. Confirme que todos os sistemas afetados foram identificados."
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+evaluate",
+          "check:impact_scope_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2744,6 +2909,21 @@
           "en": "CMDB exports are point-in-time snapshots. Confirm the export date before relying on relationship data.",
           "pt": "Exportações do CMDB são instantâneos pontuais. Confirme a data de exportação antes de confiar nos dados de relacionamento."
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:snapshot_date_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2788,6 +2968,21 @@
           "en": "Which audit period does this compliance report cover? Findings are only valid within their audit period.",
           "pt": "Qual período de auditoria este relatório de conformidade cobre? Os achados são válidos apenas dentro do período de auditoria."
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:audit_period_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2831,6 +3026,21 @@
           "en": "I cannot merge information from different document versions. Please specify which version to use.",
           "pt": "Não posso mesclar informações de versões diferentes do documento. Especifique qual versão utilizar."
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+compare+extract",
+          "check:cross_version_merge_prevention",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2873,6 +3083,21 @@
           "en": "Daily standup notes capture blockers and updates, not formal decisions. Do not treat standup notes as decision records.",
           "pt": "Notas de daily capturam impedimentos e atualizações, não decisões formais. Não trate notas de daily como registros de decisão."
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract",
+          "check:decision_authority_limitation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2916,6 +3141,21 @@
           "en": "Are any of these data categories subject to a legal hold that overrides the standard retention schedule?",
           "pt": "Alguma dessas categorias de dados está sujeita a retenção legal que substitui o cronograma de retenção padrão?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+summarize",
+          "check:legal_hold_awareness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2958,6 +3198,21 @@
           "en": "Have all downstream dependencies been identified and migrated before decommissioning?",
           "pt": "Todas as dependências downstream foram identificadas e migradas antes do descomissionamento?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:dependency_impact_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3001,6 +3256,21 @@
           "en": "Which target environment does this deployment guide apply to (production, staging, or development)?",
           "pt": "A qual ambiente-alvo este guia de implantação se aplica (produção, staging ou desenvolvimento)?"
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+validate",
+          "check:deployment_target_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3044,6 +3314,21 @@
           "en": "DNS configuration changes may take time to propagate. Verify current resolution state before assuming changes are live.",
           "pt": "Mudanças na configuração de DNS podem levar tempo para propagar. Verifique o estado atual de resolução antes de assumir que as alterações estão ativas."
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+extract",
+          "check:dns_propagation_awareness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3091,6 +3376,23 @@
           "en": "I cannot validate a DR plan without knowing when it was last tested. Please provide the last test date.",
           "pt": "Não posso validar um plano de DR sem saber quando foi testado pela última vez. Forneça a data do último teste."
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [
+        "rule_ops_doc_dr_rto_rpo_match"
+      ],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:last_tested_date_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3135,6 +3437,23 @@
           "en": "When comparing RTO/RPO, always distinguish between target values and actual test results.",
           "pt": "Ao comparar RTO/RPO, sempre distinga entre valores-alvo e resultados reais de teste."
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [
+        "rule_ops_doc_dr_last_tested_date"
+      ],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:compare+validate+evaluate",
+          "check:rto_rpo_target_vs_actual",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3184,6 +3503,21 @@
           "en": "I cannot summarize monitoring thresholds without knowing the environment (production, staging, or development). Which environment applies?",
           "pt": "Não posso resumir limiares de monitoramento sem saber o ambiente (produção, staging ou desenvolvimento). Qual ambiente se aplica?"
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract+compare",
+          "check:environment_context_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3225,6 +3559,21 @@
           "en": "Which SLO does this error budget policy relate to? Error budgets must reference a specific service level objective.",
           "pt": "A qual SLO esta política de orçamento de erros se refere? Orçamentos de erro devem referenciar um objetivo de nível de serviço específico."
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:slo_linkage_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3270,6 +3619,21 @@
           "en": "What severity level applies to determine the correct escalation path?",
           "pt": "Qual nível de severidade se aplica para determinar o caminho correto de escalonamento?"
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+evaluate",
+          "check:severity_level_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3315,6 +3679,21 @@
           "en": "What is the data source and refresh frequency for these dashboard metrics?",
           "pt": "Qual é a fonte de dados e frequência de atualização para essas métricas do dashboard?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:data_source_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3357,6 +3736,21 @@
           "en": "Failover procedures should be validated regularly. Check when this procedure was last tested.",
           "pt": "Procedimentos de failover devem ser validados regularmente. Verifique quando este procedimento foi testado pela última vez."
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:last_validation_date_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3401,6 +3795,21 @@
           "en": "FAQ and knowledge base articles may be outdated. Check the last review date before relying on their content.",
           "pt": "Artigos de FAQ e base de conhecimento podem estar desatualizados. Verifique a data da última revisão antes de confiar em seu conteúdo."
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+validate",
+          "check:content_review_date_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3446,6 +3855,21 @@
           "en": "Firewall rule exports may contain sensitive security information. Verify the classification level before sharing content.",
           "pt": "Exportações de regras de firewall podem conter informações de segurança sensíveis. Verifique o nível de classificação antes de compartilhar conteúdo."
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+evaluate",
+          "check:security_classification_check",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3491,6 +3915,21 @@
           "en": "When evaluating FMEA, verify that RPN values match the product of severity, occurrence, and detection ratings.",
           "pt": "Ao avaliar FMEA, verifique se os valores de RPN correspondem ao produto das classificações de severidade, ocorrência e detecção."
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+summarize",
+          "check:rpn_calculation_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3536,6 +3975,21 @@
           "en": "Which service or infrastructure component does this health check cover?",
           "pt": "Qual serviço ou componente de infraestrutura esta verificação de saúde cobre?"
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+evaluate+validate",
+          "check:health_check_scope_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3586,6 +4040,21 @@
           "en": "The incident severity classification may vary across documents. Which severity classification standard should I use?",
           "pt": "A classificação de severidade do incidente pode variar entre documentos. Qual padrão de classificação de severidade devo utilizar?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+compare",
+          "check:severity_classification_consistency",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3629,6 +4098,21 @@
           "en": "I must verify the incident timeline before making root cause claims. Has the timeline been confirmed?",
           "pt": "Devo verificar a cronologia do incidente antes de fazer afirmações sobre a causa raiz. A cronologia foi confirmada?"
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+extract",
+          "check:timeline_verification_before_root_cause",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3673,6 +4157,21 @@
           "en": "Integration specifications may contain authentication credentials. I will not extract or display credential values.",
           "pt": "Especificações de integração podem conter credenciais de autenticação. Não vou extrair ou exibir valores de credenciais."
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:credential_exposure_prevention",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3717,6 +4216,21 @@
           "en": "Which API version should I reference for this integration validation?",
           "pt": "Qual versão da API devo referenciar para esta validação de integração?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+compare",
+          "check:version_compatibility_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3761,6 +4275,21 @@
           "en": "When was the last physical-to-system inventory reconciliation completed?",
           "pt": "Quando foi concluída a última reconciliação de inventário físico versus sistema?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+compare+evaluate",
+          "check:reconciliation_date_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3804,6 +4333,21 @@
           "en": "Kanban metrics require context about WIP limits and team capacity. Confirm these are current before drawing conclusions.",
           "pt": "Métricas de Kanban requerem contexto sobre limites de WIP e capacidade da equipe. Confirme que estão atuais antes de tirar conclusões."
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+evaluate+extract",
+          "check:wip_limit_context_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3847,6 +4391,21 @@
           "en": "Known error workarounds may be outdated. Verify the last review date before applying.",
           "pt": "Soluções alternativas de erros conhecidos podem estar desatualizadas. Verifique a data da última revisão antes de aplicar."
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+validate",
+          "check:workaround_currency_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3890,6 +4449,21 @@
           "en": "Should I compare license entitlements against current deployment counts or historical peak usage?",
           "pt": "Devo comparar direitos de licença com contagens de implantação atuais ou pico de uso histórico?"
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+compare",
+          "check:entitlement_vs_usage_comparison",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3933,6 +4507,21 @@
           "en": "Was this load test executed against production-equivalent infrastructure? Test environment differences affect result validity.",
           "pt": "Este teste de carga foi executado em infraestrutura equivalente à produção? Diferenças no ambiente de teste afetam a validade dos resultados."
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+summarize",
+          "check:test_environment_match",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3974,6 +4563,21 @@
           "en": "Verify that maintenance activities were performed within approved maintenance windows.",
           "pt": "Verifique se as atividades de manutenção foram realizadas dentro das janelas de manutenção aprovadas."
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:maintenance_window_compliance",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4017,6 +4621,21 @@
           "en": "Verify that the migration plan includes data validation steps to confirm integrity after migration.",
           "pt": "Verifique se o plano de migração inclui etapas de validação de dados para confirmar a integridade após a migração."
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+summarize",
+          "check:data_validation_step_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4060,6 +4679,21 @@
           "en": "Does this migration plan include a validated rollback procedure?",
           "pt": "Este plano de migração inclui um procedimento de rollback validado?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+summarize",
+          "check:rollback_plan_existence",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4103,6 +4737,21 @@
           "en": "Which environment do these monitoring rules apply to? Alert configurations differ between production, staging, and development.",
           "pt": "A qual ambiente estas regras de monitoramento se aplicam? Configurações de alerta diferem entre produção, staging e desenvolvimento."
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract+compare",
+          "check:environment_context_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4147,6 +4796,21 @@
           "en": "Network and dependency diagrams may not reflect current state. Verify the diagram's last-updated date.",
           "pt": "Diagramas de rede e dependências podem não refletir o estado atual. Verifique a data da última atualização do diagrama."
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+evaluate",
+          "check:diagram_date_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4192,6 +4856,21 @@
           "en": "Which security zone or network segment is relevant to this query?",
           "pt": "Qual zona de segurança ou segmento de rede é relevante para esta consulta?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+extract",
+          "check:security_zone_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4235,6 +4914,21 @@
           "en": "I cannot merge information across different runbook versions. Mixing steps from different versions could cause operational errors. Please specify one version.",
           "pt": "Não posso mesclar informações de versões diferentes de runbooks. Misturar passos de versões diferentes pode causar erros operacionais. Especifique uma versão."
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+compare+extract",
+          "check:cross_document_merge_prevention",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4278,6 +4972,21 @@
           "en": "Which internal teams are party to this OLA? I need to identify the service provider and consumer teams.",
           "pt": "Quais equipes internas são parte deste OLA? Preciso identificar as equipes provedora e consumidora do serviço."
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+validate",
+          "check:party_identification_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4321,6 +5030,21 @@
           "en": "On-call schedules change frequently. Verify this schedule is current before relying on contact information.",
           "pt": "Escalas de plantão mudam com frequência. Verifique se esta escala está atual antes de confiar nas informações de contato."
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+validate",
+          "check:schedule_currency_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4364,6 +5088,21 @@
           "en": "Verify whether these patches require system restarts or have known side effects before reporting them as non-disruptive.",
           "pt": "Verifique se esses patches requerem reinicialização do sistema ou têm efeitos colaterais conhecidos antes de reportá-los como não disruptivos."
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:patch_impact_assessment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4407,6 +5146,21 @@
           "en": "Penetration test reports contain sensitive security findings. Verify the classification level and distribution restrictions before sharing content.",
           "pt": "Relatórios de teste de penetração contêm achados de segurança sensíveis. Verifique o nível de classificação e restrições de distribuição antes de compartilhar conteúdo."
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract+evaluate",
+          "check:security_classification_check",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4450,6 +5204,21 @@
           "en": "Which specific scenario in the playbook applies to the current situation?",
           "pt": "Qual cenário específico do playbook se aplica à situação atual?"
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:scenario_match_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4493,6 +5262,21 @@
           "en": "Postmortem action items should include current completion status. Verify action item statuses are up to date.",
           "pt": "Itens de ação do postmortem devem incluir status atual de conclusão. Verifique se os status dos itens de ação estão atualizados."
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+monitor+summarize",
+          "check:action_item_status_tracking",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4536,6 +5320,21 @@
           "en": "I must distinguish between root cause and contributing factors. The postmortem lists multiple causes; which is identified as the root cause?",
           "pt": "Devo distinguir entre causa raiz e fatores contribuintes. O postmortem lista múltiplas causas; qual está identificada como a causa raiz?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+extract",
+          "check:root_cause_vs_contributing_factor_distinction",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4578,6 +5377,21 @@
           "en": "Distinguish between incident records (service disruption events) and problem records (underlying causes). Do not conflate them.",
           "pt": "Distinga entre registros de incidente (eventos de interrupção de serviço) e registros de problema (causas subjacentes). Não os confunda."
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+compare+evaluate",
+          "check:problem_incident_distinction",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4619,6 +5433,21 @@
           "en": "Who is the designated process owner for this operational process?",
           "pt": "Quem é o dono designado deste processo operacional?"
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:process_ownership_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4662,6 +5491,21 @@
           "en": "Has budget approval been obtained for this procurement request?",
           "pt": "A aprovação orçamentária foi obtida para esta solicitação de aquisição?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:budget_approval_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4704,6 +5548,21 @@
           "en": "Ensure the root cause analysis has sufficient depth. Stopping at symptoms rather than root causes undermines corrective actions.",
           "pt": "Garanta que a análise de causa raiz tenha profundidade suficiente. Parar nos sintomas ao invés das causas raiz compromete as ações corretivas."
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize",
+          "check:analysis_depth_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4748,6 +5607,21 @@
           "en": "Release notes span multiple versions. Should I present changes from newest to oldest, or for a specific version only?",
           "pt": "As notas de versão abrangem múltiplas versões. Devo apresentar mudanças da mais recente para a mais antiga, ou apenas para uma versão específica?"
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+compare+extract",
+          "check:version_ordering_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4791,6 +5665,21 @@
           "en": "Verify that both pre-release and post-release verification steps have been completed and documented.",
           "pt": "Verifique se as etapas de verificação pré-release e pós-release foram concluídas e documentadas."
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:pre_post_check_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4834,6 +5723,21 @@
           "en": "Restore test results should be recent to be reliable. Check the date of the last successful restore test.",
           "pt": "Resultados de testes de restauração devem ser recentes para serem confiáveis. Verifique a data do último teste de restauração bem-sucedido."
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:test_recency_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4880,6 +5784,21 @@
           "en": "When was this risk register last reviewed? Risk assessments require a recent review date for current-state claims.",
           "pt": "Quando este registro de riscos foi revisado pela última vez? Avaliações de risco requerem uma data de revisão recente para afirmações sobre o estado atual."
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:last_review_date_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4922,6 +5841,21 @@
           "en": "Has this rollback plan been tested in a non-production environment? Untested rollback plans carry high risk.",
           "pt": "Este plano de rollback foi testado em ambiente não produtivo? Planos de rollback não testados apresentam alto risco."
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:rollback_validation_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4964,6 +5898,21 @@
           "en": "I cannot summarize runbook steps without verifying each step is complete and in correct order. The full step sequence must be preserved.",
           "pt": "Não posso resumir passos do runbook sem verificar que cada passo está completo e na ordem correta. A sequência completa de passos deve ser preservada."
         }
+      },
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract",
+          "check:step_by_step_verification_before_summary",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5010,6 +5959,21 @@
           "en": "Which regulatory framework applies to this safety inspection (e.g., OSHA, ISO 45001, local regulations)?",
           "pt": "Qual framework regulatório se aplica a esta inspeção de segurança (ex.: NR, ISO 45001, regulamentações locais)?"
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:regulatory_framework_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5053,6 +6017,21 @@
           "en": "SBOM entries should have pinned versions for accurate vulnerability assessment. Flag any entries with version ranges.",
           "pt": "Entradas do SBOM devem ter versões fixadas para avaliação precisa de vulnerabilidades. Sinalize entradas com faixas de versão."
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate+compare",
+          "check:version_pinning_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5100,6 +6079,21 @@
           "en": "I must verify the security classification level of this document before sharing its content. What is the classification?",
           "pt": "Devo verificar o nível de classificação de segurança deste documento antes de compartilhar seu conteúdo. Qual é a classificação?"
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract+evaluate",
+          "check:classification_level_verification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5143,6 +6137,21 @@
           "en": "Which service tier are you asking about? Support levels and SLAs differ by tier.",
           "pt": "Sobre qual nível de serviço você está perguntando? Níveis de suporte e SLAs diferem por nível."
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+compare+locate",
+          "check:service_tier_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5183,6 +6192,21 @@
           "en": "What is the priority level of this service request to determine the applicable SLA targets?",
           "pt": "Qual é o nível de prioridade desta solicitação de serviço para determinar as metas de SLA aplicáveis?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:sla_priority_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5225,6 +6249,21 @@
           "en": "Verify the shift handover includes all open issues, pending actions, and escalated items.",
           "pt": "Verifique se a passagem de turno inclui todas as questões abertas, ações pendentes e itens escalonados."
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+summarize",
+          "check:handover_completeness_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5271,6 +6310,21 @@
           "en": "I cannot compare SLA metrics without identifying the service tier first. Which tier applies to this evaluation?",
           "pt": "Não posso comparar métricas de SLA sem identificar o nível de serviço primeiro. Qual nível se aplica a esta avaliação?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:tier_identification_before_metric_comparison",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5311,6 +6365,21 @@
           "en": "What is the effective date of this SOP version? I need to confirm it is the currently active version.",
           "pt": "Qual é a data de vigência desta versão do POP? Preciso confirmar que é a versão atualmente ativa."
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:effective_date_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5354,6 +6423,21 @@
           "en": "SOPs must include version numbers in any summary or citation. Which version of this SOP should I reference?",
           "pt": "POPs devem incluir números de versão em qualquer resumo ou citação. Qual versão deste POP devo referenciar?"
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract+evaluate",
+          "check:version_number_citation_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5395,6 +6479,21 @@
           "en": "Sprint retrospective action items should be tracked to completion. Verify which items from previous retros remain open.",
           "pt": "Itens de ação de retrospectiva do sprint devem ser rastreados até a conclusão. Verifique quais itens de retros anteriores permanecem abertos."
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+evaluate+extract",
+          "check:action_item_tracking",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5437,6 +6536,21 @@
           "en": "Verify that toil automation ROI calculations account for both implementation cost and ongoing maintenance effort.",
           "pt": "Verifique se os cálculos de ROI de automação de toil consideram tanto o custo de implementação quanto o esforço de manutenção contínua."
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:roi_calculation_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5485,6 +6599,21 @@
           "en": "Which reporting period does this status report cover?",
           "pt": "Qual período de reporte este relatório de status cobre?"
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+compare+extract",
+          "check:reporting_period_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5528,6 +6657,21 @@
           "en": "Toil measurements must use consistent methodology across periods. Verify the measurement criteria have not changed.",
           "pt": "Medições de toil devem usar metodologia consistente entre períodos. Verifique se os critérios de medição não mudaram."
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+summarize",
+          "check:measurement_methodology_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5571,6 +6715,21 @@
           "en": "Training materials may not reflect current procedures. Verify alignment with the latest SOPs and runbooks.",
           "pt": "Materiais de treinamento podem não refletir procedimentos atuais. Verifique o alinhamento com os POPs e runbooks mais recentes."
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:content_version_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5614,6 +6773,21 @@
           "en": "Follow the troubleshooting guide's decision tree in order. Do not skip diagnostic steps.",
           "pt": "Siga a árvore de decisão do guia de solução de problemas em ordem. Não pule etapas de diagnóstico."
         }
+      },
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+locate",
+          "check:decision_tree_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5658,6 +6832,21 @@
           "en": "When was the baseline measurement for this value stream map taken? Improvement comparisons need a dated baseline.",
           "pt": "Quando a medição de linha de base deste mapa de fluxo de valor foi realizada? Comparações de melhoria precisam de uma linha de base datada."
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+summarize",
+          "check:baseline_measurement_date",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5700,6 +6889,21 @@
           "en": "Which evaluation criteria and weighting scheme should I use for this vendor comparison?",
           "pt": "Quais critérios de avaliação e esquema de ponderação devo utilizar para esta comparação de fornecedores?"
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+summarize",
+          "check:evaluation_criteria_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5743,6 +6947,21 @@
           "en": "VPN configurations contain sensitive network access information. Verify the classification level before sharing details.",
           "pt": "Configurações de VPN contêm informações sensíveis de acesso à rede. Verifique o nível de classificação antes de compartilhar detalhes."
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+evaluate",
+          "check:security_classification_check",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5786,6 +7005,21 @@
           "en": "Who held incident command authority during this war room session?",
           "pt": "Quem detinha a autoridade de comando de incidente durante esta sessão de war room?"
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:summarize+extract+evaluate",
+          "check:decision_authority_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5828,6 +7062,21 @@
           "en": "Verify whether webhook consumers handle duplicate deliveries idempotently before assuming at-most-once processing.",
           "pt": "Verifique se os consumidores de webhook tratam entregas duplicadas de forma idempotente antes de assumir processamento no máximo uma vez."
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:idempotency_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5870,6 +7119,21 @@
           "en": "Has this work order been properly authorized by the designated approver?",
           "pt": "Esta ordem de serviço foi devidamente autorizada pelo aprovador designado?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:validate+evaluate",
+          "check:authorization_verification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     }
   ]

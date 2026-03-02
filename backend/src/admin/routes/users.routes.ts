@@ -52,8 +52,19 @@ router.get("/", async (req: Request, res: Response) => {
  */
 router.get("/:userId", async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const range = (req.query.range as string) || "7d";
+    const userId = String(req.params.userId || "").trim();
+    const rangeParam = req.query.range;
+    let range = "7d";
+    if (typeof rangeParam === "string") {
+      range = rangeParam;
+    } else if (Array.isArray(rangeParam)) {
+      const firstString = rangeParam.find(
+        (value): value is string => typeof value === "string",
+      );
+      if (firstString) {
+        range = firstString;
+      }
+    }
 
     const result = await getUserDetail(prisma, { userId, range });
 

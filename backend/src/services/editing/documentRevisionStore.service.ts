@@ -335,6 +335,9 @@ type EditOperatorLike =
   | "CREATE_CHART"
   | "COMPUTE"
   | "COMPUTE_BUNDLE"
+  | "PY_COMPUTE"
+  | "PY_CHART"
+  | "PY_WRITEBACK"
   | "ADD_SLIDE"
   | "REWRITE_SLIDE_TEXT"
   | "REPLACE_SLIDE_IMAGE";
@@ -530,6 +533,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             "docx_list_restart_numbering",
             "docx_split_paragraph",
             "docx_update_toc",
+            "docx_create_table",
+            "docx_add_table_row",
+            "docx_delete_table_row",
+            "docx_set_table_cell",
           ]);
           const bundleLike = (parsed as any).patches.every((p: any) => {
             const kind = String(p?.kind || "").trim();
@@ -970,6 +977,96 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
               buf = await this.docxEditor.updateTableOfContents(buf);
               break;
             }
+            // --- Table operations ---
+            case "docx_create_table": {
+              const rows = Number(
+                (p as any).rows ?? (p as any).rowCount ?? (p as any).numRows,
+              );
+              const cols = Number(
+                (p as any).cols ?? (p as any).colCount ?? (p as any).numCols,
+              );
+              const headerRow =
+                (p as any).headerRow == null
+                  ? true
+                  : Boolean((p as any).headerRow);
+              const paragraphId = String(
+                (p as any).paragraphId ||
+                  (p as any).targetId ||
+                  (p as any).targets ||
+                  "",
+              ).trim();
+              buf = await this.docxEditor.createTable(buf, {
+                rows: Number.isFinite(rows) ? rows : undefined,
+                cols: Number.isFinite(cols) ? cols : undefined,
+                headerRow,
+                paragraphId: paragraphId || undefined,
+              });
+              break;
+            }
+            case "docx_add_table_row": {
+              const tableIndex = Number(
+                (p as any).tableIndex ?? (p as any).table ?? 1,
+              );
+              const rowIndex =
+                (p as any).rowIndex == null
+                  ? undefined
+                  : Number((p as any).rowIndex);
+              const position = String((p as any).position || "end").trim();
+              const cellTexts = Array.isArray((p as any).cellTexts)
+                ? (p as any).cellTexts
+                    .map((v: any) => String(v ?? "").trim())
+                    .slice(0, 50)
+                : undefined;
+              buf = await this.docxEditor.addTableRow(buf, {
+                tableIndex: Number.isFinite(tableIndex) ? tableIndex : 1,
+                rowIndex:
+                  rowIndex != null && Number.isFinite(rowIndex)
+                    ? rowIndex
+                    : undefined,
+                position,
+                cellTexts,
+              });
+              break;
+            }
+            case "docx_delete_table_row": {
+              const tableIndex = Number(
+                (p as any).tableIndex ?? (p as any).table,
+              );
+              const rowIndex = Number((p as any).rowIndex);
+              if (!Number.isFinite(tableIndex) || !Number.isFinite(rowIndex)) {
+                continue;
+              }
+              buf = await this.docxEditor.deleteTableRow(buf, {
+                tableIndex,
+                rowIndex,
+              });
+              break;
+            }
+            case "docx_set_table_cell": {
+              const tableIndex = Number(
+                (p as any).tableIndex ?? (p as any).table,
+              );
+              const rowIndex = Number((p as any).rowIndex);
+              const colIndex = Number((p as any).colIndex);
+              const text = String(
+                (p as any).text ?? (p as any).value ?? "",
+              ).trim();
+              if (
+                !Number.isFinite(tableIndex) ||
+                !Number.isFinite(rowIndex) ||
+                !Number.isFinite(colIndex) ||
+                !text
+              ) {
+                continue;
+              }
+              buf = await this.docxEditor.setTableCell(buf, {
+                tableIndex,
+                rowIndex,
+                colIndex,
+                text,
+              });
+              break;
+            }
             // --- Page / section break operations ---
             case "docx_page_break": {
               if (!pid) continue;
@@ -1121,9 +1218,8 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       // Verification gate: re-parse output and check structural invariants
       try {
-        const { DocxAnchorsService } = await import(
-          "./docx/docxAnchors.service"
-        );
+        const { DocxAnchorsService } =
+          await import("./docx/docxAnchors.service");
         const verifyAnchors = new DocxAnchorsService();
         const originalAnchors =
           await verifyAnchors.extractParagraphNodes(original);
@@ -1334,11 +1430,74 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           clientMessageId: input.clientMessageId,
         },
       });
+    } else if (op === "PY_CHART") {
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "PY_CHART",
+      );
+      edited = await this.applyXlsxEdit(original, {
+        op,
+        documentId: docId,
+        userId,
+        filename: doc.filename || "sheet.xlsx",
+        targetId: null,
+        content: input.content,
+        meta,
+        ctx: {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      });
     } else if (op === "COMPUTE") {
       assertMime(
         doc.mimeType,
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "COMPUTE",
+      );
+      edited = await this.applyXlsxEdit(original, {
+        op,
+        documentId: docId,
+        userId,
+        filename: doc.filename || "sheet.xlsx",
+        targetId: null,
+        content: input.content,
+        meta,
+        ctx: {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      });
+    } else if (op === "PY_COMPUTE") {
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "PY_COMPUTE",
+      );
+      edited = await this.applyXlsxEdit(original, {
+        op,
+        documentId: docId,
+        userId,
+        filename: doc.filename || "sheet.xlsx",
+        targetId: null,
+        content: input.content,
+        meta,
+        ctx: {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+      });
+    } else if (op === "PY_WRITEBACK") {
+      assertMime(
+        doc.mimeType,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "PY_WRITEBACK",
       );
       edited = await this.applyXlsxEdit(original, {
         op,
@@ -1573,7 +1732,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         op === "RENAME_SHEET" ||
         op === "CREATE_CHART" ||
         op === "COMPUTE" ||
-        op === "COMPUTE_BUNDLE";
+        op === "COMPUTE_BUNDLE" ||
+        op === "PY_CHART" ||
+        op === "PY_COMPUTE" ||
+        op === "PY_WRITEBACK";
 
       await prisma.$transaction(async (tx) => {
         await tx.documentChunk.deleteMany({ where: { documentId: docId } });
@@ -1845,7 +2007,8 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       op.includes("CELL") ||
       op.includes("RANGE") ||
       op.includes("CHART") ||
-      op.includes("COMPUTE");
+      op.includes("COMPUTE") ||
+      op.includes("WRITEBACK");
 
     await prisma.$transaction(async (tx) => {
       await tx.documentChunk.deleteMany({ where: { documentId: docId } });
@@ -2575,7 +2738,25 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         }
         return [{ kind: "create_chart", spec }];
       }
+      if (input.op === "PY_CHART") {
+        const raw = String(input.content || "").trim();
+        let spec: any = null;
+        try {
+          spec = JSON.parse(raw);
+        } catch {
+          throw new Error(
+            'PY_CHART requires JSON content like {"type":"PIE","range":"Sheet1!A1:B10"}',
+          );
+        }
+        if (!spec || typeof spec !== "object") {
+          throw new Error("PY_CHART requires a JSON object payload.");
+        }
+        return [{ kind: "create_chart", spec }];
+      }
       if (input.op === "COMPUTE") {
+        return parseComputePayloadOps();
+      }
+      if (input.op === "PY_COMPUTE" || input.op === "PY_WRITEBACK") {
         return parseComputePayloadOps();
       }
       throw new Error(
@@ -2694,7 +2875,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       );
     });
     const shouldCallPythonEngine =
-      input.op === "COMPUTE" &&
+      (input.op === "COMPUTE" ||
+        input.op === "PY_COMPUTE" ||
+        input.op === "PY_CHART" ||
+        input.op === "PY_WRITEBACK") &&
       this.spreadsheetEngine.enabled() &&
       (requiresRemotePython || spreadsheetEngineMode !== "off");
 

@@ -1,24 +1,140 @@
 {
   "_meta": {
     "id": "excel_number_formats_structure",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Excel number format code patterns for structural column-type inference during document intelligence.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
-  "config": { "enabled": true },
+  "config": {
+    "enabled": true,
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
+  },
   "formatFamilies": [
-    { "id": "accounting", "label": "Accounting", "labelPt": "Contábil", "semanticType": "currency" },
-    { "id": "currency", "label": "Currency", "labelPt": "Moeda", "semanticType": "currency" },
-    { "id": "custom", "label": "Custom", "labelPt": "Personalizado", "semanticType": "varies" },
-    { "id": "date", "label": "Date", "labelPt": "Data", "semanticType": "temporal" },
-    { "id": "fraction", "label": "Fraction", "labelPt": "Fração", "semanticType": "numeric" },
-    { "id": "general", "label": "General", "labelPt": "Geral", "semanticType": "text_or_numeric" },
-    { "id": "number", "label": "Number", "labelPt": "Número", "semanticType": "numeric" },
-    { "id": "percentage", "label": "Percentage", "labelPt": "Percentual", "semanticType": "ratio" },
-    { "id": "scientific", "label": "Scientific", "labelPt": "Científico", "semanticType": "numeric" },
-    { "id": "text", "label": "Text", "labelPt": "Texto", "semanticType": "text" },
-    { "id": "time", "label": "Time", "labelPt": "Hora", "semanticType": "temporal" }
+    {
+      "id": "accounting",
+      "label": "Accounting",
+      "labelPt": "Contábil",
+      "semanticType": "currency",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_accounting",
+      "curationReason": "weighted:accounting:domain_general"
+    },
+    {
+      "id": "currency",
+      "label": "Currency",
+      "labelPt": "Moeda",
+      "semanticType": "currency",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_currency",
+      "curationReason": "weighted:currency:domain_general"
+    },
+    {
+      "id": "custom",
+      "label": "Custom",
+      "labelPt": "Personalizado",
+      "semanticType": "varies",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_custom",
+      "curationReason": "weighted:custom:domain_general"
+    },
+    {
+      "id": "date",
+      "label": "Date",
+      "labelPt": "Data",
+      "semanticType": "temporal",
+      "priority": 680,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_date",
+      "curationReason": "weighted:date:domain_general"
+    },
+    {
+      "id": "fraction",
+      "label": "Fraction",
+      "labelPt": "Fração",
+      "semanticType": "numeric",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_fraction",
+      "curationReason": "weighted:fraction:domain_general"
+    },
+    {
+      "id": "general",
+      "label": "General",
+      "labelPt": "Geral",
+      "semanticType": "text_or_numeric",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_general",
+      "curationReason": "weighted:general:domain_general"
+    },
+    {
+      "id": "number",
+      "label": "Number",
+      "labelPt": "Número",
+      "semanticType": "numeric",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_number",
+      "curationReason": "weighted:number:domain_general"
+    },
+    {
+      "id": "percentage",
+      "label": "Percentage",
+      "labelPt": "Percentual",
+      "semanticType": "ratio",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_percentage",
+      "curationReason": "weighted:percentage:domain_general"
+    },
+    {
+      "id": "scientific",
+      "label": "Scientific",
+      "labelPt": "Científico",
+      "semanticType": "numeric",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_scientific",
+      "curationReason": "weighted:scientific:domain_general"
+    },
+    {
+      "id": "text",
+      "label": "Text",
+      "labelPt": "Texto",
+      "semanticType": "text",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_text",
+      "curationReason": "weighted:text:domain_general"
+    },
+    {
+      "id": "time",
+      "label": "Time",
+      "labelPt": "Hora",
+      "semanticType": "temporal",
+      "priority": 500,
+      "scope": "number_format_family",
+      "disambiguationRuleId": "formatfamilies_disambiguation_general_time",
+      "curationReason": "weighted:time:domain_general"
+    }
   ],
   "formats": [
     {
@@ -28,8 +144,16 @@
       "excelBuiltinId": 0,
       "inferredType": "general",
       "locale": "any",
-      "examples": ["123", "Hello", "1.5"],
-      "notes": "Default format — Excel auto-detects type"
+      "examples": [
+        "123",
+        "Hello",
+        "1.5"
+      ],
+      "notes": "Default format — Excel auto-detects type",
+      "priority": 500,
+      "scope": "number_format:general",
+      "disambiguationRuleId": "formats_disambiguation_general_general_default",
+      "curationReason": "weighted:general_default:domain_general"
     },
     {
       "id": "general_text_at",
@@ -38,8 +162,15 @@
       "excelBuiltinId": 49,
       "inferredType": "text",
       "locale": "any",
-      "examples": ["Hello", "00123"],
-      "notes": "Explicit text format — preserves leading zeros"
+      "examples": [
+        "Hello",
+        "00123"
+      ],
+      "notes": "Explicit text format — preserves leading zeros",
+      "priority": 500,
+      "scope": "number_format:text",
+      "disambiguationRuleId": "formats_disambiguation_general_general_text_at",
+      "curationReason": "weighted:general_text_at:domain_general"
     },
     {
       "id": "number_thousands",
@@ -48,8 +179,15 @@
       "excelBuiltinId": 3,
       "inferredType": "integer",
       "locale": "any",
-      "examples": ["1,234", "0"],
-      "notes": "Integer with thousands separator"
+      "examples": [
+        "1,234",
+        "0"
+      ],
+      "notes": "Integer with thousands separator",
+      "priority": 500,
+      "scope": "number_format:integer",
+      "disambiguationRuleId": "formats_disambiguation_general_number_thousands",
+      "curationReason": "weighted:number_thousands:domain_general"
     },
     {
       "id": "number_thousands_2dp",
@@ -58,8 +196,15 @@
       "excelBuiltinId": 4,
       "inferredType": "decimal",
       "locale": "any",
-      "examples": ["1,234.56", "0.00"],
-      "notes": "Decimal with thousands separator and 2 decimal places"
+      "examples": [
+        "1,234.56",
+        "0.00"
+      ],
+      "notes": "Decimal with thousands separator and 2 decimal places",
+      "priority": 500,
+      "scope": "number_format:decimal",
+      "disambiguationRuleId": "formats_disambiguation_general_number_thousands_2dp",
+      "curationReason": "weighted:number_thousands_2dp:domain_general"
     },
     {
       "id": "number_integer",
@@ -68,8 +213,15 @@
       "excelBuiltinId": 1,
       "inferredType": "integer",
       "locale": "any",
-      "examples": ["1234", "0"],
-      "notes": "Plain integer, no thousands separator"
+      "examples": [
+        "1234",
+        "0"
+      ],
+      "notes": "Plain integer, no thousands separator",
+      "priority": 500,
+      "scope": "number_format:integer",
+      "disambiguationRuleId": "formats_disambiguation_general_number_integer",
+      "curationReason": "weighted:number_integer:domain_general"
     },
     {
       "id": "number_2dp",
@@ -78,8 +230,15 @@
       "excelBuiltinId": 2,
       "inferredType": "decimal",
       "locale": "any",
-      "examples": ["1234.56", "0.00"],
-      "notes": "Decimal with 2 places, no thousands separator"
+      "examples": [
+        "1234.56",
+        "0.00"
+      ],
+      "notes": "Decimal with 2 places, no thousands separator",
+      "priority": 500,
+      "scope": "number_format:decimal",
+      "disambiguationRuleId": "formats_disambiguation_general_number_2dp",
+      "curationReason": "weighted:number_2dp:domain_general"
     },
     {
       "id": "number_neg_parens",
@@ -88,8 +247,15 @@
       "excelBuiltinId": 37,
       "inferredType": "integer",
       "locale": "any",
-      "examples": ["1,234", "(1,234)"],
-      "notes": "Integer with parentheses for negatives — common in finance"
+      "examples": [
+        "1,234",
+        "(1,234)"
+      ],
+      "notes": "Integer with parentheses for negatives — common in finance",
+      "priority": 500,
+      "scope": "number_format:integer",
+      "disambiguationRuleId": "formats_disambiguation_general_number_neg_parens",
+      "curationReason": "weighted:number_neg_parens:domain_general"
     },
     {
       "id": "number_neg_parens_2dp",
@@ -98,8 +264,15 @@
       "excelBuiltinId": 38,
       "inferredType": "decimal",
       "locale": "any",
-      "examples": ["1,234.56", "(1,234.56)"],
-      "notes": "Decimal with parentheses for negatives"
+      "examples": [
+        "1,234.56",
+        "(1,234.56)"
+      ],
+      "notes": "Decimal with parentheses for negatives",
+      "priority": 500,
+      "scope": "number_format:decimal",
+      "disambiguationRuleId": "formats_disambiguation_general_number_neg_parens_2dp",
+      "curationReason": "weighted:number_neg_parens_2dp:domain_general"
     },
     {
       "id": "number_dash_zero",
@@ -108,8 +281,16 @@
       "excelBuiltinId": null,
       "inferredType": "integer",
       "locale": "any",
-      "examples": ["1,234", "(1,234)", "-"],
-      "notes": "Integer with dash for zero values — financial reporting convention"
+      "examples": [
+        "1,234",
+        "(1,234)",
+        "-"
+      ],
+      "notes": "Integer with dash for zero values — financial reporting convention",
+      "priority": 500,
+      "scope": "number_format:integer",
+      "disambiguationRuleId": "formats_disambiguation_general_number_dash_zero",
+      "curationReason": "weighted:number_dash_zero:domain_general"
     },
     {
       "id": "number_1dp",
@@ -118,8 +299,15 @@
       "excelBuiltinId": null,
       "inferredType": "decimal",
       "locale": "any",
-      "examples": ["1234.5", "0.0"],
-      "notes": "Decimal with 1 decimal place"
+      "examples": [
+        "1234.5",
+        "0.0"
+      ],
+      "notes": "Decimal with 1 decimal place",
+      "priority": 500,
+      "scope": "number_format:decimal",
+      "disambiguationRuleId": "formats_disambiguation_general_number_1dp",
+      "curationReason": "weighted:number_1dp:domain_general"
     },
     {
       "id": "currency_usd_2dp",
@@ -128,8 +316,15 @@
       "excelBuiltinId": 44,
       "inferredType": "currency_usd",
       "locale": "en-US",
-      "examples": ["$1,234.56", "$0.00"],
-      "notes": "US dollar with 2 decimal places"
+      "examples": [
+        "$1,234.56",
+        "$0.00"
+      ],
+      "notes": "US dollar with 2 decimal places",
+      "priority": 640,
+      "scope": "number_format:currency_usd",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_usd_2dp",
+      "curationReason": "weighted:currency_usd_2dp:domain_general"
     },
     {
       "id": "currency_usd_0dp",
@@ -138,8 +333,15 @@
       "excelBuiltinId": 5,
       "inferredType": "currency_usd",
       "locale": "en-US",
-      "examples": ["$1,234", "$0"],
-      "notes": "US dollar with no decimal places"
+      "examples": [
+        "$1,234",
+        "$0"
+      ],
+      "notes": "US dollar with no decimal places",
+      "priority": 640,
+      "scope": "number_format:currency_usd",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_usd_0dp",
+      "curationReason": "weighted:currency_usd_0dp:domain_general"
     },
     {
       "id": "currency_eur_2dp",
@@ -148,8 +350,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_eur",
       "locale": "eu",
-      "examples": ["€1,234.56", "€0.00"],
-      "notes": "Euro with 2 decimal places"
+      "examples": [
+        "€1,234.56",
+        "€0.00"
+      ],
+      "notes": "Euro with 2 decimal places",
+      "priority": 640,
+      "scope": "number_format:currency_eur",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_eur_2dp",
+      "curationReason": "weighted:currency_eur_2dp:domain_general"
     },
     {
       "id": "currency_gbp_2dp",
@@ -158,8 +367,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_gbp",
       "locale": "en-GB",
-      "examples": ["£1,234.56", "£0.00"],
-      "notes": "British pound with 2 decimal places"
+      "examples": [
+        "£1,234.56",
+        "£0.00"
+      ],
+      "notes": "British pound with 2 decimal places",
+      "priority": 640,
+      "scope": "number_format:currency_gbp",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_gbp_2dp",
+      "curationReason": "weighted:currency_gbp_2dp:domain_general"
     },
     {
       "id": "currency_jpy_0dp",
@@ -168,8 +384,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_jpy",
       "locale": "ja-JP",
-      "examples": ["¥1,234", "¥0"],
-      "notes": "Japanese yen — no decimal places by convention"
+      "examples": [
+        "¥1,234",
+        "¥0"
+      ],
+      "notes": "Japanese yen — no decimal places by convention",
+      "priority": 640,
+      "scope": "number_format:currency_jpy",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_jpy_0dp",
+      "curationReason": "weighted:currency_jpy_0dp:domain_general"
     },
     {
       "id": "currency_brl_2dp",
@@ -178,8 +401,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_brl",
       "locale": "pt-BR",
-      "examples": ["R$1.234,56", "R$0,00"],
-      "notes": "Brazilian real with 2 decimal places — dot thousands, comma decimal"
+      "examples": [
+        "R$1.234,56",
+        "R$0,00"
+      ],
+      "notes": "Brazilian real with 2 decimal places — dot thousands, comma decimal",
+      "priority": 640,
+      "scope": "number_format:currency_brl",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_brl_2dp",
+      "curationReason": "weighted:currency_brl_2dp:domain_general"
     },
     {
       "id": "currency_brl_0dp",
@@ -188,8 +418,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_brl",
       "locale": "pt-BR",
-      "examples": ["R$1.234", "R$0"],
-      "notes": "Brazilian real with no decimal places"
+      "examples": [
+        "R$1.234",
+        "R$0"
+      ],
+      "notes": "Brazilian real with no decimal places",
+      "priority": 640,
+      "scope": "number_format:currency_brl",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_brl_0dp",
+      "curationReason": "weighted:currency_brl_0dp:domain_general"
     },
     {
       "id": "currency_cad_2dp",
@@ -198,8 +435,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_cad",
       "locale": "en-CA",
-      "examples": ["C$1,234.56", "C$0.00"],
-      "notes": "Canadian dollar with 2 decimal places"
+      "examples": [
+        "C$1,234.56",
+        "C$0.00"
+      ],
+      "notes": "Canadian dollar with 2 decimal places",
+      "priority": 640,
+      "scope": "number_format:currency_cad",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_cad_2dp",
+      "curationReason": "weighted:currency_cad_2dp:domain_general"
     },
     {
       "id": "currency_aud_2dp",
@@ -208,8 +452,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_aud",
       "locale": "en-AU",
-      "examples": ["A$1,234.56", "A$0.00"],
-      "notes": "Australian dollar with 2 decimal places"
+      "examples": [
+        "A$1,234.56",
+        "A$0.00"
+      ],
+      "notes": "Australian dollar with 2 decimal places",
+      "priority": 640,
+      "scope": "number_format:currency_aud",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_aud_2dp",
+      "curationReason": "weighted:currency_aud_2dp:domain_general"
     },
     {
       "id": "currency_chf_2dp",
@@ -218,8 +469,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_chf",
       "locale": "de-CH",
-      "examples": ["CHF1'234.56", "CHF0.00"],
-      "notes": "Swiss franc with 2 decimal places — apostrophe thousands separator"
+      "examples": [
+        "CHF1'234.56",
+        "CHF0.00"
+      ],
+      "notes": "Swiss franc with 2 decimal places — apostrophe thousands separator",
+      "priority": 640,
+      "scope": "number_format:currency_chf",
+      "disambiguationRuleId": "formats_disambiguation_general_currency_chf_2dp",
+      "curationReason": "weighted:currency_chf_2dp:domain_general"
     },
     {
       "id": "accounting_usd_2dp",
@@ -228,8 +486,15 @@
       "excelBuiltinId": 44,
       "inferredType": "currency_usd",
       "locale": "en-US",
-      "examples": ["$ 1,234.56", "$ (1,234.56)"],
-      "notes": "US dollar accounting format — aligned symbols and parentheses for negatives"
+      "examples": [
+        "$ 1,234.56",
+        "$ (1,234.56)"
+      ],
+      "notes": "US dollar accounting format — aligned symbols and parentheses for negatives",
+      "priority": 640,
+      "scope": "number_format:currency_usd",
+      "disambiguationRuleId": "formats_disambiguation_general_accounting_usd_2dp",
+      "curationReason": "weighted:accounting_usd_2dp:domain_general"
     },
     {
       "id": "accounting_eur_2dp",
@@ -238,8 +503,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_eur",
       "locale": "eu",
-      "examples": ["€ 1,234.56", "€ (1,234.56)"],
-      "notes": "Euro accounting format"
+      "examples": [
+        "€ 1,234.56",
+        "€ (1,234.56)"
+      ],
+      "notes": "Euro accounting format",
+      "priority": 640,
+      "scope": "number_format:currency_eur",
+      "disambiguationRuleId": "formats_disambiguation_general_accounting_eur_2dp",
+      "curationReason": "weighted:accounting_eur_2dp:domain_general"
     },
     {
       "id": "accounting_gbp_2dp",
@@ -248,8 +520,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_gbp",
       "locale": "en-GB",
-      "examples": ["£ 1,234.56", "£ (1,234.56)"],
-      "notes": "British pound accounting format"
+      "examples": [
+        "£ 1,234.56",
+        "£ (1,234.56)"
+      ],
+      "notes": "British pound accounting format",
+      "priority": 640,
+      "scope": "number_format:currency_gbp",
+      "disambiguationRuleId": "formats_disambiguation_general_accounting_gbp_2dp",
+      "curationReason": "weighted:accounting_gbp_2dp:domain_general"
     },
     {
       "id": "accounting_brl_2dp",
@@ -258,8 +537,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_brl",
       "locale": "pt-BR",
-      "examples": ["R$ 1.234,56", "R$ (1.234,56)"],
-      "notes": "Brazilian real accounting format"
+      "examples": [
+        "R$ 1.234,56",
+        "R$ (1.234,56)"
+      ],
+      "notes": "Brazilian real accounting format",
+      "priority": 640,
+      "scope": "number_format:currency_brl",
+      "disambiguationRuleId": "formats_disambiguation_general_accounting_brl_2dp",
+      "curationReason": "weighted:accounting_brl_2dp:domain_general"
     },
     {
       "id": "accounting_generic_2dp",
@@ -268,8 +554,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_generic",
       "locale": "any",
-      "examples": [" 1,234.56", " (1,234.56)"],
-      "notes": "Generic accounting format without currency symbol"
+      "examples": [
+        " 1,234.56",
+        " (1,234.56)"
+      ],
+      "notes": "Generic accounting format without currency symbol",
+      "priority": 640,
+      "scope": "number_format:currency_generic",
+      "disambiguationRuleId": "formats_disambiguation_general_accounting_generic_2dp",
+      "curationReason": "weighted:accounting_generic_2dp:domain_general"
     },
     {
       "id": "accounting_generic_0dp",
@@ -278,8 +571,15 @@
       "excelBuiltinId": null,
       "inferredType": "currency_generic",
       "locale": "any",
-      "examples": [" 1,234", " (1,234)"],
-      "notes": "Generic accounting format without currency symbol, no decimals"
+      "examples": [
+        " 1,234",
+        " (1,234)"
+      ],
+      "notes": "Generic accounting format without currency symbol, no decimals",
+      "priority": 640,
+      "scope": "number_format:currency_generic",
+      "disambiguationRuleId": "formats_disambiguation_general_accounting_generic_0dp",
+      "curationReason": "weighted:accounting_generic_0dp:domain_general"
     },
     {
       "id": "percentage_0dp",
@@ -288,8 +588,16 @@
       "excelBuiltinId": 9,
       "inferredType": "percentage",
       "locale": "any",
-      "examples": ["50%", "0%", "100%"],
-      "notes": "Percentage with no decimal places"
+      "examples": [
+        "50%",
+        "0%",
+        "100%"
+      ],
+      "notes": "Percentage with no decimal places",
+      "priority": 640,
+      "scope": "number_format:percentage",
+      "disambiguationRuleId": "formats_disambiguation_general_percentage_0dp",
+      "curationReason": "weighted:percentage_0dp:domain_general"
     },
     {
       "id": "percentage_2dp",
@@ -298,8 +606,16 @@
       "excelBuiltinId": 10,
       "inferredType": "percentage",
       "locale": "any",
-      "examples": ["50.00%", "0.25%", "99.99%"],
-      "notes": "Percentage with 2 decimal places"
+      "examples": [
+        "50.00%",
+        "0.25%",
+        "99.99%"
+      ],
+      "notes": "Percentage with 2 decimal places",
+      "priority": 640,
+      "scope": "number_format:percentage",
+      "disambiguationRuleId": "formats_disambiguation_general_percentage_2dp",
+      "curationReason": "weighted:percentage_2dp:domain_general"
     },
     {
       "id": "percentage_1dp",
@@ -308,8 +624,15 @@
       "excelBuiltinId": null,
       "inferredType": "percentage",
       "locale": "any",
-      "examples": ["50.0%", "0.5%"],
-      "notes": "Percentage with 1 decimal place"
+      "examples": [
+        "50.0%",
+        "0.5%"
+      ],
+      "notes": "Percentage with 1 decimal place",
+      "priority": 640,
+      "scope": "number_format:percentage",
+      "disambiguationRuleId": "formats_disambiguation_general_percentage_1dp",
+      "curationReason": "weighted:percentage_1dp:domain_general"
     },
     {
       "id": "percentage_3dp",
@@ -318,8 +641,15 @@
       "excelBuiltinId": null,
       "inferredType": "percentage",
       "locale": "any",
-      "examples": ["50.000%", "0.125%"],
-      "notes": "Percentage with 3 decimal places — used in interest rates"
+      "examples": [
+        "50.000%",
+        "0.125%"
+      ],
+      "notes": "Percentage with 3 decimal places — used in interest rates",
+      "priority": 640,
+      "scope": "number_format:percentage",
+      "disambiguationRuleId": "formats_disambiguation_general_percentage_3dp",
+      "curationReason": "weighted:percentage_3dp:domain_general"
     },
     {
       "id": "date_us",
@@ -328,8 +658,15 @@
       "excelBuiltinId": 14,
       "inferredType": "date",
       "locale": "en-US",
-      "examples": ["01/15/2026", "12/31/2025"],
-      "notes": "US date format — month/day/year"
+      "examples": [
+        "01/15/2026",
+        "12/31/2025"
+      ],
+      "notes": "US date format — month/day/year",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_us",
+      "curationReason": "weighted:date_us:domain_general"
     },
     {
       "id": "date_eu",
@@ -338,8 +675,15 @@
       "excelBuiltinId": null,
       "inferredType": "date",
       "locale": "eu",
-      "examples": ["15/01/2026", "31/12/2025"],
-      "notes": "European date format — day/month/year"
+      "examples": [
+        "15/01/2026",
+        "31/12/2025"
+      ],
+      "notes": "European date format — day/month/year",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_eu",
+      "curationReason": "weighted:date_eu:domain_general"
     },
     {
       "id": "date_iso",
@@ -348,8 +692,15 @@
       "excelBuiltinId": null,
       "inferredType": "date",
       "locale": "any",
-      "examples": ["2026-01-15", "2025-12-31"],
-      "notes": "ISO 8601 date format"
+      "examples": [
+        "2026-01-15",
+        "2025-12-31"
+      ],
+      "notes": "ISO 8601 date format",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_iso",
+      "curationReason": "weighted:date_iso:domain_general"
     },
     {
       "id": "date_us_short",
@@ -358,8 +709,15 @@
       "excelBuiltinId": 15,
       "inferredType": "date",
       "locale": "en-US",
-      "examples": ["1/15/26", "12/1/25"],
-      "notes": "Short US date — no leading zeros, 2-digit year"
+      "examples": [
+        "1/15/26",
+        "12/1/25"
+      ],
+      "notes": "Short US date — no leading zeros, 2-digit year",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_us_short",
+      "curationReason": "weighted:date_us_short:domain_general"
     },
     {
       "id": "date_eu_short",
@@ -368,8 +726,15 @@
       "excelBuiltinId": null,
       "inferredType": "date",
       "locale": "eu",
-      "examples": ["15/1/26", "1/12/25"],
-      "notes": "Short European date — no leading zeros, 2-digit year"
+      "examples": [
+        "15/1/26",
+        "1/12/25"
+      ],
+      "notes": "Short European date — no leading zeros, 2-digit year",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_eu_short",
+      "curationReason": "weighted:date_eu_short:domain_general"
     },
     {
       "id": "date_abbrev_month_year",
@@ -378,8 +743,15 @@
       "excelBuiltinId": 17,
       "inferredType": "date_month_year",
       "locale": "en",
-      "examples": ["Jan-26", "Dec-25"],
-      "notes": "Abbreviated month and 2-digit year"
+      "examples": [
+        "Jan-26",
+        "Dec-25"
+      ],
+      "notes": "Abbreviated month and 2-digit year",
+      "priority": 820,
+      "scope": "number_format:date_month_year",
+      "disambiguationRuleId": "formats_disambiguation_general_date_abbrev_month_year",
+      "curationReason": "weighted:date_abbrev_month_year:domain_general"
     },
     {
       "id": "date_long",
@@ -388,8 +760,15 @@
       "excelBuiltinId": null,
       "inferredType": "date",
       "locale": "en-US",
-      "examples": ["January 15, 2026", "December 31, 2025"],
-      "notes": "Long-form US date"
+      "examples": [
+        "January 15, 2026",
+        "December 31, 2025"
+      ],
+      "notes": "Long-form US date",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_long",
+      "curationReason": "weighted:date_long:domain_general"
     },
     {
       "id": "date_dd_mmm_yyyy",
@@ -398,8 +777,15 @@
       "excelBuiltinId": null,
       "inferredType": "date",
       "locale": "en-GB",
-      "examples": ["15 Jan 2026", "31 Dec 2025"],
-      "notes": "Day abbreviated-month year — common in UK/military"
+      "examples": [
+        "15 Jan 2026",
+        "31 Dec 2025"
+      ],
+      "notes": "Day abbreviated-month year — common in UK/military",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_dd_mmm_yyyy",
+      "curationReason": "weighted:date_dd_mmm_yyyy:domain_general"
     },
     {
       "id": "date_month_year",
@@ -408,8 +794,15 @@
       "excelBuiltinId": null,
       "inferredType": "date_month_year",
       "locale": "any",
-      "examples": ["01/2026", "12/2025"],
-      "notes": "Month and year only"
+      "examples": [
+        "01/2026",
+        "12/2025"
+      ],
+      "notes": "Month and year only",
+      "priority": 820,
+      "scope": "number_format:date_month_year",
+      "disambiguationRuleId": "formats_disambiguation_general_date_month_year",
+      "curationReason": "weighted:date_month_year:domain_general"
     },
     {
       "id": "date_year_only",
@@ -418,8 +811,15 @@
       "excelBuiltinId": null,
       "inferredType": "date_year",
       "locale": "any",
-      "examples": ["2026", "2025"],
-      "notes": "Year only"
+      "examples": [
+        "2026",
+        "2025"
+      ],
+      "notes": "Year only",
+      "priority": 820,
+      "scope": "number_format:date_year",
+      "disambiguationRuleId": "formats_disambiguation_general_date_year_only",
+      "curationReason": "weighted:date_year_only:domain_general"
     },
     {
       "id": "date_quarter",
@@ -428,8 +828,15 @@
       "excelBuiltinId": null,
       "inferredType": "date_quarter",
       "locale": "any",
-      "examples": ["Q1 2026", "Q4 2025"],
-      "notes": "Fiscal quarter notation"
+      "examples": [
+        "Q1 2026",
+        "Q4 2025"
+      ],
+      "notes": "Fiscal quarter notation",
+      "priority": 820,
+      "scope": "number_format:date_quarter",
+      "disambiguationRuleId": "formats_disambiguation_general_date_quarter",
+      "curationReason": "weighted:date_quarter:domain_general"
     },
     {
       "id": "date_dot_eu",
@@ -438,8 +845,15 @@
       "excelBuiltinId": null,
       "inferredType": "date",
       "locale": "de",
-      "examples": ["15.01.2026", "31.12.2025"],
-      "notes": "Dot-separated European date — common in German, Brazilian Portuguese"
+      "examples": [
+        "15.01.2026",
+        "31.12.2025"
+      ],
+      "notes": "Dot-separated European date — common in German, Brazilian Portuguese",
+      "priority": 820,
+      "scope": "number_format:date",
+      "disambiguationRuleId": "formats_disambiguation_general_date_dot_eu",
+      "curationReason": "weighted:date_dot_eu:domain_general"
     },
     {
       "id": "time_full",
@@ -448,8 +862,15 @@
       "excelBuiltinId": 21,
       "inferredType": "time",
       "locale": "any",
-      "examples": ["14:30:00", "09:05:12"],
-      "notes": "24-hour time with seconds"
+      "examples": [
+        "14:30:00",
+        "09:05:12"
+      ],
+      "notes": "24-hour time with seconds",
+      "priority": 500,
+      "scope": "number_format:time",
+      "disambiguationRuleId": "formats_disambiguation_general_time_full",
+      "curationReason": "weighted:time_full:domain_general"
     },
     {
       "id": "time_short",
@@ -458,8 +879,15 @@
       "excelBuiltinId": 20,
       "inferredType": "time",
       "locale": "any",
-      "examples": ["14:30", "09:05"],
-      "notes": "24-hour time without seconds"
+      "examples": [
+        "14:30",
+        "09:05"
+      ],
+      "notes": "24-hour time without seconds",
+      "priority": 500,
+      "scope": "number_format:time",
+      "disambiguationRuleId": "formats_disambiguation_general_time_short",
+      "curationReason": "weighted:time_short:domain_general"
     },
     {
       "id": "time_ampm",
@@ -468,8 +896,15 @@
       "excelBuiltinId": 18,
       "inferredType": "time",
       "locale": "en-US",
-      "examples": ["2:30 PM", "9:05 AM"],
-      "notes": "12-hour time with AM/PM"
+      "examples": [
+        "2:30 PM",
+        "9:05 AM"
+      ],
+      "notes": "12-hour time with AM/PM",
+      "priority": 500,
+      "scope": "number_format:time",
+      "disambiguationRuleId": "formats_disambiguation_general_time_ampm",
+      "curationReason": "weighted:time_ampm:domain_general"
     },
     {
       "id": "time_milliseconds",
@@ -478,8 +913,15 @@
       "excelBuiltinId": null,
       "inferredType": "time_precise",
       "locale": "any",
-      "examples": ["14:30:00.123", "09:05:12.456"],
-      "notes": "Time with milliseconds — used in scientific/logging contexts"
+      "examples": [
+        "14:30:00.123",
+        "09:05:12.456"
+      ],
+      "notes": "Time with milliseconds — used in scientific/logging contexts",
+      "priority": 500,
+      "scope": "number_format:time_precise",
+      "disambiguationRuleId": "formats_disambiguation_general_time_milliseconds",
+      "curationReason": "weighted:time_milliseconds:domain_general"
     },
     {
       "id": "time_elapsed",
@@ -488,8 +930,15 @@
       "excelBuiltinId": 46,
       "inferredType": "duration",
       "locale": "any",
-      "examples": ["25:30:00", "100:00:00"],
-      "notes": "Elapsed time — hours can exceed 24"
+      "examples": [
+        "25:30:00",
+        "100:00:00"
+      ],
+      "notes": "Elapsed time — hours can exceed 24",
+      "priority": 500,
+      "scope": "number_format:duration",
+      "disambiguationRuleId": "formats_disambiguation_general_time_elapsed",
+      "curationReason": "weighted:time_elapsed:domain_general"
     },
     {
       "id": "datetime_us",
@@ -498,8 +947,15 @@
       "excelBuiltinId": 22,
       "inferredType": "datetime",
       "locale": "en-US",
-      "examples": ["01/15/2026 14:30", "12/31/2025 09:00"],
-      "notes": "US date with 24-hour time"
+      "examples": [
+        "01/15/2026 14:30",
+        "12/31/2025 09:00"
+      ],
+      "notes": "US date with 24-hour time",
+      "priority": 820,
+      "scope": "number_format:datetime",
+      "disambiguationRuleId": "formats_disambiguation_general_datetime_us",
+      "curationReason": "weighted:datetime_us:domain_general"
     },
     {
       "id": "datetime_iso",
@@ -508,8 +964,15 @@
       "excelBuiltinId": null,
       "inferredType": "datetime",
       "locale": "any",
-      "examples": ["2026-01-15 14:30:00", "2025-12-31 09:00:00"],
-      "notes": "ISO 8601 datetime"
+      "examples": [
+        "2026-01-15 14:30:00",
+        "2025-12-31 09:00:00"
+      ],
+      "notes": "ISO 8601 datetime",
+      "priority": 820,
+      "scope": "number_format:datetime",
+      "disambiguationRuleId": "formats_disambiguation_general_datetime_iso",
+      "curationReason": "weighted:datetime_iso:domain_general"
     },
     {
       "id": "datetime_eu",
@@ -518,8 +981,15 @@
       "excelBuiltinId": null,
       "inferredType": "datetime",
       "locale": "eu",
-      "examples": ["15/01/2026 14:30", "31/12/2025 09:00"],
-      "notes": "European date with 24-hour time"
+      "examples": [
+        "15/01/2026 14:30",
+        "31/12/2025 09:00"
+      ],
+      "notes": "European date with 24-hour time",
+      "priority": 820,
+      "scope": "number_format:datetime",
+      "disambiguationRuleId": "formats_disambiguation_general_datetime_eu",
+      "curationReason": "weighted:datetime_eu:domain_general"
     },
     {
       "id": "fraction_single",
@@ -528,8 +998,15 @@
       "excelBuiltinId": 12,
       "inferredType": "fraction",
       "locale": "any",
-      "examples": ["1 1/2", "3/4"],
-      "notes": "Fraction with up to 1-digit denominator"
+      "examples": [
+        "1 1/2",
+        "3/4"
+      ],
+      "notes": "Fraction with up to 1-digit denominator",
+      "priority": 500,
+      "scope": "number_format:fraction",
+      "disambiguationRuleId": "formats_disambiguation_general_fraction_single",
+      "curationReason": "weighted:fraction_single:domain_general"
     },
     {
       "id": "fraction_double",
@@ -538,8 +1015,15 @@
       "excelBuiltinId": 13,
       "inferredType": "fraction",
       "locale": "any",
-      "examples": ["1 23/45", "7/16"],
-      "notes": "Fraction with up to 2-digit denominator"
+      "examples": [
+        "1 23/45",
+        "7/16"
+      ],
+      "notes": "Fraction with up to 2-digit denominator",
+      "priority": 500,
+      "scope": "number_format:fraction",
+      "disambiguationRuleId": "formats_disambiguation_general_fraction_double",
+      "curationReason": "weighted:fraction_double:domain_general"
     },
     {
       "id": "fraction_triple",
@@ -548,8 +1032,15 @@
       "excelBuiltinId": null,
       "inferredType": "fraction",
       "locale": "any",
-      "examples": ["1 123/456", "355/113"],
-      "notes": "Fraction with up to 3-digit denominator — high precision"
+      "examples": [
+        "1 123/456",
+        "355/113"
+      ],
+      "notes": "Fraction with up to 3-digit denominator — high precision",
+      "priority": 500,
+      "scope": "number_format:fraction",
+      "disambiguationRuleId": "formats_disambiguation_general_fraction_triple",
+      "curationReason": "weighted:fraction_triple:domain_general"
     },
     {
       "id": "scientific_2dp",
@@ -558,8 +1049,15 @@
       "excelBuiltinId": 11,
       "inferredType": "scientific",
       "locale": "any",
-      "examples": ["1.23E+04", "5.67E-03"],
-      "notes": "Scientific notation with 2 decimal places"
+      "examples": [
+        "1.23E+04",
+        "5.67E-03"
+      ],
+      "notes": "Scientific notation with 2 decimal places",
+      "priority": 500,
+      "scope": "number_format:scientific",
+      "disambiguationRuleId": "formats_disambiguation_general_scientific_2dp",
+      "curationReason": "weighted:scientific_2dp:domain_general"
     },
     {
       "id": "scientific_engineering",
@@ -568,8 +1066,15 @@
       "excelBuiltinId": 48,
       "inferredType": "scientific",
       "locale": "any",
-      "examples": ["12.3E+3", "567.0E-3"],
-      "notes": "Engineering notation — exponent is multiple of 3"
+      "examples": [
+        "12.3E+3",
+        "567.0E-3"
+      ],
+      "notes": "Engineering notation — exponent is multiple of 3",
+      "priority": 500,
+      "scope": "number_format:scientific",
+      "disambiguationRuleId": "formats_disambiguation_general_scientific_engineering",
+      "curationReason": "weighted:scientific_engineering:domain_general"
     },
     {
       "id": "custom_phone_us",
@@ -578,8 +1083,14 @@
       "excelBuiltinId": null,
       "inferredType": "phone",
       "locale": "en-US",
-      "examples": ["(555) 123-4567"],
-      "notes": "US phone number format"
+      "examples": [
+        "(555) 123-4567"
+      ],
+      "notes": "US phone number format",
+      "priority": 500,
+      "scope": "number_format:phone",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_phone_us",
+      "curationReason": "weighted:custom_phone_us:domain_general"
     },
     {
       "id": "custom_ssn",
@@ -588,8 +1099,14 @@
       "excelBuiltinId": null,
       "inferredType": "ssn",
       "locale": "en-US",
-      "examples": ["123-45-6789"],
-      "notes": "US Social Security Number"
+      "examples": [
+        "123-45-6789"
+      ],
+      "notes": "US Social Security Number",
+      "priority": 500,
+      "scope": "number_format:ssn",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_ssn",
+      "curationReason": "weighted:custom_ssn:domain_general"
     },
     {
       "id": "custom_zip",
@@ -598,8 +1115,15 @@
       "excelBuiltinId": null,
       "inferredType": "zip_code",
       "locale": "en-US",
-      "examples": ["01234", "90210"],
-      "notes": "US ZIP code — preserves leading zeros"
+      "examples": [
+        "01234",
+        "90210"
+      ],
+      "notes": "US ZIP code — preserves leading zeros",
+      "priority": 500,
+      "scope": "number_format:zip_code",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_zip",
+      "curationReason": "weighted:custom_zip:domain_general"
     },
     {
       "id": "custom_cep",
@@ -608,8 +1132,15 @@
       "excelBuiltinId": null,
       "inferredType": "cep",
       "locale": "pt-BR",
-      "examples": ["01001-000", "04538-133"],
-      "notes": "Brazilian CEP (postal code)"
+      "examples": [
+        "01001-000",
+        "04538-133"
+      ],
+      "notes": "Brazilian CEP (postal code)",
+      "priority": 500,
+      "scope": "number_format:cep",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_cep",
+      "curationReason": "weighted:custom_cep:domain_general"
     },
     {
       "id": "custom_cpf",
@@ -618,8 +1149,14 @@
       "excelBuiltinId": null,
       "inferredType": "cpf",
       "locale": "pt-BR",
-      "examples": ["123.456.789-09"],
-      "notes": "Brazilian CPF (individual tax ID)"
+      "examples": [
+        "123.456.789-09"
+      ],
+      "notes": "Brazilian CPF (individual tax ID)",
+      "priority": 500,
+      "scope": "number_format:cpf",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_cpf",
+      "curationReason": "weighted:custom_cpf:domain_general"
     },
     {
       "id": "custom_cnpj",
@@ -628,8 +1165,14 @@
       "excelBuiltinId": null,
       "inferredType": "cnpj",
       "locale": "pt-BR",
-      "examples": ["12.345.678/0001-95"],
-      "notes": "Brazilian CNPJ (company tax ID)"
+      "examples": [
+        "12.345.678/0001-95"
+      ],
+      "notes": "Brazilian CNPJ (company tax ID)",
+      "priority": 500,
+      "scope": "number_format:cnpj",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_cnpj",
+      "curationReason": "weighted:custom_cnpj:domain_general"
     },
     {
       "id": "custom_thousands",
@@ -638,8 +1181,14 @@
       "excelBuiltinId": null,
       "inferredType": "numeric_thousands",
       "locale": "any",
-      "examples": ["1,234 (represents 1,234,000)"],
-      "notes": "Displays number divided by 1000 — trailing comma convention"
+      "examples": [
+        "1,234 (represents 1,234,000)"
+      ],
+      "notes": "Displays number divided by 1000 — trailing comma convention",
+      "priority": 500,
+      "scope": "number_format:numeric_thousands",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_thousands",
+      "curationReason": "weighted:custom_thousands:domain_general"
     },
     {
       "id": "custom_negative_red",
@@ -648,8 +1197,15 @@
       "excelBuiltinId": null,
       "inferredType": "decimal",
       "locale": "any",
-      "examples": ["1,234.56", "-1,234.56 (in red)"],
-      "notes": "Negatives displayed in red — common in financial reports"
+      "examples": [
+        "1,234.56",
+        "-1,234.56 (in red)"
+      ],
+      "notes": "Negatives displayed in red — common in financial reports",
+      "priority": 500,
+      "scope": "number_format:decimal",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_negative_red",
+      "curationReason": "weighted:custom_negative_red:domain_general"
     },
     {
       "id": "custom_negative_parentheses",
@@ -658,8 +1214,15 @@
       "excelBuiltinId": null,
       "inferredType": "decimal",
       "locale": "any",
-      "examples": ["1,234.56", "(1,234.56) (in red)"],
-      "notes": "Negatives in red parentheses — standard accounting visual"
+      "examples": [
+        "1,234.56",
+        "(1,234.56) (in red)"
+      ],
+      "notes": "Negatives in red parentheses — standard accounting visual",
+      "priority": 500,
+      "scope": "number_format:decimal",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_negative_parentheses",
+      "curationReason": "weighted:custom_negative_parentheses:domain_general"
     },
     {
       "id": "custom_boolean_yes_no",
@@ -668,8 +1231,15 @@
       "excelBuiltinId": null,
       "inferredType": "boolean",
       "locale": "en",
-      "examples": ["Yes", "No"],
-      "notes": "Boolean display — non-zero shows Yes, zero shows No"
+      "examples": [
+        "Yes",
+        "No"
+      ],
+      "notes": "Boolean display — non-zero shows Yes, zero shows No",
+      "priority": 500,
+      "scope": "number_format:boolean",
+      "disambiguationRuleId": "formats_disambiguation_general_custom_boolean_yes_no",
+      "curationReason": "weighted:custom_boolean_yes_no:domain_general"
     }
   ]
 }

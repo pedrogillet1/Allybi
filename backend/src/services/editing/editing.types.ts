@@ -15,7 +15,10 @@ export type EditOperator =
   | "COMPUTE_BUNDLE"
   | "ADD_SLIDE"
   | "REWRITE_SLIDE_TEXT"
-  | "REPLACE_SLIDE_IMAGE";
+  | "REPLACE_SLIDE_IMAGE"
+  | "PY_COMPUTE"
+  | "PY_CHART"
+  | "PY_WRITEBACK";
 
 export type EditDomain = "docx" | "sheets" | "slides";
 

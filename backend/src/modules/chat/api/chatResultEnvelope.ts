@@ -68,6 +68,7 @@ export function toChatFinalEvent(result: ChatResult): Record<string, unknown> {
     truncation: (normalized as any).truncation || defaultTruncation(),
     evidence: (normalized as any).evidence || defaultEvidence(normalized),
     qualityGates: (normalized as any).qualityGates || defaultQualityGates(),
+    assistantTelemetry: (normalized as any).assistantTelemetry || null,
     ...(String((normalized as any).scopeRelaxReason || "").trim()
       ? { scopeRelaxReason: (normalized as any).scopeRelaxReason }
       : {}),

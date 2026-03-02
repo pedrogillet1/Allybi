@@ -1,15 +1,22 @@
 {
   "_meta": {
     "id": "money_patterns",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Cross-domain money extraction patterns for everyday documents with normalization guidance.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "high",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
   },
   "rules": [
     {
@@ -23,7 +30,18 @@
       ],
       "normalization": "expand_billions",
       "currency": "auto_detect",
-      "notes": "Abbreviated billions with currency symbol"
+      "notes": "Abbreviated billions with currency symbol",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_002",
@@ -36,7 +54,15 @@
       ],
       "normalization": "expand_brl_billions",
       "currency": "BRL",
-      "notes": "Brazilian abbreviated billions"
+      "notes": "Brazilian abbreviated billions",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_003",
@@ -49,7 +75,15 @@
       ],
       "normalization": "expand_brl_millions",
       "currency": "BRL",
-      "notes": "Brazilian abbreviated millions"
+      "notes": "Brazilian abbreviated millions",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_004",
@@ -62,7 +96,15 @@
       ],
       "normalization": "expand_brl_mil",
       "currency": "BRL",
-      "notes": "Brazilian abbreviated thousands with 'mil'"
+      "notes": "Brazilian abbreviated thousands with 'mil'",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_005",
@@ -75,7 +117,18 @@
       ],
       "normalization": "expand_millions",
       "currency": "auto_detect",
-      "notes": "Abbreviated millions with currency symbol"
+      "notes": "Abbreviated millions with currency symbol",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_006",
@@ -88,7 +141,18 @@
       ],
       "normalization": "expand_thousands",
       "currency": "auto_detect",
-      "notes": "Abbreviated thousands with K suffix"
+      "notes": "Abbreviated thousands with K suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_007",
@@ -101,7 +165,18 @@
       ],
       "normalization": "negate_strip_cr_suffix",
       "currency": "auto_detect",
-      "notes": "Credit/negative indicated by CR suffix"
+      "notes": "Credit/negative indicated by CR suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_008",
@@ -114,7 +189,18 @@
       ],
       "normalization": "negate_strip_dash",
       "currency": "auto_detect",
-      "notes": "Negative amount with leading dash"
+      "notes": "Negative amount with leading dash",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_009",
@@ -127,7 +213,18 @@
       ],
       "normalization": "negate_strip_parens",
       "currency": "auto_detect",
-      "notes": "Accounting-style negative with parentheses"
+      "notes": "Accounting-style negative with parentheses",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_010",
@@ -139,7 +236,18 @@
       ],
       "normalization": "negate_strip_trailing_dash",
       "currency": "auto_detect",
-      "notes": "Negative amount with trailing dash"
+      "notes": "Negative amount with trailing dash",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_011",
@@ -151,7 +259,15 @@
       ],
       "normalization": "strip_code_and_commas",
       "currency": "AED",
-      "notes": "UAE dirham with ISO code"
+      "notes": "UAE dirham with ISO code",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "amount_due_label",
@@ -162,7 +278,18 @@
       "normalization": "extract_amount_due",
       "currency": "auto_detect",
       "notes": "Amount due label extraction",
-      "id": "money_012"
+      "id": "money_012",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_followed_by_ex_tax_tag",
@@ -174,7 +301,18 @@
       "normalization": "extract_amount_mark_tax_excluded",
       "currency": "auto_detect",
       "notes": "Amount tagged as tax excluded",
-      "id": "money_013"
+      "id": "money_013",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_followed_by_tax_tag",
@@ -186,7 +324,18 @@
       "normalization": "extract_amount_mark_tax_included",
       "currency": "auto_detect",
       "notes": "Amount tagged as tax included",
-      "id": "money_014"
+      "id": "money_014",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_per_day",
@@ -197,7 +346,18 @@
       "normalization": "parse_unit_price_day",
       "currency": "auto_detect",
       "notes": "Per-day pricing",
-      "id": "money_015"
+      "id": "money_015",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_per_gb",
@@ -209,7 +369,18 @@
       "normalization": "parse_unit_price_gb",
       "currency": "auto_detect",
       "notes": "Telecom price per GB",
-      "id": "money_016"
+      "id": "money_016",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_per_kwh",
@@ -221,7 +392,18 @@
       "normalization": "parse_unit_price_kwh",
       "currency": "auto_detect",
       "notes": "Utility price per kWh",
-      "id": "money_017"
+      "id": "money_017",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_per_minute",
@@ -233,7 +415,18 @@
       "normalization": "parse_unit_price_minute",
       "currency": "auto_detect",
       "notes": "Voice call per-minute pricing",
-      "id": "money_018"
+      "id": "money_018",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_per_month",
@@ -245,7 +438,18 @@
       "normalization": "parse_unit_price_month",
       "currency": "auto_detect",
       "notes": "Monthly recurring pricing",
-      "id": "money_019"
+      "id": "money_019",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_per_night",
@@ -256,7 +460,18 @@
       "normalization": "parse_unit_price_night",
       "currency": "auto_detect",
       "notes": "Travel nightly rate",
-      "id": "money_020"
+      "id": "money_020",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_received_label",
@@ -267,7 +482,18 @@
       "normalization": "extract_amount_received",
       "currency": "auto_detect",
       "notes": "Amount received label",
-      "id": "money_021"
+      "id": "money_021",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_with_approx_sign",
@@ -279,7 +505,18 @@
       "normalization": "mark_approximate_amount",
       "currency": "auto_detect",
       "notes": "Approximate amount with symbol",
-      "id": "money_022"
+      "id": "money_022",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_with_ceiling_phrase",
@@ -291,7 +528,18 @@
       "normalization": "mark_maximum_amount",
       "currency": "auto_detect",
       "notes": "Maximum threshold amount",
-      "id": "money_023"
+      "id": "money_023",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "amount_with_floor_phrase",
@@ -303,7 +551,18 @@
       "normalization": "mark_minimum_amount",
       "currency": "auto_detect",
       "notes": "Minimum threshold amount",
-      "id": "money_024"
+      "id": "money_024",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_025",
@@ -316,7 +575,18 @@
       ],
       "normalization": "flag_approximate",
       "currency": "auto_detect",
-      "notes": "Approximate monetary amounts"
+      "notes": "Approximate monetary amounts",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_026",
@@ -329,7 +599,18 @@
       ],
       "normalization": "flag_minimum",
       "currency": "auto_detect",
-      "notes": "Minimum/floor amounts"
+      "notes": "Minimum/floor amounts",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_027",
@@ -341,7 +622,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "AUD",
-      "notes": "Australian dollar with A$ prefix"
+      "notes": "Australian dollar with A$ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "baggage_fee_label",
@@ -352,7 +641,18 @@
       "normalization": "extract_fee_amount",
       "currency": "auto_detect",
       "notes": "Travel baggage fee amount",
-      "id": "money_028"
+      "id": "money_028",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "bank_balance_label",
@@ -363,7 +663,18 @@
       "normalization": "extract_balance_labeled_amount",
       "currency": "auto_detect",
       "notes": "Balance amount labels",
-      "id": "money_029"
+      "id": "money_029",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "banking_debit_credit_columns",
@@ -375,7 +686,18 @@
       "normalization": "capture_amount_with_polarity",
       "currency": "auto_detect",
       "notes": "Debit/credit-labeled monetary amount",
-      "id": "money_030"
+      "id": "money_030",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_031",
@@ -387,7 +709,15 @@
       ],
       "normalization": "strip_code_brazilian_format",
       "currency": "BRL",
-      "notes": "Brazilian real with ISO code"
+      "notes": "Brazilian real with ISO code",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_032",
@@ -399,7 +729,15 @@
       ],
       "normalization": "strip_code_brazilian_format",
       "currency": "BRL",
-      "notes": "Brazilian real with ISO code suffix"
+      "notes": "Brazilian real with ISO code suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "brl_parenthesis_negative",
@@ -410,7 +748,15 @@
       "normalization": "negate_strip_parenthesis_brl",
       "currency": "BRL",
       "notes": "Accounting negative BRL in parentheses",
-      "id": "money_033"
+      "id": "money_033",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_034",
@@ -423,7 +769,18 @@
       ],
       "normalization": "strip_symbol_brazilian_format",
       "currency": "BRL",
-      "notes": "Brazilian real with R$ prefix, period grouping, comma decimal"
+      "notes": "Brazilian real with R$ prefix, period grouping, comma decimal",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:currency_symbol_overlap"
+      }
     },
     {
       "id": "money_035",
@@ -435,7 +792,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "CAD",
-      "notes": "Canadian dollar with C$ prefix"
+      "notes": "Canadian dollar with C$ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_036",
@@ -449,7 +814,18 @@
       ],
       "normalization": "convert_cents_to_decimal",
       "currency": "auto_detect",
-      "notes": "Cent/centavo amounts"
+      "notes": "Cent/centavo amounts",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_037",
@@ -461,7 +837,15 @@
       ],
       "normalization": "strip_code_swiss_format",
       "currency": "CHF",
-      "notes": "Swiss franc with apostrophe or comma grouping"
+      "notes": "Swiss franc with apostrophe or comma grouping",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_038",
@@ -473,7 +857,18 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "CNY",
-      "notes": "Chinese yuan with ¥ prefix (same symbol as JPY, disambiguate by context)"
+      "notes": "Chinese yuan with ¥ prefix (same symbol as JPY, disambiguate by context)",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:notes_ambiguity+currency_symbol_overlap"
+      }
     },
     {
       "name": "commission_percentage_amount",
@@ -484,7 +879,18 @@
       "normalization": "extract_percentage_and_base",
       "currency": "auto_detect",
       "notes": "Commission amount from percentage of base",
-      "id": "money_039"
+      "id": "money_039",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "copay_label",
@@ -495,7 +901,18 @@
       "normalization": "extract_copay",
       "currency": "auto_detect",
       "notes": "Insurance copay amount",
-      "id": "money_040"
+      "id": "money_040",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "currency_after_parenthesis",
@@ -506,7 +923,18 @@
       "normalization": "negate_strip_parenthesis_code_suffix",
       "currency": "auto_detect",
       "notes": "Parenthesized amount followed by currency code",
-      "id": "money_041"
+      "id": "money_041",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "currency_code_before_parenthesis",
@@ -518,7 +946,18 @@
       "normalization": "strip_code_parenthesis_parse",
       "currency": "auto_detect",
       "notes": "Currency code with parenthesized number",
-      "id": "money_042"
+      "id": "money_042",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_043",
@@ -531,7 +970,18 @@
       ],
       "normalization": "null_amount",
       "currency": "auto_detect",
-      "notes": "Dash placeholder indicating no value"
+      "notes": "Dash placeholder indicating no value",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "deductible_label",
@@ -542,7 +992,18 @@
       "normalization": "extract_deductible",
       "currency": "auto_detect",
       "notes": "Insurance deductible amount",
-      "id": "money_044"
+      "id": "money_044",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_045",
@@ -554,7 +1015,15 @@
       ],
       "normalization": "strip_suffix_european_format",
       "currency": "DKK",
-      "notes": "Danish krone with kr/DKK suffix"
+      "notes": "Danish krone with kr/DKK suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "due_in_installments_label",
@@ -566,7 +1035,18 @@
       "normalization": "extract_installment_count_and_amount",
       "currency": "auto_detect",
       "notes": "Installment count and installment amount",
-      "id": "money_046"
+      "id": "money_046",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_047",
@@ -578,7 +1058,15 @@
       ],
       "normalization": "strip_code_european_format",
       "currency": "EUR",
-      "notes": "Euro with ISO code prefix"
+      "notes": "Euro with ISO code prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_048",
@@ -590,7 +1078,15 @@
       ],
       "normalization": "strip_code_european_format",
       "currency": "EUR",
-      "notes": "Euro with ISO code suffix"
+      "notes": "Euro with ISO code suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "eur_space_grouping",
@@ -601,7 +1097,15 @@
       "normalization": "strip_symbol_space_grouping",
       "currency": "EUR",
       "notes": "EUR using space thousand separator",
-      "id": "money_049"
+      "id": "money_049",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_050",
@@ -614,7 +1118,15 @@
       ],
       "normalization": "strip_symbol_european_format",
       "currency": "EUR",
-      "notes": "Euro with € prefix, supports both decimal conventions"
+      "notes": "Euro with € prefix, supports both decimal conventions",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "fixed_fee_label",
@@ -625,7 +1137,18 @@
       "normalization": "extract_fixed_fee",
       "currency": "auto_detect",
       "notes": "Fixed fee label",
-      "id": "money_051"
+      "id": "money_051",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "fuel_surcharge_label",
@@ -636,7 +1159,18 @@
       "normalization": "extract_surcharge",
       "currency": "auto_detect",
       "notes": "Travel fuel surcharge amount",
-      "id": "money_052"
+      "id": "money_052",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_053",
@@ -648,7 +1182,15 @@
       ],
       "normalization": "strip_code_and_commas",
       "currency": "GBP",
-      "notes": "British pound with ISO code"
+      "notes": "British pound with ISO code",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "gbp_space_grouping",
@@ -659,7 +1201,15 @@
       "normalization": "strip_symbol_space_grouping",
       "currency": "GBP",
       "notes": "GBP using space thousand separator",
-      "id": "money_054"
+      "id": "money_054",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_055",
@@ -671,7 +1221,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "GBP",
-      "notes": "British pound with £ prefix"
+      "notes": "British pound with £ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_056",
@@ -684,7 +1242,18 @@
       ],
       "normalization": "strip_code_and_commas",
       "currency": "auto_detect",
-      "notes": "Generic ISO currency code prefix for less common currencies"
+      "notes": "Generic ISO currency code prefix for less common currencies",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_057",
@@ -697,7 +1266,18 @@
       ],
       "normalization": "strip_code_and_commas",
       "currency": "auto_detect",
-      "notes": "Generic ISO currency code suffix"
+      "notes": "Generic ISO currency code suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_058",
@@ -709,7 +1289,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "HKD",
-      "notes": "Hong Kong dollar with HK$ prefix"
+      "notes": "Hong Kong dollar with HK$ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_059",
@@ -721,7 +1309,15 @@
       ],
       "normalization": "strip_prefix_indonesian_format",
       "currency": "IDR",
-      "notes": "Indonesian rupiah with Rp prefix"
+      "notes": "Indonesian rupiah with Rp prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_060",
@@ -733,7 +1329,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "ILS",
-      "notes": "Israeli new shekel with ₪ prefix"
+      "notes": "Israeli new shekel with ₪ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_061",
@@ -745,7 +1349,15 @@
       ],
       "normalization": "strip_code_indian_format",
       "currency": "INR",
-      "notes": "Indian rupee with ISO code"
+      "notes": "Indian rupee with ISO code",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_062",
@@ -757,7 +1369,15 @@
       ],
       "normalization": "strip_symbol_indian_format",
       "currency": "INR",
-      "notes": "Indian rupee with ₹ prefix, lakh/crore grouping"
+      "notes": "Indian rupee with ₹ prefix, lakh/crore grouping",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "installment_fraction_amount",
@@ -769,7 +1389,18 @@
       "normalization": "extract_installment_marker_and_amount",
       "currency": "auto_detect",
       "notes": "Installment fraction plus amount",
-      "id": "money_063"
+      "id": "money_063",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "insurance_premium_label",
@@ -781,7 +1412,18 @@
       "normalization": "extract_premium",
       "currency": "auto_detect",
       "notes": "Insurance premium amount",
-      "id": "money_064"
+      "id": "money_064",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "interest_charge_label",
@@ -792,7 +1434,18 @@
       "normalization": "extract_interest_amount",
       "currency": "auto_detect",
       "notes": "Interest charge extraction",
-      "id": "money_065"
+      "id": "money_065",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "iso_code_with_apostrophe_grouping",
@@ -803,7 +1456,18 @@
       "normalization": "strip_code_apostrophe_grouping",
       "currency": "auto_detect",
       "notes": "ISO code with apostrophe thousand separators",
-      "id": "money_066"
+      "id": "money_066",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_067",
@@ -815,7 +1479,15 @@
       ],
       "normalization": "strip_code_and_commas_no_decimal",
       "currency": "JPY",
-      "notes": "Japanese yen with ISO code"
+      "notes": "Japanese yen with ISO code",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_068",
@@ -827,7 +1499,18 @@
       ],
       "normalization": "strip_symbol_and_commas_no_decimal",
       "currency": "JPY",
-      "notes": "Japanese yen with ¥ prefix, no decimal places"
+      "notes": "Japanese yen with ¥ prefix, no decimal places",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:currency_symbol_overlap"
+      }
     },
     {
       "id": "money_069",
@@ -839,7 +1522,15 @@
       ],
       "normalization": "strip_symbol_and_commas_no_decimal",
       "currency": "KRW",
-      "notes": "Korean won with ₩ prefix, no decimals"
+      "notes": "Korean won with ₩ prefix, no decimals",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "large_grouped_amount",
@@ -851,7 +1542,18 @@
       "normalization": "normalize_multi_group_separator",
       "currency": "auto_detect",
       "notes": "Very large grouped amount",
-      "id": "money_070"
+      "id": "money_070",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "late_fee_label",
@@ -862,7 +1564,18 @@
       "normalization": "extract_late_fee",
       "currency": "auto_detect",
       "notes": "Late fee extraction",
-      "id": "money_071"
+      "id": "money_071",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "loan_interest_label",
@@ -873,7 +1586,18 @@
       "normalization": "extract_interest_amount",
       "currency": "auto_detect",
       "notes": "Loan interest amount label",
-      "id": "money_072"
+      "id": "money_072",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "loan_principal_label",
@@ -884,7 +1608,18 @@
       "normalization": "extract_principal_amount",
       "currency": "auto_detect",
       "notes": "Loan principal amount label",
-      "id": "money_073"
+      "id": "money_073",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "minimum_payment_label",
@@ -895,7 +1630,18 @@
       "normalization": "extract_minimum_payment",
       "currency": "auto_detect",
       "notes": "Minimum payment amount",
-      "id": "money_074"
+      "id": "money_074",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_075",
@@ -908,7 +1654,18 @@
       ],
       "normalization": "expand_with_code",
       "currency": "auto_detect",
-      "notes": "ISO code with abbreviated magnitude"
+      "notes": "ISO code with abbreviated magnitude",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "mortgage_payment_label",
@@ -919,7 +1676,18 @@
       "normalization": "extract_mortgage_payment",
       "currency": "auto_detect",
       "notes": "Mortgage installment amount",
-      "id": "money_076"
+      "id": "money_076",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_077",
@@ -931,7 +1699,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "MXN",
-      "notes": "Mexican peso with MX$ prefix"
+      "notes": "Mexican peso with MX$ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_078",
@@ -943,7 +1719,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "MYR",
-      "notes": "Malaysian ringgit with RM prefix"
+      "notes": "Malaysian ringgit with RM prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_079",
@@ -955,7 +1739,15 @@
       ],
       "normalization": "strip_suffix_nordic_format",
       "currency": "NOK",
-      "notes": "Norwegian krone with kr/NOK suffix"
+      "notes": "Norwegian krone with kr/NOK suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_080",
@@ -967,7 +1759,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "NZD",
-      "notes": "New Zealand dollar with NZ$ prefix"
+      "notes": "New Zealand dollar with NZ$ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_081",
@@ -980,7 +1780,15 @@
       ],
       "normalization": "parse_per_unit_brl",
       "currency": "BRL",
-      "notes": "BRL per-unit pricing in Portuguese"
+      "notes": "BRL per-unit pricing in Portuguese",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_082",
@@ -993,7 +1801,15 @@
       ],
       "normalization": "parse_per_unit",
       "currency": "EUR",
-      "notes": "EUR per-unit pricing"
+      "notes": "EUR per-unit pricing",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_083",
@@ -1007,7 +1823,15 @@
       ],
       "normalization": "parse_per_unit",
       "currency": "USD",
-      "notes": "USD per-unit pricing"
+      "notes": "USD per-unit pricing",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_084",
@@ -1020,7 +1844,18 @@
       ],
       "normalization": "compute_percentage",
       "currency": "auto_detect",
-      "notes": "Percentage of a monetary amount"
+      "notes": "Percentage of a monetary amount",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_085",
@@ -1032,7 +1867,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "PHP",
-      "notes": "Philippine peso with ₱ prefix"
+      "notes": "Philippine peso with ₱ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_086",
@@ -1044,7 +1887,15 @@
       ],
       "normalization": "strip_suffix_european_format",
       "currency": "PLN",
-      "notes": "Polish zloty with zl/PLN suffix"
+      "notes": "Polish zloty with zl/PLN suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "property_tax_label",
@@ -1056,7 +1907,18 @@
       "normalization": "extract_property_tax",
       "currency": "auto_detect",
       "notes": "Property tax amount",
-      "id": "money_087"
+      "id": "money_087",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_088",
@@ -1068,7 +1930,15 @@
       ],
       "normalization": "parse_range_brl",
       "currency": "BRL",
-      "notes": "BRL range with between/entre"
+      "notes": "BRL range with between/entre",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_089",
@@ -1080,7 +1950,15 @@
       ],
       "normalization": "parse_range_eur",
       "currency": "EUR",
-      "notes": "EUR range with to/a"
+      "notes": "EUR range with to/a",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_090",
@@ -1092,7 +1970,18 @@
       ],
       "normalization": "parse_range_generic",
       "currency": "auto_detect",
-      "notes": "Generic currency range with ISO code suffix"
+      "notes": "Generic currency range with ISO code suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_091",
@@ -1105,7 +1994,15 @@
       ],
       "normalization": "parse_range_usd",
       "currency": "USD",
-      "notes": "USD range with dash/en-dash"
+      "notes": "USD range with dash/en-dash",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "range_with_to_word_and_code",
@@ -1117,7 +2014,18 @@
       "normalization": "parse_numeric_range_with_code",
       "currency": "auto_detect",
       "notes": "Numeric range with ISO code suffix",
-      "id": "money_092"
+      "id": "money_092",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "reimbursement_label",
@@ -1128,7 +2036,18 @@
       "normalization": "extract_reimbursement_amount",
       "currency": "auto_detect",
       "notes": "Reimbursement amount",
-      "id": "money_093"
+      "id": "money_093",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "rent_amount_label",
@@ -1140,7 +2059,18 @@
       "normalization": "extract_rent_amount",
       "currency": "auto_detect",
       "notes": "Housing rent amount",
-      "id": "money_094"
+      "id": "money_094",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "salary_gross_label",
@@ -1151,7 +2081,18 @@
       "normalization": "extract_gross_salary",
       "currency": "auto_detect",
       "notes": "Gross salary amount",
-      "id": "money_095"
+      "id": "money_095",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "salary_net_label",
@@ -1162,7 +2103,18 @@
       "normalization": "extract_net_salary",
       "currency": "auto_detect",
       "notes": "Net salary amount",
-      "id": "money_096"
+      "id": "money_096",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_097",
@@ -1174,7 +2126,15 @@
       ],
       "normalization": "strip_code_and_commas",
       "currency": "SAR",
-      "notes": "Saudi riyal with ISO code"
+      "notes": "Saudi riyal with ISO code",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "security_deposit_label",
@@ -1185,7 +2145,18 @@
       "normalization": "extract_security_deposit",
       "currency": "auto_detect",
       "notes": "Security deposit amount",
-      "id": "money_098"
+      "id": "money_098",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_099",
@@ -1197,7 +2168,15 @@
       ],
       "normalization": "strip_suffix_nordic_format",
       "currency": "SEK",
-      "notes": "Swedish krona with kr/SEK suffix, space grouping"
+      "notes": "Swedish krona with kr/SEK suffix, space grouping",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_100",
@@ -1209,7 +2188,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "SGD",
-      "notes": "Singapore dollar with S$ prefix"
+      "notes": "Singapore dollar with S$ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "short_notation_mn_code",
@@ -1222,7 +2209,18 @@
       "normalization": "expand_short_magnitude_suffix",
       "currency": "auto_detect",
       "notes": "Short magnitude notation mn/bn/k",
-      "id": "money_101"
+      "id": "money_101",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "signed_amount_with_dr_cr",
@@ -1234,7 +2232,18 @@
       "normalization": "parse_signed_and_polarity_suffix",
       "currency": "auto_detect",
       "notes": "Signed amount with DR/CR suffix",
-      "id": "money_102"
+      "id": "money_102",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "signed_parenthesis_with_code",
@@ -1245,7 +2254,18 @@
       "normalization": "parse_parenthesis_signed_with_code",
       "currency": "auto_detect",
       "notes": "Signed parenthesis with currency code and optional DR/CR",
-      "id": "money_103"
+      "id": "money_103",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "small_decimal_amount",
@@ -1257,7 +2277,18 @@
       "normalization": "preserve_small_decimal_scale",
       "currency": "auto_detect",
       "notes": "Small fractional amount",
-      "id": "money_104"
+      "id": "money_104",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "tax_due_label",
@@ -1268,7 +2299,18 @@
       "normalization": "extract_tax_due",
       "currency": "auto_detect",
       "notes": "Tax due amount",
-      "id": "money_105"
+      "id": "money_105",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "tax_refund_label",
@@ -1280,7 +2322,18 @@
       "normalization": "extract_tax_refund",
       "currency": "auto_detect",
       "notes": "Tax refund amount",
-      "id": "money_106"
+      "id": "money_106",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_107",
@@ -1292,7 +2345,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "THB",
-      "notes": "Thai baht with ฿ prefix"
+      "notes": "Thai baht with ฿ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_108",
@@ -1305,7 +2366,18 @@
       ],
       "normalization": "strip_space_grouped",
       "currency": "auto_detect",
-      "notes": "Space as thousands separator (common in French, some European)"
+      "notes": "Space as thousands separator (common in French, some European)",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "total_after_tax_label",
@@ -1316,7 +2388,18 @@
       "normalization": "extract_post_tax_total",
       "currency": "auto_detect",
       "notes": "Amount after tax",
-      "id": "money_109"
+      "id": "money_109",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "total_before_tax_label",
@@ -1327,7 +2410,18 @@
       "normalization": "extract_pre_tax_total",
       "currency": "auto_detect",
       "notes": "Amount before tax",
-      "id": "money_110"
+      "id": "money_110",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "total_paid_label",
@@ -1338,7 +2432,18 @@
       "normalization": "extract_total_paid",
       "currency": "auto_detect",
       "notes": "Total paid amount label",
-      "id": "money_111"
+      "id": "money_111",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_112",
@@ -1350,7 +2455,15 @@
       ],
       "normalization": "strip_symbol_european_format",
       "currency": "TRY",
-      "notes": "Turkish lira with ₺ prefix"
+      "notes": "Turkish lira with ₺ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "tuition_fee_label",
@@ -1361,7 +2474,18 @@
       "normalization": "extract_tuition_amount",
       "currency": "auto_detect",
       "notes": "Education tuition amount",
-      "id": "money_113"
+      "id": "money_113",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_114",
@@ -1373,7 +2497,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "TWD",
-      "notes": "Taiwan dollar with NT$ prefix"
+      "notes": "Taiwan dollar with NT$ prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_115",
@@ -1386,7 +2518,18 @@
       ],
       "normalization": "flag_maximum",
       "currency": "auto_detect",
-      "notes": "Maximum/ceiling amounts"
+      "notes": "Maximum/ceiling amounts",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_116",
@@ -1398,7 +2541,15 @@
       ],
       "normalization": "strip_code_and_commas",
       "currency": "USD",
-      "notes": "US dollar with ISO code prefix"
+      "notes": "US dollar with ISO code prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_117",
@@ -1410,7 +2561,15 @@
       ],
       "normalization": "strip_code_and_commas",
       "currency": "USD",
-      "notes": "US dollar with ISO code suffix"
+      "notes": "US dollar with ISO code suffix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "usd_parenthesis_negative",
@@ -1421,7 +2580,15 @@
       "normalization": "negate_strip_parenthesis",
       "currency": "USD",
       "notes": "Accounting negative USD in parentheses",
-      "id": "money_118"
+      "id": "money_118",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_119",
@@ -1434,7 +2601,15 @@
       ],
       "normalization": "strip_symbol_and_commas",
       "currency": "USD",
-      "notes": "US dollar with $ prefix, optional space, comma grouping"
+      "notes": "US dollar with $ prefix, optional space, comma grouping",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "name": "value_in_words_en_currency",
@@ -1445,7 +2620,18 @@
       "normalization": "parse_written_amount_words_en",
       "currency": "auto_detect",
       "notes": "Written amount in English words",
-      "id": "money_120"
+      "id": "money_120",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "value_in_words_pt_currency",
@@ -1456,7 +2642,18 @@
       "normalization": "parse_written_amount_words_pt",
       "currency": "auto_detect",
       "notes": "Written amount in Portuguese words",
-      "id": "money_121"
+      "id": "money_121",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "variable_fee_label",
@@ -1467,7 +2664,18 @@
       "normalization": "extract_variable_fee",
       "currency": "auto_detect",
       "notes": "Variable fee label",
-      "id": "money_122"
+      "id": "money_122",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "with_currency_word_en",
@@ -1479,7 +2687,18 @@
       "normalization": "extract_amount_currency_word",
       "currency": "auto_detect",
       "notes": "Amount with English currency word",
-      "id": "money_123"
+      "id": "money_123",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "with_currency_word_pt",
@@ -1491,7 +2710,18 @@
       "normalization": "extract_amount_currency_word",
       "currency": "auto_detect",
       "notes": "Amount with Portuguese currency word",
-      "id": "money_124"
+      "id": "money_124",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "name": "withholding_label",
@@ -1503,7 +2733,18 @@
       "normalization": "extract_withholding_amount",
       "currency": "auto_detect",
       "notes": "Tax withholding amount",
-      "id": "money_125"
+      "id": "money_125",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     },
     {
       "id": "money_126",
@@ -1516,7 +2757,18 @@
       ],
       "normalization": "parse_written_en",
       "currency": "auto_detect",
-      "notes": "Written English amounts with currency name"
+      "notes": "Written English amounts with currency name",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "ask_clarification",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale+broad_token_pattern"
+      }
     },
     {
       "id": "money_127",
@@ -1529,7 +2781,18 @@
       ],
       "normalization": "parse_written_pt",
       "currency": "auto_detect",
-      "notes": "Written Portuguese amounts with currency name"
+      "notes": "Written Portuguese amounts with currency name",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "ask_clarification",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale+broad_token_pattern"
+      }
     },
     {
       "id": "money_128",
@@ -1541,7 +2804,15 @@
       ],
       "normalization": "strip_symbol_space_grouped",
       "currency": "ZAR",
-      "notes": "South African rand with R prefix"
+      "notes": "South African rand with R prefix",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_currency"
+      }
     },
     {
       "id": "money_129",
@@ -1555,7 +2826,18 @@
       ],
       "normalization": "zero",
       "currency": "auto_detect",
-      "notes": "Zero monetary amounts"
+      "notes": "Zero monetary amounts",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:auto_or_universal_locale"
+      }
     }
   ]
 }

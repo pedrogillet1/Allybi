@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "id": "hallucination_guards",
+    "version": "1.0.0",
+    "description": "Hallucination risk guardrails used by quality gates for evidence-first response safety.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "highRiskRequiresBlock": true,
+    "requireEvidenceInGroundedModes": true
+  },
+  "rules": [
+    {
+      "id": "HG_001_grounded_without_evidence",
+      "severity": "error",
+      "description": "Block grounded answers when evidence is missing.",
+      "failureAction": "BLOCK_AND_FALLBACK"
+    },
+    {
+      "id": "HG_002_speculative_language_under_low_evidence",
+      "severity": "warning",
+      "description": "Warn or block speculative language when evidence confidence is low.",
+      "failureAction": "WARN_OR_BLOCK"
+    },
+    {
+      "id": "HG_003_numeric_fabrication",
+      "severity": "error",
+      "description": "Block numeric values not in evidence.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "HG_004_entity_attribution_required",
+      "severity": "error",
+      "description": "Block attributions to entities not in evidence.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "HG_005_cross_document_contamination",
+      "severity": "error",
+      "description": "Block mixing facts across documents.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "HG_006_temporal_claim_without_evidence",
+      "severity": "error",
+      "description": "Block date claims without temporal evidence.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "HG_007_confident_language_on_ambiguous_evidence",
+      "severity": "warning",
+      "description": "Block definitive language on conflicting evidence.",
+      "failureAction": "FORCE_HEDGE"
+    }
+  ]
+}

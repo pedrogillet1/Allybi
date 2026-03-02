@@ -41,6 +41,7 @@ import type {
 
 import { BRAND_NAME } from "../../../config/brand";
 import { resolveOutputTokenBudget } from "../../core/enforcement/tokenBudget.service";
+import { ReasoningPolicyService } from "../../core/policy/reasoningPolicy.service";
 
 export type LangCode = "any" | "en" | "pt" | "es";
 
@@ -142,13 +143,16 @@ export interface BuildRequestInput {
   // Routing/scope signals for prompt shaping
   signals: {
     answerMode: string;
+    promptMode?: "compose" | "retrieval_plan";
     intentFamily?: string | null;
     operator?: string | null;
     operatorFamily?: string | null;
+    domain?: string | null;
 
     // constraints / policies
     disallowJsonOutput?: boolean;
     maxQuestions?: number;
+    retrievalPlanning?: boolean;
 
     // doc grounding
     explicitDocLock?: boolean;
@@ -159,6 +163,13 @@ export interface BuildRequestInput {
     disambiguation?: DisambiguationPayload | null;
     productHelpTopic?: string | null;
     productHelpSnippet?: string | null;
+    styleProfile?: string | null;
+    styleMaxChars?: number | null;
+    userRequestedShort?: boolean;
+    boldingEnabled?: boolean;
+    uiSurface?: string | null;
+    usedBy?: string[] | null;
+    semanticFlags?: string[] | null;
 
     // nav pills
     navType?: "open" | "where" | "discover" | null;
@@ -181,7 +192,15 @@ export interface BuildRequestInput {
 }
 
 export class LlmRequestBuilderService {
-  constructor(private readonly prompts: PromptRegistryService) {}
+  private readonly reasoningPolicy: ReasoningPolicyService;
+
+  constructor(
+    private readonly prompts: PromptRegistryService,
+    opts?: { reasoningPolicy?: ReasoningPolicyService },
+  ) {
+    this.reasoningPolicy =
+      opts?.reasoningPolicy || new ReasoningPolicyService();
+  }
 
   build(input: BuildRequestInput): LlmRequest {
     const maxQuestions =
@@ -225,6 +244,10 @@ export class LlmRequestBuilderService {
     });
 
     const answerMode = input.signals.answerMode;
+    const normalizedAnswerMode = String(answerMode || "")
+      .trim()
+      .toLowerCase();
+    const userRequestedShort = input.signals.userRequestedShort === true;
     const outputBudget = resolveOutputTokenBudget({
       answerMode,
       outputLanguage: input.outputLanguage,
@@ -249,6 +272,29 @@ export class LlmRequestBuilderService {
       maxOutputTokens,
       ...input.options,
     };
+
+    const styleMaxCharsRaw = Number(input.signals.styleMaxChars);
+    const styleClampModes = new Set([
+      "nav_pills",
+      "rank_disambiguate",
+      "scoped_not_found",
+      "refusal",
+    ]);
+    if (
+      Number.isFinite(styleMaxCharsRaw) &&
+      styleMaxCharsRaw > 0 &&
+      (userRequestedShort || styleClampModes.has(normalizedAnswerMode))
+    ) {
+      const styleTokenCap = Math.max(64, Math.ceil(styleMaxCharsRaw / 4.5));
+      options.maxOutputTokens = Math.min(
+        options.maxOutputTokens ?? styleTokenCap,
+        styleTokenCap,
+      );
+    }
+
+    if (normalizedAnswerMode.startsWith("doc_grounded") && !userRequestedShort) {
+      options.maxOutputTokens = Math.max(options.maxOutputTokens ?? 0, 1600);
+    }
 
     // Special case: nav_pills should be short and fast
     if (answerMode === "nav_pills") {
@@ -316,21 +362,19 @@ export class LlmRequestBuilderService {
     )
       return "disambiguation";
 
-    // Retrieval planning flows
+    // Retrieval planner prompt is internal-only and must be explicit.
     if (
-      input.signals.operator === "locate_docs" ||
-      input.signals.operator === "locate_content" ||
-      input.signals.intentFamily === "retrieval"
+      input.signals.promptMode === "retrieval_plan" ||
+      input.signals.retrievalPlanning === true
     ) {
       return "retrieval";
     }
 
-    // File actions can use tool prompt shape
-    if (input.signals.operatorFamily === "file_actions" && input.toolContext)
-      return "tool";
-
     // Fallback triggered
     if (input.signals.fallback?.triggered) return "fallback";
+
+    // Tool prompt shape only for explicit task/tool contexts.
+    if (input.toolContext) return "tool";
 
     // Default compose prompt for normal doc-grounded answers
     return "compose_answer";
@@ -343,6 +387,11 @@ export class LlmRequestBuilderService {
     disambiguationSignal: DisambiguationPayload | null,
   ) {
     const evidenceStats = input.evidencePack?.stats ?? {};
+    const reasoningGuidance = this.reasoningPolicy.buildGuidance({
+      domain: this.resolveDomainForReasoning(input),
+      answerMode: input.signals.answerMode,
+      outputLanguage: input.outputLanguage,
+    });
     const evidenceSummary = input.evidencePack
       ? {
           evidenceCount: Number(
@@ -360,6 +409,47 @@ export class LlmRequestBuilderService {
           ),
         }
       : undefined;
+    const scopeSummary = input.signals.explicitDocLock
+      ? {
+          lock: "hard",
+          activeDocId: input.signals.activeDocId ?? null,
+        }
+      : {
+          lock: "soft",
+          activeDocId: input.signals.activeDocId ?? null,
+        };
+    const docContext = {
+      evidenceItems: evidenceSummary?.evidenceCount ?? 0,
+      uniqueDocs: evidenceSummary?.uniqueDocs ?? 0,
+      topScore: evidenceSummary?.topScore ?? null,
+    };
+    const disambiguationOptions = disambiguationSignal
+      ? disambiguationSignal.options.map((o, i) => ({
+          index: i + 1,
+          id: o.id,
+          label: o.label,
+        }))
+      : [];
+    const runtimeSignals = {
+      answerMode: input.signals.answerMode,
+      promptMode: input.signals.promptMode ?? "compose",
+      operator: input.signals.operator ?? "",
+      intentFamily: input.signals.intentFamily ?? "",
+      operatorFamily: input.signals.operatorFamily ?? "",
+      navType: input.signals.navType ?? null,
+      isExtractionQuery: Boolean(input.signals.isExtractionQuery),
+      retrievalPlanning: Boolean(input.signals.retrievalPlanning),
+      semanticFlags: Array.isArray(input.signals.semanticFlags)
+        ? input.signals.semanticFlags
+        : [],
+      styleProfile: input.signals.styleProfile ?? null,
+      styleMaxChars: input.signals.styleMaxChars ?? null,
+      userRequestedShort: input.signals.userRequestedShort === true,
+      boldingEnabled:
+        typeof input.signals.boldingEnabled === "boolean"
+          ? input.signals.boldingEnabled
+          : null,
+    };
 
     return {
       env: input.env,
@@ -369,9 +459,18 @@ export class LlmRequestBuilderService {
       intentFamily: input.signals.intentFamily,
       operator: input.signals.operator,
       operatorFamily: input.signals.operatorFamily,
+      domainId: input.signals.domain ?? "",
+      uiSurface: input.signals.uiSurface ?? null,
+      usedBy: Array.isArray(input.signals.usedBy) ? input.signals.usedBy : [],
+      semanticFlags: Array.isArray(input.signals.semanticFlags)
+        ? input.signals.semanticFlags
+        : [],
 
       explicitDocLock: Boolean(input.signals.explicitDocLock),
       activeDocId: input.signals.activeDocId ?? null,
+      userQuery: input.userText,
+      scope: scopeSummary,
+      docContext,
 
       query: input.userText,
       normalizedQuery: input.evidencePack?.query?.normalized ?? "",
@@ -390,6 +489,9 @@ export class LlmRequestBuilderService {
         : { active: false },
 
       fallback: input.signals.fallback ?? { triggered: false },
+      candidateCount: disambiguationOptions.length,
+      candidates: disambiguationOptions,
+      runtimeSignals,
 
       constraints: {
         maxQuestions,
@@ -398,15 +500,61 @@ export class LlmRequestBuilderService {
         navPillsStrict: input.signals.answerMode === "nav_pills",
         numericStrict: false,
         quoteStrict: input.signals.operator === "quote",
+        styleProfile: input.signals.styleProfile ?? null,
+        styleMaxChars: input.signals.styleMaxChars ?? null,
+        boldingEnabled:
+          typeof input.signals.boldingEnabled === "boolean"
+            ? input.signals.boldingEnabled
+            : null,
       },
 
       // Interpolated into bank-driven prompt templates (e.g. {{brandName}}).
       slots: {
         brandName: BRAND_NAME,
+        userQuery: input.userText,
+        domainId: input.signals.domain ?? "",
+        scope: scopeSummary,
+        docContext,
+        candidates: disambiguationOptions,
+        candidateCount: disambiguationOptions.length,
+        runtimeSignals,
+        uiSurface: input.signals.uiSurface ?? null,
+        usedBy: Array.isArray(input.signals.usedBy) ? input.signals.usedBy : [],
+        semanticFlags: Array.isArray(input.signals.semanticFlags)
+          ? input.signals.semanticFlags
+          : [],
+        state: {
+          fallback: input.signals.fallback ?? { triggered: false },
+          disambiguationActive: Boolean(disambiguationSignal?.active),
+        },
         productHelpTopic: String(input.signals.productHelpTopic || "").trim(),
-        productHelpSnippet: String(input.signals.productHelpSnippet || "").trim(),
+        productHelpSnippet: String(
+          input.signals.productHelpSnippet || "",
+        ).trim(),
+        reasoningPolicyGuidance: reasoningGuidance.text,
+        reasoningAssumptionsLimit: reasoningGuidance.assumptionsLimit,
       },
     };
+  }
+
+  private resolveDomainForReasoning(input: BuildRequestInput): string | null {
+    const explicit = String(input.signals.domain || "")
+      .trim()
+      .toLowerCase();
+    if (explicit) return explicit;
+    const family = String(input.signals.intentFamily || "")
+      .trim()
+      .toLowerCase();
+    if (
+      family === "finance" ||
+      family === "legal" ||
+      family === "medical" ||
+      family === "ops" ||
+      family === "accounting"
+    ) {
+      return family;
+    }
+    return null;
   }
 
   // -------------------------

@@ -1,0 +1,140 @@
+{
+  "_meta": {
+    "id": "di_ops_sections_ops_incident_report",
+    "version": "1.0.0",
+    "description": "Section map for incident report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_incident_report"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "incident report",
+        "occurrence report",
+        "relatorio de incidente",
+        "relatorio de ocorrencia"
+      ]
+    },
+    {
+      "id": "incident_details",
+      "name": {
+        "en": "Incident Details",
+        "pt": "Detalhes do Incidente"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "description",
+        "narrative",
+        "event details",
+        "descricao",
+        "detalhes"
+      ]
+    },
+    {
+      "id": "timeline",
+      "name": {
+        "en": "Timeline",
+        "pt": "Cronologia"
+      },
+      "required": false,
+      "order": 3,
+      "headingAnchors": [
+        "timeline",
+        "sequence of events",
+        "cronologia",
+        "sequencia"
+      ]
+    },
+    {
+      "id": "impact_assessment",
+      "name": {
+        "en": "Impact Assessment",
+        "pt": "Avaliacao de Impacto"
+      },
+      "required": false,
+      "order": 4,
+      "headingAnchors": [
+        "impact",
+        "damage",
+        "downtime",
+        "cost",
+        "impacto"
+      ]
+    },
+    {
+      "id": "root_cause_analysis",
+      "name": {
+        "en": "Root Cause Analysis",
+        "pt": "Analise de Causa Raiz"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "root cause",
+        "cause analysis",
+        "contributing factors",
+        "causa raiz"
+      ]
+    },
+    {
+      "id": "corrective_actions",
+      "name": {
+        "en": "Corrective Actions",
+        "pt": "Acoes Corretivas"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "corrective action",
+        "remediation",
+        "preventive action",
+        "acao corretiva"
+      ]
+    },
+    {
+      "id": "approvals",
+      "name": {
+        "en": "Approvals",
+        "pt": "Aprovacoes"
+      },
+      "required": false,
+      "order": 7,
+      "headingAnchors": [
+        "approved by",
+        "reviewed by",
+        "signature",
+        "aprovado por"
+      ]
+    },
+    {
+      "id": "footer_metadata",
+      "name": {
+        "en": "Footer Metadata",
+        "pt": "Rodape e Metadados"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "page",
+        "document id",
+        "reference",
+        "confidential"
+      ]
+    }
+  ]
+}

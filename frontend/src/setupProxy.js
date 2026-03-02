@@ -7,7 +7,8 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
  * the backend runs with self-signed TLS (:5000).
  */
 module.exports = function (app) {
-  const target = 'https://[::1]:5000';
+  // Use localhost by default to avoid IPv6-only loopback issues on some dev setups.
+  const target = process.env.REACT_APP_PROXY_TARGET || 'http://localhost:5000';
   const common = {
     target,
     changeOrigin: true,

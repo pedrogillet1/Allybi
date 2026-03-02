@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "id": "logging_policy",
+    "version": "1.0.0",
+    "description": "Structured logging governance: sanitization, allowed channels, and raw-console restrictions for runtime paths.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": true,
+    "redactKeys": [
+      "password",
+      "token",
+      "authorization",
+      "apiKey",
+      "secret",
+      "ssn",
+      "creditCard"
+    ],
+    "runtimePathsNoRawConsole": [
+      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
+      "src/services/core/retrieval/evidenceGate.service.ts",
+      "src/services/llm/core/llmGateway.service.ts"
+    ]
+  }
+}

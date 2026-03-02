@@ -16,5 +16,18 @@
         }
       }
     ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "PROMPT_TEST_001_policy_citations",
+        "input": "Summarize the key findings",
+        "expect": {
+          "promptApplied": true,
+          "noInlineSourcesSection": true,
+          "citationsInAttachments": true
+        }
+      }
+    ]
   }
 }

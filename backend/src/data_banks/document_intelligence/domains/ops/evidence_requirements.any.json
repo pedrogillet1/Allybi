@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "id": "di_ops_evidence_requirements",
+    "version": "1.0.0",
+    "description": "Evidence requirements and citation policy for operations documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "ops",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "work_order_header",
+      "label": {
+        "en": "Work order header",
+        "pt": "Cabecalho da ordem de servico"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "inspection_record",
+      "label": {
+        "en": "Inspection record",
+        "pt": "Registro de inspecao"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "measurement_data",
+      "label": {
+        "en": "Measurement data",
+        "pt": "Dados de medicao"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 4,
+      "type": "maintenance_log_entry",
+      "label": {
+        "en": "Maintenance log entry",
+        "pt": "Entrada do registro de manutencao"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 5,
+      "type": "scheduling_note",
+      "label": {
+        "en": "Scheduling note",
+        "pt": "Nota de agendamento"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 6,
+      "type": "footnote",
+      "label": {
+        "en": "Footnote or remark",
+        "pt": "Rodape ou observacao"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "ops_ev_001_work_order_claim",
+      "description": "Work order claims must include order number, date, and status from the header.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "work_order_header"
+      ]
+    },
+    {
+      "id": "ops_ev_002_inspection_claim",
+      "description": "Inspection findings must cite the inspection record with pass/fail status and inspector.",
+      "applies": [
+        "extract",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "inspection_record"
+      ]
+    },
+    {
+      "id": "ops_ev_003_measurement_claim",
+      "description": "Measurement claims must cite value, unit, and instrument or source from measurement data.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "measurement_data"
+      ]
+    },
+    {
+      "id": "ops_ev_004_maintenance_claim",
+      "description": "Maintenance activity claims must cite the maintenance log entry with date and technician.",
+      "applies": [
+        "extract",
+        "locate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "maintenance_log_entry"
+      ]
+    },
+    {
+      "id": "ops_ev_005_disclaimer_scope",
+      "description": "Any operational recommendation must acknowledge that output is informational and not operational advice.",
+      "applies": [
+        "advise"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "footnote"
+      ]
+    }
+  ]
+}

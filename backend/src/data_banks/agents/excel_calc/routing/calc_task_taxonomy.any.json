@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "id": "calc_task_taxonomy",
     "bankId": "calc_task_taxonomy",
     "version": "1.0.0",
     "description": "Canonical taxonomy of 134 Excel calculation families spanning descriptive statistics, distributions, inferential statistics, regression, time series, finance, optimization, matrix math, and data cleaning.",

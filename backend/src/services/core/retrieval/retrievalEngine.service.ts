@@ -44,6 +44,7 @@ import {
   type DocumentIntelligenceBanksService,
   type DocumentIntelligenceDomain,
 } from "../banks/documentIntelligenceBanks.service";
+import type { RetrievalPlan } from "./retrievalPlanParser.service";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 type AnswerMode =
@@ -55,7 +56,10 @@ type AnswerMode =
   | "general_answer"
   | "help_steps"
   | "rank_disambiguate"
-  | "rank_autopick";
+  | "rank_autopick"
+  | "no_docs"
+  | "scoped_not_found"
+  | "refusal";
 
 type CandidateType = "text" | "table" | "image";
 type CandidateSource = "semantic" | "lexical" | "structural";
@@ -118,6 +122,9 @@ export interface RetrievalRequest {
     slotContract?: import("./slotResolver.service").SlotContract | null;
     isExtractionQuery?: boolean;
   };
+
+  // Optional: if you store recent fallback history/anti-repetition
+  retrievalPlan?: Partial<RetrievalPlan> | null;
 
   // Optional: if you store recent fallback history/anti-repetition
   history?: {
@@ -201,6 +208,7 @@ export interface CandidateChunk {
     typeBoost?: number;
     recencyBoost?: number;
     documentIntelligenceBoost?: number;
+    routingPriorityBoost?: number;
     penalties?: number;
     final?: number;
   };
@@ -541,6 +549,7 @@ export class RetrievalEngineService {
     const boostsTitle = this.safeGetBank<any>("doc_title_boost_rules");
     const boostsType = this.safeGetBank<any>("doc_type_boost_rules");
     const boostsRecency = this.safeGetBank<any>("recency_boost_rules");
+    const routingPriority = this.safeGetBank<any>("routing_priority");
     const diversification = this.getRequiredBank<any>("diversification_rules");
     const negatives = this.getRequiredBank<any>("retrieval_negatives");
     const packaging = this.getRequiredBank<any>("evidence_packaging");
@@ -558,9 +567,16 @@ export class RetrievalEngineService {
       hasQuotedText: req.signals.hasQuotedText ?? norm.hasQuotedText,
       hasFilename: req.signals.hasFilename ?? norm.hasFilename,
     };
+    const allDocs = await this.docStore.listDocs();
+    const docMetaById = new Map<string, DocMeta>();
+    for (const doc of allDocs) {
+      const docId = String(doc?.docId || "").trim();
+      if (!docId) continue;
+      docMetaById.set(docId, doc);
+    }
 
     // 3) Determine scope docIds (strict on explicit doc locks/refs)
-    let scope = await this.resolveScope(req, signals, semanticCfg);
+    let scope = await this.resolveScope(req, signals, semanticCfg, allDocs);
     if (scope.hardScopeActive && scope.candidateDocIds.length === 0) {
       const reasonCode = signals.explicitDocRef
         ? "explicit_doc_not_found"
@@ -757,6 +773,12 @@ export class RetrievalEngineService {
       baseQuery: queryNormalized,
       expandedQueries,
       rewriteVariants: domainRewriteVariants,
+      plannerQueryVariants: Array.isArray(req.retrievalPlan?.queryVariants)
+        ? (req.retrievalPlan?.queryVariants as string[])
+        : [],
+      requiredTerms: Array.isArray(req.retrievalPlan?.requiredTerms)
+        ? (req.retrievalPlan?.requiredTerms as string[])
+        : [],
       maxVariants: safeNumber(domainRewriteBank?.config?.maxRewriteTerms, 12),
     });
     const sectionRules = Array.isArray(sectionPriorityBank?.priorities)
@@ -833,12 +855,18 @@ export class RetrievalEngineService {
     );
 
     // 8) Apply boosts (keyword/title/type/recency), with caps and guards
-    candidates = this.applyBoosts(candidates, req, signals, {
-      boostsKeyword,
-      boostsTitle,
-      boostsType,
-      boostsRecency,
-    });
+    candidates = this.applyBoosts(
+      candidates,
+      req,
+      signals,
+      {
+        boostsKeyword,
+        boostsTitle,
+        boostsType,
+        boostsRecency,
+      },
+      docMetaById,
+    );
     const documentIntelligenceBoostCtx: RuleMatchContext = {
       ...ruleCtx,
       maxMatchedBoostRules: safeNumber(
@@ -872,10 +900,17 @@ export class RetrievalEngineService {
       candidates,
       runtimeBoostRules,
     ) as CandidateChunk[];
+    candidates = this.applyRetrievalPlanHints(candidates, req.retrievalPlan);
     phaseCounts.afterBoosts = candidates.length;
 
     // 9) Rank candidates using ranker config (weights + normalization + tie-breakers)
-    candidates = this.rankCandidates(candidates, req, signals, rankerCfg);
+    candidates = this.rankCandidates(
+      candidates,
+      req,
+      signals,
+      rankerCfg,
+      routingPriority,
+    );
 
     // 10) Diversify (doc/section spread + near-dup control) unless disabled by overrides/lock policy
     if (!req.overrides?.disableDiversification) {
@@ -984,13 +1019,17 @@ export class RetrievalEngineService {
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
     semanticCfg: any,
+    docsInput?: DocMeta[],
   ): Promise<{
     candidateDocIds: string[];
     hardScopeActive: boolean;
     sheetName?: string | null;
     rangeA1?: string | null;
   }> {
-    const docs = await this.docStore.listDocs();
+    const docs =
+      Array.isArray(docsInput) && docsInput.length
+        ? docsInput
+        : await this.docStore.listDocs();
     const allDocIds = Array.from(
       new Set(docs.map((d) => String(d.docId || "").trim()).filter(Boolean)),
     ).sort((a, b) => a.localeCompare(b));
@@ -1706,6 +1745,8 @@ export class RetrievalEngineService {
     baseQuery: string;
     expandedQueries: string[];
     rewriteVariants: QueryVariant[];
+    plannerQueryVariants: string[];
+    requiredTerms: string[];
     maxVariants: number;
   }): RetrievalQueryVariant[] {
     const maxVariants = Math.max(1, Math.floor(Number(opts.maxVariants || 12)));
@@ -1743,7 +1784,36 @@ export class RetrievalEngineService {
       }))
       .filter((variant) => variant.text && variant.text !== opts.baseQuery);
 
-    const extras = [...rewriteVariants, ...expansionVariants];
+    const plannerVariants: RetrievalQueryVariant[] = (opts.plannerQueryVariants || [])
+      .map((query, index) => ({
+        text: String(query || "")
+          .trim()
+          .toLowerCase(),
+        weight: 0.95,
+        sourceRuleId: `planner_variant_${index + 1}`,
+        reason: "retrieval planner variant",
+      }))
+      .filter((variant) => variant.text && variant.text !== opts.baseQuery);
+
+    const requiredTermVariants: RetrievalQueryVariant[] = (
+      opts.requiredTerms || []
+    )
+      .map((term, index) => ({
+        text: String(term || "")
+          .trim()
+          .toLowerCase(),
+        weight: 0.72,
+        sourceRuleId: `planner_required_term_${index + 1}`,
+        reason: "required term hint",
+      }))
+      .filter((variant) => variant.text && variant.text !== opts.baseQuery);
+
+    const extras = [
+      ...plannerVariants,
+      ...rewriteVariants,
+      ...requiredTermVariants,
+      ...expansionVariants,
+    ];
     extras.sort((a, b) => {
       if (b.weight !== a.weight) return b.weight - a.weight;
       if (a.sourceRuleId !== b.sourceRuleId)
@@ -1930,13 +2000,18 @@ export class RetrievalEngineService {
           continue;
         }
 
+        const tablePayload = this.extractTablePayload(hit, req);
+        const inferredType: CandidateType = tablePayload ? "table" : "text";
+        const snippet = this.resolveCandidateSnippet(
+          String(hit.snippet ?? "").trim(),
+          tablePayload,
+        );
         // Minimal provenance requirement: docId + (location OR stable locationKey) + snippet
-        const snippet = String(hit.snippet ?? "").trim();
         const provenanceOk = Boolean(docId && locationKey && snippet);
 
         const candidate: CandidateChunk = {
           candidateId,
-          type: "text",
+          type: inferredType,
           source: phase.source,
 
           docId,
@@ -1954,7 +2029,7 @@ export class RetrievalEngineService {
 
           snippet,
           rawText: null,
-          table: null,
+          table: tablePayload,
 
           scores: {
             semantic: phase.source === "semantic" ? score : 0,
@@ -1967,6 +2042,9 @@ export class RetrievalEngineService {
           signals: {
             isScopedMatch: scope.hardScopeActive,
             isAnchorMatch: phase.source === "structural",
+            tableValidated: tablePayload
+              ? !tablePayload?.warnings?.length
+              : false,
           },
 
           provenanceOk,
@@ -1977,6 +2055,118 @@ export class RetrievalEngineService {
     }
 
     return out;
+  }
+
+  private resolveCandidateSnippet(
+    snippet: string,
+    tablePayload: CandidateChunk["table"],
+  ): string {
+    const cleanSnippet = String(snippet || "").trim();
+    if (cleanSnippet) return cleanSnippet;
+    if (!tablePayload) return "";
+    const header = Array.isArray(tablePayload.header)
+      ? tablePayload.header
+          .map((value) => String(value || "").trim())
+          .filter(Boolean)
+      : [];
+    const firstRow = Array.isArray(tablePayload.rows?.[0])
+      ? tablePayload.rows?.[0]
+          ?.map((value) => String(value ?? "").trim())
+          .filter(Boolean)
+      : [];
+    const pieces = [header.join(" | "), firstRow.join(" | ")]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean);
+    return pieces.join(" || ").trim();
+  }
+
+  private extractTablePayload(
+    hit: any,
+    req: RetrievalRequest,
+  ): CandidateChunk["table"] {
+    const explicitTable = hit?.table;
+    if (explicitTable && typeof explicitTable === "object") {
+      const header = Array.isArray(explicitTable.header)
+        ? explicitTable.header
+            .map((value: unknown) => String(value ?? "").trim())
+            .filter(Boolean)
+        : [];
+      const rows = Array.isArray(explicitTable.rows)
+        ? explicitTable.rows
+            .filter((row: unknown) => Array.isArray(row))
+            .slice(0, 12)
+            .map((row: any[]) =>
+              row.map((value) =>
+                value == null
+                  ? null
+                  : typeof value === "number"
+                    ? value
+                    : String(value),
+              ),
+            )
+        : [];
+      if (header.length || rows.length) {
+        return {
+          header,
+          rows,
+          structureScore: clamp01(
+            safeNumber(explicitTable.structureScore, 0.9),
+          ),
+          numericIntegrityScore: clamp01(
+            safeNumber(explicitTable.numericIntegrityScore, 0.9),
+          ),
+          warnings: Array.isArray(explicitTable.warnings)
+            ? explicitTable.warnings
+                .map((value: unknown) => String(value || "").trim())
+                .filter(Boolean)
+            : undefined,
+        };
+      }
+    }
+
+    const tableExpected = Boolean(
+      req.signals.tableExpected || req.signals.userAskedForTable,
+    );
+    const snippet = String(hit?.snippet || "").trim();
+    if (!tableExpected || !snippet) return null;
+    const lines = snippet
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    if (lines.length < 2) return null;
+    const delimiter = lines.some((line) => line.includes("|"))
+      ? "|"
+      : lines.some((line) => line.includes("\t"))
+        ? "\t"
+        : lines.some((line) => line.includes(","))
+          ? ","
+          : "";
+    if (!delimiter) return null;
+
+    const parsed = lines
+      .map((line) =>
+        line
+          .split(delimiter)
+          .map((value) => value.trim())
+          .filter(Boolean),
+      )
+      .filter((cells) => cells.length >= 2);
+    if (parsed.length < 2) return null;
+    const header = parsed[0];
+    const rows = parsed.slice(1, 9).map((row) =>
+      row.map((cell) => {
+        const numeric = Number(cell.replace(/[,$%]/g, ""));
+        if (Number.isFinite(numeric) && cell.match(/[0-9]/)) return numeric;
+        return cell;
+      }),
+    );
+    return {
+      header,
+      rows,
+      structureScore: 0.65,
+      numericIntegrityScore: 0.6,
+      warnings: ["heuristic_table_from_snippet"],
+    };
   }
 
   // -----------------------------
@@ -2120,69 +2310,480 @@ export class RetrievalEngineService {
       boostsType: any | null;
       boostsRecency: any | null;
     },
+    docMetaById?: Map<string, DocMeta>,
   ): CandidateChunk[] {
     // Apply boosts as additive components with caps (final ranker may re-cap).
-    const allowRecencyBoost =
+    const query = String(req.query || "").toLowerCase();
+    const queryTokens = this.simpleTokens(query).filter(
+      (token) => token.length >= 2,
+    );
+
+    const keywordCfg = banks.boostsKeyword?.config || {};
+    const keywordCap = safeNumber(
+      keywordCfg.actionsContract?.combination?.capMaxBoost ??
+        keywordCfg.actionsContract?.thresholds?.maxTotalBoost,
+      0.25,
+    );
+    const keywordBodyWeight = safeNumber(
+      keywordCfg.regionWeights?.body ?? keywordCfg.regionWeights?.body_text,
+      0.02,
+    );
+    const keywordTitleWeight = safeNumber(
+      keywordCfg.regionWeights?.doc_title,
+      0.08,
+    );
+    const keywordHeadingWeight = safeNumber(
+      keywordCfg.regionWeights?.section_heading,
+      0.06,
+    );
+    const genericTerms = new Set(
+      [
+        ...(keywordCfg.genericTermGuard?.terms?.en || []),
+        ...(keywordCfg.genericTermGuard?.terms?.pt || []),
+        ...(keywordCfg.genericTermGuard?.terms?.es || []),
+      ]
+        .map((token: unknown) =>
+          String(token || "")
+            .trim()
+            .toLowerCase(),
+        )
+        .filter(Boolean),
+    );
+    const genericPenalty = safeNumber(
+      keywordCfg.genericTermGuard?.penalty ??
+        keywordCfg.actionsContract?.thresholds?.genericTermPenaltyThreshold,
+      0.08,
+    );
+
+    const titleCfg = banks.boostsTitle?.config || {};
+    const titleWeights = titleCfg.boostWeights || {};
+    const titleCap = safeNumber(
+      titleCfg.actionsContract?.combination?.capMaxBoost ??
+        titleCfg.actionsContract?.thresholds?.maxTotalTitleBoost,
+      0.15,
+    );
+    const titleMinOverlapRatio = safeNumber(
+      titleCfg.actionsContract?.thresholds?.minOverlapRatioForPartial,
+      0.55,
+    );
+    const titleMinTokens = Math.max(
+      1,
+      Math.floor(
+        safeNumber(
+          titleCfg.actionsContract?.thresholds?.minTokensForPartial,
+          2,
+        ),
+      ),
+    );
+
+    const typeCfg = banks.boostsType?.config || {};
+    const typeCap = safeNumber(
+      typeCfg.actionsContract?.thresholds?.maxTotalTypeBoost,
+      0.12,
+    );
+    const expectedTypeTags = this.resolveExpectedTypeTags(signals, query);
+
+    const recencyCfg = banks.boostsRecency?.config || {};
+    const recencyThresholds = recencyCfg.actionsContract?.thresholds || {};
+    const recencyWeights = recencyCfg.recencyWeights || {};
+    const recencyCap = safeNumber(recencyThresholds.maxTotalRecencyBoost, 0.08);
+    const disableRecencyForDocLock =
+      recencyCfg.neverOverrideExplicitDocLock !== false &&
+      Boolean(signals.explicitDocLock || signals.singleDocIntent);
+    const disableRecencyForExplicitTimeWindow =
+      Boolean(signals.explicitYearOrQuarterComparison) &&
+      recencyCfg.timeFilterGuards
+        ?.disableWhenExplicitYearOrQuarterComparison !== false;
+    const recencyScale =
       Boolean(signals.timeConstraintsPresent) &&
-      !Boolean(signals.explicitDocLock || signals.singleDocIntent);
+      recencyCfg.timeFilterGuards?.enabled !== false
+        ? clamp01(
+            safeNumber(
+              recencyCfg.timeFilterGuards
+                ?.reduceFactorWhenTimeConstraintsPresent,
+              0.5,
+            ),
+          )
+        : 1;
+
     for (const c of candidates) {
       // Keyword boost (approximation): if query tokens appear in snippet, treat as body_text match.
       if (banks.boostsKeyword?.config?.enabled) {
-        const maxTotalBoost = safeNumber(
-          banks.boostsKeyword.config.actionsContract?.thresholds?.maxTotalBoost,
-          0.22,
-        );
-        const wBody = safeNumber(
-          banks.boostsKeyword.config.regionWeights?.body_text,
-          0.03,
-        );
-        const q = (req.query ?? "").toLowerCase();
-        const s = (c.snippet ?? "").toLowerCase();
-        let hitCount = 0;
-        for (const tok of this.simpleTokens(q)) {
-          if (tok.length < 3) continue;
-          if (s.includes(tok)) hitCount++;
+        const snippet = String(c.snippet || "").toLowerCase();
+        const title = String(c.title || "").toLowerCase();
+        const section = String(c.location?.sectionKey || "").toLowerCase();
+        let genericHits = 0;
+        let specificHits = 0;
+        let boost = 0;
+        for (const token of queryTokens) {
+          if (
+            !snippet.includes(token) &&
+            !title.includes(token) &&
+            !section.includes(token)
+          ) {
+            continue;
+          }
+          const isGeneric = genericTerms.has(token);
+          if (isGeneric) genericHits += 1;
+          else specificHits += 1;
+          if (title.includes(token)) boost += keywordTitleWeight;
+          else if (section.includes(token)) boost += keywordHeadingWeight;
+          else boost += keywordBodyWeight;
         }
-        const rawBoost = Math.min(maxTotalBoost, hitCount * wBody);
-        c.scores.keywordBoost = clamp01(rawBoost);
+        if (genericHits > 0 && specificHits === 0) {
+          c.scores.penalties = clamp01(
+            (c.scores.penalties ?? 0) + genericPenalty,
+          );
+          boost = Math.max(0, boost - genericPenalty);
+        }
+        c.scores.keywordBoost = clamp01(Math.min(keywordCap, boost));
       }
 
       // Title boost (approx): if active doc matches / explicit filename, boost strongly
       if (banks.boostsTitle?.config?.enabled) {
-        const maxTotal = safeNumber(
-          banks.boostsTitle.config.actionsContract?.thresholds
-            ?.maxTotalTitleBoost,
-          0.18,
-        );
         let b = 0;
         if (
           signals.explicitDocRef &&
           signals.resolvedDocId &&
           c.docId === signals.resolvedDocId
         )
-          b += 0.12;
-        if (signals.activeDocId && c.docId === signals.activeDocId) b += 0.06;
-        c.scores.titleBoost = clamp01(Math.min(maxTotal, b));
+          b += safeNumber(titleWeights.exact_filename, 0.12);
+        if (signals.activeDocId && c.docId === signals.activeDocId) {
+          b += safeNumber(titleWeights.high_overlap, 0.1) * 0.6;
+        }
+
+        const titleTokens = this.simpleTokens(
+          `${String(c.title || "")} ${String(c.filename || "")}`,
+        );
+        const overlap = this.computeTokenOverlap(queryTokens, titleTokens);
+        const genericOnlyRef = this.isGenericDocReferenceQuery(query, titleCfg);
+        if (!genericOnlyRef) {
+          if (
+            overlap.overlapCount >= titleMinTokens &&
+            overlap.overlapRatio >= 0.7
+          ) {
+            b += safeNumber(titleWeights.high_overlap, 0.1);
+          } else if (
+            overlap.overlapCount >= titleMinTokens &&
+            overlap.overlapRatio >= titleMinOverlapRatio
+          ) {
+            b += safeNumber(titleWeights.partial, 0.07);
+          }
+        }
+        c.scores.titleBoost = clamp01(Math.min(titleCap, b));
       }
 
       // Type boost (very light): apply if query hints spreadsheet/pdf, etc. (we only know via signals)
       if (banks.boostsType?.config?.enabled) {
+        const candidateType = this.resolveCandidateTypeTag(c);
         let b = 0;
-        if (signals.rangeExplicit || signals.sheetHintPresent) b += 0.08;
-        if (signals.userAskedForQuote) b += 0; // quotes don’t need type preference
-        c.scores.typeBoost = clamp01(Math.min(0.12, b));
+        if (candidateType && expectedTypeTags.has(candidateType)) {
+          b += safeNumber(typeCfg.typeWeights?.[candidateType], 0.06);
+        }
+        c.scores.typeBoost = clamp01(Math.min(typeCap, b));
       }
 
       // Recency boost: requires doc metadata; apply lightly; reduce if time constraints present
-      if (banks.boostsRecency?.config?.enabled && allowRecencyBoost) {
-        // Without doc meta age days we can’t compute precisely; keep 0 unless you wire doc meta.
-        c.scores.recencyBoost = 0;
+      if (
+        banks.boostsRecency?.config?.enabled &&
+        !disableRecencyForDocLock &&
+        !disableRecencyForExplicitTimeWindow
+      ) {
+        const docMeta = docMetaById?.get(c.docId);
+        const ageDays = this.resolveDocAgeDays(docMeta);
+        if (ageDays == null) {
+          c.scores.recencyBoost = 0;
+        } else {
+          let recencyBoost = 0;
+          if (ageDays <= safeNumber(recencyThresholds.recentDaysStrong, 7)) {
+            recencyBoost = safeNumber(recencyWeights.strong, 0.05);
+          } else if (
+            ageDays <= safeNumber(recencyThresholds.recentDaysMedium, 30)
+          ) {
+            recencyBoost = safeNumber(recencyWeights.medium, 0.03);
+          } else if (
+            ageDays <= safeNumber(recencyThresholds.recentDaysLight, 90)
+          ) {
+            recencyBoost = safeNumber(recencyWeights.light, 0.015);
+          }
+          recencyBoost *= recencyScale;
+          c.scores.recencyBoost = clamp01(Math.min(recencyCap, recencyBoost));
+        }
       } else {
         c.scores.recencyBoost = 0;
       }
     }
 
     return candidates;
+  }
+
+  private computeTokenOverlap(
+    queryTokens: string[],
+    targetTokens: string[],
+  ): { overlapCount: number; overlapRatio: number } {
+    if (!queryTokens.length || !targetTokens.length) {
+      return { overlapCount: 0, overlapRatio: 0 };
+    }
+    const targetSet = new Set(targetTokens.map((token) => token.toLowerCase()));
+    const overlapCount = queryTokens.filter((token) =>
+      targetSet.has(token),
+    ).length;
+    const overlapRatio = overlapCount / Math.max(1, queryTokens.length);
+    return { overlapCount, overlapRatio };
+  }
+
+  private isGenericDocReferenceQuery(query: string, titleCfg: any): boolean {
+    const clean = String(query || "")
+      .trim()
+      .toLowerCase();
+    if (!clean) return false;
+    const patterns = [
+      ...(Array.isArray(titleCfg?.genericDocRefGuard?.patterns?.en)
+        ? titleCfg.genericDocRefGuard.patterns.en
+        : []),
+      ...(Array.isArray(titleCfg?.genericDocRefGuard?.patterns?.pt)
+        ? titleCfg.genericDocRefGuard.patterns.pt
+        : []),
+      ...(Array.isArray(titleCfg?.genericDocRefGuard?.patterns?.es)
+        ? titleCfg.genericDocRefGuard.patterns.es
+        : []),
+    ]
+      .map((pattern: unknown) => String(pattern || "").trim())
+      .filter(Boolean);
+    return patterns.some((pattern) => this.regexMatches(clean, pattern));
+  }
+
+  private resolveCandidateTypeTag(candidate: CandidateChunk): string | null {
+    const filename = String(candidate.filename || "").toLowerCase();
+    const docType = String(candidate.docType || "").toLowerCase();
+    const raw = `${filename} ${docType}`;
+    if (/\b(pdf|application\/pdf)\b/.test(raw)) return "pdf";
+    if (/\b(xlsx|xls|csv|spreadsheet|sheet)\b/.test(raw)) return "spreadsheet";
+    if (/\b(ppt|pptx|slide|presentation)\b/.test(raw)) return "slides";
+    if (/\b(png|jpg|jpeg|webp|gif|image)\b/.test(raw)) return "image";
+    if (/\b(txt|text|doc|docx)\b/.test(raw)) return "text";
+    return null;
+  }
+
+  private applyRetrievalPlanHints(
+    candidates: CandidateChunk[],
+    retrievalPlan?: Partial<RetrievalPlan> | null,
+  ): CandidateChunk[] {
+    if (!retrievalPlan) return candidates;
+
+    const requiredTerms = this.normalizePlanHintTerms(
+      retrievalPlan.requiredTerms,
+      10,
+    );
+    const excludedTerms = this.normalizePlanHintTerms(
+      retrievalPlan.excludedTerms,
+      10,
+    );
+    const docTypePreferences = this.normalizePlanHintTerms(
+      retrievalPlan.docTypePreferences,
+      4,
+    );
+    const locationTargets = Array.isArray(retrievalPlan.locationTargets)
+      ? retrievalPlan.locationTargets
+          .map((target) => {
+            const rawType = String((target as any)?.type || "")
+              .trim()
+              .toLowerCase();
+            const rawValue = String((target as any)?.value || "")
+              .trim()
+              .toLowerCase();
+            if (!rawType || !rawValue) return null;
+            return { type: rawType, value: rawValue };
+          })
+          .filter(
+            (target): target is { type: string; value: string } =>
+              target !== null,
+          )
+          .slice(0, 8)
+      : [];
+
+    if (
+      requiredTerms.length === 0 &&
+      excludedTerms.length === 0 &&
+      docTypePreferences.length === 0 &&
+      locationTargets.length === 0
+    ) {
+      return candidates;
+    }
+
+    for (const candidate of candidates) {
+      const searchable = this.buildSearchableTextForPlannerHint(candidate);
+      if (requiredTerms.length > 0) {
+        const requiredHits = requiredTerms.filter((term) =>
+          searchable.includes(term),
+        ).length;
+        if (requiredHits > 0) {
+          candidate.scores.keywordBoost = clamp01(
+            (candidate.scores.keywordBoost ?? 0) +
+              Math.min(0.18, requiredHits * 0.05),
+          );
+        } else {
+          candidate.scores.penalties = clamp01(
+            (candidate.scores.penalties ?? 0) + 0.06,
+          );
+        }
+      }
+
+      if (excludedTerms.length > 0) {
+        const excludedHits = excludedTerms.filter((term) =>
+          searchable.includes(term),
+        ).length;
+        if (excludedHits > 0) {
+          candidate.scores.penalties = clamp01(
+            (candidate.scores.penalties ?? 0) +
+              Math.min(0.28, excludedHits * 0.1),
+          );
+        }
+      }
+
+      if (docTypePreferences.length > 0) {
+        const docType = this.normalizeDocType(candidate.docType);
+        if (docType && docTypePreferences.includes(docType)) {
+          candidate.scores.typeBoost = clamp01(
+            (candidate.scores.typeBoost ?? 0) + 0.08,
+          );
+        }
+      }
+
+      if (locationTargets.length > 0) {
+        const hit = locationTargets.some((target) =>
+          this.matchesPlannerLocationTarget(candidate, target),
+        );
+        if (hit) {
+          candidate.scores.keywordBoost = clamp01(
+            (candidate.scores.keywordBoost ?? 0) + 0.07,
+          );
+        }
+      }
+    }
+
+    return candidates;
+  }
+
+  private normalizePlanHintTerms(values: unknown, maxItems: number): string[] {
+    if (!Array.isArray(values)) return [];
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const value of values) {
+      const normalized = String(value || "")
+        .trim()
+        .toLowerCase();
+      if (!normalized) continue;
+      if (seen.has(normalized)) continue;
+      seen.add(normalized);
+      out.push(normalized);
+      if (out.length >= maxItems) break;
+    }
+    return out;
+  }
+
+  private buildSearchableTextForPlannerHint(candidate: CandidateChunk): string {
+    const parts = [
+      candidate.snippet,
+      candidate.rawText,
+      candidate.title,
+      candidate.filename,
+      candidate.docType,
+      candidate.location.sectionKey,
+      candidate.location.sheet,
+      candidate.location.page != null ? `page ${candidate.location.page}` : "",
+      candidate.location.slide != null
+        ? `slide ${candidate.location.slide}`
+        : "",
+    ]
+      .map((value) => String(value || "").trim().toLowerCase())
+      .filter(Boolean);
+    return parts.join(" ");
+  }
+
+  private matchesPlannerLocationTarget(
+    candidate: CandidateChunk,
+    target: { type: string; value: string },
+  ): boolean {
+    if (!target.value) return false;
+    if (target.type === "sheet") {
+      return String(candidate.location.sheet || "")
+        .trim()
+        .toLowerCase()
+        .includes(target.value);
+    }
+    if (target.type === "section") {
+      return String(candidate.location.sectionKey || "")
+        .trim()
+        .toLowerCase()
+        .includes(target.value);
+    }
+    if (target.type === "page") {
+      return String(candidate.location.page ?? "").trim() === target.value;
+    }
+    if (target.type === "slide") {
+      return String(candidate.location.slide ?? "").trim() === target.value;
+    }
+    if (target.type === "cell" || target.type === "range") {
+      return String(candidate.snippet || "")
+        .trim()
+        .toLowerCase()
+        .includes(target.value);
+    }
+    return this.buildSearchableTextForPlannerHint(candidate).includes(
+      target.value,
+    );
+  }
+
+  private resolveExpectedTypeTags(
+    signals: RetrievalRequest["signals"],
+    queryLower: string,
+  ): Set<string> {
+    const expected = new Set<string>();
+    if (signals.rangeExplicit || signals.sheetHintPresent) {
+      expected.add("spreadsheet");
+    }
+    if (signals.userAskedForQuote) {
+      expected.add("pdf");
+      expected.add("text");
+    }
+    if (signals.userAskedForTable || signals.tableExpected) {
+      expected.add("spreadsheet");
+    }
+    if (
+      /\b(sheet|tab|xlsx|csv|range|aba|planilha|hoja|rango)\b/.test(queryLower)
+    ) {
+      expected.add("spreadsheet");
+    }
+    if (/\b(page|pdf|section|página|pagina|seção|seccion)\b/.test(queryLower)) {
+      expected.add("pdf");
+    }
+    if (
+      /\b(slide|deck|pptx|diapositiva|apresentação|presentacion)\b/.test(
+        queryLower,
+      )
+    ) {
+      expected.add("slides");
+    }
+    if (
+      /\b(image|photo|screenshot|ocr|png|jpg|jpeg|imagem|foto|captura|imagen)\b/.test(
+        queryLower,
+      )
+    ) {
+      expected.add("image");
+    }
+    return expected;
+  }
+
+  private resolveDocAgeDays(docMeta: DocMeta | undefined): number | null {
+    if (!docMeta) return null;
+    const rawTimestamp = docMeta.updatedAt || docMeta.createdAt || null;
+    if (!rawTimestamp) return null;
+    const ts = Date.parse(String(rawTimestamp));
+    if (!Number.isFinite(ts)) return null;
+    const ageMs = Date.now() - ts;
+    if (!Number.isFinite(ageMs)) return null;
+    return Math.max(0, ageMs / (1000 * 60 * 60 * 24));
   }
 
   // -----------------------------
@@ -2194,6 +2795,7 @@ export class RetrievalEngineService {
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
     rankerCfg: any,
+    routingPriorityBank?: any,
   ): CandidateChunk[] {
     const cfg = rankerCfg?.config;
     const weights = cfg?.weights ?? {
@@ -2202,9 +2804,14 @@ export class RetrievalEngineService {
       structural: 0.14,
       titleBoost: 0.06,
       documentIntelligenceBoost: 0.08,
+      routingPriorityBoost: 0.04,
       typeBoost: 0.03,
       recencyBoost: 0.03,
     };
+    const familyPriorityBoost = this.resolveIntentFamilyPriorityBoost(
+      signals.intentFamily,
+      routingPriorityBank,
+    );
     for (const c of candidates) {
       const semantic = clamp01(c.scores.semantic ?? 0);
       const lexical = clamp01(c.scores.lexical ?? 0);
@@ -2216,6 +2823,11 @@ export class RetrievalEngineService {
       const documentIntelligenceBoost = clamp01(
         c.scores.documentIntelligenceBoost ?? 0,
       );
+      const routingPriorityBoost = clamp01(
+        familyPriorityBoost +
+          this.resolveSourceAffinityBoost(signals.intentFamily, c.source),
+      );
+      c.scores.routingPriorityBoost = routingPriorityBoost;
       const typeBoost = clamp01(c.scores.typeBoost ?? 0);
       const recencyBoost = clamp01(c.scores.recencyBoost ?? 0);
 
@@ -2228,6 +2840,7 @@ export class RetrievalEngineService {
         weights.titleBoost * titleBoost +
         safeNumber(weights.documentIntelligenceBoost, 0.08) *
           documentIntelligenceBoost +
+        safeNumber(weights.routingPriorityBoost, 0.04) * routingPriorityBoost +
         weights.typeBoost * typeBoost +
         weights.recencyBoost * recencyBoost -
         penalties;
@@ -2250,6 +2863,93 @@ export class RetrievalEngineService {
     });
 
     return candidates;
+  }
+
+  private resolveIntentFamilyPriorityBoost(
+    intentFamily: string | null | undefined,
+    routingPriorityBank: any,
+  ): number {
+    if (!routingPriorityBank?.config?.enabled) return 0;
+    const priorities =
+      routingPriorityBank?.intentFamilyBasePriority &&
+      typeof routingPriorityBank.intentFamilyBasePriority === "object"
+        ? (routingPriorityBank.intentFamilyBasePriority as Record<
+            string,
+            unknown
+          >)
+        : null;
+    if (!priorities) return 0;
+    const values = Object.values(priorities)
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value) && value > 0);
+    if (values.length === 0) return 0;
+    const family = String(intentFamily || "general")
+      .trim()
+      .toLowerCase();
+    const rawPriority = Number(priorities[family] ?? priorities.general ?? 0);
+    if (!Number.isFinite(rawPriority) || rawPriority <= 0) return 0;
+    const maxPriority = Math.max(...values);
+    if (maxPriority <= 0) return 0;
+    const stageWeight = this.resolveRoutingStageWeight(
+      routingPriorityBank,
+      "intent_family_priority",
+    );
+    const stageScale = stageWeight > 0 ? stageWeight : 1;
+    return Math.max(
+      0,
+      Math.min(0.08, (rawPriority / maxPriority) * 0.08 * stageScale),
+    );
+  }
+
+  private resolveRoutingStageWeight(
+    routingPriorityBank: any,
+    stageId: string,
+  ): number {
+    const stages = Array.isArray(routingPriorityBank?.tiebreakStages)
+      ? routingPriorityBank.tiebreakStages
+      : [];
+    if (stages.length === 0) return 0;
+    const maxWeight = Math.max(
+      ...stages
+        .map((stage: any) => Number(stage?.weight || 0))
+        .filter((weight: number) => Number.isFinite(weight) && weight > 0),
+      0,
+    );
+    if (maxWeight <= 0) return 0;
+    const stage = stages.find(
+      (entry: any) => String(entry?.id || "").trim() === stageId,
+    );
+    const raw = Number(stage?.weight || 0);
+    if (!Number.isFinite(raw) || raw <= 0) return 0;
+    return Math.max(0, Math.min(1, raw / maxWeight));
+  }
+
+  private resolveSourceAffinityBoost(
+    intentFamily: string | null | undefined,
+    source: CandidateSource,
+  ): number {
+    const family = String(intentFamily || "")
+      .trim()
+      .toLowerCase();
+    if (family === "documents" || family === "doc_stats") {
+      if (source === "semantic") return 0.02;
+      if (source === "structural") return 0.015;
+      return 0;
+    }
+    if (family === "file_actions") {
+      if (source === "lexical") return 0.02;
+      if (source === "structural") return 0.01;
+      return 0;
+    }
+    if (family === "editing") {
+      if (source === "structural") return 0.02;
+      return 0;
+    }
+    if (family === "help" || family === "conversation") {
+      if (source === "semantic") return 0.01;
+      return 0;
+    }
+    return 0;
   }
 
   // -----------------------------
@@ -2388,7 +3088,10 @@ export class RetrievalEngineService {
     const maxDistinctDocsNonCompare = Math.max(
       1,
       Math.floor(
-        safeNumber(cfg.actionsContract?.thresholds?.maxDistinctDocsNonCompare, 1),
+        safeNumber(
+          cfg.actionsContract?.thresholds?.maxDistinctDocsNonCompare,
+          1,
+        ),
       ),
     );
     const maxDistinctDocsExploratoryNonCompare = Math.max(
@@ -2402,7 +3105,9 @@ export class RetrievalEngineService {
     );
     const maxPerSectionHard = Math.max(
       1,
-      Math.floor(safeNumber(cfg.actionsContract?.thresholds?.maxPerSectionHard, 1)),
+      Math.floor(
+        safeNumber(cfg.actionsContract?.thresholds?.maxPerSectionHard, 1),
+      ),
     );
     const maxPerSectionExploratoryHard = Math.max(
       maxPerSectionHard,
@@ -2418,7 +3123,10 @@ export class RetrievalEngineService {
       Math.floor(
         safeNumber(
           cfg.actionsContract?.thresholds?.maxNearDuplicatesPerDocPackaging,
-          safeNumber(cfg.actionsContract?.thresholds?.maxNearDuplicatesPerDoc, 1),
+          safeNumber(
+            cfg.actionsContract?.thresholds?.maxNearDuplicatesPerDoc,
+            1,
+          ),
         ),
       ),
     );
@@ -2515,7 +3223,8 @@ export class RetrievalEngineService {
         const sectionKey = String(c.location?.sectionKey || "__unknown__")
           .trim()
           .toLowerCase();
-        const sectionMap = perDocSectionCounts.get(c.docId) ?? new Map<string, number>();
+        const sectionMap =
+          perDocSectionCounts.get(c.docId) ?? new Map<string, number>();
         const sectionCount = sectionMap.get(sectionKey) ?? 0;
         if (sectionCount >= effectiveMaxPerSectionHard) continue;
 
@@ -2524,7 +3233,8 @@ export class RetrievalEngineService {
           .update(this.normalizeForNearDup(c.snippet))
           .digest("hex")
           .slice(0, 16);
-        const hashMap = perDocSnippetHashes.get(c.docId) ?? new Map<string, number>();
+        const hashMap =
+          perDocSnippetHashes.get(c.docId) ?? new Map<string, number>();
         const hashCount = hashMap.get(snippetHash) ?? 0;
         if (hashCount >= effectiveMaxNearDuplicatesPerDocPackaging) continue;
 
@@ -2561,6 +3271,7 @@ export class RetrievalEngineService {
             keywordBoost: c.scores.keywordBoost ?? 0,
             titleBoost: c.scores.titleBoost ?? 0,
             documentIntelligenceBoost: c.scores.documentIntelligenceBoost ?? 0,
+            routingPriorityBoost: c.scores.routingPriorityBoost ?? 0,
             typeBoost: c.scores.typeBoost ?? 0,
             recencyBoost: c.scores.recencyBoost ?? 0,
           },

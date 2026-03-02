@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "di_doc_type_ontology",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "owner": "document_intelligence",
     "languages": [
       "en",
@@ -17,7 +17,7 @@
     "tests": [
       "SSOT_DOCTYPE_001"
     ],
-    "lastUpdated": "2026-02-28",
+    "lastUpdated": "2026-03-01",
     "description": "di_doc_type_ontology (document_intelligence) configuration bank."
   },
   "config": {
@@ -51,7 +51,7 @@
   "docTypes": [
     {
       "id": "access_control_policy",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Access Control Policy",
       "labelPt": "Política de Controle de Acesso",
       "category": "policy"
@@ -121,7 +121,7 @@
     },
     {
       "id": "audit_checklist",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Audit Checklist",
       "labelPt": "Checklist de Auditoria",
       "category": "checklist"
@@ -333,7 +333,7 @@
     },
     {
       "id": "bcp_plan",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "BCP Plan",
       "labelPt": "Plano de Continuidade de Negócios",
       "category": "plan"
@@ -800,14 +800,14 @@
     },
     {
       "id": "business_requirements_document",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Business Requirements Document",
       "labelPt": "Documento de Requisitos de Negócios",
       "category": "report"
     },
     {
       "id": "capacity_plan",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Capacity Plan",
       "labelPt": "Plano de Capacidade",
       "category": "plan"
@@ -856,7 +856,7 @@
     },
     {
       "id": "change_request",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Change Request",
       "labelPt": "Solicitação de Mudança",
       "category": "request"
@@ -891,7 +891,7 @@
     },
     {
       "id": "compliance_runbook",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Compliance Runbook",
       "labelPt": "Runbook de Conformidade",
       "category": "playbook"
@@ -947,7 +947,7 @@
     },
     {
       "id": "customer_support_playbook",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Customer Support Playbook",
       "labelPt": "Playbook de Suporte ao Cliente",
       "category": "playbook"
@@ -961,7 +961,7 @@
     },
     {
       "id": "data_retention_schedule",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Data Retention Schedule",
       "labelPt": "Cronograma de Retenção de Dados",
       "category": "schedule"
@@ -989,7 +989,7 @@
     },
     {
       "id": "disaster_recovery_plan",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Disaster Recovery Plan",
       "labelPt": "Plano de Recuperação de Desastres",
       "category": "plan"
@@ -1182,7 +1182,7 @@
     },
     {
       "id": "escalation_matrix",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Escalation Matrix",
       "labelPt": "Matriz de Escalonamento",
       "category": "matrix"
@@ -1716,14 +1716,14 @@
     },
     {
       "id": "incident_postmortem",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Incident Postmortem",
       "labelPt": "Post-Mortem de Incidente",
       "category": "report"
     },
     {
       "id": "incident_report",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Incident Report",
       "labelPt": "Relatório de Incidente",
       "category": "report"
@@ -1950,7 +1950,7 @@
     },
     {
       "id": "inventory_report",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Inventory Report",
       "labelPt": "Relatório de Inventário",
       "category": "report"
@@ -1971,7 +1971,7 @@
     },
     {
       "id": "it_asset_register",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "IT Asset Register",
       "labelPt": "Registro de Ativos de TI",
       "category": "register"
@@ -1985,7 +1985,7 @@
     },
     {
       "id": "kpi_dashboard",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "KPI Dashboard",
       "labelPt": "Painel de KPIs",
       "category": "dashboard"
@@ -2027,7 +2027,7 @@
     },
     {
       "id": "maintenance_log",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Maintenance Log",
       "labelPt": "Registro de Manutenção",
       "category": "log"
@@ -2062,7 +2062,7 @@
     },
     {
       "id": "meeting_minutes",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Meeting Minutes",
       "labelPt": "Ata de Reunião",
       "category": "record"
@@ -2090,7 +2090,7 @@
     },
     {
       "id": "onboarding_checklist",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Onboarding Checklist",
       "labelPt": "Checklist de Integração",
       "category": "checklist"
@@ -2139,7 +2139,7 @@
     },
     {
       "id": "policy_manual",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Policy Manual",
       "labelPt": "Manual de Políticas",
       "category": "manual"
@@ -2167,14 +2167,14 @@
     },
     {
       "id": "process_map",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Process Map",
       "labelPt": "Mapa de Processos",
       "category": "map"
     },
     {
       "id": "procurement_request",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Procurement Request",
       "labelPt": "Solicitação de Compras",
       "category": "request"
@@ -2195,7 +2195,7 @@
     },
     {
       "id": "project_status_report",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Project Status Report",
       "labelPt": "Relatório de Status do Projeto",
       "category": "report"
@@ -2209,7 +2209,7 @@
     },
     {
       "id": "quality_assurance_checklist",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Quality Assurance Checklist",
       "labelPt": "Checklist de Garantia de Qualidade",
       "category": "checklist"
@@ -2237,35 +2237,35 @@
     },
     {
       "id": "release_checklist",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Release Checklist",
       "labelPt": "Checklist de Release",
       "category": "checklist"
     },
     {
       "id": "risk_register",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Risk Register",
       "labelPt": "Registro de Riscos",
       "category": "register"
     },
     {
       "id": "runbook",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Runbook",
       "labelPt": "Runbook",
       "category": "playbook"
     },
     {
       "id": "service_catalog",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Service Catalog",
       "labelPt": "Catálogo de Serviços",
       "category": "catalog"
     },
     {
       "id": "service_level_agreement",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Service Level Agreement",
       "labelPt": "Acordo de Nível de Serviço",
       "category": "agreement"
@@ -2286,7 +2286,7 @@
     },
     {
       "id": "standard_operating_procedure",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Standard Operating Procedure",
       "labelPt": "Procedimento Operacional Padrão",
       "category": "manual"
@@ -2530,7 +2530,7 @@
     },
     {
       "id": "training_manual",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Training Manual",
       "labelPt": "Manual de Treinamento",
       "category": "manual"
@@ -2708,7 +2708,7 @@
     },
     {
       "id": "vendor_performance_review",
-      "domainId": "operations",
+      "domainId": "ops",
       "label": "Vendor Performance Review",
       "labelPt": "Avaliação de Desempenho de Fornecedor",
       "category": "review"

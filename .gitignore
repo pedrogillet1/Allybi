@@ -77,3 +77,4 @@ tmpclaude-*-cwd/
 *.patch
 backend/src/services/analytics/feedbackLogger.service.ts
 .worktrees/
+backend/notes/BANK_FIX_PLAN.md

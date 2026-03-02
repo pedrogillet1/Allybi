@@ -47,6 +47,13 @@ const CAPABILITIES: Record<ConnectorProvider, ConnectorCapabilities> = {
   slack: { oauth: true, sync: true, search: true, send: false, realtime: true },
 };
 
+function slackRealtimeEnabled(): boolean {
+  return (
+    String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
+    "true"
+  );
+}
+
 const ENV_REQUIREMENTS: Record<ConnectorProvider, string[]> = {
   // Prefer dedicated Gmail OAuth vars (callback path differs from Google-login callback).
   // Backward compatibility is handled inside gmailOAuth.service.ts.
@@ -87,7 +94,11 @@ export function listConnectorProviders(): ConnectorProvider[] {
 export function getConnectorCapabilities(
   provider: ConnectorProvider,
 ): ConnectorCapabilities {
-  return CAPABILITIES[provider];
+  if (provider !== "slack") return CAPABILITIES[provider];
+  return {
+    ...CAPABILITIES.slack,
+    realtime: slackRealtimeEnabled(),
+  };
 }
 
 export function getConnectorEnvRequirements(
@@ -114,7 +125,13 @@ export async function getConnector(
 
   const normalized: ConnectorModule = {
     provider,
-    capabilities: registered.capabilities ?? CAPABILITIES[provider],
+    capabilities:
+      provider === "slack"
+        ? {
+            ...(registered.capabilities ?? CAPABILITIES[provider]),
+            realtime: slackRealtimeEnabled(),
+          }
+        : (registered.capabilities ?? CAPABILITIES[provider]),
     oauthService: registered.oauthService,
     clientService: registered.clientService,
     syncService: registered.syncService,
@@ -136,7 +153,13 @@ export function registerConnector(
 
   registeredModules.set(provider, {
     provider,
-    capabilities: module.capabilities ?? CAPABILITIES[provider],
+    capabilities:
+      provider === "slack"
+        ? {
+            ...(module.capabilities ?? CAPABILITIES[provider]),
+            realtime: slackRealtimeEnabled(),
+          }
+        : (module.capabilities ?? CAPABILITIES[provider]),
     oauthService: module.oauthService,
     clientService: module.clientService,
     syncService: module.syncService,

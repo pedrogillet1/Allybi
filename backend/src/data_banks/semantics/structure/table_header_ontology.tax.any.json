@@ -1,16 +1,29 @@
 {
   "_meta": {
     "id": "table_header_ontology_tax",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for tax documents with multilingual synonym coverage.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "tax"
+    "domain": "tax",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "tax",
   "headers": [
@@ -33,7 +46,11 @@
         "adjusted_gross_income_code",
         "adjusted_gross_income_number",
         "adjusted_gross_income_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_amount",
+      "curationReason": "weighted:adjusted_gross_income_amount:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_code",
@@ -52,7 +69,11 @@
         "adjusted_gross_income_count",
         "adjusted_gross_income_quantity",
         "adjusted_gross_income_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_code",
+      "curationReason": "weighted:adjusted_gross_income_code:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_count",
@@ -69,7 +90,11 @@
         "adjusted_gross_income_date",
         "adjusted_gross_income_rate",
         "adjusted_gross_income_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_count",
+      "curationReason": "weighted:adjusted_gross_income_count:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_date",
@@ -88,7 +113,11 @@
         "adjusted_gross_income_end_date",
         "adjusted_gross_income_start_date",
         "amount_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_date",
+      "curationReason": "weighted:adjusted_gross_income_date:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_end_date",
@@ -107,7 +136,11 @@
         "adjusted_gross_income_id",
         "adjusted_gross_income_status",
         "amount_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_end_date",
+      "curationReason": "weighted:adjusted_gross_income_end_date:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_id",
@@ -124,7 +157,11 @@
         "adjusted_gross_income_name",
         "adjusted_gross_income_subtotal",
         "amount_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_id",
+      "curationReason": "weighted:adjusted_gross_income_id:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_name",
@@ -143,7 +180,11 @@
         "adjusted_gross_income_number",
         "adjusted_gross_income_total",
         "amount_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_name",
+      "curationReason": "weighted:adjusted_gross_income_name:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_number",
@@ -163,7 +204,11 @@
         "adjusted_gross_income_quantity",
         "adjusted_gross_income_type",
         "amount_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_number",
+      "curationReason": "weighted:adjusted_gross_income_number:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_quantity",
@@ -183,7 +228,11 @@
         "adjusted_gross_income_rate",
         "adjusted_gross_income_unit",
         "amount_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_quantity",
+      "curationReason": "weighted:adjusted_gross_income_quantity:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_rate",
@@ -202,7 +251,11 @@
         "adjusted_gross_income_start_date",
         "amount_amount",
         "amount_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_rate",
+      "curationReason": "weighted:adjusted_gross_income_rate:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_start_date",
@@ -221,7 +274,11 @@
         "adjusted_gross_income_status",
         "amount_code",
         "amount_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_start_date",
+      "curationReason": "weighted:adjusted_gross_income_start_date:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_status",
@@ -238,7 +295,11 @@
         "adjusted_gross_income_subtotal",
         "amount_count",
         "amount_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_status",
+      "curationReason": "weighted:adjusted_gross_income_status:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_subtotal",
@@ -255,7 +316,11 @@
         "adjusted_gross_income_total",
         "amount_date",
         "amount_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_subtotal",
+      "curationReason": "weighted:adjusted_gross_income_subtotal:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_total",
@@ -272,7 +337,11 @@
         "adjusted_gross_income_type",
         "amount_end_date",
         "amount_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_total",
+      "curationReason": "weighted:adjusted_gross_income_total:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_type",
@@ -291,7 +360,11 @@
         "adjusted_gross_income_unit",
         "amount_id",
         "amount_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_type",
+      "curationReason": "weighted:adjusted_gross_income_type:domain_general"
     },
     {
       "canonical": "adjusted_gross_income_unit",
@@ -310,7 +383,11 @@
         "amount_amount",
         "amount_name",
         "amount_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_adjusted_gross_income_unit",
+      "curationReason": "weighted:adjusted_gross_income_unit:domain_general"
     },
     {
       "canonical": "amount_amount",
@@ -331,7 +408,11 @@
         "amount_code",
         "amount_number",
         "amount_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_amount",
+      "curationReason": "weighted:amount_amount:domain_general"
     },
     {
       "canonical": "amount_code",
@@ -352,7 +433,11 @@
         "amount_count",
         "amount_quantity",
         "amount_type"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_code",
+      "curationReason": "weighted:amount_code:domain_general"
     },
     {
       "canonical": "amount_count",
@@ -373,7 +458,11 @@
         "amount_date",
         "amount_rate",
         "amount_unit"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_count",
+      "curationReason": "weighted:amount_count:domain_general"
     },
     {
       "canonical": "amount_date",
@@ -394,7 +483,11 @@
         "amount_end_date",
         "amount_start_date",
         "assessment_amount"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_date",
+      "curationReason": "weighted:amount_date:domain_general"
     },
     {
       "canonical": "amount_end_date",
@@ -415,7 +508,11 @@
         "amount_id",
         "amount_status",
         "assessment_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_end_date",
+      "curationReason": "weighted:amount_end_date:domain_general"
     },
     {
       "canonical": "amount_id",
@@ -436,7 +533,11 @@
         "amount_name",
         "amount_subtotal",
         "assessment_count"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_id",
+      "curationReason": "weighted:amount_id:domain_general"
     },
     {
       "canonical": "amount_name",
@@ -457,7 +558,11 @@
         "amount_number",
         "amount_total",
         "assessment_date"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_name",
+      "curationReason": "weighted:amount_name:domain_general"
     },
     {
       "canonical": "amount_number",
@@ -479,7 +584,11 @@
         "amount_quantity",
         "amount_type",
         "assessment_end_date"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_number",
+      "curationReason": "weighted:amount_number:domain_general"
     },
     {
       "canonical": "amount_quantity",
@@ -501,7 +610,11 @@
         "amount_rate",
         "amount_unit",
         "assessment_id"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_quantity",
+      "curationReason": "weighted:amount_quantity:domain_general"
     },
     {
       "canonical": "amount_rate",
@@ -522,7 +635,11 @@
         "amount_start_date",
         "assessment_amount",
         "assessment_name"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_rate",
+      "curationReason": "weighted:amount_rate:domain_general"
     },
     {
       "canonical": "amount_start_date",
@@ -543,7 +660,11 @@
         "amount_status",
         "assessment_code",
         "assessment_number"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_start_date",
+      "curationReason": "weighted:amount_start_date:domain_general"
     },
     {
       "canonical": "amount_status",
@@ -564,7 +685,11 @@
         "amount_subtotal",
         "assessment_count",
         "assessment_quantity"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_status",
+      "curationReason": "weighted:amount_status:domain_general"
     },
     {
       "canonical": "amount_subtotal",
@@ -585,7 +710,11 @@
         "amount_total",
         "assessment_date",
         "assessment_rate"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_subtotal",
+      "curationReason": "weighted:amount_subtotal:domain_general"
     },
     {
       "canonical": "amount_total",
@@ -606,7 +735,11 @@
         "amount_type",
         "assessment_end_date",
         "assessment_start_date"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_total",
+      "curationReason": "weighted:amount_total:domain_general"
     },
     {
       "canonical": "amount_type",
@@ -627,7 +760,11 @@
         "amount_unit",
         "assessment_id",
         "assessment_status"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_type",
+      "curationReason": "weighted:amount_type:domain_general"
     },
     {
       "canonical": "amount_unit",
@@ -648,7 +785,11 @@
         "assessment_amount",
         "assessment_name",
         "assessment_subtotal"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_unit",
+      "curationReason": "weighted:amount_unit:domain_general"
     },
     {
       "canonical": "assessment_amount",
@@ -669,7 +810,11 @@
         "assessment_code",
         "assessment_number",
         "assessment_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_amount",
+      "curationReason": "weighted:assessment_amount:domain_general"
     },
     {
       "canonical": "assessment_code",
@@ -688,7 +833,11 @@
         "assessment_count",
         "assessment_quantity",
         "assessment_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_code",
+      "curationReason": "weighted:assessment_code:domain_general"
     },
     {
       "canonical": "assessment_count",
@@ -705,7 +854,11 @@
         "assessment_date",
         "assessment_rate",
         "assessment_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_count",
+      "curationReason": "weighted:assessment_count:domain_general"
     },
     {
       "canonical": "assessment_date",
@@ -724,7 +877,11 @@
         "assessment_end_date",
         "assessment_start_date",
         "audit_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_date",
+      "curationReason": "weighted:assessment_date:domain_general"
     },
     {
       "canonical": "assessment_end_date",
@@ -743,7 +900,11 @@
         "assessment_id",
         "assessment_status",
         "audit_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_end_date",
+      "curationReason": "weighted:assessment_end_date:domain_general"
     },
     {
       "canonical": "assessment_id",
@@ -760,7 +921,11 @@
         "assessment_name",
         "assessment_subtotal",
         "audit_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_id",
+      "curationReason": "weighted:assessment_id:domain_general"
     },
     {
       "canonical": "assessment_name",
@@ -779,7 +944,11 @@
         "assessment_number",
         "assessment_total",
         "audit_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_name",
+      "curationReason": "weighted:assessment_name:domain_general"
     },
     {
       "canonical": "assessment_number",
@@ -799,7 +968,11 @@
         "assessment_quantity",
         "assessment_type",
         "audit_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_number",
+      "curationReason": "weighted:assessment_number:domain_general"
     },
     {
       "canonical": "assessment_quantity",
@@ -819,7 +992,11 @@
         "assessment_rate",
         "assessment_unit",
         "audit_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_quantity",
+      "curationReason": "weighted:assessment_quantity:domain_general"
     },
     {
       "canonical": "assessment_rate",
@@ -838,7 +1015,11 @@
         "assessment_start_date",
         "audit_amount",
         "audit_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_rate",
+      "curationReason": "weighted:assessment_rate:domain_general"
     },
     {
       "canonical": "assessment_start_date",
@@ -857,7 +1038,11 @@
         "assessment_status",
         "audit_code",
         "audit_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_start_date",
+      "curationReason": "weighted:assessment_start_date:domain_general"
     },
     {
       "canonical": "assessment_status",
@@ -874,7 +1059,11 @@
         "assessment_subtotal",
         "audit_count",
         "audit_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_status",
+      "curationReason": "weighted:assessment_status:domain_general"
     },
     {
       "canonical": "assessment_subtotal",
@@ -891,7 +1080,11 @@
         "assessment_total",
         "audit_date",
         "audit_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_subtotal",
+      "curationReason": "weighted:assessment_subtotal:domain_general"
     },
     {
       "canonical": "assessment_total",
@@ -908,7 +1101,11 @@
         "assessment_type",
         "audit_end_date",
         "audit_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_total",
+      "curationReason": "weighted:assessment_total:domain_general"
     },
     {
       "canonical": "assessment_type",
@@ -927,7 +1124,11 @@
         "assessment_unit",
         "audit_id",
         "audit_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_type",
+      "curationReason": "weighted:assessment_type:domain_general"
     },
     {
       "canonical": "assessment_unit",
@@ -946,7 +1147,11 @@
         "audit_amount",
         "audit_name",
         "audit_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_assessment_unit",
+      "curationReason": "weighted:assessment_unit:domain_general"
     },
     {
       "canonical": "audit_amount",
@@ -967,7 +1172,11 @@
         "audit_code",
         "audit_number",
         "audit_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_amount",
+      "curationReason": "weighted:audit_amount:domain_general"
     },
     {
       "canonical": "audit_code",
@@ -986,7 +1195,11 @@
         "audit_count",
         "audit_quantity",
         "audit_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_code",
+      "curationReason": "weighted:audit_code:domain_general"
     },
     {
       "canonical": "audit_count",
@@ -1003,7 +1216,11 @@
         "audit_date",
         "audit_rate",
         "audit_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_count",
+      "curationReason": "weighted:audit_count:domain_general"
     },
     {
       "canonical": "audit_date",
@@ -1022,7 +1239,11 @@
         "audit_end_date",
         "audit_start_date",
         "basis_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_date",
+      "curationReason": "weighted:audit_date:domain_general"
     },
     {
       "canonical": "audit_end_date",
@@ -1041,7 +1262,11 @@
         "audit_id",
         "audit_status",
         "basis_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_end_date",
+      "curationReason": "weighted:audit_end_date:domain_general"
     },
     {
       "canonical": "audit_id",
@@ -1058,7 +1283,11 @@
         "audit_name",
         "audit_subtotal",
         "basis_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_id",
+      "curationReason": "weighted:audit_id:domain_general"
     },
     {
       "canonical": "audit_name",
@@ -1077,7 +1306,11 @@
         "audit_number",
         "audit_total",
         "basis_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_name",
+      "curationReason": "weighted:audit_name:domain_general"
     },
     {
       "canonical": "audit_number",
@@ -1097,7 +1330,11 @@
         "audit_quantity",
         "audit_type",
         "basis_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_number",
+      "curationReason": "weighted:audit_number:domain_general"
     },
     {
       "canonical": "audit_quantity",
@@ -1117,7 +1354,11 @@
         "audit_rate",
         "audit_unit",
         "basis_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_quantity",
+      "curationReason": "weighted:audit_quantity:domain_general"
     },
     {
       "canonical": "audit_rate",
@@ -1136,7 +1377,11 @@
         "audit_start_date",
         "basis_amount",
         "basis_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_rate",
+      "curationReason": "weighted:audit_rate:domain_general"
     },
     {
       "canonical": "audit_start_date",
@@ -1155,7 +1400,11 @@
         "audit_status",
         "basis_code",
         "basis_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_start_date",
+      "curationReason": "weighted:audit_start_date:domain_general"
     },
     {
       "canonical": "audit_status",
@@ -1172,7 +1421,11 @@
         "audit_subtotal",
         "basis_count",
         "basis_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_status",
+      "curationReason": "weighted:audit_status:domain_general"
     },
     {
       "canonical": "audit_subtotal",
@@ -1189,7 +1442,11 @@
         "audit_total",
         "basis_date",
         "basis_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_subtotal",
+      "curationReason": "weighted:audit_subtotal:domain_general"
     },
     {
       "canonical": "audit_total",
@@ -1206,7 +1463,11 @@
         "audit_type",
         "basis_end_date",
         "basis_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_total",
+      "curationReason": "weighted:audit_total:domain_general"
     },
     {
       "canonical": "audit_type",
@@ -1225,7 +1486,11 @@
         "audit_unit",
         "basis_id",
         "basis_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_type",
+      "curationReason": "weighted:audit_type:domain_general"
     },
     {
       "canonical": "audit_unit",
@@ -1244,7 +1509,11 @@
         "basis_amount",
         "basis_name",
         "basis_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_unit",
+      "curationReason": "weighted:audit_unit:domain_general"
     },
     {
       "canonical": "basis_amount",
@@ -1265,7 +1534,11 @@
         "basis_code",
         "basis_number",
         "basis_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_amount",
+      "curationReason": "weighted:basis_amount:domain_general"
     },
     {
       "canonical": "basis_code",
@@ -1284,7 +1557,11 @@
         "basis_count",
         "basis_quantity",
         "basis_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_code",
+      "curationReason": "weighted:basis_code:domain_general"
     },
     {
       "canonical": "basis_count",
@@ -1301,7 +1578,11 @@
         "basis_date",
         "basis_rate",
         "basis_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_count",
+      "curationReason": "weighted:basis_count:domain_general"
     },
     {
       "canonical": "basis_date",
@@ -1320,7 +1601,11 @@
         "basis_end_date",
         "basis_start_date",
         "capital_gain_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_date",
+      "curationReason": "weighted:basis_date:domain_general"
     },
     {
       "canonical": "basis_end_date",
@@ -1339,7 +1624,11 @@
         "basis_id",
         "basis_status",
         "capital_gain_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_end_date",
+      "curationReason": "weighted:basis_end_date:domain_general"
     },
     {
       "canonical": "basis_id",
@@ -1356,7 +1645,11 @@
         "basis_name",
         "basis_subtotal",
         "capital_gain_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_id",
+      "curationReason": "weighted:basis_id:domain_general"
     },
     {
       "canonical": "basis_name",
@@ -1375,7 +1668,11 @@
         "basis_number",
         "basis_total",
         "capital_gain_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_name",
+      "curationReason": "weighted:basis_name:domain_general"
     },
     {
       "canonical": "basis_number",
@@ -1395,7 +1692,11 @@
         "basis_quantity",
         "basis_type",
         "capital_gain_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_number",
+      "curationReason": "weighted:basis_number:domain_general"
     },
     {
       "canonical": "basis_quantity",
@@ -1415,7 +1716,11 @@
         "basis_rate",
         "basis_unit",
         "capital_gain_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_quantity",
+      "curationReason": "weighted:basis_quantity:domain_general"
     },
     {
       "canonical": "basis_rate",
@@ -1434,7 +1739,11 @@
         "basis_start_date",
         "capital_gain_amount",
         "capital_gain_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_rate",
+      "curationReason": "weighted:basis_rate:domain_general"
     },
     {
       "canonical": "basis_start_date",
@@ -1453,7 +1762,11 @@
         "basis_status",
         "capital_gain_code",
         "capital_gain_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_start_date",
+      "curationReason": "weighted:basis_start_date:domain_general"
     },
     {
       "canonical": "basis_status",
@@ -1470,7 +1783,11 @@
         "basis_subtotal",
         "capital_gain_count",
         "capital_gain_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_status",
+      "curationReason": "weighted:basis_status:domain_general"
     },
     {
       "canonical": "basis_subtotal",
@@ -1487,7 +1804,11 @@
         "basis_total",
         "capital_gain_date",
         "capital_gain_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_subtotal",
+      "curationReason": "weighted:basis_subtotal:domain_general"
     },
     {
       "canonical": "basis_total",
@@ -1504,7 +1825,11 @@
         "basis_type",
         "capital_gain_end_date",
         "capital_gain_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_total",
+      "curationReason": "weighted:basis_total:domain_general"
     },
     {
       "canonical": "basis_type",
@@ -1523,7 +1848,11 @@
         "basis_unit",
         "capital_gain_id",
         "capital_gain_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_type",
+      "curationReason": "weighted:basis_type:domain_general"
     },
     {
       "canonical": "basis_unit",
@@ -1542,7 +1871,11 @@
         "capital_gain_amount",
         "capital_gain_name",
         "capital_gain_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_unit",
+      "curationReason": "weighted:basis_unit:domain_general"
     },
     {
       "canonical": "capital_gain_amount",
@@ -1563,7 +1896,11 @@
         "capital_gain_code",
         "capital_gain_number",
         "capital_gain_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_amount",
+      "curationReason": "weighted:capital_gain_amount:domain_general"
     },
     {
       "canonical": "capital_gain_code",
@@ -1582,7 +1919,11 @@
         "capital_gain_count",
         "capital_gain_quantity",
         "capital_gain_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_code",
+      "curationReason": "weighted:capital_gain_code:domain_general"
     },
     {
       "canonical": "capital_gain_count",
@@ -1599,7 +1940,11 @@
         "capital_gain_date",
         "capital_gain_rate",
         "capital_gain_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_count",
+      "curationReason": "weighted:capital_gain_count:domain_general"
     },
     {
       "canonical": "capital_gain_date",
@@ -1618,7 +1963,11 @@
         "capital_gain_end_date",
         "capital_gain_start_date",
         "credit_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_date",
+      "curationReason": "weighted:capital_gain_date:domain_general"
     },
     {
       "canonical": "capital_gain_end_date",
@@ -1637,7 +1986,11 @@
         "capital_gain_id",
         "capital_gain_status",
         "credit_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_end_date",
+      "curationReason": "weighted:capital_gain_end_date:domain_general"
     },
     {
       "canonical": "capital_gain_id",
@@ -1654,7 +2007,11 @@
         "capital_gain_name",
         "capital_gain_subtotal",
         "credit_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_id",
+      "curationReason": "weighted:capital_gain_id:domain_general"
     },
     {
       "canonical": "capital_gain_name",
@@ -1673,7 +2030,11 @@
         "capital_gain_number",
         "capital_gain_total",
         "credit_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_name",
+      "curationReason": "weighted:capital_gain_name:domain_general"
     },
     {
       "canonical": "capital_gain_number",
@@ -1693,7 +2054,11 @@
         "capital_gain_quantity",
         "capital_gain_type",
         "credit_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_number",
+      "curationReason": "weighted:capital_gain_number:domain_general"
     },
     {
       "canonical": "capital_gain_quantity",
@@ -1713,7 +2078,11 @@
         "capital_gain_rate",
         "capital_gain_unit",
         "credit_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_quantity",
+      "curationReason": "weighted:capital_gain_quantity:domain_general"
     },
     {
       "canonical": "capital_gain_rate",
@@ -1732,7 +2101,11 @@
         "capital_gain_start_date",
         "credit_amount",
         "credit_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_rate",
+      "curationReason": "weighted:capital_gain_rate:domain_general"
     },
     {
       "canonical": "capital_gain_start_date",
@@ -1751,7 +2124,11 @@
         "capital_gain_status",
         "credit_code",
         "credit_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_start_date",
+      "curationReason": "weighted:capital_gain_start_date:domain_general"
     },
     {
       "canonical": "capital_gain_status",
@@ -1768,7 +2145,11 @@
         "capital_gain_subtotal",
         "credit_count",
         "credit_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_status",
+      "curationReason": "weighted:capital_gain_status:domain_general"
     },
     {
       "canonical": "capital_gain_subtotal",
@@ -1785,7 +2166,11 @@
         "capital_gain_total",
         "credit_date",
         "credit_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_subtotal",
+      "curationReason": "weighted:capital_gain_subtotal:domain_general"
     },
     {
       "canonical": "capital_gain_total",
@@ -1802,7 +2187,11 @@
         "capital_gain_type",
         "credit_end_date",
         "credit_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_total",
+      "curationReason": "weighted:capital_gain_total:domain_general"
     },
     {
       "canonical": "capital_gain_type",
@@ -1821,7 +2210,11 @@
         "capital_gain_unit",
         "credit_id",
         "credit_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_type",
+      "curationReason": "weighted:capital_gain_type:domain_general"
     },
     {
       "canonical": "capital_gain_unit",
@@ -1840,7 +2233,11 @@
         "credit_amount",
         "credit_name",
         "credit_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gain_unit",
+      "curationReason": "weighted:capital_gain_unit:domain_general"
     },
     {
       "canonical": "credit_amount",
@@ -1861,7 +2258,11 @@
         "credit_code",
         "credit_number",
         "credit_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_amount",
+      "curationReason": "weighted:credit_amount:domain_general"
     },
     {
       "canonical": "credit_code",
@@ -1880,7 +2281,11 @@
         "credit_count",
         "credit_quantity",
         "credit_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_code",
+      "curationReason": "weighted:credit_code:domain_general"
     },
     {
       "canonical": "credit_count",
@@ -1899,7 +2304,11 @@
         "credit_date",
         "credit_rate",
         "credit_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_count",
+      "curationReason": "weighted:credit_count:domain_general"
     },
     {
       "canonical": "credit_date",
@@ -1918,7 +2327,11 @@
         "credit_end_date",
         "credit_start_date",
         "currency_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_date",
+      "curationReason": "weighted:credit_date:domain_general"
     },
     {
       "canonical": "credit_end_date",
@@ -1937,7 +2350,11 @@
         "credit_id",
         "credit_status",
         "currency_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_end_date",
+      "curationReason": "weighted:credit_end_date:domain_general"
     },
     {
       "canonical": "credit_id",
@@ -1956,7 +2373,11 @@
         "credit_name",
         "credit_subtotal",
         "currency_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_id",
+      "curationReason": "weighted:credit_id:domain_general"
     },
     {
       "canonical": "credit_name",
@@ -1975,7 +2396,11 @@
         "credit_number",
         "credit_total",
         "currency_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_name",
+      "curationReason": "weighted:credit_name:domain_general"
     },
     {
       "canonical": "credit_number",
@@ -1995,7 +2420,11 @@
         "credit_quantity",
         "credit_type",
         "currency_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_number",
+      "curationReason": "weighted:credit_number:domain_general"
     },
     {
       "canonical": "credit_quantity",
@@ -2015,7 +2444,11 @@
         "credit_rate",
         "credit_unit",
         "currency_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_quantity",
+      "curationReason": "weighted:credit_quantity:domain_general"
     },
     {
       "canonical": "credit_rate",
@@ -2034,7 +2467,11 @@
         "credit_start_date",
         "currency_amount",
         "currency_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_rate",
+      "curationReason": "weighted:credit_rate:domain_general"
     },
     {
       "canonical": "credit_start_date",
@@ -2053,7 +2490,11 @@
         "credit_status",
         "currency_code",
         "currency_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_start_date",
+      "curationReason": "weighted:credit_start_date:domain_general"
     },
     {
       "canonical": "credit_status",
@@ -2072,7 +2513,11 @@
         "credit_subtotal",
         "currency_count",
         "currency_quantity"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_status",
+      "curationReason": "weighted:credit_status:domain_general"
     },
     {
       "canonical": "credit_subtotal",
@@ -2091,7 +2536,11 @@
         "credit_total",
         "currency_date",
         "currency_rate"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_subtotal",
+      "curationReason": "weighted:credit_subtotal:domain_general"
     },
     {
       "canonical": "credit_total",
@@ -2110,7 +2559,11 @@
         "credit_type",
         "currency_end_date",
         "currency_start_date"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_total",
+      "curationReason": "weighted:credit_total:domain_general"
     },
     {
       "canonical": "credit_type",
@@ -2129,7 +2582,11 @@
         "credit_unit",
         "currency_id",
         "currency_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_type",
+      "curationReason": "weighted:credit_type:domain_general"
     },
     {
       "canonical": "credit_unit",
@@ -2148,7 +2605,11 @@
         "currency_amount",
         "currency_name",
         "currency_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_unit",
+      "curationReason": "weighted:credit_unit:domain_general"
     },
     {
       "canonical": "currency_amount",
@@ -2169,7 +2630,11 @@
         "currency_code",
         "currency_number",
         "currency_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_amount",
+      "curationReason": "weighted:currency_amount:domain_general"
     },
     {
       "canonical": "currency_code",
@@ -2188,7 +2653,11 @@
         "currency_count",
         "currency_quantity",
         "currency_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_code",
+      "curationReason": "weighted:currency_code:domain_general"
     },
     {
       "canonical": "currency_count",
@@ -2205,7 +2674,11 @@
         "currency_date",
         "currency_rate",
         "currency_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_count",
+      "curationReason": "weighted:currency_count:domain_general"
     },
     {
       "canonical": "currency_date",
@@ -2224,7 +2697,11 @@
         "currency_end_date",
         "currency_start_date",
         "deduction_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_date",
+      "curationReason": "weighted:currency_date:domain_general"
     },
     {
       "canonical": "currency_end_date",
@@ -2243,7 +2720,11 @@
         "currency_id",
         "currency_status",
         "deduction_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_end_date",
+      "curationReason": "weighted:currency_end_date:domain_general"
     },
     {
       "canonical": "currency_id",
@@ -2260,7 +2741,11 @@
         "currency_name",
         "currency_subtotal",
         "deduction_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_id",
+      "curationReason": "weighted:currency_id:domain_general"
     },
     {
       "canonical": "currency_name",
@@ -2279,7 +2764,11 @@
         "currency_number",
         "currency_total",
         "deduction_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_name",
+      "curationReason": "weighted:currency_name:domain_general"
     },
     {
       "canonical": "currency_number",
@@ -2299,7 +2788,11 @@
         "adjusted_gross_income_amount",
         "currency_quantity",
         "currency_type"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_number",
+      "curationReason": "weighted:currency_number:domain_general"
     },
     {
       "canonical": "currency_quantity",
@@ -2319,7 +2812,11 @@
         "adjusted_gross_income_code",
         "currency_rate",
         "currency_unit"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_quantity",
+      "curationReason": "weighted:currency_quantity:domain_general"
     },
     {
       "canonical": "currency_rate",
@@ -2338,7 +2835,11 @@
         "adjusted_gross_income_count",
         "currency_start_date",
         "deduction_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_rate",
+      "curationReason": "weighted:currency_rate:domain_general"
     },
     {
       "canonical": "currency_start_date",
@@ -2357,7 +2858,11 @@
         "adjusted_gross_income_date",
         "currency_status",
         "deduction_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_start_date",
+      "curationReason": "weighted:currency_start_date:domain_general"
     },
     {
       "canonical": "currency_status",
@@ -2374,7 +2879,11 @@
         "adjusted_gross_income_end_date",
         "currency_subtotal",
         "deduction_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_status",
+      "curationReason": "weighted:currency_status:domain_general"
     },
     {
       "canonical": "currency_subtotal",
@@ -2391,7 +2900,11 @@
         "adjusted_gross_income_id",
         "currency_total",
         "deduction_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_subtotal",
+      "curationReason": "weighted:currency_subtotal:domain_general"
     },
     {
       "canonical": "currency_total",
@@ -2408,7 +2921,11 @@
         "adjusted_gross_income_amount",
         "adjusted_gross_income_name",
         "currency_type"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_total",
+      "curationReason": "weighted:currency_total:domain_general"
     },
     {
       "canonical": "currency_type",
@@ -2427,7 +2944,11 @@
         "adjusted_gross_income_code",
         "adjusted_gross_income_number",
         "currency_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_type",
+      "curationReason": "weighted:currency_type:domain_general"
     },
     {
       "canonical": "currency_unit",
@@ -2446,7 +2967,11 @@
         "adjusted_gross_income_count",
         "adjusted_gross_income_quantity",
         "deduction_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_currency_unit",
+      "curationReason": "weighted:currency_unit:domain_general"
     },
     {
       "canonical": "deduction_amount",
@@ -2467,7 +2992,11 @@
         "adjusted_gross_income_date",
         "adjusted_gross_income_rate",
         "deduction_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_deduction_amount",
+      "curationReason": "weighted:deduction_amount:domain_general"
     },
     {
       "canonical": "deduction_code",
@@ -2486,7 +3015,11 @@
         "adjusted_gross_income_end_date",
         "adjusted_gross_income_start_date",
         "deduction_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_deduction_code",
+      "curationReason": "weighted:deduction_code:domain_general"
     },
     {
       "canonical": "deduction_count",
@@ -2503,7 +3036,11 @@
         "adjusted_gross_income_id",
         "adjusted_gross_income_status",
         "deduction_date"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_deduction_count",
+      "curationReason": "weighted:deduction_count:domain_general"
     },
     {
       "canonical": "deduction_date",
@@ -2522,7 +3059,11 @@
         "adjusted_gross_income_amount",
         "adjusted_gross_income_name",
         "adjusted_gross_income_subtotal"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:tax",
+      "disambiguationRuleId": "headers_disambiguation_general_deduction_date",
+      "curationReason": "weighted:deduction_date:domain_general"
     }
   ]
 }

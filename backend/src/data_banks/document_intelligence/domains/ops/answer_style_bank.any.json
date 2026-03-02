@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_ops_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Answer style rules for operations domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "audienceProfiles": [
+    {
+      "id": "plant_manager",
+      "tone": "decisive",
+      "defaultDepth": "summary",
+      "numberFormatting": "exact_with_units",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "field_technician",
+      "tone": "direct",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_units",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "supply_chain_analyst",
+      "tone": "analytical",
+      "defaultDepth": "decision_memo",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "executive_brief",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "ops_style_001_measurement_context",
+      "rule": "Always pair measurement values with their unit and instrument/source when available.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "ops_style_002_timeline_format",
+      "rule": "Present work order and maintenance entries as date - action - responsible party - status when available.",
+      "applies": [
+        "extract",
+        "locate",
+        "compare"
+      ]
+    },
+    {
+      "id": "ops_style_003_kpi_clarity",
+      "rule": "Explicitly state KPI target vs actual and whether the threshold is met or breached.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "id": "ops_style_004_safety_flags",
+      "rule": "Highlight safety-critical findings with severity labels (critical, major, minor).",
+      "applies": [
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "ops_style_005_uncertainty",
+      "rule": "If a root cause or metric source is inferred, state that it is inferred and why.",
+      "applies": [
+        "evaluate",
+        "summarize"
+      ]
+    }
+  ]
+}

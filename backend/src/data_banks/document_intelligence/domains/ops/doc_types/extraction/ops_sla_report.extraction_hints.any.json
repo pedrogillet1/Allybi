@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "di_ops_extraction_ops_sla_report",
+    "version": "1.0.0",
+    "description": "Extraction hints for SLA report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_sla_report"
+  },
+  "hints": [
+    {
+      "id": "hint_01_docType",
+      "entity": "docType",
+      "anchors": [
+        "SLA report",
+        "KPI report",
+        "service level report",
+        "ops_sla_report"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_reportNumber",
+      "entity": "reportNumber",
+      "anchors": [
+        "report no",
+        "report number",
+        "numero do relatorio"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_03_reportingPeriodStart",
+      "entity": "reportingPeriodStart",
+      "anchors": [
+        "period start",
+        "from",
+        "inicio do periodo"
+      ],
+      "location": "header",
+      "extractionMethod": "date_range_parse"
+    },
+    {
+      "id": "hint_04_reportingPeriodEnd",
+      "entity": "reportingPeriodEnd",
+      "anchors": [
+        "period end",
+        "to",
+        "fim do periodo"
+      ],
+      "location": "header",
+      "extractionMethod": "date_range_parse"
+    },
+    {
+      "id": "hint_05_serviceName",
+      "entity": "serviceName",
+      "anchors": [
+        "service",
+        "contract",
+        "servico"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_06_providerName",
+      "entity": "providerName",
+      "anchors": [
+        "provider",
+        "vendor",
+        "fornecedor"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_07_clientName",
+      "entity": "clientName",
+      "anchors": [
+        "client",
+        "customer",
+        "cliente"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_08_overallCompliance",
+      "entity": "overallCompliance",
+      "anchors": [
+        "overall compliance",
+        "status",
+        "conformidade geral"
+      ],
+      "location": "compliance_summary",
+      "extractionMethod": "enum_match"
+    },
+    {
+      "id": "hint_09_uptimePercent",
+      "entity": "uptimePercent",
+      "anchors": [
+        "uptime",
+        "availability",
+        "disponibilidade"
+      ],
+      "location": "kpi_details",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_10_responseTimeAvg",
+      "entity": "responseTimeAvg",
+      "anchors": [
+        "response time",
+        "avg response",
+        "tempo de resposta"
+      ],
+      "location": "kpi_details",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_11_penaltyAmount",
+      "entity": "penaltyAmount",
+      "anchors": [
+        "penalty",
+        "credit",
+        "deduction",
+        "penalidade"
+      ],
+      "location": "penalties",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_12_kpisBreached",
+      "entity": "kpisBreached",
+      "anchors": [
+        "breached",
+        "failed KPIs",
+        "KPIs nao atingidos"
+      ],
+      "location": "compliance_summary",
+      "extractionMethod": "amount_parse"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import crypto from "crypto";
 import type { PrismaClient } from "@prisma/client";
 import { supportsModel } from "../admin/_shared/prismaAdapter";
 import { logger } from "../../utils/logger";
+import { LoggingPolicyService } from "../core/policy/loggingPolicy.service";
 
 export type TraceStepName =
   | "input_normalization"
@@ -219,6 +220,7 @@ function normalizeEnv(input?: string | null): string {
 export class TraceWriterService {
   private readonly buffers = new Map<string, TraceBuffer>();
   private readonly turnDebugPackets = new Map<string, TurnDebugPacket>();
+  private readonly loggingPolicy = new LoggingPolicyService();
   private readonly enabled: boolean;
   private readonly successSamplePercent: number;
   private readonly maxBufferedTraces: number;
@@ -643,8 +645,9 @@ export class TraceWriterService {
     error: unknown,
   ): void {
     const reason = error instanceof Error ? error.message : String(error);
+    const sanitizedContext = this.loggingPolicy.sanitizeContext(context);
     logger.warn(`[trace-writer] ${message}`, {
-      ...context,
+      ...sanitizedContext,
       error: reason,
     });
     if (this.strictWriteFailures) {

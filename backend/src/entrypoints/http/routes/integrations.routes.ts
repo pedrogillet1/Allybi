@@ -40,7 +40,14 @@ registerConnector("outlook", {
 });
 
 registerConnector("slack", {
-  capabilities: { oauth: true, sync: true, search: true, realtime: true },
+  capabilities: {
+    oauth: true,
+    sync: true,
+    search: true,
+    realtime:
+      String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
+      "true",
+  },
   oauthService: new SlackOAuthService(),
   clientService: new SlackClientService(),
   syncService: new SlackSyncService(),

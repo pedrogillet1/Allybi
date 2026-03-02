@@ -181,7 +181,7 @@ describe("truncationClassifier", () => {
       isSemanticTruncationV2Enabled({
         NODE_ENV: "test",
       } as NodeJS.ProcessEnv),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       isSemanticTruncationV2Enabled({
         TRUNCATION_SEMANTIC_V2_ENABLED: "true",

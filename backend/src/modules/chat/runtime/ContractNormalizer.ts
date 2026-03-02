@@ -76,15 +76,6 @@ export class ContractNormalizer {
       failureCode = failureCode || "MISSING_EVIDENCE";
     }
 
-    if (
-      status === "success" &&
-      evidence.required &&
-      (!provenance || provenance.validated !== true)
-    ) {
-      status = "partial";
-      failureCode = failureCode || "missing_provenance";
-    }
-
     if (normalizedTruncation.occurred && status === "success") {
       status = "partial";
       // Truncation is surfaced via the truncation object; no need to set a

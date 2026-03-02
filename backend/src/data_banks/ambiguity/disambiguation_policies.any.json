@@ -81,11 +81,11 @@
     "integrationHooks": {
       "dependsOn": [
         "ambiguity_rank_features",
-        "disambiguation_render_policy",
         "clarification_phrases",
-        "option_labeling_rules",
         "scope_hints",
-        "followup_indicators"
+        "followup_indicators",
+        "render_policy",
+        "ui_contracts"
       ],
       "emitsSignals": [
         "requiresDisambiguation",

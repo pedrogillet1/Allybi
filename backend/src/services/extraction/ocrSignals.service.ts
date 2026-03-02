@@ -79,8 +79,8 @@ export function deriveOcrSignals(input: {
 
   const ocrUsed = Boolean(
     (extraction as any).ocrUsed ||
-      (extraction as any).ocrApplied ||
-      (ocrPageCount ?? 0) > 0,
+    (extraction as any).ocrApplied ||
+    (ocrPageCount ?? 0) > 0,
   );
   const ocrAttempted =
     typeof (extraction as any).ocrAttempted === "boolean"

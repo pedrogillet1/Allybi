@@ -25,14 +25,10 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }) {
   const cmdKey = isMac ? '⌘' : 'Ctrl';
 
   const shortcuts = [
-    { keys: [`${cmdKey}`, 'Enter'], action: t('keyboardShortcuts.sendMessage') },
+    { keys: ['Enter'], action: t('keyboardShortcuts.sendMessage') },
     { keys: [`${cmdKey}`, 'K'], action: t('keyboardShortcuts.focusSearch') },
-    { keys: [`${cmdKey}`, 'N'], action: t('keyboardShortcuts.newConversation') },
-    { keys: [`${cmdKey}`, 'Shift', 'C'], action: t('keyboardShortcuts.copyLastResponse') },
     { keys: ['Esc'], action: t('keyboardShortcuts.cancelGeneration') },
     { keys: [`${cmdKey}`, '/'], action: t('keyboardShortcuts.showThisMenu') },
-    { keys: ['↑'], action: t('keyboardShortcuts.editLastMessage') },
-    { keys: [`${cmdKey}`, 'Shift', 'L'], action: t('keyboardShortcuts.toggleSidebar') },
   ];
 
   return (

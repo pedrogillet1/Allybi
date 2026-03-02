@@ -1,0 +1,162 @@
+{
+  "_meta": {
+    "id": "di_ops_entities_ops_sla_report",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for SLA report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_sla_report"
+  },
+  "entities": [
+    {
+      "id": "docType",
+      "type": "string",
+      "required": true,
+      "description": "Detected document type identifier"
+    },
+    {
+      "id": "reportNumber",
+      "type": "string",
+      "required": true,
+      "description": "SLA or KPI report number"
+    },
+    {
+      "id": "reportTitle",
+      "type": "string",
+      "required": false,
+      "description": "Report title or heading"
+    },
+    {
+      "id": "reportingPeriodStart",
+      "type": "date",
+      "required": true,
+      "description": "Reporting period start date"
+    },
+    {
+      "id": "reportingPeriodEnd",
+      "type": "date",
+      "required": true,
+      "description": "Reporting period end date"
+    },
+    {
+      "id": "reportDate",
+      "type": "date",
+      "required": false,
+      "description": "Date the report was generated"
+    },
+    {
+      "id": "serviceName",
+      "type": "string",
+      "required": false,
+      "description": "Name of the service or contract"
+    },
+    {
+      "id": "providerName",
+      "type": "string",
+      "required": false,
+      "description": "Service provider name"
+    },
+    {
+      "id": "clientName",
+      "type": "string",
+      "required": false,
+      "description": "Client or customer name"
+    },
+    {
+      "id": "overallCompliance",
+      "type": "enum",
+      "required": true,
+      "description": "Overall SLA compliance status",
+      "values": [
+        "compliant",
+        "non_compliant",
+        "partial",
+        "unknown"
+      ]
+    },
+    {
+      "id": "totalKpiCount",
+      "type": "number",
+      "required": false,
+      "description": "Total number of KPIs tracked"
+    },
+    {
+      "id": "kpisInCompliance",
+      "type": "number",
+      "required": false,
+      "description": "Number of KPIs meeting target"
+    },
+    {
+      "id": "kpisBreached",
+      "type": "number",
+      "required": false,
+      "description": "Number of KPIs that breached target"
+    },
+    {
+      "id": "penaltyAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Total penalty or credit amount for breaches"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code"
+    },
+    {
+      "id": "uptimePercent",
+      "type": "number",
+      "required": false,
+      "description": "Overall uptime or availability percentage"
+    },
+    {
+      "id": "responseTimeAvg",
+      "type": "number",
+      "required": false,
+      "description": "Average response time in the reporting period"
+    },
+    {
+      "id": "responseTimeUnit",
+      "type": "string",
+      "required": false,
+      "description": "Unit for response time (minutes, hours)"
+    },
+    {
+      "id": "preparedBy",
+      "type": "string",
+      "required": false,
+      "description": "Person who prepared the report"
+    },
+    {
+      "id": "languageDetected",
+      "type": "enum",
+      "required": true,
+      "description": "Detected language",
+      "values": [
+        "en",
+        "pt",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "documentPages",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidenceScore",
+      "type": "number",
+      "required": false,
+      "description": "Overall extraction confidence"
+    }
+  ]
+}

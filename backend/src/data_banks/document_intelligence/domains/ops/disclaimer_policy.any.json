@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "di_ops_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer policy for operations responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "disclaimers": [
+    {
+      "id": "ops_disc_001_not_operational_advice",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This analysis is informational and does not constitute operational, engineering, or safety advice.",
+        "pt": "Esta analise e informativa e nao constitui orientacao operacional, de engenharia ou de seguranca."
+      }
+    },
+    {
+      "id": "ops_disc_002_document_timebound",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Data reflects the uploaded document period and current conditions may have changed.",
+        "pt": "Os dados refletem o periodo do documento enviado e as condicoes atuais podem ter mudado."
+      }
+    },
+    {
+      "id": "ops_disc_003_safety_critical_caveat",
+      "trigger": "analysis_involves_safety",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Safety-critical decisions must be validated by qualified personnel on-site before any action is taken.",
+        "pt": "Decisoes criticas de seguranca devem ser validadas por pessoal qualificado no local antes de qualquer acao."
+      }
+    }
+  ]
+}

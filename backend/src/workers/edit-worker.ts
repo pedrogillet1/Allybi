@@ -14,15 +14,13 @@ export async function runJob(job: Job<ReindexRevisionJobData>): Promise<void> {
     String(job.data.revisionId || "").trim(),
   ].filter(Boolean);
   const seen = new Set<string>();
-  let doc:
-    | {
-        id: string;
-        userId: string;
-        encryptedFilename: string | null;
-        filename: string | null;
-        mimeType: string | null;
-      }
-    | null = null;
+  let doc: {
+    id: string;
+    userId: string;
+    encryptedFilename: string | null;
+    filename: string | null;
+    mimeType: string | null;
+  } | null = null;
   for (const candidateId of candidateIds) {
     if (seen.has(candidateId)) continue;
     seen.add(candidateId);

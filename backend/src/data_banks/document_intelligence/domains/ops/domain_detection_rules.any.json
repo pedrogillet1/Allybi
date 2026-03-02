@@ -1,0 +1,133 @@
+{
+  "_meta": {
+    "id": "di_ops_domain_detection_rules",
+    "version": "1.0.0",
+    "description": "Rules for detecting operations documents from headings, content, and table structure.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "minScore": 0.6,
+    "maxRulesPerDocument": 30
+  },
+  "domain": "ops",
+  "rules": [
+    {
+      "id": "ops_detect_001_work_order",
+      "priority": 100,
+      "weight": 3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bwork\\s+order\\b",
+        "\\bservice\\s+order\\b",
+        "\\bmaintenance\\s+request\\b",
+        "\\bordem\\s+de\\s+servico\\b",
+        "\\bOS\\b"
+      ],
+      "description": "Work order and service order markers"
+    },
+    {
+      "id": "ops_detect_002_incident_report",
+      "priority": 98,
+      "weight": 2.8,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bincident\\s+report\\b",
+        "\\boccurrence\\s+report\\b",
+        "\\broot\\s+cause\\s+analysis\\b",
+        "\\brelatorio\\s+de\\s+incidente\\b",
+        "\\brelatorio\\s+de\\s+ocorrencia\\b"
+      ],
+      "description": "Incident and occurrence report markers"
+    },
+    {
+      "id": "ops_detect_003_maintenance_log",
+      "priority": 97,
+      "weight": 2.7,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bmaintenance\\s+log\\b",
+        "\\bpreventive\\s+maintenance\\b",
+        "\\bcorrective\\s+maintenance\\b",
+        "\\bregistro\\s+de\\s+manutencao\\b",
+        "\\bmanutencao\\s+preventiva\\b"
+      ],
+      "description": "Maintenance log and schedule markers"
+    },
+    {
+      "id": "ops_detect_004_shipping_manifest",
+      "priority": 96,
+      "weight": 2.6,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bshipping\\s+manifest\\b",
+        "\\bbill\\s+of\\s+lading\\b",
+        "\\bpacking\\s+list\\b",
+        "\\bromaneio\\b",
+        "\\bconhecimento\\s+de\\s+transporte\\b"
+      ],
+      "description": "Shipping manifest and logistics markers"
+    },
+    {
+      "id": "ops_detect_005_quality_report",
+      "priority": 95,
+      "weight": 2.5,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bquality\\s+(?:inspection|report|control)\\b",
+        "\\bnon-?conformance\\b",
+        "\\brelatorio\\s+de\\s+qualidade\\b",
+        "\\binspecao\\s+de\\s+qualidade\\b"
+      ],
+      "description": "Quality inspection and control markers"
+    },
+    {
+      "id": "ops_detect_006_sla_report",
+      "priority": 94,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bSLA\\s+report\\b",
+        "\\bservice\\s+level\\s+agreement\\b",
+        "\\bKPI\\s+dashboard\\b",
+        "\\brelatorio\\s+de\\s+SLA\\b",
+        "\\bindicadores\\s+de\\s+desempenho\\b"
+      ],
+      "description": "SLA and KPI reporting markers"
+    },
+    {
+      "id": "ops_detect_007_operational_metrics",
+      "priority": 88,
+      "weight": 1.8,
+      "signal": "content",
+      "patterns": [
+        "\\bMTBF\\b",
+        "\\bMTTR\\b",
+        "\\bOEE\\b",
+        "\\bcycle\\s+time\\b",
+        "\\bthroughput\\b",
+        "\\buptime\\b",
+        "\\bdowntime\\b"
+      ],
+      "description": "Operational KPI and metric terms"
+    },
+    {
+      "id": "ops_detect_008_negative_nonoperational",
+      "priority": 120,
+      "weight": -3.5,
+      "signal": "negative_heading_or_content",
+      "patterns": [
+        "\\blab\\s+report\\b",
+        "\\bpatient\\b",
+        "\\bdiagnosis\\b",
+        "\\bprescription\\b",
+        "\\bmedical\\s+record\\b"
+      ],
+      "description": "Negative medical markers reduce operations classification confidence"
+    }
+  ]
+}

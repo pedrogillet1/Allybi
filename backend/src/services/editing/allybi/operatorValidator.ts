@@ -22,6 +22,21 @@ function isRewriteOperator(canonicalOperator: string): boolean {
   return op.includes("REWRITE") || op === "DOCX_REPLACE_SPAN";
 }
 
+function connectorPermissionActionForOperator(
+  canonicalOperator: string,
+): "CONNECTOR_READ_LIST" | "CONNECTOR_DRAFT" | "CONNECTOR_SEND_CONFIRM" | null {
+  const op = String(canonicalOperator || "")
+    .trim()
+    .toUpperCase();
+  if (!op) return null;
+  if (op === "EMAIL_SEND") return "CONNECTOR_SEND_CONFIRM";
+  if (op === "EMAIL_DRAFT") return "CONNECTOR_DRAFT";
+  if (op.startsWith("CONNECTOR_") || op.startsWith("EMAIL_")) {
+    return "CONNECTOR_READ_LIST";
+  }
+  return null;
+}
+
 function classesCompatible(
   expected: AllybiOperatorClass | undefined,
   actual: AllybiOperatorClass,
@@ -84,6 +99,46 @@ export function validateAllybiOperatorPayload(
   payload: Record<string, unknown>,
   options?: { language?: "en" | "pt" },
 ): AllybiValidationResult {
+  const banks = loadAllybiBanks();
+  const connectorPermissions = banks.connectorPermissions;
+  const connectorAction = connectorPermissionActionForOperator(
+    plan.canonicalOperator,
+  );
+  if (connectorPermissions?.config?.enabled && connectorAction) {
+    const actionPolicy =
+      connectorPermissions?.actions &&
+      typeof connectorPermissions.actions === "object"
+        ? connectorPermissions.actions[connectorAction]
+        : null;
+    if (actionPolicy && typeof actionPolicy === "object") {
+      if (
+        actionPolicy.requiresExplicitActivation === true &&
+        payload.explicitConnectorActivation !== true
+      ) {
+        return {
+          ok: false,
+          code: "CONNECTOR_EXPLICIT_ACTIVATION_REQUIRED",
+          message:
+            "Connector action requires explicit activation before execution.",
+        };
+      }
+      const requiresSendClick =
+        actionPolicy.requiresSendClick === true ||
+        connectorPermissions?.config?.requireExplicitSendClick === true;
+      if (
+        connectorAction === "CONNECTOR_SEND_CONFIRM" &&
+        requiresSendClick &&
+        payload.explicitSendClick !== true
+      ) {
+        return {
+          ok: false,
+          code: "CONNECTOR_SEND_CLICK_REQUIRED",
+          message: "Sending requires an explicit send click confirmation.",
+        };
+      }
+    }
+  }
+
   if (plan.clarificationRequired) {
     return {
       ok: false,
@@ -163,7 +218,6 @@ export function validateAllybiOperatorPayload(
     style.fontFamily || format.fontFamily || plan.fontFamily || "",
   ).trim();
   if (fontFamily) {
-    const banks = loadAllybiBanks();
     const familyMap =
       banks.fontAliases?.families &&
       typeof banks.fontAliases.families === "object"

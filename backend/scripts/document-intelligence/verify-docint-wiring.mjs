@@ -150,23 +150,300 @@ function extractSchema(schemaBank) {
   return null;
 }
 
+function isPlainObject(value) {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+function toInstancePath(pathSegments) {
+  if (!Array.isArray(pathSegments) || pathSegments.length === 0) return "";
+  return "/" + pathSegments.join("/");
+}
+
+function deepEqual(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function resolveLocalRef(rootSchema, ref) {
+  if (typeof ref !== "string") return null;
+  if (ref === "#") return rootSchema;
+  if (!ref.startsWith("#/")) return null;
+  const parts = ref
+    .slice(2)
+    .split("/")
+    .map((part) => decodeURIComponent(part.replace(/~1/g, "/").replace(/~0/g, "~")));
+  let cur = rootSchema;
+  for (const part of parts) {
+    if (!cur || typeof cur !== "object") return null;
+    cur = cur[part];
+  }
+  return cur || null;
+}
+
+function matchesSchemaType(expectedType, value) {
+  switch (expectedType) {
+    case "null":
+      return value === null;
+    case "boolean":
+      return typeof value === "boolean";
+    case "number":
+      return typeof value === "number" && Number.isFinite(value);
+    case "integer":
+      return typeof value === "number" && Number.isInteger(value);
+    case "string":
+      return typeof value === "string";
+    case "array":
+      return Array.isArray(value);
+    case "object":
+      return isPlainObject(value);
+    default:
+      return true;
+  }
+}
+
+function validateFallbackSchema(schema, value, ctx, pathSegments = []) {
+  if (!isPlainObject(schema)) return true;
+  const errors = ctx.errors;
+
+  if (typeof schema.$ref === "string") {
+    const target = resolveLocalRef(ctx.rootSchema, schema.$ref);
+    if (!target) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `unresolved $ref: ${schema.$ref}`,
+      });
+      return false;
+    }
+    return validateFallbackSchema(target, value, ctx, pathSegments);
+  }
+
+  if (Array.isArray(schema.allOf)) {
+    for (const sub of schema.allOf) {
+      validateFallbackSchema(sub, value, ctx, pathSegments);
+    }
+  }
+
+  if (Array.isArray(schema.anyOf) && schema.anyOf.length > 0) {
+    let anyOk = false;
+    for (const sub of schema.anyOf) {
+      const branchErrors = [];
+      validateFallbackSchema(sub, value, { ...ctx, errors: branchErrors }, pathSegments);
+      if (branchErrors.length === 0) {
+        anyOk = true;
+        break;
+      }
+    }
+    if (!anyOk) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: "must satisfy at least one schema in anyOf",
+      });
+      return false;
+    }
+  }
+
+  if (Array.isArray(schema.oneOf) && schema.oneOf.length > 0) {
+    let matchCount = 0;
+    for (const sub of schema.oneOf) {
+      const branchErrors = [];
+      validateFallbackSchema(sub, value, { ...ctx, errors: branchErrors }, pathSegments);
+      if (branchErrors.length === 0) matchCount += 1;
+    }
+    if (matchCount !== 1) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: "must satisfy exactly one schema in oneOf",
+      });
+      return false;
+    }
+  }
+
+  if (schema.const !== undefined && !deepEqual(value, schema.const)) {
+    errors.push({
+      instancePath: toInstancePath(pathSegments),
+      message: "must equal const value",
+    });
+  }
+
+  if (Array.isArray(schema.enum) && schema.enum.length > 0) {
+    const inEnum = schema.enum.some((candidate) => deepEqual(candidate, value));
+    if (!inEnum) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: "must be one of enum values",
+      });
+    }
+  }
+
+  if (schema.type !== undefined) {
+    const allowedTypes = Array.isArray(schema.type) ? schema.type : [schema.type];
+    const typeOk = allowedTypes.some((type) => matchesSchemaType(type, value));
+    if (!typeOk) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `must be ${allowedTypes.join(" or ")}`,
+      });
+      return false;
+    }
+  }
+
+  if (typeof value === "string") {
+    if (typeof schema.minLength === "number" && value.length < schema.minLength) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `must NOT have fewer than ${schema.minLength} characters`,
+      });
+    }
+    if (typeof schema.maxLength === "number" && value.length > schema.maxLength) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `must NOT have more than ${schema.maxLength} characters`,
+      });
+    }
+    if (typeof schema.pattern === "string") {
+      try {
+        const re = new RegExp(schema.pattern);
+        if (!re.test(value)) {
+          errors.push({
+            instancePath: toInstancePath(pathSegments),
+            message: `must match pattern ${schema.pattern}`,
+          });
+        }
+      } catch {
+        // Ignore invalid fallback regex patterns; AJV handles these strictly when available.
+      }
+    }
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (typeof schema.minimum === "number" && value < schema.minimum) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `must be >= ${schema.minimum}`,
+      });
+    }
+    if (typeof schema.maximum === "number" && value > schema.maximum) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `must be <= ${schema.maximum}`,
+      });
+    }
+  }
+
+  if (Array.isArray(value)) {
+    if (typeof schema.minItems === "number" && value.length < schema.minItems) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `must NOT have fewer than ${schema.minItems} items`,
+      });
+    }
+    if (typeof schema.maxItems === "number" && value.length > schema.maxItems) {
+      errors.push({
+        instancePath: toInstancePath(pathSegments),
+        message: `must NOT have more than ${schema.maxItems} items`,
+      });
+    }
+    if (schema.uniqueItems === true) {
+      const seen = new Set();
+      for (const item of value) {
+        const key = JSON.stringify(item);
+        if (seen.has(key)) {
+          errors.push({
+            instancePath: toInstancePath(pathSegments),
+            message: "must NOT have duplicate items",
+          });
+          break;
+        }
+        seen.add(key);
+      }
+    }
+    if (schema.items !== undefined) {
+      if (Array.isArray(schema.items)) {
+        for (let i = 0; i < schema.items.length && i < value.length; i++) {
+          validateFallbackSchema(schema.items[i], value[i], ctx, [...pathSegments, String(i)]);
+        }
+      } else {
+        for (let i = 0; i < value.length; i++) {
+          validateFallbackSchema(schema.items, value[i], ctx, [...pathSegments, String(i)]);
+        }
+      }
+    }
+  }
+
+  if (isPlainObject(value)) {
+    const required = Array.isArray(schema.required) ? schema.required : [];
+    for (const reqKey of required) {
+      if (!(reqKey in value)) {
+        errors.push({
+          instancePath: toInstancePath(pathSegments),
+          message: `must have required property '${reqKey}'`,
+        });
+      }
+    }
+
+    const properties = isPlainObject(schema.properties) ? schema.properties : {};
+    for (const [key, propSchema] of Object.entries(properties)) {
+      if (key in value) {
+        validateFallbackSchema(propSchema, value[key], ctx, [...pathSegments, key]);
+      }
+    }
+
+    if (schema.additionalProperties === false) {
+      for (const key of Object.keys(value)) {
+        if (!(key in properties)) {
+          errors.push({
+            instancePath: toInstancePath([...pathSegments, key]),
+            message: "must NOT have additional properties",
+          });
+        }
+      }
+    } else if (isPlainObject(schema.additionalProperties)) {
+      for (const key of Object.keys(value)) {
+        if (!(key in properties)) {
+          validateFallbackSchema(
+            schema.additionalProperties,
+            value[key],
+            ctx,
+            [...pathSegments, key],
+          );
+        }
+      }
+    }
+  }
+
+  return errors.length === 0;
+}
+
+function createFallbackSchemaValidator(schemaObj) {
+  const validator = (value) => {
+    const errors = [];
+    validateFallbackSchema(schemaObj, value, { rootSchema: schemaObj, errors }, []);
+    validator.errors = errors;
+    return errors.length === 0;
+  };
+  validator.errors = [];
+  return validator;
+}
+
 function compileSchemaValidators(registry) {
   let Ajv;
+  let usingFallback = false;
   try {
     Ajv = require("ajv");
   } catch {
-    warn("AJV unavailable; schema validation checks skipped.");
-    return { available: false, validators: new Map() };
+    usingFallback = true;
   }
 
-  const ajv = new Ajv({ allErrors: true, strict: false, allowUnionTypes: true });
-  try {
-    const addFormats = require("ajv-formats");
-    if (typeof addFormats === "function") {
-      addFormats(ajv);
+  let ajv = null;
+  if (!usingFallback) {
+    ajv = new Ajv({ allErrors: true, strict: false, allowUnionTypes: true });
+    try {
+      const addFormats = require("ajv-formats");
+      if (typeof addFormats === "function") {
+        addFormats(ajv);
+      }
+    } catch {
+      // Optional dependency; schema checks still run without format helpers.
     }
-  } catch {
-    // Optional dependency; schema checks still run without format helpers.
   }
 
   const validators = new Map();
@@ -183,17 +460,21 @@ function compileSchemaValidators(registry) {
     const schemaObj = extractSchema(schemaBank);
     if (!schemaObj || typeof schemaObj !== "object") continue;
     try {
-      const schemaForAjv =
-        schemaObj && typeof schemaObj === "object" ? { ...schemaObj } : schemaObj;
-      if (
-        schemaForAjv &&
-        typeof schemaForAjv === "object" &&
-        typeof schemaForAjv.$schema === "string" &&
-        schemaForAjv.$schema.includes("json-schema.org/draft/2020-12")
-      ) {
-        delete schemaForAjv.$schema;
+      if (usingFallback) {
+        validators.set(entry.id, createFallbackSchemaValidator(schemaObj));
+      } else {
+        const schemaForAjv =
+          schemaObj && typeof schemaObj === "object" ? { ...schemaObj } : schemaObj;
+        if (
+          schemaForAjv &&
+          typeof schemaForAjv === "object" &&
+          typeof schemaForAjv.$schema === "string" &&
+          schemaForAjv.$schema.includes("json-schema.org/draft/2020-12")
+        ) {
+          delete schemaForAjv.$schema;
+        }
+        validators.set(entry.id, ajv.compile(schemaForAjv));
       }
-      validators.set(entry.id, ajv.compile(schemaForAjv));
     } catch (err) {
       fail(`Schema compile failed for ${entry.id}: ${err?.message || err}`);
     }

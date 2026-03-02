@@ -64,16 +64,15 @@
     ],
     "integrationHooks": {
       "normalizers": [
-        "tokenization_rules",
-        "filename_normalization",
+        "language_indicators",
         "stopwords_docnames",
         "doc_aliases",
-        "language_indicators"
+        "document_intelligence_bank_map"
       ],
       "semantics": [
-        "pdf_semantics",
         "spreadsheet_semantics",
-        "intent_semantics"
+        "domain_ontology",
+        "document_intelligence_bank_map"
       ]
     }
   },

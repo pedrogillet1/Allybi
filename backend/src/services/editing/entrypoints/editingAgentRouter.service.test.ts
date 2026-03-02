@@ -1,6 +1,16 @@
-import { describe, expect, test } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
+
+jest.mock("../banks/bankService", () => ({
+  safeEditingBank: jest.fn(),
+}));
+
 import { EditingAgentRouterService } from "./editingAgentRouter.service";
 import type { EditHandlerRequest } from "../../core/handlers/editHandler.service";
+import { safeEditingBank } from "../banks/bankService";
+
+const mockedSafeEditingBank = safeEditingBank as jest.MockedFunction<
+  typeof safeEditingBank
+>;
 
 function makeRequest(
   mode: EditHandlerRequest["mode"],
@@ -38,6 +48,11 @@ function makeRequest(
 }
 
 describe("EditingAgentRouterService", () => {
+  beforeEach(() => {
+    mockedSafeEditingBank.mockReset();
+    mockedSafeEditingBank.mockReturnValue(null);
+  });
+
   test("routes DOCX edit flow to docx agent", async () => {
     const router = new EditingAgentRouterService();
     const execution = await router.execute(makeRequest("plan", "docx"));
@@ -59,6 +74,23 @@ describe("EditingAgentRouterService", () => {
   test("routes undo mode to default agent", async () => {
     const router = new EditingAgentRouterService();
     const execution = await router.execute(makeRequest("undo"));
+    expect(execution.agentId).toBe("edit_agent_default");
+  });
+
+  test("respects editing_agent_policy domain map overrides", async () => {
+    mockedSafeEditingBank.mockReturnValue({
+      config: {
+        enabled: true,
+        defaultAgentId: "edit_agent_default",
+        domainAgentMap: {
+          docx: "edit_agent_default",
+          sheets: "edit_agent_sheets",
+        },
+      },
+    } as any);
+
+    const router = new EditingAgentRouterService();
+    const execution = await router.execute(makeRequest("plan", "docx"));
     expect(execution.agentId).toBe("edit_agent_default");
   });
 });

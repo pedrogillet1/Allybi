@@ -53,6 +53,36 @@ describe("Bank Mutation Proof", () => {
     expect(plan!.kind).toMatch(/^(plan|clarification)$/);
   });
 
+  test("TOC intents resolve to canonical DOCX_UPDATE_TOC", () => {
+    const plan = analyzeMessageToPlan({
+      message: "update the table of contents",
+      domain: "docx",
+      viewerContext: {},
+      language: "en",
+    });
+    expect(plan).not.toBeNull();
+    if (!plan) return;
+    if (plan.kind === "plan") {
+      expect(plan.ops[0]?.op).toBe("DOCX_UPDATE_TOC");
+      return;
+    }
+    expect(plan.kind).toBe("clarification");
+    expect(plan.partialOps.some((op) => op.op === "DOCX_UPDATE_TOC")).toBe(
+      true,
+    );
+  });
+
+  test("table create intent resolves to DOCX_CREATE_TABLE", () => {
+    const plan = analyzeMessageToPlan({
+      message: "create a table with rows 4 and columns 3",
+      domain: "docx",
+      viewerContext: {},
+      language: "en",
+    });
+    expect(isPlan(plan)).toBe(true);
+    expect((plan as IntentPlan).ops[0]?.op).toBe("DOCX_CREATE_TABLE");
+  });
+
   test("'forecast next quarter' produces an excel plan", () => {
     const plan = analyzeMessageToPlan({
       message: "forecast next quarter sales",
@@ -62,6 +92,28 @@ describe("Bank Mutation Proof", () => {
     });
     expect(plan).not.toBeNull();
     expect(plan!.kind).toMatch(/^(plan|clarification)$/);
+  });
+
+  test("python forecast resolves to executable plan when sheet context is available", () => {
+    const plan = analyzeMessageToPlan({
+      message: "forecast next quarter sales",
+      domain: "excel",
+      viewerContext: { sheetName: "Sheet1" },
+      language: "en",
+    });
+    expect(isPlan(plan)).toBe(true);
+    expect((plan as IntentPlan).ops[0]?.op).toBe("PY_TIME_SERIES_FORECAST");
+  });
+
+  test("python what-if resolves to executable plan when sheet context is available", () => {
+    const plan = analyzeMessageToPlan({
+      message: "what if price increases by 5 percent",
+      domain: "excel",
+      viewerContext: { sheetName: "Sheet1" },
+      language: "en",
+    });
+    expect(isPlan(plan)).toBe(true);
+    expect((plan as IntentPlan).ops[0]?.op).toBe("PY_CALC_DERIVE_COLUMN");
   });
 
   // -----------------------------------------------------------------------

@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "id": "list_styles",
+    "version": "1.0.0",
+    "description": "List style primitives consumed by render policy and response contract enforcement.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "marker": "-",
+    "indentSpaces": 2,
+    "ensureSpaceAfterMarker": true,
+    "convertAsteriskAndPlus": true,
+    "maxConsecutiveBullets": 7
+  },
+  "rules": [
+    {
+      "id": "LS_001_marker_normalization",
+      "description": "Normalize *, + to -",
+      "action": "REPLACE"
+    },
+    {
+      "id": "LS_002_nested_indent_enforcement",
+      "description": "2-space indent for nested",
+      "action": "ENFORCE"
+    },
+    {
+      "id": "LS_003_blank_line_before_list",
+      "description": "Blank line before first bullet",
+      "action": "INSERT"
+    }
+  ],
+  "nestedListLimits": {
+    "maxDepth": 3,
+    "indentPerLevel": 2
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "LS_T01",
+        "input": "* item",
+        "expect": "- item"
+      }
+    ]
+  }
+}

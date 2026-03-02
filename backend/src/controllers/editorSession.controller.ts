@@ -585,7 +585,7 @@ export class EditorSessionController {
       requiresUserChoice:
         Boolean(
           session.lastPreview &&
-            (session.lastPreview as any).requiresConfirmation,
+          (session.lastPreview as any).requiresConfirmation,
         ) || false,
       expiresAt: new Date(session.expiresAt).toISOString(),
     };

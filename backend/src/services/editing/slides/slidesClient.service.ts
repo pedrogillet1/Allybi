@@ -1,5 +1,4 @@
 import { google, slides_v1 } from "googleapis";
-import type { GoogleAuth } from "google-auth-library";
 import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
@@ -82,7 +81,7 @@ const DEFAULT_SCOPES = [
  * Google Slides API wrapper with retry/backoff and typed error mapping.
  */
 export class SlidesClientService {
-  private readonly auth: GoogleAuth;
+  private readonly auth: InstanceType<typeof google.auth.GoogleAuth>;
   private readonly client: slides_v1.Slides;
   private readonly drive: ReturnType<typeof google.drive>;
   private readonly options: Required<SlidesClientOptions>;
@@ -96,7 +95,10 @@ export class SlidesClientService {
     "deleteDriveFile",
   ]);
 
-  constructor(auth?: GoogleAuth, options?: SlidesClientOptions) {
+  constructor(
+    auth?: InstanceType<typeof google.auth.GoogleAuth>,
+    options?: SlidesClientOptions,
+  ) {
     this.auth = auth ?? SlidesClientService.resolveAuth();
     this.client = google.slides({ version: "v1", auth: this.auth });
     this.drive = google.drive({ version: "v3", auth: this.auth });
@@ -108,7 +110,7 @@ export class SlidesClientService {
    * Prefers ADC (authorized_user) over the GCP service account
    * since the service account may lack Workspace API permissions.
    */
-  private static resolveAuth(): GoogleAuth {
+  private static resolveAuth(): InstanceType<typeof google.auth.GoogleAuth> {
     const adcPath = path.join(
       process.env.HOME || "~",
       ".config",

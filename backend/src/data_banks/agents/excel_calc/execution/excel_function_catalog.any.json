@@ -1,4 +1,12 @@
 {
+  "_meta": {
+    "id": "excel_function_catalog",
+    "version": "1.0.0",
+    "description": "Production-grade Excel function catalog for safe formula insertion by AI agents"
+  },
+  "config": {
+    "enabled": true
+  },
   "$schema": "excel_function_catalog.schema.json",
   "meta": {
     "id": "excel_function_catalog",

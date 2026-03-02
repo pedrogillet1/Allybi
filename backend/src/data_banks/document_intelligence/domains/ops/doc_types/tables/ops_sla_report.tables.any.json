@@ -1,0 +1,126 @@
+{
+  "_meta": {
+    "id": "di_ops_tables_ops_sla_report",
+    "version": "1.0.0",
+    "description": "Expected table patterns for SLA report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_sla_report"
+  },
+  "tableHeaderSynonyms": {
+    "kpi_name": [
+      "KPI",
+      "metric",
+      "indicator",
+      "indicador"
+    ],
+    "target": [
+      "target",
+      "threshold",
+      "SLA target",
+      "meta"
+    ],
+    "actual": [
+      "actual",
+      "achieved",
+      "result",
+      "realizado"
+    ],
+    "status": [
+      "status",
+      "compliance",
+      "pass/fail",
+      "conformidade"
+    ],
+    "penalty": [
+      "penalty",
+      "credit",
+      "deduction",
+      "penalidade"
+    ],
+    "period": [
+      "period",
+      "month",
+      "week",
+      "periodo"
+    ]
+  },
+  "tables": [
+    {
+      "id": "ops_sla_report_kpi_table",
+      "name": {
+        "en": "KPI Performance",
+        "pt": "Desempenho dos KPIs"
+      },
+      "section": "kpi_details",
+      "expectedColumns": [
+        "kpi_name",
+        "target",
+        "actual",
+        "status"
+      ],
+      "keyRows": [
+        "overall_compliance"
+      ]
+    },
+    {
+      "id": "ops_sla_report_breaches_table",
+      "name": {
+        "en": "Breach Details",
+        "pt": "Detalhes das Violacoes"
+      },
+      "section": "breaches",
+      "expectedColumns": [
+        "kpi_name",
+        "breach_date",
+        "target",
+        "actual",
+        "impact"
+      ],
+      "keyRows": [
+        "total_breaches"
+      ]
+    },
+    {
+      "id": "ops_sla_report_penalties_table",
+      "name": {
+        "en": "Penalty Calculation",
+        "pt": "Calculo de Penalidades"
+      },
+      "section": "penalties",
+      "expectedColumns": [
+        "kpi_name",
+        "breach_count",
+        "penalty_rate",
+        "penalty_amount"
+      ],
+      "keyRows": [
+        "total_penalty"
+      ]
+    },
+    {
+      "id": "ops_sla_report_trend_table",
+      "name": {
+        "en": "Monthly Trend",
+        "pt": "Tendencia Mensal"
+      },
+      "section": "kpi_details",
+      "expectedColumns": [
+        "period",
+        "kpi_name",
+        "actual",
+        "target",
+        "status"
+      ],
+      "keyRows": [
+        "period_average"
+      ]
+    }
+  ]
+}

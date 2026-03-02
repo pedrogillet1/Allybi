@@ -111,7 +111,7 @@ export class EditingCapabilityMatrixService {
       const declaredSupported = capabilityEntry?.supported !== false;
       const supportedInExecutor = Boolean(
         contract &&
-          contract.domain === (rowDomain === "sheets" ? "sheets" : rowDomain),
+        contract.domain === (rowDomain === "sheets" ? "sheets" : rowDomain),
       );
       const supported = declaredSupported && supportedInExecutor;
       const unsupportedReason = supported

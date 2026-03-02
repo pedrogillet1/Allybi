@@ -315,7 +315,9 @@ function includesContextTerm(context: string, term: string): boolean {
 }
 
 function isShortAcronymPattern(pattern: string): boolean {
-  const token = String(pattern || "").trim().toLowerCase();
+  const token = String(pattern || "")
+    .trim()
+    .toLowerCase();
   if (!token) return false;
   if (/^[a-z0-9]{1,4}$/i.test(token)) return true;
   return /^\\b[a-z0-9]{1,4}\\b$/i.test(token);
@@ -1160,8 +1162,8 @@ export function enforceCrossDocPolicy(
   );
   const requireDomainMatch = Boolean(
     selectedRule?.requireDomainMatch ??
-      retrievalPolicy.requireDomainMatch ??
-      false,
+    retrievalPolicy.requireDomainMatch ??
+    false,
   );
   const minExplicitForCompare = Math.max(
     1,

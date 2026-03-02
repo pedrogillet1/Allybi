@@ -1,10 +1,10 @@
-# Harsh Rubric Scorecard (27 queries)
+# Harsh Rubric Scorecard (50 queries)
 
-- Generated: 2026-02-28T19:39:28.810Z
-- Input: /Users/pg/Desktop/koda-webapp/frontend/e2e/reports/test1-bilingual-100-results.regrade4.json
-- Run ID: run_2026-02-28T19-39-28-810Z
+- Generated: 2026-03-02T03:01:15.048Z
+- Input: /Users/pg/Desktop/koda-webapp/frontend/e2e/reports/allybi-human-style-test1-semantic-50-v2-rerun8-results.json
+- Run ID: rerun8
 - Verdict: **NO_GO**
-- Final Score: **0/100**
+- Final Score: **89.88/100**
 
 ## Hard Gates
 
@@ -12,61 +12,80 @@
 |---|---:|
 | A (Doc-grounded + sources) | 0 |
 | B (Wrong-doc) | 0 |
-| C (Truncation) | 7 |
+| C (Truncation) | 0 |
 | D (Fallback with docs) | 0 |
 | E (Language mismatch) | 0 |
-
-Hard fail reasons:
-- Gate C failed in 7 queries
 
 ## Category Averages
 
 | Category | Avg | Max |
 |---|---:|---:|
-| Retrieval & Evidence | 29.63 | 40 |
-| Correctness & Coverage | 16.37 | 25 |
-| Reasoning | 8.74 | 15 |
-| Writing | 6.96 | 10 |
-| Conversation | 6.26 | 10 |
+| Retrieval & Evidence | 40 | 40 |
+| Correctness & Coverage | 19.4 | 25 |
+| Reasoning | 13.58 | 15 |
+| Writing | 8.4 | 10 |
+| Conversation | 8.5 | 10 |
 
 ## Outcome Counts
 
 - PASS: 10
-- PARTIAL: 10
-- FAIL: 7
+- PARTIAL: 40
+- FAIL: 0
 
 ## Top Issues
 
-- GATE_C_TRUNCATION_DETECTED: 7
 
 ## Per Query
 
 | # | Status | Score | Gates | Issues |
 |---:|---|---:|---|---|
-| 1 | FAIL | 0 | A:P B:P C:F D:P E:P | GATE_C_TRUNCATION_DETECTED |
-| 2 | FAIL | 0 | A:P B:P C:F D:P E:P | GATE_C_TRUNCATION_DETECTED |
-| 3 | PARTIAL | 84 | A:P B:P C:P D:P E:P | OK |
-| 4 | FAIL | 0 | A:P B:P C:F D:P E:P | GATE_C_TRUNCATION_DETECTED |
-| 5 | PASS | 98 | A:P B:P C:P D:P E:P | OK |
-| 6 | PARTIAL | 86 | A:P B:P C:P D:P E:P | OK |
-| 7 | PARTIAL | 86 | A:P B:P C:P D:P E:P | OK |
-| 8 | FAIL | 0 | A:P B:P C:F D:P E:P | GATE_C_TRUNCATION_DETECTED |
-| 9 | FAIL | 0 | A:P B:P C:F D:P E:P | GATE_C_TRUNCATION_DETECTED |
-| 10 | PARTIAL | 86 | A:P B:P C:P D:P E:P | OK |
-| 11 | FAIL | 0 | A:P B:P C:F D:P E:P | GATE_C_TRUNCATION_DETECTED |
-| 12 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
-| 13 | PARTIAL | 86 | A:P B:P C:P D:P E:P | OK |
-| 14 | PARTIAL | 93 | A:P B:P C:P D:P E:P | OK |
-| 15 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
-| 16 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
-| 17 | FAIL | 0 | A:P B:P C:F D:P E:P | GATE_C_TRUNCATION_DETECTED |
-| 18 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
-| 19 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
-| 20 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
-| 21 | PARTIAL | 86 | A:P B:P C:P D:P E:P | OK |
-| 22 | PARTIAL | 83 | A:P B:P C:P D:P E:P | OK |
-| 23 | PASS | 99 | A:P B:P C:P D:P E:P | OK |
-| 24 | PASS | 99 | A:P B:P C:P D:P E:P | OK |
-| 25 | PARTIAL | 86 | A:P B:P C:P D:P E:P | OK |
+| 1 | PARTIAL | 85 | A:P B:P C:P D:P E:P | OK |
+| 2 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 3 | PASS | 98 | A:P B:P C:P D:P E:P | OK |
+| 4 | PARTIAL | 85 | A:P B:P C:P D:P E:P | OK |
+| 5 | PARTIAL | 83 | A:P B:P C:P D:P E:P | OK |
+| 6 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 7 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 8 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 9 | PARTIAL | 87 | A:P B:P C:P D:P E:P | OK |
+| 10 | PARTIAL | 87 | A:P B:P C:P D:P E:P | OK |
+| 11 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 12 | PARTIAL | 86 | A:P B:P C:P D:P E:P | OK |
+| 13 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 14 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 15 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 16 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 17 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 18 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 19 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 20 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 21 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 22 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 23 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 24 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 25 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
 | 26 | PARTIAL | 84 | A:P B:P C:P D:P E:P | OK |
-| 27 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
+| 27 | PASS | 98 | A:P B:P C:P D:P E:P | OK |
+| 28 | PASS | 97 | A:P B:P C:P D:P E:P | OK |
+| 29 | PARTIAL | 88 | A:P B:P C:P D:P E:P | OK |
+| 30 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 31 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 32 | PARTIAL | 84 | A:P B:P C:P D:P E:P | OK |
+| 33 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 34 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 35 | PARTIAL | 85 | A:P B:P C:P D:P E:P | OK |
+| 36 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 37 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 38 | PARTIAL | 85 | A:P B:P C:P D:P E:P | OK |
+| 39 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 40 | PARTIAL | 89 | A:P B:P C:P D:P E:P | OK |
+| 41 | PARTIAL | 90 | A:P B:P C:P D:P E:P | OK |
+| 42 | PASS | 99 | A:P B:P C:P D:P E:P | OK |
+| 43 | PASS | 96 | A:P B:P C:P D:P E:P | OK |
+| 44 | PASS | 99 | A:P B:P C:P D:P E:P | OK |
+| 45 | PARTIAL | 85 | A:P B:P C:P D:P E:P | OK |
+| 46 | PASS | 98 | A:P B:P C:P D:P E:P | OK |
+| 47 | PASS | 98 | A:P B:P C:P D:P E:P | OK |
+| 48 | PASS | 99 | A:P B:P C:P D:P E:P | OK |
+| 49 | PARTIAL | 87 | A:P B:P C:P D:P E:P | OK |
+| 50 | PASS | 99 | A:P B:P C:P D:P E:P | OK |

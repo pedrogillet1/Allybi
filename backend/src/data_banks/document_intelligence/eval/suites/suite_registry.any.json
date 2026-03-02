@@ -14,7 +14,9 @@
     "enforceAtBoot": false,
     "failOnMissingCases": true,
     "requireUniqueCaseIds": true,
-    "requireJsonlParse": true
+    "requireJsonlParse": true,
+    "minimumNegativeRatio": 0.2,
+    "parityTolerancePercent": 25
   },
   "schema": {
     "required": [

@@ -25,7 +25,8 @@
       "semantics"
     ],
     "schemas": [
-      "manifest"
+      "manifest",
+      "semantics"
     ],
     "normalizers": [
       "schemas",
@@ -134,16 +135,6 @@
       ]
     },
     {
-      "id": "agg_stats_terms_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "agg_stats_terms_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "allybi_capabilities",
       "dependsOn": [],
       "optional": true
@@ -190,11 +181,6 @@
     },
     {
       "id": "allybi_language_triggers",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "allybi_python_operators",
       "dependsOn": [],
       "optional": true
     },
@@ -391,6 +377,11 @@
       "optional": true
     },
     {
+      "id": "citation_styles",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "clarification_phrases",
       "dependsOn": [],
       "optional": true
@@ -434,12 +425,7 @@
       "optional": true
     },
     {
-      "id": "compose_answer_prompt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "connector_operators",
+      "id": "compliance_policy",
       "dependsOn": [],
       "optional": true
     },
@@ -449,16 +435,6 @@
         "intent_patterns",
         "operator_families"
       ]
-    },
-    {
-      "id": "conversation_messages",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "creative_operators",
-      "dependsOn": [],
-      "optional": true
     },
     {
       "id": "date_patterns",
@@ -501,6 +477,11 @@
         "assumption_policy",
         "explain_style_ops"
       ]
+    },
+    {
+      "id": "dedupe_and_repetition",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "di_abbreviation_global",
@@ -2979,6 +2960,202 @@
       "optional": true
     },
     {
+      "id": "di_ops_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_answer_style_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_disclaimer_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_domain_detection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_domain_profile",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_evidence_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_extraction_ops_incident_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_extraction_ops_maintenance_log",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_extraction_ops_quality_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_extraction_ops_shipping_manifest",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_extraction_ops_sla_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_extraction_ops_work_order",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_reasoning_scaffolds",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_redaction_and_safety_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_retrieval_strategies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_ops_sections_ops_incident_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_sections_ops_maintenance_log",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_sections_ops_quality_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_sections_ops_shipping_manifest",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_sections_ops_sla_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_sections_ops_work_order",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_tables_ops_incident_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_tables_ops_maintenance_log",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_tables_ops_quality_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_tables_ops_shipping_manifest",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_tables_ops_sla_report",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_tables_ops_work_order",
+      "dependsOn": [
+        "di_ops_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_ops_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_section_ontology",
       "dependsOn": [],
       "optional": true
@@ -3469,6 +3646,11 @@
       ]
     },
     {
+      "id": "doc_grounding_checks",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "doc_identity_schema",
       "dependsOn": [
         "bank_registry"
@@ -3615,12 +3797,6 @@
       "optional": true
     },
     {
-      "id": "email_action_operators",
-      "dependsOn": [
-        "operator_contracts"
-      ]
-    },
-    {
       "id": "email_routing",
       "dependsOn": [
         "intent_patterns",
@@ -3681,16 +3857,6 @@
     },
     {
       "id": "excel_function_catalog",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "excel_functions_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "excel_functions_pt",
       "dependsOn": [],
       "optional": true
     },
@@ -3806,11 +3972,6 @@
       ]
     },
     {
-      "id": "file_actions_microcopy",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "finance_doc_logic",
       "dependsOn": [
         "doc_archetypes_finance"
@@ -3829,9 +3990,7 @@
     },
     {
       "id": "followup_suggestions",
-      "dependsOn": [
-        "conversation_messages"
-      ]
+      "dependsOn": []
     },
     {
       "id": "fonts",
@@ -3839,10 +3998,9 @@
       "optional": true
     },
     {
-      "id": "format_semantics",
-      "dependsOn": [
-        "language_indicators"
-      ]
+      "id": "hallucination_guards",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "headings_map",
@@ -3926,11 +4084,6 @@
       "dependsOn": [
         "capabilities_catalog"
       ],
-      "optional": true
-    },
-    {
-      "id": "lab_result_patterns",
-      "dependsOn": [],
       "optional": true
     },
     {
@@ -4807,7 +4960,17 @@
       "optional": true
     },
     {
+      "id": "list_styles",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "locale_numeric_date_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "logging_policy",
       "dependsOn": [],
       "optional": true
     },
@@ -5587,31 +5750,10 @@
       "optional": true
     },
     {
-      "id": "mode_editing_docx",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "mode_editing_sheets",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "money_patterns",
       "dependsOn": [
         "doc_taxonomy"
       ]
-    },
-    {
-      "id": "month_normalization",
-      "dependsOn": [
-        "language_indicators"
-      ]
-    },
-    {
-      "id": "nav_microcopy",
-      "dependsOn": [],
-      "optional": true
     },
     {
       "id": "no_docs_messages",
@@ -6086,7 +6228,17 @@
       "optional": true
     },
     {
+      "id": "pii_field_labels",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "policy_citations",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "privacy_minimal_rules",
       "dependsOn": [],
       "optional": true
     },
@@ -6175,12 +6327,22 @@
       "optional": true
     },
     {
+      "id": "quote_styles",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "rag_policy",
       "dependsOn": [],
       "optional": true
     },
     {
       "id": "range_resolution_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "rate_limit_policy",
       "dependsOn": [],
       "optional": true
     },
@@ -6340,11 +6502,6 @@
       "optional": true
     },
     {
-      "id": "system_prompt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "table_header_ontology_accounting",
       "dependsOn": [
         "doc_taxonomy"
@@ -6401,17 +6558,17 @@
       "optional": true
     },
     {
+      "id": "table_styles",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "task_answer_with_sources",
       "dependsOn": [],
       "optional": true
     },
     {
       "id": "task_plan_generation",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "telecom_usage_patterns",
       "dependsOn": [],
       "optional": true
     },
@@ -6431,17 +6588,7 @@
       "optional": true
     },
     {
-      "id": "ui_intro_neutral",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "ui_next_step_suggestion",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "ui_soft_close",
+      "id": "unused_bank_lifecycle",
       "dependsOn": [],
       "optional": true
     },

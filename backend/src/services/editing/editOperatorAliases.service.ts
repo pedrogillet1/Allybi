@@ -15,6 +15,9 @@ const CANONICAL_EDIT_OPERATORS = new Set<EditOperator>([
   "ADD_SLIDE",
   "REWRITE_SLIDE_TEXT",
   "REPLACE_SLIDE_IMAGE",
+  "PY_COMPUTE",
+  "PY_CHART",
+  "PY_WRITEBACK",
 ]);
 
 const PLAN_ALIASES = new Set([
@@ -64,7 +67,11 @@ function defaultOperatorForDomain(domain: EditDomain): EditOperator {
 }
 
 function isAllybiCanonicalOperator(value: string): boolean {
-  return /^DOCX_[A-Z0-9_]+$/.test(value) || /^XLSX_[A-Z0-9_]+$/.test(value);
+  return (
+    /^DOCX_[A-Z0-9_]+$/.test(value) ||
+    /^XLSX_[A-Z0-9_]+$/.test(value) ||
+    /^PY_[A-Z0-9_]+$/.test(value)
+  );
 }
 
 function runtimeFromAllybiCanonical(operator: string): EditOperator | null {
@@ -85,6 +92,9 @@ function runtimeFromAllybiCanonical(operator: string): EditOperator | null {
   if (op === "XLSX_RENAME_SHEET") return "RENAME_SHEET";
   if (op.startsWith("XLSX_CHART_")) return "CREATE_CHART";
   if (op.startsWith("XLSX_")) return "COMPUTE_BUNDLE";
+  if (op.startsWith("PY_CHART_")) return "PY_CHART";
+  if (op === "PY_WRITEBACK_RESULTS") return "PY_WRITEBACK";
+  if (op.startsWith("PY_")) return "PY_COMPUTE";
 
   return null;
 }

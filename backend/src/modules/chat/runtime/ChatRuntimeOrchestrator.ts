@@ -2,6 +2,7 @@ import type {
   LLMStreamingConfig,
   StreamSink,
 } from "../../../services/llm/types/llmStreaming.types";
+import type { DocumentStatus } from "@prisma/client";
 import prisma from "../../../config/database";
 import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
 import { logger } from "../../../utils/logger";
@@ -32,6 +33,14 @@ type ScopeRuntimeMentionConfig = {
   docStatusesAllowed: string[];
   stopWords: Set<string>;
 };
+
+const KNOWN_DOCUMENT_STATUSES: ReadonlySet<DocumentStatus> = new Set([
+  "ready",
+  "indexed",
+  "enriching",
+  "available",
+  "completed",
+]);
 
 function filenameFromStorageKey(
   storageKey: string | null | undefined,
@@ -415,12 +424,22 @@ export class ChatRuntimeOrchestrator {
     if (options?.restrictToDocumentIds && restrictedDocIds.length === 0) {
       return [];
     }
+    const allowedStatuses = this.scopeRuntime.docStatusesAllowed
+      .map((status) =>
+        String(status || "")
+          .trim()
+          .toLowerCase(),
+      )
+      .filter((status): status is DocumentStatus =>
+        KNOWN_DOCUMENT_STATUSES.has(status as DocumentStatus),
+      );
+    if (allowedStatuses.length === 0) return [];
 
     // Fetch user's ready/indexed documents
     const docs = await prisma.document.findMany({
       where: {
         userId,
-        status: { in: this.scopeRuntime.docStatusesAllowed },
+        status: { in: allowedStatuses },
         ...(restrictedDocIds.length > 0
           ? { id: { in: restrictedDocIds } }
           : {}),

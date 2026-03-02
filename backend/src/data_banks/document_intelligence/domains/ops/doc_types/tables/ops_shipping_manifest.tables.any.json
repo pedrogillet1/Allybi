@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "id": "di_ops_tables_ops_shipping_manifest",
+    "version": "1.0.0",
+    "description": "Expected table patterns for shipping manifest documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_shipping_manifest"
+  },
+  "tableHeaderSynonyms": {
+    "item_number": [
+      "item",
+      "line",
+      "seq",
+      "numero"
+    ],
+    "description": [
+      "description",
+      "product",
+      "goods",
+      "descricao",
+      "mercadoria"
+    ],
+    "quantity": [
+      "qty",
+      "quantity",
+      "packages",
+      "quantidade",
+      "volumes"
+    ],
+    "weight": [
+      "weight",
+      "gross weight",
+      "net weight",
+      "peso"
+    ],
+    "volume": [
+      "volume",
+      "CBM",
+      "m3"
+    ],
+    "sku": [
+      "SKU",
+      "part no",
+      "code",
+      "codigo"
+    ]
+  },
+  "tables": [
+    {
+      "id": "ops_shipping_manifest_items_table",
+      "name": {
+        "en": "Item List",
+        "pt": "Lista de Itens"
+      },
+      "section": "item_list",
+      "expectedColumns": [
+        "item_number",
+        "sku",
+        "description",
+        "quantity",
+        "weight"
+      ],
+      "keyRows": [
+        "total_items",
+        "total_weight"
+      ]
+    },
+    {
+      "id": "ops_shipping_manifest_totals_table",
+      "name": {
+        "en": "Shipment Totals",
+        "pt": "Totais do Embarque"
+      },
+      "section": "totals",
+      "expectedColumns": [
+        "metric",
+        "value",
+        "unit"
+      ],
+      "keyRows": [
+        "gross_weight",
+        "total_packages"
+      ]
+    },
+    {
+      "id": "ops_shipping_manifest_handling_table",
+      "name": {
+        "en": "Special Handling",
+        "pt": "Manuseio Especial"
+      },
+      "section": "special_instructions",
+      "expectedColumns": [
+        "instruction",
+        "applies_to",
+        "notes"
+      ],
+      "keyRows": [
+        "hazardous_flag"
+      ]
+    }
+  ]
+}

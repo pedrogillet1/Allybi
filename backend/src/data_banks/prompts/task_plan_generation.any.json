@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "Planner/output-contract prompt for machine-consumed steps.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true
@@ -33,5 +33,118 @@
         }
       ]
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "TPG_1001_json_only_contract",
+        "input": {
+          "operator": "plan_edit",
+          "request": "rewrite paragraph 2 in formal tone"
+        },
+        "expect": {
+          "outputShape": "json_only",
+          "forbidProsePrefix": true
+        }
+      },
+      {
+        "id": "TPG_1002_clarification_when_required_missing",
+        "input": {
+          "operator": "plan_edit",
+          "request": "change it"
+        },
+        "expect": {
+          "returnsClarificationObject": true,
+          "forbidFreeFormNarrative": true
+        }
+      },
+      {
+        "id": "TPG_1003_no_markdown_or_commentary",
+        "input": {
+          "operator": "multi_intent_planner",
+          "request": "summarize then translate"
+        },
+        "expect": {
+          "outputShape": "json_only",
+          "forbidTokens": ["```", "Here is", "Plan:"]
+        }
+      },
+      {
+        "id": "TPG_1004_operator_scope_is_planner_only",
+        "input": {
+          "operator": "plan_xlsx"
+        },
+        "expect": {
+          "templateApplies": true,
+          "allowedOperators": [
+            "plan_edit",
+            "plan_multi_intent",
+            "docx_edit_planner",
+            "xlsx_edit_planner",
+            "sheets_edit_planner",
+            "slides_edit_planner",
+            "multi_intent_planner"
+          ]
+        }
+      },
+      {
+        "id": "TPG_1005_schema_shape_conformance",
+        "input": {
+          "operator": "docx_edit_planner",
+          "request": "fix tone and keep dates unchanged"
+        },
+        "expect": {
+          "matchesRequiredSchema": true,
+          "requiredTopLevelFieldsPresent": true
+        }
+      },
+      {
+        "id": "TPG_TEST_001_strict_json_output",
+        "input": "Bold the title paragraph",
+        "expect": {
+          "promptApplied": true,
+          "outputIsStrictJson": true,
+          "noFreeFormProse": true
+        }
+      },
+      {
+        "id": "TPG_TEST_002_clarification_when_fields_missing",
+        "input": "Change the font",
+        "expect": {
+          "promptApplied": true,
+          "returnsClarificationObject": true,
+          "clarificationHasQuestion": true,
+          "maxOneClarification": true
+        }
+      },
+      {
+        "id": "TPG_TEST_003_no_free_form_prose",
+        "input": "Make the second paragraph italic",
+        "expect": {
+          "promptApplied": true,
+          "noNaturalLanguageWrapper": true,
+          "noExplanationText": true
+        }
+      },
+      {
+        "id": "TPG_TEST_004_operator_routing_applicability",
+        "input": "Delete row 5 from the spreadsheet",
+        "expect": {
+          "promptApplied": true,
+          "selectedOperatorMatchesIntent": true,
+          "operatorIsValidForFileType": true
+        }
+      },
+      {
+        "id": "TPG_TEST_005_schema_shape_conformance",
+        "input": "Replace 'foo' with 'bar' in all paragraphs",
+        "expect": {
+          "promptApplied": true,
+          "hasRequiredFields": true,
+          "conformsToOutputSchema": true,
+          "noExtraTopLevelKeys": true
+        }
+      }
+    ]
+  }
 }

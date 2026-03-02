@@ -1,0 +1,103 @@
+{
+  "_meta": {
+    "id": "di_ops_tables_ops_work_order",
+    "version": "1.0.0",
+    "description": "Expected table patterns for work order documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_work_order"
+  },
+  "tableHeaderSynonyms": {
+    "part_number": [
+      "part no",
+      "part number",
+      "codigo peca",
+      "SKU"
+    ],
+    "description": [
+      "description",
+      "descricao",
+      "details",
+      "item"
+    ],
+    "quantity": [
+      "qty",
+      "quantity",
+      "quantidade"
+    ],
+    "unit_cost": [
+      "unit cost",
+      "unit price",
+      "custo unitario"
+    ],
+    "total": [
+      "total",
+      "amount",
+      "valor"
+    ],
+    "date": [
+      "date",
+      "data",
+      "completed"
+    ]
+  },
+  "tables": [
+    {
+      "id": "ops_work_order_parts_table",
+      "name": {
+        "en": "Parts Used",
+        "pt": "Pecas Utilizadas"
+      },
+      "section": "parts_and_materials",
+      "expectedColumns": [
+        "part_number",
+        "description",
+        "quantity",
+        "unit_cost",
+        "total"
+      ],
+      "keyRows": [
+        "total_parts_cost"
+      ]
+    },
+    {
+      "id": "ops_work_order_labor_table",
+      "name": {
+        "en": "Labor Log",
+        "pt": "Registro de Mao de Obra"
+      },
+      "section": "summary",
+      "expectedColumns": [
+        "date",
+        "technician",
+        "hours",
+        "description"
+      ],
+      "keyRows": [
+        "total_hours"
+      ]
+    },
+    {
+      "id": "ops_work_order_tasks_table",
+      "name": {
+        "en": "Task Checklist",
+        "pt": "Lista de Tarefas"
+      },
+      "section": "work_description",
+      "expectedColumns": [
+        "task",
+        "status",
+        "notes"
+      ],
+      "keyRows": [
+        "completion_summary"
+      ]
+    }
+  ]
+}

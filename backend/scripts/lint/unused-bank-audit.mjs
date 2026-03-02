@@ -59,11 +59,38 @@ const registryPaths = new Set(
     .map((entry) => toPosix(entry?.path))
     .filter(Boolean),
 );
+const registryById = new Map(
+  (Array.isArray(registry.banks) ? registry.banks : [])
+    .map((entry) => [String(entry?.id || "").trim(), entry])
+    .filter(([id]) => Boolean(id)),
+);
 
 const allJson = walkJson(BANKS_ROOT);
-const unregistered = allJson.filter(
+const unregisteredCandidates = allJson.filter(
   (relPath) => !registryPaths.has(relPath) && !isAllowed(relPath),
 );
+const canonicalMirrorsIgnored = [];
+const unregistered = [];
+for (const relPath of unregisteredCandidates) {
+  try {
+    const fullPath = path.join(BANKS_ROOT, relPath);
+    const data = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    const metaId = String(data?._meta?.id || "").trim();
+    const canonicalEntry = metaId ? registryById.get(metaId) : null;
+    const canonicalPath = toPosix(canonicalEntry?.path);
+    if (metaId && canonicalPath && canonicalPath !== relPath) {
+      canonicalMirrorsIgnored.push({
+        relPath,
+        metaId,
+        canonicalPath,
+      });
+      continue;
+    }
+  } catch {
+    // keep as unregistered when the payload cannot be parsed for _meta.id
+  }
+  unregistered.push(relPath);
+}
 const missingOnDisk = [...registryPaths].filter(
   (relPath) => !fs.existsSync(path.join(BANKS_ROOT, relPath)),
 );
@@ -76,6 +103,7 @@ const report = {
   totals: {
     discoveredJsonFiles: allJson.length,
     registryEntries: registryPaths.size,
+    canonicalMirrorsIgnored: canonicalMirrorsIgnored.length,
     unregisteredOutsideQuarantine: unregistered.length,
     missingRegistryFilesOnDisk: missingOnDisk.length,
   },
@@ -83,6 +111,7 @@ const report = {
     allowedPrefixes: ALLOWED_PREFIXES,
     allowedSuffixes: ALLOWED_SUFFIXES,
   },
+  canonicalMirrorsIgnored,
   unregisteredOutsideQuarantine: unregistered,
   missingRegistryFilesOnDisk: missingOnDisk,
 };

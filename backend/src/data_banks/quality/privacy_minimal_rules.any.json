@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "id": "privacy_minimal_rules",
+    "version": "1.0.0",
+    "description": "Privacy-minimal output rules for quality enforcement.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true
+  },
+  "rules": [
+    {
+      "id": "PMR_001_no_internal_paths",
+      "severity": "error",
+      "pattern": "(/Users/|/home/|C:\\\\|D:\\\\)",
+      "failureAction": "BLOCK_AND_FALLBACK"
+    },
+    {
+      "id": "PMR_002_no_raw_internal_ids",
+      "severity": "warning",
+      "pattern": "[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "failureAction": "STRIP"
+    },
+    {
+      "id": "PMR_003_no_api_keys_or_tokens",
+      "severity": "error",
+      "pattern": "eyJ[A-Za-z0-9_-]+|sk-[A-Za-z0-9]+|AKIA[A-Z0-9]{16}",
+      "failureAction": "STRIP"
+    },
+    {
+      "id": "PMR_004_no_raw_stack_traces",
+      "severity": "error",
+      "pattern": "\\bat\\s+\\S+\\s+\\(\\S+:\\d+:\\d+\\)|Traceback \\(most recent call last\\)",
+      "failureAction": "STRIP"
+    },
+    {
+      "id": "PMR_005_no_internal_urls",
+      "severity": "warning",
+      "pattern": "https?://(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\S+\\.internal|\\S+\\.staging)(:\\d+)?\\S*",
+      "failureAction": "STRIP"
+    },
+    {
+      "id": "PMR_006_no_environment_variables",
+      "severity": "error",
+      "pattern": "(DATABASE_URL|AWS_SECRET_ACCESS_KEY|AWS_ACCESS_KEY_ID|SECRET_KEY|API_KEY|PRIVATE_KEY)\\s*=\\s*\\S+",
+      "failureAction": "STRIP"
+    },
+    {
+      "id": "PMR_007_no_raw_connection_strings",
+      "severity": "error",
+      "pattern": "(mongodb|postgresql|mysql|redis|amqp)://\\S+",
+      "failureAction": "STRIP"
+    }
+  ]
+}

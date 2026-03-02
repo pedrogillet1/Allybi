@@ -64,8 +64,19 @@ router.get("/", async (req: Request, res: Response) => {
  */
 router.get("/:fileId", async (req: Request, res: Response) => {
   try {
-    const { fileId } = req.params;
-    const range = (req.query.range as string) || "7d";
+    const fileId = String(req.params.fileId || "").trim();
+    const rangeParam = req.query.range;
+    let range = "7d";
+    if (typeof rangeParam === "string") {
+      range = rangeParam;
+    } else if (Array.isArray(rangeParam)) {
+      const firstString = rangeParam.find(
+        (value): value is string => typeof value === "string",
+      );
+      if (firstString) {
+        range = firstString;
+      }
+    }
 
     const result = await getFileDetail(prisma, { fileId, range });
 

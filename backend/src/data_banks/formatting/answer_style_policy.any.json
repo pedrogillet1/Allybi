@@ -189,17 +189,17 @@
     },
     "standard": {
       "name": "Standard",
-      "budget": { "maxChars": 1300, "maxParagraphs": 4, "maxBullets": 8, "maxTableRows": 22, "maxQuoteLines": 7, "maxQuestions": 1 },
+      "budget": { "maxChars": 4000, "maxParagraphs": 6, "maxBullets": 10, "maxTableRows": 22, "maxQuoteLines": 7, "maxQuestions": 1 },
       "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
     },
     "detailed": {
       "name": "Detailed",
-      "budget": { "maxChars": 1900, "maxParagraphs": 6, "maxBullets": 10, "maxTableRows": 28, "maxQuoteLines": 8, "maxQuestions": 1 },
+      "budget": { "maxChars": 6000, "maxParagraphs": 8, "maxBullets": 12, "maxTableRows": 28, "maxQuoteLines": 8, "maxQuestions": 1 },
       "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
     },
     "deep": {
       "name": "Deep",
-      "budget": { "maxChars": 2600, "maxParagraphs": 8, "maxBullets": 12, "maxTableRows": 36, "maxQuoteLines": 10, "maxQuestions": 1 },
+      "budget": { "maxChars": 8000, "maxParagraphs": 10, "maxBullets": 14, "maxTableRows": 36, "maxQuoteLines": 10, "maxQuestions": 1 },
       "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
     }
   },

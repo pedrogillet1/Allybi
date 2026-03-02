@@ -245,13 +245,11 @@ export class ConnectorsIngestionService {
       // Queue unavailable: fallback to inline indexing.
     }
 
-    const chunks = splitTextIntoChunks(textContent).map(
-      (content, idx) => ({
-        chunkIndex: idx,
-        content,
-        metadata: { source: "connector_ingestion" },
-      }),
-    );
+    const chunks = splitTextIntoChunks(textContent).map((content, idx) => ({
+      chunkIndex: idx,
+      content,
+      metadata: { source: "connector_ingestion" },
+    }));
 
     await vectorEmbeddingService.storeDocumentEmbeddings(
       queuePayload.documentId,

@@ -34,7 +34,9 @@ function nowIso(): string {
 
 function ensureGroup(template: any, id: string): any {
   const groups = safeArr(template?.groups);
-  const existing = groups.find((group: any) => String(group?.id || "").trim() === id);
+  const existing = groups.find(
+    (group: any) => String(group?.id || "").trim() === id,
+  );
   if (existing) return existing;
   const fallback = {
     id,
@@ -54,7 +56,10 @@ function main() {
   const semanticsDir = path.join(root, "semantics");
 
   const contractsPath = path.join(operatorsDir, "operator_contracts.any.json");
-  const capabilitiesPath = path.join(semanticsDir, "allybi_capabilities.any.json");
+  const capabilitiesPath = path.join(
+    semanticsDir,
+    "allybi_capabilities.any.json",
+  );
   const outPath = path.join(semanticsDir, "capabilities_catalog.any.json");
 
   const contracts = readJson(contractsPath);
@@ -92,7 +97,9 @@ function main() {
     byFamily.set(family, uniq([...(byFamily.get(family) || []), id]));
   }
 
-  const supportedEditingOperators = Object.entries(capabilities?.operators || {})
+  const supportedEditingOperators = Object.entries(
+    capabilities?.operators || {},
+  )
     .filter(([, data]: [string, any]) => Boolean(data?.supported))
     .map(([id]) => String(id).trim())
     .filter(Boolean);

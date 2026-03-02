@@ -1,19 +1,32 @@
 {
   "_meta": {
     "id": "headings_map",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Canonical heading ontology with multilingual synonyms for cross-domain section detection across everyday documents.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
     "languages": [
       "en",
       "pt"
-    ]
+    ],
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "headings": [
     {
@@ -32,7 +45,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_abbreviations",
+      "curationReason": "weighted:abbreviations:domain_general"
     },
     {
       "canonical": "abstract",
@@ -50,7 +67,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_abstract",
+      "curationReason": "weighted:abstract:domain_general"
     },
     {
       "canonical": "acceptance_criteria",
@@ -68,7 +89,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_acceptance_criteria",
+      "curationReason": "weighted:acceptance_criteria:domain_ops"
     },
     {
       "canonical": "account_holder_information",
@@ -84,7 +109,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_account_holder_information",
+      "curationReason": "weighted:account_holder_information:domain_general"
     },
     {
       "canonical": "account_identifier_block",
@@ -100,7 +129,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_account_identifier_block",
+      "curationReason": "weighted:account_identifier_block:domain_general"
     },
     {
       "canonical": "account_summary",
@@ -116,7 +149,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_account_summary",
+      "curationReason": "weighted:account_summary:domain_general"
     },
     {
       "canonical": "accounts_payable",
@@ -135,7 +172,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_accounts_payable",
+      "curationReason": "weighted:accounts_payable:domain_finance"
     },
     {
       "canonical": "accounts_receivable",
@@ -154,7 +195,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_accounts_receivable",
+      "curationReason": "weighted:accounts_receivable:domain_finance"
     },
     {
       "canonical": "acknowledgements",
@@ -171,7 +216,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_acknowledgements",
+      "curationReason": "weighted:acknowledgements:domain_general"
     },
     {
       "canonical": "action_items",
@@ -190,7 +239,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_action_items",
+      "curationReason": "weighted:action_items:domain_ops"
     },
     {
       "canonical": "additional_services",
@@ -206,7 +259,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_additional_services",
+      "curationReason": "weighted:additional_services:domain_general"
     },
     {
       "canonical": "address_block",
@@ -222,7 +279,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_address_block",
+      "curationReason": "weighted:address_block:domain_general"
     },
     {
       "canonical": "adjustments_section",
@@ -238,7 +299,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_adjustments_section",
+      "curationReason": "weighted:adjustments_section:domain_general"
     },
     {
       "canonical": "agent_information",
@@ -254,7 +319,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_agent_information",
+      "curationReason": "weighted:agent_information:domain_general"
     },
     {
       "canonical": "allergies",
@@ -273,7 +342,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_allergies",
+      "curationReason": "weighted:allergies:domain_medical"
     },
     {
       "canonical": "amendments",
@@ -293,7 +366,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_amendments",
+      "curationReason": "weighted:amendments:domain_legal"
     },
     {
       "canonical": "amortization",
@@ -310,7 +387,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_amortization",
+      "curationReason": "weighted:amortization:domain_finance"
     },
     {
       "canonical": "amount_due_summary",
@@ -326,7 +407,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 1030,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_amount_due_summary",
+      "curationReason": "weighted:amount_due_summary:domain_general"
     },
     {
       "canonical": "annual_totals",
@@ -342,7 +427,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_annual_totals",
+      "curationReason": "weighted:annual_totals:domain_general"
     },
     {
       "canonical": "appeal_instructions",
@@ -358,7 +447,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_appeal_instructions",
+      "curationReason": "weighted:appeal_instructions:domain_general"
     },
     {
       "canonical": "appendix",
@@ -378,7 +471,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 380,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_appendix",
+      "curationReason": "weighted:appendix:domain_general"
     },
     {
       "canonical": "application_metadata",
@@ -394,7 +491,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 380,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_application_metadata",
+      "curationReason": "weighted:application_metadata:domain_general"
     },
     {
       "canonical": "approval",
@@ -413,7 +514,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_approval",
+      "curationReason": "weighted:approval:domain_ops"
     },
     {
       "canonical": "approval_status",
@@ -429,7 +534,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_approval_status",
+      "curationReason": "weighted:approval_status:domain_general"
     },
     {
       "canonical": "arbitration",
@@ -447,7 +556,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_arbitration",
+      "curationReason": "weighted:arbitration:domain_legal"
     },
     {
       "canonical": "arrears_breakdown",
@@ -463,7 +576,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_arrears_breakdown",
+      "curationReason": "weighted:arrears_breakdown:domain_general"
     },
     {
       "canonical": "assessment",
@@ -481,7 +598,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_assessment",
+      "curationReason": "weighted:assessment:domain_medical"
     },
     {
       "canonical": "assessment_summary",
@@ -497,7 +618,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_assessment_summary",
+      "curationReason": "weighted:assessment_summary:domain_general"
     },
     {
       "canonical": "assets",
@@ -515,7 +640,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_assets",
+      "curationReason": "weighted:assets:domain_finance"
     },
     {
       "canonical": "assignment",
@@ -533,7 +662,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_assignment",
+      "curationReason": "weighted:assignment:domain_legal"
     },
     {
       "canonical": "auditor_report",
@@ -552,7 +685,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_auditor_report",
+      "curationReason": "weighted:auditor_report:domain_finance"
     },
     {
       "canonical": "authorization_code_block",
@@ -568,7 +705,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_authorization_code_block",
+      "curationReason": "weighted:authorization_code_block:domain_general"
     },
     {
       "canonical": "autopay_configuration",
@@ -584,7 +725,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_autopay_configuration",
+      "curationReason": "weighted:autopay_configuration:domain_general"
     },
     {
       "canonical": "average_daily_usage",
@@ -601,7 +746,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_average_daily_usage",
+      "curationReason": "weighted:average_daily_usage:domain_billing"
     },
     {
       "canonical": "balance_forward",
@@ -618,7 +767,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_balance_forward",
+      "curationReason": "weighted:balance_forward:domain_banking"
     },
     {
       "canonical": "balance_reconciliation",
@@ -635,7 +788,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_balance_reconciliation",
+      "curationReason": "weighted:balance_reconciliation:domain_banking"
     },
     {
       "canonical": "balance_sheet",
@@ -653,7 +810,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_balance_sheet",
+      "curationReason": "weighted:balance_sheet:domain_finance"
     },
     {
       "canonical": "bank_branch_details",
@@ -670,7 +831,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_bank_branch_details",
+      "curationReason": "weighted:bank_branch_details:domain_banking"
     },
     {
       "canonical": "bank_contact_details",
@@ -687,7 +852,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_bank_contact_details",
+      "curationReason": "weighted:bank_contact_details:domain_banking"
     },
     {
       "canonical": "banking_activity_summary",
@@ -704,7 +873,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_banking_activity_summary",
+      "curationReason": "weighted:banking_activity_summary:domain_banking"
     },
     {
       "canonical": "beneficiary_details",
@@ -720,7 +893,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_beneficiary_details",
+      "curationReason": "weighted:beneficiary_details:domain_general"
     },
     {
       "canonical": "benefit_schedule",
@@ -737,7 +914,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_benefit_schedule",
+      "curationReason": "weighted:benefit_schedule:domain_general"
     },
     {
       "canonical": "billing_address",
@@ -754,7 +935,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_billing_address",
+      "curationReason": "weighted:billing_address:domain_billing"
     },
     {
       "canonical": "billing_cycle",
@@ -771,7 +956,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_billing_cycle",
+      "curationReason": "weighted:billing_cycle:domain_billing"
     },
     {
       "canonical": "billing_dispute_process",
@@ -788,7 +977,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_billing_dispute_process",
+      "curationReason": "weighted:billing_dispute_process:domain_billing"
     },
     {
       "canonical": "billing_period",
@@ -805,7 +998,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_billing_period",
+      "curationReason": "weighted:billing_period:domain_billing"
     },
     {
       "canonical": "billing_summary",
@@ -822,7 +1019,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_billing_summary",
+      "curationReason": "weighted:billing_summary:domain_billing"
     },
     {
       "canonical": "boarding_group",
@@ -839,7 +1040,11 @@
       "domainTags": [
         "general",
         "travel"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_boarding_group",
+      "curationReason": "weighted:boarding_group:domain_general"
     },
     {
       "canonical": "boarding_instructions",
@@ -856,7 +1061,11 @@
       "domainTags": [
         "general",
         "travel"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_boarding_instructions",
+      "curationReason": "weighted:boarding_instructions:domain_general"
     },
     {
       "canonical": "budget",
@@ -876,7 +1085,11 @@
       "domainTags": [
         "finance",
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_budget",
+      "curationReason": "weighted:budget:domain_finance"
     },
     {
       "canonical": "budget_variance",
@@ -894,7 +1107,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_budget_variance",
+      "curationReason": "weighted:budget_variance:domain_finance"
     },
     {
       "canonical": "call_detail_records",
@@ -910,7 +1127,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_call_detail_records",
+      "curationReason": "weighted:call_detail_records:domain_general"
     },
     {
       "canonical": "call_usage_summary",
@@ -927,7 +1148,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_call_usage_summary",
+      "curationReason": "weighted:call_usage_summary:domain_billing"
     },
     {
       "canonical": "campus_information",
@@ -943,7 +1168,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_campus_information",
+      "curationReason": "weighted:campus_information:domain_general"
     },
     {
       "canonical": "capital_expenditure",
@@ -962,7 +1191,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_capital_expenditure",
+      "curationReason": "weighted:capital_expenditure:domain_finance"
     },
     {
       "canonical": "carrier_information",
@@ -978,7 +1211,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_carrier_information",
+      "curationReason": "weighted:carrier_information:domain_general"
     },
     {
       "canonical": "cash_flow",
@@ -996,7 +1233,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_cash_flow",
+      "curationReason": "weighted:cash_flow:domain_finance"
     },
     {
       "canonical": "cashback_rewards",
@@ -1012,7 +1253,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_cashback_rewards",
+      "curationReason": "weighted:cashback_rewards:domain_general"
     },
     {
       "canonical": "change_log",
@@ -1031,7 +1276,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_change_log",
+      "curationReason": "weighted:change_log:domain_ops"
     },
     {
       "canonical": "charges_breakdown",
@@ -1048,7 +1297,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_charges_breakdown",
+      "curationReason": "weighted:charges_breakdown:domain_billing"
     },
     {
       "canonical": "check_in_details",
@@ -1064,7 +1317,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_check_in_details",
+      "curationReason": "weighted:check_in_details:domain_general"
     },
     {
       "canonical": "check_out_details",
@@ -1080,7 +1337,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_check_out_details",
+      "curationReason": "weighted:check_out_details:domain_general"
     },
     {
       "canonical": "chief_complaint",
@@ -1099,7 +1360,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_chief_complaint",
+      "curationReason": "weighted:chief_complaint:domain_medical"
     },
     {
       "canonical": "claim_details",
@@ -1116,7 +1381,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_claim_details",
+      "curationReason": "weighted:claim_details:domain_general"
     },
     {
       "canonical": "claim_filing_window",
@@ -1134,7 +1403,11 @@
         "general",
         "insurance",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_claim_filing_window",
+      "curationReason": "weighted:claim_filing_window:domain_general"
     },
     {
       "canonical": "claim_number_block",
@@ -1151,7 +1424,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_claim_number_block",
+      "curationReason": "weighted:claim_number_block:domain_general"
     },
     {
       "canonical": "claim_status",
@@ -1168,7 +1445,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_claim_status",
+      "curationReason": "weighted:claim_status:domain_general"
     },
     {
       "canonical": "class_schedule",
@@ -1184,7 +1465,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_class_schedule",
+      "curationReason": "weighted:class_schedule:domain_general"
     },
     {
       "canonical": "co_insurance_details",
@@ -1200,7 +1485,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_co_insurance_details",
+      "curationReason": "weighted:co_insurance_details:domain_general"
     },
     {
       "canonical": "co_pay_details",
@@ -1216,7 +1505,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_co_pay_details",
+      "curationReason": "weighted:co_pay_details:domain_general"
     },
     {
       "canonical": "collateral_details",
@@ -1232,7 +1525,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_collateral_details",
+      "curationReason": "weighted:collateral_details:domain_general"
     },
     {
       "canonical": "compliance",
@@ -1251,7 +1548,11 @@
       "domainTags": [
         "legal",
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_compliance",
+      "curationReason": "weighted:compliance:domain_legal"
     },
     {
       "canonical": "conclusion",
@@ -1270,7 +1571,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_conclusion",
+      "curationReason": "weighted:conclusion:domain_general"
     },
     {
       "canonical": "confidentiality",
@@ -1289,7 +1594,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_confidentiality",
+      "curationReason": "weighted:confidentiality:domain_legal"
     },
     {
       "canonical": "consultation_notes",
@@ -1307,7 +1616,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_consultation_notes",
+      "curationReason": "weighted:consultation_notes:domain_medical"
     },
     {
       "canonical": "consumer_notice",
@@ -1323,7 +1636,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_consumer_notice",
+      "curationReason": "weighted:consumer_notice:domain_general"
     },
     {
       "canonical": "contact_information",
@@ -1339,7 +1656,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_contact_information",
+      "curationReason": "weighted:contact_information:domain_general"
     },
     {
       "canonical": "contingent_liabilities",
@@ -1357,7 +1678,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_contingent_liabilities",
+      "curationReason": "weighted:contingent_liabilities:domain_finance"
     },
     {
       "canonical": "contract_reference",
@@ -1373,7 +1698,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 380,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_contract_reference",
+      "curationReason": "weighted:contract_reference:domain_general"
     },
     {
       "canonical": "cost_of_goods_sold",
@@ -1393,7 +1722,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_cost_of_goods_sold",
+      "curationReason": "weighted:cost_of_goods_sold:domain_finance"
     },
     {
       "canonical": "counterparts",
@@ -1411,7 +1744,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_counterparts",
+      "curationReason": "weighted:counterparts:domain_legal"
     },
     {
       "canonical": "course_credits",
@@ -1428,7 +1765,11 @@
       "domainTags": [
         "education",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:education",
+      "disambiguationRuleId": "headings_disambiguation_education_course_credits",
+      "curationReason": "weighted:course_credits:domain_education"
     },
     {
       "canonical": "course_grades",
@@ -1445,7 +1786,11 @@
       "domainTags": [
         "education",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:education",
+      "disambiguationRuleId": "headings_disambiguation_education_course_grades",
+      "curationReason": "weighted:course_grades:domain_education"
     },
     {
       "canonical": "course_list",
@@ -1462,7 +1807,11 @@
       "domainTags": [
         "education",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:education",
+      "disambiguationRuleId": "headings_disambiguation_education_course_list",
+      "curationReason": "weighted:course_list:domain_education"
     },
     {
       "canonical": "coverage_limits",
@@ -1479,7 +1828,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_coverage_limits",
+      "curationReason": "weighted:coverage_limits:domain_general"
     },
     {
       "canonical": "coverage_period",
@@ -1496,7 +1849,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_coverage_period",
+      "curationReason": "weighted:coverage_period:domain_general"
     },
     {
       "canonical": "coverage_summary",
@@ -1513,7 +1870,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_coverage_summary",
+      "curationReason": "weighted:coverage_summary:domain_general"
     },
     {
       "canonical": "credit_limit_details",
@@ -1529,7 +1890,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_credit_limit_details",
+      "curationReason": "weighted:credit_limit_details:domain_general"
     },
     {
       "canonical": "credit_score_snapshot",
@@ -1545,7 +1910,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_credit_score_snapshot",
+      "curationReason": "weighted:credit_score_snapshot:domain_general"
     },
     {
       "canonical": "currency_notes",
@@ -1561,7 +1930,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_currency_notes",
+      "curationReason": "weighted:currency_notes:domain_general"
     },
     {
       "canonical": "customer_service_contacts",
@@ -1577,7 +1950,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_customer_service_contacts",
+      "curationReason": "weighted:customer_service_contacts:domain_general"
     },
     {
       "canonical": "data_allowance",
@@ -1593,7 +1970,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_data_allowance",
+      "curationReason": "weighted:data_allowance:domain_general"
     },
     {
       "canonical": "data_protection",
@@ -1614,7 +1995,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_data_protection",
+      "curationReason": "weighted:data_protection:domain_legal"
     },
     {
       "canonical": "data_usage_summary",
@@ -1631,7 +2016,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_data_usage_summary",
+      "curationReason": "weighted:data_usage_summary:domain_billing"
     },
     {
       "canonical": "debt_schedule",
@@ -1650,7 +2039,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_debt_schedule",
+      "curationReason": "weighted:debt_schedule:domain_finance"
     },
     {
       "canonical": "deductible_details",
@@ -1667,7 +2060,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_deductible_details",
+      "curationReason": "weighted:deductible_details:domain_general"
     },
     {
       "canonical": "deductions_breakdown",
@@ -1685,7 +2082,11 @@
         "general",
         "hr_payroll",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_deductions_breakdown",
+      "curationReason": "weighted:deductions_breakdown:domain_general"
     },
     {
       "canonical": "definitions",
@@ -1704,7 +2105,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_definitions",
+      "curationReason": "weighted:definitions:domain_legal"
     },
     {
       "canonical": "delinquency_notice",
@@ -1720,7 +2125,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_delinquency_notice",
+      "curationReason": "weighted:delinquency_notice:domain_general"
     },
     {
       "canonical": "deliverables",
@@ -1739,7 +2148,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_deliverables",
+      "curationReason": "weighted:deliverables:domain_ops"
     },
     {
       "canonical": "delivery_address",
@@ -1755,7 +2168,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_delivery_address",
+      "curationReason": "weighted:delivery_address:domain_general"
     },
     {
       "canonical": "department_information",
@@ -1771,7 +2188,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_department_information",
+      "curationReason": "weighted:department_information:domain_general"
     },
     {
       "canonical": "dependencies",
@@ -1790,7 +2211,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_dependencies",
+      "curationReason": "weighted:dependencies:domain_ops"
     },
     {
       "canonical": "dependent_information",
@@ -1806,7 +2231,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_dependent_information",
+      "curationReason": "weighted:dependent_information:domain_general"
     },
     {
       "canonical": "deployment_plan",
@@ -1825,7 +2254,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_deployment_plan",
+      "curationReason": "weighted:deployment_plan:domain_ops"
     },
     {
       "canonical": "deposit_history",
@@ -1842,7 +2275,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_deposit_history",
+      "curationReason": "weighted:deposit_history:domain_banking"
     },
     {
       "canonical": "depreciation",
@@ -1860,7 +2297,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_depreciation",
+      "curationReason": "weighted:depreciation:domain_finance"
     },
     {
       "canonical": "device_information",
@@ -1876,7 +2317,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_device_information",
+      "curationReason": "weighted:device_information:domain_general"
     },
     {
       "canonical": "diagnosis",
@@ -1896,7 +2341,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_diagnosis",
+      "curationReason": "weighted:diagnosis:domain_medical"
     },
     {
       "canonical": "differential_diagnosis",
@@ -1913,7 +2362,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_differential_diagnosis",
+      "curationReason": "weighted:differential_diagnosis:domain_medical"
     },
     {
       "canonical": "digital_signature_block",
@@ -1929,7 +2382,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_digital_signature_block",
+      "curationReason": "weighted:digital_signature_block:domain_general"
     },
     {
       "canonical": "disbursement_history",
@@ -1945,7 +2402,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_disbursement_history",
+      "curationReason": "weighted:disbursement_history:domain_general"
     },
     {
       "canonical": "discharge_summary",
@@ -1963,7 +2424,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_discharge_summary",
+      "curationReason": "weighted:discharge_summary:domain_medical"
     },
     {
       "canonical": "discounts_and_promotions",
@@ -1980,7 +2445,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_discounts_and_promotions",
+      "curationReason": "weighted:discounts_and_promotions:domain_general"
     },
     {
       "canonical": "dispute_resolution",
@@ -1999,7 +2468,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_dispute_resolution",
+      "curationReason": "weighted:dispute_resolution:domain_legal"
     },
     {
       "canonical": "dividends",
@@ -2017,7 +2490,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_dividends",
+      "curationReason": "weighted:dividends:domain_finance"
     },
     {
       "canonical": "document_issuer_details",
@@ -2034,7 +2511,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_document_issuer_details",
+      "curationReason": "weighted:document_issuer_details:domain_general"
     },
     {
       "canonical": "document_verification_block",
@@ -2051,7 +2532,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_document_verification_block",
+      "curationReason": "weighted:document_verification_block:domain_general"
     },
     {
       "canonical": "due_date_information",
@@ -2067,7 +2552,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_due_date_information",
+      "curationReason": "weighted:due_date_information:domain_general"
     },
     {
       "canonical": "ebitda",
@@ -2085,7 +2574,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_ebitda",
+      "curationReason": "weighted:ebitda:domain_finance"
     },
     {
       "canonical": "education_institution_details",
@@ -2101,7 +2594,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_education_institution_details",
+      "curationReason": "weighted:education_institution_details:domain_general"
     },
     {
       "canonical": "effective_date",
@@ -2119,7 +2616,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_effective_date",
+      "curationReason": "weighted:effective_date:domain_legal"
     },
     {
       "canonical": "eligibility_details",
@@ -2135,7 +2636,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_eligibility_details",
+      "curationReason": "weighted:eligibility_details:domain_general"
     },
     {
       "canonical": "email_contacts",
@@ -2151,7 +2656,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_email_contacts",
+      "curationReason": "weighted:email_contacts:domain_general"
     },
     {
       "canonical": "emergency_contacts",
@@ -2167,7 +2676,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_emergency_contacts",
+      "curationReason": "weighted:emergency_contacts:domain_general"
     },
     {
       "canonical": "employee_information",
@@ -2184,7 +2697,11 @@
       "domainTags": [
         "general",
         "hr_payroll"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_employee_information",
+      "curationReason": "weighted:employee_information:domain_general"
     },
     {
       "canonical": "employer_information",
@@ -2201,7 +2718,11 @@
       "domainTags": [
         "general",
         "hr_payroll"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_employer_information",
+      "curationReason": "weighted:employer_information:domain_general"
     },
     {
       "canonical": "enrollment_details",
@@ -2218,7 +2739,11 @@
       "domainTags": [
         "education",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:education",
+      "disambiguationRuleId": "headings_disambiguation_education_enrollment_details",
+      "curationReason": "weighted:enrollment_details:domain_education"
     },
     {
       "canonical": "entire_agreement",
@@ -2237,7 +2762,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_entire_agreement",
+      "curationReason": "weighted:entire_agreement:domain_legal"
     },
     {
       "canonical": "entity_identifiers",
@@ -2253,7 +2782,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_entity_identifiers",
+      "curationReason": "weighted:entity_identifiers:domain_general"
     },
     {
       "canonical": "equity",
@@ -2272,7 +2805,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_equity",
+      "curationReason": "weighted:equity:domain_finance"
     },
     {
       "canonical": "escalation_matrix",
@@ -2290,7 +2827,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_escalation_matrix",
+      "curationReason": "weighted:escalation_matrix:domain_ops"
     },
     {
       "canonical": "exam_scores",
@@ -2306,7 +2847,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_exam_scores",
+      "curationReason": "weighted:exam_scores:domain_general"
     },
     {
       "canonical": "exchange_rate_notes",
@@ -2322,7 +2867,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_exchange_rate_notes",
+      "curationReason": "weighted:exchange_rate_notes:domain_general"
     },
     {
       "canonical": "exclusivity",
@@ -2340,7 +2889,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_exclusivity",
+      "curationReason": "weighted:exclusivity:domain_legal"
     },
     {
       "canonical": "executive_summary",
@@ -2360,7 +2913,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_executive_summary",
+      "curationReason": "weighted:executive_summary:domain_general"
     },
     {
       "canonical": "expenses",
@@ -2380,7 +2937,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_expenses",
+      "curationReason": "weighted:expenses:domain_finance"
     },
     {
       "canonical": "fair_value",
@@ -2399,7 +2960,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_fair_value",
+      "curationReason": "weighted:fair_value:domain_finance"
     },
     {
       "canonical": "family_history",
@@ -2417,7 +2982,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_family_history",
+      "curationReason": "weighted:family_history:domain_medical"
     },
     {
       "canonical": "fare_rules",
@@ -2433,7 +3002,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_fare_rules",
+      "curationReason": "weighted:fare_rules:domain_general"
     },
     {
       "canonical": "fee_schedule",
@@ -2450,7 +3023,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_fee_schedule",
+      "curationReason": "weighted:fee_schedule:domain_billing"
     },
     {
       "canonical": "filing_status",
@@ -2467,7 +3044,11 @@
       "domainTags": [
         "general",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_filing_status",
+      "curationReason": "weighted:filing_status:domain_general"
     },
     {
       "canonical": "financial_aid_summary",
@@ -2483,7 +3064,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_financial_aid_summary",
+      "curationReason": "weighted:financial_aid_summary:domain_general"
     },
     {
       "canonical": "financial_summary",
@@ -2501,7 +3086,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_financial_summary",
+      "curationReason": "weighted:financial_summary:domain_finance"
     },
     {
       "canonical": "flight_details",
@@ -2518,7 +3107,11 @@
       "domainTags": [
         "general",
         "travel"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_flight_details",
+      "curationReason": "weighted:flight_details:domain_general"
     },
     {
       "canonical": "follow_up",
@@ -2538,7 +3131,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_follow_up",
+      "curationReason": "weighted:follow_up:domain_medical"
     },
     {
       "canonical": "force_majeure",
@@ -2556,7 +3153,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_force_majeure",
+      "curationReason": "weighted:force_majeure:domain_legal"
     },
     {
       "canonical": "foreign_transaction_fees",
@@ -2574,7 +3175,11 @@
         "banking",
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_foreign_transaction_fees",
+      "curationReason": "weighted:foreign_transaction_fees:domain_banking"
     },
     {
       "canonical": "forex_exposure",
@@ -2593,7 +3198,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_forex_exposure",
+      "curationReason": "weighted:forex_exposure:domain_finance"
     },
     {
       "canonical": "fraud_alerts",
@@ -2609,7 +3218,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 780,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_fraud_alerts",
+      "curationReason": "weighted:fraud_alerts:domain_general"
     },
     {
       "canonical": "fuel_surcharge_details",
@@ -2626,7 +3239,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_fuel_surcharge_details",
+      "curationReason": "weighted:fuel_surcharge_details:domain_billing"
     },
     {
       "canonical": "glossary",
@@ -2645,7 +3262,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_glossary",
+      "curationReason": "weighted:glossary:domain_general"
     },
     {
       "canonical": "governing_law",
@@ -2665,7 +3286,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_governing_law",
+      "curationReason": "weighted:governing_law:domain_legal"
     },
     {
       "canonical": "gpa_summary",
@@ -2682,7 +3307,11 @@
       "domainTags": [
         "education",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:education",
+      "disambiguationRuleId": "headings_disambiguation_education_gpa_summary",
+      "curationReason": "weighted:gpa_summary:domain_education"
     },
     {
       "canonical": "grace_period_terms",
@@ -2698,7 +3327,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_grace_period_terms",
+      "curationReason": "weighted:grace_period_terms:domain_general"
     },
     {
       "canonical": "gross_profit",
@@ -2716,7 +3349,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_gross_profit",
+      "curationReason": "weighted:gross_profit:domain_finance"
     },
     {
       "canonical": "guarantor_information",
@@ -2732,7 +3369,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_guarantor_information",
+      "curationReason": "weighted:guarantor_information:domain_general"
     },
     {
       "canonical": "health_plan_details",
@@ -2748,7 +3389,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_health_plan_details",
+      "curationReason": "weighted:health_plan_details:domain_general"
     },
     {
       "canonical": "historical_comparison",
@@ -2764,7 +3409,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_historical_comparison",
+      "curationReason": "weighted:historical_comparison:domain_general"
     },
     {
       "canonical": "history_of_present_illness",
@@ -2784,7 +3433,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_history_of_present_illness",
+      "curationReason": "weighted:history_of_present_illness:domain_medical"
     },
     {
       "canonical": "home_address",
@@ -2800,7 +3453,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_home_address",
+      "curationReason": "weighted:home_address:domain_general"
     },
     {
       "canonical": "housing_cost_breakdown",
@@ -2817,7 +3474,11 @@
       "domainTags": [
         "general",
         "housing"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_housing_cost_breakdown",
+      "curationReason": "weighted:housing_cost_breakdown:domain_general"
     },
     {
       "canonical": "identity_document_details",
@@ -2834,7 +3495,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_identity_document_details",
+      "curationReason": "weighted:identity_document_details:domain_general"
     },
     {
       "canonical": "imaging_results",
@@ -2853,7 +3518,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_imaging_results",
+      "curationReason": "weighted:imaging_results:domain_medical"
     },
     {
       "canonical": "immunization_history",
@@ -2872,7 +3541,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_immunization_history",
+      "curationReason": "weighted:immunization_history:domain_medical"
     },
     {
       "canonical": "impairment",
@@ -2891,7 +3564,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_impairment",
+      "curationReason": "weighted:impairment:domain_finance"
     },
     {
       "canonical": "incident_details",
@@ -2907,7 +3584,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_incident_details",
+      "curationReason": "weighted:incident_details:domain_general"
     },
     {
       "canonical": "incident_report",
@@ -2926,7 +3607,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_incident_report",
+      "curationReason": "weighted:incident_report:domain_ops"
     },
     {
       "canonical": "income_summary",
@@ -2942,7 +3627,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_income_summary",
+      "curationReason": "weighted:income_summary:domain_general"
     },
     {
       "canonical": "indemnification",
@@ -2961,7 +3650,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_indemnification",
+      "curationReason": "weighted:indemnification:domain_legal"
     },
     {
       "canonical": "informed_consent",
@@ -2979,7 +3672,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_informed_consent",
+      "curationReason": "weighted:informed_consent:domain_medical"
     },
     {
       "canonical": "installment_schedule",
@@ -2995,7 +3692,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_installment_schedule",
+      "curationReason": "weighted:installment_schedule:domain_general"
     },
     {
       "canonical": "insurance_plan_summary",
@@ -3011,7 +3712,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_insurance_plan_summary",
+      "curationReason": "weighted:insurance_plan_summary:domain_general"
     },
     {
       "canonical": "insured_party_details",
@@ -3027,7 +3732,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_insured_party_details",
+      "curationReason": "weighted:insured_party_details:domain_general"
     },
     {
       "canonical": "intellectual_property",
@@ -3046,7 +3755,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_intellectual_property",
+      "curationReason": "weighted:intellectual_property:domain_legal"
     },
     {
       "canonical": "interest_calculation",
@@ -3063,7 +3776,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_interest_calculation",
+      "curationReason": "weighted:interest_calculation:domain_banking"
     },
     {
       "canonical": "interest_expense",
@@ -3082,7 +3799,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_interest_expense",
+      "curationReason": "weighted:interest_expense:domain_finance"
     },
     {
       "canonical": "interest_rate_details",
@@ -3099,7 +3820,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_interest_rate_details",
+      "curationReason": "weighted:interest_rate_details:domain_banking"
     },
     {
       "canonical": "introduction",
@@ -3119,7 +3844,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_introduction",
+      "curationReason": "weighted:introduction:domain_general"
     },
     {
       "canonical": "inventory",
@@ -3138,7 +3867,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_inventory",
+      "curationReason": "weighted:inventory:domain_ops"
     },
     {
       "canonical": "investment_portfolio",
@@ -3156,7 +3889,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_investment_portfolio",
+      "curationReason": "weighted:investment_portfolio:domain_finance"
     },
     {
       "canonical": "invoice_line_items",
@@ -3173,7 +3910,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_invoice_line_items",
+      "curationReason": "weighted:invoice_line_items:domain_billing"
     },
     {
       "canonical": "issuer_address",
@@ -3190,7 +3931,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_issuer_address",
+      "curationReason": "weighted:issuer_address:domain_general"
     },
     {
       "canonical": "issuer_tax_information",
@@ -3208,7 +3953,11 @@
         "general",
         "identity",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_issuer_tax_information",
+      "curationReason": "weighted:issuer_tax_information:domain_general"
     },
     {
       "canonical": "jurisdiction",
@@ -3227,7 +3976,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_jurisdiction",
+      "curationReason": "weighted:jurisdiction:domain_legal"
     },
     {
       "canonical": "lab_results",
@@ -3246,7 +3999,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_lab_results",
+      "curationReason": "weighted:lab_results:domain_medical"
     },
     {
       "canonical": "late_fee_terms",
@@ -3263,7 +4020,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_late_fee_terms",
+      "curationReason": "weighted:late_fee_terms:domain_billing"
     },
     {
       "canonical": "lease_terms",
@@ -3280,7 +4041,11 @@
       "domainTags": [
         "general",
         "housing"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_lease_terms",
+      "curationReason": "weighted:lease_terms:domain_general"
     },
     {
       "canonical": "legal_disclaimer",
@@ -3297,7 +4062,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_legal_disclaimer",
+      "curationReason": "weighted:legal_disclaimer:domain_general"
     },
     {
       "canonical": "lessons_learned",
@@ -3316,7 +4085,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_lessons_learned",
+      "curationReason": "weighted:lessons_learned:domain_ops"
     },
     {
       "canonical": "liabilities",
@@ -3336,7 +4109,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_liabilities",
+      "curationReason": "weighted:liabilities:domain_finance"
     },
     {
       "canonical": "limitation_of_liability",
@@ -3355,7 +4132,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_limitation_of_liability",
+      "curationReason": "weighted:limitation_of_liability:domain_legal"
     },
     {
       "canonical": "loan_amortization_schedule",
@@ -3372,7 +4153,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_loan_amortization_schedule",
+      "curationReason": "weighted:loan_amortization_schedule:domain_banking"
     },
     {
       "canonical": "loan_balance_summary",
@@ -3389,7 +4174,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_loan_balance_summary",
+      "curationReason": "weighted:loan_balance_summary:domain_banking"
     },
     {
       "canonical": "loan_payment_history",
@@ -3406,7 +4195,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_loan_payment_history",
+      "curationReason": "weighted:loan_payment_history:domain_banking"
     },
     {
       "canonical": "logistics",
@@ -3426,7 +4219,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_logistics",
+      "curationReason": "weighted:logistics:domain_ops"
     },
     {
       "canonical": "maintenance_schedule",
@@ -3444,7 +4241,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_maintenance_schedule",
+      "curationReason": "weighted:maintenance_schedule:domain_ops"
     },
     {
       "canonical": "mediation",
@@ -3463,7 +4264,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_mediation",
+      "curationReason": "weighted:mediation:domain_legal"
     },
     {
       "canonical": "medications",
@@ -3484,7 +4289,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_medications",
+      "curationReason": "weighted:medications:domain_medical"
     },
     {
       "canonical": "merchant_details",
@@ -3500,7 +4309,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_merchant_details",
+      "curationReason": "weighted:merchant_details:domain_general"
     },
     {
       "canonical": "meter_readings",
@@ -3517,7 +4330,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_meter_readings",
+      "curationReason": "weighted:meter_readings:domain_billing"
     },
     {
       "canonical": "methodology",
@@ -3536,7 +4353,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_methodology",
+      "curationReason": "weighted:methodology:domain_general"
     },
     {
       "canonical": "milestones",
@@ -3555,7 +4376,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_milestones",
+      "curationReason": "weighted:milestones:domain_ops"
     },
     {
       "canonical": "minimum_payment_information",
@@ -3571,7 +4396,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_minimum_payment_information",
+      "curationReason": "weighted:minimum_payment_information:domain_general"
     },
     {
       "canonical": "mobile_plan_summary",
@@ -3587,7 +4416,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_mobile_plan_summary",
+      "curationReason": "weighted:mobile_plan_summary:domain_general"
     },
     {
       "canonical": "monthly_totals",
@@ -3603,7 +4436,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_monthly_totals",
+      "curationReason": "weighted:monthly_totals:domain_general"
     },
     {
       "canonical": "mortgage_terms",
@@ -3620,7 +4457,11 @@
       "domainTags": [
         "general",
         "housing"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_mortgage_terms",
+      "curationReason": "weighted:mortgage_terms:domain_general"
     },
     {
       "canonical": "national_id_details",
@@ -3637,7 +4478,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_national_id_details",
+      "curationReason": "weighted:national_id_details:domain_general"
     },
     {
       "canonical": "net_income",
@@ -3656,7 +4501,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_net_income",
+      "curationReason": "weighted:net_income:domain_finance"
     },
     {
       "canonical": "net_pay_summary",
@@ -3672,7 +4521,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_net_pay_summary",
+      "curationReason": "weighted:net_pay_summary:domain_general"
     },
     {
       "canonical": "next_payment_information",
@@ -3688,7 +4541,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_next_payment_information",
+      "curationReason": "weighted:next_payment_information:domain_general"
     },
     {
       "canonical": "non_compete",
@@ -3707,7 +4564,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_non_compete",
+      "curationReason": "weighted:non_compete:domain_legal"
     },
     {
       "canonical": "non_covered_items",
@@ -3723,7 +4584,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_non_covered_items",
+      "curationReason": "weighted:non_covered_items:domain_general"
     },
     {
       "canonical": "non_solicitation",
@@ -3741,7 +4606,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_non_solicitation",
+      "curationReason": "weighted:non_solicitation:domain_legal"
     },
     {
       "canonical": "notes_to_financial_statements",
@@ -3759,7 +4628,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_notes_to_financial_statements",
+      "curationReason": "weighted:notes_to_financial_statements:domain_finance"
     },
     {
       "canonical": "notices",
@@ -3778,7 +4651,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_notices",
+      "curationReason": "weighted:notices:domain_legal"
     },
     {
       "canonical": "notification_preferences",
@@ -3794,7 +4671,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 380,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_notification_preferences",
+      "curationReason": "weighted:notification_preferences:domain_general"
     },
     {
       "canonical": "nursing_notes",
@@ -3813,7 +4694,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_nursing_notes",
+      "curationReason": "weighted:nursing_notes:domain_medical"
     },
     {
       "canonical": "obligations",
@@ -3833,7 +4718,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_obligations",
+      "curationReason": "weighted:obligations:domain_legal"
     },
     {
       "canonical": "occupancy_details",
@@ -3849,7 +4738,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_occupancy_details",
+      "curationReason": "weighted:occupancy_details:domain_general"
     },
     {
       "canonical": "onboarding",
@@ -3868,7 +4761,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_onboarding",
+      "curationReason": "weighted:onboarding:domain_ops"
     },
     {
       "canonical": "opening_balance",
@@ -3885,7 +4782,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_opening_balance",
+      "curationReason": "weighted:opening_balance:domain_banking"
     },
     {
       "canonical": "operating_hours",
@@ -3901,7 +4802,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_operating_hours",
+      "curationReason": "weighted:operating_hours:domain_general"
     },
     {
       "canonical": "operating_income",
@@ -3920,7 +4825,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_operating_income",
+      "curationReason": "weighted:operating_income:domain_finance"
     },
     {
       "canonical": "operative_report",
@@ -3939,7 +4848,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_operative_report",
+      "curationReason": "weighted:operative_report:domain_medical"
     },
     {
       "canonical": "out_of_network_details",
@@ -3955,7 +4868,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_out_of_network_details",
+      "curationReason": "weighted:out_of_network_details:domain_general"
     },
     {
       "canonical": "outstanding_items",
@@ -3971,7 +4888,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_outstanding_items",
+      "curationReason": "weighted:outstanding_items:domain_general"
     },
     {
       "canonical": "overage_charges",
@@ -3988,7 +4909,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_overage_charges",
+      "curationReason": "weighted:overage_charges:domain_billing"
     },
     {
       "canonical": "ownership_information",
@@ -4004,7 +4929,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_ownership_information",
+      "curationReason": "weighted:ownership_information:domain_general"
     },
     {
       "canonical": "parking_details",
@@ -4020,7 +4949,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_parking_details",
+      "curationReason": "weighted:parking_details:domain_general"
     },
     {
       "canonical": "passenger_information",
@@ -4036,7 +4969,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_passenger_information",
+      "curationReason": "weighted:passenger_information:domain_general"
     },
     {
       "canonical": "passport_information",
@@ -4053,7 +4990,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_passport_information",
+      "curationReason": "weighted:passport_information:domain_general"
     },
     {
       "canonical": "past_due_summary",
@@ -4069,7 +5010,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_past_due_summary",
+      "curationReason": "weighted:past_due_summary:domain_general"
     },
     {
       "canonical": "past_medical_history",
@@ -4088,7 +5033,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_past_medical_history",
+      "curationReason": "weighted:past_medical_history:domain_medical"
     },
     {
       "canonical": "pathology_report",
@@ -4107,7 +5056,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_pathology_report",
+      "curationReason": "weighted:pathology_report:domain_medical"
     },
     {
       "canonical": "patient_demographics",
@@ -4126,7 +5079,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_patient_demographics",
+      "curationReason": "weighted:patient_demographics:domain_medical"
     },
     {
       "canonical": "payment_allocation",
@@ -4142,7 +5099,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_payment_allocation",
+      "curationReason": "weighted:payment_allocation:domain_general"
     },
     {
       "canonical": "payment_channel_information",
@@ -4158,7 +5119,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_payment_channel_information",
+      "curationReason": "weighted:payment_channel_information:domain_general"
     },
     {
       "canonical": "payment_history",
@@ -4174,7 +5139,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_payment_history",
+      "curationReason": "weighted:payment_history:domain_general"
     },
     {
       "canonical": "payment_instructions",
@@ -4190,7 +5159,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_payment_instructions",
+      "curationReason": "weighted:payment_instructions:domain_general"
     },
     {
       "canonical": "payment_method_details",
@@ -4206,7 +5179,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_payment_method_details",
+      "curationReason": "weighted:payment_method_details:domain_general"
     },
     {
       "canonical": "payment_receipt_details",
@@ -4223,7 +5200,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_payment_receipt_details",
+      "curationReason": "weighted:payment_receipt_details:domain_billing"
     },
     {
       "canonical": "payment_terms",
@@ -4243,7 +5224,11 @@
       "domainTags": [
         "finance",
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_payment_terms",
+      "curationReason": "weighted:payment_terms:domain_finance"
     },
     {
       "canonical": "payroll_period",
@@ -4260,7 +5245,11 @@
       "domainTags": [
         "general",
         "hr_payroll"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_payroll_period",
+      "curationReason": "weighted:payroll_period:domain_general"
     },
     {
       "canonical": "penalties",
@@ -4280,7 +5269,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_penalties",
+      "curationReason": "weighted:penalties:domain_legal"
     },
     {
       "canonical": "penalty_terms",
@@ -4296,7 +5289,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_penalty_terms",
+      "curationReason": "weighted:penalty_terms:domain_general"
     },
     {
       "canonical": "performance_indicators",
@@ -4315,7 +5312,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_performance_indicators",
+      "curationReason": "weighted:performance_indicators:domain_ops"
     },
     {
       "canonical": "period_totals",
@@ -4331,7 +5332,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 1030,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_period_totals",
+      "curationReason": "weighted:period_totals:domain_general"
     },
     {
       "canonical": "personal_details",
@@ -4347,7 +5352,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_personal_details",
+      "curationReason": "weighted:personal_details:domain_general"
     },
     {
       "canonical": "physical_examination",
@@ -4366,7 +5375,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_physical_examination",
+      "curationReason": "weighted:physical_examination:domain_medical"
     },
     {
       "canonical": "plan",
@@ -4386,7 +5399,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_plan",
+      "curationReason": "weighted:plan:domain_medical"
     },
     {
       "canonical": "plan_allowances",
@@ -4402,7 +5419,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_plan_allowances",
+      "curationReason": "weighted:plan_allowances:domain_general"
     },
     {
       "canonical": "plan_change_history",
@@ -4418,7 +5439,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_plan_change_history",
+      "curationReason": "weighted:plan_change_history:domain_general"
     },
     {
       "canonical": "policy_holder_details",
@@ -4435,7 +5460,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_policy_holder_details",
+      "curationReason": "weighted:policy_holder_details:domain_general"
     },
     {
       "canonical": "policy_terms",
@@ -4452,7 +5481,11 @@
       "domainTags": [
         "general",
         "insurance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_policy_terms",
+      "curationReason": "weighted:policy_terms:domain_general"
     },
     {
       "canonical": "portfolio_overview",
@@ -4468,7 +5501,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_portfolio_overview",
+      "curationReason": "weighted:portfolio_overview:domain_general"
     },
     {
       "canonical": "postal_information",
@@ -4484,7 +5521,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_postal_information",
+      "curationReason": "weighted:postal_information:domain_general"
     },
     {
       "canonical": "pre_authorization_details",
@@ -4500,7 +5541,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_pre_authorization_details",
+      "curationReason": "weighted:pre_authorization_details:domain_general"
     },
     {
       "canonical": "preventive_care",
@@ -4519,7 +5564,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_preventive_care",
+      "curationReason": "weighted:preventive_care:domain_medical"
     },
     {
       "canonical": "previous_balance",
@@ -4536,7 +5585,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_previous_balance",
+      "curationReason": "weighted:previous_balance:domain_banking"
     },
     {
       "canonical": "pricing_tiers",
@@ -4552,7 +5605,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_pricing_tiers",
+      "curationReason": "weighted:pricing_tiers:domain_general"
     },
     {
       "canonical": "principal_balance",
@@ -4569,7 +5626,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_principal_balance",
+      "curationReason": "weighted:principal_balance:domain_banking"
     },
     {
       "canonical": "prognosis",
@@ -4588,7 +5649,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_prognosis",
+      "curationReason": "weighted:prognosis:domain_medical"
     },
     {
       "canonical": "progress_notes",
@@ -4607,7 +5672,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_progress_notes",
+      "curationReason": "weighted:progress_notes:domain_medical"
     },
     {
       "canonical": "project_overview",
@@ -4626,7 +5695,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_project_overview",
+      "curationReason": "weighted:project_overview:domain_ops"
     },
     {
       "canonical": "property_information",
@@ -4643,7 +5716,11 @@
       "domainTags": [
         "general",
         "housing"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_property_information",
+      "curationReason": "weighted:property_information:domain_general"
     },
     {
       "canonical": "provider_information",
@@ -4659,7 +5736,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_provider_information",
+      "curationReason": "weighted:provider_information:domain_general"
     },
     {
       "canonical": "purchase_summary",
@@ -4675,7 +5756,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_purchase_summary",
+      "curationReason": "weighted:purchase_summary:domain_general"
     },
     {
       "canonical": "quality_control",
@@ -4694,7 +5779,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_quality_control",
+      "curationReason": "weighted:quality_control:domain_ops"
     },
     {
       "canonical": "rail_segment_details",
@@ -4710,7 +5799,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_rail_segment_details",
+      "curationReason": "weighted:rail_segment_details:domain_general"
     },
     {
       "canonical": "rate_plan_information",
@@ -4726,7 +5819,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_rate_plan_information",
+      "curationReason": "weighted:rate_plan_information:domain_general"
     },
     {
       "canonical": "recitals",
@@ -4745,7 +5842,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_recitals",
+      "curationReason": "weighted:recitals:domain_legal"
     },
     {
       "canonical": "references",
@@ -4765,7 +5866,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 380,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_references",
+      "curationReason": "weighted:references:domain_general"
     },
     {
       "canonical": "referral",
@@ -4784,7 +5889,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_referral",
+      "curationReason": "weighted:referral:domain_medical"
     },
     {
       "canonical": "refund_policy",
@@ -4802,7 +5911,11 @@
         "general",
         "insurance",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_refund_policy",
+      "curationReason": "weighted:refund_policy:domain_general"
     },
     {
       "canonical": "regulatory_notices",
@@ -4818,7 +5931,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_regulatory_notices",
+      "curationReason": "weighted:regulatory_notices:domain_general"
     },
     {
       "canonical": "regulatory_requirements",
@@ -4837,7 +5954,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_regulatory_requirements",
+      "curationReason": "weighted:regulatory_requirements:domain_legal"
     },
     {
       "canonical": "related_party_transactions",
@@ -4855,7 +5976,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_related_party_transactions",
+      "curationReason": "weighted:related_party_transactions:domain_finance"
     },
     {
       "canonical": "remaining_allowance",
@@ -4871,7 +5996,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_remaining_allowance",
+      "curationReason": "weighted:remaining_allowance:domain_general"
     },
     {
       "canonical": "renewal_terms",
@@ -4887,7 +6016,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_renewal_terms",
+      "curationReason": "weighted:renewal_terms:domain_general"
     },
     {
       "canonical": "rent_schedule",
@@ -4904,7 +6037,11 @@
       "domainTags": [
         "general",
         "housing"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_rent_schedule",
+      "curationReason": "weighted:rent_schedule:domain_general"
     },
     {
       "canonical": "representations_and_warranties",
@@ -4922,7 +6059,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_representations_and_warranties",
+      "curationReason": "weighted:representations_and_warranties:domain_legal"
     },
     {
       "canonical": "reservation_details",
@@ -4940,7 +6081,11 @@
         "general",
         "tax",
         "travel"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_reservation_details",
+      "curationReason": "weighted:reservation_details:domain_general"
     },
     {
       "canonical": "residence_information",
@@ -4956,7 +6101,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_residence_information",
+      "curationReason": "weighted:residence_information:domain_general"
     },
     {
       "canonical": "resources",
@@ -4975,7 +6124,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_resources",
+      "curationReason": "weighted:resources:domain_ops"
     },
     {
       "canonical": "retained_earnings",
@@ -4993,7 +6146,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_retained_earnings",
+      "curationReason": "weighted:retained_earnings:domain_finance"
     },
     {
       "canonical": "revenue",
@@ -5014,7 +6171,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_revenue",
+      "curationReason": "weighted:revenue:domain_finance"
     },
     {
       "canonical": "review_of_systems",
@@ -5033,7 +6194,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_review_of_systems",
+      "curationReason": "weighted:review_of_systems:domain_medical"
     },
     {
       "canonical": "rewards_points_summary",
@@ -5049,7 +6214,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_rewards_points_summary",
+      "curationReason": "weighted:rewards_points_summary:domain_general"
     },
     {
       "canonical": "risk_assessment",
@@ -5068,7 +6237,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 780,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_risk_assessment",
+      "curationReason": "weighted:risk_assessment:domain_ops"
     },
     {
       "canonical": "roaming_charges",
@@ -5085,7 +6258,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_roaming_charges",
+      "curationReason": "weighted:roaming_charges:domain_billing"
     },
     {
       "canonical": "rollback_plan",
@@ -5104,7 +6281,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_rollback_plan",
+      "curationReason": "weighted:rollback_plan:domain_ops"
     },
     {
       "canonical": "root_cause_analysis",
@@ -5123,7 +6304,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_root_cause_analysis",
+      "curationReason": "weighted:root_cause_analysis:domain_ops"
     },
     {
       "canonical": "route_information",
@@ -5139,7 +6324,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_route_information",
+      "curationReason": "weighted:route_information:domain_general"
     },
     {
       "canonical": "salary_components",
@@ -5156,7 +6345,11 @@
       "domainTags": [
         "general",
         "hr_payroll"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_salary_components",
+      "curationReason": "weighted:salary_components:domain_general"
     },
     {
       "canonical": "scholarship_information",
@@ -5172,7 +6365,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_scholarship_information",
+      "curationReason": "weighted:scholarship_information:domain_general"
     },
     {
       "canonical": "scope",
@@ -5193,7 +6390,11 @@
       "domainTags": [
         "legal",
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_scope",
+      "curationReason": "weighted:scope:domain_legal"
     },
     {
       "canonical": "security_deposit_details",
@@ -5210,7 +6411,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_security_deposit_details",
+      "curationReason": "weighted:security_deposit_details:domain_banking"
     },
     {
       "canonical": "segment_reporting",
@@ -5229,7 +6434,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_segment_reporting",
+      "curationReason": "weighted:segment_reporting:domain_finance"
     },
     {
       "canonical": "service_address",
@@ -5245,7 +6454,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_service_address",
+      "curationReason": "weighted:service_address:domain_general"
     },
     {
       "canonical": "service_period",
@@ -5261,7 +6474,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_service_period",
+      "curationReason": "weighted:service_period:domain_general"
     },
     {
       "canonical": "service_provider_details",
@@ -5277,7 +6494,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_service_provider_details",
+      "curationReason": "weighted:service_provider_details:domain_general"
     },
     {
       "canonical": "settlement_details",
@@ -5293,7 +6514,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_settlement_details",
+      "curationReason": "weighted:settlement_details:domain_general"
     },
     {
       "canonical": "severability",
@@ -5311,7 +6536,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_severability",
+      "curationReason": "weighted:severability:domain_legal"
     },
     {
       "canonical": "shipping_details",
@@ -5327,7 +6556,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_shipping_details",
+      "curationReason": "weighted:shipping_details:domain_general"
     },
     {
       "canonical": "sign_off",
@@ -5346,7 +6579,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_sign_off",
+      "curationReason": "weighted:sign_off:domain_ops"
     },
     {
       "canonical": "signature_attestation",
@@ -5362,7 +6599,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_signature_attestation",
+      "curationReason": "weighted:signature_attestation:domain_general"
     },
     {
       "canonical": "sla_metrics",
@@ -5381,7 +6622,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_sla_metrics",
+      "curationReason": "weighted:sla_metrics:domain_ops"
     },
     {
       "canonical": "sms_usage_summary",
@@ -5398,7 +6643,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_sms_usage_summary",
+      "curationReason": "weighted:sms_usage_summary:domain_billing"
     },
     {
       "canonical": "social_history",
@@ -5417,7 +6666,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_social_history",
+      "curationReason": "weighted:social_history:domain_medical"
     },
     {
       "canonical": "special_conditions",
@@ -5433,7 +6686,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_special_conditions",
+      "curationReason": "weighted:special_conditions:domain_general"
     },
     {
       "canonical": "stakeholders",
@@ -5452,7 +6709,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_stakeholders",
+      "curationReason": "weighted:stakeholders:domain_ops"
     },
     {
       "canonical": "statement_period",
@@ -5469,7 +6730,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_statement_period",
+      "curationReason": "weighted:statement_period:domain_banking"
     },
     {
       "canonical": "status_overview",
@@ -5485,7 +6750,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_status_overview",
+      "curationReason": "weighted:status_overview:domain_general"
     },
     {
       "canonical": "status_update",
@@ -5504,7 +6773,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_status_update",
+      "curationReason": "weighted:status_update:domain_ops"
     },
     {
       "canonical": "student_information",
@@ -5521,7 +6794,11 @@
       "domainTags": [
         "education",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:education",
+      "disambiguationRuleId": "headings_disambiguation_education_student_information",
+      "curationReason": "weighted:student_information:domain_education"
     },
     {
       "canonical": "subsidy_information",
@@ -5537,7 +6814,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_subsidy_information",
+      "curationReason": "weighted:subsidy_information:domain_general"
     },
     {
       "canonical": "supply_chain",
@@ -5557,7 +6838,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_supply_chain",
+      "curationReason": "weighted:supply_chain:domain_ops"
     },
     {
       "canonical": "supporting_documents",
@@ -5574,7 +6859,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_supporting_documents",
+      "curationReason": "weighted:supporting_documents:domain_general"
     },
     {
       "canonical": "surcharge_breakdown",
@@ -5591,7 +6880,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_surcharge_breakdown",
+      "curationReason": "weighted:surcharge_breakdown:domain_billing"
     },
     {
       "canonical": "surgical_history",
@@ -5610,7 +6903,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_surgical_history",
+      "curationReason": "weighted:surgical_history:domain_medical"
     },
     {
       "canonical": "survival",
@@ -5628,7 +6925,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_survival",
+      "curationReason": "weighted:survival:domain_legal"
     },
     {
       "canonical": "table_of_contents",
@@ -5647,7 +6948,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_table_of_contents",
+      "curationReason": "weighted:table_of_contents:domain_general"
     },
     {
       "canonical": "tax_breakdown",
@@ -5664,7 +6969,11 @@
       "domainTags": [
         "general",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_tax_breakdown",
+      "curationReason": "weighted:tax_breakdown:domain_general"
     },
     {
       "canonical": "tax_identification",
@@ -5681,7 +6990,11 @@
       "domainTags": [
         "general",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_tax_identification",
+      "curationReason": "weighted:tax_identification:domain_general"
     },
     {
       "canonical": "tax_provision",
@@ -5700,7 +7013,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_tax_provision",
+      "curationReason": "weighted:tax_provision:domain_finance"
     },
     {
       "canonical": "tax_withholding_summary",
@@ -5717,7 +7034,11 @@
       "domainTags": [
         "general",
         "tax"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_tax_withholding_summary",
+      "curationReason": "weighted:tax_withholding_summary:domain_general"
     },
     {
       "canonical": "taxpayer_information",
@@ -5734,7 +7055,11 @@
       "domainTags": [
         "general",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_taxpayer_information",
+      "curationReason": "weighted:taxpayer_information:domain_general"
     },
     {
       "canonical": "term_and_duration",
@@ -5755,7 +7080,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_term_and_duration",
+      "curationReason": "weighted:term_and_duration:domain_legal"
     },
     {
       "canonical": "term_dates",
@@ -5771,7 +7100,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 680,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_term_dates",
+      "curationReason": "weighted:term_dates:domain_general"
     },
     {
       "canonical": "termination",
@@ -5791,7 +7124,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_termination",
+      "curationReason": "weighted:termination:domain_legal"
     },
     {
       "canonical": "termination_conditions",
@@ -5807,7 +7144,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_termination_conditions",
+      "curationReason": "weighted:termination_conditions:domain_general"
     },
     {
       "canonical": "test_results",
@@ -5826,7 +7167,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_test_results",
+      "curationReason": "weighted:test_results:domain_ops"
     },
     {
       "canonical": "ticket_information",
@@ -5842,7 +7187,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_ticket_information",
+      "curationReason": "weighted:ticket_information:domain_general"
     },
     {
       "canonical": "time_and_attendance",
@@ -5859,7 +7208,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_time_and_attendance",
+      "curationReason": "weighted:time_and_attendance:domain_general"
     },
     {
       "canonical": "timeline",
@@ -5878,7 +7231,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_timeline",
+      "curationReason": "weighted:timeline:domain_ops"
     },
     {
       "canonical": "toll_usage_summary",
@@ -5895,7 +7252,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_toll_usage_summary",
+      "curationReason": "weighted:toll_usage_summary:domain_billing"
     },
     {
       "canonical": "total_due",
@@ -5911,7 +7272,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_total_due",
+      "curationReason": "weighted:total_due:domain_general"
     },
     {
       "canonical": "training_plan",
@@ -5930,7 +7295,11 @@
       },
       "domainTags": [
         "ops"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:ops",
+      "disambiguationRuleId": "headings_disambiguation_ops_training_plan",
+      "curationReason": "weighted:training_plan:domain_ops"
     },
     {
       "canonical": "transaction_history",
@@ -5947,7 +7316,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_transaction_history",
+      "curationReason": "weighted:transaction_history:domain_banking"
     },
     {
       "canonical": "transaction_summary",
@@ -5964,7 +7337,11 @@
       "domainTags": [
         "banking",
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:banking",
+      "disambiguationRuleId": "headings_disambiguation_banking_transaction_summary",
+      "curationReason": "weighted:transaction_summary:domain_banking"
     },
     {
       "canonical": "travel_document_details",
@@ -5981,7 +7358,11 @@
       "domainTags": [
         "general",
         "identity"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_travel_document_details",
+      "curationReason": "weighted:travel_document_details:domain_general"
     },
     {
       "canonical": "treasury",
@@ -5999,7 +7380,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_treasury",
+      "curationReason": "weighted:treasury:domain_finance"
     },
     {
       "canonical": "treatment_plan",
@@ -6019,7 +7404,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_treatment_plan",
+      "curationReason": "weighted:treatment_plan:domain_medical"
     },
     {
       "canonical": "tuition_summary",
@@ -6035,7 +7424,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_tuition_summary",
+      "curationReason": "weighted:tuition_summary:domain_general"
     },
     {
       "canonical": "unit_rates",
@@ -6051,7 +7444,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_unit_rates",
+      "curationReason": "weighted:unit_rates:domain_general"
     },
     {
       "canonical": "usage_alerts",
@@ -6068,7 +7465,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 780,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_usage_alerts",
+      "curationReason": "weighted:usage_alerts:domain_billing"
     },
     {
       "canonical": "usage_by_category",
@@ -6085,7 +7486,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_usage_by_category",
+      "curationReason": "weighted:usage_by_category:domain_billing"
     },
     {
       "canonical": "utility_service_details",
@@ -6102,7 +7507,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_utility_service_details",
+      "curationReason": "weighted:utility_service_details:domain_billing"
     },
     {
       "canonical": "validation_notes",
@@ -6118,7 +7527,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_validation_notes",
+      "curationReason": "weighted:validation_notes:domain_general"
     },
     {
       "canonical": "vehicle_information",
@@ -6134,7 +7547,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_vehicle_information",
+      "curationReason": "weighted:vehicle_information:domain_general"
     },
     {
       "canonical": "verification_results",
@@ -6150,7 +7567,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 850,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_verification_results",
+      "curationReason": "weighted:verification_results:domain_general"
     },
     {
       "canonical": "visa_information",
@@ -6166,7 +7587,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_visa_information",
+      "curationReason": "weighted:visa_information:domain_general"
     },
     {
       "canonical": "vital_signs",
@@ -6185,7 +7610,11 @@
       },
       "domainTags": [
         "medical"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:medical",
+      "disambiguationRuleId": "headings_disambiguation_medical_vital_signs",
+      "curationReason": "weighted:vital_signs:domain_medical"
     },
     {
       "canonical": "waiver",
@@ -6203,7 +7632,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_waiver",
+      "curationReason": "weighted:waiver:domain_legal"
     },
     {
       "canonical": "water_sewer_usage",
@@ -6220,7 +7653,11 @@
       "domainTags": [
         "billing",
         "general"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:billing",
+      "disambiguationRuleId": "headings_disambiguation_billing_water_sewer_usage",
+      "curationReason": "weighted:water_sewer_usage:domain_billing"
     },
     {
       "canonical": "whereas_clauses",
@@ -6239,7 +7676,11 @@
       },
       "domainTags": [
         "legal"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:legal",
+      "disambiguationRuleId": "headings_disambiguation_legal_whereas_clauses",
+      "curationReason": "weighted:whereas_clauses:domain_legal"
     },
     {
       "canonical": "withholding_details",
@@ -6256,7 +7697,11 @@
       "domainTags": [
         "general",
         "tax"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_withholding_details",
+      "curationReason": "weighted:withholding_details:domain_general"
     },
     {
       "canonical": "working_capital",
@@ -6274,7 +7719,11 @@
       },
       "domainTags": [
         "finance"
-      ]
+      ],
+      "priority": 500,
+      "scope": "heading:finance",
+      "disambiguationRuleId": "headings_disambiguation_finance_working_capital",
+      "curationReason": "weighted:working_capital:domain_finance"
     },
     {
       "canonical": "year_to_date_summary",
@@ -6290,7 +7739,11 @@
       },
       "domainTags": [
         "general"
-      ]
+      ],
+      "priority": 1030,
+      "scope": "heading:general",
+      "disambiguationRuleId": "headings_disambiguation_general_year_to_date_summary",
+      "curationReason": "weighted:year_to_date_summary:domain_general"
     }
   ]
 }

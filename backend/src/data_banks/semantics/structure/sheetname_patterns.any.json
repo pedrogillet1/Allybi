@@ -1,98 +1,1289 @@
 {
   "_meta": {
     "id": "sheetname_patterns",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Spreadsheet sheet-name pattern normalization and canonical mapping.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "patterns": [
-    { "canonical": "accounts_payable", "synonyms": ["accounts payable", "ap", "payables", "contas a pagar", "fornecedores"], "domainHint": "finance" },
-    { "canonical": "accounts_receivable", "synonyms": ["accounts receivable", "ar", "receivables", "contas a receber", "clientes"], "domainHint": "finance" },
-    { "canonical": "actuals", "synonyms": ["actuals", "actual", "realized", "realizado", "valores realizados"], "domainHint": "finance" },
-    { "canonical": "aging", "synonyms": ["aging", "ageing", "aging report", "aging analysis", "contas vencidas"], "domainHint": "finance" },
-    { "canonical": "amendments", "synonyms": ["amendments", "aditivos", "emendas", "changes", "modifications"], "domainHint": "legal" },
-    { "canonical": "archive", "synonyms": ["archive", "archived", "old data", "arquivo", "dados antigos"], "domainHint": "general" },
-    { "canonical": "assets", "synonyms": ["assets", "fixed assets", "asset register", "ativos", "bens patrimoniais"], "domainHint": "finance" },
-    { "canonical": "balance_sheet", "synonyms": ["balance sheet", "bs", "balanco", "balanco patrimonial", "statement of financial position"], "domainHint": "finance" },
-    { "canonical": "bank_reconciliation", "synonyms": ["bank reconciliation", "bank recon", "bank rec", "conciliacao bancaria", "extrato bancario"], "domainHint": "finance" },
-    { "canonical": "bed_occupancy", "synonyms": ["bed occupancy", "bed census", "occupancy", "ocupacao de leitos", "censo de leitos"], "domainHint": "medical" },
-    { "canonical": "billing_codes", "synonyms": ["billing codes", "cpt codes", "procedure codes", "codigos de faturamento", "tuss"], "domainHint": "medical" },
-    { "canonical": "budget", "synonyms": ["budget", "orcamento", "budget plan", "plano orcamentario", "previsao orcamentaria"], "domainHint": "finance" },
-    { "canonical": "capex", "synonyms": ["capex", "capital expenditure", "capital budget", "investimentos", "despesas de capital"], "domainHint": "finance" },
-    { "canonical": "case_summary", "synonyms": ["case summary", "case overview", "resumo do caso", "sumario do processo", "case details"], "domainHint": "legal" },
-    { "canonical": "cash_flow", "synonyms": ["cash flow", "cf", "fluxo de caixa", "dfc", "cash flow statement"], "domainHint": "finance" },
-    { "canonical": "census", "synonyms": ["census", "patient census", "daily census", "censo", "censo diario"], "domainHint": "medical" },
-    { "canonical": "claims", "synonyms": ["claims", "reclamacoes", "sinistros", "insurance claims", "claim tracker"], "domainHint": "legal" },
-    { "canonical": "clauses", "synonyms": ["clauses", "contract clauses", "clausulas", "terms", "disposicoes"], "domainHint": "legal" },
-    { "canonical": "compliance", "synonyms": ["compliance", "compliance tracker", "conformidade", "regulatory", "regulatorio"], "domainHint": "legal" },
-    { "canonical": "consolidation", "synonyms": ["consolidation", "consolidated", "consol", "consolidado", "consolidacao"], "domainHint": "finance" },
-    { "canonical": "contracts", "synonyms": ["contracts", "contratos", "agreement list", "contract register", "registro de contratos"], "domainHint": "legal" },
-    { "canonical": "dashboard", "synonyms": ["dashboard", "painel", "overview", "visao geral", "control panel"], "domainHint": "general" },
-    { "canonical": "deadlines", "synonyms": ["deadlines", "prazos", "due dates", "vencimentos", "key dates"], "domainHint": "legal" },
-    { "canonical": "debt", "synonyms": ["debt", "debt schedule", "loans", "emprestimos", "dividas", "financiamentos"], "domainHint": "finance" },
-    { "canonical": "depreciation", "synonyms": ["depreciation", "depr", "depreciacao", "depreciation schedule", "tabela de depreciacao"], "domainHint": "finance" },
-    { "canonical": "diagnosis", "synonyms": ["diagnosis", "diagnostico", "diagnostics", "dx", "diagnostic list"], "domainHint": "medical" },
-    { "canonical": "discharge", "synonyms": ["discharge", "discharges", "alta", "altas", "discharge summary"], "domainHint": "medical" },
-    { "canonical": "disputes", "synonyms": ["disputes", "disputas", "litigation", "litigios", "contenciosos"], "domainHint": "legal" },
-    { "canonical": "dividends", "synonyms": ["dividends", "dividend history", "dividendos", "distribuicao de lucros"], "domainHint": "finance" },
-    { "canonical": "docket", "synonyms": ["docket", "court docket", "pauta", "agenda judicial", "calendar"], "domainHint": "legal" },
-    { "canonical": "encounters", "synonyms": ["encounters", "patient encounters", "visits", "atendimentos", "consultas"], "domainHint": "medical" },
-    { "canonical": "equity", "synonyms": ["equity", "shareholders equity", "patrimonio liquido", "capital proprio"], "domainHint": "finance" },
-    { "canonical": "evidence_log", "synonyms": ["evidence log", "evidence", "provas", "registro de evidencias", "exhibits"], "domainHint": "legal" },
-    { "canonical": "expenses", "synonyms": ["expenses", "despesas", "gastos", "expenditures", "custos operacionais"], "domainHint": "finance" },
-    { "canonical": "filings", "synonyms": ["filings", "court filings", "peticoes", "protocolos", "filing tracker"], "domainHint": "legal" },
-    { "canonical": "fleet", "synonyms": ["fleet", "vehicles", "fleet management", "frota", "veiculos"], "domainHint": "ops" },
-    { "canonical": "forecast", "synonyms": ["forecast", "projection", "previsao", "projecao", "outlook"], "domainHint": "finance" },
-    { "canonical": "formulary", "synonyms": ["formulary", "drug formulary", "formulario", "medicamentos padronizados", "drug list"], "domainHint": "medical" },
-    { "canonical": "fx_rates", "synonyms": ["fx rates", "exchange rates", "cotacoes", "taxas de cambio", "currency rates"], "domainHint": "finance" },
-    { "canonical": "general_ledger", "synonyms": ["general ledger", "gl", "ledger", "razao", "livro razao"], "domainHint": "finance" },
-    { "canonical": "immunizations", "synonyms": ["immunizations", "vaccinations", "vacinacao", "imunizacoes", "vaccine log"], "domainHint": "medical" },
-    { "canonical": "incidents", "synonyms": ["incidents", "incident log", "incidentes", "ocorrencias", "event log"], "domainHint": "ops" },
-    { "canonical": "insurance_claims", "synonyms": ["insurance claims", "claims processing", "sinistros", "faturamento sus", "insurance billing"], "domainHint": "medical" },
-    { "canonical": "intercompany", "synonyms": ["intercompany", "interco", "intercompany transactions", "transacoes intercompany", "eliminacoes"], "domainHint": "finance" },
-    { "canonical": "inventory", "synonyms": ["inventory", "stock", "estoque", "inventario", "stock levels"], "domainHint": "ops" },
-    { "canonical": "investments", "synonyms": ["investments", "investimentos", "portfolio", "carteira", "holdings"], "domainHint": "finance" },
-    { "canonical": "journal_entries", "synonyms": ["journal entries", "je", "lancamentos", "lancamentos contabeis", "journal"], "domainHint": "finance" },
-    { "canonical": "kpi_dashboard", "synonyms": ["kpi dashboard", "kpis", "metrics", "indicadores", "metricas"], "domainHint": "finance" },
-    { "canonical": "lab_results", "synonyms": ["lab results", "labs", "exames", "resultados laboratoriais", "laboratory"], "domainHint": "medical" },
-    { "canonical": "lookup", "synonyms": ["lookup", "reference table", "tabela de referencia", "vlookup", "de-para"], "domainHint": "general" },
-    { "canonical": "maintenance", "synonyms": ["maintenance", "manutencao", "preventive maintenance", "manutencao preventiva", "repairs"], "domainHint": "ops" },
-    { "canonical": "metadata", "synonyms": ["metadata", "meta", "metadados", "properties", "config"], "domainHint": "general" },
-    { "canonical": "monthly_close", "synonyms": ["monthly close", "month end", "fechamento mensal", "encerramento mensal", "close"], "domainHint": "finance" },
-    { "canonical": "obligations", "synonyms": ["obligations", "obrigacoes", "duties", "deveres", "commitments"], "domainHint": "legal" },
-    { "canonical": "orders", "synonyms": ["orders", "pedidos", "order list", "lista de pedidos", "sales orders"], "domainHint": "ops" },
-    { "canonical": "parties", "synonyms": ["parties", "partes", "counterparties", "stakeholders", "signatories"], "domainHint": "legal" },
-    { "canonical": "patients", "synonyms": ["patients", "pacientes", "patient list", "lista de pacientes", "patient roster"], "domainHint": "medical" },
-    { "canonical": "payroll", "synonyms": ["payroll", "folha de pagamento", "salaries", "salarios", "compensation"], "domainHint": "finance" },
-    { "canonical": "prescriptions", "synonyms": ["prescriptions", "rx", "receitas", "prescricoes", "medication orders"], "domainHint": "medical" },
-    { "canonical": "production", "synonyms": ["production", "producao", "manufacturing", "fabricacao", "output"], "domainHint": "ops" },
-    { "canonical": "profit_and_loss", "synonyms": ["p&l", "income statement", "dre", "demonstracao de resultados", "resultado do exercicio"], "domainHint": "finance" },
-    { "canonical": "purchase_orders", "synonyms": ["purchase orders", "po", "pedidos de compra", "ordens de compra", "procurement"], "domainHint": "ops" },
-    { "canonical": "quality_checks", "synonyms": ["quality checks", "qc", "quality inspection", "inspecao de qualidade", "controle de qualidade"], "domainHint": "ops" },
-    { "canonical": "quarterly_review", "synonyms": ["quarterly review", "q1", "q2", "q3", "q4", "revisao trimestral"], "domainHint": "finance" },
-    { "canonical": "ratios", "synonyms": ["ratios", "financial ratios", "indicadores financeiros", "indices", "key ratios"], "domainHint": "finance" },
-    { "canonical": "raw_data", "synonyms": ["raw data", "raw", "dados brutos", "source data", "dados fonte"], "domainHint": "general" },
-    { "canonical": "reference", "synonyms": ["reference", "ref", "referencia", "reference data", "dados de referencia"], "domainHint": "general" },
-    { "canonical": "referrals", "synonyms": ["referrals", "encaminhamentos", "referral list", "specialist referrals", "referencias"], "domainHint": "medical" },
-    { "canonical": "regulatory", "synonyms": ["regulatory", "regulatorio", "regulation tracker", "normas", "regulamentacao"], "domainHint": "legal" },
-    { "canonical": "revenue", "synonyms": ["revenue", "receita", "sales", "vendas", "faturamento"], "domainHint": "finance" },
-    { "canonical": "schedule", "synonyms": ["schedule", "cronograma", "timetable", "agenda", "planning"], "domainHint": "ops" },
-    { "canonical": "settlements", "synonyms": ["settlements", "acordos", "settlement tracker", "composicoes", "settlement log"], "domainHint": "legal" },
-    { "canonical": "settings", "synonyms": ["settings", "config", "configuracoes", "parameters", "parametros"], "domainHint": "general" },
-    { "canonical": "shipments", "synonyms": ["shipments", "shipping", "embarques", "entregas", "remessas"], "domainHint": "ops" },
-    { "canonical": "sla_tracking", "synonyms": ["sla tracking", "sla", "service levels", "niveis de servico", "sla compliance"], "domainHint": "ops" },
-    { "canonical": "summary", "synonyms": ["summary", "resumo", "overview", "visao geral", "executive summary"], "domainHint": "general" },
-    { "canonical": "suppliers", "synonyms": ["suppliers", "vendors", "fornecedores", "supplier list", "lista de fornecedores"], "domainHint": "ops" },
-    { "canonical": "tax", "synonyms": ["tax", "taxes", "impostos", "tax schedule", "tributacao"], "domainHint": "finance" },
-    { "canonical": "tracking", "synonyms": ["tracking", "tracker", "rastreamento", "acompanhamento", "monitoring"], "domainHint": "ops" },
-    { "canonical": "trial_balance", "synonyms": ["trial balance", "tb", "balancete", "balancete de verificacao", "trial bal"], "domainHint": "finance" },
-    { "canonical": "variance", "synonyms": ["variance", "variacao", "budget variance", "variance analysis", "desvio orcamentario"], "domainHint": "finance" },
-    { "canonical": "vitals", "synonyms": ["vitals", "vital signs", "sinais vitais", "vs", "vital parameters"], "domainHint": "medical" },
-    { "canonical": "warehouse", "synonyms": ["warehouse", "armazem", "storage", "estoque", "deposito"], "domainHint": "ops" },
-    { "canonical": "work_orders", "synonyms": ["work orders", "wo", "ordens de servico", "os", "service orders"], "domainHint": "ops" }
+    {
+      "canonical": "accounts_payable",
+      "synonyms": [
+        "accounts payable",
+        "ap",
+        "payables",
+        "contas a pagar",
+        "fornecedores"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_accounts_payable",
+      "curationReason": "weighted:accounts_payable:domain_finance"
+    },
+    {
+      "canonical": "accounts_receivable",
+      "synonyms": [
+        "accounts receivable",
+        "ar",
+        "receivables",
+        "contas a receber",
+        "clientes"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_accounts_receivable",
+      "curationReason": "weighted:accounts_receivable:domain_finance"
+    },
+    {
+      "canonical": "actuals",
+      "synonyms": [
+        "actuals",
+        "actual",
+        "realized",
+        "realizado",
+        "valores realizados"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_actuals",
+      "curationReason": "weighted:actuals:domain_finance"
+    },
+    {
+      "canonical": "aging",
+      "synonyms": [
+        "aging",
+        "ageing",
+        "aging report",
+        "aging analysis",
+        "contas vencidas"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_aging",
+      "curationReason": "weighted:aging:domain_finance"
+    },
+    {
+      "canonical": "amendments",
+      "synonyms": [
+        "amendments",
+        "aditivos",
+        "emendas",
+        "changes",
+        "modifications"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_amendments",
+      "curationReason": "weighted:amendments:domain_legal"
+    },
+    {
+      "canonical": "archive",
+      "synonyms": [
+        "archive",
+        "archived",
+        "old data",
+        "arquivo",
+        "dados antigos"
+      ],
+      "domainHint": "general",
+      "priority": 620,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_archive",
+      "curationReason": "weighted:archive:domain_general"
+    },
+    {
+      "canonical": "assets",
+      "synonyms": [
+        "assets",
+        "fixed assets",
+        "asset register",
+        "ativos",
+        "bens patrimoniais"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_assets",
+      "curationReason": "weighted:assets:domain_finance"
+    },
+    {
+      "canonical": "balance_sheet",
+      "synonyms": [
+        "balance sheet",
+        "bs",
+        "balanco",
+        "balanco patrimonial",
+        "statement of financial position"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_balance_sheet",
+      "curationReason": "weighted:balance_sheet:domain_finance"
+    },
+    {
+      "canonical": "bank_reconciliation",
+      "synonyms": [
+        "bank reconciliation",
+        "bank recon",
+        "bank rec",
+        "conciliacao bancaria",
+        "extrato bancario"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_bank_reconciliation",
+      "curationReason": "weighted:bank_reconciliation:domain_finance"
+    },
+    {
+      "canonical": "bed_occupancy",
+      "synonyms": [
+        "bed occupancy",
+        "bed census",
+        "occupancy",
+        "ocupacao de leitos",
+        "censo de leitos"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_bed_occupancy",
+      "curationReason": "weighted:bed_occupancy:domain_medical"
+    },
+    {
+      "canonical": "billing_codes",
+      "synonyms": [
+        "billing codes",
+        "cpt codes",
+        "procedure codes",
+        "codigos de faturamento",
+        "tuss"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_billing_codes",
+      "curationReason": "weighted:billing_codes:domain_medical"
+    },
+    {
+      "canonical": "budget",
+      "synonyms": [
+        "budget",
+        "orcamento",
+        "budget plan",
+        "plano orcamentario",
+        "previsao orcamentaria"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_budget",
+      "curationReason": "weighted:budget:domain_finance"
+    },
+    {
+      "canonical": "capex",
+      "synonyms": [
+        "capex",
+        "capital expenditure",
+        "capital budget",
+        "investimentos",
+        "despesas de capital"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_capex",
+      "curationReason": "weighted:capex:domain_finance"
+    },
+    {
+      "canonical": "case_summary",
+      "synonyms": [
+        "case summary",
+        "case overview",
+        "resumo do caso",
+        "sumario do processo",
+        "case details"
+      ],
+      "domainHint": "legal",
+      "priority": 970,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_case_summary",
+      "curationReason": "weighted:case_summary:domain_legal"
+    },
+    {
+      "canonical": "cash_flow",
+      "synonyms": [
+        "cash flow",
+        "cf",
+        "fluxo de caixa",
+        "dfc",
+        "cash flow statement"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_cash_flow",
+      "curationReason": "weighted:cash_flow:domain_finance"
+    },
+    {
+      "canonical": "census",
+      "synonyms": [
+        "census",
+        "patient census",
+        "daily census",
+        "censo",
+        "censo diario"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_census",
+      "curationReason": "weighted:census:domain_medical"
+    },
+    {
+      "canonical": "claims",
+      "synonyms": [
+        "claims",
+        "reclamacoes",
+        "sinistros",
+        "insurance claims",
+        "claim tracker"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_claims",
+      "curationReason": "weighted:claims:domain_legal"
+    },
+    {
+      "canonical": "clauses",
+      "synonyms": [
+        "clauses",
+        "contract clauses",
+        "clausulas",
+        "terms",
+        "disposicoes"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_clauses",
+      "curationReason": "weighted:clauses:domain_legal"
+    },
+    {
+      "canonical": "compliance",
+      "synonyms": [
+        "compliance",
+        "compliance tracker",
+        "conformidade",
+        "regulatory",
+        "regulatorio"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_compliance",
+      "curationReason": "weighted:compliance:domain_legal"
+    },
+    {
+      "canonical": "consolidation",
+      "synonyms": [
+        "consolidation",
+        "consolidated",
+        "consol",
+        "consolidado",
+        "consolidacao"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_consolidation",
+      "curationReason": "weighted:consolidation:domain_finance"
+    },
+    {
+      "canonical": "contracts",
+      "synonyms": [
+        "contracts",
+        "contratos",
+        "agreement list",
+        "contract register",
+        "registro de contratos"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_contracts",
+      "curationReason": "weighted:contracts:domain_legal"
+    },
+    {
+      "canonical": "dashboard",
+      "synonyms": [
+        "dashboard",
+        "painel",
+        "overview",
+        "visao geral",
+        "control panel"
+      ],
+      "domainHint": "general",
+      "priority": 620,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_dashboard",
+      "curationReason": "weighted:dashboard:domain_general"
+    },
+    {
+      "canonical": "deadlines",
+      "synonyms": [
+        "deadlines",
+        "prazos",
+        "due dates",
+        "vencimentos",
+        "key dates"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_deadlines",
+      "curationReason": "weighted:deadlines:domain_legal"
+    },
+    {
+      "canonical": "debt",
+      "synonyms": [
+        "debt",
+        "debt schedule",
+        "loans",
+        "emprestimos",
+        "dividas",
+        "financiamentos"
+      ],
+      "domainHint": "finance",
+      "priority": 626,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_debt",
+      "curationReason": "weighted:debt:domain_finance"
+    },
+    {
+      "canonical": "depreciation",
+      "synonyms": [
+        "depreciation",
+        "depr",
+        "depreciacao",
+        "depreciation schedule",
+        "tabela de depreciacao"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_depreciation",
+      "curationReason": "weighted:depreciation:domain_finance"
+    },
+    {
+      "canonical": "diagnosis",
+      "synonyms": [
+        "diagnosis",
+        "diagnostico",
+        "diagnostics",
+        "dx",
+        "diagnostic list"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_diagnosis",
+      "curationReason": "weighted:diagnosis:domain_medical"
+    },
+    {
+      "canonical": "discharge",
+      "synonyms": [
+        "discharge",
+        "discharges",
+        "alta",
+        "altas",
+        "discharge summary"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_discharge",
+      "curationReason": "weighted:discharge:domain_medical"
+    },
+    {
+      "canonical": "disputes",
+      "synonyms": [
+        "disputes",
+        "disputas",
+        "litigation",
+        "litigios",
+        "contenciosos"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_disputes",
+      "curationReason": "weighted:disputes:domain_legal"
+    },
+    {
+      "canonical": "dividends",
+      "synonyms": [
+        "dividends",
+        "dividend history",
+        "dividendos",
+        "distribuicao de lucros"
+      ],
+      "domainHint": "finance",
+      "priority": 614,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_dividends",
+      "curationReason": "weighted:dividends:domain_finance"
+    },
+    {
+      "canonical": "docket",
+      "synonyms": [
+        "docket",
+        "court docket",
+        "pauta",
+        "agenda judicial",
+        "calendar"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_docket",
+      "curationReason": "weighted:docket:domain_legal"
+    },
+    {
+      "canonical": "encounters",
+      "synonyms": [
+        "encounters",
+        "patient encounters",
+        "visits",
+        "atendimentos",
+        "consultas"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_encounters",
+      "curationReason": "weighted:encounters:domain_medical"
+    },
+    {
+      "canonical": "equity",
+      "synonyms": [
+        "equity",
+        "shareholders equity",
+        "patrimonio liquido",
+        "capital proprio"
+      ],
+      "domainHint": "finance",
+      "priority": 614,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_equity",
+      "curationReason": "weighted:equity:domain_finance"
+    },
+    {
+      "canonical": "evidence_log",
+      "synonyms": [
+        "evidence log",
+        "evidence",
+        "provas",
+        "registro de evidencias",
+        "exhibits"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_evidence_log",
+      "curationReason": "weighted:evidence_log:domain_legal"
+    },
+    {
+      "canonical": "expenses",
+      "synonyms": [
+        "expenses",
+        "despesas",
+        "gastos",
+        "expenditures",
+        "custos operacionais"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_expenses",
+      "curationReason": "weighted:expenses:domain_finance"
+    },
+    {
+      "canonical": "filings",
+      "synonyms": [
+        "filings",
+        "court filings",
+        "peticoes",
+        "protocolos",
+        "filing tracker"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_filings",
+      "curationReason": "weighted:filings:domain_legal"
+    },
+    {
+      "canonical": "fleet",
+      "synonyms": [
+        "fleet",
+        "vehicles",
+        "fleet management",
+        "frota",
+        "veiculos"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_fleet",
+      "curationReason": "weighted:fleet:domain_ops"
+    },
+    {
+      "canonical": "forecast",
+      "synonyms": [
+        "forecast",
+        "projection",
+        "previsao",
+        "projecao",
+        "outlook"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_forecast",
+      "curationReason": "weighted:forecast:domain_finance"
+    },
+    {
+      "canonical": "formulary",
+      "synonyms": [
+        "formulary",
+        "drug formulary",
+        "formulario",
+        "medicamentos padronizados",
+        "drug list"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_formulary",
+      "curationReason": "weighted:formulary:domain_medical"
+    },
+    {
+      "canonical": "fx_rates",
+      "synonyms": [
+        "fx rates",
+        "exchange rates",
+        "cotacoes",
+        "taxas de cambio",
+        "currency rates"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_fx_rates",
+      "curationReason": "weighted:fx_rates:domain_finance"
+    },
+    {
+      "canonical": "general_ledger",
+      "synonyms": [
+        "general ledger",
+        "gl",
+        "ledger",
+        "razao",
+        "livro razao"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_general_ledger",
+      "curationReason": "weighted:general_ledger:domain_finance"
+    },
+    {
+      "canonical": "immunizations",
+      "synonyms": [
+        "immunizations",
+        "vaccinations",
+        "vacinacao",
+        "imunizacoes",
+        "vaccine log"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_immunizations",
+      "curationReason": "weighted:immunizations:domain_medical"
+    },
+    {
+      "canonical": "incidents",
+      "synonyms": [
+        "incidents",
+        "incident log",
+        "incidentes",
+        "ocorrencias",
+        "event log"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_incidents",
+      "curationReason": "weighted:incidents:domain_ops"
+    },
+    {
+      "canonical": "insurance_claims",
+      "synonyms": [
+        "insurance claims",
+        "claims processing",
+        "sinistros",
+        "faturamento sus",
+        "insurance billing"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_insurance_claims",
+      "curationReason": "weighted:insurance_claims:domain_medical"
+    },
+    {
+      "canonical": "intercompany",
+      "synonyms": [
+        "intercompany",
+        "interco",
+        "intercompany transactions",
+        "transacoes intercompany",
+        "eliminacoes"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_intercompany",
+      "curationReason": "weighted:intercompany:domain_finance"
+    },
+    {
+      "canonical": "inventory",
+      "synonyms": [
+        "inventory",
+        "stock",
+        "estoque",
+        "inventario",
+        "stock levels"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_inventory",
+      "curationReason": "weighted:inventory:domain_ops"
+    },
+    {
+      "canonical": "investments",
+      "synonyms": [
+        "investments",
+        "investimentos",
+        "portfolio",
+        "carteira",
+        "holdings"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_investments",
+      "curationReason": "weighted:investments:domain_finance"
+    },
+    {
+      "canonical": "journal_entries",
+      "synonyms": [
+        "journal entries",
+        "je",
+        "lancamentos",
+        "lancamentos contabeis",
+        "journal"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_journal_entries",
+      "curationReason": "weighted:journal_entries:domain_finance"
+    },
+    {
+      "canonical": "kpi_dashboard",
+      "synonyms": [
+        "kpi dashboard",
+        "kpis",
+        "metrics",
+        "indicadores",
+        "metricas"
+      ],
+      "domainHint": "finance",
+      "priority": 970,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_kpi_dashboard",
+      "curationReason": "weighted:kpi_dashboard:domain_finance"
+    },
+    {
+      "canonical": "lab_results",
+      "synonyms": [
+        "lab results",
+        "labs",
+        "exames",
+        "resultados laboratoriais",
+        "laboratory"
+      ],
+      "domainHint": "medical",
+      "priority": 970,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_lab_results",
+      "curationReason": "weighted:lab_results:domain_medical"
+    },
+    {
+      "canonical": "lookup",
+      "synonyms": [
+        "lookup",
+        "reference table",
+        "tabela de referencia",
+        "vlookup",
+        "de-para"
+      ],
+      "domainHint": "general",
+      "priority": 620,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_lookup",
+      "curationReason": "weighted:lookup:domain_general"
+    },
+    {
+      "canonical": "maintenance",
+      "synonyms": [
+        "maintenance",
+        "manutencao",
+        "preventive maintenance",
+        "manutencao preventiva",
+        "repairs"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_maintenance",
+      "curationReason": "weighted:maintenance:domain_ops"
+    },
+    {
+      "canonical": "metadata",
+      "synonyms": [
+        "metadata",
+        "meta",
+        "metadados",
+        "properties",
+        "config"
+      ],
+      "domainHint": "general",
+      "priority": 500,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_metadata",
+      "curationReason": "weighted:metadata:domain_general"
+    },
+    {
+      "canonical": "monthly_close",
+      "synonyms": [
+        "monthly close",
+        "month end",
+        "fechamento mensal",
+        "encerramento mensal",
+        "close"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_monthly_close",
+      "curationReason": "weighted:monthly_close:domain_finance"
+    },
+    {
+      "canonical": "obligations",
+      "synonyms": [
+        "obligations",
+        "obrigacoes",
+        "duties",
+        "deveres",
+        "commitments"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_obligations",
+      "curationReason": "weighted:obligations:domain_legal"
+    },
+    {
+      "canonical": "orders",
+      "synonyms": [
+        "orders",
+        "pedidos",
+        "order list",
+        "lista de pedidos",
+        "sales orders"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_orders",
+      "curationReason": "weighted:orders:domain_ops"
+    },
+    {
+      "canonical": "parties",
+      "synonyms": [
+        "parties",
+        "partes",
+        "counterparties",
+        "stakeholders",
+        "signatories"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_parties",
+      "curationReason": "weighted:parties:domain_legal"
+    },
+    {
+      "canonical": "patients",
+      "synonyms": [
+        "patients",
+        "pacientes",
+        "patient list",
+        "lista de pacientes",
+        "patient roster"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_patients",
+      "curationReason": "weighted:patients:domain_medical"
+    },
+    {
+      "canonical": "payroll",
+      "synonyms": [
+        "payroll",
+        "folha de pagamento",
+        "salaries",
+        "salarios",
+        "compensation"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_payroll",
+      "curationReason": "weighted:payroll:domain_finance"
+    },
+    {
+      "canonical": "prescriptions",
+      "synonyms": [
+        "prescriptions",
+        "rx",
+        "receitas",
+        "prescricoes",
+        "medication orders"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_prescriptions",
+      "curationReason": "weighted:prescriptions:domain_medical"
+    },
+    {
+      "canonical": "production",
+      "synonyms": [
+        "production",
+        "producao",
+        "manufacturing",
+        "fabricacao",
+        "output"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_production",
+      "curationReason": "weighted:production:domain_ops"
+    },
+    {
+      "canonical": "profit_and_loss",
+      "synonyms": [
+        "p&l",
+        "income statement",
+        "dre",
+        "demonstracao de resultados",
+        "resultado do exercicio"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_profit_and_loss",
+      "curationReason": "weighted:profit_and_loss:domain_finance"
+    },
+    {
+      "canonical": "purchase_orders",
+      "synonyms": [
+        "purchase orders",
+        "po",
+        "pedidos de compra",
+        "ordens de compra",
+        "procurement"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_purchase_orders",
+      "curationReason": "weighted:purchase_orders:domain_ops"
+    },
+    {
+      "canonical": "quality_checks",
+      "synonyms": [
+        "quality checks",
+        "qc",
+        "quality inspection",
+        "inspecao de qualidade",
+        "controle de qualidade"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_quality_checks",
+      "curationReason": "weighted:quality_checks:domain_ops"
+    },
+    {
+      "canonical": "quarterly_review",
+      "synonyms": [
+        "quarterly review",
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "revisao trimestral"
+      ],
+      "domainHint": "finance",
+      "priority": 626,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_quarterly_review",
+      "curationReason": "weighted:quarterly_review:domain_finance"
+    },
+    {
+      "canonical": "ratios",
+      "synonyms": [
+        "ratios",
+        "financial ratios",
+        "indicadores financeiros",
+        "indices",
+        "key ratios"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_ratios",
+      "curationReason": "weighted:ratios:domain_finance"
+    },
+    {
+      "canonical": "raw_data",
+      "synonyms": [
+        "raw data",
+        "raw",
+        "dados brutos",
+        "source data",
+        "dados fonte"
+      ],
+      "domainHint": "general",
+      "priority": 620,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_raw_data",
+      "curationReason": "weighted:raw_data:domain_general"
+    },
+    {
+      "canonical": "reference",
+      "synonyms": [
+        "reference",
+        "ref",
+        "referencia",
+        "reference data",
+        "dados de referencia"
+      ],
+      "domainHint": "general",
+      "priority": 500,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_reference",
+      "curationReason": "weighted:reference:domain_general"
+    },
+    {
+      "canonical": "referrals",
+      "synonyms": [
+        "referrals",
+        "encaminhamentos",
+        "referral list",
+        "specialist referrals",
+        "referencias"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_referrals",
+      "curationReason": "weighted:referrals:domain_medical"
+    },
+    {
+      "canonical": "regulatory",
+      "synonyms": [
+        "regulatory",
+        "regulatorio",
+        "regulation tracker",
+        "normas",
+        "regulamentacao"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_regulatory",
+      "curationReason": "weighted:regulatory:domain_legal"
+    },
+    {
+      "canonical": "revenue",
+      "synonyms": [
+        "revenue",
+        "receita",
+        "sales",
+        "vendas",
+        "faturamento"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_revenue",
+      "curationReason": "weighted:revenue:domain_finance"
+    },
+    {
+      "canonical": "schedule",
+      "synonyms": [
+        "schedule",
+        "cronograma",
+        "timetable",
+        "agenda",
+        "planning"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_schedule",
+      "curationReason": "weighted:schedule:domain_ops"
+    },
+    {
+      "canonical": "settlements",
+      "synonyms": [
+        "settlements",
+        "acordos",
+        "settlement tracker",
+        "composicoes",
+        "settlement log"
+      ],
+      "domainHint": "legal",
+      "priority": 620,
+      "scope": "sheetname:legal",
+      "disambiguationRuleId": "patterns_disambiguation_legal_settlements",
+      "curationReason": "weighted:settlements:domain_legal"
+    },
+    {
+      "canonical": "settings",
+      "synonyms": [
+        "settings",
+        "config",
+        "configuracoes",
+        "parameters",
+        "parametros"
+      ],
+      "domainHint": "general",
+      "priority": 620,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_settings",
+      "curationReason": "weighted:settings:domain_general"
+    },
+    {
+      "canonical": "shipments",
+      "synonyms": [
+        "shipments",
+        "shipping",
+        "embarques",
+        "entregas",
+        "remessas"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_shipments",
+      "curationReason": "weighted:shipments:domain_ops"
+    },
+    {
+      "canonical": "sla_tracking",
+      "synonyms": [
+        "sla tracking",
+        "sla",
+        "service levels",
+        "niveis de servico",
+        "sla compliance"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_sla_tracking",
+      "curationReason": "weighted:sla_tracking:domain_ops"
+    },
+    {
+      "canonical": "summary",
+      "synonyms": [
+        "summary",
+        "resumo",
+        "overview",
+        "visao geral",
+        "executive summary"
+      ],
+      "domainHint": "general",
+      "priority": 970,
+      "scope": "sheetname:general",
+      "disambiguationRuleId": "patterns_disambiguation_general_summary",
+      "curationReason": "weighted:summary:domain_general"
+    },
+    {
+      "canonical": "suppliers",
+      "synonyms": [
+        "suppliers",
+        "vendors",
+        "fornecedores",
+        "supplier list",
+        "lista de fornecedores"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_suppliers",
+      "curationReason": "weighted:suppliers:domain_ops"
+    },
+    {
+      "canonical": "tax",
+      "synonyms": [
+        "tax",
+        "taxes",
+        "impostos",
+        "tax schedule",
+        "tributacao"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_tax",
+      "curationReason": "weighted:tax:domain_finance"
+    },
+    {
+      "canonical": "tracking",
+      "synonyms": [
+        "tracking",
+        "tracker",
+        "rastreamento",
+        "acompanhamento",
+        "monitoring"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_tracking",
+      "curationReason": "weighted:tracking:domain_ops"
+    },
+    {
+      "canonical": "trial_balance",
+      "synonyms": [
+        "trial balance",
+        "tb",
+        "balancete",
+        "balancete de verificacao",
+        "trial bal"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_trial_balance",
+      "curationReason": "weighted:trial_balance:domain_finance"
+    },
+    {
+      "canonical": "variance",
+      "synonyms": [
+        "variance",
+        "variacao",
+        "budget variance",
+        "variance analysis",
+        "desvio orcamentario"
+      ],
+      "domainHint": "finance",
+      "priority": 620,
+      "scope": "sheetname:finance",
+      "disambiguationRuleId": "patterns_disambiguation_finance_variance",
+      "curationReason": "weighted:variance:domain_finance"
+    },
+    {
+      "canonical": "vitals",
+      "synonyms": [
+        "vitals",
+        "vital signs",
+        "sinais vitais",
+        "vs",
+        "vital parameters"
+      ],
+      "domainHint": "medical",
+      "priority": 620,
+      "scope": "sheetname:medical",
+      "disambiguationRuleId": "patterns_disambiguation_medical_vitals",
+      "curationReason": "weighted:vitals:domain_medical"
+    },
+    {
+      "canonical": "warehouse",
+      "synonyms": [
+        "warehouse",
+        "armazem",
+        "storage",
+        "estoque",
+        "deposito"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_warehouse",
+      "curationReason": "weighted:warehouse:domain_ops"
+    },
+    {
+      "canonical": "work_orders",
+      "synonyms": [
+        "work orders",
+        "wo",
+        "ordens de servico",
+        "os",
+        "service orders"
+      ],
+      "domainHint": "ops",
+      "priority": 620,
+      "scope": "sheetname:ops",
+      "disambiguationRuleId": "patterns_disambiguation_ops_work_orders",
+      "curationReason": "weighted:work_orders:domain_ops"
+    }
   ]
 }

@@ -59,6 +59,10 @@ import {
   type SourceButtonsAttachment,
 } from "../../../services/core/retrieval/sourceButtons.service";
 import {
+  getRetrievalPlanParser,
+  type RetrievalPlan,
+} from "../../../services/core/retrieval/retrievalPlanParser.service";
+import {
   RuntimePolicyError,
   isRuntimePolicyError,
   toRuntimePolicyErrorCode,
@@ -78,7 +82,6 @@ import {
   SEMANTIC_TRUNCATION_DETECTOR_VERSION,
   classifyProviderTruncation,
   classifyVisibleTruncation,
-  isSemanticTruncationV2Enabled,
   normalizeFinishReason,
 } from "./truncationClassifier";
 import { buildChatProvenance } from "./provenance/ProvenanceBuilder";
@@ -122,6 +125,17 @@ function normalizeEnv(): "production" | "staging" | "dev" | "local" {
   if (raw === "test" || raw === "development" || raw === "dev") return "dev";
   return "local";
 }
+
+const USER_FACING_FALLBACK_REASON_CODES = new Set<string>([
+  "no_docs_indexed",
+  "scope_hard_constraints_empty",
+  "no_relevant_chunks_in_scoped_docs",
+  "explicit_doc_not_found",
+  "needs_doc_choice",
+  "doc_ambiguous",
+  "indexing_in_progress",
+  "extraction_failed",
+]);
 
 export function buildAttachmentDocScopeSignals(
   attachedDocumentIds: string[],
@@ -253,6 +267,42 @@ function normalizeSnippetForHash(input: string): string {
     .toLowerCase()
     .replace(/\s+/g, " ")
     .trim();
+}
+
+const PLACEHOLDER_CONVERSATION_TITLES = new Set(["", "new chat", "untitled"]);
+
+function normalizeTitleKey(value: unknown): string {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isPlaceholderConversationTitle(value: unknown): boolean {
+  return PLACEHOLDER_CONVERSATION_TITLES.has(normalizeTitleKey(value));
+}
+
+function deriveAutoConversationTitleFromMessage(
+  message: string,
+  opts?: { maxWords?: number; maxChars?: number },
+): string | null {
+  const maxWords = Math.max(3, Math.min(16, Number(opts?.maxWords) || 10));
+  const maxChars = Math.max(24, Math.min(120, Number(opts?.maxChars) || 80));
+
+  const cleaned = String(message || "")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s"'`“”‘’\-–—:;,.!?()[\]{}]+/, "")
+    .trim();
+  if (!cleaned) return null;
+
+  const words = cleaned.split(" ").filter(Boolean);
+  if (!words.length) return null;
+
+  let title = words.slice(0, maxWords).join(" ").trim();
+  title = title.replace(/[\s"'`“”‘’\-–—:;,.!?()[\]{}]+$/, "").trim();
+  if (!title) return null;
+
+  if (title.length > maxChars) {
+    title = title.slice(0, maxChars).replace(/\s+\S*$/, "").trim();
+  }
+  return title || null;
 }
 
 function buildEvidenceMapForEnforcer(
@@ -605,7 +655,7 @@ function buildFallbackMicrocopyParams(input: {
     ? retrievalPack.evidence
     : [];
   const firstEvidence = evidence[0] || null;
-  const scope = retrievalPack?.scope || {};
+  const scope: Partial<EvidencePack["scope"]> = retrievalPack?.scope || {};
   const candidateDocCount = Array.isArray(scope.candidateDocIds)
     ? scope.candidateDocIds.length
     : 0;
@@ -962,10 +1012,14 @@ export function enforceLanguageContract(params: {
     return { text: repaired, adjusted: true, failClosed: false };
   }
 
+  // Preserve the original text rather than replacing with a generic fallback.
+  // A correct answer in the wrong language is more useful than a message
+  // telling the user to retry.  The mismatch is still logged via the
+  // `adjusted` flag for telemetry.
   return {
-    text: buildLanguageContractFallback(lang),
-    adjusted: true,
-    failClosed: true,
+    text: normalized,
+    adjusted: false,
+    failClosed: false,
   };
 }
 
@@ -1069,11 +1123,10 @@ function resolveTruncationState(params: {
     enforcementRepairs: params.enforcementRepairs,
     providerTruncation: provider,
   });
-  const useSemanticV2 = isSemanticTruncationV2Enabled();
 
   return {
-    contractOccurred: useSemanticV2 ? semantic.occurred : provider.occurred,
-    contractReason: useSemanticV2 ? semantic.reason : provider.reason,
+    contractOccurred: semantic.occurred,
+    contractReason: semantic.reason,
     providerOccurred: provider.occurred,
     providerReason: provider.reason,
     semanticOccurred: semantic.occurred,
@@ -1127,6 +1180,11 @@ export class CentralizedChatRuntimeDelegate {
   private readonly compliancePolicy = new CompliancePolicyService();
   private readonly fallbackDecisionPolicy = new FallbackDecisionPolicyService();
   private readonly traceWriter = new TraceWriterService(prisma as any);
+  private readonly retrievalPlanParser = getRetrievalPlanParser();
+  private readonly lowConfidenceSurfaceFallback =
+    String(process.env.LOW_CONFIDENCE_SURFACE_FALLBACK || "")
+      .trim()
+      .toLowerCase() === "true";
 
   constructor(
     private readonly engine: ChatEngine,
@@ -1387,6 +1445,8 @@ export class CentralizedChatRuntimeDelegate {
     status: ChatResult["status"];
     failureCode?: string | null;
     fallbackReasonCode?: string;
+    fallbackReasonCodeTelemetry?: string;
+    fallbackPolicyMeta?: Record<string, unknown> | null;
     assistantText: string;
     telemetry?: Record<string, unknown> | null;
     totalMs: number;
@@ -1414,8 +1474,18 @@ export class CentralizedChatRuntimeDelegate {
       params.evidenceGateDecision?.evidenceStrength,
     );
     const meta = asObject(params.req.meta);
-    const fallbackReason =
+    const fallbackPolicyMeta = asObject(params.fallbackPolicyMeta);
+    const fallbackReasonTelemetryFromPolicy = String(
+      fallbackPolicyMeta.reasonCode || "",
+    ).trim();
+    const fallbackReasonForUser =
       params.failureCode || params.fallbackReasonCode || null;
+    const fallbackReasonForTelemetry =
+      params.failureCode ||
+      params.fallbackReasonCodeTelemetry ||
+      fallbackReasonTelemetryFromPolicy ||
+      params.fallbackReasonCode ||
+      null;
     const retrievalAdequate = (params.retrievalPack?.evidence.length ?? 0) > 0;
     const resolvedOperator =
       typeof meta.operator === "string"
@@ -1590,8 +1660,8 @@ export class CentralizedChatRuntimeDelegate {
         evidenceGateAction: evidenceAction,
         evidenceShouldProceed:
           evidenceAction === "answer" || evidenceAction === "hedge",
-        hadFallback: Boolean(fallbackReason),
-        fallbackScenario: fallbackReason,
+        hadFallback: Boolean(fallbackReasonForTelemetry),
+        fallbackScenario: fallbackReasonForTelemetry,
         answerLength: String(params.assistantText || "").length,
         wasTruncated: truncation.contractOccurred,
         wasProviderTruncated: truncation.providerOccurred,
@@ -1600,7 +1670,9 @@ export class CentralizedChatRuntimeDelegate {
         providerTruncationReason: truncation.providerReason,
         failureCode: params.failureCode || null,
         hasErrors: params.status === "failed" || Boolean(params.failureCode),
-        warnings: fallbackReason ? [fallbackReason] : [],
+        warnings: fallbackReasonForTelemetry
+          ? [fallbackReasonForTelemetry]
+          : [],
         totalMs: params.totalMs,
         ttft: toPositiveInt(asObject(params.telemetry).firstTokenMs),
         retrievalMs: params.retrievalMs ?? null,
@@ -1637,7 +1709,7 @@ export class CentralizedChatRuntimeDelegate {
           (params.retrievalPack?.stats.scopeCandidatesDropped ?? 0) > 0,
         sourcesCount: params.retrievalPack?.evidence.length ?? 0,
         navPillsUsed: params.answerMode === "nav_pills",
-        fallbackReasonCode: fallbackReason,
+        fallbackReasonCode: fallbackReasonForTelemetry,
         at: new Date(),
         meta: {
           requestId:
@@ -1646,6 +1718,11 @@ export class CentralizedChatRuntimeDelegate {
           retrievalStats: params.retrievalPack?.stats || null,
           retrievalRuleSummary:
             params.retrievalPack?.telemetry?.summary || null,
+          fallbackPolicy:
+            Object.keys(fallbackPolicyMeta).length > 0
+              ? fallbackPolicyMeta
+              : null,
+          fallbackReasonCodeUser: fallbackReasonForUser,
         },
       }),
       ...retrievalRuleEventWrites,
@@ -1668,6 +1745,7 @@ export class CentralizedChatRuntimeDelegate {
     );
     let conversationId = "";
     let lastDocumentId: string | null = null;
+    let generatedConversationTitle: string | null = null;
     let userMessage: ChatMessageDTO | null = null;
     let retrievalPack:
       | (EvidencePack & { resolvedDocId?: string | null })
@@ -1686,12 +1764,17 @@ export class CentralizedChatRuntimeDelegate {
       );
       conversationId = conv.id;
       lastDocumentId = conv.lastDocumentId;
+      const titleWasPlaceholder = isPlaceholderConversationTitle(conv.title);
 
       userMessage = await this.createMessage({
         conversationId,
         role: "user",
         content: req.message,
         userId: req.userId,
+      });
+      generatedConversationTitle = await this.resolveGeneratedTitleForTurn({
+        conversationId,
+        titleWasPlaceholder,
       });
 
       const governanceBlock = this.resolveGovernancePolicyBlock(req);
@@ -1734,7 +1817,10 @@ export class CentralizedChatRuntimeDelegate {
             },
           );
         });
-        return { ...result, traceId };
+        return this.withGeneratedConversationTitle(
+          { ...result, traceId },
+          generatedConversationTitle,
+        );
       }
 
       const history = await this.loadRecentForEngine(
@@ -1754,7 +1840,10 @@ export class CentralizedChatRuntimeDelegate {
 
       const retrievalSpanId = this.traceWriter.startSpan(traceId, "retrieval");
       const retrievalStartedAt = Date.now();
-      retrievalPack = await this.retrieveEvidence(req, lastDocumentId);
+      retrievalPack = await this.retrieveEvidence(req, lastDocumentId, {
+        traceId,
+        conversationId,
+      });
       retrievalMs = Date.now() - retrievalStartedAt;
 
       // Persist resolved doc for conversation-history follow-up scoping
@@ -1901,7 +1990,10 @@ export class CentralizedChatRuntimeDelegate {
             error: error instanceof Error ? error.message : String(error),
           });
         });
-        return result;
+        return this.withGeneratedConversationTitle(
+          result,
+          generatedConversationTitle,
+        );
       }
 
       const messages = this.buildEngineMessages(
@@ -1910,6 +2002,8 @@ export class CentralizedChatRuntimeDelegate {
         req.preferredLanguage,
         evidenceGateDecision,
       );
+      const fallbackSignal = this.resolveFallbackSignal(req, retrievalPack);
+      const fallbackReasonCode = fallbackSignal.reasonCode;
       const composeSpanId = this.traceWriter.startSpan(traceId, "compose");
       const llmStartedAt = Date.now();
       const generated = await this.engine.generate({
@@ -1924,6 +2018,7 @@ export class CentralizedChatRuntimeDelegate {
           retrievalPack,
           answerMode,
           evidenceGateDecision,
+          fallbackSignal,
         ),
       });
       llmMs = Date.now() - llmStartedAt;
@@ -1942,10 +2037,6 @@ export class CentralizedChatRuntimeDelegate {
       });
 
       const assistantTextRaw = String(generated.text || "").trim();
-      const fallbackReasonCode = this.resolveFallbackReasonCode(
-        req,
-        retrievalPack,
-      );
       const fallbackMicrocopyParams = buildFallbackMicrocopyParams({
         reasonCode: fallbackReasonCode,
         query: req.message,
@@ -2045,6 +2136,12 @@ export class CentralizedChatRuntimeDelegate {
           answerClass,
           navType,
           fallbackReasonCode,
+          fallbackTelemetry: fallbackSignal.telemetryReasonCode
+            ? {
+                reasonCode: fallbackSignal.telemetryReasonCode,
+              }
+            : null,
+          fallbackPolicy: fallbackSignal.policyMeta || null,
           evidenceGate: evidenceGateDecision
             ? {
                 action: evidenceGateDecision.suggestedAction,
@@ -2129,6 +2226,8 @@ export class CentralizedChatRuntimeDelegate {
         status,
         failureCode,
         fallbackReasonCode,
+        fallbackReasonCodeTelemetry: fallbackSignal.telemetryReasonCode,
+        fallbackPolicyMeta: fallbackSignal.policyMeta || null,
         assistantText,
         telemetry: (generated.telemetry as Record<string, unknown>) ?? null,
         totalMs: Date.now() - turnStartedAt,
@@ -2146,7 +2245,10 @@ export class CentralizedChatRuntimeDelegate {
           error: error instanceof Error ? error.message : String(error),
         });
       });
-      return result;
+      return this.withGeneratedConversationTitle(
+        result,
+        generatedConversationTitle,
+      );
     } catch (error) {
       if (!isRuntimePolicyFailure(error)) {
         await this.persistTraceArtifacts({
@@ -2215,7 +2317,10 @@ export class CentralizedChatRuntimeDelegate {
           },
         );
       });
-      return result;
+      return this.withGeneratedConversationTitle(
+        result,
+        generatedConversationTitle,
+      );
     }
   }
 
@@ -2237,6 +2342,7 @@ export class CentralizedChatRuntimeDelegate {
     );
     let conversationId = "";
     let lastDocumentId: string | null = null;
+    let generatedConversationTitle: string | null = null;
     let userMessage: ChatMessageDTO | null = null;
     let retrievalPack:
       | (EvidencePack & { resolvedDocId?: string | null })
@@ -2255,12 +2361,17 @@ export class CentralizedChatRuntimeDelegate {
       );
       conversationId = conv.id;
       lastDocumentId = conv.lastDocumentId;
+      const titleWasPlaceholder = isPlaceholderConversationTitle(conv.title);
 
       userMessage = await this.createMessage({
         conversationId,
         role: "user",
         content: req.message,
         userId: req.userId,
+      });
+      generatedConversationTitle = await this.resolveGeneratedTitleForTurn({
+        conversationId,
+        titleWasPlaceholder,
       });
 
       const governanceBlock = this.resolveGovernancePolicyBlock(req);
@@ -2313,7 +2424,10 @@ export class CentralizedChatRuntimeDelegate {
             },
           );
         });
-        return { ...result, traceId };
+        return this.withGeneratedConversationTitle(
+          { ...result, traceId },
+          generatedConversationTitle,
+        );
       }
 
       if (sink.isOpen()) {
@@ -2346,7 +2460,10 @@ export class CentralizedChatRuntimeDelegate {
         stream: true,
       });
       const retrievalStartedAt = Date.now();
-      retrievalPack = await this.retrieveEvidence(req, lastDocumentId);
+      retrievalPack = await this.retrieveEvidence(req, lastDocumentId, {
+        traceId,
+        conversationId,
+      });
       retrievalMs = Date.now() - retrievalStartedAt;
 
       // Persist resolved doc for conversation-history follow-up scoping
@@ -2507,7 +2624,10 @@ export class CentralizedChatRuntimeDelegate {
             },
           );
         });
-        return result;
+        return this.withGeneratedConversationTitle(
+          result,
+          generatedConversationTitle,
+        );
       }
 
       const messages = this.buildEngineMessages(
@@ -2536,6 +2656,8 @@ export class CentralizedChatRuntimeDelegate {
         } as any);
       }
 
+      const fallbackSignal = this.resolveFallbackSignal(req, retrievalPack);
+      const fallbackReasonCode = fallbackSignal.reasonCode;
       const streamSpanId = this.traceWriter.startSpan(traceId, "stream");
       const llmStartedAt = Date.now();
       const streamed = await this.engine.stream({
@@ -2550,6 +2672,7 @@ export class CentralizedChatRuntimeDelegate {
           retrievalPack,
           answerMode,
           evidenceGateDecision,
+          fallbackSignal,
         ),
         sink,
         streamingConfig,
@@ -2569,10 +2692,6 @@ export class CentralizedChatRuntimeDelegate {
       });
 
       const assistantTextRaw = String(streamed.finalText || "").trim();
-      const fallbackReasonCode = this.resolveFallbackReasonCode(
-        req,
-        retrievalPack,
-      );
       const fallbackMicrocopyParams = buildFallbackMicrocopyParams({
         reasonCode: fallbackReasonCode,
         query: req.message,
@@ -2678,6 +2797,12 @@ export class CentralizedChatRuntimeDelegate {
           answerClass,
           navType,
           fallbackReasonCode,
+          fallbackTelemetry: fallbackSignal.telemetryReasonCode
+            ? {
+                reasonCode: fallbackSignal.telemetryReasonCode,
+              }
+            : null,
+          fallbackPolicy: fallbackSignal.policyMeta || null,
           evidenceGate: evidenceGateDecision
             ? {
                 action: evidenceGateDecision.suggestedAction,
@@ -2762,6 +2887,8 @@ export class CentralizedChatRuntimeDelegate {
         status,
         failureCode,
         fallbackReasonCode,
+        fallbackReasonCodeTelemetry: fallbackSignal.telemetryReasonCode,
+        fallbackPolicyMeta: fallbackSignal.policyMeta || null,
         assistantText,
         telemetry: (streamed.telemetry as Record<string, unknown>) ?? null,
         totalMs: Date.now() - turnStartedAt,
@@ -2779,7 +2906,10 @@ export class CentralizedChatRuntimeDelegate {
           error: error instanceof Error ? error.message : String(error),
         });
       });
-      return result;
+      return this.withGeneratedConversationTitle(
+        result,
+        generatedConversationTitle,
+      );
     } catch (error) {
       if (!isRuntimePolicyFailure(error)) {
         await this.persistTraceArtifacts({
@@ -2861,7 +2991,10 @@ export class CentralizedChatRuntimeDelegate {
           },
         );
       });
-      return result;
+      return this.withGeneratedConversationTitle(
+        result,
+        generatedConversationTitle,
+      );
     }
   }
 
@@ -2901,13 +3034,11 @@ export class CentralizedChatRuntimeDelegate {
       where: {
         userId,
         isDeleted: false,
-        NOT: {
-          OR: [
-            { contextType: { in: ["viewer", "editor"] } },
-            { title: { startsWith: "__viewer__:" } },
-            { title: { startsWith: "__editor__:" } },
-          ],
-        },
+        OR: [{ contextType: null }, { contextType: { notIn: ["viewer", "editor"] } }],
+        NOT: [
+          { title: { startsWith: "__viewer__:" } },
+          { title: { startsWith: "__editor__:" } },
+        ],
       },
       orderBy: { updatedAt: "desc" },
       take: limit,
@@ -3111,6 +3242,13 @@ export class CentralizedChatRuntimeDelegate {
         data: { updatedAt: now },
       });
 
+      await this.maybeAutoTitleConversationFromFirstUserMessage({
+        conversationId: params.conversationId,
+        role: params.role,
+        content: params.content ?? "",
+        now,
+      });
+
       try {
         await this.recordConversationMemoryArtifacts({
           messageId: saved.id,
@@ -3160,6 +3298,13 @@ export class CentralizedChatRuntimeDelegate {
       data: { updatedAt: now },
     });
 
+    await this.maybeAutoTitleConversationFromFirstUserMessage({
+      conversationId: params.conversationId,
+      role: params.role,
+      content: params.content ?? "",
+      now,
+    });
+
     try {
       await this.recordConversationMemoryArtifacts({
         messageId: created.id,
@@ -3175,6 +3320,69 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     return toMessageDTO(created);
+  }
+
+  private async maybeAutoTitleConversationFromFirstUserMessage(input: {
+    conversationId: string;
+    role: ChatRole;
+    content: string;
+    now: Date;
+  }): Promise<void> {
+    if (input.role !== "user") return;
+
+    const titleCandidate = deriveAutoConversationTitleFromMessage(input.content, {
+      maxWords: 10,
+      maxChars: 80,
+    });
+    if (!titleCandidate) return;
+
+    const existing = await prisma.conversation.findFirst({
+      where: {
+        id: input.conversationId,
+        isDeleted: false,
+      },
+      select: {
+        title: true,
+      },
+    });
+    if (!existing || !isPlaceholderConversationTitle(existing.title)) return;
+
+    await prisma.conversation.updateMany({
+      where: {
+        id: input.conversationId,
+        isDeleted: false,
+        ...(existing.title === null ? { title: null } : { title: existing.title }),
+      },
+      data: {
+        title: titleCandidate,
+        updatedAt: input.now,
+      },
+    });
+  }
+
+  private async resolveGeneratedTitleForTurn(input: {
+    conversationId: string;
+    titleWasPlaceholder: boolean;
+  }): Promise<string | null> {
+    if (!input.titleWasPlaceholder) return null;
+    const row = await prisma.conversation.findFirst({
+      where: { id: input.conversationId, isDeleted: false },
+      select: { title: true },
+    });
+    const title = String(row?.title || "").trim();
+    if (!title || isPlaceholderConversationTitle(title)) return null;
+    return title;
+  }
+
+  private withGeneratedConversationTitle(
+    result: ChatResult,
+    generatedTitle: string | null,
+  ): ChatResult {
+    if (!generatedTitle) return result;
+    return {
+      ...result,
+      generatedTitle,
+    };
   }
 
   /**
@@ -3702,6 +3910,7 @@ export class CentralizedChatRuntimeDelegate {
     }
 
     if (!failureCode) {
+      const textBeforeOverflowRepair = text;
       text = this.repairProviderOverflowStructuredOutput(
         text,
         (params.telemetry as Record<string, unknown>) ?? null,
@@ -3730,12 +3939,46 @@ export class CentralizedChatRuntimeDelegate {
             : sourceDocumentIdsFromSources,
       };
       if (!revalidated.ok) {
-        failureCode = revalidated.failureCode;
-        text = buildEmptyAssistantText({
-          language: params.req.preferredLanguage,
-          reasonCode: revalidated.failureCode,
-          seed: `${params.req.userId}:provenance:${revalidated.failureCode}`,
-        });
+        // When evidence documents are present the LLM was called with real
+        // snippets and generated a grounded answer.  Lexical provenance
+        // matching can produce false negatives (cross-language answers,
+        // short numeric extractions, paraphrased summaries), so we record
+        // the provenance failure for telemetry but preserve the LLM text
+        // instead of replacing it with generic microcopy.
+        const hasEvidenceBacking =
+          provenance.sourceDocumentIds.length > 0 ||
+          sourceDocumentIdsFromSources.length > 0;
+        if (hasEvidenceBacking) {
+          const demoteMissingProvenance =
+            revalidated.failureCode === "missing_provenance" &&
+            hasEvidenceBacking;
+          if (!demoteMissingProvenance) {
+            failureCode = revalidated.failureCode;
+          }
+          if (
+            revalidated.failureCode === "missing_provenance" &&
+            text !== textBeforeOverflowRepair
+          ) {
+            const provider = classifyProviderTruncation(
+              (params.telemetry as Record<string, unknown>) ?? null,
+            );
+            const semanticBeforeRepair = classifyVisibleTruncation({
+              finalText: textBeforeOverflowRepair,
+              enforcementRepairs: enforcement?.repairs ?? [],
+              providerTruncation: provider,
+            });
+            if (!semanticBeforeRepair.occurred) {
+              text = textBeforeOverflowRepair;
+            }
+          }
+        } else {
+          failureCode = revalidated.failureCode;
+          text = buildEmptyAssistantText({
+            language: params.req.preferredLanguage,
+            reasonCode: revalidated.failureCode,
+            seed: `${params.req.userId}:provenance:${revalidated.failureCode}`,
+          });
+        }
       }
     }
 
@@ -3776,15 +4019,16 @@ export class CentralizedChatRuntimeDelegate {
   private async ensureConversation(
     userId: string,
     conversationId?: string,
-  ): Promise<{ id: string; lastDocumentId: string | null }> {
+  ): Promise<{ id: string; title: string | null; lastDocumentId: string | null }> {
     if (conversationId) {
       const existing = await prisma.conversation.findFirst({
         where: { id: conversationId, userId, isDeleted: false },
-        select: { id: true, lastDocumentId: true },
+        select: { id: true, title: true, lastDocumentId: true },
       });
       if (existing)
         return {
           id: existing.id,
+          title: existing.title ?? null,
           lastDocumentId: existing.lastDocumentId ?? null,
         };
       throw new ConversationNotFoundError(
@@ -3796,7 +4040,7 @@ export class CentralizedChatRuntimeDelegate {
       userId,
       title: "New Chat",
     });
-    return { id: created.id, lastDocumentId: null };
+    return { id: created.id, title: created.title ?? null, lastDocumentId: null };
   }
 
   private async buildRuntimePolicyFailureResult(input: {
@@ -4630,9 +4874,115 @@ export class CentralizedChatRuntimeDelegate {
     };
   }
 
+  private async generateRetrievalPlanForEvidence(params: {
+    req: ChatRequest;
+    runtimeCtx?: { traceId?: string | null; conversationId?: string | null };
+    intentFamily: string;
+    operator: string | null;
+    answerMode: RetrievalRequest["signals"]["answerMode"];
+    docScopeSignals: Pick<
+      RetrievalRequest["signals"],
+      | "docScopeLock"
+      | "explicitDocLock"
+      | "activeDocId"
+      | "explicitDocRef"
+      | "resolvedDocId"
+      | "hardScopeActive"
+      | "singleDocIntent"
+    >;
+    semanticSignals: ReturnType<CentralizedChatRuntimeDelegate["collectSemanticSignals"]>;
+    allowGlobalScope: boolean;
+    attachedDocumentIds: string[];
+    docStore: {
+      getDocMeta(docId: string): Promise<{
+        title?: string | null;
+        filename?: string | null;
+      } | null>;
+    };
+  }): Promise<RetrievalPlan | null> {
+    if (typeof this.engine.generateRetrievalPlan !== "function") return null;
+
+    const traceId =
+      sanitizeTraceId(params.runtimeCtx?.traceId) ||
+      sanitizeTraceId((params.req.meta as any)?.requestId) ||
+      mkTraceId();
+    const conversationId = String(
+      params.runtimeCtx?.conversationId || params.req.conversationId || "",
+    ).trim();
+
+    const knownDocTitles: string[] = [];
+    const seenDocTitle = new Set<string>();
+    for (const docId of params.attachedDocumentIds.slice(0, 8)) {
+      const meta = await params.docStore.getDocMeta(docId);
+      const candidates = [meta?.title, meta?.filename];
+      for (const candidate of candidates) {
+        const text = String(candidate || "").trim();
+        if (!text) continue;
+        const key = text.toLowerCase();
+        if (seenDocTitle.has(key)) continue;
+        seenDocTitle.add(key);
+        knownDocTitles.push(text);
+        if (knownDocTitles.length >= 8) break;
+      }
+      if (knownDocTitles.length >= 8) break;
+    }
+
+    try {
+      const generated = await this.engine.generateRetrievalPlan({
+        traceId,
+        userId: params.req.userId,
+        conversationId: conversationId || "retrieval_planning",
+        messages: [{ role: "user", content: String(params.req.message || "") }],
+        context: {
+          planner: {
+            scope: {
+              hard: params.docScopeSignals.hardScopeActive === true,
+              explicitDocLock: params.docScopeSignals.explicitDocLock === true,
+              activeDocId: params.docScopeSignals.activeDocId ?? null,
+              resolvedDocId: params.docScopeSignals.resolvedDocId ?? null,
+              allowGlobalScope: params.allowGlobalScope,
+            },
+            docContext: {
+              attachedDocumentIds: params.attachedDocumentIds.slice(0, 16),
+              knownDocTitles,
+            },
+            runtimeSignals: params.semanticSignals,
+          },
+        },
+        meta: {
+          intentFamily: params.intentFamily,
+          operator: params.operator,
+          answerMode: params.answerMode,
+          purpose: "retrieval_planning",
+          promptMode: "retrieval_plan",
+        },
+      });
+
+      const parsed = this.retrievalPlanParser.tryParse(String(generated.text || ""));
+      if (!parsed) {
+        appLogger.warn("[retrieval-plan] planner returned invalid JSON plan", {
+          traceId,
+          userId: params.req.userId,
+          conversationId: conversationId || null,
+        });
+        return null;
+      }
+      return parsed;
+    } catch (error) {
+      appLogger.warn("[retrieval-plan] planner invocation failed", {
+        traceId,
+        userId: params.req.userId,
+        conversationId: conversationId || null,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  }
+
   private async retrieveEvidence(
     req: ChatRequest,
     lastDocumentId?: string | null,
+    runtimeCtx?: { traceId?: string | null; conversationId?: string | null },
   ): Promise<(EvidencePack & { resolvedDocId: string | null }) | null> {
     const cfg = this.getMemoryRuntimeTuning();
     const attachedBase = Array.isArray(req.attachedDocumentIds)
@@ -4755,19 +5105,36 @@ export class CentralizedChatRuntimeDelegate {
       }),
     );
 
+    const intentFamily =
+      typeof (req.meta as any)?.intentFamily === "string"
+        ? String((req.meta as any).intentFamily)
+        : "documents";
+    const operator =
+      typeof (req.meta as any)?.operator === "string"
+        ? String((req.meta as any).operator)
+        : null;
+    const answerMode = coerceRetrievalAnswerMode((req.meta as any)?.answerMode);
+    const retrievalPlan = await this.generateRetrievalPlanForEvidence({
+      req,
+      runtimeCtx,
+      intentFamily,
+      operator,
+      answerMode,
+      docScopeSignals,
+      semanticSignals,
+      allowGlobalScope,
+      attachedDocumentIds: attached,
+      docStore: dependencies.docStore,
+    });
+
     const retrievalReq: RetrievalRequest = {
       query: req.message,
       env: normalizeEnv(),
+      retrievalPlan,
       signals: {
-        intentFamily:
-          typeof (req.meta as any)?.intentFamily === "string"
-            ? String((req.meta as any).intentFamily)
-            : "documents",
-        operator:
-          typeof (req.meta as any)?.operator === "string"
-            ? String((req.meta as any).operator)
-            : null,
-        answerMode: coerceRetrievalAnswerMode((req.meta as any)?.answerMode),
+        intentFamily,
+        operator,
+        answerMode,
         ...docScopeSignals,
         hasQuotedText: semanticSignals.hasQuotedText,
         hasFilename: semanticSignals.hasFilename,
@@ -4876,15 +5243,29 @@ export class CentralizedChatRuntimeDelegate {
     retrievalPack: EvidencePack | null,
     answerMode: AnswerMode,
     evidenceGateDecision?: EvidenceCheckResult | null,
+    fallbackSignal?: {
+      reasonCode?: string;
+      telemetryReasonCode?: string;
+      policyMeta?: Record<string, unknown> | null;
+    } | null,
   ): Record<string, unknown> {
     const sourceCount = retrievalPack?.evidence.length ?? 0;
+    const resolvedFallbackSignal =
+      fallbackSignal ?? this.resolveFallbackSignal(req, retrievalPack);
     return {
       ...(req.meta || {}),
       preferredLanguage: req.preferredLanguage || "en",
       answerMode,
       intentFamily: sourceCount > 0 ? "documents" : "general",
       operator: sourceCount > 0 ? "answer_with_sources" : "answer",
-      fallbackReasonCode: this.resolveFallbackReasonCode(req, retrievalPack),
+      fallbackReasonCode: resolvedFallbackSignal.reasonCode,
+      fallbackTelemetry: resolvedFallbackSignal.telemetryReasonCode
+        ? {
+            reasonCode: resolvedFallbackSignal.telemetryReasonCode,
+            policy: resolvedFallbackSignal.policyMeta || null,
+          }
+        : null,
+      fallbackPolicy: resolvedFallbackSignal.policyMeta || null,
       retrievalStats: retrievalPack?.stats ?? null,
       evidenceGate: evidenceGateDecision
         ? {
@@ -5217,6 +5598,9 @@ export class CentralizedChatRuntimeDelegate {
         : null;
     const profileMaxChars = toPositiveInt(profileEntry?.budget?.maxChars);
     const profileMaxQuestions = toPositiveInt(profileEntry?.budget?.maxQuestions);
+    const contextSignals = asObject((req.context as any)?.signals || null);
+    const userRequestedShort =
+      req.truncationRetry === true || Boolean(contextSignals.userRequestedShort);
     const overrideMaxQuestions = Number.isFinite(
       Number(modeOverride?.maxQuestions),
     )
@@ -5248,6 +5632,7 @@ export class CentralizedChatRuntimeDelegate {
         typeof styleMaxQuestions === "number" ? styleMaxQuestions : undefined,
       profileMaxChars:
         typeof profileMaxChars === "number" ? profileMaxChars : undefined,
+      userRequestedShort: userRequestedShort || undefined,
       allowBullets:
         modeOverride?.allowBullets === false ? false : undefined,
       allowTables: modeOverride?.allowTables === false ? false : undefined,
@@ -5326,11 +5711,70 @@ export class CentralizedChatRuntimeDelegate {
     return "general_answer";
   }
 
-  private resolveFallbackReasonCode(
+  private resolveFallbackSignal(
     req: ChatRequest,
     retrievalPack: EvidencePack | null,
-  ): string | undefined {
-    return this.fallbackDecisionPolicy.resolveReasonCode(req, retrievalPack);
+  ): {
+    reasonCode?: string;
+    telemetryReasonCode?: string;
+    policyMeta: Record<string, unknown> | null;
+  } {
+    const decision = this.fallbackDecisionPolicy.resolve(req, retrievalPack);
+    const reasonCodeRaw = String(decision?.reasonCode || "").trim();
+    const shouldSurface = this.shouldSurfaceFallback(
+      reasonCodeRaw,
+      retrievalPack,
+    );
+    const userFacingReasonCode =
+      shouldSurface && reasonCodeRaw ? reasonCodeRaw : undefined;
+    const suppressPromptFallback =
+      Boolean(reasonCodeRaw) && !shouldSurface;
+
+    if (!decision || !reasonCodeRaw) {
+      return {
+        reasonCode: userFacingReasonCode,
+        telemetryReasonCode: undefined,
+        policyMeta: null,
+      };
+    }
+
+    return {
+      reasonCode: userFacingReasonCode,
+      telemetryReasonCode: reasonCodeRaw,
+      policyMeta: {
+        reasonCode: reasonCodeRaw,
+        selectedBankId: decision.selectedBankId,
+        selectedRuleId: decision.selectedRuleId,
+        severity: decision.severity,
+        fallbackType: decision.fallbackType,
+        routerAction: decision.routerAction,
+        routerTelemetryReason: decision.routerTelemetryReason,
+        userFacingReasonCode: userFacingReasonCode || null,
+        suppressedForPrompt: suppressPromptFallback,
+        suppressionReason:
+          suppressPromptFallback && reasonCodeRaw === "low_confidence"
+            ? "low_confidence_with_evidence"
+            : suppressPromptFallback
+              ? "non_user_facing_reason"
+              : null,
+      },
+    };
+  }
+
+  private shouldSurfaceFallback(
+    reasonCode: string,
+    retrievalPack: EvidencePack | null,
+  ): boolean {
+    const normalized = String(reasonCode || "")
+      .trim()
+      .toLowerCase();
+    if (!normalized) return false;
+    if (normalized === "low_confidence") {
+      const hasEvidence = (retrievalPack?.evidence.length ?? 0) > 0;
+      if (hasEvidence && !this.lowConfidenceSurfaceFallback) return false;
+      return true;
+    }
+    return USER_FACING_FALLBACK_REASON_CODES.has(normalized);
   }
 
   private buildSourceButtonsAttachment(

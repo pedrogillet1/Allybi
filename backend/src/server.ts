@@ -38,6 +38,7 @@ import {
 import { LLMClientFactory } from "./services/llm/core/llmClientFactory";
 import { LLMChatEngine } from "./services/llm/core/llmChatEngine";
 import { loadGeminiConfig } from "./services/llm/providers/gemini/geminiConfig";
+import { loadOpenAIConfig } from "./services/llm/providers/openai/openaiConfig";
 import { TelemetryLLMClient } from "./services/llm/core/telemetryLlmClient.decorator";
 import { PromptRegistryService } from "./services/llm/prompts/promptRegistry.service";
 import { LlmRequestBuilderService } from "./services/llm/core/llmRequestBuilder.service";
@@ -109,6 +110,7 @@ async function startServer() {
     // 4. Wire LLM client factory → TelemetryDecorator → ChatEngine → PrismaChatService
     let chatService: PrismaChatService;
     try {
+      const envName = (process.env.NODE_ENV as any) || "dev";
       const llmFactory = buildLLMFactory();
       const rawClient = llmFactory.get();
       console.log(
@@ -119,9 +121,12 @@ async function startServer() {
       const llmClient = new TelemetryLLMClient(rawClient, telemetryService);
       console.log("[Server] LLM client wrapped with telemetry decorator");
 
-      const geminiCfg = loadGeminiConfig(
-        (process.env.NODE_ENV as any) || "dev",
-      );
+      const geminiCfg = loadGeminiConfig(envName);
+      const openaiCfg = loadOpenAIConfig(envName);
+      const defaultModelId =
+        llmClient.provider === "openai"
+          ? openaiCfg.defaultModelDraft
+          : geminiCfg.models.defaultDraft;
       const bankLoader = getBankLoaderInstance();
       const promptRegistry = new PromptRegistryService(bankLoader);
       const requestBuilder = new LlmRequestBuilderService(promptRegistry);
@@ -139,14 +144,14 @@ async function startServer() {
                 ? "dev"
                 : "local") as any,
           provider: llmClient.provider,
-          modelId: geminiCfg.models.defaultDraft,
+          modelId: defaultModelId,
           defaultTemperature: 0.2,
           defaultMaxOutputTokens: 900,
         },
       );
       const bankBackedChatEngine = new LLMChatEngine(llmGateway, {
         provider: llmClient.provider,
-        modelId: geminiCfg.models.defaultDraft,
+        modelId: defaultModelId,
       });
 
       chatService = new PrismaChatService(bankBackedChatEngine, {
@@ -227,14 +232,18 @@ async function startServer() {
       docCryptoService,
     );
 
-    // Wire encryption into chat service (if KODA_MASTER_KEY_BASE64 is set)
+    // Wire encryption into chat service unless explicitly disabled for local/debug runs.
     const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
-    if (hasEncryptionKey) {
+    const disableChatEncryption =
+      String(process.env.KODA_DISABLE_CHAT_ENCRYPTION || "")
+        .trim()
+        .toLowerCase() === "true";
+    if (hasEncryptionKey && !disableChatEncryption) {
       chatService.wireEncryption(encryptedChatRepo, encryptedChatContext);
       console.log("[Server] Chat encryption enabled");
     } else {
       console.warn(
-        "[Server] Chat encryption DISABLED (no KODA_MASTER_KEY_BASE64)",
+        "[Server] Chat encryption DISABLED",
       );
     }
 
@@ -350,34 +359,43 @@ async function startServer() {
     process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
     process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-    // 7. Start document queue + preview workers (non-fatal on boot failures)
-    try {
-      startDocumentWorker();
-      console.log("[Server] Document queue worker started");
-      startPreviewGenerationWorker();
-      console.log("[Server] Preview generation worker started");
-      await startPreviewReconciliationWorker();
-      console.log("[Server] Preview reconciliation worker started");
-      await startStuckDocSweeper();
-      console.log("[Server] Stuck document sweeper started");
-    } catch {
-      console.warn("[Server] Document queue worker not available");
-    }
+    const disableBackgroundWorkers =
+      String(process.env.DISABLE_BACKGROUND_WORKERS || "")
+        .trim()
+        .toLowerCase() === "true";
 
-    // 8. Start connector worker (non-fatal if missing)
-    try {
-      startConnectorWorker();
-      console.log("[Server] Connector worker started");
-    } catch {
-      console.warn("[Server] Connector worker not available");
-    }
+    if (disableBackgroundWorkers) {
+      console.warn("[Server] Background workers disabled by env");
+    } else {
+      // 7. Start document queue + preview workers (non-fatal on boot failures)
+      try {
+        startDocumentWorker();
+        console.log("[Server] Document queue worker started");
+        startPreviewGenerationWorker();
+        console.log("[Server] Preview generation worker started");
+        await startPreviewReconciliationWorker();
+        console.log("[Server] Preview reconciliation worker started");
+        await startStuckDocSweeper();
+        console.log("[Server] Stuck document sweeper started");
+      } catch {
+        console.warn("[Server] Document queue worker not available");
+      }
 
-    // 9. Start edit worker (non-fatal if missing)
-    try {
-      startEditWorker();
-      console.log("[Server] Edit worker started");
-    } catch {
-      console.warn("[Server] Edit worker not available");
+      // 8. Start connector worker (non-fatal if missing)
+      try {
+        startConnectorWorker();
+        console.log("[Server] Connector worker started");
+      } catch {
+        console.warn("[Server] Connector worker not available");
+      }
+
+      // 9. Start edit worker (non-fatal if missing)
+      try {
+        startEditWorker();
+        console.log("[Server] Edit worker started");
+      } catch {
+        console.warn("[Server] Edit worker not available");
+      }
     }
 
     console.log("[Server] Startup complete");
@@ -394,6 +412,7 @@ async function startServer() {
 function buildLLMFactory(): LLMClientFactory {
   const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
+  const envName = (process.env.NODE_ENV as any) || "dev";
 
   if (!geminiKey && !openaiKey) {
     throw new Error(
@@ -401,7 +420,8 @@ function buildLLMFactory(): LLMClientFactory {
     );
   }
 
-  const geminiCfg = loadGeminiConfig((process.env.NODE_ENV as any) || "dev");
+  const geminiCfg = geminiKey ? loadGeminiConfig(envName) : null;
+  const openaiCfg = openaiKey ? loadOpenAIConfig(envName) : null;
 
   return new LLMClientFactory({
     defaultProvider: geminiKey ? "google" : "openai",
@@ -410,19 +430,36 @@ function buildLLMFactory(): LLMClientFactory {
         ? {
             enabled: true,
             config: {
-              apiKey: geminiCfg.apiKey,
+              apiKey: geminiCfg!.apiKey,
               baseUrl:
-                geminiCfg.baseUrl ||
+                geminiCfg!.baseUrl ||
                 "https://generativelanguage.googleapis.com/v1beta",
               defaults: {
-                gemini3: geminiCfg.models.defaultFinal,
-                gemini3Flash: geminiCfg.models.defaultDraft,
+                gemini3: geminiCfg!.models.defaultFinal,
+                gemini3Flash: geminiCfg!.models.defaultDraft,
               },
-              timeoutMs: geminiCfg.timeoutMs,
+              timeoutMs: geminiCfg!.timeoutMs,
             },
           }
         : undefined,
-      // OpenAI support can be enabled here when needed
+      openai: openaiCfg
+        ? {
+            enabled: true,
+            config: {
+              apiKey: openaiCfg.apiKey,
+              baseURL: openaiCfg.baseURL,
+              organization: openaiCfg.organization,
+              project: openaiCfg.project,
+              timeoutMs: openaiCfg.timeoutMs,
+              defaultModelDraft: openaiCfg.defaultModelDraft,
+              defaultModelFinal: openaiCfg.defaultModelFinal,
+              allowedModels: openaiCfg.allowedModels,
+              includeUsageInStream: openaiCfg.includeUsageInStream,
+              maxDeltaCharsSoft: openaiCfg.maxDeltaCharsSoft,
+              allowTools: openaiCfg.allowTools,
+            },
+          }
+        : undefined,
     },
   });
 }

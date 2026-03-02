@@ -3,13 +3,13 @@
     "id": "versioning",
     "version": "1.0.0",
     "description": "Canonical versioning + compatibility policy for Koda data banks. Defines semantic version rules, compatibility gates, migration expectations, and boot-time enforcement so bank changes never silently break ChatGPT-like behavior.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-25"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
-
   "config": {
     "enabled": true,
-
     "_comment": "If a required bank fails compatibility checks, fail closed in prod/staging.",
     "failClosedByEnv": {
       "production": true,
@@ -17,17 +17,13 @@
       "dev": false,
       "local": false
     },
-
     "_comment2": "If a bank is missing required version metadata or violates semver formatting, treat as invalid.",
     "requireSemver": true,
-
     "_comment3": "When a bank changes major version, orchestrator must confirm compatible schema and migration plan exists.",
     "requireMigrationNotesOnMajor": true,
-
     "_comment4": "Disallow loading banks with versions outside these ranges.",
     "allowedVersionPolicy": "allowlisted_ranges_only"
   },
-
   "semverRules": {
     "_comment": "SemVer reference policy for banks.",
     "format": "MAJOR.MINOR.PATCH",
@@ -39,7 +35,6 @@
     "preReleaseAllowed": false,
     "buildMetadataAllowed": false
   },
-
   "categoryCompatibility": [
     {
       "category": "manifest",
@@ -56,6 +51,12 @@
       "notes": "Schema changes must be coordinated with bank authors and loader."
     },
     {
+      "category": "normalizers",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_dev_fail_prod"
+    },
+    {
       "category": "routing",
       "minVersion": "1.0.0",
       "maxVersion": "9.9.9",
@@ -68,16 +69,18 @@
       "breakingChangePolicy": "fail_closed_prod"
     },
     {
-      "category": "normalizers",
+      "category": "semantics",
       "minVersion": "1.0.0",
       "maxVersion": "9.9.9",
-      "breakingChangePolicy": "warn_dev_fail_prod"
+      "breakingChangePolicy": "fail_closed_prod",
+      "notes": "Generated strict compatibility policy for required runtime category."
     },
     {
-      "category": "negatives",
+      "category": "scope",
       "minVersion": "1.0.0",
       "maxVersion": "9.9.9",
-      "breakingChangePolicy": "warn_dev_fail_prod"
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
     },
     {
       "category": "retrieval",
@@ -91,6 +94,34 @@
       "maxVersion": "9.9.9",
       "breakingChangePolicy": "fail_closed_prod",
       "notes": "Formatting is user-facing; regressions are unacceptable."
+    },
+    {
+      "category": "dictionaries",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
+    },
+    {
+      "category": "lexicons",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
+    },
+    {
+      "category": "parsers",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
+    },
+    {
+      "category": "intent_patterns",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
     },
     {
       "category": "microcopy",
@@ -110,6 +141,20 @@
       "minVersion": "1.0.0",
       "maxVersion": "9.9.9",
       "breakingChangePolicy": "warn_dev_fail_prod"
+    },
+    {
+      "category": "policies",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod",
+      "notes": "Generated strict compatibility policy for required runtime category."
+    },
+    {
+      "category": "fallbacks",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
     },
     {
       "category": "quality",
@@ -132,54 +177,68 @@
       "breakingChangePolicy": "fail_closed_prod"
     },
     {
-      "category": "state",
-      "minVersion": "1.0.0",
-      "maxVersion": "9.9.9",
-      "breakingChangePolicy": "fail_closed_prod"
-    },
-    {
       "category": "probes",
       "minVersion": "1.0.0",
       "maxVersion": "9.9.9",
       "breakingChangePolicy": "warn_only",
       "notes": "Probes are CI/dev tools; not required for prod runtime."
+    },
+    {
+      "category": "templates",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
+    },
+    {
+      "category": "tests",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Generated compatibility policy for optional/runtime-support category."
     }
   ],
-
   "bankAllowlist": {
     "_comment": "Optional: restrict certain banks to known version ranges for safety. Use for critical banks.",
     "ranges": [
       {
         "id": "quality_gates",
         "path": "quality/quality_gates.any.json",
-        "allowedVersions": ["2.0.0 - 2.9.9"],
+        "allowedVersions": [
+          "3.0.0 - 3.9.9"
+        ],
         "required": true,
         "notes": "Must remain within v2.x for current orchestrator hooks."
       },
       {
         "id": "answer_style_policy",
         "path": "formatting/answer_style_policy.any.json",
-        "allowedVersions": ["5.0.0 - 5.9.9"],
+        "allowedVersions": [
+          "6.0.0 - 6.9.9"
+        ],
         "required": true,
         "notes": "Ensures short-paragraph rules and intro/conclusion behavior exist."
       },
       {
         "id": "render_policy",
         "path": "formatting/render_policy.any.json",
-        "allowedVersions": ["5.0.0 - 5.9.9"],
+        "allowedVersions": [
+          "6.0.0 - 6.9.9"
+        ],
         "required": true,
         "notes": "Ensures nav_pills pills-only contract and no inline Sources section."
       },
       {
         "id": "semantic_search_config",
         "path": "retrieval/semantic_search_config.any.json",
-        "allowedVersions": ["2.0.0 - 2.9.9"],
+        "allowedVersions": [
+          "1.0.0 - 1.9.9"
+        ],
         "required": true,
         "notes": "Ensures hard-scope enforcement and no drift to unrelated docs."
       }
     ]
   },
-
   "migrationPolicy": {
     "_comment": "How to handle bank migrations when versions change.",
     "requireForMajorChange": true,
@@ -192,12 +251,17 @@
     "exampleMigrationNoteShape": {
       "fromVersion": "1.x.x",
       "toVersion": "2.x.x",
-      "breakingChanges": ["..."],
-      "migrationSteps": ["..."],
-      "compatibilityNotes": ["..."]
+      "breakingChanges": [
+        "..."
+      ],
+      "migrationSteps": [
+        "..."
+      ],
+      "compatibilityNotes": [
+        "..."
+      ]
     }
   },
-
   "bootValidation": {
     "_comment": "What the loader/orchestrator must validate at startup.",
     "checks": [
@@ -225,7 +289,6 @@
       "writeOnSuccessfulBootOnly": true
     }
   },
-
   "tests": {
     "_comment": "Lightweight sanity tests for this bank itself.",
     "cases": [

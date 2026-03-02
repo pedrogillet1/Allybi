@@ -1,5 +1,4 @@
 import { google } from "googleapis";
-import type { GoogleAuth } from "google-auth-library";
 import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
@@ -47,15 +46,15 @@ const DEFAULT_SCOPES = [
  * This is the spreadsheet analog to slidesClient.import/export.
  */
 export class SheetsBridgeService {
-  private readonly auth: GoogleAuth;
+  private readonly auth: InstanceType<typeof google.auth.GoogleAuth>;
   private readonly drive: ReturnType<typeof google.drive>;
 
-  constructor(auth?: GoogleAuth) {
+  constructor(auth?: InstanceType<typeof google.auth.GoogleAuth>) {
     this.auth = auth ?? SheetsBridgeService.resolveAuth();
     this.drive = google.drive({ version: "v3", auth: this.auth });
   }
 
-  private static resolveAuth(): GoogleAuth {
+  private static resolveAuth(): InstanceType<typeof google.auth.GoogleAuth> {
     const adcPath = path.join(
       process.env.HOME || "~",
       ".config",

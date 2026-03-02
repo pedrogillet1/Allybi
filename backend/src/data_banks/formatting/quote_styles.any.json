@@ -1,0 +1,49 @@
+{
+  "_meta": {
+    "id": "quote_styles",
+    "version": "1.0.0",
+    "description": "Quote rendering constraints for doc-grounded quote outputs.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "maxLines": 10,
+    "requireAttribution": true,
+    "attributionPrefixByLang": {
+      "en": "Source:",
+      "pt": "Fonte:",
+      "es": "Fuente:"
+    }
+  },
+  "rules": [
+    {
+      "id": "QS_001_max_quote_lines",
+      "description": "Truncate quotes exceeding maxLines",
+      "action": "TRUNCATE"
+    },
+    {
+      "id": "QS_002_attribution_required",
+      "description": "Block quote without attribution",
+      "action": "BLOCK"
+    },
+    {
+      "id": "QS_003_blockquote_format",
+      "description": "Enforce > prefix on quote lines",
+      "action": "ENFORCE"
+    }
+  ],
+  "truncation": {
+    "strategy": "ellipsis_end",
+    "marker": "..."
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "QS_T01",
+        "input": "quote\nquote",
+        "expect": "> quote\n> quote"
+      }
+    ]
+  }
+}

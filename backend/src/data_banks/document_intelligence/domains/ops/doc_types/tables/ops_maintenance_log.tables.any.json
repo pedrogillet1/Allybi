@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "id": "di_ops_tables_ops_maintenance_log",
+    "version": "1.0.0",
+    "description": "Expected table patterns for maintenance log documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_maintenance_log"
+  },
+  "tableHeaderSynonyms": {
+    "date": [
+      "date",
+      "data",
+      "service date"
+    ],
+    "type": [
+      "type",
+      "maintenance type",
+      "tipo"
+    ],
+    "description": [
+      "description",
+      "work performed",
+      "descricao"
+    ],
+    "technician": [
+      "technician",
+      "performed by",
+      "tecnico"
+    ],
+    "hours": [
+      "hours",
+      "labor hours",
+      "horas"
+    ],
+    "parts": [
+      "parts used",
+      "materials",
+      "pecas"
+    ],
+    "cost": [
+      "cost",
+      "amount",
+      "custo"
+    ]
+  },
+  "tables": [
+    {
+      "id": "ops_maintenance_log_entries_table",
+      "name": {
+        "en": "Maintenance Entries",
+        "pt": "Entradas de Manutencao"
+      },
+      "section": "maintenance_entries",
+      "expectedColumns": [
+        "date",
+        "type",
+        "description",
+        "technician",
+        "hours"
+      ],
+      "keyRows": [
+        "total_hours"
+      ]
+    },
+    {
+      "id": "ops_maintenance_log_parts_table",
+      "name": {
+        "en": "Parts Consumed",
+        "pt": "Pecas Consumidas"
+      },
+      "section": "parts_consumed",
+      "expectedColumns": [
+        "part_number",
+        "description",
+        "quantity",
+        "cost"
+      ],
+      "keyRows": [
+        "total_parts_cost"
+      ]
+    },
+    {
+      "id": "ops_maintenance_log_reliability_table",
+      "name": {
+        "en": "Reliability Metrics",
+        "pt": "Metricas de Confiabilidade"
+      },
+      "section": "reliability_metrics",
+      "expectedColumns": [
+        "metric",
+        "value",
+        "unit"
+      ],
+      "keyRows": [
+        "MTBF",
+        "MTTR"
+      ]
+    }
+  ]
+}

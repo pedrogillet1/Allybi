@@ -1,0 +1,144 @@
+{
+  "_meta": {
+    "id": "di_ops_entities_ops_maintenance_log",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for maintenance log documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_maintenance_log"
+  },
+  "entities": [
+    {
+      "id": "docType",
+      "type": "string",
+      "required": true,
+      "description": "Detected document type identifier"
+    },
+    {
+      "id": "logId",
+      "type": "string",
+      "required": true,
+      "description": "Maintenance log identifier"
+    },
+    {
+      "id": "equipmentId",
+      "type": "string",
+      "required": true,
+      "description": "Equipment asset ID or tag"
+    },
+    {
+      "id": "equipmentName",
+      "type": "string",
+      "required": true,
+      "description": "Equipment or asset description"
+    },
+    {
+      "id": "locationName",
+      "type": "string",
+      "required": false,
+      "description": "Physical location or site"
+    },
+    {
+      "id": "reportingPeriodStart",
+      "type": "date",
+      "required": false,
+      "description": "Log period start date"
+    },
+    {
+      "id": "reportingPeriodEnd",
+      "type": "date",
+      "required": false,
+      "description": "Log period end date"
+    },
+    {
+      "id": "entryCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of maintenance entries in the log"
+    },
+    {
+      "id": "maintenanceType",
+      "type": "enum",
+      "required": false,
+      "description": "Predominant maintenance type in the log",
+      "values": [
+        "preventive",
+        "corrective",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "totalDowntimeHours",
+      "type": "number",
+      "required": false,
+      "description": "Total downtime hours across all entries"
+    },
+    {
+      "id": "totalLaborHours",
+      "type": "number",
+      "required": false,
+      "description": "Total labor hours across all entries"
+    },
+    {
+      "id": "totalCost",
+      "type": "currency",
+      "required": false,
+      "description": "Total maintenance cost for the period"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code"
+    },
+    {
+      "id": "mtbf",
+      "type": "number",
+      "required": false,
+      "description": "Mean Time Between Failures (hours)"
+    },
+    {
+      "id": "mttr",
+      "type": "number",
+      "required": false,
+      "description": "Mean Time To Repair (hours)"
+    },
+    {
+      "id": "preparedBy",
+      "type": "string",
+      "required": false,
+      "description": "Person who prepared or compiled the log"
+    },
+    {
+      "id": "languageDetected",
+      "type": "enum",
+      "required": true,
+      "description": "Detected language",
+      "values": [
+        "en",
+        "pt",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "documentPages",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidenceScore",
+      "type": "number",
+      "required": false,
+      "description": "Overall extraction confidence"
+    }
+  ]
+}

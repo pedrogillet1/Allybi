@@ -1,0 +1,151 @@
+{
+  "_meta": {
+    "id": "di_ops_extraction_ops_maintenance_log",
+    "version": "1.0.0",
+    "description": "Extraction hints for maintenance log documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_maintenance_log"
+  },
+  "hints": [
+    {
+      "id": "hint_01_docType",
+      "entity": "docType",
+      "anchors": [
+        "maintenance log",
+        "equipment history",
+        "ops_maintenance_log"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_logId",
+      "entity": "logId",
+      "anchors": [
+        "log id",
+        "log number",
+        "registro numero"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_03_equipmentId",
+      "entity": "equipmentId",
+      "anchors": [
+        "equipment id",
+        "asset tag",
+        "asset id",
+        "codigo equipamento"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_04_equipmentName",
+      "entity": "equipmentName",
+      "anchors": [
+        "equipment",
+        "asset name",
+        "machine",
+        "equipamento"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_05_locationName",
+      "entity": "locationName",
+      "anchors": [
+        "location",
+        "site",
+        "plant",
+        "local"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_06_reportingPeriodStart",
+      "entity": "reportingPeriodStart",
+      "anchors": [
+        "period start",
+        "from",
+        "inicio"
+      ],
+      "location": "header",
+      "extractionMethod": "date_range_parse"
+    },
+    {
+      "id": "hint_07_reportingPeriodEnd",
+      "entity": "reportingPeriodEnd",
+      "anchors": [
+        "period end",
+        "to",
+        "fim"
+      ],
+      "location": "header",
+      "extractionMethod": "date_range_parse"
+    },
+    {
+      "id": "hint_08_totalDowntimeHours",
+      "entity": "totalDowntimeHours",
+      "anchors": [
+        "total downtime",
+        "downtime hours",
+        "horas de parada"
+      ],
+      "location": "summary",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_09_totalLaborHours",
+      "entity": "totalLaborHours",
+      "anchors": [
+        "total labor",
+        "labor hours",
+        "horas trabalhadas"
+      ],
+      "location": "summary",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_10_totalCost",
+      "entity": "totalCost",
+      "anchors": [
+        "total cost",
+        "maintenance cost",
+        "custo total"
+      ],
+      "location": "summary",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_11_mtbf",
+      "entity": "mtbf",
+      "anchors": [
+        "MTBF",
+        "mean time between failures"
+      ],
+      "location": "reliability_metrics",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_12_mttr",
+      "entity": "mttr",
+      "anchors": [
+        "MTTR",
+        "mean time to repair"
+      ],
+      "location": "reliability_metrics",
+      "extractionMethod": "amount_parse"
+    }
+  ]
+}

@@ -16,5 +16,18 @@
         }
       }
     ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "PROMPT_TEST_001_system_base",
+        "input": "Show me a comparison table",
+        "expect": {
+          "promptApplied": true,
+          "maxColumns": 5,
+          "maxRows": 12
+        }
+      }
+    ]
   }
 }

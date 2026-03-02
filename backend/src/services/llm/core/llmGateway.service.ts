@@ -15,6 +15,7 @@ import {
   type MemoryPackLike,
 } from "./llmRequestBuilder.service";
 import { getProductHelpService } from "../../chat/productHelp.service";
+import { getAnswerModeRouterService } from "../../config/answerModeRouter.service";
 
 export type GatewayChatRole = "system" | "user" | "assistant";
 
@@ -98,12 +99,63 @@ function firstNonEmptyString(...values: Array<unknown>): string | null {
   return null;
 }
 
+function asNormalizedCode(value: unknown): string | null {
+  const text = String(value || "").trim();
+  return text ? text.toLowerCase() : null;
+}
+
+function asNonNegativeInt(value: unknown): number | null {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num < 0) return null;
+  return Math.floor(num);
+}
+
+function asStringList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => String(entry || "").trim())
+      .filter((entry) => entry.length > 0);
+  }
+  const one = String(value || "").trim();
+  return one ? [one] : [];
+}
+
+function asBool(value: unknown): boolean | null {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return null;
+    return value !== 0;
+  }
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return null;
+    if (["1", "true", "yes", "on"].includes(normalized)) return true;
+    if (["0", "false", "no", "off"].includes(normalized)) return false;
+  }
+  return null;
+}
+
+function normalizePromptMode(value: unknown): "compose" | "retrieval_plan" {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (
+    normalized === "retrieval_plan" ||
+    normalized === "retrieval" ||
+    normalized === "retrieval_planning"
+  ) {
+    return "retrieval_plan";
+  }
+  return "compose";
+}
+
 export class LlmGatewayService {
   constructor(
     private readonly llmClient: LLMClient,
     private readonly router: LlmRouterService,
     private readonly builder: LlmRequestBuilderService,
     private readonly cfg: LlmGatewayConfig,
+    private readonly answerModeRouter = getAnswerModeRouterService(),
   ) {}
 
   async generate(params: LlmGatewayRequest): Promise<{
@@ -112,6 +164,38 @@ export class LlmGatewayService {
     promptTrace: GatewayPromptTrace;
   }> {
     const prepared = this.prepareProviderRequest(params, false);
+    const response = await this.llmClient.complete(prepared.request);
+
+    return {
+      text: response.content,
+      telemetry: {
+        provider: this.cfg.provider,
+        model: this.cfg.modelId,
+        finishReason: response.finishReason || "unknown",
+        usage: response.usage,
+        promptType: prepared.promptType,
+        requestedMaxOutputTokens:
+          prepared.request.sampling?.maxOutputTokens ?? null,
+        ...prepared.promptTrace,
+      },
+      promptTrace: prepared.promptTrace,
+    };
+  }
+
+  async generateRetrievalPlan(params: LlmGatewayRequest): Promise<{
+    text: string;
+    telemetry?: Record<string, unknown>;
+    promptTrace: GatewayPromptTrace;
+  }> {
+    const enriched: LlmGatewayRequest = {
+      ...params,
+      meta: {
+        ...(params.meta || {}),
+        purpose: "retrieval_planning",
+        promptMode: "retrieval_plan",
+      },
+    };
+    const prepared = this.prepareProviderRequest(enriched, false);
     const response = await this.llmClient.complete(prepared.request);
 
     return {
@@ -206,16 +290,32 @@ export class LlmGatewayService {
       userText: parsed.userText,
       signals: {
         answerMode: parsed.answerMode,
+        promptMode: parsed.promptMode ?? "compose",
         intentFamily: parsed.intentFamily,
         operator: parsed.operator,
         operatorFamily: parsed.operatorFamily,
-        disallowJsonOutput: promptTask ? false : true,
-        maxQuestions: 1,
+        disallowJsonOutput:
+          promptTask || parsed.promptMode === "retrieval_plan" ? false : true,
+        maxQuestions:
+          typeof parsed.styleMaxQuestions === "number"
+            ? parsed.styleMaxQuestions
+            : 1,
         navType: parsed.navType,
         fallback: parsed.fallback,
         disambiguation: parsed.disambiguation,
         productHelpTopic,
         productHelpSnippet,
+        styleProfile: parsed.styleProfile,
+        styleMaxChars: parsed.styleMaxChars,
+        userRequestedShort: parsed.userRequestedShort,
+        boldingEnabled:
+          typeof parsed.boldingEnabled === "boolean"
+            ? parsed.boldingEnabled
+            : undefined,
+        retrievalPlanning: parsed.promptMode === "retrieval_plan",
+        uiSurface: parsed.uiSurface ?? null,
+        usedBy: parsed.usedBy ?? [],
+        semanticFlags: parsed.semanticFlags ?? [],
       },
       evidencePack: params.evidencePack ?? parsed.evidencePack,
       memoryPack: parsed.memoryPack,
@@ -313,6 +413,15 @@ export class LlmGatewayService {
     memoryPack?: MemoryPackLike;
     productHelpTopic?: string | null;
     productHelpSnippet?: string | null;
+    styleProfile?: string | null;
+    styleMaxQuestions?: number | null;
+    styleMaxChars?: number | null;
+    userRequestedShort?: boolean;
+    boldingEnabled?: boolean | null;
+    promptMode?: "compose" | "retrieval_plan";
+    uiSurface?: string | null;
+    usedBy?: string[] | null;
+    semanticFlags?: string[] | null;
   } {
     const messages = params.messages || [];
 
@@ -333,53 +442,55 @@ export class LlmGatewayService {
       typeof params.meta?.promptTask === "string"
         ? String(params.meta.promptTask)
         : null;
+    const rawMeta = params.meta || {};
+    const rawContext = params.context || {};
+    const evidencePack = params.evidencePack ?? undefined;
+    const contextSignals = (rawContext?.signals as any) || {};
+    const metaSignals = (rawMeta?.signals as any) || {};
     const systemBlocks = history
       .filter((m) => m.role === "system")
       .map((m) => clampText(m.content, this.resolveSystemBlockCharCap()));
     const dialogueHistory = history.filter((m) => m.role !== "system");
-    const dialogue = this.buildDialogueContext(dialogueHistory).join("\n");
-
-    const memoryParts: string[] = [];
-    if (dialogue) {
-      memoryParts.push(`### Conversation History\n${dialogue}`);
-    }
-
-    if (!promptTask && systemBlocks.length) {
-      memoryParts.push(
-        "### Runtime Context Data\n" +
-          systemBlocks.map((s, i) => `[ctx_${i + 1}]\n${s}`).join("\n\n"),
-      );
-    }
-
-    const joinedMemory = memoryParts.join("\n\n");
-    const memoryPack = memoryParts.length
-      ? {
-          contextText: clampText(joinedMemory, this.resolveMemoryPackCharCap()),
-          stats: { usedChars: joinedMemory.length },
-        }
-      : undefined;
-
-    const rawMeta = params.meta || {};
-    const rawContext = params.context || {};
-    const evidencePack = params.evidencePack ?? undefined;
 
     const outputLanguage = this.detectOutputLanguage(
       rawMeta,
       rawContext,
       systemBlocks,
     );
+    const promptTaskName = String(promptTask || "").trim();
+    const resolvedOperator =
+      promptTaskName ||
+      firstNonEmptyString(
+        rawMeta.operator,
+        (rawContext as any).operator,
+        contextSignals.operator,
+        metaSignals.operator,
+      ) ||
+      null;
+    const familyResolution = this.resolveOperatorFamilyRouting(
+      resolvedOperator,
+      rawMeta,
+      rawContext,
+    );
     const answerMode = this.detectAnswerMode(
       rawMeta,
       systemBlocks,
       evidencePack,
       rawContext,
+      {
+        operator: resolvedOperator,
+        operatorFamily: familyResolution.operatorFamily,
+        operatorFamilyDefaultMode: familyResolution.defaultAnswerMode,
+      },
     );
     const disambiguation = this.detectDisambiguation(
       rawMeta,
       rawContext,
       answerMode,
     );
-    const operatorFamily = answerMode === "nav_pills" ? "file_actions" : null;
+    const operatorFamily =
+      familyResolution.operatorFamily ||
+      (answerMode === "nav_pills" ? "file_actions" : null);
     const navType =
       (rawMeta.navType as any) ??
       (answerMode === "nav_pills" ? "discover" : null);
@@ -388,8 +499,14 @@ export class LlmGatewayService {
       typeof rawMeta.fallbackReasonCode === "string"
         ? rawMeta.fallbackReasonCode
         : null;
-    const contextSignals = (rawContext?.signals as any) || {};
-    const metaSignals = (rawMeta?.signals as any) || {};
+    const requestedPurpose = asNormalizedCode(
+      firstNonEmptyString(
+        rawMeta.purpose,
+        (rawContext as any).purpose,
+        contextSignals.purpose,
+        metaSignals.purpose,
+      ),
+    );
     const productHelpTopic = firstNonEmptyString(
       rawMeta.productHelpTopic,
       (rawContext as any).productHelpTopic,
@@ -402,14 +519,141 @@ export class LlmGatewayService {
       contextSignals.productHelpSnippet,
       metaSignals.productHelpSnippet,
     );
+    const styleProfile =
+      firstNonEmptyString(
+        rawMeta.styleProfile,
+        (rawContext as any).styleProfile,
+        contextSignals.styleProfile,
+        metaSignals.styleProfile,
+      ) || null;
+    const styleMaxQuestions =
+      asNonNegativeInt(
+        rawMeta.styleMaxQuestions ??
+          rawMeta.maxQuestions ??
+          (rawContext as any).styleMaxQuestions ??
+          contextSignals.styleMaxQuestions ??
+          contextSignals.maxQuestions ??
+          metaSignals.styleMaxQuestions ??
+          metaSignals.maxQuestions,
+      ) ?? null;
+    const styleMaxChars =
+      asNonNegativeInt(
+        rawMeta.styleMaxChars ??
+          (rawContext as any).styleMaxChars ??
+          contextSignals.styleMaxChars ??
+          contextSignals.profileMaxChars ??
+          metaSignals.styleMaxChars,
+      ) ?? null;
+    const userRequestedShort =
+      asBool(
+        rawMeta.userRequestedShort ??
+          rawMeta.truncationRetry ??
+          (rawContext as any).userRequestedShort ??
+          (rawContext as any).truncationRetry ??
+          contextSignals.userRequestedShort ??
+          contextSignals.truncationRetry ??
+          contextSignals.shortAnswer ??
+          metaSignals.userRequestedShort ??
+          metaSignals.truncationRetry ??
+          metaSignals.shortAnswer,
+      ) === true;
+    const boldingEnabledRaw =
+      rawMeta.boldingEnabled ??
+      (rawContext as any).boldingEnabled ??
+      contextSignals.boldingEnabled ??
+      metaSignals.boldingEnabled;
+    const boldingEnabled =
+      typeof boldingEnabledRaw === "boolean" ? boldingEnabledRaw : null;
+    const retrievalPlanningSignal =
+      asBool(
+        rawMeta.retrievalPlanning ??
+          (rawContext as any).retrievalPlanning ??
+          contextSignals.retrievalPlanning ??
+          metaSignals.retrievalPlanning,
+      ) === true;
+    const promptMode = normalizePromptMode(
+      firstNonEmptyString(
+        rawMeta.promptMode,
+        (rawContext as any).promptMode,
+        contextSignals.promptMode,
+        metaSignals.promptMode,
+        requestedPurpose === "retrieval_planning" ? "retrieval_plan" : null,
+        retrievalPlanningSignal ? "retrieval_plan" : null,
+      ),
+    );
+    const uiSurface =
+      firstNonEmptyString(
+        rawMeta.uiSurface,
+        (rawContext as any).uiSurface,
+        contextSignals.uiSurface,
+        metaSignals.uiSurface,
+      ) || null;
+    const usedBy = [
+      ...asStringList(rawMeta.usedBy),
+      ...asStringList((rawContext as any).usedBy),
+      ...asStringList(contextSignals.usedBy),
+      ...asStringList(metaSignals.usedBy),
+    ];
+    const semanticFlagsSet = new Set<string>();
+    for (const value of [
+      ...asStringList(rawMeta.semanticFlags),
+      ...asStringList((rawContext as any).semanticFlags),
+      ...asStringList(contextSignals.semanticFlags),
+      ...asStringList(metaSignals.semanticFlags),
+    ]) {
+      semanticFlagsSet.add(value);
+    }
+    const signalObjects = [contextSignals, metaSignals];
+    for (const obj of signalObjects) {
+      if (!obj || typeof obj !== "object") continue;
+      for (const [key, value] of Object.entries(obj)) {
+        const enabled = asBool(value);
+        if (enabled === true) semanticFlagsSet.add(String(key || "").trim());
+      }
+    }
+    const semanticFlags = Array.from(semanticFlagsSet).filter(Boolean);
+    const tightenedHistoryForDocGrounded =
+      String(answerMode || "").startsWith("doc_grounded") &&
+      dialogueHistory.length > 18;
+    const dialogue = this.buildDialogueContext(dialogueHistory, {
+      maxTurns: tightenedHistoryForDocGrounded
+        ? Math.min(this.resolveDialogueTurnLimit(), 12)
+        : undefined,
+      perMessageCap: tightenedHistoryForDocGrounded
+        ? Math.min(this.resolveDialogueMessageCharCap(), 1000)
+        : undefined,
+      charBudget: tightenedHistoryForDocGrounded
+        ? Math.min(this.resolveDialogueCharBudget(), 8000)
+        : undefined,
+    }).join("\n");
+    const memoryParts: string[] = [];
+    if (dialogue) {
+      memoryParts.push(`### Conversation History\n${dialogue}`);
+    }
+    if (!promptTask && systemBlocks.length) {
+      memoryParts.push(
+        "### Runtime Context Data\n" +
+          systemBlocks.map((s, i) => `[ctx_${i + 1}]\n${s}`).join("\n\n"),
+      );
+    }
+    const joinedMemory = memoryParts.join("\n\n");
+    const memoryPackCharCap = tightenedHistoryForDocGrounded
+      ? Math.min(this.resolveMemoryPackCharCap(), 14000)
+      : this.resolveMemoryPackCharCap();
+    const memoryPack = memoryParts.length
+      ? {
+          contextText: clampText(joinedMemory, memoryPackCharCap),
+          stats: { usedChars: joinedMemory.length },
+        }
+      : undefined;
 
     return {
       userText,
       outputLanguage,
       answerMode,
       intentFamily: (rawMeta.intentFamily as string) || null,
-      operator: promptTask || (rawMeta.operator as string) || null,
-      operatorFamily: promptTask ? "file_actions" : operatorFamily,
+      operator: resolvedOperator,
+      operatorFamily: promptTaskName ? "file_actions" : operatorFamily,
       navType,
       fallback: reasonCode
         ? { triggered: true, reasonCode }
@@ -419,17 +663,40 @@ export class LlmGatewayService {
       memoryPack,
       productHelpTopic,
       productHelpSnippet,
+      styleProfile,
+      styleMaxQuestions,
+      styleMaxChars,
+      userRequestedShort,
+      boldingEnabled,
+      promptMode,
+      uiSurface,
+      usedBy: usedBy.length ? Array.from(new Set(usedBy)) : [],
+      semanticFlags,
     };
   }
 
   private buildDialogueContext(
     history: Array<{ role: GatewayChatRole; content: string }>,
+    overrides?: {
+      maxTurns?: number;
+      perMessageCap?: number;
+      charBudget?: number;
+    },
   ): string[] {
     if (!history.length) return [];
 
-    const maxTurns = this.resolveDialogueTurnLimit();
-    const perMessageCap = this.resolveDialogueMessageCharCap();
-    const charBudget = this.resolveDialogueCharBudget();
+    const maxTurns = Math.max(
+      1,
+      Number(overrides?.maxTurns) || this.resolveDialogueTurnLimit(),
+    );
+    const perMessageCap = Math.max(
+      64,
+      Number(overrides?.perMessageCap) || this.resolveDialogueMessageCharCap(),
+    );
+    const charBudget = Math.max(
+      512,
+      Number(overrides?.charBudget) || this.resolveDialogueCharBudget(),
+    );
 
     const selected = history.slice(Math.max(0, history.length - maxTurns));
     const lines: string[] = [];
@@ -567,12 +834,16 @@ export class LlmGatewayService {
     systemBlocks: string[],
     evidencePack?: EvidencePackLike,
     context?: Record<string, unknown>,
+    operatorRouting?: {
+      operator?: string | null;
+      operatorFamily?: string | null;
+      operatorFamilyDefaultMode?: string | null;
+    },
   ): string {
     if (typeof meta.promptTask === "string" && meta.promptTask.trim()) {
-      return "action_receipt";
-    }
-    if (typeof meta.answerMode === "string" && meta.answerMode.trim()) {
-      return meta.answerMode;
+      return this.answerModeRouter.decide({
+        promptTask: String(meta.promptTask),
+      }).answerMode;
     }
     const contextSignals = (context?.signals as any) || {};
     const metaSignals = (meta?.signals as any) || {};
@@ -586,18 +857,89 @@ export class LlmGatewayService {
       (context as any)?.disambiguation?.active === true ||
       contextSignals?.disambiguation?.active === true ||
       metaSignals?.disambiguation?.active === true;
-    if (needsClarification || disambiguationActive) {
-      return "rank_disambiguate";
+
+    const evidenceDocCount = evidencePack?.evidence?.length
+      ? new Set(evidencePack.evidence.map((e) => e.docId)).size
+      : 0;
+    return this.answerModeRouter.decide({
+      promptTask:
+        typeof meta.promptTask === "string" ? String(meta.promptTask) : null,
+      explicitAnswerMode:
+        typeof meta.answerMode === "string" ? String(meta.answerMode) : null,
+      needsClarification,
+      disambiguationActive,
+      operator: operatorRouting?.operator,
+      operatorFamily:
+        operatorRouting?.operatorFamily || (context as any)?.operatorFamily,
+      intentFamily:
+        (meta.intentFamily as string) ||
+        ((context as any)?.intentFamily as string) ||
+        null,
+      evidenceDocCount,
+      systemBlocks,
+    }).answerMode;
+  }
+
+  private resolveOperatorFamilyRouting(
+    operator: string | null,
+    meta: Record<string, unknown>,
+    context: Record<string, unknown>,
+  ): { operatorFamily: string | null; defaultAnswerMode: string | null } {
+    const explicitFamily = firstNonEmptyString(
+      meta.operatorFamily,
+      (context as any).operatorFamily,
+      (meta.signals as any)?.operatorFamily,
+      (context.signals as any)?.operatorFamily,
+    );
+    const familyBank = getOptionalBank<any>("operator_families");
+    const families = Array.isArray(familyBank?.families)
+      ? familyBank.families
+      : [];
+    const findFamilyById = (familyId: string) =>
+      families.find(
+        (entry: any) =>
+          asNormalizedCode(entry?.id) === asNormalizedCode(familyId),
+      ) || null;
+
+    let familyEntry = explicitFamily ? findFamilyById(explicitFamily) : null;
+    if (!familyEntry && operator) {
+      const normalizedOperator = asNormalizedCode(operator);
+      familyEntry =
+        families.find((entry: any) =>
+          Array.isArray(entry?.operators)
+            ? entry.operators.some(
+                (op: unknown) => asNormalizedCode(op) === normalizedOperator,
+              )
+            : false,
+        ) || null;
     }
 
-    const joined = systemBlocks.join("\n");
-    if (/NAVIGATION MODE/i.test(joined)) return "nav_pills";
-    if (evidencePack?.evidence?.length) {
-      const unique = new Set(evidencePack.evidence.map((e) => e.docId)).size;
-      return unique > 1 ? "doc_grounded_multi" : "doc_grounded_single";
+    if (!familyEntry) {
+      return {
+        operatorFamily: explicitFamily ? String(explicitFamily) : null,
+        defaultAnswerMode: null,
+      };
     }
 
-    return "general_answer";
+    const operatorHints =
+      familyEntry.operatorHints && typeof familyEntry.operatorHints === "object"
+        ? familyEntry.operatorHints
+        : null;
+    const normalizedOperator = asNormalizedCode(operator);
+    const hintedMode =
+      normalizedOperator && operatorHints
+        ? Object.entries(operatorHints).find(
+            ([opId]) => asNormalizedCode(opId) === normalizedOperator,
+          )?.[1]
+        : null;
+    const defaultAnswerMode = String(
+      (hintedMode as any)?.defaultMode || familyEntry.defaultAnswerMode || "",
+    ).trim();
+
+    return {
+      operatorFamily: String(familyEntry.id || "").trim() || null,
+      defaultAnswerMode: defaultAnswerMode || null,
+    };
   }
 
   private detectDisambiguation(

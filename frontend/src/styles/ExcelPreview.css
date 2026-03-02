@@ -160,6 +160,19 @@
   background: white;
 }
 
+.excel-inline-editor {
+  width: 100%;
+  min-width: 56px;
+  border: none;
+  outline: 2px solid #111827;
+  outline-offset: -2px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  line-height: 1.35;
+  padding: 2px 4px;
+}
+
 /* Last column - keep right border for Excel look */
 .excel-cell:last-child {
   border-right: 1px solid #C8C8C8;

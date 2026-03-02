@@ -1,0 +1,129 @@
+{
+  "_meta": {
+    "id": "di_ops_sections_ops_quality_report",
+    "version": "1.0.0",
+    "description": "Section map for quality report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_quality_report"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "quality report",
+        "inspection report",
+        "QC report",
+        "relatorio de qualidade",
+        "relatorio de inspecao"
+      ]
+    },
+    {
+      "id": "inspection_scope",
+      "name": {
+        "en": "Inspection Scope",
+        "pt": "Escopo da Inspecao"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "scope",
+        "criteria",
+        "standard",
+        "escopo",
+        "criterios"
+      ]
+    },
+    {
+      "id": "test_results",
+      "name": {
+        "en": "Test Results",
+        "pt": "Resultados dos Testes"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "results",
+        "measurements",
+        "test data",
+        "resultados",
+        "medicoes"
+      ]
+    },
+    {
+      "id": "non_conformances",
+      "name": {
+        "en": "Non-Conformances",
+        "pt": "Nao Conformidades"
+      },
+      "required": false,
+      "order": 4,
+      "headingAnchors": [
+        "non-conformance",
+        "defect",
+        "deviation",
+        "nao conformidade",
+        "defeito"
+      ]
+    },
+    {
+      "id": "summary",
+      "name": {
+        "en": "Summary",
+        "pt": "Resumo"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "summary",
+        "conclusion",
+        "verdict",
+        "resumo",
+        "conclusao"
+      ]
+    },
+    {
+      "id": "corrective_actions",
+      "name": {
+        "en": "Corrective Actions",
+        "pt": "Acoes Corretivas"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "corrective action",
+        "CAPA",
+        "recommendation",
+        "acao corretiva"
+      ]
+    },
+    {
+      "id": "footer_metadata",
+      "name": {
+        "en": "Footer Metadata",
+        "pt": "Rodape e Metadados"
+      },
+      "required": false,
+      "order": 7,
+      "headingAnchors": [
+        "approved by",
+        "signature",
+        "page",
+        "document id",
+        "aprovado por"
+      ]
+    }
+  ]
+}

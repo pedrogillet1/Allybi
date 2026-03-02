@@ -66,8 +66,14 @@ describe("chunking.service", () => {
   test("deduplicateChunkRecords keeps distinct chunks", () => {
     const rows = [
       { id: "a", content: "contract indemnity liability cap renewal clause" },
-      { id: "b", content: "blood test leukocytes reference range platelet count" },
-      { id: "c", content: "bank statement ending balance payment received fees" },
+      {
+        id: "b",
+        content: "blood test leukocytes reference range platelet count",
+      },
+      {
+        id: "c",
+        content: "bank statement ending balance payment received fees",
+      },
     ];
 
     const deduped = deduplicateChunkRecords(rows);

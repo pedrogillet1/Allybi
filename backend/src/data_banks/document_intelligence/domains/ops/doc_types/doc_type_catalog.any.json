@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "id": "di_ops_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Document type catalog for operations domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "docTypes": [
+    {
+      "id": "ops_work_order",
+      "name": {
+        "en": "Work Order",
+        "pt": "Ordem de Servico"
+      },
+      "description": "Maintenance or service work order with task description, assignments, parts, and completion status.",
+      "detectionPatterns": [
+        "\\bwork\\s+order\\b",
+        "\\bservice\\s+order\\b",
+        "\\bmaintenance\\s+request\\b",
+        "\\bordem\\s+de\\s+servico\\b",
+        "\\bOS\\b"
+      ],
+      "priority": 100
+    },
+    {
+      "id": "ops_incident_report",
+      "name": {
+        "en": "Incident Report",
+        "pt": "Relatorio de Incidente"
+      },
+      "description": "Operational incident report documenting event timeline, root cause, impact, and corrective actions.",
+      "detectionPatterns": [
+        "\\bincident\\s+report\\b",
+        "\\boccurrence\\s+report\\b",
+        "\\broot\\s+cause\\b",
+        "\\brelatorio\\s+de\\s+incidente\\b",
+        "\\bocorrencia\\b"
+      ],
+      "priority": 99
+    },
+    {
+      "id": "ops_maintenance_log",
+      "name": {
+        "en": "Maintenance Log",
+        "pt": "Registro de Manutencao"
+      },
+      "description": "Chronological maintenance activity log with entries for preventive and corrective actions on equipment.",
+      "detectionPatterns": [
+        "\\bmaintenance\\s+log\\b",
+        "\\bequipment\\s+history\\b",
+        "\\bregistro\\s+de\\s+manutencao\\b",
+        "\\bhistorico\\s+de\\s+equipamento\\b"
+      ],
+      "priority": 98
+    },
+    {
+      "id": "ops_shipping_manifest",
+      "name": {
+        "en": "Shipping Manifest",
+        "pt": "Romaneio de Embarque"
+      },
+      "description": "Shipping manifest or bill of lading with consignment details, item list, weights, and routing.",
+      "detectionPatterns": [
+        "\\bshipping\\s+manifest\\b",
+        "\\bbill\\s+of\\s+lading\\b",
+        "\\bpacking\\s+list\\b",
+        "\\bromaneio\\b",
+        "\\bconhecimento\\s+de\\s+transporte\\b"
+      ],
+      "priority": 97
+    },
+    {
+      "id": "ops_quality_report",
+      "name": {
+        "en": "Quality Report",
+        "pt": "Relatorio de Qualidade"
+      },
+      "description": "Quality inspection or audit report with test results, pass/fail criteria, and non-conformance findings.",
+      "detectionPatterns": [
+        "\\bquality\\s+report\\b",
+        "\\binspection\\s+report\\b",
+        "\\bnon-?conformance\\b",
+        "\\brelatorio\\s+de\\s+qualidade\\b",
+        "\\binspecao\\b"
+      ],
+      "priority": 96
+    },
+    {
+      "id": "ops_sla_report",
+      "name": {
+        "en": "SLA Report",
+        "pt": "Relatorio de SLA"
+      },
+      "description": "Service level agreement performance report with KPI metrics, targets, actuals, and compliance status.",
+      "detectionPatterns": [
+        "\\bSLA\\s+report\\b",
+        "\\bservice\\s+level\\b",
+        "\\bKPI\\s+report\\b",
+        "\\brelatorio\\s+de\\s+SLA\\b",
+        "\\bindicadores\\b"
+      ],
+      "priority": 95
+    }
+  ]
+}

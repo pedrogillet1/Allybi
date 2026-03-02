@@ -162,10 +162,17 @@ export interface MatchCandidate {
   matchedTriggers: string[];
 }
 
+export interface MatchAmbiguity {
+  group: string;
+  candidateIds: string[];
+  reason: "tie_score" | "low_margin";
+}
+
 export interface MatchResult {
   segment: Segment;
   candidates: MatchCandidate[];
   bestMatch: MatchCandidate | null;
+  ambiguity?: MatchAmbiguity;
 }
 
 // ---------------------------------------------------------------------------

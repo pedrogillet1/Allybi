@@ -27,6 +27,13 @@
       "example_pt": "=SUMIFS(F:F,C:C,\"CABINS\")"
     },
     {
+      "name": "COUNT",
+      "aliases_en": ["count", "count values"],
+      "aliases_pt": ["contar", "contagem"],
+      "example_en": "=COUNT(A:A)",
+      "example_pt": "=COUNT(A:A)"
+    },
+    {
       "name": "IFERROR",
       "aliases_en": ["iferror", "if error"],
       "aliases_pt": ["seerro", "se erro"],
@@ -52,11 +59,11 @@
     "errors": {
       "en": {
         "MISSING_PREFIX": "Formula must start with '='.",
-        "UNKNOWN_FUNCTION": "Unknown formula function. Try one of: SUM, SUMIFS, IFERROR, XLOOKUP, LET."
+        "UNKNOWN_FUNCTION": "Unknown formula function. Try one of: SUM, SUMIFS, COUNT, IFERROR, XLOOKUP, LET."
       },
       "pt": {
         "MISSING_PREFIX": "A f\u00f3rmula deve come\u00e7ar com '='.",
-        "UNKNOWN_FUNCTION": "Fun\u00e7\u00e3o de f\u00f3rmula desconhecida. Tente: SUM, SUMIFS, IFERROR, XLOOKUP, LET."
+        "UNKNOWN_FUNCTION": "Fun\u00e7\u00e3o de f\u00f3rmula desconhecida. Tente: SUM, SUMIFS, COUNT, IFERROR, XLOOKUP, LET."
       }
     }
   }

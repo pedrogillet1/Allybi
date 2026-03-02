@@ -1,182 +1,3068 @@
 {
   "_meta": {
     "id": "table_header_ontology_legal",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for legal.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "legal"
+    "domain": "legal",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "legal",
   "headers": [
-    { "canonical": "action_required", "synonyms": ["action required", "action needed", "next action", "acao necessaria", "providencia"], "related": ["obligation_owner", "deadline"] },
-    { "canonical": "agreement_date", "synonyms": ["agreement date", "contract date", "execution date", "data do contrato", "data do acordo"], "related": ["agreement_number", "effective_date"] },
-    { "canonical": "agreement_number", "synonyms": ["agreement number", "agreement no", "contract no", "numero do contrato", "numero do acordo"], "related": ["agreement_date", "contract_number"] },
-    { "canonical": "agreement_type", "synonyms": ["agreement type", "contract type", "document type", "tipo de contrato", "tipo de acordo"], "related": ["contract_type", "document_type"] },
-    { "canonical": "amendment_date", "synonyms": ["amendment date", "addendum date", "modification date", "data do aditivo", "data da emenda"], "related": ["amendment_number", "original_date"] },
-    { "canonical": "amendment_number", "synonyms": ["amendment number", "addendum no", "amendment no", "numero do aditivo", "numero da emenda"], "related": ["amendment_date", "agreement_number"] },
-    { "canonical": "applicable_law", "synonyms": ["applicable law", "governing law", "jurisdiction", "lei aplicavel", "legislacao aplicavel", "foro"], "related": ["governing_law", "jurisdiction"] },
-    { "canonical": "approval_date", "synonyms": ["approval date", "approved on", "date approved", "data de aprovacao", "aprovado em"], "related": ["approval_status", "review_date"] },
-    { "canonical": "approval_status", "synonyms": ["approval status", "approved", "status", "status de aprovacao", "situacao da aprovacao"], "related": ["approval_date", "review_status"] },
-    { "canonical": "arbitration_clause", "synonyms": ["arbitration clause", "arbitration", "arb clause", "clausula de arbitragem", "arbitragem"], "related": ["dispute_category", "forum"] },
-    { "canonical": "article_number", "synonyms": ["article", "article no", "art", "artigo", "art.", "numero do artigo"], "related": ["section_number", "clause_number"] },
-    { "canonical": "assignee", "synonyms": ["assignee", "transferee", "assignee party", "cessionario", "parte cessionaria"], "related": ["assignment_date", "party_name"] },
-    { "canonical": "assignment_date", "synonyms": ["assignment date", "transfer date", "date of assignment", "data da cessao", "data da transferencia"], "related": ["assignee", "effective_date"] },
-    { "canonical": "attorney_name", "synonyms": ["attorney", "lawyer", "counsel", "advogado", "procurador", "patrono"], "related": ["law_firm", "bar_number"] },
-    { "canonical": "authority", "synonyms": ["authority", "regulatory body", "governing authority", "autoridade", "orgao regulador", "entidade competente"], "related": ["jurisdiction", "applicable_law"] },
-    { "canonical": "authorized_signatory", "synonyms": ["authorized signatory", "signatory", "authorized representative", "signatario autorizado", "representante autorizado"], "related": ["signatory_name", "signatory_title"] },
-    { "canonical": "bar_number", "synonyms": ["bar number", "oab number", "license no", "numero da oab", "inscricao na oab"], "related": ["attorney_name", "law_firm"] },
-    { "canonical": "breach_description", "synonyms": ["breach description", "breach details", "violation", "descricao da violacao", "detalhes do descumprimento"], "related": ["breach_type", "damages_amount"] },
-    { "canonical": "breach_type", "synonyms": ["breach type", "type of breach", "violation type", "tipo de violacao", "tipo de descumprimento"], "related": ["breach_description", "penalty_amount"] },
-    { "canonical": "cap_amount", "synonyms": ["cap", "cap amount", "maximum liability", "teto", "limite maximo", "valor maximo"], "related": ["indemnification_cap", "liability_cap"] },
-    { "canonical": "case_number", "synonyms": ["case number", "case no", "docket no", "numero do processo", "numero do caso", "autos"], "related": ["case_status", "case_type"] },
-    { "canonical": "case_status", "synonyms": ["case status", "status", "proceeding status", "status do processo", "situacao processual"], "related": ["case_number", "case_type"] },
-    { "canonical": "case_type", "synonyms": ["case type", "type of case", "action type", "tipo de acao", "tipo do processo"], "related": ["case_number", "cause_of_action"] },
-    { "canonical": "cause_of_action", "synonyms": ["cause of action", "grounds", "legal basis", "causa de pedir", "fundamento legal"], "related": ["case_type", "claim_amount"] },
-    { "canonical": "claim_amount", "synonyms": ["claim amount", "amount claimed", "damages sought", "valor da reclamacao", "valor pleiteado", "valor do pedido"], "related": ["claim_number", "damages_amount"] },
-    { "canonical": "claim_date", "synonyms": ["claim date", "filing date", "date of claim", "data da reclamacao", "data do sinistro"], "related": ["claim_number", "claim_status"] },
-    { "canonical": "claim_number", "synonyms": ["claim number", "claim no", "claim id", "numero da reclamacao", "numero do sinistro"], "related": ["claim_amount", "claim_status"] },
-    { "canonical": "claim_status", "synonyms": ["claim status", "status", "disposition", "status da reclamacao", "situacao do sinistro"], "related": ["claim_number", "resolution_type"] },
-    { "canonical": "clause_id", "synonyms": ["clause id", "clause identifier", "clause ref", "id da clausula", "referencia da clausula"], "related": ["clause_number", "clause_type"] },
-    { "canonical": "clause_number", "synonyms": ["clause number", "clause no", "cl", "numero da clausula", "clausula"], "related": ["clause_id", "section_number"] },
-    { "canonical": "clause_text", "synonyms": ["clause text", "text", "provision text", "texto da clausula", "teor da clausula"], "related": ["clause_number", "clause_type"] },
-    { "canonical": "clause_type", "synonyms": ["clause type", "type of clause", "provision type", "tipo de clausula", "tipo de disposicao"], "related": ["clause_number", "clause_text"] },
-    { "canonical": "client_name", "synonyms": ["client", "client name", "customer", "cliente", "nome do cliente"], "related": ["matter_number", "attorney_name"] },
-    { "canonical": "closing_date", "synonyms": ["closing date", "completion date", "settlement date", "data de fechamento", "data de conclusao"], "related": ["effective_date", "commencement_date"] },
-    { "canonical": "commencement_date", "synonyms": ["commencement date", "start date", "inception date", "data de inicio", "data de vigencia"], "related": ["effective_date", "expiration_date"] },
-    { "canonical": "compliance_deadline", "synonyms": ["compliance deadline", "regulatory deadline", "due date", "prazo de conformidade", "prazo regulatorio"], "related": ["compliance_status", "due_date"] },
-    { "canonical": "compliance_status", "synonyms": ["compliance status", "compliant", "status", "status de conformidade", "situacao de compliance"], "related": ["compliance_deadline", "regulatory_requirements"] },
-    { "canonical": "condition_precedent", "synonyms": ["condition precedent", "cp", "prerequisite", "condicao precedente", "condicao suspensiva"], "related": ["closing_date", "milestone"] },
-    { "canonical": "confidentiality_level", "synonyms": ["confidentiality", "classification", "security level", "nivel de confidencialidade", "classificacao de sigilo"], "related": ["document_type", "restriction_type"] },
-    { "canonical": "consent_date", "synonyms": ["consent date", "date of consent", "approval date", "data do consentimento", "data da aprovacao"], "related": ["consent_type", "approval_date"] },
-    { "canonical": "consideration_amount", "synonyms": ["consideration", "purchase price", "value", "contraprestacao", "preco", "valor da operacao"], "related": ["contract_value", "payment_milestone"] },
-    { "canonical": "contract_duration", "synonyms": ["duration", "contract term", "length", "duracao do contrato", "prazo contratual", "vigencia"], "related": ["term_length", "commencement_date"] },
-    { "canonical": "contract_number", "synonyms": ["contract number", "contract no", "contract id", "numero do contrato", "id do contrato"], "related": ["agreement_number", "contract_status"] },
-    { "canonical": "contract_party", "synonyms": ["party", "contracting party", "signatory", "parte contratante", "parte", "signatario"], "related": ["party_name", "counterparty"] },
-    { "canonical": "contract_status", "synonyms": ["contract status", "status", "agreement status", "status do contrato", "situacao contratual"], "related": ["contract_number", "effective_date"] },
-    { "canonical": "contract_type", "synonyms": ["contract type", "type", "agreement category", "tipo de contrato", "categoria do acordo"], "related": ["agreement_type", "document_type"] },
-    { "canonical": "contract_value", "synonyms": ["contract value", "agreement value", "total value", "valor do contrato", "valor total do acordo"], "related": ["consideration_amount", "contract_number"] },
-    { "canonical": "controlling_party", "synonyms": ["controlling party", "majority party", "dominant party", "parte controladora", "parte majoritaria"], "related": ["party_name", "counterparty"] },
-    { "canonical": "counterparty", "synonyms": ["counterparty", "other party", "opposite party", "contraparte", "outra parte"], "related": ["party_name", "contract_party"] },
-    { "canonical": "court_date", "synonyms": ["court date", "hearing date", "trial date", "data da audiencia", "data do julgamento"], "related": ["court_name", "case_number"] },
-    { "canonical": "court_name", "synonyms": ["court", "court name", "tribunal", "tribunal", "vara", "juizo"], "related": ["jurisdiction", "judge_name"] },
-    { "canonical": "covenant_type", "synonyms": ["covenant type", "covenant", "obligation type", "tipo de pacto", "tipo de obrigacao"], "related": ["obligation_type", "restriction_type"] },
-    { "canonical": "damages_amount", "synonyms": ["damages", "damages amount", "compensation", "danos", "valor dos danos", "indenizacao"], "related": ["claim_amount", "settlement_amount"] },
-    { "canonical": "deadline", "synonyms": ["deadline", "due date", "target date", "prazo", "data limite", "vencimento"], "related": ["due_date", "compliance_deadline"] },
-    { "canonical": "decision_date", "synonyms": ["decision date", "ruling date", "judgment date", "data da decisao", "data da sentenca"], "related": ["court_date", "case_number"] },
-    { "canonical": "defendant", "synonyms": ["defendant", "respondent", "accused", "reu", "requerido", "demandado"], "related": ["plaintiff", "case_number"] },
-    { "canonical": "deposition_date", "synonyms": ["deposition date", "depo date", "testimony date", "data do depoimento", "data da oitiva"], "related": ["witness_name", "discovery_deadline"] },
-    { "canonical": "disclosure_date", "synonyms": ["disclosure date", "date disclosed", "revelation date", "data da divulgacao", "data da revelacao"], "related": ["confidentiality_level", "document_date"] },
-    { "canonical": "discovery_deadline", "synonyms": ["discovery deadline", "discovery cutoff", "disclosure deadline", "prazo de discovery", "prazo de instrucao"], "related": ["deposition_date", "filing_date"] },
-    { "canonical": "dispute_category", "synonyms": ["dispute category", "dispute type", "type of dispute", "categoria da disputa", "tipo de litigio"], "related": ["dispute_status", "case_type"] },
-    { "canonical": "dispute_status", "synonyms": ["dispute status", "litigation status", "status", "status da disputa", "situacao do litigio"], "related": ["dispute_category", "resolution_type"] },
-    { "canonical": "document_date", "synonyms": ["document date", "doc date", "date", "data do documento", "data"], "related": ["document_id", "document_type"] },
-    { "canonical": "document_id", "synonyms": ["document id", "doc id", "document number", "id do documento", "numero do documento"], "related": ["document_date", "document_type"] },
-    { "canonical": "document_type", "synonyms": ["document type", "doc type", "type", "tipo de documento", "tipo do documento"], "related": ["document_id", "document_date"] },
-    { "canonical": "due_date", "synonyms": ["due date", "due", "payment due", "data de vencimento", "vencimento", "prazo final"], "related": ["deadline", "payment_schedule"] },
-    { "canonical": "effective_date", "synonyms": ["effective date", "eff date", "start date", "data de vigencia", "data efetiva", "inicio de vigencia"], "related": ["commencement_date", "expiration_date"] },
-    { "canonical": "enforceability_status", "synonyms": ["enforceability", "enforceable", "validity", "exequibilidade", "validade", "vigencia"], "related": ["effective_date", "applicable_law"] },
-    { "canonical": "entity_name", "synonyms": ["entity", "legal entity", "company name", "entidade", "pessoa juridica", "razao social"], "related": ["entity_type", "party_name"] },
-    { "canonical": "entity_type", "synonyms": ["entity type", "legal form", "corporate form", "tipo de entidade", "forma juridica", "natureza juridica"], "related": ["entity_name", "party_type"] },
-    { "canonical": "escalation_level", "synonyms": ["escalation level", "priority", "urgency", "nivel de escalacao", "prioridade", "urgencia"], "related": ["priority_level", "response_deadline"] },
-    { "canonical": "evidence_id", "synonyms": ["evidence id", "exhibit id", "evidence no", "id da prova", "numero da evidencia"], "related": ["evidence_type", "exhibit_number"] },
-    { "canonical": "evidence_type", "synonyms": ["evidence type", "type of evidence", "proof type", "tipo de prova", "tipo de evidencia"], "related": ["evidence_id", "exhibit_number"] },
-    { "canonical": "exhibit_number", "synonyms": ["exhibit", "exhibit no", "exhibit number", "documento", "peca", "numero do documento"], "related": ["evidence_id", "document_id"] },
-    { "canonical": "expiration_date", "synonyms": ["expiration date", "expiry", "end date", "data de expiracao", "data de termino", "prazo final"], "related": ["effective_date", "renewal_date"] },
-    { "canonical": "fee_arrangement", "synonyms": ["fee arrangement", "fee structure", "billing arrangement", "honorarios", "estrutura de honorarios"], "related": ["attorney_name", "law_firm"] },
-    { "canonical": "filing_date", "synonyms": ["filing date", "date filed", "submission date", "data de protocolo", "data de entrada"], "related": ["filing_number", "filing_type"] },
-    { "canonical": "filing_number", "synonyms": ["filing number", "filing no", "registration no", "numero de protocolo", "numero de registro"], "related": ["filing_date", "filing_type"] },
-    { "canonical": "filing_type", "synonyms": ["filing type", "type of filing", "submission type", "tipo de peticao", "tipo de protocolo"], "related": ["filing_date", "filing_number"] },
-    { "canonical": "force_majeure_trigger", "synonyms": ["force majeure", "fm event", "act of god", "forca maior", "caso fortuito"], "related": ["termination_reason", "contract_status"] },
-    { "canonical": "forum", "synonyms": ["forum", "venue", "court", "foro", "jurisdicao", "tribunal competente"], "related": ["jurisdiction", "governing_law"] },
-    { "canonical": "governing_law", "synonyms": ["governing law", "applicable law", "choice of law", "lei aplicavel", "lei regente", "legislacao"], "related": ["jurisdiction", "forum"] },
-    { "canonical": "guarantee_amount", "synonyms": ["guarantee", "guarantee amount", "guaranteed sum", "garantia", "valor da garantia", "valor garantido"], "related": ["guarantor", "indemnity_amount"] },
-    { "canonical": "guarantor", "synonyms": ["guarantor", "surety", "warrantor", "fiador", "garantidor", "avalista"], "related": ["guarantee_amount", "party_name"] },
-    { "canonical": "hearing_date", "synonyms": ["hearing date", "hearing", "oral argument date", "data da audiencia", "audiencia"], "related": ["court_date", "judge_name"] },
-    { "canonical": "holdback_amount", "synonyms": ["holdback", "escrow", "retention", "retencao", "deposito em garantia", "escrow"], "related": ["consideration_amount", "closing_date"] },
-    { "canonical": "indemnification_cap", "synonyms": ["indemnification cap", "indemnity cap", "indemnity limit", "teto de indenizacao", "limite de indenizacao"], "related": ["indemnity_amount", "liability_cap"] },
-    { "canonical": "indemnifying_party", "synonyms": ["indemnifying party", "indemnitor", "indemnifier", "parte indenizadora", "indenizante"], "related": ["indemnity_amount", "party_name"] },
-    { "canonical": "indemnity_amount", "synonyms": ["indemnity", "indemnification", "compensation", "indenizacao", "valor da indenizacao"], "related": ["indemnification_cap", "damages_amount"] },
-    { "canonical": "insurance_requirement", "synonyms": ["insurance requirement", "insurance", "coverage required", "requisito de seguro", "seguro exigido"], "related": ["cap_amount", "indemnity_amount"] },
-    { "canonical": "ip_type", "synonyms": ["ip type", "intellectual property type", "ip category", "tipo de pi", "tipo de propriedade intelectual"], "related": ["license_type", "restriction_type"] },
-    { "canonical": "issue_date", "synonyms": ["issue date", "date of issue", "issuance date", "data de emissao", "data de expedicao"], "related": ["document_date", "filing_date"] },
-    { "canonical": "judge_name", "synonyms": ["judge", "justice", "magistrate", "juiz", "desembargador", "magistrado"], "related": ["court_name", "case_number"] },
-    { "canonical": "jurisdiction", "synonyms": ["jurisdiction", "venue", "forum", "jurisdicao", "foro", "competencia"], "related": ["governing_law", "court_name"] },
-    { "canonical": "law_firm", "synonyms": ["law firm", "firm", "legal counsel", "escritorio de advocacia", "firma de advocacia"], "related": ["attorney_name", "bar_number"] },
-    { "canonical": "legal_entity", "synonyms": ["legal entity", "corporate entity", "entity", "pessoa juridica", "entidade legal"], "related": ["entity_name", "entity_type"] },
-    { "canonical": "legal_reference", "synonyms": ["legal reference", "statutory reference", "law citation", "referencia legal", "citacao de lei"], "related": ["statute_reference", "provision_reference"] },
-    { "canonical": "liability_cap", "synonyms": ["liability cap", "maximum liability", "cap", "limite de responsabilidade", "teto de responsabilidade"], "related": ["indemnification_cap", "cap_amount"] },
-    { "canonical": "license_type", "synonyms": ["license type", "licence type", "permit type", "tipo de licenca", "tipo de autorizacao"], "related": ["ip_type", "restriction_type"] },
-    { "canonical": "lien_amount", "synonyms": ["lien amount", "encumbrance", "charge", "valor do gravame", "valor do onus"], "related": ["lien_type", "guarantee_amount"] },
-    { "canonical": "lien_type", "synonyms": ["lien type", "type of lien", "encumbrance type", "tipo de gravame", "tipo de onus"], "related": ["lien_amount", "guarantee_amount"] },
-    { "canonical": "limitation_period", "synonyms": ["limitation period", "statute of limitations", "prescriptive period", "prazo prescricional", "prescricao"], "related": ["expiration_date", "filing_date"] },
-    { "canonical": "litigation_hold", "synonyms": ["litigation hold", "legal hold", "preservation notice", "retencao judicial", "preservacao de documentos"], "related": ["case_number", "retention_period"] },
-    { "canonical": "matter_number", "synonyms": ["matter number", "matter no", "matter id", "numero da materia", "numero do assunto"], "related": ["case_number", "client_name"] },
-    { "canonical": "mediation_date", "synonyms": ["mediation date", "mediation session", "conciliation date", "data da mediacao", "data da conciliacao"], "related": ["dispute_status", "resolution_date"] },
-    { "canonical": "milestone", "synonyms": ["milestone", "key date", "checkpoint", "marco", "etapa", "ponto de verificacao"], "related": ["payment_milestone", "deadline"] },
-    { "canonical": "non_compete_duration", "synonyms": ["non-compete duration", "non-compete term", "restriction period", "duracao da nao concorrencia", "prazo de nao competicao"], "related": ["non_compete_territory", "restriction_type"] },
-    { "canonical": "non_compete_territory", "synonyms": ["non-compete territory", "restricted area", "geographic scope", "territorio de nao concorrencia", "area restrita"], "related": ["non_compete_duration", "territory"] },
-    { "canonical": "notice_address", "synonyms": ["notice address", "address for notices", "notification address", "endereco para notificacao", "endereco de aviso"], "related": ["notice_period", "notice_type"] },
-    { "canonical": "notice_period", "synonyms": ["notice period", "notice days", "advance notice", "prazo de aviso", "prazo de notificacao", "aviso previo"], "related": ["notice_address", "termination_date"] },
-    { "canonical": "notice_type", "synonyms": ["notice type", "type of notice", "notification type", "tipo de notificacao", "tipo de aviso"], "related": ["notice_period", "notice_address"] },
-    { "canonical": "obligation_description", "synonyms": ["obligation", "obligation description", "duty", "descricao da obrigacao", "dever"], "related": ["obligation_owner", "obligation_status"] },
-    { "canonical": "obligation_owner", "synonyms": ["responsible party", "obligation owner", "assignee", "responsavel", "parte obrigada"], "related": ["obligation_description", "obligation_status"] },
-    { "canonical": "obligation_status", "synonyms": ["obligation status", "compliance", "status", "status da obrigacao", "situacao de cumprimento"], "related": ["obligation_description", "obligation_owner"] },
-    { "canonical": "obligation_type", "synonyms": ["obligation type", "duty type", "covenant type", "tipo de obrigacao", "tipo de dever"], "related": ["obligation_description", "covenant_type"] },
-    { "canonical": "opposing_counsel", "synonyms": ["opposing counsel", "adversary counsel", "other side", "advogado adverso", "patrono adverso"], "related": ["opposing_party", "attorney_name"] },
-    { "canonical": "opposing_party", "synonyms": ["opposing party", "adverse party", "other party", "parte adversa", "parte contraria"], "related": ["opposing_counsel", "defendant"] },
-    { "canonical": "order_date", "synonyms": ["order date", "court order date", "date of order", "data da decisao", "data do despacho"], "related": ["decision_date", "case_number"] },
-    { "canonical": "original_date", "synonyms": ["original date", "initial date", "first date", "data original", "data inicial"], "related": ["amendment_date", "effective_date"] },
-    { "canonical": "party_name", "synonyms": ["party name", "party", "name", "nome da parte", "parte", "nome"], "related": ["party_role", "party_type"] },
-    { "canonical": "party_role", "synonyms": ["party role", "role", "capacity", "papel da parte", "funcao", "qualificacao"], "related": ["party_name", "party_type"] },
-    { "canonical": "party_type", "synonyms": ["party type", "entity type", "nature", "tipo da parte", "natureza da parte"], "related": ["party_name", "entity_type"] },
-    { "canonical": "payment_milestone", "synonyms": ["payment milestone", "payment stage", "payment trigger", "marco de pagamento", "etapa de pagamento"], "related": ["payment_schedule", "milestone"] },
-    { "canonical": "payment_schedule", "synonyms": ["payment schedule", "installments", "payment plan", "cronograma de pagamento", "parcelas"], "related": ["payment_milestone", "due_date"] },
-    { "canonical": "penalty_amount", "synonyms": ["penalty", "fine", "liquidated damages", "multa", "penalidade", "clausula penal"], "related": ["breach_type", "damages_amount"] },
-    { "canonical": "permit_number", "synonyms": ["permit number", "permit no", "license no", "numero da licenca", "numero do alvara"], "related": ["filing_number", "license_type"] },
-    { "canonical": "plaintiff", "synonyms": ["plaintiff", "claimant", "petitioner", "autor", "requerente", "demandante"], "related": ["defendant", "case_number"] },
-    { "canonical": "power_of_attorney", "synonyms": ["power of attorney", "poa", "proxy", "procuracao", "mandato"], "related": ["authorized_signatory", "party_name"] },
-    { "canonical": "precedent_case", "synonyms": ["precedent", "case law", "prior ruling", "jurisprudencia", "precedente", "caso anterior"], "related": ["legal_reference", "statute_reference"] },
-    { "canonical": "priority_level", "synonyms": ["priority", "urgency", "importance", "prioridade", "nivel de urgencia", "importancia"], "related": ["escalation_level", "deadline"] },
-    { "canonical": "proceeding_type", "synonyms": ["proceeding type", "type of proceeding", "action type", "tipo de procedimento", "rito processual"], "related": ["case_type", "court_name"] },
-    { "canonical": "provision_reference", "synonyms": ["provision", "section reference", "clause reference", "disposicao", "referencia a clausula"], "related": ["legal_reference", "clause_number"] },
-    { "canonical": "recital_number", "synonyms": ["recital", "recital no", "whereas no", "considerando", "numero do considerando"], "related": ["clause_number", "article_number"] },
-    { "canonical": "renewal_date", "synonyms": ["renewal date", "renewal", "next renewal", "data de renovacao", "renovacao"], "related": ["renewal_term", "expiration_date"] },
-    { "canonical": "renewal_term", "synonyms": ["renewal term", "renewal period", "auto-renewal", "prazo de renovacao", "periodo de renovacao"], "related": ["renewal_date", "contract_duration"] },
-    { "canonical": "representation_scope", "synonyms": ["representation scope", "scope of representation", "mandate scope", "escopo da representacao", "abrangencia do mandato"], "related": ["power_of_attorney", "territory"] },
-    { "canonical": "resolution_date", "synonyms": ["resolution date", "settled date", "resolved on", "data da resolucao", "data da solucao"], "related": ["resolution_type", "dispute_status"] },
-    { "canonical": "resolution_type", "synonyms": ["resolution type", "outcome", "disposition", "tipo de resolucao", "resultado", "desfecho"], "related": ["resolution_date", "dispute_status"] },
-    { "canonical": "response_deadline", "synonyms": ["response deadline", "reply due", "answer date", "prazo de resposta", "prazo para contestacao"], "related": ["deadline", "filing_date"] },
-    { "canonical": "restriction_type", "synonyms": ["restriction", "restriction type", "covenant type", "tipo de restricao", "tipo de limitacao"], "related": ["non_compete_duration", "covenant_type"] },
-    { "canonical": "retention_period", "synonyms": ["retention period", "record retention", "preservation period", "prazo de retencao", "prazo de guarda"], "related": ["litigation_hold", "expiration_date"] },
-    { "canonical": "review_date", "synonyms": ["review date", "next review", "audit date", "data de revisao", "data da proxima revisao"], "related": ["review_status", "approval_date"] },
-    { "canonical": "review_status", "synonyms": ["review status", "review outcome", "assessment", "status da revisao", "resultado da avaliacao"], "related": ["review_date", "approval_status"] },
-    { "canonical": "risk_level", "synonyms": ["risk level", "risk rating", "risk", "nivel de risco", "classificacao de risco"], "related": ["priority_level", "escalation_level"] },
-    { "canonical": "schedule_reference", "synonyms": ["schedule", "schedule ref", "attachment ref", "quadro", "referencia ao quadro", "anexo ref"], "related": ["exhibit_number", "provision_reference"] },
-    { "canonical": "section_number", "synonyms": ["section", "section no", "sec", "secao", "numero da secao"], "related": ["clause_number", "article_number"] },
-    { "canonical": "settlement_amount", "synonyms": ["settlement amount", "settlement", "agreed amount", "valor do acordo", "valor da composicao"], "related": ["claim_amount", "damages_amount"] },
-    { "canonical": "settlement_date", "synonyms": ["settlement date", "date of settlement", "agreed on", "data do acordo", "data da composicao"], "related": ["settlement_amount", "resolution_date"] },
-    { "canonical": "signatory_name", "synonyms": ["signatory", "signer", "name of signatory", "signatario", "nome do signatario", "assinante"], "related": ["signatory_title", "authorized_signatory"] },
-    { "canonical": "signatory_title", "synonyms": ["title", "position", "role", "cargo", "funcao", "titulo"], "related": ["signatory_name", "authorized_signatory"] },
-    { "canonical": "signature_date", "synonyms": ["signature date", "signed on", "execution date", "data da assinatura", "assinado em"], "related": ["signatory_name", "effective_date"] },
-    { "canonical": "sla_metric", "synonyms": ["sla", "service level", "sla metric", "metrica de sla", "nivel de servico"], "related": ["deadline", "penalty_amount"] },
-    { "canonical": "statute_reference", "synonyms": ["statute", "law reference", "legal citation", "lei", "referencia legal", "dispositivo legal"], "related": ["legal_reference", "applicable_law"] },
-    { "canonical": "status", "synonyms": ["status", "current status", "state", "status", "situacao", "estado"], "related": ["case_status", "contract_status"] },
-    { "canonical": "subcontractor", "synonyms": ["subcontractor", "sub", "third party", "subcontratado", "terceiro", "subempreiteiro"], "related": ["contract_party", "party_name"] },
-    { "canonical": "survival_period", "synonyms": ["survival period", "surviving term", "post-termination period", "periodo de sobrevivencia", "prazo pos-rescisao"], "related": ["termination_date", "expiration_date"] },
-    { "canonical": "term_length", "synonyms": ["term", "term length", "contract term", "prazo", "duracao", "vigencia contratual"], "related": ["contract_duration", "effective_date"] },
-    { "canonical": "termination_date", "synonyms": ["termination date", "end date", "cancellation date", "data de rescisao", "data de encerramento"], "related": ["termination_reason", "effective_date"] },
-    { "canonical": "termination_reason", "synonyms": ["termination reason", "cause", "grounds", "motivo da rescisao", "causa da rescisao"], "related": ["termination_date", "breach_type"] },
-    { "canonical": "territory", "synonyms": ["territory", "region", "geographic scope", "territorio", "regiao", "abrangencia geografica"], "related": ["non_compete_territory", "jurisdiction"] },
-    { "canonical": "third_party", "synonyms": ["third party", "external party", "outside party", "terceiro", "parte externa"], "related": ["subcontractor", "party_name"] },
-    { "canonical": "threshold_amount", "synonyms": ["threshold", "minimum amount", "trigger amount", "valor minimo", "patamar", "limiar"], "related": ["cap_amount", "indemnification_cap"] },
-    { "canonical": "venue", "synonyms": ["venue", "forum", "court venue", "foro", "local de jurisdicao", "comarca"], "related": ["jurisdiction", "forum"] },
-    { "canonical": "waiver_date", "synonyms": ["waiver date", "date of waiver", "waived on", "data da renuncia", "data da dispensa"], "related": ["waiver_type", "consent_date"] },
-    { "canonical": "waiver_type", "synonyms": ["waiver type", "type of waiver", "waiver category", "tipo de renuncia", "tipo de dispensa"], "related": ["waiver_date", "obligation_type"] },
-    { "canonical": "warranty_period", "synonyms": ["warranty period", "guarantee period", "warranty term", "prazo de garantia", "periodo de garantia"], "related": ["expiration_date", "contract_duration"] },
-    { "canonical": "witness_name", "synonyms": ["witness", "witness name", "testimony", "testemunha", "nome da testemunha", "depoente"], "related": ["deposition_date", "case_number"] }
+    {
+      "canonical": "action_required",
+      "synonyms": [
+        "action required",
+        "action needed",
+        "next action",
+        "acao necessaria",
+        "providencia"
+      ],
+      "related": [
+        "obligation_owner",
+        "deadline"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_action_required",
+      "curationReason": "weighted:action_required:domain_general"
+    },
+    {
+      "canonical": "agreement_date",
+      "synonyms": [
+        "agreement date",
+        "contract date",
+        "execution date",
+        "data do contrato",
+        "data do acordo"
+      ],
+      "related": [
+        "agreement_number",
+        "effective_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_agreement_date",
+      "curationReason": "weighted:agreement_date:domain_general"
+    },
+    {
+      "canonical": "agreement_number",
+      "synonyms": [
+        "agreement number",
+        "agreement no",
+        "contract no",
+        "numero do contrato",
+        "numero do acordo"
+      ],
+      "related": [
+        "agreement_date",
+        "contract_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_agreement_number",
+      "curationReason": "weighted:agreement_number:domain_general"
+    },
+    {
+      "canonical": "agreement_type",
+      "synonyms": [
+        "agreement type",
+        "contract type",
+        "document type",
+        "tipo de contrato",
+        "tipo de acordo"
+      ],
+      "related": [
+        "contract_type",
+        "document_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_agreement_type",
+      "curationReason": "weighted:agreement_type:domain_general"
+    },
+    {
+      "canonical": "amendment_date",
+      "synonyms": [
+        "amendment date",
+        "addendum date",
+        "modification date",
+        "data do aditivo",
+        "data da emenda"
+      ],
+      "related": [
+        "amendment_number",
+        "original_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_amendment_date",
+      "curationReason": "weighted:amendment_date:domain_general"
+    },
+    {
+      "canonical": "amendment_number",
+      "synonyms": [
+        "amendment number",
+        "addendum no",
+        "amendment no",
+        "numero do aditivo",
+        "numero da emenda"
+      ],
+      "related": [
+        "amendment_date",
+        "agreement_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_amendment_number",
+      "curationReason": "weighted:amendment_number:domain_general"
+    },
+    {
+      "canonical": "applicable_law",
+      "synonyms": [
+        "applicable law",
+        "governing law",
+        "jurisdiction",
+        "lei aplicavel",
+        "legislacao aplicavel",
+        "foro"
+      ],
+      "related": [
+        "governing_law",
+        "jurisdiction"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_applicable_law",
+      "curationReason": "weighted:applicable_law:domain_general"
+    },
+    {
+      "canonical": "approval_date",
+      "synonyms": [
+        "approval date",
+        "approved on",
+        "date approved",
+        "data de aprovacao",
+        "aprovado em"
+      ],
+      "related": [
+        "approval_status",
+        "review_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_approval_date",
+      "curationReason": "weighted:approval_date:domain_general"
+    },
+    {
+      "canonical": "approval_status",
+      "synonyms": [
+        "approval status",
+        "approved",
+        "status",
+        "status de aprovacao",
+        "situacao da aprovacao"
+      ],
+      "related": [
+        "approval_date",
+        "review_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_approval_status",
+      "curationReason": "weighted:approval_status:domain_general"
+    },
+    {
+      "canonical": "arbitration_clause",
+      "synonyms": [
+        "arbitration clause",
+        "arbitration",
+        "arb clause",
+        "clausula de arbitragem",
+        "arbitragem"
+      ],
+      "related": [
+        "dispute_category",
+        "forum"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_arbitration_clause",
+      "curationReason": "weighted:arbitration_clause:domain_general"
+    },
+    {
+      "canonical": "article_number",
+      "synonyms": [
+        "article",
+        "article no",
+        "art",
+        "artigo",
+        "art.",
+        "numero do artigo"
+      ],
+      "related": [
+        "section_number",
+        "clause_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_article_number",
+      "curationReason": "weighted:article_number:domain_general"
+    },
+    {
+      "canonical": "assignee",
+      "synonyms": [
+        "assignee",
+        "transferee",
+        "assignee party",
+        "cessionario",
+        "parte cessionaria"
+      ],
+      "related": [
+        "assignment_date",
+        "party_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_assignee",
+      "curationReason": "weighted:assignee:domain_general"
+    },
+    {
+      "canonical": "assignment_date",
+      "synonyms": [
+        "assignment date",
+        "transfer date",
+        "date of assignment",
+        "data da cessao",
+        "data da transferencia"
+      ],
+      "related": [
+        "assignee",
+        "effective_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_assignment_date",
+      "curationReason": "weighted:assignment_date:domain_general"
+    },
+    {
+      "canonical": "attorney_name",
+      "synonyms": [
+        "attorney",
+        "lawyer",
+        "counsel",
+        "advogado",
+        "procurador",
+        "patrono"
+      ],
+      "related": [
+        "law_firm",
+        "bar_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_attorney_name",
+      "curationReason": "weighted:attorney_name:domain_general"
+    },
+    {
+      "canonical": "authority",
+      "synonyms": [
+        "authority",
+        "regulatory body",
+        "governing authority",
+        "autoridade",
+        "orgao regulador",
+        "entidade competente"
+      ],
+      "related": [
+        "jurisdiction",
+        "applicable_law"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_authority",
+      "curationReason": "weighted:authority:domain_general"
+    },
+    {
+      "canonical": "authorized_signatory",
+      "synonyms": [
+        "authorized signatory",
+        "signatory",
+        "authorized representative",
+        "signatario autorizado",
+        "representante autorizado"
+      ],
+      "related": [
+        "signatory_name",
+        "signatory_title"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_authorized_signatory",
+      "curationReason": "weighted:authorized_signatory:domain_general"
+    },
+    {
+      "canonical": "bar_number",
+      "synonyms": [
+        "bar number",
+        "oab number",
+        "license no",
+        "numero da oab",
+        "inscricao na oab"
+      ],
+      "related": [
+        "attorney_name",
+        "law_firm"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_bar_number",
+      "curationReason": "weighted:bar_number:domain_general"
+    },
+    {
+      "canonical": "breach_description",
+      "synonyms": [
+        "breach description",
+        "breach details",
+        "violation",
+        "descricao da violacao",
+        "detalhes do descumprimento"
+      ],
+      "related": [
+        "breach_type",
+        "damages_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_breach_description",
+      "curationReason": "weighted:breach_description:domain_general"
+    },
+    {
+      "canonical": "breach_type",
+      "synonyms": [
+        "breach type",
+        "type of breach",
+        "violation type",
+        "tipo de violacao",
+        "tipo de descumprimento"
+      ],
+      "related": [
+        "breach_description",
+        "penalty_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_breach_type",
+      "curationReason": "weighted:breach_type:domain_general"
+    },
+    {
+      "canonical": "cap_amount",
+      "synonyms": [
+        "cap",
+        "cap amount",
+        "maximum liability",
+        "teto",
+        "limite maximo",
+        "valor maximo"
+      ],
+      "related": [
+        "indemnification_cap",
+        "liability_cap"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_cap_amount",
+      "curationReason": "weighted:cap_amount:domain_general"
+    },
+    {
+      "canonical": "case_number",
+      "synonyms": [
+        "case number",
+        "case no",
+        "docket no",
+        "numero do processo",
+        "numero do caso",
+        "autos"
+      ],
+      "related": [
+        "case_status",
+        "case_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_case_number",
+      "curationReason": "weighted:case_number:domain_general"
+    },
+    {
+      "canonical": "case_status",
+      "synonyms": [
+        "case status",
+        "status",
+        "proceeding status",
+        "status do processo",
+        "situacao processual"
+      ],
+      "related": [
+        "case_number",
+        "case_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_case_status",
+      "curationReason": "weighted:case_status:domain_general"
+    },
+    {
+      "canonical": "case_type",
+      "synonyms": [
+        "case type",
+        "type of case",
+        "action type",
+        "tipo de acao",
+        "tipo do processo"
+      ],
+      "related": [
+        "case_number",
+        "cause_of_action"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_case_type",
+      "curationReason": "weighted:case_type:domain_general"
+    },
+    {
+      "canonical": "cause_of_action",
+      "synonyms": [
+        "cause of action",
+        "grounds",
+        "legal basis",
+        "causa de pedir",
+        "fundamento legal"
+      ],
+      "related": [
+        "case_type",
+        "claim_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_cause_of_action",
+      "curationReason": "weighted:cause_of_action:domain_general"
+    },
+    {
+      "canonical": "claim_amount",
+      "synonyms": [
+        "claim amount",
+        "amount claimed",
+        "damages sought",
+        "valor da reclamacao",
+        "valor pleiteado",
+        "valor do pedido"
+      ],
+      "related": [
+        "claim_number",
+        "damages_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_amount",
+      "curationReason": "weighted:claim_amount:domain_general"
+    },
+    {
+      "canonical": "claim_date",
+      "synonyms": [
+        "claim date",
+        "filing date",
+        "date of claim",
+        "data da reclamacao",
+        "data do sinistro"
+      ],
+      "related": [
+        "claim_number",
+        "claim_status"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_date",
+      "curationReason": "weighted:claim_date:domain_general"
+    },
+    {
+      "canonical": "claim_number",
+      "synonyms": [
+        "claim number",
+        "claim no",
+        "claim id",
+        "numero da reclamacao",
+        "numero do sinistro"
+      ],
+      "related": [
+        "claim_amount",
+        "claim_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_number",
+      "curationReason": "weighted:claim_number:domain_general"
+    },
+    {
+      "canonical": "claim_status",
+      "synonyms": [
+        "claim status",
+        "status",
+        "disposition",
+        "status da reclamacao",
+        "situacao do sinistro"
+      ],
+      "related": [
+        "claim_number",
+        "resolution_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_claim_status",
+      "curationReason": "weighted:claim_status:domain_general"
+    },
+    {
+      "canonical": "clause_id",
+      "synonyms": [
+        "clause id",
+        "clause identifier",
+        "clause ref",
+        "id da clausula",
+        "referencia da clausula"
+      ],
+      "related": [
+        "clause_number",
+        "clause_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_clause_id",
+      "curationReason": "weighted:clause_id:domain_general"
+    },
+    {
+      "canonical": "clause_number",
+      "synonyms": [
+        "clause number",
+        "clause no",
+        "cl",
+        "numero da clausula",
+        "clausula"
+      ],
+      "related": [
+        "clause_id",
+        "section_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_clause_number",
+      "curationReason": "weighted:clause_number:domain_general"
+    },
+    {
+      "canonical": "clause_text",
+      "synonyms": [
+        "clause text",
+        "text",
+        "provision text",
+        "texto da clausula",
+        "teor da clausula"
+      ],
+      "related": [
+        "clause_number",
+        "clause_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_clause_text",
+      "curationReason": "weighted:clause_text:domain_general"
+    },
+    {
+      "canonical": "clause_type",
+      "synonyms": [
+        "clause type",
+        "type of clause",
+        "provision type",
+        "tipo de clausula",
+        "tipo de disposicao"
+      ],
+      "related": [
+        "clause_number",
+        "clause_text"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_clause_type",
+      "curationReason": "weighted:clause_type:domain_general"
+    },
+    {
+      "canonical": "client_name",
+      "synonyms": [
+        "client",
+        "client name",
+        "customer",
+        "cliente",
+        "nome do cliente"
+      ],
+      "related": [
+        "matter_number",
+        "attorney_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_client_name",
+      "curationReason": "weighted:client_name:domain_general"
+    },
+    {
+      "canonical": "closing_date",
+      "synonyms": [
+        "closing date",
+        "completion date",
+        "settlement date",
+        "data de fechamento",
+        "data de conclusao"
+      ],
+      "related": [
+        "effective_date",
+        "commencement_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_closing_date",
+      "curationReason": "weighted:closing_date:domain_general"
+    },
+    {
+      "canonical": "commencement_date",
+      "synonyms": [
+        "commencement date",
+        "start date",
+        "inception date",
+        "data de inicio",
+        "data de vigencia"
+      ],
+      "related": [
+        "effective_date",
+        "expiration_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_commencement_date",
+      "curationReason": "weighted:commencement_date:domain_general"
+    },
+    {
+      "canonical": "compliance_deadline",
+      "synonyms": [
+        "compliance deadline",
+        "regulatory deadline",
+        "due date",
+        "prazo de conformidade",
+        "prazo regulatorio"
+      ],
+      "related": [
+        "compliance_status",
+        "due_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_compliance_deadline",
+      "curationReason": "weighted:compliance_deadline:domain_general"
+    },
+    {
+      "canonical": "compliance_status",
+      "synonyms": [
+        "compliance status",
+        "compliant",
+        "status",
+        "status de conformidade",
+        "situacao de compliance"
+      ],
+      "related": [
+        "compliance_deadline",
+        "regulatory_requirements"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_compliance_status",
+      "curationReason": "weighted:compliance_status:domain_general"
+    },
+    {
+      "canonical": "condition_precedent",
+      "synonyms": [
+        "condition precedent",
+        "cp",
+        "prerequisite",
+        "condicao precedente",
+        "condicao suspensiva"
+      ],
+      "related": [
+        "closing_date",
+        "milestone"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_condition_precedent",
+      "curationReason": "weighted:condition_precedent:domain_general"
+    },
+    {
+      "canonical": "confidentiality_level",
+      "synonyms": [
+        "confidentiality",
+        "classification",
+        "security level",
+        "nivel de confidencialidade",
+        "classificacao de sigilo"
+      ],
+      "related": [
+        "document_type",
+        "restriction_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_confidentiality_level",
+      "curationReason": "weighted:confidentiality_level:domain_general"
+    },
+    {
+      "canonical": "consent_date",
+      "synonyms": [
+        "consent date",
+        "date of consent",
+        "approval date",
+        "data do consentimento",
+        "data da aprovacao"
+      ],
+      "related": [
+        "consent_type",
+        "approval_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_consent_date",
+      "curationReason": "weighted:consent_date:domain_general"
+    },
+    {
+      "canonical": "consideration_amount",
+      "synonyms": [
+        "consideration",
+        "purchase price",
+        "value",
+        "contraprestacao",
+        "preco",
+        "valor da operacao"
+      ],
+      "related": [
+        "contract_value",
+        "payment_milestone"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_consideration_amount",
+      "curationReason": "weighted:consideration_amount:domain_general"
+    },
+    {
+      "canonical": "contract_duration",
+      "synonyms": [
+        "duration",
+        "contract term",
+        "length",
+        "duracao do contrato",
+        "prazo contratual",
+        "vigencia"
+      ],
+      "related": [
+        "term_length",
+        "commencement_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_contract_duration",
+      "curationReason": "weighted:contract_duration:domain_general"
+    },
+    {
+      "canonical": "contract_number",
+      "synonyms": [
+        "contract number",
+        "contract no",
+        "contract id",
+        "numero do contrato",
+        "id do contrato"
+      ],
+      "related": [
+        "agreement_number",
+        "contract_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_contract_number",
+      "curationReason": "weighted:contract_number:domain_general"
+    },
+    {
+      "canonical": "contract_party",
+      "synonyms": [
+        "party",
+        "contracting party",
+        "signatory",
+        "parte contratante",
+        "parte",
+        "signatario"
+      ],
+      "related": [
+        "party_name",
+        "counterparty"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_contract_party",
+      "curationReason": "weighted:contract_party:domain_general"
+    },
+    {
+      "canonical": "contract_status",
+      "synonyms": [
+        "contract status",
+        "status",
+        "agreement status",
+        "status do contrato",
+        "situacao contratual"
+      ],
+      "related": [
+        "contract_number",
+        "effective_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_contract_status",
+      "curationReason": "weighted:contract_status:domain_general"
+    },
+    {
+      "canonical": "contract_type",
+      "synonyms": [
+        "contract type",
+        "type",
+        "agreement category",
+        "tipo de contrato",
+        "categoria do acordo"
+      ],
+      "related": [
+        "agreement_type",
+        "document_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_contract_type",
+      "curationReason": "weighted:contract_type:domain_general"
+    },
+    {
+      "canonical": "contract_value",
+      "synonyms": [
+        "contract value",
+        "agreement value",
+        "total value",
+        "valor do contrato",
+        "valor total do acordo"
+      ],
+      "related": [
+        "consideration_amount",
+        "contract_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_contract_value",
+      "curationReason": "weighted:contract_value:domain_general"
+    },
+    {
+      "canonical": "controlling_party",
+      "synonyms": [
+        "controlling party",
+        "majority party",
+        "dominant party",
+        "parte controladora",
+        "parte majoritaria"
+      ],
+      "related": [
+        "party_name",
+        "counterparty"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_controlling_party",
+      "curationReason": "weighted:controlling_party:domain_general"
+    },
+    {
+      "canonical": "counterparty",
+      "synonyms": [
+        "counterparty",
+        "other party",
+        "opposite party",
+        "contraparte",
+        "outra parte"
+      ],
+      "related": [
+        "party_name",
+        "contract_party"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_counterparty",
+      "curationReason": "weighted:counterparty:domain_general"
+    },
+    {
+      "canonical": "court_date",
+      "synonyms": [
+        "court date",
+        "hearing date",
+        "trial date",
+        "data da audiencia",
+        "data do julgamento"
+      ],
+      "related": [
+        "court_name",
+        "case_number"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_court_date",
+      "curationReason": "weighted:court_date:domain_general"
+    },
+    {
+      "canonical": "court_name",
+      "synonyms": [
+        "court",
+        "court name",
+        "tribunal",
+        "tribunal",
+        "vara",
+        "juizo"
+      ],
+      "related": [
+        "jurisdiction",
+        "judge_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_court_name",
+      "curationReason": "weighted:court_name:domain_general"
+    },
+    {
+      "canonical": "covenant_type",
+      "synonyms": [
+        "covenant type",
+        "covenant",
+        "obligation type",
+        "tipo de pacto",
+        "tipo de obrigacao"
+      ],
+      "related": [
+        "obligation_type",
+        "restriction_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_covenant_type",
+      "curationReason": "weighted:covenant_type:domain_general"
+    },
+    {
+      "canonical": "damages_amount",
+      "synonyms": [
+        "damages",
+        "damages amount",
+        "compensation",
+        "danos",
+        "valor dos danos",
+        "indenizacao"
+      ],
+      "related": [
+        "claim_amount",
+        "settlement_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_damages_amount",
+      "curationReason": "weighted:damages_amount:domain_general"
+    },
+    {
+      "canonical": "deadline",
+      "synonyms": [
+        "deadline",
+        "due date",
+        "target date",
+        "prazo",
+        "data limite",
+        "vencimento"
+      ],
+      "related": [
+        "due_date",
+        "compliance_deadline"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_deadline",
+      "curationReason": "weighted:deadline:domain_general"
+    },
+    {
+      "canonical": "decision_date",
+      "synonyms": [
+        "decision date",
+        "ruling date",
+        "judgment date",
+        "data da decisao",
+        "data da sentenca"
+      ],
+      "related": [
+        "court_date",
+        "case_number"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_decision_date",
+      "curationReason": "weighted:decision_date:domain_general"
+    },
+    {
+      "canonical": "defendant",
+      "synonyms": [
+        "defendant",
+        "respondent",
+        "accused",
+        "reu",
+        "requerido",
+        "demandado"
+      ],
+      "related": [
+        "plaintiff",
+        "case_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_defendant",
+      "curationReason": "weighted:defendant:domain_general"
+    },
+    {
+      "canonical": "deposition_date",
+      "synonyms": [
+        "deposition date",
+        "depo date",
+        "testimony date",
+        "data do depoimento",
+        "data da oitiva"
+      ],
+      "related": [
+        "witness_name",
+        "discovery_deadline"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_deposition_date",
+      "curationReason": "weighted:deposition_date:domain_general"
+    },
+    {
+      "canonical": "disclosure_date",
+      "synonyms": [
+        "disclosure date",
+        "date disclosed",
+        "revelation date",
+        "data da divulgacao",
+        "data da revelacao"
+      ],
+      "related": [
+        "confidentiality_level",
+        "document_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_disclosure_date",
+      "curationReason": "weighted:disclosure_date:domain_general"
+    },
+    {
+      "canonical": "discovery_deadline",
+      "synonyms": [
+        "discovery deadline",
+        "discovery cutoff",
+        "disclosure deadline",
+        "prazo de discovery",
+        "prazo de instrucao"
+      ],
+      "related": [
+        "deposition_date",
+        "filing_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_discovery_deadline",
+      "curationReason": "weighted:discovery_deadline:domain_general"
+    },
+    {
+      "canonical": "dispute_category",
+      "synonyms": [
+        "dispute category",
+        "dispute type",
+        "type of dispute",
+        "categoria da disputa",
+        "tipo de litigio"
+      ],
+      "related": [
+        "dispute_status",
+        "case_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_dispute_category",
+      "curationReason": "weighted:dispute_category:domain_general"
+    },
+    {
+      "canonical": "dispute_status",
+      "synonyms": [
+        "dispute status",
+        "litigation status",
+        "status",
+        "status da disputa",
+        "situacao do litigio"
+      ],
+      "related": [
+        "dispute_category",
+        "resolution_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_dispute_status",
+      "curationReason": "weighted:dispute_status:domain_general"
+    },
+    {
+      "canonical": "document_date",
+      "synonyms": [
+        "document date",
+        "doc date",
+        "date",
+        "data do documento",
+        "data"
+      ],
+      "related": [
+        "document_id",
+        "document_type"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_document_date",
+      "curationReason": "weighted:document_date:domain_general"
+    },
+    {
+      "canonical": "document_id",
+      "synonyms": [
+        "document id",
+        "doc id",
+        "document number",
+        "id do documento",
+        "numero do documento"
+      ],
+      "related": [
+        "document_date",
+        "document_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_document_id",
+      "curationReason": "weighted:document_id:domain_general"
+    },
+    {
+      "canonical": "document_type",
+      "synonyms": [
+        "document type",
+        "doc type",
+        "type",
+        "tipo de documento",
+        "tipo do documento"
+      ],
+      "related": [
+        "document_id",
+        "document_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_document_type",
+      "curationReason": "weighted:document_type:domain_general"
+    },
+    {
+      "canonical": "due_date",
+      "synonyms": [
+        "due date",
+        "due",
+        "payment due",
+        "data de vencimento",
+        "vencimento",
+        "prazo final"
+      ],
+      "related": [
+        "deadline",
+        "payment_schedule"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_due_date",
+      "curationReason": "weighted:due_date:domain_general"
+    },
+    {
+      "canonical": "effective_date",
+      "synonyms": [
+        "effective date",
+        "eff date",
+        "start date",
+        "data de vigencia",
+        "data efetiva",
+        "inicio de vigencia"
+      ],
+      "related": [
+        "commencement_date",
+        "expiration_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_effective_date",
+      "curationReason": "weighted:effective_date:domain_general"
+    },
+    {
+      "canonical": "enforceability_status",
+      "synonyms": [
+        "enforceability",
+        "enforceable",
+        "validity",
+        "exequibilidade",
+        "validade",
+        "vigencia"
+      ],
+      "related": [
+        "effective_date",
+        "applicable_law"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_enforceability_status",
+      "curationReason": "weighted:enforceability_status:domain_general"
+    },
+    {
+      "canonical": "entity_name",
+      "synonyms": [
+        "entity",
+        "legal entity",
+        "company name",
+        "entidade",
+        "pessoa juridica",
+        "razao social"
+      ],
+      "related": [
+        "entity_type",
+        "party_name"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_entity_name",
+      "curationReason": "weighted:entity_name:domain_general"
+    },
+    {
+      "canonical": "entity_type",
+      "synonyms": [
+        "entity type",
+        "legal form",
+        "corporate form",
+        "tipo de entidade",
+        "forma juridica",
+        "natureza juridica"
+      ],
+      "related": [
+        "entity_name",
+        "party_type"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_entity_type",
+      "curationReason": "weighted:entity_type:domain_general"
+    },
+    {
+      "canonical": "escalation_level",
+      "synonyms": [
+        "escalation level",
+        "priority",
+        "urgency",
+        "nivel de escalacao",
+        "prioridade",
+        "urgencia"
+      ],
+      "related": [
+        "priority_level",
+        "response_deadline"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_escalation_level",
+      "curationReason": "weighted:escalation_level:domain_general"
+    },
+    {
+      "canonical": "evidence_id",
+      "synonyms": [
+        "evidence id",
+        "exhibit id",
+        "evidence no",
+        "id da prova",
+        "numero da evidencia"
+      ],
+      "related": [
+        "evidence_type",
+        "exhibit_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_evidence_id",
+      "curationReason": "weighted:evidence_id:domain_general"
+    },
+    {
+      "canonical": "evidence_type",
+      "synonyms": [
+        "evidence type",
+        "type of evidence",
+        "proof type",
+        "tipo de prova",
+        "tipo de evidencia"
+      ],
+      "related": [
+        "evidence_id",
+        "exhibit_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_evidence_type",
+      "curationReason": "weighted:evidence_type:domain_general"
+    },
+    {
+      "canonical": "exhibit_number",
+      "synonyms": [
+        "exhibit",
+        "exhibit no",
+        "exhibit number",
+        "documento",
+        "peca",
+        "numero do documento"
+      ],
+      "related": [
+        "evidence_id",
+        "document_id"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_exhibit_number",
+      "curationReason": "weighted:exhibit_number:domain_general"
+    },
+    {
+      "canonical": "expiration_date",
+      "synonyms": [
+        "expiration date",
+        "expiry",
+        "end date",
+        "data de expiracao",
+        "data de termino",
+        "prazo final"
+      ],
+      "related": [
+        "effective_date",
+        "renewal_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_expiration_date",
+      "curationReason": "weighted:expiration_date:domain_general"
+    },
+    {
+      "canonical": "fee_arrangement",
+      "synonyms": [
+        "fee arrangement",
+        "fee structure",
+        "billing arrangement",
+        "honorarios",
+        "estrutura de honorarios"
+      ],
+      "related": [
+        "attorney_name",
+        "law_firm"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_fee_arrangement",
+      "curationReason": "weighted:fee_arrangement:domain_general"
+    },
+    {
+      "canonical": "filing_date",
+      "synonyms": [
+        "filing date",
+        "date filed",
+        "submission date",
+        "data de protocolo",
+        "data de entrada"
+      ],
+      "related": [
+        "filing_number",
+        "filing_type"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_filing_date",
+      "curationReason": "weighted:filing_date:domain_general"
+    },
+    {
+      "canonical": "filing_number",
+      "synonyms": [
+        "filing number",
+        "filing no",
+        "registration no",
+        "numero de protocolo",
+        "numero de registro"
+      ],
+      "related": [
+        "filing_date",
+        "filing_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_filing_number",
+      "curationReason": "weighted:filing_number:domain_general"
+    },
+    {
+      "canonical": "filing_type",
+      "synonyms": [
+        "filing type",
+        "type of filing",
+        "submission type",
+        "tipo de peticao",
+        "tipo de protocolo"
+      ],
+      "related": [
+        "filing_date",
+        "filing_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_filing_type",
+      "curationReason": "weighted:filing_type:domain_general"
+    },
+    {
+      "canonical": "force_majeure_trigger",
+      "synonyms": [
+        "force majeure",
+        "fm event",
+        "act of god",
+        "forca maior",
+        "caso fortuito"
+      ],
+      "related": [
+        "termination_reason",
+        "contract_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_force_majeure_trigger",
+      "curationReason": "weighted:force_majeure_trigger:domain_general"
+    },
+    {
+      "canonical": "forum",
+      "synonyms": [
+        "forum",
+        "venue",
+        "court",
+        "foro",
+        "jurisdicao",
+        "tribunal competente"
+      ],
+      "related": [
+        "jurisdiction",
+        "governing_law"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_forum",
+      "curationReason": "weighted:forum:domain_general"
+    },
+    {
+      "canonical": "governing_law",
+      "synonyms": [
+        "governing law",
+        "applicable law",
+        "choice of law",
+        "lei aplicavel",
+        "lei regente",
+        "legislacao"
+      ],
+      "related": [
+        "jurisdiction",
+        "forum"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_governing_law",
+      "curationReason": "weighted:governing_law:domain_general"
+    },
+    {
+      "canonical": "guarantee_amount",
+      "synonyms": [
+        "guarantee",
+        "guarantee amount",
+        "guaranteed sum",
+        "garantia",
+        "valor da garantia",
+        "valor garantido"
+      ],
+      "related": [
+        "guarantor",
+        "indemnity_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_guarantee_amount",
+      "curationReason": "weighted:guarantee_amount:domain_general"
+    },
+    {
+      "canonical": "guarantor",
+      "synonyms": [
+        "guarantor",
+        "surety",
+        "warrantor",
+        "fiador",
+        "garantidor",
+        "avalista"
+      ],
+      "related": [
+        "guarantee_amount",
+        "party_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_guarantor",
+      "curationReason": "weighted:guarantor:domain_general"
+    },
+    {
+      "canonical": "hearing_date",
+      "synonyms": [
+        "hearing date",
+        "hearing",
+        "oral argument date",
+        "data da audiencia",
+        "audiencia"
+      ],
+      "related": [
+        "court_date",
+        "judge_name"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_hearing_date",
+      "curationReason": "weighted:hearing_date:domain_general"
+    },
+    {
+      "canonical": "holdback_amount",
+      "synonyms": [
+        "holdback",
+        "escrow",
+        "retention",
+        "retencao",
+        "deposito em garantia",
+        "escrow"
+      ],
+      "related": [
+        "consideration_amount",
+        "closing_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_holdback_amount",
+      "curationReason": "weighted:holdback_amount:domain_general"
+    },
+    {
+      "canonical": "indemnification_cap",
+      "synonyms": [
+        "indemnification cap",
+        "indemnity cap",
+        "indemnity limit",
+        "teto de indenizacao",
+        "limite de indenizacao"
+      ],
+      "related": [
+        "indemnity_amount",
+        "liability_cap"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_indemnification_cap",
+      "curationReason": "weighted:indemnification_cap:domain_general"
+    },
+    {
+      "canonical": "indemnifying_party",
+      "synonyms": [
+        "indemnifying party",
+        "indemnitor",
+        "indemnifier",
+        "parte indenizadora",
+        "indenizante"
+      ],
+      "related": [
+        "indemnity_amount",
+        "party_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_indemnifying_party",
+      "curationReason": "weighted:indemnifying_party:domain_general"
+    },
+    {
+      "canonical": "indemnity_amount",
+      "synonyms": [
+        "indemnity",
+        "indemnification",
+        "compensation",
+        "indenizacao",
+        "valor da indenizacao"
+      ],
+      "related": [
+        "indemnification_cap",
+        "damages_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_indemnity_amount",
+      "curationReason": "weighted:indemnity_amount:domain_general"
+    },
+    {
+      "canonical": "insurance_requirement",
+      "synonyms": [
+        "insurance requirement",
+        "insurance",
+        "coverage required",
+        "requisito de seguro",
+        "seguro exigido"
+      ],
+      "related": [
+        "cap_amount",
+        "indemnity_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_insurance_requirement",
+      "curationReason": "weighted:insurance_requirement:domain_general"
+    },
+    {
+      "canonical": "ip_type",
+      "synonyms": [
+        "ip type",
+        "intellectual property type",
+        "ip category",
+        "tipo de pi",
+        "tipo de propriedade intelectual"
+      ],
+      "related": [
+        "license_type",
+        "restriction_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_ip_type",
+      "curationReason": "weighted:ip_type:domain_general"
+    },
+    {
+      "canonical": "issue_date",
+      "synonyms": [
+        "issue date",
+        "date of issue",
+        "issuance date",
+        "data de emissao",
+        "data de expedicao"
+      ],
+      "related": [
+        "document_date",
+        "filing_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_issue_date",
+      "curationReason": "weighted:issue_date:domain_general"
+    },
+    {
+      "canonical": "judge_name",
+      "synonyms": [
+        "judge",
+        "justice",
+        "magistrate",
+        "juiz",
+        "desembargador",
+        "magistrado"
+      ],
+      "related": [
+        "court_name",
+        "case_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_judge_name",
+      "curationReason": "weighted:judge_name:domain_general"
+    },
+    {
+      "canonical": "jurisdiction",
+      "synonyms": [
+        "jurisdiction",
+        "venue",
+        "forum",
+        "jurisdicao",
+        "foro",
+        "competencia"
+      ],
+      "related": [
+        "governing_law",
+        "court_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_jurisdiction",
+      "curationReason": "weighted:jurisdiction:domain_general"
+    },
+    {
+      "canonical": "law_firm",
+      "synonyms": [
+        "law firm",
+        "firm",
+        "legal counsel",
+        "escritorio de advocacia",
+        "firma de advocacia"
+      ],
+      "related": [
+        "attorney_name",
+        "bar_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_law_firm",
+      "curationReason": "weighted:law_firm:domain_general"
+    },
+    {
+      "canonical": "legal_entity",
+      "synonyms": [
+        "legal entity",
+        "corporate entity",
+        "entity",
+        "pessoa juridica",
+        "entidade legal"
+      ],
+      "related": [
+        "entity_name",
+        "entity_type"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_legal_entity",
+      "curationReason": "weighted:legal_entity:domain_general"
+    },
+    {
+      "canonical": "legal_reference",
+      "synonyms": [
+        "legal reference",
+        "statutory reference",
+        "law citation",
+        "referencia legal",
+        "citacao de lei"
+      ],
+      "related": [
+        "statute_reference",
+        "provision_reference"
+      ],
+      "priority": 420,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_legal_reference",
+      "curationReason": "weighted:legal_reference:domain_general"
+    },
+    {
+      "canonical": "liability_cap",
+      "synonyms": [
+        "liability cap",
+        "maximum liability",
+        "cap",
+        "limite de responsabilidade",
+        "teto de responsabilidade"
+      ],
+      "related": [
+        "indemnification_cap",
+        "cap_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_liability_cap",
+      "curationReason": "weighted:liability_cap:domain_general"
+    },
+    {
+      "canonical": "license_type",
+      "synonyms": [
+        "license type",
+        "licence type",
+        "permit type",
+        "tipo de licenca",
+        "tipo de autorizacao"
+      ],
+      "related": [
+        "ip_type",
+        "restriction_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_license_type",
+      "curationReason": "weighted:license_type:domain_general"
+    },
+    {
+      "canonical": "lien_amount",
+      "synonyms": [
+        "lien amount",
+        "encumbrance",
+        "charge",
+        "valor do gravame",
+        "valor do onus"
+      ],
+      "related": [
+        "lien_type",
+        "guarantee_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_lien_amount",
+      "curationReason": "weighted:lien_amount:domain_general"
+    },
+    {
+      "canonical": "lien_type",
+      "synonyms": [
+        "lien type",
+        "type of lien",
+        "encumbrance type",
+        "tipo de gravame",
+        "tipo de onus"
+      ],
+      "related": [
+        "lien_amount",
+        "guarantee_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_lien_type",
+      "curationReason": "weighted:lien_type:domain_general"
+    },
+    {
+      "canonical": "limitation_period",
+      "synonyms": [
+        "limitation period",
+        "statute of limitations",
+        "prescriptive period",
+        "prazo prescricional",
+        "prescricao"
+      ],
+      "related": [
+        "expiration_date",
+        "filing_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_limitation_period",
+      "curationReason": "weighted:limitation_period:domain_general"
+    },
+    {
+      "canonical": "litigation_hold",
+      "synonyms": [
+        "litigation hold",
+        "legal hold",
+        "preservation notice",
+        "retencao judicial",
+        "preservacao de documentos"
+      ],
+      "related": [
+        "case_number",
+        "retention_period"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_litigation_hold",
+      "curationReason": "weighted:litigation_hold:domain_general"
+    },
+    {
+      "canonical": "matter_number",
+      "synonyms": [
+        "matter number",
+        "matter no",
+        "matter id",
+        "numero da materia",
+        "numero do assunto"
+      ],
+      "related": [
+        "case_number",
+        "client_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_matter_number",
+      "curationReason": "weighted:matter_number:domain_general"
+    },
+    {
+      "canonical": "mediation_date",
+      "synonyms": [
+        "mediation date",
+        "mediation session",
+        "conciliation date",
+        "data da mediacao",
+        "data da conciliacao"
+      ],
+      "related": [
+        "dispute_status",
+        "resolution_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_mediation_date",
+      "curationReason": "weighted:mediation_date:domain_general"
+    },
+    {
+      "canonical": "milestone",
+      "synonyms": [
+        "milestone",
+        "key date",
+        "checkpoint",
+        "marco",
+        "etapa",
+        "ponto de verificacao"
+      ],
+      "related": [
+        "payment_milestone",
+        "deadline"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_milestone",
+      "curationReason": "weighted:milestone:domain_general"
+    },
+    {
+      "canonical": "non_compete_duration",
+      "synonyms": [
+        "non-compete duration",
+        "non-compete term",
+        "restriction period",
+        "duracao da nao concorrencia",
+        "prazo de nao competicao"
+      ],
+      "related": [
+        "non_compete_territory",
+        "restriction_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_non_compete_duration",
+      "curationReason": "weighted:non_compete_duration:domain_general"
+    },
+    {
+      "canonical": "non_compete_territory",
+      "synonyms": [
+        "non-compete territory",
+        "restricted area",
+        "geographic scope",
+        "territorio de nao concorrencia",
+        "area restrita"
+      ],
+      "related": [
+        "non_compete_duration",
+        "territory"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_non_compete_territory",
+      "curationReason": "weighted:non_compete_territory:domain_general"
+    },
+    {
+      "canonical": "notice_address",
+      "synonyms": [
+        "notice address",
+        "address for notices",
+        "notification address",
+        "endereco para notificacao",
+        "endereco de aviso"
+      ],
+      "related": [
+        "notice_period",
+        "notice_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_notice_address",
+      "curationReason": "weighted:notice_address:domain_general"
+    },
+    {
+      "canonical": "notice_period",
+      "synonyms": [
+        "notice period",
+        "notice days",
+        "advance notice",
+        "prazo de aviso",
+        "prazo de notificacao",
+        "aviso previo"
+      ],
+      "related": [
+        "notice_address",
+        "termination_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_notice_period",
+      "curationReason": "weighted:notice_period:domain_general"
+    },
+    {
+      "canonical": "notice_type",
+      "synonyms": [
+        "notice type",
+        "type of notice",
+        "notification type",
+        "tipo de notificacao",
+        "tipo de aviso"
+      ],
+      "related": [
+        "notice_period",
+        "notice_address"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_notice_type",
+      "curationReason": "weighted:notice_type:domain_general"
+    },
+    {
+      "canonical": "obligation_description",
+      "synonyms": [
+        "obligation",
+        "obligation description",
+        "duty",
+        "descricao da obrigacao",
+        "dever"
+      ],
+      "related": [
+        "obligation_owner",
+        "obligation_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_obligation_description",
+      "curationReason": "weighted:obligation_description:domain_general"
+    },
+    {
+      "canonical": "obligation_owner",
+      "synonyms": [
+        "responsible party",
+        "obligation owner",
+        "assignee",
+        "responsavel",
+        "parte obrigada"
+      ],
+      "related": [
+        "obligation_description",
+        "obligation_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_obligation_owner",
+      "curationReason": "weighted:obligation_owner:domain_general"
+    },
+    {
+      "canonical": "obligation_status",
+      "synonyms": [
+        "obligation status",
+        "compliance",
+        "status",
+        "status da obrigacao",
+        "situacao de cumprimento"
+      ],
+      "related": [
+        "obligation_description",
+        "obligation_owner"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_obligation_status",
+      "curationReason": "weighted:obligation_status:domain_general"
+    },
+    {
+      "canonical": "obligation_type",
+      "synonyms": [
+        "obligation type",
+        "duty type",
+        "covenant type",
+        "tipo de obrigacao",
+        "tipo de dever"
+      ],
+      "related": [
+        "obligation_description",
+        "covenant_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_obligation_type",
+      "curationReason": "weighted:obligation_type:domain_general"
+    },
+    {
+      "canonical": "opposing_counsel",
+      "synonyms": [
+        "opposing counsel",
+        "adversary counsel",
+        "other side",
+        "advogado adverso",
+        "patrono adverso"
+      ],
+      "related": [
+        "opposing_party",
+        "attorney_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_opposing_counsel",
+      "curationReason": "weighted:opposing_counsel:domain_general"
+    },
+    {
+      "canonical": "opposing_party",
+      "synonyms": [
+        "opposing party",
+        "adverse party",
+        "other party",
+        "parte adversa",
+        "parte contraria"
+      ],
+      "related": [
+        "opposing_counsel",
+        "defendant"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_opposing_party",
+      "curationReason": "weighted:opposing_party:domain_general"
+    },
+    {
+      "canonical": "order_date",
+      "synonyms": [
+        "order date",
+        "court order date",
+        "date of order",
+        "data da decisao",
+        "data do despacho"
+      ],
+      "related": [
+        "decision_date",
+        "case_number"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_order_date",
+      "curationReason": "weighted:order_date:domain_general"
+    },
+    {
+      "canonical": "original_date",
+      "synonyms": [
+        "original date",
+        "initial date",
+        "first date",
+        "data original",
+        "data inicial"
+      ],
+      "related": [
+        "amendment_date",
+        "effective_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_original_date",
+      "curationReason": "weighted:original_date:domain_general"
+    },
+    {
+      "canonical": "party_name",
+      "synonyms": [
+        "party name",
+        "party",
+        "name",
+        "nome da parte",
+        "parte",
+        "nome"
+      ],
+      "related": [
+        "party_role",
+        "party_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_party_name",
+      "curationReason": "weighted:party_name:domain_general"
+    },
+    {
+      "canonical": "party_role",
+      "synonyms": [
+        "party role",
+        "role",
+        "capacity",
+        "papel da parte",
+        "funcao",
+        "qualificacao"
+      ],
+      "related": [
+        "party_name",
+        "party_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_party_role",
+      "curationReason": "weighted:party_role:domain_general"
+    },
+    {
+      "canonical": "party_type",
+      "synonyms": [
+        "party type",
+        "entity type",
+        "nature",
+        "tipo da parte",
+        "natureza da parte"
+      ],
+      "related": [
+        "party_name",
+        "entity_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_party_type",
+      "curationReason": "weighted:party_type:domain_general"
+    },
+    {
+      "canonical": "payment_milestone",
+      "synonyms": [
+        "payment milestone",
+        "payment stage",
+        "payment trigger",
+        "marco de pagamento",
+        "etapa de pagamento"
+      ],
+      "related": [
+        "payment_schedule",
+        "milestone"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_payment_milestone",
+      "curationReason": "weighted:payment_milestone:domain_general"
+    },
+    {
+      "canonical": "payment_schedule",
+      "synonyms": [
+        "payment schedule",
+        "installments",
+        "payment plan",
+        "cronograma de pagamento",
+        "parcelas"
+      ],
+      "related": [
+        "payment_milestone",
+        "due_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_payment_schedule",
+      "curationReason": "weighted:payment_schedule:domain_general"
+    },
+    {
+      "canonical": "penalty_amount",
+      "synonyms": [
+        "penalty",
+        "fine",
+        "liquidated damages",
+        "multa",
+        "penalidade",
+        "clausula penal"
+      ],
+      "related": [
+        "breach_type",
+        "damages_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_penalty_amount",
+      "curationReason": "weighted:penalty_amount:domain_general"
+    },
+    {
+      "canonical": "permit_number",
+      "synonyms": [
+        "permit number",
+        "permit no",
+        "license no",
+        "numero da licenca",
+        "numero do alvara"
+      ],
+      "related": [
+        "filing_number",
+        "license_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_permit_number",
+      "curationReason": "weighted:permit_number:domain_general"
+    },
+    {
+      "canonical": "plaintiff",
+      "synonyms": [
+        "plaintiff",
+        "claimant",
+        "petitioner",
+        "autor",
+        "requerente",
+        "demandante"
+      ],
+      "related": [
+        "defendant",
+        "case_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_plaintiff",
+      "curationReason": "weighted:plaintiff:domain_general"
+    },
+    {
+      "canonical": "power_of_attorney",
+      "synonyms": [
+        "power of attorney",
+        "poa",
+        "proxy",
+        "procuracao",
+        "mandato"
+      ],
+      "related": [
+        "authorized_signatory",
+        "party_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_power_of_attorney",
+      "curationReason": "weighted:power_of_attorney:domain_general"
+    },
+    {
+      "canonical": "precedent_case",
+      "synonyms": [
+        "precedent",
+        "case law",
+        "prior ruling",
+        "jurisprudencia",
+        "precedente",
+        "caso anterior"
+      ],
+      "related": [
+        "legal_reference",
+        "statute_reference"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_precedent_case",
+      "curationReason": "weighted:precedent_case:domain_general"
+    },
+    {
+      "canonical": "priority_level",
+      "synonyms": [
+        "priority",
+        "urgency",
+        "importance",
+        "prioridade",
+        "nivel de urgencia",
+        "importancia"
+      ],
+      "related": [
+        "escalation_level",
+        "deadline"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_priority_level",
+      "curationReason": "weighted:priority_level:domain_general"
+    },
+    {
+      "canonical": "proceeding_type",
+      "synonyms": [
+        "proceeding type",
+        "type of proceeding",
+        "action type",
+        "tipo de procedimento",
+        "rito processual"
+      ],
+      "related": [
+        "case_type",
+        "court_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_proceeding_type",
+      "curationReason": "weighted:proceeding_type:domain_general"
+    },
+    {
+      "canonical": "provision_reference",
+      "synonyms": [
+        "provision",
+        "section reference",
+        "clause reference",
+        "disposicao",
+        "referencia a clausula"
+      ],
+      "related": [
+        "legal_reference",
+        "clause_number"
+      ],
+      "priority": 420,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_provision_reference",
+      "curationReason": "weighted:provision_reference:domain_general"
+    },
+    {
+      "canonical": "recital_number",
+      "synonyms": [
+        "recital",
+        "recital no",
+        "whereas no",
+        "considerando",
+        "numero do considerando"
+      ],
+      "related": [
+        "clause_number",
+        "article_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_recital_number",
+      "curationReason": "weighted:recital_number:domain_general"
+    },
+    {
+      "canonical": "renewal_date",
+      "synonyms": [
+        "renewal date",
+        "renewal",
+        "next renewal",
+        "data de renovacao",
+        "renovacao"
+      ],
+      "related": [
+        "renewal_term",
+        "expiration_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_renewal_date",
+      "curationReason": "weighted:renewal_date:domain_general"
+    },
+    {
+      "canonical": "renewal_term",
+      "synonyms": [
+        "renewal term",
+        "renewal period",
+        "auto-renewal",
+        "prazo de renovacao",
+        "periodo de renovacao"
+      ],
+      "related": [
+        "renewal_date",
+        "contract_duration"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_renewal_term",
+      "curationReason": "weighted:renewal_term:domain_general"
+    },
+    {
+      "canonical": "representation_scope",
+      "synonyms": [
+        "representation scope",
+        "scope of representation",
+        "mandate scope",
+        "escopo da representacao",
+        "abrangencia do mandato"
+      ],
+      "related": [
+        "power_of_attorney",
+        "territory"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_representation_scope",
+      "curationReason": "weighted:representation_scope:domain_general"
+    },
+    {
+      "canonical": "resolution_date",
+      "synonyms": [
+        "resolution date",
+        "settled date",
+        "resolved on",
+        "data da resolucao",
+        "data da solucao"
+      ],
+      "related": [
+        "resolution_type",
+        "dispute_status"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_resolution_date",
+      "curationReason": "weighted:resolution_date:domain_general"
+    },
+    {
+      "canonical": "resolution_type",
+      "synonyms": [
+        "resolution type",
+        "outcome",
+        "disposition",
+        "tipo de resolucao",
+        "resultado",
+        "desfecho"
+      ],
+      "related": [
+        "resolution_date",
+        "dispute_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_resolution_type",
+      "curationReason": "weighted:resolution_type:domain_general"
+    },
+    {
+      "canonical": "response_deadline",
+      "synonyms": [
+        "response deadline",
+        "reply due",
+        "answer date",
+        "prazo de resposta",
+        "prazo para contestacao"
+      ],
+      "related": [
+        "deadline",
+        "filing_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_response_deadline",
+      "curationReason": "weighted:response_deadline:domain_general"
+    },
+    {
+      "canonical": "restriction_type",
+      "synonyms": [
+        "restriction",
+        "restriction type",
+        "covenant type",
+        "tipo de restricao",
+        "tipo de limitacao"
+      ],
+      "related": [
+        "non_compete_duration",
+        "covenant_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_restriction_type",
+      "curationReason": "weighted:restriction_type:domain_general"
+    },
+    {
+      "canonical": "retention_period",
+      "synonyms": [
+        "retention period",
+        "record retention",
+        "preservation period",
+        "prazo de retencao",
+        "prazo de guarda"
+      ],
+      "related": [
+        "litigation_hold",
+        "expiration_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_retention_period",
+      "curationReason": "weighted:retention_period:domain_general"
+    },
+    {
+      "canonical": "review_date",
+      "synonyms": [
+        "review date",
+        "next review",
+        "audit date",
+        "data de revisao",
+        "data da proxima revisao"
+      ],
+      "related": [
+        "review_status",
+        "approval_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_review_date",
+      "curationReason": "weighted:review_date:domain_general"
+    },
+    {
+      "canonical": "review_status",
+      "synonyms": [
+        "review status",
+        "review outcome",
+        "assessment",
+        "status da revisao",
+        "resultado da avaliacao"
+      ],
+      "related": [
+        "review_date",
+        "approval_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_review_status",
+      "curationReason": "weighted:review_status:domain_general"
+    },
+    {
+      "canonical": "risk_level",
+      "synonyms": [
+        "risk level",
+        "risk rating",
+        "risk",
+        "nivel de risco",
+        "classificacao de risco"
+      ],
+      "related": [
+        "priority_level",
+        "escalation_level"
+      ],
+      "priority": 820,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_risk_level",
+      "curationReason": "weighted:risk_level:domain_general"
+    },
+    {
+      "canonical": "schedule_reference",
+      "synonyms": [
+        "schedule",
+        "schedule ref",
+        "attachment ref",
+        "quadro",
+        "referencia ao quadro",
+        "anexo ref"
+      ],
+      "related": [
+        "exhibit_number",
+        "provision_reference"
+      ],
+      "priority": 426,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_schedule_reference",
+      "curationReason": "weighted:schedule_reference:domain_general"
+    },
+    {
+      "canonical": "section_number",
+      "synonyms": [
+        "section",
+        "section no",
+        "sec",
+        "secao",
+        "numero da secao"
+      ],
+      "related": [
+        "clause_number",
+        "article_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_section_number",
+      "curationReason": "weighted:section_number:domain_general"
+    },
+    {
+      "canonical": "settlement_amount",
+      "synonyms": [
+        "settlement amount",
+        "settlement",
+        "agreed amount",
+        "valor do acordo",
+        "valor da composicao"
+      ],
+      "related": [
+        "claim_amount",
+        "damages_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_settlement_amount",
+      "curationReason": "weighted:settlement_amount:domain_general"
+    },
+    {
+      "canonical": "settlement_date",
+      "synonyms": [
+        "settlement date",
+        "date of settlement",
+        "agreed on",
+        "data do acordo",
+        "data da composicao"
+      ],
+      "related": [
+        "settlement_amount",
+        "resolution_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_settlement_date",
+      "curationReason": "weighted:settlement_date:domain_general"
+    },
+    {
+      "canonical": "signatory_name",
+      "synonyms": [
+        "signatory",
+        "signer",
+        "name of signatory",
+        "signatario",
+        "nome do signatario",
+        "assinante"
+      ],
+      "related": [
+        "signatory_title",
+        "authorized_signatory"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_signatory_name",
+      "curationReason": "weighted:signatory_name:domain_general"
+    },
+    {
+      "canonical": "signatory_title",
+      "synonyms": [
+        "title",
+        "position",
+        "role",
+        "cargo",
+        "funcao",
+        "titulo"
+      ],
+      "related": [
+        "signatory_name",
+        "authorized_signatory"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_signatory_title",
+      "curationReason": "weighted:signatory_title:domain_general"
+    },
+    {
+      "canonical": "signature_date",
+      "synonyms": [
+        "signature date",
+        "signed on",
+        "execution date",
+        "data da assinatura",
+        "assinado em"
+      ],
+      "related": [
+        "signatory_name",
+        "effective_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_signature_date",
+      "curationReason": "weighted:signature_date:domain_general"
+    },
+    {
+      "canonical": "sla_metric",
+      "synonyms": [
+        "sla",
+        "service level",
+        "sla metric",
+        "metrica de sla",
+        "nivel de servico"
+      ],
+      "related": [
+        "deadline",
+        "penalty_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_sla_metric",
+      "curationReason": "weighted:sla_metric:domain_general"
+    },
+    {
+      "canonical": "statute_reference",
+      "synonyms": [
+        "statute",
+        "law reference",
+        "legal citation",
+        "lei",
+        "referencia legal",
+        "dispositivo legal"
+      ],
+      "related": [
+        "legal_reference",
+        "applicable_law"
+      ],
+      "priority": 426,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_statute_reference",
+      "curationReason": "weighted:statute_reference:domain_general"
+    },
+    {
+      "canonical": "status",
+      "synonyms": [
+        "status",
+        "current status",
+        "state",
+        "status",
+        "situacao",
+        "estado"
+      ],
+      "related": [
+        "case_status",
+        "contract_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_status",
+      "curationReason": "weighted:status:domain_general"
+    },
+    {
+      "canonical": "subcontractor",
+      "synonyms": [
+        "subcontractor",
+        "sub",
+        "third party",
+        "subcontratado",
+        "terceiro",
+        "subempreiteiro"
+      ],
+      "related": [
+        "contract_party",
+        "party_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_subcontractor",
+      "curationReason": "weighted:subcontractor:domain_general"
+    },
+    {
+      "canonical": "survival_period",
+      "synonyms": [
+        "survival period",
+        "surviving term",
+        "post-termination period",
+        "periodo de sobrevivencia",
+        "prazo pos-rescisao"
+      ],
+      "related": [
+        "termination_date",
+        "expiration_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_survival_period",
+      "curationReason": "weighted:survival_period:domain_general"
+    },
+    {
+      "canonical": "term_length",
+      "synonyms": [
+        "term",
+        "term length",
+        "contract term",
+        "prazo",
+        "duracao",
+        "vigencia contratual"
+      ],
+      "related": [
+        "contract_duration",
+        "effective_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_term_length",
+      "curationReason": "weighted:term_length:domain_general"
+    },
+    {
+      "canonical": "termination_date",
+      "synonyms": [
+        "termination date",
+        "end date",
+        "cancellation date",
+        "data de rescisao",
+        "data de encerramento"
+      ],
+      "related": [
+        "termination_reason",
+        "effective_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_termination_date",
+      "curationReason": "weighted:termination_date:domain_general"
+    },
+    {
+      "canonical": "termination_reason",
+      "synonyms": [
+        "termination reason",
+        "cause",
+        "grounds",
+        "motivo da rescisao",
+        "causa da rescisao"
+      ],
+      "related": [
+        "termination_date",
+        "breach_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_termination_reason",
+      "curationReason": "weighted:termination_reason:domain_general"
+    },
+    {
+      "canonical": "territory",
+      "synonyms": [
+        "territory",
+        "region",
+        "geographic scope",
+        "territorio",
+        "regiao",
+        "abrangencia geografica"
+      ],
+      "related": [
+        "non_compete_territory",
+        "jurisdiction"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_territory",
+      "curationReason": "weighted:territory:domain_general"
+    },
+    {
+      "canonical": "third_party",
+      "synonyms": [
+        "third party",
+        "external party",
+        "outside party",
+        "terceiro",
+        "parte externa"
+      ],
+      "related": [
+        "subcontractor",
+        "party_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_third_party",
+      "curationReason": "weighted:third_party:domain_general"
+    },
+    {
+      "canonical": "threshold_amount",
+      "synonyms": [
+        "threshold",
+        "minimum amount",
+        "trigger amount",
+        "valor minimo",
+        "patamar",
+        "limiar"
+      ],
+      "related": [
+        "cap_amount",
+        "indemnification_cap"
+      ],
+      "priority": 726,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_threshold_amount",
+      "curationReason": "weighted:threshold_amount:domain_general"
+    },
+    {
+      "canonical": "venue",
+      "synonyms": [
+        "venue",
+        "forum",
+        "court venue",
+        "foro",
+        "local de jurisdicao",
+        "comarca"
+      ],
+      "related": [
+        "jurisdiction",
+        "forum"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_venue",
+      "curationReason": "weighted:venue:domain_general"
+    },
+    {
+      "canonical": "waiver_date",
+      "synonyms": [
+        "waiver date",
+        "date of waiver",
+        "waived on",
+        "data da renuncia",
+        "data da dispensa"
+      ],
+      "related": [
+        "waiver_type",
+        "consent_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_waiver_date",
+      "curationReason": "weighted:waiver_date:domain_general"
+    },
+    {
+      "canonical": "waiver_type",
+      "synonyms": [
+        "waiver type",
+        "type of waiver",
+        "waiver category",
+        "tipo de renuncia",
+        "tipo de dispensa"
+      ],
+      "related": [
+        "waiver_date",
+        "obligation_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_waiver_type",
+      "curationReason": "weighted:waiver_type:domain_general"
+    },
+    {
+      "canonical": "warranty_period",
+      "synonyms": [
+        "warranty period",
+        "guarantee period",
+        "warranty term",
+        "prazo de garantia",
+        "periodo de garantia"
+      ],
+      "related": [
+        "expiration_date",
+        "contract_duration"
+      ],
+      "priority": 720,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_warranty_period",
+      "curationReason": "weighted:warranty_period:domain_general"
+    },
+    {
+      "canonical": "witness_name",
+      "synonyms": [
+        "witness",
+        "witness name",
+        "testimony",
+        "testemunha",
+        "nome da testemunha",
+        "depoente"
+      ],
+      "related": [
+        "deposition_date",
+        "case_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:legal",
+      "disambiguationRuleId": "headers_disambiguation_general_witness_name",
+      "curationReason": "weighted:witness_name:domain_general"
+    }
   ]
 }

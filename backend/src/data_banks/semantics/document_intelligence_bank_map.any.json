@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "document_intelligence_bank_map",
-    "version": "1.0.0",
+    "version": "1.5.0",
     "description": "Canonical map of all document-intelligence banks, required coverage, and domain/operator matrix.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -15,14 +15,29 @@
     "strictEnvs": [
       "production",
       "staging"
-    ]
+    ],
+    "domainAliases": {
+      "operations": "ops"
+    },
+    "domainNormalization": {
+      "required": true,
+      "normalizeAliases": true,
+      "failOnUnknownInStrict": true,
+      "coreDomains": [
+        "accounting",
+        "finance",
+        "legal",
+        "medical",
+        "ops"
+      ]
+    }
   },
   "domains": [
+    "accounting",
     "finance",
     "legal",
     "medical",
-    "ops",
-    "accounting"
+    "ops"
   ],
   "operators": [
     "navigate",
@@ -444,8 +459,19 @@
       },
       {
         "id": "DOCINT_0002_domains_present",
-        "assert": "domains includes finance, legal, medical, ops, accounting"
+        "assert": "domains includes accounting, banking, billing, education, finance, housing, hr_payroll, identity, insurance, legal, medical, ops, tax, travel"
       }
     ]
-  }
+  },
+  "extendedDomains": [
+    "banking",
+    "billing",
+    "education",
+    "housing",
+    "hr_payroll",
+    "identity",
+    "insurance",
+    "tax",
+    "travel"
+  ]
 }

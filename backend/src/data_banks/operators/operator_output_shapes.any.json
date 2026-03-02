@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "operator_output_shapes",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Output shape rules per operator. Defines default shape, allowed shapes, and shape-specific constraints used by the composer + render policy. Enforces ChatGPT-like readability: short paragraphs (1–2 sentences) and bullets with 1–3 sentences per bullet. Koda never outputs JSON.",
     "languages": [
       "any",
@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-01-26"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -84,6 +84,14 @@
         "useAttachment": true,
         "defaultCap": 10,
         "showMoreSupported": true
+      }
+    },
+    "doc_discovery_list": {
+      "description": "Short ranked discovery list for document candidates. Prefer source buttons/attachments for navigation.",
+      "docDiscoveryRules": {
+        "maxItems": 5,
+        "maxCharsPerItemSoft": 140,
+        "preferSourceButtons": true
       }
     },
     "button_only": {
@@ -467,6 +475,26 @@
       "allowedShapes": [
         "paragraph"
       ]
+    },
+    "PY_COMPUTE": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph",
+        "bullets"
+      ]
+    },
+    "PY_CHART": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph",
+        "bullets"
+      ]
+    },
+    "PY_WRITEBACK": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
     }
   },
   "tests": {
@@ -499,6 +527,34 @@
         },
         "expect": {
           "maxSentencesPerBullet": 3
+        }
+      },
+      {
+        "id": "OS_0004_connector_search_allows_bullets",
+        "input": {
+          "operator": "CONNECTOR_SEARCH"
+        },
+        "expect": {
+          "allowedContains": "bullets"
+        }
+      },
+      {
+        "id": "OS_0005_email_explain_latest_defaults_bullets",
+        "input": {
+          "operator": "EMAIL_EXPLAIN_LATEST"
+        },
+        "expect": {
+          "defaultShape": "bullets"
+        }
+      },
+      {
+        "id": "OS_0006_email_send_is_paragraph_only",
+        "input": {
+          "operator": "EMAIL_SEND"
+        },
+        "expect": {
+          "defaultShape": "paragraph",
+          "allowedContains": "paragraph"
         }
       }
     ]

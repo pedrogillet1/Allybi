@@ -81,7 +81,8 @@ export function splitTextIntoChunks(
     let end = Math.min(offset + policy.targetChars, clean.length);
 
     if (end < clean.length) {
-      const minBoundaryOffset = offset + policy.targetChars * policy.minBoundaryRatio;
+      const minBoundaryOffset =
+        offset + policy.targetChars * policy.minBoundaryRatio;
       const paragraphBreak = clean.lastIndexOf("\n\n", end);
       if (paragraphBreak > minBoundaryOffset) {
         end = paragraphBreak;
@@ -160,7 +161,10 @@ export function deduplicateChunkRecords<T extends { content: string }>(
   const acceptedTokens: Set<string>[] = [];
 
   for (const record of records) {
-    const tokens = tokenizeForDedupe(record.content, policy.dedupeMinWordLength);
+    const tokens = tokenizeForDedupe(
+      record.content,
+      policy.dedupeMinWordLength,
+    );
     let duplicate = false;
 
     for (const existing of acceptedTokens) {

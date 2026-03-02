@@ -3,7 +3,10 @@ import { URLSearchParams } from "url";
 
 import type { ConnectorProvider } from "../connectorsRegistry";
 import ConnectorIdentityMapService from "../connectorIdentityMap.service";
-import { markOAuthStateNonceUsed } from "../oauthStateNonceStore.service";
+import {
+  markOAuthStateNonceUsed,
+  markOAuthStateNonceUsedDurable,
+} from "../oauthStateNonceStore.service";
 import { TokenVaultService } from "../tokenVault.service";
 
 const PROVIDER: ConnectorProvider = "slack";
@@ -140,6 +143,17 @@ export class SlackOAuthService {
       throw new Error("Invalid or expired Slack OAuth state.");
     }
     const userId = verified.userId;
+    const replayOk = await markOAuthStateNonceUsedDurable(
+      PROVIDER,
+      userId,
+      verified.nonce,
+      verified.iat,
+      15 * 60,
+      true,
+    );
+    if (!replayOk) {
+      throw new Error("Invalid or expired Slack OAuth state.");
+    }
 
     const token = await this.exchangeCode({
       code,

@@ -1,16 +1,32 @@
 {
   "_meta": {
     "id": "doc_taxonomy",
-    "version": "1.0.0",
-    "description": "Master taxonomy of document types across finance, legal, medical, and operations.",
+    "version": "1.3.0",
+    "description": "Master taxonomy of document types across finance, legal, medical, accounting, and operations (canonical domain id: ops) with strict canonical domain validation.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "defaultLanguage": "any"
+    "defaultLanguage": "any",
+    "domainAliases": {
+      "operations": "ops"
+    },
+    "canonicalDomains": [
+      "accounting",
+      "finance",
+      "legal",
+      "medical",
+      "ops"
+    ],
+    "domainValidation": {
+      "required": true,
+      "failOnUnknown": true,
+      "normalizeAliases": true,
+      "enforceCanonicalSet": true
+    }
   },
   "clusters": {
     "finance": [
@@ -274,7 +290,7 @@
       "triage_note",
       "vital_signs_chart"
     ],
-    "operations": [
+    "ops": [
       "access_control_policy",
       "audit_checklist",
       "bcp_plan",
@@ -393,7 +409,7 @@
   "typeDefinitions": [
     {
       "id": "access_control_policy",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_access_control_policy",
       "aliases": [
         "access_control_policy",
@@ -664,7 +680,7 @@
     },
     {
       "id": "audit_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_audit_checklist",
       "aliases": [
         "audit_checklist",
@@ -774,7 +790,7 @@
     },
     {
       "id": "bcp_plan",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_bcp_plan",
       "aliases": [
         "bcp_plan",
@@ -986,7 +1002,7 @@
     },
     {
       "id": "capacity_plan",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_capacity_plan",
       "aliases": [
         "capacity_plan",
@@ -1159,7 +1175,7 @@
     },
     {
       "id": "change_request",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_change_request",
       "aliases": [
         "change_request",
@@ -1210,7 +1226,7 @@
     },
     {
       "id": "compliance_runbook",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_compliance_runbook",
       "aliases": [
         "compliance_runbook",
@@ -1440,7 +1456,7 @@
     },
     {
       "id": "customer_support_playbook",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_customer_support_playbook",
       "aliases": [
         "customer_support_playbook",
@@ -1491,7 +1507,7 @@
     },
     {
       "id": "data_retention_schedule",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_data_retention_schedule",
       "aliases": [
         "data_retention_schedule",
@@ -1603,7 +1619,7 @@
     },
     {
       "id": "disaster_recovery_plan",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_disaster_recovery_plan",
       "aliases": [
         "disaster_recovery_plan",
@@ -1890,7 +1906,7 @@
     },
     {
       "id": "escalation_matrix",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_escalation_matrix",
       "aliases": [
         "escalation_matrix",
@@ -3838,7 +3854,7 @@
     },
     {
       "id": "incident_postmortem",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_incident_postmortem",
       "aliases": [
         "incident_postmortem",
@@ -3889,7 +3905,7 @@
     },
     {
       "id": "incident_report",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_incident_report",
       "aliases": [
         "incident_report",
@@ -4062,7 +4078,7 @@
     },
     {
       "id": "inventory_report",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_inventory_report",
       "aliases": [
         "inventory_report",
@@ -4121,7 +4137,7 @@
     },
     {
       "id": "it_asset_register",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_it_asset_register",
       "aliases": [
         "it_asset_register",
@@ -4172,7 +4188,7 @@
     },
     {
       "id": "kpi_dashboard",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_kpi_dashboard",
       "aliases": [
         "kpi_dashboard",
@@ -6122,7 +6138,7 @@
     },
     {
       "id": "maintenance_log",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_maintenance_log",
       "aliases": [
         "maintenance_log",
@@ -8210,7 +8226,7 @@
     },
     {
       "id": "meeting_minutes",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_meeting_minutes",
       "aliases": [
         "meeting_minutes",
@@ -8373,7 +8389,7 @@
     },
     {
       "id": "onboarding_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_onboarding_checklist",
       "aliases": [
         "onboarding_checklist",
@@ -8493,7 +8509,7 @@
     },
     {
       "id": "ops_access_control_policy",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Access Control Policy",
         "Acesso controle política",
@@ -8553,7 +8569,7 @@
     },
     {
       "id": "ops_audit_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Audit Checklist",
         "Auditoria checklist",
@@ -8613,7 +8629,7 @@
     },
     {
       "id": "ops_bcp_plan",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "BCP Plan",
         "Continuidade plano",
@@ -8673,7 +8689,7 @@
     },
     {
       "id": "ops_business_requirements_document",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Business Requirements Document",
         "Negócio requisitos documento",
@@ -8724,7 +8740,7 @@
     },
     {
       "id": "ops_capacity_plan",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Capacity Plan",
         "Capacity plano",
@@ -8784,7 +8800,7 @@
     },
     {
       "id": "ops_change_request",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Change Request",
         "Mudança solicitação",
@@ -8836,7 +8852,7 @@
     },
     {
       "id": "ops_compliance_runbook",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Compliance Runbook",
         "Conformidade runbook",
@@ -8896,7 +8912,7 @@
     },
     {
       "id": "ops_customer_support_playbook",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Customer Support Playbook",
         "Cliente suporte guia",
@@ -8948,7 +8964,7 @@
     },
     {
       "id": "ops_data_retention_schedule",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Data Retention Schedule",
         "Dados retenção cronograma",
@@ -9000,7 +9016,7 @@
     },
     {
       "id": "ops_disaster_recovery_plan",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Disaster Recovery Plan",
         "Desastre recovery plano",
@@ -9060,7 +9076,7 @@
     },
     {
       "id": "ops_escalation_matrix",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Escalation Matrix",
         "Escalonamento matriz",
@@ -9112,7 +9128,7 @@
     },
     {
       "id": "ops_incident_postmortem",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Incident Postmortem",
         "Incidente pós-incidente",
@@ -9164,7 +9180,7 @@
     },
     {
       "id": "ops_incident_report",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Incident Report",
         "Incidente relatório",
@@ -9224,7 +9240,7 @@
     },
     {
       "id": "ops_inventory_report",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Inventory Report",
         "Inventário relatório",
@@ -9284,7 +9300,7 @@
     },
     {
       "id": "ops_it_asset_register",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "IT Asset Register",
         "Ti ativo cadastro",
@@ -9336,7 +9352,7 @@
     },
     {
       "id": "ops_kpi_dashboard",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "KPI Dashboard",
         "Kpi painel",
@@ -9396,7 +9412,7 @@
     },
     {
       "id": "ops_maintenance_log",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Maintenance LOG",
         "Manutenção log",
@@ -9448,7 +9464,7 @@
     },
     {
       "id": "ops_meeting_minutes",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Meeting Minutes",
         "Meeting ata",
@@ -9500,7 +9516,7 @@
     },
     {
       "id": "ops_onboarding_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Onboarding Checklist",
         "Integração checklist",
@@ -9560,7 +9576,7 @@
     },
     {
       "id": "ops_policy_manual",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Policy Manual",
         "Política manual",
@@ -9620,7 +9636,7 @@
     },
     {
       "id": "ops_process_map",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Process MAP",
         "Processo map",
@@ -9672,7 +9688,7 @@
     },
     {
       "id": "ops_procurement_request",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Procurement Request",
         "Compras solicitação",
@@ -9724,7 +9740,7 @@
     },
     {
       "id": "ops_project_status_report",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Project Status Report",
         "Projeto status relatório",
@@ -9784,7 +9800,7 @@
     },
     {
       "id": "ops_quality_assurance_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Quality Assurance Checklist",
         "Qualidade assurance checklist",
@@ -9844,7 +9860,7 @@
     },
     {
       "id": "ops_release_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Release Checklist",
         "Liberação checklist",
@@ -9904,7 +9920,7 @@
     },
     {
       "id": "ops_risk_register",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Risk Register",
         "Risco cadastro",
@@ -9956,7 +9972,7 @@
     },
     {
       "id": "ops_runbook",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Runbook",
         "ops_runbook",
@@ -10015,7 +10031,7 @@
     },
     {
       "id": "ops_service_catalog",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Service Catalog",
         "Serviço catálogo",
@@ -10067,7 +10083,7 @@
     },
     {
       "id": "ops_service_level_agreement",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Service Level Agreement",
         "Serviço nível acordo",
@@ -10127,7 +10143,7 @@
     },
     {
       "id": "ops_standard_operating_procedure",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Standard Operating Procedure",
         "Padrão operating procedure",
@@ -10187,7 +10203,7 @@
     },
     {
       "id": "ops_training_manual",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Training Manual",
         "Treinamento manual",
@@ -10239,7 +10255,7 @@
     },
     {
       "id": "ops_vendor_performance_review",
-      "domain": "operations",
+      "domain": "ops",
       "aliases": [
         "Vendor Performance Review",
         "Fornecedor desempenho revisão",
@@ -10415,7 +10431,7 @@
     },
     {
       "id": "policy_manual",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_policy_manual",
       "aliases": [
         "policy_manual",
@@ -10586,7 +10602,7 @@
     },
     {
       "id": "process_map",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_process_map",
       "aliases": [
         "process_map",
@@ -10637,7 +10653,7 @@
     },
     {
       "id": "procurement_request",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_procurement_request",
       "aliases": [
         "procurement_request",
@@ -10743,7 +10759,7 @@
     },
     {
       "id": "project_status_report",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_project_status_report",
       "aliases": [
         "project_status_report",
@@ -10802,7 +10818,7 @@
     },
     {
       "id": "quality_assurance_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_quality_assurance_checklist",
       "aliases": [
         "quality_assurance_checklist",
@@ -10971,7 +10987,7 @@
     },
     {
       "id": "release_checklist",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_release_checklist",
       "aliases": [
         "release_checklist",
@@ -11030,7 +11046,7 @@
     },
     {
       "id": "risk_register",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_risk_register",
       "aliases": [
         "risk_register",
@@ -11081,7 +11097,7 @@
     },
     {
       "id": "runbook",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_runbook",
       "aliases": [
         "runbook",
@@ -11140,7 +11156,7 @@
     },
     {
       "id": "service_catalog",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_service_catalog",
       "aliases": [
         "service_catalog",
@@ -11191,7 +11207,7 @@
     },
     {
       "id": "service_level_agreement",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_service_level_agreement",
       "aliases": [
         "service_level_agreement",
@@ -11307,7 +11323,7 @@
     },
     {
       "id": "standard_operating_procedure",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_standard_operating_procedure",
       "aliases": [
         "standard_operating_procedure",
@@ -11472,7 +11488,7 @@
     },
     {
       "id": "training_manual",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_training_manual",
       "aliases": [
         "training_manual",
@@ -11698,7 +11714,7 @@
     },
     {
       "id": "vendor_performance_review",
-      "domain": "operations",
+      "domain": "ops",
       "canonicalId": "ops_vendor_performance_review",
       "aliases": [
         "vendor_performance_review",
@@ -13268,5 +13284,21 @@
         "docx"
       ]
     }
-  ]
+  ],
+  "tests": {
+    "domainNormalizationExamples": [
+      {
+        "input": "operations",
+        "expected": "ops"
+      },
+      {
+        "input": "ops",
+        "expected": "ops"
+      },
+      {
+        "input": "finance",
+        "expected": "finance"
+      }
+    ]
+  }
 }

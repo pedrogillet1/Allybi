@@ -47,6 +47,12 @@ export interface DocumentCapabilities {
   };
   alwaysConfirmOperators: string[];
   viewerModeRules: Record<string, unknown>;
+  connectorPermissions: {
+    enabled: boolean;
+    viewerModeBlocksConnectorFallback: boolean;
+    requireExplicitSendClick: boolean;
+    actions: Record<string, unknown>;
+  };
 }
 
 export function buildDocumentCapabilities(input: {
@@ -56,6 +62,10 @@ export function buildDocumentCapabilities(input: {
 }): DocumentCapabilities {
   const banks = loadAllybiBanks();
   const capsBank = banks.capabilities || {};
+  const connectorPermissions =
+    banks.connectorPermissions && typeof banks.connectorPermissions === "object"
+      ? banks.connectorPermissions
+      : {};
   const allOps =
     capsBank.operators && typeof capsBank.operators === "object"
       ? capsBank.operators
@@ -113,5 +123,17 @@ export function buildDocumentCapabilities(input: {
       capsBank.viewerModeRules && typeof capsBank.viewerModeRules === "object"
         ? capsBank.viewerModeRules
         : {},
+    connectorPermissions: {
+      enabled: connectorPermissions?.config?.enabled !== false,
+      viewerModeBlocksConnectorFallback:
+        connectorPermissions?.config?.viewerModeBlocksConnectorFallback === true,
+      requireExplicitSendClick:
+        connectorPermissions?.config?.requireExplicitSendClick === true,
+      actions:
+        connectorPermissions?.actions &&
+        typeof connectorPermissions.actions === "object"
+          ? connectorPermissions.actions
+          : {},
+    },
   };
 }

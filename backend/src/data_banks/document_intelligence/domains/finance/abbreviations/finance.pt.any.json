@@ -36,6 +36,27 @@
     { "abbr": "TIR", "expansion": "Taxa Interna de Retorno" },
     { "abbr": "VPL", "expansion": "Valor Presente Líquido" },
     { "abbr": "YoY", "expansion": "Ano contra Ano" },
-    { "abbr": "YTD", "expansion": "Acumulado no Ano" }
+    { "abbr": "YTD", "expansion": "Acumulado no Ano" },
+    { "abbr": "CP", "expansion": "Contas a Pagar" },
+    { "abbr": "CR", "expansion": "Contas a Receber" },
+    { "abbr": "D/E", "expansion": "Relação Dívida/Patrimônio" },
+    { "abbr": "ICSD", "expansion": "Índice de Cobertura do Serviço da Dívida" },
+    { "abbr": "VE", "expansion": "Valor da Empresa" },
+    { "abbr": "FP&A", "expansion": "Planejamento e Análise Financeira" },
+    { "abbr": "AF", "expansion": "Ano Fiscal" },
+    { "abbr": "GAAP", "expansion": "Princípios Contábeis Geralmente Aceitos" },
+    { "abbr": "IPO", "expansion": "Oferta Pública Inicial" },
+    { "abbr": "U12M", "expansion": "Últimos Doze Meses" },
+    { "abbr": "F&A", "expansion": "Fusões e Aquisições" },
+    { "abbr": "RDA", "expansion": "Relatório da Administração" },
+    { "abbr": "NAV", "expansion": "Valor Patrimonial Líquido" },
+    { "abbr": "ROL", "expansion": "Resultado Operacional Líquido" },
+    { "abbr": "CCL", "expansion": "Capital Circulante Líquido" },
+    { "abbr": "P/L", "expansion": "Relação Preço/Lucro" },
+    { "abbr": "AI", "expansion": "Ativo Imobilizado" },
+    { "abbr": "ROA", "expansion": "Retorno sobre Ativos" },
+    { "abbr": "ROIC", "expansion": "Retorno sobre Capital Investido" },
+    { "abbr": "DVA", "expansion": "Despesas com Vendas, Gerais e Administrativas" },
+    { "abbr": "WACC", "expansion": "Custo Médio Ponderado de Capital" }
   ]
 }

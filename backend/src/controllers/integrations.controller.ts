@@ -239,8 +239,43 @@ function mapHandlerError(error: string): { code: string; status: number } {
     return { code: "TOKEN_ERROR", status: 401 };
   if (e.includes("not authenticated") || e.includes("unauthorized"))
     return { code: "AUTH_ERROR", status: 401 };
+  if (e.includes("timed out")) return { code: "INTEGRATION_TIMEOUT", status: 504 };
+  if (e.includes("attachment")) return { code: "ATTACHMENT_INVALID", status: 400 };
+  if (e.includes("query is required"))
+    return { code: "QUERY_REQUIRED", status: 400 };
   // Server-side failures (API errors, sync failures) should be 500, not 400
   return { code: "INTEGRATION_ERROR", status: 500 };
+}
+
+function resolveConnectorHttpTimeoutMs(): number {
+  const raw = Number(process.env.CONNECTOR_HTTP_OP_TIMEOUT_MS);
+  if (!Number.isFinite(raw)) return 20_000;
+  const normalized = Math.floor(raw);
+  return Math.max(1_000, Math.min(120_000, normalized));
+}
+
+async function withConnectorHttpTimeout<T>(
+  label: string,
+  run: () => Promise<T>,
+): Promise<T> {
+  const timeoutMs = resolveConnectorHttpTimeoutMs();
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  return new Promise<T>((resolve, reject) => {
+    timer = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${timeoutMs}ms.`));
+    }, timeoutMs);
+    if (typeof (timer as any)?.unref === "function") {
+      (timer as any).unref();
+    }
+
+    run()
+      .then(resolve, reject)
+      .finally(() => {
+        if (timer) clearTimeout(timer);
+        timer = null;
+      });
+  });
 }
 
 export class IntegrationsController {
@@ -578,13 +613,23 @@ export class IntegrationsController {
       ? Math.min(Math.max(Math.floor(limitRaw), 1), 50)
       : 10;
 
-    const result = await this.connectorHandler.execute({
-      action: "search",
-      provider: providerRaw,
-      context,
-      query,
-      limit,
-    });
+    let result;
+    try {
+      result = await withConnectorHttpTimeout(`${providerRaw} search`, () =>
+        this.connectorHandler.execute({
+          action: "search",
+          provider: providerRaw,
+          context,
+          query,
+          limit,
+        }),
+      );
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : "Connector search timed out.";
+      const mapped = mapHandlerError(message);
+      return sendErr(res, mapped.code, message, mapped.status);
+    }
 
     if (!result.ok) {
       const mapped = mapHandlerError(result.error || "search failed");
@@ -600,6 +645,7 @@ export class IntegrationsController {
       provider: providerRaw,
       hits: result.hits ?? [],
       total: result.hits?.length ?? 0,
+      source: asString(result.data?.source) || null,
     });
   };
 
@@ -670,17 +716,27 @@ export class IntegrationsController {
         400,
       );
 
-    const result = await this.connectorHandler.execute({
-      action: "send",
-      provider: providerRaw,
-      context,
-      to,
-      subject,
-      body: emailBody,
-      confirmationId: confirmationTokenRaw,
-      cc,
-      bcc,
-    });
+    let result;
+    try {
+      result = await withConnectorHttpTimeout(`${providerRaw} send`, () =>
+        this.connectorHandler.execute({
+          action: "send",
+          provider: providerRaw,
+          context,
+          to,
+          subject,
+          body: emailBody,
+          confirmationId: confirmationTokenRaw,
+          cc,
+          bcc,
+          attachmentDocumentIds: confirmed.attachmentDocumentIds,
+        }),
+      );
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to send email.";
+      const mapped = mapHandlerError(message);
+      return sendErr(res, mapped.code, message, mapped.status);
+    }
 
     if (!result.ok) {
       const mapped = mapHandlerError(result.error || "send failed");

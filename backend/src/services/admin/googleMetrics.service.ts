@@ -181,8 +181,11 @@ export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
     if (OCR_ERROR_OUTCOMES.has(outcome)) ocrErrors += 1;
 
     if (used) {
-      const normalizedConfidence = normalizeConfidencePercent(event.ocrConfidence);
-      if (normalizedConfidence !== null) confidenceValues.push(normalizedConfidence);
+      const normalizedConfidence = normalizeConfidencePercent(
+        event.ocrConfidence,
+      );
+      if (normalizedConfidence !== null)
+        confidenceValues.push(normalizedConfidence);
     }
   }
 

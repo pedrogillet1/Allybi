@@ -75,7 +75,10 @@ type ChunkRow = {
 let embeddingsServiceSingleton: EmbeddingsService | null | undefined;
 let chunkCryptoServiceSingleton: ChunkCryptoService | null | undefined;
 
-function isRuntimeFlagEnabled(flagName: string, defaultValue: boolean): boolean {
+function isRuntimeFlagEnabled(
+  flagName: string,
+  defaultValue: boolean,
+): boolean {
   const raw = String(process.env[flagName] || "")
     .trim()
     .toLowerCase();
@@ -114,7 +117,8 @@ function uniq(values: string[]): string[] {
 }
 
 function getEmbeddingsServiceSafe(): EmbeddingsService | null {
-  if (embeddingsServiceSingleton !== undefined) return embeddingsServiceSingleton;
+  if (embeddingsServiceSingleton !== undefined)
+    return embeddingsServiceSingleton;
   try {
     embeddingsServiceSingleton = new EmbeddingsService();
   } catch {
@@ -124,7 +128,8 @@ function getEmbeddingsServiceSafe(): EmbeddingsService | null {
 }
 
 function getChunkCryptoServiceSafe(): ChunkCryptoService | null {
-  if (chunkCryptoServiceSingleton !== undefined) return chunkCryptoServiceSingleton;
+  if (chunkCryptoServiceSingleton !== undefined)
+    return chunkCryptoServiceSingleton;
   try {
     const encryption = new EncryptionService();
     const envelope = new EnvelopeService(encryption);
@@ -759,7 +764,10 @@ class PrismaRetrievalUserAdapter
         requestedDocIds[0],
       );
     } else if (requestedDocIds.length > 1) {
-      const perDocTopK = Math.max(Math.ceil(effectiveTopK / requestedDocIds.length), 6);
+      const perDocTopK = Math.max(
+        Math.ceil(effectiveTopK / requestedDocIds.length),
+        6,
+      );
       const grouped = await Promise.all(
         requestedDocIds.map((docId) =>
           pineconeService.searchSimilarChunks(
@@ -792,9 +800,9 @@ class PrismaRetrievalUserAdapter
       const prev = deduped.get(key);
       if (!prev || hit.similarity > prev.similarity) deduped.set(key, hit);
     }
-    const semanticHydrated = await this.resolveSemanticFallbackChunks(
-      [...deduped.values()],
-    );
+    const semanticHydrated = await this.resolveSemanticFallbackChunks([
+      ...deduped.values(),
+    ]);
 
     const normalized = [...deduped.values()]
       .map((hit) => {
@@ -851,7 +859,9 @@ class PrismaRetrievalUserAdapter
     return normalized.slice(0, requestedK);
   }
 
-  private async resolveChunkTexts(rows: ChunkRow[]): Promise<Map<string, string>> {
+  private async resolveChunkTexts(
+    rows: ChunkRow[],
+  ): Promise<Map<string, string>> {
     const out = new Map<string, string>();
     if (!rows.length) return out;
 
@@ -903,7 +913,9 @@ class PrismaRetrievalUserAdapter
       content: string;
       metadata: Record<string, any>;
     }>,
-  ): Promise<Map<string, { chunkId: string; text: string; page: number | null }>> {
+  ): Promise<
+    Map<string, { chunkId: string; text: string; page: number | null }>
+  > {
     const needsHydration = new Map<string, number[]>();
     for (const hit of hits) {
       const md = (hit.metadata || {}) as Record<string, unknown>;

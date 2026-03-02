@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "medical_report_ontology",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Medical report ontology with panels, abbreviations, and interpretation anchors.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "medical"
+    "domain": "medical",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "highest_confidence"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "medical",
   "definitions": [
@@ -7158,7 +7173,21 @@
       "missingQuestions": [
         "Does ABG have an alternate meaning in this report?",
         "ABG tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 179,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_alp",
@@ -7187,7 +7216,21 @@
       "missingQuestions": [
         "Does ALP have an alternate meaning in this report?",
         "ALP tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 180,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_alt",
@@ -7216,7 +7259,21 @@
       "missingQuestions": [
         "Does ALT have an alternate meaning in this report?",
         "ALT tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 181,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ams",
@@ -7245,7 +7302,21 @@
       "missingQuestions": [
         "Does AMS have an alternate meaning in this report?",
         "AMS tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 182,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_anc",
@@ -7274,7 +7345,21 @@
       "missingQuestions": [
         "Does ANC have an alternate meaning in this report?",
         "ANC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 183,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_aptt",
@@ -7303,7 +7388,21 @@
       "missingQuestions": [
         "Does aPTT have an alternate meaning in this report?",
         "aPTT tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 184,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ast",
@@ -7332,7 +7431,21 @@
       "missingQuestions": [
         "Does AST have an alternate meaning in this report?",
         "AST tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 185,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_bid",
@@ -7361,7 +7474,21 @@
       "missingQuestions": [
         "Does BID have an alternate meaning in this report?",
         "BID tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 186,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_bmp",
@@ -7390,7 +7517,21 @@
       "missingQuestions": [
         "Does BMP have an alternate meaning in this report?",
         "BMP tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 187,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_bnp",
@@ -7419,7 +7560,21 @@
       "missingQuestions": [
         "Does BNP have an alternate meaning in this report?",
         "BNP tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 188,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_bun",
@@ -7448,7 +7603,21 @@
       "missingQuestions": [
         "Does BUN have an alternate meaning in this report?",
         "BUN tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 189,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_cbc",
@@ -7477,7 +7646,21 @@
       "missingQuestions": [
         "Does CBC have an alternate meaning in this report?",
         "CBC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 190,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ck",
@@ -7506,7 +7689,21 @@
       "missingQuestions": [
         "Does CK have an alternate meaning in this report?",
         "CK tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 191,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ck_mb",
@@ -7535,7 +7732,21 @@
       "missingQuestions": [
         "Does CK-MB have an alternate meaning in this report?",
         "CK-MB tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 192,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_cmp",
@@ -7564,7 +7775,21 @@
       "missingQuestions": [
         "Does CMP have an alternate meaning in this report?",
         "CMP tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 193,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_cp",
@@ -7593,7 +7818,21 @@
       "missingQuestions": [
         "Does CP have an alternate meaning in this report?",
         "CP tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 194,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_crp",
@@ -7622,7 +7861,21 @@
       "missingQuestions": [
         "Does CRP have an alternate meaning in this report?",
         "CRP tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 195,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ct",
@@ -7651,7 +7904,21 @@
       "missingQuestions": [
         "Does CT have an alternate meaning in this report?",
         "CT tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 196,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_cxr",
@@ -7680,7 +7947,21 @@
       "missingQuestions": [
         "Does CXR have an alternate meaning in this report?",
         "CXR tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 197,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_d_dimer",
@@ -7709,7 +7990,21 @@
       "missingQuestions": [
         "Does D-Dimer have an alternate meaning in this report?",
         "D-Dimer tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 198,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_dnr",
@@ -7738,7 +8033,21 @@
       "missingQuestions": [
         "Does DNR have an alternate meaning in this report?",
         "DNR tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 199,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_dx",
@@ -7767,7 +8076,21 @@
       "missingQuestions": [
         "Does Dx have an alternate meaning in this report?",
         "Dx tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 200,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ecg",
@@ -7796,7 +8119,21 @@
       "missingQuestions": [
         "Does ECG have an alternate meaning in this report?",
         "ECG tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 201,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_echo",
@@ -7825,7 +8162,21 @@
       "missingQuestions": [
         "Does ECHO have an alternate meaning in this report?",
         "ECHO tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 202,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ed",
@@ -7854,7 +8205,21 @@
       "missingQuestions": [
         "Does ED have an alternate meaning in this report?",
         "ED tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 203,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_eeg",
@@ -7883,7 +8248,21 @@
       "missingQuestions": [
         "Does EEG have an alternate meaning in this report?",
         "EEG tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 204,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_egfr",
@@ -7912,7 +8291,21 @@
       "missingQuestions": [
         "Does eGFR have an alternate meaning in this report?",
         "eGFR tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 205,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_esr",
@@ -7941,7 +8334,21 @@
       "missingQuestions": [
         "Does ESR have an alternate meaning in this report?",
         "ESR tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 206,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ft3",
@@ -7970,7 +8377,21 @@
       "missingQuestions": [
         "Does fT3 have an alternate meaning in this report?",
         "fT3 tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 207,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ft4",
@@ -7999,7 +8420,21 @@
       "missingQuestions": [
         "Does fT4 have an alternate meaning in this report?",
         "fT4 tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 208,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_hba1c",
@@ -8028,7 +8463,21 @@
       "missingQuestions": [
         "Does HbA1c have an alternate meaning in this report?",
         "HbA1c tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 209,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_hco3",
@@ -8057,7 +8506,21 @@
       "missingQuestions": [
         "Does HCO3 have an alternate meaning in this report?",
         "HCO3 tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 210,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_hct",
@@ -8086,7 +8549,21 @@
       "missingQuestions": [
         "Does HCT have an alternate meaning in this report?",
         "HCT tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 211,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_hgb",
@@ -8115,7 +8592,21 @@
       "missingQuestions": [
         "Does HGB have an alternate meaning in this report?",
         "HGB tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 212,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_hx",
@@ -8144,7 +8635,21 @@
       "missingQuestions": [
         "Does Hx have an alternate meaning in this report?",
         "Hx tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 213,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_icu",
@@ -8173,7 +8678,21 @@
       "missingQuestions": [
         "Does ICU have an alternate meaning in this report?",
         "ICU tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 214,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_im",
@@ -8202,7 +8721,21 @@
       "missingQuestions": [
         "Does IM have an alternate meaning in this report?",
         "IM tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 215,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_inr",
@@ -8231,7 +8764,21 @@
       "missingQuestions": [
         "Does INR have an alternate meaning in this report?",
         "INR tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 216,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_iv",
@@ -8260,7 +8807,21 @@
       "missingQuestions": [
         "Does IV have an alternate meaning in this report?",
         "IV tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 217,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_loc",
@@ -8289,7 +8850,21 @@
       "missingQuestions": [
         "Does LOC have an alternate meaning in this report?",
         "LOC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 218,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_mch",
@@ -8318,7 +8893,21 @@
       "missingQuestions": [
         "Does MCH have an alternate meaning in this report?",
         "MCH tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 219,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_mchc",
@@ -8347,7 +8936,21 @@
       "missingQuestions": [
         "Does MCHC have an alternate meaning in this report?",
         "MCHC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 220,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_mcv",
@@ -8376,7 +8979,21 @@
       "missingQuestions": [
         "Does MCV have an alternate meaning in this report?",
         "MCV tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 221,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_mri",
@@ -8405,7 +9022,21 @@
       "missingQuestions": [
         "Does MRI have an alternate meaning in this report?",
         "MRI tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 222,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_npo",
@@ -8434,7 +9065,21 @@
       "missingQuestions": [
         "Does NPO have an alternate meaning in this report?",
         "NPO tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 223,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_nt_probnp",
@@ -8463,7 +9108,21 @@
       "missingQuestions": [
         "Does NT-proBNP have an alternate meaning in this report?",
         "NT-proBNP tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 224,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_opd",
@@ -8492,7 +9151,21 @@
       "missingQuestions": [
         "Does OPD have an alternate meaning in this report?",
         "OPD tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 225,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_paco2",
@@ -8521,7 +9194,21 @@
       "missingQuestions": [
         "Does PaCO2 have an alternate meaning in this report?",
         "PaCO2 tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 226,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_pao2",
@@ -8550,7 +9237,21 @@
       "missingQuestions": [
         "Does PaO2 have an alternate meaning in this report?",
         "PaO2 tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 227,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_pcr",
@@ -8579,7 +9280,21 @@
       "missingQuestions": [
         "Does PCR have an alternate meaning in this report?",
         "PCR tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 228,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_plt",
@@ -8608,7 +9323,21 @@
       "missingQuestions": [
         "Does PLT have an alternate meaning in this report?",
         "PLT tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 229,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_po",
@@ -8637,7 +9366,21 @@
       "missingQuestions": [
         "Does PO have an alternate meaning in this report?",
         "PO tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 230,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_prn",
@@ -8666,7 +9409,21 @@
       "missingQuestions": [
         "Does PRN have an alternate meaning in this report?",
         "PRN tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 231,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_pt",
@@ -8695,7 +9452,21 @@
       "missingQuestions": [
         "Does PT have an alternate meaning in this report?",
         "PT tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 232,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_q6h",
@@ -8724,7 +9495,21 @@
       "missingQuestions": [
         "Does q6h have an alternate meaning in this report?",
         "q6h tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 233,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_qid",
@@ -8753,7 +9538,21 @@
       "missingQuestions": [
         "Does QID have an alternate meaning in this report?",
         "QID tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 234,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_rbc",
@@ -8782,7 +9581,21 @@
       "missingQuestions": [
         "Does RBC have an alternate meaning in this report?",
         "RBC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 235,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_rdw",
@@ -8811,7 +9624,21 @@
       "missingQuestions": [
         "Does RDW have an alternate meaning in this report?",
         "RDW tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 236,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_rx",
@@ -8840,7 +9667,21 @@
       "missingQuestions": [
         "Does Rx have an alternate meaning in this report?",
         "Rx tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 237,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_sc",
@@ -8869,7 +9710,21 @@
       "missingQuestions": [
         "Does SC have an alternate meaning in this report?",
         "SC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 238,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_sob",
@@ -8898,7 +9753,21 @@
       "missingQuestions": [
         "Does SOB have an alternate meaning in this report?",
         "SOB tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 239,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_spo2",
@@ -8927,7 +9796,21 @@
       "missingQuestions": [
         "Does SpO2 have an alternate meaning in this report?",
         "SpO2 tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 240,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_sx",
@@ -8956,7 +9839,21 @@
       "missingQuestions": [
         "Does Sx have an alternate meaning in this report?",
         "Sx tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 241,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_tibc",
@@ -8985,7 +9882,21 @@
       "missingQuestions": [
         "Does TIBC have an alternate meaning in this report?",
         "TIBC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 242,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_tid",
@@ -9014,7 +9925,21 @@
       "missingQuestions": [
         "Does TID have an alternate meaning in this report?",
         "TID tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 243,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_tsh",
@@ -9043,7 +9968,21 @@
       "missingQuestions": [
         "Does TSH have an alternate meaning in this report?",
         "TSH tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 244,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_tx",
@@ -9072,7 +10011,21 @@
       "missingQuestions": [
         "Does Tx have an alternate meaning in this report?",
         "Tx tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 245,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_ua",
@@ -9101,7 +10054,21 @@
       "missingQuestions": [
         "Does UA have an alternate meaning in this report?",
         "UA tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 246,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_us",
@@ -9130,7 +10097,21 @@
       "missingQuestions": [
         "Does US have an alternate meaning in this report?",
         "US tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 247,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_abbreviation_expansion_wbc",
@@ -9159,7 +10140,21 @@
       "missingQuestions": [
         "Does WBC have an alternate meaning in this report?",
         "WBC tem significado alternativo neste relatório?"
-      ]
+      ],
+      "precedence": 248,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:low",
+          "ruleType:abbreviation_expansion",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_imaging_alert_acute_infarct_sign",
@@ -9193,7 +10188,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_aortic_aneurysm",
@@ -9228,7 +10237,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_aortic_dissection_sign",
@@ -9262,7 +10285,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_appendicitis_features",
@@ -9296,7 +10333,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_atelectasis",
@@ -9330,7 +10381,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_bowel_obstruction_pattern",
@@ -9364,7 +10429,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_cardiomegaly",
@@ -9398,7 +10477,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_cerebral_edema",
@@ -9432,7 +10525,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_cholecystitis_features",
@@ -9466,7 +10573,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_consolidation",
@@ -9500,7 +10621,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_disc_herniation",
@@ -9534,7 +10669,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_dvt_sign",
@@ -9567,7 +10716,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_fracture_displaced",
@@ -9601,7 +10764,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_free_air_abdomen",
@@ -9635,7 +10812,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_gallstones",
@@ -9669,7 +10860,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_ground_glass_opacity",
@@ -9702,7 +10907,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_hepatic_mass",
@@ -9737,7 +10956,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_hepatic_steatosis",
@@ -9772,7 +11005,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_hydrocephalus",
@@ -9806,7 +11053,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_hydronephrosis",
@@ -9840,7 +11101,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_intracranial_hemorrhage",
@@ -9874,7 +11149,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_joint_effusion",
@@ -9909,7 +11198,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_lymphadenopathy",
@@ -9944,7 +11247,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_mass_effect",
@@ -9978,7 +11295,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_mediastinal_widening",
@@ -10012,7 +11343,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_metastatic_pattern",
@@ -10047,7 +11392,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_midline_shift",
@@ -10081,7 +11440,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_osteomyelitis_sign",
@@ -10116,7 +11489,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_pericardial_effusion",
@@ -10150,7 +11537,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_pleural_effusion",
@@ -10185,7 +11586,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_pneumothorax",
@@ -10219,7 +11634,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_pulmonary_edema",
@@ -10253,7 +11682,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_pulmonary_embolism_sign",
@@ -10286,7 +11729,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_reduced_ejection_fraction",
@@ -10319,7 +11776,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_renal_calculus",
@@ -10353,7 +11824,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_sinus_opacification",
@@ -10387,7 +11872,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_soft_tissue_abscess",
@@ -10422,7 +11921,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_spinal_cord_compression",
@@ -10456,7 +11969,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_valvular_regurgitation",
@@ -10489,7 +12016,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_imaging_alert_valvular_stenosis",
@@ -10522,7 +12063,21 @@
         "Este achado é novo em comparação a exames anteriores?",
         "Are associated symptoms documented in the report?",
         "Os sintomas associados estão documentados no relatório?"
-      ]
+      ],
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:imaging_redflag_detection",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_active_ingredient",
@@ -10555,7 +12110,21 @@
       "missingQuestions": [
         "Is active ingredient explicitly documented?",
         "Princípio ativo está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_adherence_status",
@@ -10588,7 +12157,21 @@
       "missingQuestions": [
         "Is adherence status explicitly documented?",
         "Status de adesão está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_allergy_alert",
@@ -10621,7 +12204,21 @@
       "missingQuestions": [
         "Is allergy alert explicitly documented?",
         "Alerta de alergia está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_brand_name",
@@ -10654,7 +12251,21 @@
       "missingQuestions": [
         "Is brand name explicitly documented?",
         "Nome comercial está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_contraindications",
@@ -10687,7 +12298,21 @@
       "missingQuestions": [
         "Is contraindications explicitly documented?",
         "Contraindicações está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_discontinue_reason",
@@ -10720,7 +12345,21 @@
       "missingQuestions": [
         "Is discontinuation reason explicitly documented?",
         "Motivo de descontinuação está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_dispensing_pharmacy",
@@ -10753,7 +12392,21 @@
       "missingQuestions": [
         "Is dispensing pharmacy explicitly documented?",
         "Farmácia dispensadora está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_dose_form",
@@ -10786,7 +12439,21 @@
       "missingQuestions": [
         "Is dose form explicitly documented?",
         "Forma farmacêutica está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_dose_unit",
@@ -10819,7 +12486,21 @@
       "missingQuestions": [
         "Is dose unit explicitly documented?",
         "Unidade da dose está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_dose_value",
@@ -10852,7 +12533,21 @@
       "missingQuestions": [
         "Is dose value explicitly documented?",
         "Valor da dose está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_duration",
@@ -10885,7 +12580,21 @@
       "missingQuestions": [
         "Is duration explicitly documented?",
         "Duração está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_end_date",
@@ -10918,7 +12627,21 @@
       "missingQuestions": [
         "Is end date explicitly documented?",
         "Data de término está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_frequency",
@@ -10951,7 +12674,21 @@
       "missingQuestions": [
         "Is frequency explicitly documented?",
         "Frequência está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_hepatic_adjustment",
@@ -10984,7 +12721,21 @@
       "missingQuestions": [
         "Is hepatic dose adjustment explicitly documented?",
         "Ajuste hepático de dose está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_high_alert_medication",
@@ -11017,7 +12768,21 @@
       "missingQuestions": [
         "Is high-alert medication explicitly documented?",
         "Medicação de alto risco está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_hold_reason",
@@ -11050,7 +12815,21 @@
       "missingQuestions": [
         "Is hold reason explicitly documented?",
         "Motivo de suspensão está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_indication",
@@ -11083,7 +12862,21 @@
       "missingQuestions": [
         "Is indication explicitly documented?",
         "Indicação está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_interaction_warning",
@@ -11116,7 +12909,21 @@
       "missingQuestions": [
         "Is interaction warning explicitly documented?",
         "Alerta de interação está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_last_administered_at",
@@ -11149,7 +12956,21 @@
       "missingQuestions": [
         "Is last administered at explicitly documented?",
         "Última administração em está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_max_daily_dose",
@@ -11182,7 +13003,21 @@
       "missingQuestions": [
         "Is maximum daily dose explicitly documented?",
         "Dose máxima diária está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_medication_reconciliation_status",
@@ -11215,7 +13050,21 @@
       "missingQuestions": [
         "Is medication reconciliation status explicitly documented?",
         "Status de reconciliação medicamentosa está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_monitoring_parameter",
@@ -11248,7 +13097,21 @@
       "missingQuestions": [
         "Is monitoring parameter explicitly documented?",
         "Parâmetro de monitoramento está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_next_due_at",
@@ -11281,7 +13144,21 @@
       "missingQuestions": [
         "Is next dose due at explicitly documented?",
         "Próxima dose prevista em está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_patient_instruction",
@@ -11314,7 +13191,21 @@
       "missingQuestions": [
         "Is patient instruction explicitly documented?",
         "Orientação ao paciente está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_prescriber",
@@ -11347,7 +13238,21 @@
       "missingQuestions": [
         "Is prescriber explicitly documented?",
         "Prescritor está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_renal_adjustment",
@@ -11380,7 +13285,21 @@
       "missingQuestions": [
         "Is renal dose adjustment explicitly documented?",
         "Ajuste renal de dose está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_route",
@@ -11413,7 +13332,21 @@
       "missingQuestions": [
         "Is administration route explicitly documented?",
         "Via de administração está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_schedule",
@@ -11446,7 +13379,21 @@
       "missingQuestions": [
         "Is schedule explicitly documented?",
         "Horário está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_start_date",
@@ -11479,7 +13426,21 @@
       "missingQuestions": [
         "Is start date explicitly documented?",
         "Data de início está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_medication_field_validation_taper_plan",
@@ -11512,7 +13473,21 @@
       "missingQuestions": [
         "Is taper plan explicitly documented?",
         "Plano de desmame está explicitamente documentado(a)?"
-      ]
+      ],
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:medication_field_validation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_abg_panel",
@@ -11550,7 +13525,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_bmp_panel",
@@ -11591,7 +13580,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_cardiac_panel",
@@ -11629,7 +13632,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_cbc_panel",
@@ -11671,7 +13688,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_cmp_panel",
@@ -11718,7 +13749,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_coagulation_panel",
@@ -11755,7 +13800,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_diabetes_panel",
@@ -11792,7 +13851,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_ed_triage_panel",
@@ -11829,7 +13902,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_electrolyte_panel",
@@ -11869,7 +13956,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_hematology_diff_panel",
@@ -11907,7 +14008,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_icu_daily_panel",
@@ -11945,7 +14060,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_infectious_screen_panel",
@@ -11983,7 +14112,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_inflammatory_panel",
@@ -12020,7 +14163,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_iron_studies_panel",
@@ -12057,7 +14214,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 84,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_lipid_panel",
@@ -12094,7 +14265,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 85,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_liver_panel",
@@ -12134,7 +14319,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 86,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_oncology_monitoring_panel",
@@ -12171,7 +14370,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 87,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_pancreatic_panel",
@@ -12206,7 +14419,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 88,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_pregnancy_panel",
@@ -12242,7 +14469,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 89,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_preop_panel",
@@ -12278,7 +14519,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 90,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_renal_panel",
@@ -12317,7 +14572,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 91,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_sepsis_panel",
@@ -12355,7 +14624,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 92,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_thyroid_panel",
@@ -12391,7 +14674,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 93,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_urinalysis_panel",
@@ -12428,7 +14725,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 94,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_panel_completeness_vitamin_panel",
@@ -12464,7 +14775,21 @@
         "Quais componentes do painel estão ausentes ou inválidos?",
         "Should missing values be repeated before interpretation?",
         "Valores ausentes devem ser repetidos antes da interpretação?"
-      ]
+      ],
+      "precedence": 95,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:panel_completeness",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_range_interpretation_albumin",
@@ -12525,7 +14850,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 96,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_alp",
@@ -12586,7 +14925,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 97,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_alt",
@@ -12647,7 +15000,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 98,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_amylase",
@@ -12708,7 +15075,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 99,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_anti_hcv",
@@ -12769,7 +15150,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 100,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_aptt",
@@ -12830,7 +15225,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 101,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ast",
@@ -12891,7 +15300,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 102,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_basophils_abs",
@@ -12952,7 +15375,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 103,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_beta_hcg",
@@ -13013,7 +15450,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 104,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_bicarbonate",
@@ -13074,7 +15525,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 105,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_bilirubin_direct",
@@ -13135,7 +15600,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 106,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_bilirubin_total",
@@ -13196,7 +15675,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 107,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_bnp",
@@ -13257,7 +15750,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 108,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_bun",
@@ -13318,7 +15825,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 109,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_calcium_ionized",
@@ -13379,7 +15900,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 110,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_calcium_total",
@@ -13440,7 +15975,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 111,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_chloride",
@@ -13501,7 +16050,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 112,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_cholesterol_total",
@@ -13562,7 +16125,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 113,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ck_total",
@@ -13623,7 +16200,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 114,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ckmb",
@@ -13684,7 +16275,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 115,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_covid_pcr",
@@ -13745,7 +16350,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 116,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_creatinine",
@@ -13806,7 +16425,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 117,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_crp",
@@ -13867,7 +16500,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 118,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_culture_blood",
@@ -13928,7 +16575,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 119,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_culture_urine",
@@ -13989,7 +16650,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 120,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_d_dimer",
@@ -14050,7 +16725,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 121,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_egfr",
@@ -14111,7 +16800,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 122,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_eosinophils_abs",
@@ -14172,7 +16875,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 123,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_esr",
@@ -14233,7 +16950,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 124,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ferritin",
@@ -14294,7 +17025,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 125,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_folate",
@@ -14355,7 +17100,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 126,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_free_t3",
@@ -14416,7 +17175,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 127,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_free_t4",
@@ -14477,7 +17250,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 128,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_glucose_fasting",
@@ -14538,7 +17325,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 129,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_hba1c",
@@ -14599,7 +17400,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 130,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_hbsag",
@@ -14660,7 +17475,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 131,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_hco3_arterial",
@@ -14721,7 +17550,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 132,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_hdl",
@@ -14782,7 +17625,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 133,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_hematocrit",
@@ -14843,7 +17700,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 134,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_hemoglobin",
@@ -14904,7 +17775,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 135,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_hiv_agab",
@@ -14965,7 +17850,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 136,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_influenza_pcr",
@@ -15026,7 +17925,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 137,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_inr",
@@ -15087,7 +18000,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 138,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_iron_serum",
@@ -15148,7 +18075,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 139,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ketones",
@@ -15209,7 +18150,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 140,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_lactate",
@@ -15270,7 +18225,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 141,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ldl",
@@ -15331,7 +18300,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 142,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_lipase",
@@ -15392,7 +18375,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 143,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_lymphocytes_abs",
@@ -15453,7 +18450,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 144,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_magnesium",
@@ -15514,7 +18525,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 145,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_mch",
@@ -15575,7 +18600,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 146,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_mchc",
@@ -15636,7 +18675,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 147,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_mcv",
@@ -15697,7 +18750,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 148,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_microalbumin_urine",
@@ -15758,7 +18825,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 149,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_monocytes_abs",
@@ -15819,7 +18900,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 150,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_neutrophils_abs",
@@ -15880,7 +18975,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 151,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ntprobnp",
@@ -15941,7 +19050,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 152,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_oxygen_saturation",
@@ -16002,7 +19125,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 153,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_pco2_arterial",
@@ -16063,7 +19200,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 154,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ph_arterial",
@@ -16124,7 +19275,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 155,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_phosphate",
@@ -16185,7 +19350,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 156,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_platelets",
@@ -16246,7 +19425,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 157,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_po2_arterial",
@@ -16307,7 +19500,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 158,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_potassium",
@@ -16368,7 +19575,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 159,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_procalcitonin",
@@ -16429,7 +19650,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 160,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_protein_urine",
@@ -16490,7 +19725,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 161,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_psa",
@@ -16551,7 +19800,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 162,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_pt",
@@ -16612,7 +19875,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 163,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_rbc",
@@ -16673,7 +19950,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 164,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_rdw",
@@ -16734,7 +20025,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 165,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_sodium",
@@ -16795,7 +20100,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 166,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_tibc",
@@ -16856,7 +20175,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 167,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_total_protein",
@@ -16917,7 +20250,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 168,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_transferrin_saturation",
@@ -16978,7 +20325,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 169,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_triglycerides",
@@ -17039,7 +20400,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 170,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_troponin_i",
@@ -17100,7 +20475,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 171,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_troponin_t",
@@ -17161,7 +20550,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 172,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_tsh",
@@ -17222,7 +20625,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 173,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_ua_specific_gravity",
@@ -17283,7 +20700,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 174,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_uric_acid",
@@ -17344,7 +20775,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 175,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_vitamin_b12",
@@ -17405,7 +20850,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 176,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_vitamin_d25",
@@ -17466,7 +20925,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 177,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_range_interpretation_wbc",
@@ -17527,7 +21000,21 @@
         "O horário da coleta foi apropriado para interpretação?",
         "Is there a prior value to compare trend direction?",
         "Existe valor prévio para comparar a direção da tendência?"
-      ]
+      ],
+      "precedence": 178,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:medium",
+          "ruleType:reference_range_interpretation",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     }
   ]
 }

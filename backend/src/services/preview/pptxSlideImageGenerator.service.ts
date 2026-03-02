@@ -64,12 +64,17 @@ export async function generateSlideImages(
   );
 
   try {
+    const pdfArrayBuffer = pdfBuffer.buffer.slice(
+      pdfBuffer.byteOffset,
+      pdfBuffer.byteOffset + pdfBuffer.byteLength,
+    );
+
     // 1. Convert PDF pages to PNG images
     console.log(
       `[SlideImageGen] Converting PDF to PNG images (DPI: ${dpi})...`,
     );
 
-    const pngPages: PngPageOutput[] = await pdfToPng(pdfBuffer, {
+    const pngPages: PngPageOutput[] = await pdfToPng(pdfArrayBuffer, {
       disableFontFace: true,
       useSystemFonts: true,
       viewportScale: dpi / 72,
@@ -92,9 +97,13 @@ export async function generateSlideImages(
       const page = pngPages[i];
       const slideNumber = i + 1;
       const storagePath = getSlideStoragePath(documentId, slideNumber);
+      const pageContent = page.content;
 
       try {
-        await uploadFile(storagePath, page.content, "image/png");
+        if (!pageContent) {
+          throw new Error("PNG page content missing");
+        }
+        await uploadFile(storagePath, pageContent, "image/png");
         uploadedCount++;
 
         const imageUrl = await getSignedUrl(storagePath, signedUrlExpiration);

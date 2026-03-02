@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_ops_abbreviations_en",
+    "version": "1.0.0",
+    "description": "EN abbreviations for operations domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "language": "en"
+  },
+  "domain": "ops",
+  "abbreviations": [
+    {
+      "abbr": "SLA",
+      "expansion": "Service Level Agreement"
+    },
+    {
+      "abbr": "KPI",
+      "expansion": "Key Performance Indicator"
+    },
+    {
+      "abbr": "MTBF",
+      "expansion": "Mean Time Between Failures"
+    },
+    {
+      "abbr": "MTTR",
+      "expansion": "Mean Time To Repair"
+    },
+    {
+      "abbr": "WO",
+      "expansion": "Work Order"
+    },
+    {
+      "abbr": "PM",
+      "expansion": "Preventive Maintenance"
+    },
+    {
+      "abbr": "QC",
+      "expansion": "Quality Control"
+    },
+    {
+      "abbr": "QA",
+      "expansion": "Quality Assurance"
+    },
+    {
+      "abbr": "BOM",
+      "expansion": "Bill of Materials"
+    },
+    {
+      "abbr": "BOL",
+      "expansion": "Bill of Lading"
+    },
+    {
+      "abbr": "PO",
+      "expansion": "Purchase Order"
+    },
+    {
+      "abbr": "MRO",
+      "expansion": "Maintenance, Repair, and Operations"
+    },
+    {
+      "abbr": "ERP",
+      "expansion": "Enterprise Resource Planning"
+    },
+    {
+      "abbr": "OEE",
+      "expansion": "Overall Equipment Effectiveness"
+    },
+    {
+      "abbr": "COGS",
+      "expansion": "Cost of Goods Sold"
+    },
+    {
+      "abbr": "SKU",
+      "expansion": "Stock Keeping Unit"
+    },
+    {
+      "abbr": "WMS",
+      "expansion": "Warehouse Management System"
+    },
+    {
+      "abbr": "TMS",
+      "expansion": "Transportation Management System"
+    },
+    {
+      "abbr": "FIFO",
+      "expansion": "First In, First Out"
+    },
+    {
+      "abbr": "JIT",
+      "expansion": "Just In Time"
+    }
+  ]
+}

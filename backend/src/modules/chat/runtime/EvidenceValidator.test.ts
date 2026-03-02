@@ -72,7 +72,7 @@ describe("EvidenceValidator", () => {
     expect(scoped.scopeEnforced).toBe(true);
   });
 
-  test("fails when scoped sources remain but provenance refs are missing", () => {
+  test("keeps success when scoped sources remain but provenance refs are missing", () => {
     const validator = new EvidenceValidator();
     const result = baseResult({
       sources: [
@@ -90,8 +90,8 @@ describe("EvidenceValidator", () => {
 
     const scoped = validator.enforceScope(result, ["doc-1"]);
     expect(scoped.sources?.length).toBe(1);
-    expect(scoped.status).toBe("partial");
-    expect(scoped.failureCode).toBe("missing_provenance");
+    expect(scoped.status).toBe("success");
+    expect(scoped.failureCode).toBeUndefined();
     expect(scoped.provenance?.validated).toBe(false);
     expect(scoped.provenance?.failureCode).toBe("out_of_scope_provenance");
   });

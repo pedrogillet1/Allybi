@@ -53,6 +53,36 @@ interface FallbackConfig {
   scenarios: FallbackScenario[];
 }
 
+interface FallbackRouterRule {
+  id?: string;
+  when?: {
+    reasonCodeIn?: string[];
+  };
+  do?: {
+    action?: string;
+    telemetryReason?: string;
+  };
+}
+
+interface FallbackRouterConfig {
+  enabled?: boolean;
+  defaults?: {
+    action?: string;
+    telemetryReason?: string;
+  };
+}
+
+interface FallbackRouterBank {
+  config?: FallbackRouterConfig;
+  rules?: FallbackRouterRule[];
+  scenarios?: FallbackScenario[];
+}
+
+export interface FallbackRouterDecision {
+  action: string;
+  telemetryReason: string;
+}
+
 /**
  * Fallback response
  */
@@ -72,6 +102,8 @@ export interface FallbackResponse {
 
 export class FallbackConfigService {
   private scenarios: Map<FallbackScenarioKey, FallbackScenario> = new Map();
+  private routerRules: FallbackRouterRule[] = [];
+  private routerDefaults: FallbackRouterConfig["defaults"] = undefined;
   private isLoaded = false;
   private readonly logger: any;
 
@@ -91,7 +123,7 @@ export class FallbackConfigService {
 
     try {
       this.logger.info("[FallbackConfig] Loading fallbacks from bank loader");
-      const raw = getOptionalBank<any>("fallback_router");
+      const raw = getOptionalBank<FallbackRouterBank>("fallback_router");
       const config: FallbackConfig =
         raw && typeof raw === "object"
           ? (raw as FallbackConfig)
@@ -99,10 +131,14 @@ export class FallbackConfigService {
       const scenarios = Array.isArray(config?.scenarios)
         ? config.scenarios
         : [];
+      const rules = Array.isArray(raw?.rules) ? raw.rules : [];
 
-      if (!scenarios.length) {
+      this.routerRules = rules;
+      this.routerDefaults = raw?.config?.defaults;
+
+      if (!scenarios.length && !rules.length) {
         this.logger.warn(
-          "[FallbackConfig] fallback_router has no scenarios[] contract; continuing with empty fallback scenarios",
+          "[FallbackConfig] fallback_router has no rules[] or scenarios[]; continuing with defaults",
         );
       }
 
@@ -115,7 +151,7 @@ export class FallbackConfigService {
 
       this.isLoaded = true;
       this.logger.info(
-        `[FallbackConfig] Loaded ${loadedCount} fallback scenarios`,
+        `[FallbackConfig] Loaded ${loadedCount} fallback scenarios and ${rules.length} fallback rules`,
       );
 
       // Validate critical scenarios exist
@@ -130,6 +166,21 @@ export class FallbackConfigService {
    * Validate that critical fallback scenarios are present
    */
   private validateCoverage(): void {
+    if (this.routerRules.length > 0) {
+      const hasDefault = this.routerRules.some(
+        (rule) => {
+          const reasonCodes = rule?.when?.reasonCodeIn;
+          return !Array.isArray(reasonCodes) || reasonCodes.length === 0;
+        },
+      );
+      if (!hasDefault) {
+        this.logger.warn(
+          "[FallbackConfig] fallback_router rules[] has no default catch-all rule",
+        );
+      }
+      return;
+    }
+
     const criticalScenarios: FallbackScenarioKey[] = [
       "NO_DOCUMENTS",
       "OUT_OF_SCOPE",
@@ -208,6 +259,44 @@ export class FallbackConfigService {
         style: style.id,
         language,
       },
+    };
+  }
+
+  getRouterDecision(reasonCode: string): FallbackRouterDecision {
+    const normalized = String(reasonCode || "")
+      .trim()
+      .toLowerCase();
+    if (!normalized) {
+      return {
+        action: String(this.routerDefaults?.action || "ask_one_question"),
+        telemetryReason: String(this.routerDefaults?.telemetryReason || "UNKNOWN"),
+      };
+    }
+
+    for (const rule of this.routerRules) {
+      const reasonCodes = Array.isArray(rule?.when?.reasonCodeIn)
+        ? rule.when.reasonCodeIn
+            .map((value) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            )
+            .filter((value) => value.length > 0)
+        : [];
+      if (reasonCodes.length > 0 && !reasonCodes.includes(normalized)) continue;
+
+      const action = String(rule?.do?.action || "").trim();
+      if (!action) continue;
+      const telemetryReason = String(rule?.do?.telemetryReason || "").trim();
+      return {
+        action,
+        telemetryReason: telemetryReason || "UNKNOWN",
+      };
+    }
+
+    return {
+      action: String(this.routerDefaults?.action || "ask_one_question"),
+      telemetryReason: String(this.routerDefaults?.telemetryReason || "UNKNOWN"),
     };
   }
 

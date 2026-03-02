@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "finance_doc_logic",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Finance document logic for budget/forecast/actual precedence, evidence controls, and period/currency/entity guardrails.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "finance"
+    "domain": "finance",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "finance",
   "definitions": [
@@ -2460,6 +2475,23 @@
           "en": "Should I prioritize actuals over budget/forecast for this factual answer?",
           "pt": "Devo priorizar realizado sobre orçamento/previsão para esta resposta factual?"
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [
+        "rule_finance_doc_budget_over_actual_for_targets"
+      ],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:actuals_have_precedence_for_factual_statements",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2501,6 +2533,23 @@
           "en": "Should target values come from budget or forecast?",
           "pt": "Os valores de meta devem vir do orçamento ou da previsão?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [
+        "rule_finance_doc_actual_over_plan_for_facts"
+      ],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:budget/plan_has_precedence_for_target_questions",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2541,6 +2590,21 @@
           "en": "Should I treat this document as Actuals File for retrieval priority?",
           "pt": "Devo tratar este documento como Actuals File para prioridade de busca?"
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2581,6 +2645,21 @@
           "en": "Should I treat this document as Allocation Model for retrieval priority?",
           "pt": "Devo tratar este documento como Allocation Model para prioridade de busca?"
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2621,6 +2700,21 @@
           "en": "Should I treat this document as Annual Plan for retrieval priority?",
           "pt": "Devo tratar este documento como Annual Plan para prioridade de busca?"
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2661,6 +2755,21 @@
           "en": "Should I treat this document as Balance Sheet for retrieval priority?",
           "pt": "Devo tratar este documento como Balance Sheet para prioridade de busca?"
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2701,6 +2810,21 @@
           "en": "Should I treat this document as Board Pack for retrieval priority?",
           "pt": "Devo tratar este documento como Board Pack para prioridade de busca?"
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2741,6 +2865,21 @@
           "en": "Should I treat this document as Bookings & Backlog Report for retrieval priority?",
           "pt": "Devo tratar este documento como Bookings & Backlog Report para prioridade de busca?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2781,6 +2920,21 @@
           "en": "Should I treat this document as Budget Assumptions Memo for retrieval priority?",
           "pt": "Devo tratar este documento como Budget Assumptions Memo para prioridade de busca?"
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2821,6 +2975,21 @@
           "en": "Should I treat this document as Budget File for retrieval priority?",
           "pt": "Devo tratar este documento como Budget File para prioridade de busca?"
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2861,6 +3030,23 @@
           "en": "Should I treat this document as Capex Plan for retrieval priority?",
           "pt": "Devo tratar este documento como Capex Plan para prioridade de busca?"
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [
+        "rule_finance_doc_capex_budget_variance"
+      ],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2901,6 +3087,21 @@
           "en": "Should I treat this document as Cash Collections Report for retrieval priority?",
           "pt": "Devo tratar este documento como Cash Collections Report para prioridade de busca?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2941,6 +3142,21 @@
           "en": "Should I treat this document as Cash Flow Statement for retrieval priority?",
           "pt": "Devo tratar este documento como Cash Flow Statement para prioridade de busca?"
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2981,6 +3197,21 @@
           "en": "Should I treat this document as Cost Center Rollup for retrieval priority?",
           "pt": "Devo tratar este documento como Cost Center Rollup para prioridade de busca?"
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3021,6 +3252,21 @@
           "en": "Should I treat this document as Country Report for retrieval priority?",
           "pt": "Devo tratar este documento como Country Report para prioridade de busca?"
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3061,6 +3307,21 @@
           "en": "Should I treat this document as Customer Profitability for retrieval priority?",
           "pt": "Devo tratar este documento como Customer Profitability para prioridade de busca?"
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3101,6 +3362,21 @@
           "en": "Should I treat this document as Debt Covenant Pack for retrieval priority?",
           "pt": "Devo tratar este documento como Debt Covenant Pack para prioridade de busca?"
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3141,6 +3417,21 @@
           "en": "Should I treat this document as Expense Schedule for retrieval priority?",
           "pt": "Devo tratar este documento como Expense Schedule para prioridade de busca?"
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3181,6 +3472,21 @@
           "en": "Should I treat this document as Forecast File for retrieval priority?",
           "pt": "Devo tratar este documento como Forecast File para prioridade de busca?"
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3221,6 +3527,21 @@
           "en": "Should I treat this document as Headcount Report for retrieval priority?",
           "pt": "Devo tratar este documento como Headcount Report para prioridade de busca?"
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3261,6 +3582,21 @@
           "en": "Should I treat this document as Hotel Performance Pack for retrieval priority?",
           "pt": "Devo tratar este documento como Hotel Performance Pack para prioridade de busca?"
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3301,6 +3637,21 @@
           "en": "Should I treat this document as Inventory Turn Report for retrieval priority?",
           "pt": "Devo tratar este documento como Inventory Turn Report para prioridade de busca?"
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3341,6 +3692,21 @@
           "en": "Should I treat this document as Investor Update for retrieval priority?",
           "pt": "Devo tratar este documento como Investor Update para prioridade de busca?"
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3381,6 +3747,21 @@
           "en": "Should I treat this document as Journal Dump for retrieval priority?",
           "pt": "Devo tratar este documento como Journal Dump para prioridade de busca?"
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3421,6 +3802,21 @@
           "en": "Should I treat this document as KPI Dashboard for retrieval priority?",
           "pt": "Devo tratar este documento como KPI Dashboard para prioridade de busca?"
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3461,6 +3857,21 @@
           "en": "Should I treat this document as Management P&L for retrieval priority?",
           "pt": "Devo tratar este documento como Management P&L para prioridade de busca?"
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3501,6 +3912,21 @@
           "en": "Should I treat this document as Monthly Close Pack for retrieval priority?",
           "pt": "Devo tratar este documento como Monthly Close Pack para prioridade de busca?"
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3541,6 +3967,21 @@
           "en": "Should I treat this document as OPEX Bridge for retrieval priority?",
           "pt": "Devo tratar este documento como OPEX Bridge para prioridade de busca?"
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3581,6 +4022,21 @@
           "en": "Should I treat this document as Payables Aging Report for retrieval priority?",
           "pt": "Devo tratar este documento como Payables Aging Report para prioridade de busca?"
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3621,6 +4077,21 @@
           "en": "Should I treat this document as Pricing Model for retrieval priority?",
           "pt": "Devo tratar este documento como Pricing Model para prioridade de busca?"
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3661,6 +4132,21 @@
           "en": "Should I treat this document as Procurement Spend Report for retrieval priority?",
           "pt": "Devo tratar este documento como Procurement Spend Report para prioridade de busca?"
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3701,6 +4187,21 @@
           "en": "Should I treat this document as Product Margin Matrix for retrieval priority?",
           "pt": "Devo tratar este documento como Product Margin Matrix para prioridade de busca?"
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3741,6 +4242,21 @@
           "en": "Should I treat this document as Profit Bridge Report for retrieval priority?",
           "pt": "Devo tratar este documento como Profit Bridge Report para prioridade de busca?"
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3781,6 +4297,21 @@
           "en": "Should I treat this document as Quarterly Review Pack for retrieval priority?",
           "pt": "Devo tratar este documento como Quarterly Review Pack para prioridade de busca?"
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3821,6 +4352,21 @@
           "en": "Should I treat this document as Real Estate Asset Pack for retrieval priority?",
           "pt": "Devo tratar este documento como Real Estate Asset Pack para prioridade de busca?"
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3861,6 +4407,21 @@
           "en": "Should I treat this document as Receivables Aging Report for retrieval priority?",
           "pt": "Devo tratar este documento como Receivables Aging Report para prioridade de busca?"
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3901,6 +4462,21 @@
           "en": "Should I treat this document as Revenue Schedule for retrieval priority?",
           "pt": "Devo tratar este documento como Revenue Schedule para prioridade de busca?"
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3941,6 +4517,21 @@
           "en": "Should I treat this document as Rolling 12M Report for retrieval priority?",
           "pt": "Devo tratar este documento como Rolling 12M Report para prioridade de busca?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3981,6 +4572,21 @@
           "en": "Should I treat this document as Sales Waterfall for retrieval priority?",
           "pt": "Devo tratar este documento como Sales Waterfall para prioridade de busca?"
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4021,6 +4627,21 @@
           "en": "Should I treat this document as Scenario Model for retrieval priority?",
           "pt": "Devo tratar este documento como Scenario Model para prioridade de busca?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4061,6 +4682,21 @@
           "en": "Should I treat this document as Segment Report for retrieval priority?",
           "pt": "Devo tratar este documento como Segment Report para prioridade de busca?"
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4101,6 +4737,21 @@
           "en": "Should I treat this document as Sensitivity Table for retrieval priority?",
           "pt": "Devo tratar este documento como Sensitivity Table para prioridade de busca?"
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4141,6 +4792,21 @@
           "en": "Should I treat this document as Statutory P&L for retrieval priority?",
           "pt": "Devo tratar este documento como Statutory P&L para prioridade de busca?"
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4181,6 +4847,21 @@
           "en": "Should I treat this document as Treasury Liquidity Report for retrieval priority?",
           "pt": "Devo tratar este documento como Treasury Liquidity Report para prioridade de busca?"
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4221,6 +4902,21 @@
           "en": "Should I treat this document as Trial Balance for retrieval priority?",
           "pt": "Devo tratar este documento como Trial Balance para prioridade de busca?"
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4261,6 +4957,21 @@
           "en": "Should I treat this document as Variance Report for retrieval priority?",
           "pt": "Devo tratar este documento como Variance Report para prioridade de busca?"
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4301,6 +5012,21 @@
           "en": "Should I treat this document as Weekly Flash for retrieval priority?",
           "pt": "Devo tratar este documento como Weekly Flash para prioridade de busca?"
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4341,6 +5067,21 @@
           "en": "Should I treat this document as Working Capital Pack for retrieval priority?",
           "pt": "Devo tratar este documento como Working Capital Pack para prioridade de busca?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:doc_type_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4380,6 +5121,21 @@
           "en": "Numeric table and commentary disagree. Should I prioritize numeric evidence?",
           "pt": "Tabela numérica e comentário divergem. Devo priorizar evidência numérica?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:narrative_commentary_cannot_override_numeric_evidence",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4421,6 +5177,21 @@
           "en": "Which entities should be included in this comparison?",
           "pt": "Quais entidades devem ser incluídas nesta comparação?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:cross-entity_comparison_requires_explicit_entity_list",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4464,6 +5235,21 @@
           "en": "I found values without explicit currency. Which currency should I assume?",
           "pt": "Encontrei valores sem moeda explícita. Qual moeda devo assumir?"
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:source_currency_must_be_surfaced_in_outputs",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4503,6 +5289,21 @@
           "en": "I detected duplicate tables. Should I keep the most recent or the audited version?",
           "pt": "Detectei tabelas duplicadas. Devo manter a versão mais recente ou auditada?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:duplicate_tables_should_be_deduped_by_title+period+entity",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4543,6 +5344,21 @@
           "en": "Should I use the latest forecast version for outlook?",
           "pt": "Devo usar a versão mais recente da previsão para outlook?"
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:forecast_has_precedence_for_outlook_questions",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4582,6 +5398,21 @@
           "en": "I could not find the required section. Which section name should I search next?",
           "pt": "Não encontrei a seção necessária. Qual nome de seção devo buscar em seguida?"
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:if_required_section_missing,_ask_exactly_one_question",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4625,6 +5456,21 @@
           "en": "Which reporting period should I anchor this answer to?",
           "pt": "A qual período de reporte devo ancorar esta resposta?"
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:period_label_is_mandatory_in_result_blocks",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4665,6 +5511,21 @@
           "en": "I found multiple versions. Should I keep only the latest approved one?",
           "pt": "Encontrei múltiplas versões. Devo manter apenas a mais recente aprovada?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:newer_version_supersedes_older_version_with_same_scope",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4706,6 +5567,21 @@
           "en": "These figures appear to come from different accounting frameworks. Should I flag the GAAP vs IFRS difference?",
           "pt": "Estes valores parecem vir de normas contábeis diferentes. Devo sinalizar a diferença entre GAAP e IFRS?"
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:compare+validate+extract",
+          "check:never_compare_figures_across_different_gaap_frameworks_without_disclosure",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4748,6 +5624,21 @@
           "en": "Should I identify and pair the elimination journals for these intercompany balances?",
           "pt": "Devo identificar e associar os lançamentos de eliminação para estes saldos intercompany?"
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+validate",
+          "check:intercompany_reconciliation_requires_elimination_journal_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4789,6 +5680,21 @@
           "en": "This transfer pricing document needs arm's length standard reference. Which TP method applies?",
           "pt": "Este documento de preços de transferência precisa de referência ao padrão arm's length. Qual método de TP se aplica?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:transfer_pricing_must_cite_arms_length_standard",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4830,6 +5736,21 @@
           "en": "This board pack projection needs a version date. Which version date should I anchor to?",
           "pt": "Esta projeção do pacote do conselho precisa de uma data de versão. Qual data de versão devo utilizar?"
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:board_packs_need_version_date_coupling_before_quoting_projections",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4873,6 +5794,21 @@
           "en": "Which measurement period and compliance status should I reference for this covenant test?",
           "pt": "Qual período de medição e status de conformidade devo referenciar para este teste de covenant?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:covenant_reports_must_identify_measurement_period_and_compliance_status",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4914,6 +5850,21 @@
           "en": "Should I show both pre-adjustment and post-adjustment figures for this audit entry?",
           "pt": "Devo mostrar os valores pré-ajuste e pós-ajuste para este lançamento de auditoria?"
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+compare",
+          "check:audit_adjustments_must_state_pre_vs_post_adjustment_figures",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4955,6 +5906,21 @@
           "en": "This GL extract lacks account hierarchy context. Which level of the chart of accounts should I map to?",
           "pt": "Este extrato do razão não possui contexto de hierarquia de contas. A qual nível do plano de contas devo mapear?"
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:general_ledger_extracts_need_account_hierarchy_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4997,6 +5963,21 @@
           "en": "Which pay period boundaries (start/end dates) should I use for this payroll data?",
           "pt": "Quais limites de período de pagamento (datas de início/fim) devo usar para estes dados de folha?"
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:payroll_registers_require_pay_period_boundaries",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5038,6 +6019,21 @@
           "en": "This expense report needs approval status. Should I include only approved items or all submissions?",
           "pt": "Este relatório de despesas precisa de status de aprovação. Devo incluir apenas itens aprovados ou todas as submissões?"
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:expense_reports_need_approval_workflow_status",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5082,6 +6078,21 @@
           "en": "Which tax jurisdiction (federal, state, or foreign) does this return apply to?",
           "pt": "A qual jurisdição fiscal (federal, estadual ou estrangeira) esta declaração se aplica?"
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:tax_returns_require_jurisdiction_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5123,6 +6134,21 @@
           "en": "Which depreciation method (straight-line, declining balance, etc.) is used for these assets?",
           "pt": "Qual método de depreciação (linear, saldo decrescente, etc.) é utilizado para estes ativos?"
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:fixed_asset_register_needs_depreciation_method_disclosure",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5165,6 +6191,21 @@
           "en": "Should I break down the debt by maturity bands (current, 1-3 years, 3-5 years, 5+ years)?",
           "pt": "Devo detalhar a dívida por faixas de vencimento (corrente, 1-3 anos, 3-5 anos, 5+ anos)?"
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+validate",
+          "check:debt_schedules_must_show_maturity_profile",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5206,6 +6247,21 @@
           "en": "Should I segregate outstanding deposits in transit from outstanding checks?",
           "pt": "Devo separar os depósitos em trânsito dos cheques pendentes de compensação?"
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+compare",
+          "check:bank_reconciliation_needs_outstanding_items_segregation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5249,6 +6305,21 @@
           "en": "Which aging brackets should I use (0-30, 31-60, 61-90, 90+ days)?",
           "pt": "Quais faixas de vencimento devo usar (0-30, 31-60, 61-90, 90+ dias)?"
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+compare",
+          "check:invoice_analysis_requires_aging_bracket_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5292,6 +6363,21 @@
           "en": "Are these management (unaudited) figures or audited financials? This distinction affects reliability.",
           "pt": "Estes são valores gerenciais (não auditados) ou demonstrações auditadas? Esta distinção afeta a confiabilidade."
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+compare+validate",
+          "check:management_accounts_vs_audited_financials_must_be_clearly_distinguished",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5336,6 +6422,21 @@
           "en": "Which regulatory form type is this (10-K, 10-Q, 8-K, or other)?",
           "pt": "Qual é o tipo de formulário regulatório (10-K, 10-Q, 8-K ou outro)?"
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:regulatory_filings_require_sec_form_type_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5378,6 +6479,21 @@
           "en": "Should I present GAAP figures alongside non-GAAP adjustments with a reconciliation table?",
           "pt": "Devo apresentar os valores GAAP junto com os ajustes não-GAAP com uma tabela de reconciliação?"
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+compare+validate",
+          "check:earnings_releases_need_gaap_vs_nongaap_reconciliation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5420,6 +6536,21 @@
           "en": "Which aggregation criteria define these operating segments?",
           "pt": "Quais critérios de agregação definem estes segmentos operacionais?"
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+summarize+compare",
+          "check:segment_reporting_requires_aggregation_criteria_disclosure",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5461,6 +6592,21 @@
           "en": "What is the 12-month forward-looking assessment date for this going concern evaluation?",
           "pt": "Qual é a data base da avaliação prospectiva de 12 meses para esta análise de continuidade operacional?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:going_concern_needs_12_month_forward_looking_window_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5502,6 +6648,21 @@
           "en": "Which reporting unit does this goodwill impairment test apply to?",
           "pt": "A qual unidade geradora de caixa este teste de impairment de ágio se aplica?"
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:goodwill_impairment_tests_need_reporting_unit_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5543,6 +6704,21 @@
           "en": "Which actuarial assumption set (discount rate, salary growth, mortality table) applies to this valuation?",
           "pt": "Qual conjunto de premissas atuariais (taxa de desconto, crescimento salarial, tábua de mortalidade) se aplica a esta avaliação?"
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+summarize",
+          "check:pension_valuations_need_actuarial_assumption_set_identification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5584,6 +6760,21 @@
           "en": "Which financial statement line item does this footnote relate to?",
           "pt": "A qual rubrica das demonstrações financeiras esta nota explicativa se refere?"
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:footnotes_must_be_linked_to_specific_line_items",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5624,6 +6815,21 @@
           "en": "At which hierarchy level should I extract accounts (parent, child, or leaf level)?",
           "pt": "Em qual nível hierárquico devo extrair as contas (nível pai, filho ou folha)?"
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+summarize",
+          "check:chart_of_accounts_needs_hierarchy_depth_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5665,6 +6871,21 @@
           "en": "Which originating invoice number does this credit memo reference?",
           "pt": "A qual número de fatura original este memorando de crédito se refere?"
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+validate+locate",
+          "check:credit_memos_require_originating_invoice_linkage",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5707,6 +6928,23 @@
           "en": "Should I compare this capex request against the approved budget and show the variance?",
           "pt": "Devo comparar esta solicitação de capex com o orçamento aprovado e mostrar a variação?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [
+        "rule_finance_doc_classify_doc_capex_plan"
+      ],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+compare+validate",
+          "check:capex_requests_need_budget_vs_actual_variance_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     }
   ]

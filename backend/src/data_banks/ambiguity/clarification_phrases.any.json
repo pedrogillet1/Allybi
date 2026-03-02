@@ -49,7 +49,7 @@
       "entropyWindow": 6
     },
     "integrationHooks": {
-      "dependsOn": ["ui_copy_tokens", "disambiguation_render_policy"],
+      "dependsOn": ["ui_contracts", "render_policy"],
       "emitsSignals": ["clarificationQuestionAllowed", "clarificationPromptIntent"]
     }
   },

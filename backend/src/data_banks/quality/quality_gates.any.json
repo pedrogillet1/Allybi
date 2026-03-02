@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "quality_gates",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "ChatGPT-like answer quality gates for Koda. Post-generation checks + adaptive fallbacks. Guarantees: (1) never answer from the wrong doc when explicit docRef exists, (2) nav_pills responses render as intro-only + pills (no Sources label, no message actions), (3) replace bad fallbacks with adaptive guidance, (4) block malformed/truncated numbers, (5) enforce markdown + paragraph/bullet hygiene, (6) enforce brevity constraints, (7) reduce repetition and banned phrases, (8) minimal privacy-safe output. Designed to be deterministic and explainable.",
     "languages": ["any"],
-    "lastUpdated": "2026-01-26"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -69,6 +69,11 @@
       "ambiguity_single_question_policy": "warn",
       "redaction_default_pii_identity_tax_banking": "block",
       "medical_safety_boundaries": "block",
+      "doc_grounding_minimums": "block",
+      "hallucination_risk": "block",
+      "repetition_and_banned_phrases": "block",
+      "privacy_minimal": "block",
+      "final_consistency": "block",
       "brevity_and_constraints": "warn",
       "markdown_sanity": "warn",
       "no_raw_json": "block"

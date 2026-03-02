@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "di_entity_ontology",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "owner": "document_intelligence",
     "languages": [
       "en",
@@ -17,7 +17,7 @@
     "tests": [
       "SSOT_ENTITY_001"
     ],
-    "lastUpdated": "2026-02-27",
+    "lastUpdated": "2026-03-01",
     "description": "di_entity_ontology (document_intelligence) configuration bank."
   },
   "config": {
@@ -33,7 +33,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "after 'Effective Date:' or 'Data de Vigência:'",
@@ -136,7 +136,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "date range",
@@ -164,7 +164,7 @@
       "domains": [
         "finance",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "after 'Report Date:' or 'Data do Relatório:'",
@@ -213,7 +213,7 @@
       "category": "financial",
       "domains": [
         "finance",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "alphanumeric code",
@@ -285,7 +285,7 @@
       "category": "financial",
       "domains": [
         "finance",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "alphanumeric",
@@ -335,7 +335,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "alphanumeric code",
@@ -361,7 +361,7 @@
       "domains": [
         "finance",
         "legal",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "alphanumeric code",
@@ -556,7 +556,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "street number",
@@ -583,7 +583,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "proper noun",
@@ -610,7 +610,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "proper noun",
@@ -637,7 +637,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "abbreviation or proper noun",
@@ -789,7 +789,7 @@
       "domains": [
         "finance",
         "legal",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "currency symbol",
@@ -914,7 +914,7 @@
       "domains": [
         "finance",
         "legal",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "proper noun",
@@ -964,7 +964,7 @@
       "category": "organization",
       "domains": [
         "finance",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "after 'Department' or 'Departamento'",
@@ -1043,7 +1043,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "proper noun",
@@ -1070,7 +1070,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "after person name",
@@ -1099,7 +1099,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "extractionHints": [
         "honorific",

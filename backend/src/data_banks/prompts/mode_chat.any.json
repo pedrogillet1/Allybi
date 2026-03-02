@@ -16,5 +16,18 @@
         }
       }
     ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "PROMPT_TEST_001_mode_chat",
+        "input": "What is the revenue for Q3?",
+        "expect": {
+          "promptApplied": true,
+          "shortParagraphs": true,
+          "noFiller": true
+        }
+      }
+    ]
   }
 }

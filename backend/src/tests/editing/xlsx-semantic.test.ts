@@ -36,14 +36,34 @@ describe("Excel Semantic Classification", () => {
     message: string;
     expectedOp: string;
   }> = [
-    { message: "forecast next quarter sales", expectedOp: "XLSX_FORECAST" },
-    { message: "clean up the missing values", expectedOp: "XLSX_CLEAN_DATA" },
-    { message: "deduplicate the data", expectedOp: "XLSX_DEDUPE" },
-    { message: "find outliers in revenue", expectedOp: "XLSX_ANOMALY_DETECT" },
-    { message: "run a regression on the data", expectedOp: "XLSX_REGRESSION" },
-    { message: "create a pivot table by region", expectedOp: "XLSX_PIVOT" },
-    { message: "cluster these customers", expectedOp: "XLSX_CLUSTERING" },
-    { message: "explain this formula", expectedOp: "XLSX_EXPLAIN_FORMULA" },
+    {
+      message: "forecast next quarter sales",
+      expectedOp: "PY_TIME_SERIES_FORECAST",
+    },
+    {
+      message: "clean up the missing values",
+      expectedOp: "PY_CLEAN_MISSING_VALUES",
+    },
+    {
+      message: "find outliers in revenue",
+      expectedOp: "PY_OUTLIER_DETECT",
+    },
+    {
+      message: "calculate descriptive statistics for sales columns",
+      expectedOp: "PY_STATS_DESCRIPTIVE",
+    },
+    {
+      message: "calculate month over month growth rate",
+      expectedOp: "PY_STATS_REGRESSION",
+    },
+    {
+      message: "what if sales increases by 5 percent",
+      expectedOp: "PY_CALC_DERIVE_COLUMN",
+    },
+    { message: "deduplicate the data", expectedOp: "XLSX_REMOVE_DUPLICATES" },
+    { message: "create a pivot table by region", expectedOp: "PY_PIVOT_TABLE" },
+    { message: "cluster these customers", expectedOp: "PY_BINNING" },
+    { message: "set formula =SUM(A1:A10) in B1", expectedOp: "XLSX_SET_CELL_FORMULA" },
   ];
 
   for (const c of semanticCases) {
@@ -116,6 +136,16 @@ describe("Excel Semantic Classification", () => {
   test("gibberish does not produce any compute operator", () => {
     const plan = analyzeMessageToPlan({
       message: "flubberwocky zingbat",
+      domain: "excel",
+      viewerContext: {},
+      language: "en",
+    });
+    expect(plan).toBeNull();
+  });
+
+  test("formula explanation request does not trigger spreadsheet mutation intent", () => {
+    const plan = analyzeMessageToPlan({
+      message: "explain this formula",
       domain: "excel",
       viewerContext: {},
       language: "en",

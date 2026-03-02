@@ -1,0 +1,157 @@
+{
+  "_meta": {
+    "id": "di_ops_extraction_ops_shipping_manifest",
+    "version": "1.0.0",
+    "description": "Extraction hints for shipping manifest documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_shipping_manifest"
+  },
+  "hints": [
+    {
+      "id": "hint_01_docType",
+      "entity": "docType",
+      "anchors": [
+        "shipping manifest",
+        "bill of lading",
+        "packing list",
+        "ops_shipping_manifest"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_manifestNumber",
+      "entity": "manifestNumber",
+      "anchors": [
+        "manifest no",
+        "BOL number",
+        "shipment number",
+        "numero romaneio"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_03_shipmentDate",
+      "entity": "shipmentDate",
+      "anchors": [
+        "ship date",
+        "date shipped",
+        "data embarque"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_04_expectedDeliveryDate",
+      "entity": "expectedDeliveryDate",
+      "anchors": [
+        "expected delivery",
+        "ETA",
+        "previsao entrega"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_05_shipperName",
+      "entity": "shipperName",
+      "anchors": [
+        "shipper",
+        "consignor",
+        "from",
+        "remetente"
+      ],
+      "location": "shipper_consignee",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_06_consigneeName",
+      "entity": "consigneeName",
+      "anchors": [
+        "consignee",
+        "receiver",
+        "ship to",
+        "destinatario"
+      ],
+      "location": "shipper_consignee",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_07_carrierName",
+      "entity": "carrierName",
+      "anchors": [
+        "carrier",
+        "transport company",
+        "transportadora"
+      ],
+      "location": "routing",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_08_vehicleId",
+      "entity": "vehicleId",
+      "anchors": [
+        "vehicle",
+        "plate",
+        "container",
+        "vessel",
+        "placa"
+      ],
+      "location": "routing",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_09_totalWeight",
+      "entity": "totalWeight",
+      "anchors": [
+        "total weight",
+        "gross weight",
+        "peso total",
+        "peso bruto"
+      ],
+      "location": "totals",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_10_totalItems",
+      "entity": "totalItems",
+      "anchors": [
+        "total items",
+        "total packages",
+        "total volumes"
+      ],
+      "location": "totals",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_11_declaredValue",
+      "entity": "declaredValue",
+      "anchors": [
+        "declared value",
+        "cargo value",
+        "valor declarado"
+      ],
+      "location": "totals",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_12_purchaseOrderNumber",
+      "entity": "purchaseOrderNumber",
+      "anchors": [
+        "PO number",
+        "purchase order",
+        "ordem de compra"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    }
+  ]
+}

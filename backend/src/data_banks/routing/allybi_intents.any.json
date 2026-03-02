@@ -194,5 +194,19 @@
       "examples_pt": ["Mude este gráfico para combinado e legenda embaixo."],
       "negative_examples": ["Set formula in C2"]
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "AI_T_0001_viewer_disallows_connector_fallbacks",
+        "input": { "viewerMode": true, "fallbackOperator": "CONNECTOR_SEARCH" },
+        "expect": { "allowed": false }
+      },
+      {
+        "id": "AI_T_0002_docx_rewrite_rejects_email_prompt",
+        "input": { "intent_id": "DOCX_REWRITE", "text": "Email this to John" },
+        "expect": { "classifiedAsIntent": false }
+      }
+    ]
+  }
 }

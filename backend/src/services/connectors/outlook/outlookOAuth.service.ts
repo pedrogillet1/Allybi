@@ -2,7 +2,10 @@ import { createHmac, randomUUID, timingSafeEqual } from "crypto";
 import { URLSearchParams } from "url";
 
 import type { ConnectorProvider } from "../connectorsRegistry";
-import { markOAuthStateNonceUsed } from "../oauthStateNonceStore.service";
+import {
+  markOAuthStateNonceUsed,
+  markOAuthStateNonceUsedDurable,
+} from "../oauthStateNonceStore.service";
 import { TokenVaultService } from "../tokenVault.service";
 
 const PROVIDER: ConnectorProvider = "outlook";
@@ -138,6 +141,17 @@ export class OutlookOAuthService {
       throw new Error("Invalid or expired OAuth state.");
     }
     const userId = verified.userId;
+    const replayOk = await markOAuthStateNonceUsedDurable(
+      PROVIDER,
+      userId,
+      verified.nonce,
+      verified.iat,
+      15 * 60,
+      true,
+    );
+    if (!replayOk) {
+      throw new Error("Invalid or expired OAuth state.");
+    }
 
     const token = await this.exchangeCode({
       code,

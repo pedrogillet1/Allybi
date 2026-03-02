@@ -454,6 +454,71 @@ export interface RoutingGuardrailResult {
   message?: string;
 }
 
+function connectorPermissionActionForOperator(
+  canonicalOperator: string,
+): "CONNECTOR_READ_LIST" | "CONNECTOR_DRAFT" | "CONNECTOR_SEND_CONFIRM" | null {
+  const op = String(canonicalOperator || "")
+    .trim()
+    .toUpperCase();
+  if (!op) return null;
+  if (op === "EMAIL_SEND") return "CONNECTOR_SEND_CONFIRM";
+  if (op === "EMAIL_DRAFT") return "CONNECTOR_DRAFT";
+  if (op.startsWith("CONNECTOR_") || op.startsWith("EMAIL_")) {
+    return "CONNECTOR_READ_LIST";
+  }
+  return null;
+}
+
+function applyConnectorPermissionPolicy(input: {
+  plan: AllybiOperatorPlan;
+  language: "en" | "pt";
+}): RoutingGuardrailResult | null {
+  const banks = loadAllybiBanks();
+  const connectorPermissions = banks.connectorPermissions;
+  if (!connectorPermissions?.config?.enabled) return null;
+
+  const actionId = connectorPermissionActionForOperator(
+    input.plan.canonicalOperator,
+  );
+  if (!actionId) return null;
+
+  const actionPolicy =
+    connectorPermissions?.actions &&
+    typeof connectorPermissions.actions === "object"
+      ? connectorPermissions.actions[actionId]
+      : null;
+  if (!actionPolicy || typeof actionPolicy !== "object") return null;
+
+  if (actionPolicy.requiresExplicitActivation === true) {
+    return {
+      id: "connector_permissions_explicit_activation",
+      action: "require_confirmation",
+      code: "CONNECTOR_EXPLICIT_ACTIVATION_REQUIRED",
+      message:
+        input.language === "pt"
+          ? "Esta ação de integração exige ativação explícita."
+          : "This integration action requires explicit activation.",
+    };
+  }
+
+  const requiresSendClick =
+    actionPolicy.requiresSendClick === true ||
+    connectorPermissions?.config?.requireExplicitSendClick === true;
+  if (actionId === "CONNECTOR_SEND_CONFIRM" && requiresSendClick) {
+    return {
+      id: "connector_permissions_send_click",
+      action: "require_confirmation",
+      code: "CONNECTOR_SEND_CLICK_REQUIRED",
+      message:
+        input.language === "pt"
+          ? "O envio exige clique explícito de confirmação."
+          : "Sending requires an explicit confirmation click.",
+    };
+  }
+
+  return null;
+}
+
 function loadGuardrails(): any[] {
   const banks = loadAllybiBanks();
   const routing = banks.editingRouting;
@@ -774,8 +839,8 @@ export function planAllybiOperator(input: {
       domain: input.domain,
       requiresConfirmation: Boolean(
         info?.confirmationPolicy?.requiresExplicitConfirm ??
-          info?.requires_confirmation ??
-          false,
+        info?.requires_confirmation ??
+        false,
       ),
       previewRenderType: mapRenderType(
         input.domain,
@@ -821,6 +886,28 @@ export function planAllybiOperator(input: {
       if (postGuard.action === "require_confirmation") {
         candidatePlan.requiresConfirmation = true;
       }
+    }
+    const connectorPolicy = applyConnectorPermissionPolicy({
+      plan: candidatePlan,
+      language,
+    });
+    if (connectorPolicy?.action === "block") {
+      return buildBlockedPlan({
+        domain: input.domain,
+        canonicalOperator: candidate,
+        scope: input.scope,
+        language,
+        formattingOnly,
+        blockedRewrite,
+        fontFamily: input.classifiedIntent?.fontFamily,
+        operatorClass: expectedOperatorClass,
+        reasonCode: connectorPolicy.code || "CONNECTOR_PERMISSION_BLOCKED",
+        reasonMessage:
+          connectorPolicy.message || "Connector permission policy blocked operation.",
+      });
+    }
+    if (connectorPolicy?.action === "require_confirmation") {
+      candidatePlan.requiresConfirmation = true;
     }
     return candidatePlan;
   }
@@ -911,6 +998,29 @@ export function planAllybiOperator(input: {
     if (postGuardFallback.action === "require_confirmation") {
       fallbackPlan.requiresConfirmation = true;
     }
+  }
+  const fallbackConnectorPolicy = applyConnectorPermissionPolicy({
+    plan: fallbackPlan,
+    language,
+  });
+  if (fallbackConnectorPolicy?.action === "block") {
+    return buildBlockedPlan({
+      domain: input.domain,
+      canonicalOperator: canonicalFallback,
+      scope: input.scope,
+      language,
+      formattingOnly,
+      blockedRewrite,
+      fontFamily: input.classifiedIntent?.fontFamily,
+      operatorClass: expectedOperatorClass,
+      reasonCode: fallbackConnectorPolicy.code || "CONNECTOR_PERMISSION_BLOCKED",
+      reasonMessage:
+        fallbackConnectorPolicy.message ||
+        "Connector permission policy blocked operation.",
+    });
+  }
+  if (fallbackConnectorPolicy?.action === "require_confirmation") {
+    fallbackPlan.requiresConfirmation = true;
   }
   return fallbackPlan;
 }

@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "ops_kpi_ontology",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Operations KPI ontology with metric definitions, bilingual synonyms, interpretation boundaries, and guardrail rules.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "ops"
+    "domain": "ops",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "ops",
   "definitions": [
@@ -3687,6 +3702,21 @@
           "en": "Employee attrition rate must distinguish voluntary from involuntary departures. Which type is being measured?",
           "pt": "A taxa de rotatividade deve distinguir saídas voluntárias das involuntárias. Qual tipo está sendo medido?"
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:attrition_type_distinction",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3726,6 +3756,21 @@
           "en": "Automation rate must specify which task categories are included (deployments, alerts, provisioning, all). Which scope?",
           "pt": "A taxa de automação deve especificar quais categorias de tarefas estão incluídas (implantações, alertas, provisionamento, todas). Qual escopo?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:scope_boundary_definition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3765,6 +3810,21 @@
           "en": "Availability % must specify the measurement window (daily, monthly, or annual). Which window applies?",
           "pt": "O percentual de disponibilidade deve especificar a janela de medição (diária, mensal ou anual). Qual janela se aplica?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:measurement_window_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3802,6 +3862,21 @@
           "en": "Availability zone redundancy must specify mode: active-active, active-passive, or pilot light. Which mode?",
           "pt": "A redundância de zonas de disponibilidade deve especificar o modo: ativo-ativo, ativo-passivo ou pilot light. Qual modo?"
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:active_mode_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3841,6 +3916,21 @@
           "en": "Ticket backlog age should be segmented by priority. Are you looking at all priorities or a specific tier?",
           "pt": "A idade do backlog de chamados deve ser segmentada por prioridade. Você está analisando todas as prioridades ou um nível específico?"
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:priority_segmentation_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3879,6 +3969,21 @@
           "en": "Backup success rate should be evaluated alongside RPO targets to determine if backup frequency meets recovery requirements.",
           "pt": "A taxa de sucesso de backup deve ser avaliada junto com metas de RPO para determinar se a frequência de backup atende aos requisitos de recuperação."
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:rpo_alignment_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3917,6 +4022,21 @@
           "en": "Batch job success rate must reference the SLA completion window. What is the target completion time?",
           "pt": "A taxa de sucesso de jobs em lote deve referenciar a janela de conclusão do SLA. Qual é o tempo alvo de conclusão?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:sla_window_reference",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3956,6 +4076,21 @@
           "en": "Burn rate comparisons require aligned time periods. What time granularity should be used (weekly, monthly, quarterly)?",
           "pt": "Comparações de taxa de queima requerem períodos de tempo alinhados. Qual granularidade de tempo deve ser usada (semanal, mensal, trimestral)?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+calculate",
+          "check:time_period_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3995,6 +4130,21 @@
           "en": "CDN hit ratio varies significantly by content type (static, dynamic, API). Which content type should be evaluated?",
           "pt": "A taxa de acerto do CDN varia significativamente por tipo de conteúdo (estático, dinâmico, API). Qual tipo de conteúdo deve ser avaliado?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:content_type_segmentation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4034,6 +4184,21 @@
           "en": "Customer Effort Score methodology (scale, question wording) must be consistent across comparison periods.",
           "pt": "A metodologia do Customer Effort Score (escala, redação da pergunta) deve ser consistente entre períodos de comparação."
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:survey_methodology_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4072,6 +4237,21 @@
           "en": "Change failure rate denominator must be defined: all changes, or only standard/normal changes? Please specify.",
           "pt": "O denominador da taxa de falha de mudanças precisa ser definido: todas as mudanças ou apenas mudanças padrão/normais? Especifique."
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+calculate+validate",
+          "check:denominator_definition_clarity",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4110,6 +4290,21 @@
           "en": "Change approval cycle time should track emergency/expedited changes separately as they bypass normal approval flow.",
           "pt": "O tempo de ciclo de aprovação de mudanças deve rastrear mudanças de emergência/expeditas separadamente, pois elas contornam o fluxo normal de aprovação."
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:bypass_tracking_inclusion",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4147,6 +4342,21 @@
           "en": "Change success rate must specify change types included (standard, normal, emergency). Which types are in scope?",
           "pt": "A taxa de sucesso de mudanças deve especificar os tipos de mudança incluídos (padrão, normal, emergencial). Quais tipos estão no escopo?"
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:change_type_scope",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4184,6 +4394,21 @@
           "en": "Code coverage must specify the type: line coverage, branch coverage, or function coverage. Which type?",
           "pt": "A cobertura de código deve especificar o tipo: cobertura de linhas, cobertura de branches ou cobertura de funções. Qual tipo?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:coverage_type_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4222,6 +4447,21 @@
           "en": "Compliance audit pass rate must reference the specific framework (SOC2, ISO27001, PCI-DSS, HIPAA). Which framework?",
           "pt": "A taxa de aprovação em auditoria deve referenciar o framework específico (SOC2, ISO27001, PCI-DSS, HIPAA). Qual framework?"
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:audit_framework_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4259,6 +4499,21 @@
           "en": "Container restart rates must be contextualized against OOM kill vs. liveness probe failures. Include restart reason breakdown.",
           "pt": "Taxas de reinicialização de contêineres devem ser contextualizadas entre OOM kill vs. falhas de liveness probe. Inclua a decomposição por motivo de restart."
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:threshold_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4297,6 +4552,21 @@
           "en": "Mean Time to Containment and Mean Time to Resolve are distinct metrics. Do not substitute one for the other.",
           "pt": "O Tempo Médio de Contenção e o Tempo Médio de Resolução são métricas distintas. Não substitua uma pela outra."
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:containment_resolution_distinction",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4340,6 +4610,21 @@
           "en": "Cost metrics require currency specification and inflation adjustment context. Which currency and base period apply?",
           "pt": "Métricas de custo requerem especificação de moeda e contexto de ajuste inflacionário. Qual moeda e período base se aplicam?"
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+calculate",
+          "check:currency_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4380,6 +4665,21 @@
           "en": "Critical incident rate should be normalized by service count or transaction volume for meaningful comparison across teams.",
           "pt": "A taxa de incidentes críticos deve ser normalizada por quantidade de serviços ou volume de transações para comparação significativa entre equipes."
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:normalization_by_service_count",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4419,6 +4719,21 @@
           "en": "CSAT scores require sample size disclosure to assess statistical significance. What is the response count?",
           "pt": "Notas de CSAT requerem divulgação do tamanho da amostra para avaliar significância estatística. Qual é a contagem de respostas?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+validate",
+          "check:sample_size_disclosure",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4455,6 +4770,21 @@
           "en": "Cycle time must specify the work item type (story, bug, task, epic). Which type applies?",
           "pt": "O tempo de ciclo deve especificar o tipo de item de trabalho (story, bug, tarefa, épico). Qual tipo se aplica?"
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:work_item_type_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4492,6 +4822,21 @@
           "en": "Database query time varies widely by query type (read, write, analytical). Which query category is being measured?",
           "pt": "O tempo de consulta ao banco varia amplamente por tipo de consulta (leitura, escrita, analítica). Qual categoria de consulta está sendo medida?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:query_type_normalization",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4530,6 +4875,21 @@
           "en": "Defect density requires a consistent size unit (per KLOC, per function point, per story point). Which unit applies?",
           "pt": "A densidade de defeitos requer uma unidade de tamanho consistente (por KLOC, por ponto de função, por story point). Qual unidade se aplica?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+calculate",
+          "check:size_unit_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4569,6 +4929,21 @@
           "en": "Defect escape rate should include the intended detection stage (unit test, integration test, QA, staging).",
           "pt": "A taxa de escape de defeitos deve incluir o estágio de detecção pretendido (teste unitário, teste de integração, QA, staging)."
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:detection_stage_mapping",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4607,6 +4982,21 @@
           "en": "Deployment frequency requires a consistent calendar window. Which period should I use (daily, weekly, monthly)?",
           "pt": "A frequência de implantação requer uma janela de calendário consistente. Qual período devo usar (diário, semanal, mensal)?"
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:consistent_time_window",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4647,6 +5037,21 @@
           "en": "Deployment lead time must define start (commit, PR merge, tag) and end (deploy start, deploy verified) points consistently.",
           "pt": "O lead time de implantação deve definir pontos de início (commit, merge de PR, tag) e fim (início do deploy, deploy verificado) de forma consistente."
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:measurement_point_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4684,6 +5089,21 @@
           "en": "DNS resolution time varies by geography and resolver. From which region and resolver were measurements taken?",
           "pt": "O tempo de resolução DNS varia por geografia e resolvedor. De qual região e resolvedor foram feitas as medições?"
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:geographic_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4720,6 +5140,21 @@
           "en": "Documentation coverage does not measure accuracy. Include last-reviewed date to assess documentation freshness.",
           "pt": "A cobertura de documentação não mede precisão. Inclua a data da última revisão para avaliar a atualidade da documentação."
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:freshness_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4758,6 +5193,21 @@
           "en": "DR test pass rate should report the percentage of total DR scenarios covered, not just pass rate of tested scenarios.",
           "pt": "A taxa de aprovação em testes de DR deve reportar o percentual de cenários totais de DR cobertos, não apenas a taxa de aprovação dos cenários testados."
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:scenario_coverage_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4795,6 +5245,21 @@
           "en": "Infrastructure drift rate must reference the baseline state (last applied Terraform/IaC state, approved config). What is the baseline?",
           "pt": "A taxa de desvio de infraestrutura deve referenciar o estado base (último estado Terraform/IaC aplicado, configuração aprovada). Qual é a linha de base?"
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:baseline_state_definition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4834,6 +5299,21 @@
           "en": "Error rate must specify scope: client errors (4xx), server errors (5xx), or both? Which scope applies?",
           "pt": "A taxa de erros deve especificar o escopo: erros do cliente (4xx), erros do servidor (5xx) ou ambos? Qual escopo se aplica?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:scope_definition_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4871,6 +5351,21 @@
           "en": "Escalation rate should include reason breakdown (skill gap, policy requirement, customer request) for actionable insights.",
           "pt": "A taxa de escalonamento deve incluir decomposição por motivo (lacuna de habilidade, requisito de política, solicitação do cliente) para insights acionáveis."
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:escalation_reason_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4907,6 +5402,21 @@
           "en": "Escaped vulnerability rate depends on pre-production scan coverage. What percentage of assets are scanned pre-production?",
           "pt": "A taxa de vulnerabilidades escapadas depende da cobertura de varredura em pré-produção. Qual percentual de ativos é varrido em pré-produção?"
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:preprod_scan_coverage_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4944,6 +5454,21 @@
           "en": "Failover time must specify test conditions: planned drill, actual failure, or simulated load. Which scenario?",
           "pt": "O tempo de failover deve especificar as condições do teste: simulação planejada, falha real ou carga simulada. Qual cenário?"
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:test_conditions_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4982,6 +5507,21 @@
           "en": "False positive alert rate should be segmented by alert category to enable targeted tuning.",
           "pt": "A taxa de falsos positivos deve ser segmentada por categoria de alerta para permitir ajuste direcionado."
         }
+      },
+      "precedence": 84,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize",
+          "check:alert_category_segmentation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5021,6 +5561,21 @@
           "en": "FCR must be compared within the same support channel (phone, chat, email). Which channel applies?",
           "pt": "O FCR deve ser comparado dentro do mesmo canal de suporte (telefone, chat, e-mail). Qual canal se aplica?"
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:channel_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5060,6 +5615,21 @@
           "en": "Order fulfillment cycle time scope must be defined: from order placement, payment confirmation, or warehouse pick? Which start point?",
           "pt": "O escopo do tempo de ciclo de atendimento deve ser definido: a partir do pedido, confirmação de pagamento ou separação no armazém? Qual ponto de início?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:fulfillment_scope_definition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5102,6 +5672,21 @@
           "en": "Division by zero detected or possible. Verify the denominator is non-zero before computing the metric.",
           "pt": "Divisão por zero detectada ou possível. Verifique se o denominador é diferente de zero antes de calcular a métrica."
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+evaluate",
+          "check:denominator_zero_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5145,6 +5730,21 @@
           "en": "Metrics being compared must cover identical time periods. Misaligned periods produce invalid comparisons.",
           "pt": "As métricas comparadas devem cobrir períodos de tempo idênticos. Períodos desalinhados produzem comparações inválidas."
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:compare+evaluate+validate",
+          "check:period_alignment_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5189,6 +5789,21 @@
           "en": "All metrics in a comparison must use consistent units (e.g., do not mix hours with minutes or days).",
           "pt": "Todas as métricas em uma comparação devem usar unidades consistentes (ex.: não misture horas com minutos ou dias)."
         }
+      },
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare",
+          "check:unit_consistency_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5225,6 +5840,21 @@
           "en": "Average incident age should be severity-weighted. A high-severity old incident has greater impact than multiple low-severity ones.",
           "pt": "A idade média de incidentes deve ser ponderada por severidade. Um incidente antigo de alta severidade tem maior impacto do que múltiplos de baixa severidade."
         }
+      },
+      "precedence": 85,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize",
+          "check:severity_weighting_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5262,6 +5892,21 @@
           "en": "Inventory turnover requires a consistent cost basis (COGS at cost vs. revenue). Which numerator basis applies?",
           "pt": "O giro de estoque requer uma base de custo consistente (CPV a custo vs. receita). Qual base do numerador se aplica?"
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+calculate+compare",
+          "check:cost_basis_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5300,6 +5945,21 @@
           "en": "Knowledge article usage rate measures reference, not resolution. Track deflection or resolution rate separately for effectiveness.",
           "pt": "A taxa de uso de artigos de conhecimento mede referência, não resolução. Acompanhe a taxa de desvio ou resolução separadamente para eficácia."
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:effectiveness_vs_usage_distinction",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5344,6 +6004,21 @@
           "en": "Do not compare different latency percentiles as if they were equivalent. P50, P95, and P99 measure fundamentally different things.",
           "pt": "Não compare percentis de latência diferentes como se fossem equivalentes. P50, P95 e P99 medem coisas fundamentalmente diferentes."
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:compare+evaluate",
+          "check:percentile_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5380,6 +6055,21 @@
           "en": "Maintenance window compliance should also report average overrun duration for non-compliant activities.",
           "pt": "A conformidade com janela de manutenção deve também reportar a duração média de estouro para atividades não conformes."
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:overrun_impact_assessment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5419,6 +6109,21 @@
           "en": "Planned vs. unplanned maintenance ratio requires a consistent measurement timeframe. Which period applies?",
           "pt": "A proporção de manutenção planejada vs. não planejada requer um período de medição consistente. Qual período se aplica?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:timeframe_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5458,6 +6163,21 @@
           "en": "MTBF values depend on operating conditions (load, environment). Under which conditions was MTBF measured?",
           "pt": "Valores de MTBF dependem das condições de operação (carga, ambiente). Sob quais condições o MTBF foi medido?"
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:operating_conditions_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5496,6 +6216,21 @@
           "en": "MTTA measurement start point must be defined: from alert firing or from incident creation? Please clarify.",
           "pt": "O ponto de início da medição do MTTA deve ser definido: a partir do disparo do alerta ou da criação do incidente? Esclareça."
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:measurement_point_definition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5534,6 +6269,21 @@
           "en": "MTTD must specify the detection method: automated monitoring, user report, or periodic audit. Which method?",
           "pt": "O MTTD deve especificar o método de detecção: monitoramento automatizado, reporte do usuário ou auditoria periódica. Qual método?"
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:detection_method_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5573,6 +6323,21 @@
           "en": "MTTR cannot be compared across different severity levels without normalization. Please specify the severity level or apply severity weighting.",
           "pt": "O MTTR não pode ser comparado entre níveis de severidade diferentes sem normalização. Especifique o nível de severidade ou aplique ponderação por severidade."
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+summarize",
+          "check:severity_level_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5610,6 +6375,21 @@
           "en": "Network availability must specify scope (WAN, LAN, specific circuit, all). Which network segment?",
           "pt": "A disponibilidade de rede deve especificar o escopo (WAN, LAN, circuito específico, todos). Qual segmento de rede?"
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:network_scope_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5649,6 +6429,21 @@
           "en": "Never infer incident severity from resolution time alone. Severity must come from the incident record's classification field.",
           "pt": "Nunca inferir a severidade do incidente apenas pelo tempo de resolução. A severidade deve vir do campo de classificação do registro do incidente."
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+extract",
+          "check:no_inference_from_proxy",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5691,6 +6486,21 @@
           "en": "Do not extrapolate short incident windows to annual rates. The sample may not represent seasonal or cyclical patterns.",
           "pt": "Não extrapole janelas curtas de incidentes para taxas anuais. A amostra pode não representar padrões sazonais ou cíclicos."
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+calculate+summarize",
+          "check:extrapolation_guard",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5730,6 +6540,21 @@
           "en": "NPS benchmarks are industry-specific. Comparison without industry context may be misleading.",
           "pt": "Benchmarks de NPS são específicos por indústria. Comparação sem contexto da indústria pode ser enganosa."
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:industry_benchmark_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5768,6 +6593,21 @@
           "en": "OEE components (Availability x Performance x Quality) must be shown separately alongside the composite score.",
           "pt": "Os componentes do OEE (Disponibilidade x Desempenho x Qualidade) devem ser apresentados separadamente junto com a pontuação composta."
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+calculate",
+          "check:composite_metric_decomposition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5807,6 +6647,21 @@
           "en": "Onboarding time to productivity requires a defined productivity benchmark (e.g., 80% of team average output). What benchmark is used?",
           "pt": "O tempo de integração até produtividade requer um marco de produtividade definido (ex.: 80% da produção média da equipe). Qual marco é usado?"
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:productivity_benchmark_definition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5846,6 +6701,21 @@
           "en": "On-time delivery must define 'on time': committed date, requested date, or contractual date? Which definition applies?",
           "pt": "A entrega no prazo deve definir 'no prazo': data comprometida, data solicitada ou data contratual? Qual definição se aplica?"
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:delivery_definition_clarity",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5885,6 +6755,21 @@
           "en": "Averaging P99 latency across services is statistically invalid. Report P99 per service or use a merged histogram.",
           "pt": "Calcular a média da latência P99 entre serviços é estatisticamente inválido. Reporte P99 por serviço ou use um histograma combinado."
         }
+      },
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+calculate+summarize",
+          "check:percentile_aggregation_guard",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5923,6 +6808,21 @@
           "en": "Patch compliance rate must specify the age window (e.g., within 30 days of release, within policy SLA). Which window?",
           "pt": "A taxa de conformidade de patches deve especificar a janela de tempo (ex.: dentro de 30 dias do lançamento, dentro do SLA da política). Qual janela?"
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:age_window_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5961,6 +6861,21 @@
           "en": "Pipeline success rate must specify which stages are included (build, test, deploy, full pipeline). Which scope?",
           "pt": "A taxa de sucesso do pipeline deve especificar quais estágios estão incluídos (build, teste, deploy, pipeline completo). Qual escopo?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:pipeline_stage_scope",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5999,6 +6914,21 @@
           "en": "Post-incident review completion must reference the timeliness SLA (e.g., within 5 business days). What is the target SLA?",
           "pt": "A conclusão da revisão pós-incidente deve referenciar o SLA de prazo (ex.: dentro de 5 dias úteis). Qual é o SLA alvo?"
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:timeliness_sla_reference",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6035,6 +6965,21 @@
           "en": "Problem resolution rate does not measure quality of root cause analysis. Track recurrence rate alongside resolution rate.",
           "pt": "A taxa de resolução de problemas não mede a qualidade da análise de causa raiz. Acompanhe a taxa de recorrência junto com a taxa de resolução."
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:resolution_quality_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6074,6 +7019,21 @@
           "en": "High reopen rates should be reported alongside root cause categories (incomplete fix, new symptom, user error).",
           "pt": "Taxas altas de reabertura devem ser reportadas junto com categorias de causa raiz (correção incompleta, novo sintoma, erro do usuário)."
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+validate",
+          "check:root_cause_categorization",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6113,6 +7073,21 @@
           "en": "Release rollback rate should be reported alongside the severity of the triggering issue (P1-P4).",
           "pt": "A taxa de rollback de releases deve ser reportada junto com a severidade do problema que a causou (P1-P4)."
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+validate",
+          "check:severity_impact_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6155,6 +7130,21 @@
           "en": "RTO/RPO values must cite the disaster recovery plan version they are drawn from. Which DR plan version applies?",
           "pt": "Valores de RTO/RPO devem citar a versão do plano de recuperação de desastres de onde foram extraídos. Qual versão do plano de DR se aplica?"
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:dr_plan_version_citation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6193,6 +7183,21 @@
           "en": "Runbook coverage should also assess last-tested date. Untested runbooks may be outdated and unreliable.",
           "pt": "A cobertura de runbooks deve também avaliar a data do último teste. Runbooks não testados podem estar desatualizados e não confiáveis."
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:testing_freshness_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6230,6 +7235,21 @@
           "en": "Security incident response time must specify the incident classification (data breach, malware, unauthorized access). Which type?",
           "pt": "O tempo de resposta a incidentes de segurança deve especificar a classificação do incidente (violação de dados, malware, acesso não autorizado). Qual tipo?"
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:incident_classification_required",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6267,6 +7287,21 @@
           "en": "Service request fulfillment time varies by category. Which request type is being measured (access, provisioning, general)?",
           "pt": "O tempo de atendimento de solicitações de serviço varia por categoria. Qual tipo de requisição está sendo medido (acesso, provisionamento, geral)?"
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:request_category_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6304,6 +7339,21 @@
           "en": "Incident severity distribution changes are only meaningful when compared against a baseline period. Include baseline reference.",
           "pt": "Mudanças na distribuição de severidade de incidentes só são significativas quando comparadas com um período base. Inclua referência ao período base."
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare",
+          "check:baseline_comparison_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6343,6 +7393,21 @@
           "en": "Shift coverage ratio must specify the operational area and shift type (day, night, weekend). Which context applies?",
           "pt": "A proporção de cobertura de turnos deve especificar a área operacional e tipo de turno (diurno, noturno, fim de semana). Qual contexto se aplica?"
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:operational_context_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6381,6 +7446,21 @@
           "en": "SLA breach count should be categorized by severity and business impact, not reported as a flat total.",
           "pt": "A contagem de violações de SLA deve ser categorizada por severidade e impacto no negócio, não reportada como um total simples."
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+validate",
+          "check:severity_categorization_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6420,6 +7500,21 @@
           "en": "SLA compliance must reference specific SLA tiers (e.g., Gold, Silver, Bronze). Which tier applies?",
           "pt": "A conformidade com SLA deve referenciar tiers específicos de SLA (ex.: Ouro, Prata, Bronze). Qual tier se aplica?"
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:sla_tier_specification",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6459,6 +7554,21 @@
           "en": "Storage utilization should include growth trend to predict capacity exhaustion date.",
           "pt": "A utilização de armazenamento deve incluir tendência de crescimento para prever a data de esgotamento de capacidade."
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+monitor",
+          "check:trend_context_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6498,6 +7608,21 @@
           "en": "Supplier Quality Index is a composite score. Please specify the component weights (defect, delivery, compliance).",
           "pt": "O Índice de Qualidade do Fornecedor é uma pontuação composta. Especifique os pesos dos componentes (defeito, entrega, conformidade)."
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+calculate",
+          "check:component_weight_disclosure",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6541,6 +7666,21 @@
           "en": "Supply chain metrics need lead time normalization when comparing across regions or suppliers. Are comparison targets normalized?",
           "pt": "Métricas de cadeia de suprimentos precisam de normalização de lead time ao comparar entre regiões ou fornecedores. Os alvos de comparação estão normalizados?"
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:lead_time_normalization",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6578,6 +7718,21 @@
           "en": "Tech debt ratio estimation methodology must be consistent (static analysis tool, team estimate, backlog sizing).",
           "pt": "A metodologia de estimativa da proporção de dívida técnica deve ser consistente (ferramenta de análise estática, estimativa da equipe, dimensionamento do backlog)."
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:estimation_method_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6616,6 +7771,21 @@
           "en": "Test automation rate measures quantity of automated tests, not their effectiveness. Track test failure detection rate separately.",
           "pt": "A taxa de automação de testes mede a quantidade de testes automatizados, não sua eficácia. Acompanhe a taxa de detecção de falhas separadamente."
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:quality_vs_quantity_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6655,6 +7825,21 @@
           "en": "Throughput (TPS) must include workload characterization (read vs write, payload size). What workload type applies?",
           "pt": "O throughput (TPS) deve incluir caracterização da carga de trabalho (leitura vs escrita, tamanho do payload). Qual tipo de carga se aplica?"
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:workload_characterization",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6694,6 +7879,21 @@
           "en": "Toil ratio measurement varies by methodology (self-reported vs. automated tracking). Ensure consistent measurement method.",
           "pt": "A medição da proporção de toil varia por metodologia (autorreportada vs. rastreamento automatizado). Garanta método de medição consistente."
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:measurement_methodology_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6730,6 +7930,21 @@
           "en": "Training completion rates should specify the compliance period and whether expired certifications are excluded.",
           "pt": "Taxas de conclusão de treinamento devem especificar o período de conformidade e se certificações expiradas são excluídas."
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate",
+          "check:relevance_period_check",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6773,6 +7988,21 @@
           "en": "Utilization metrics need baseline versus peak distinction. Are you referring to average, peak, or a specific percentile?",
           "pt": "Métricas de utilização precisam distinguir entre linha de base e pico. Você se refere à média, ao pico ou a um percentil específico?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+compare+validate",
+          "check:baseline_peak_distinction",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6812,6 +8042,21 @@
           "en": "Sprint velocity is team-specific and must never be compared across teams. Each team has its own estimation baseline.",
           "pt": "A velocidade do sprint é específica de cada equipe e nunca deve ser comparada entre equipes. Cada equipe tem sua própria base de estimativa."
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:compare+evaluate+validate",
+          "check:team_scope_guard",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6850,6 +8095,21 @@
           "en": "Open vulnerability count should include aging distribution (0-30, 30-60, 60-90, 90+ days) for prioritization context.",
           "pt": "A contagem de vulnerabilidades abertas deve incluir distribuição por idade (0-30, 30-60, 60-90, 90+ dias) para contexto de priorização."
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+summarize+validate",
+          "check:aging_distribution_required",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6893,6 +8153,21 @@
           "en": "Vulnerability metrics need CVSS severity context (Critical/High/Medium/Low). Which severity band applies?",
           "pt": "Métricas de vulnerabilidade precisam de contexto de severidade CVSS (Crítico/Alto/Médio/Baixo). Qual faixa de severidade se aplica?"
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:cvss_score_context",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6932,6 +8207,21 @@
           "en": "War room duration metrics require consistent trigger criteria (which severity levels activate a war room).",
           "pt": "Métricas de duração do war room requerem critérios de acionamento consistentes (quais níveis de severidade ativam um war room)."
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:trigger_criteria_consistency",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     }
   ]

@@ -48,7 +48,7 @@
       }
     },
     "integrationHooks": {
-      "dependsOn": ["scope_hints", "tokenization_rules", "language_indicators"],
+      "dependsOn": ["scope_hints", "language_indicators", "stopwords_docnames"],
       "emitsSignals": [
         "isFollowup",
         "followupStrength",

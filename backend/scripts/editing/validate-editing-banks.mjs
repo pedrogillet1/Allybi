@@ -23,6 +23,14 @@ function normalizeOperator(value) {
   return String(value || "").trim().toUpperCase();
 }
 
+function normalizeText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
 function collectPatternOps(patternBank) {
   const ops = new Set();
   const patterns = Array.isArray(patternBank?.patterns) ? patternBank.patterns : [];
@@ -36,6 +44,90 @@ function collectPatternOps(patternBank) {
     if (fallback) ops.add(fallback);
   }
   return ops;
+}
+
+const HIGH_RISK_DIRECTIONAL_GROUPS = {
+  "excel.fill_direction": [
+    { idPattern: /fill_down$/, hints: ["down", "baixo"] },
+    { idPattern: /fill_right$/, hints: ["right", "direita"] },
+  ],
+  "docx.align_mode": [
+    { idPattern: /align\.left$/, hints: ["left", "esquerda"] },
+    { idPattern: /align\.right$/, hints: ["right", "direita"] },
+    { idPattern: /align\.center$/, hints: ["center", "centre", "centro"] },
+    { idPattern: /align\.justify$/, hints: ["justify", "justific"] },
+  ],
+  "docx.insert_position": [
+    { idPattern: /insert\.before$/, hints: ["before", "antes"] },
+    { idPattern: /insert\.after$/, hints: ["after", "depois"] },
+  ],
+  "docx.paragraph_structure": [
+    { idPattern: /merge\.paragraphs$/, hints: ["merge", "mesclar"] },
+    { idPattern: /split\.paragraph$/, hints: ["split", "dividir"] },
+  ],
+  "docx.text_case": [
+    { idPattern: /case\.title$/, hints: ["title", "titulo", "título"] },
+    { idPattern: /case\.upper$/, hints: ["upper", "maiusculas", "maiúsculas"] },
+    { idPattern: /case\.lower$/, hints: ["lower", "minusculas", "minúsculas"] },
+    { idPattern: /case\.sentence$/, hints: ["sentence", "frase", "sentença"] },
+  ],
+  "docx.toc_action": [
+    { idPattern: /toc\.insert$/, hints: ["insert", "table of contents", "sumário", "sumario"] },
+    { idPattern: /toc\.update$/, hints: ["update", "refresh", "atualizar"] },
+  ],
+  "docx.break_action": [
+    { idPattern: /page_break$/, hints: ["page break", "quebra de página", "quebra de pagina"] },
+    { idPattern: /section_break$/, hints: ["section break", "quebra de seção", "quebra de secao"] },
+  ],
+  "excel.cond_format": [
+    { idPattern: /cond_format\.color_scale$/, hints: ["color", "escala"] },
+    { idPattern: /cond_format\.data_bars$/, hints: ["bars", "barras"] },
+    { idPattern: /cond_format\.top_n$/, hints: ["top", "top n", "maiores"] },
+  ],
+  "excel.rows_structural": [
+    { idPattern: /insert_rows$/, hints: ["insert", "insira", "adicione"] },
+    { idPattern: /delete_rows$/, hints: ["delete", "remove", "exclua", "remova"] },
+  ],
+  "excel.columns_structural": [
+    { idPattern: /insert_columns$/, hints: ["insert", "insira", "adicione"] },
+    { idPattern: /delete_columns$/, hints: ["delete", "remove", "exclua", "remova"] },
+  ],
+  "excel.sheet_structural": [
+    { idPattern: /add_sheet$/, hints: ["add", "create", "new", "adicione", "crie", "nova"] },
+    { idPattern: /rename_sheet$/, hints: ["rename", "renomeie", "renomear"] },
+    { idPattern: /delete_sheet$/, hints: ["delete", "remove", "exclua", "remova"] },
+  ],
+  "excel.rows_visibility": [
+    { idPattern: /hide_rows$/, hints: ["hide rows", "ocultar linhas"] },
+    { idPattern: /show_rows$/, hints: ["show rows", "mostrar linhas"] },
+  ],
+  "excel.columns_visibility": [
+    { idPattern: /hide_columns$/, hints: ["hide columns", "ocultar colunas"] },
+    { idPattern: /show_columns$/, hints: ["show columns", "mostrar colunas"] },
+  ],
+  "excel.protection": [
+    { idPattern: /set_protection$/, hints: ["protect sheet", "proteger planilha"] },
+    { idPattern: /lock_cells$/, hints: ["lock cells", "bloquear células"] },
+  ],
+};
+
+function hasDirectionalHint(pattern, expectedHints) {
+  const source = [
+    ...(pattern?.triggers?.tokens_any || []),
+    ...(pattern?.triggers?.tokens_all || []),
+    ...(pattern?.triggers?.regex_any || []),
+  ]
+    .map(normalizeText)
+    .join(" ");
+  return expectedHints.some((hint) => source.includes(normalizeText(hint)));
+}
+
+function isOperatorLikeSyntheticExample(example) {
+  const low = String(example || "").toLowerCase();
+  if (low.includes("[synthetic]")) return false;
+  if (/\b(?:apply|aplique)\s+[a-z0-9]+_[a-z0-9_]+\b/.test(low)) return true;
+  if (/\b(?:apply|aplique)\s+align\s+(?:left|right|center|justify)\b/.test(low)) return true;
+  return false;
 }
 
 // ---------------------------------------------------------------------------
@@ -93,6 +185,8 @@ function main() {
     "intent_patterns/docx.pt.any.json",
     "intent_patterns/excel.en.any.json",
     "intent_patterns/excel.pt.any.json",
+    "agents/excel_calc/routing/calc_intent_patterns.en.any.json",
+    "agents/excel_calc/routing/calc_intent_patterns.pt.any.json",
     "microcopy/editing_microcopy.any.json",
     "microcopy/edit_error_catalog.any.json",
     "scope/allybi_docx_resolvers.any.json",
@@ -116,6 +210,8 @@ function main() {
     readJson("intent_patterns/docx.pt.any.json"),
     readJson("intent_patterns/excel.en.any.json"),
     readJson("intent_patterns/excel.pt.any.json"),
+    readJson("agents/excel_calc/routing/calc_intent_patterns.en.any.json"),
+    readJson("agents/excel_calc/routing/calc_intent_patterns.pt.any.json"),
   ];
   const requiredByPatterns = new Set();
   for (const bank of patternBanks) {
@@ -133,10 +229,13 @@ function main() {
   const ptDocxBank = patternBanks[1]; // docx.pt
   const enExcelBank = patternBanks[2]; // excel.en
   const ptExcelBank = patternBanks[3]; // excel.pt
+  const enCalcBank = patternBanks[4]; // calc.en
+  const ptCalcBank = patternBanks[5]; // calc.pt
 
   const slotPairs = [
     { label: "DOCX", en: collectSlotsByType(enDocxBank), pt: collectSlotsByType(ptDocxBank) },
     { label: "XLSX", en: collectSlotsByType(enExcelBank), pt: collectSlotsByType(ptExcelBank) },
+    { label: "CALC", en: collectSlotsByType(enCalcBank), pt: collectSlotsByType(ptCalcBank) },
   ];
 
   for (const { label, en, pt } of slotPairs) {
@@ -189,6 +288,8 @@ function main() {
     { label: "DOCX PT", bank: ptDocxBank },
     { label: "XLSX EN", bank: enExcelBank },
     { label: "XLSX PT", bank: ptExcelBank },
+    { label: "CALC EN", bank: enCalcBank },
+    { label: "CALC PT", bank: ptCalcBank },
   ];
 
   for (const { label, bank } of localePairs) {
@@ -245,6 +346,18 @@ function main() {
     const scoreAdjustmentCount = patterns.filter(
       (p) => p?.scoreAdjustments && typeof p.scoreAdjustments === "object",
     ).length;
+    const priorityCount = patterns.filter(
+      (p) => Number.isFinite(Number(p?.priority)),
+    ).length;
+    const negativeExamplesCount = patterns.filter(
+      (p) => Array.isArray(p?.examples?.negative) && p.examples.negative.length > 0,
+    ).length;
+    const nonEmptyTemplateCount = patterns.filter(
+      (p) => Array.isArray(p?.planTemplate) && p.planTemplate.length > 0,
+    ).length;
+    const calcFamilyCount = patterns.filter(
+      (p) => String(p?.calcFamily || "").trim().length > 0,
+    ).length;
 
     const tokensNoneCoverage = tokensNoneCount / patterns.length;
     const disambiguationCoverage = disambiguationCount / patterns.length;
@@ -269,6 +382,65 @@ function main() {
       warnings.push(
         `${label} scoreAdjustments coverage is low (${scoreAdjustmentCount}/${patterns.length}); target is 75%+.`,
       );
+    }
+    if (label.startsWith("CALC") && priorityCount !== patterns.length) {
+      errors.push(
+        `${label} priority coverage too low (${priorityCount}/${patterns.length}); all calc patterns must define numeric priority.`,
+      );
+    }
+    if (label.startsWith("CALC") && disambiguationCoverage < 0.95) {
+      errors.push(
+        `${label} disambiguationGroup coverage too low (${disambiguationCount}/${patterns.length}); minimum is 95%.`,
+      );
+    }
+    if (label.startsWith("CALC") && negativeExamplesCount !== patterns.length) {
+      errors.push(
+        `${label} negative example coverage too low (${negativeExamplesCount}/${patterns.length}); all calc patterns must include negative examples.`,
+      );
+    }
+    if (
+      label.startsWith("CALC") &&
+      patterns.filter((p) => {
+        const hasTemplate = Array.isArray(p?.planTemplate) && p.planTemplate.length > 0;
+        const hasFamily = String(p?.calcFamily || "").trim().length > 0;
+        return hasTemplate || hasFamily;
+      }).length !== patterns.length
+    ) {
+      errors.push(
+        `${label} calc execution contract coverage too low (${Math.max(nonEmptyTemplateCount, calcFamilyCount)}/${patterns.length}); all calc patterns must define calcFamily or planTemplate.`,
+      );
+    }
+    if (label.startsWith("CALC") && tokensNoneCoverage < 0.3) {
+      errors.push(
+        `${label} tokens_none coverage too low (${tokensNoneCount}/${patterns.length}); minimum is 30%.`,
+      );
+    }
+
+    // High-risk disambiguation groups must carry directional hooks per variant.
+    for (const [group, rules] of Object.entries(HIGH_RISK_DIRECTIONAL_GROUPS)) {
+      const groupPatterns = patterns.filter(
+        (pattern) => String(pattern?.disambiguationGroup || "").trim() === group,
+      );
+      for (const pattern of groupPatterns) {
+        const matchedRule = rules.find((rule) => rule.idPattern.test(String(pattern?.id || "")));
+        if (!matchedRule) continue;
+        if (!hasDirectionalHint(pattern, matchedRule.hints)) {
+          errors.push(
+            `${label} pattern ${pattern.id} in ${group} is missing directional disambiguation hints (${matchedRule.hints.join(", ")}).`,
+          );
+        }
+      }
+    }
+
+    // Prevent machine-like examples unless explicitly marked synthetic.
+    for (const pattern of patterns) {
+      for (const example of pattern?.examples?.positive || []) {
+        if (isOperatorLikeSyntheticExample(example)) {
+          errors.push(
+            `${label} pattern ${pattern.id} has operator-like positive example "${example}" (tag as [synthetic] or rewrite naturally).`,
+          );
+        }
+      }
     }
 
     const collisions = collisionCounts.get(label) || 0;

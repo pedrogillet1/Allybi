@@ -24,6 +24,9 @@ const REQUIRED_ENTITY_BY_OPERATOR: Record<EditOperator, string[]> = {
   ADD_SLIDE: [],
   REWRITE_SLIDE_TEXT: ["slide"],
   REPLACE_SLIDE_IMAGE: ["slide"],
+  PY_COMPUTE: [],
+  PY_CHART: [],
+  PY_WRITEBACK: [],
 };
 
 const DESTRUCTIVE_OR_HINTED_OPS = new Set<EditOperator>([

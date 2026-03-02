@@ -1,176 +1,2939 @@
 {
   "_meta": {
     "id": "table_header_ontology_finance",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for finance.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "finance"
+    "domain": "finance",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "finance",
   "headers": [
-    { "canonical": "account_code", "synonyms": ["account code", "acct code", "gl code", "codigo da conta", "cod conta"], "related": ["account_name", "gl_account"] },
-    { "canonical": "account_name", "synonyms": ["account name", "account", "account description", "conta", "descricao da conta", "nome da conta"], "related": ["account_code", "account_type"] },
-    { "canonical": "account_type", "synonyms": ["account type", "acct type", "type", "tipo de conta", "natureza da conta"], "related": ["account_code", "account_name"] },
-    { "canonical": "accrued_expenses", "synonyms": ["accrued expenses", "accruals", "accrued liabilities", "despesas acumuladas", "provisoes"], "related": ["expense_amount", "accrued_revenue"] },
-    { "canonical": "accrued_revenue", "synonyms": ["accrued revenue", "accrued income", "unbilled revenue", "receita acumulada", "receita nao faturada"], "related": ["revenue_amount", "accrued_expenses"] },
-    { "canonical": "accumulated_depreciation", "synonyms": ["accumulated depreciation", "accum depr", "total depreciation", "depreciacao acumulada", "depr acumulada"], "related": ["depreciation_amount", "asset_value"] },
-    { "canonical": "actual_amount", "synonyms": ["actual", "actual amount", "actuals", "realizado", "valor realizado", "valor atual"], "related": ["budget_amount", "variance_amount"] },
-    { "canonical": "aging_bucket", "synonyms": ["aging bucket", "aging period", "days range", "faixa de vencimento", "faixa de aging"], "related": ["days_outstanding", "receivable_amount"] },
-    { "canonical": "amortization_amount", "synonyms": ["amortization", "amort", "intangible amortization", "amortizacao", "valor de amortizacao"], "related": ["depreciation_amount", "useful_life"] },
-    { "canonical": "annual_budget", "synonyms": ["annual budget", "yearly budget", "full year budget", "orcamento anual", "budget anual"], "related": ["budget_amount", "fiscal_year"] },
-    { "canonical": "asset_class", "synonyms": ["asset class", "asset category", "asset group", "classe de ativo", "categoria do ativo"], "related": ["asset_value", "account_type"] },
-    { "canonical": "asset_value", "synonyms": ["asset value", "book value", "carrying amount", "valor do ativo", "valor contabil"], "related": ["asset_class", "accumulated_depreciation"] },
-    { "canonical": "audit_adjustment", "synonyms": ["audit adjustment", "audit entry", "adjusting entry", "ajuste de auditoria", "lancamento de ajuste"], "related": ["journal_entry", "balance"] },
-    { "canonical": "average_balance", "synonyms": ["average balance", "avg balance", "mean balance", "saldo medio", "media do saldo"], "related": ["beginning_balance", "ending_balance"] },
-    { "canonical": "balance", "synonyms": ["balance", "account balance", "bal", "saldo", "saldo da conta"], "related": ["beginning_balance", "ending_balance"] },
-    { "canonical": "bank_account", "synonyms": ["bank account", "bank", "bank name", "conta bancaria", "banco"], "related": ["cash_balance", "balance"] },
-    { "canonical": "base_currency", "synonyms": ["base currency", "functional currency", "reporting currency", "moeda base", "moeda funcional"], "related": ["currency", "exchange_rate"] },
-    { "canonical": "basis_points", "synonyms": ["basis points", "bps", "bp", "pontos base", "pontos percentuais"], "related": ["interest_rate", "spread"] },
-    { "canonical": "beginning_balance", "synonyms": ["beginning balance", "opening balance", "beg bal", "saldo inicial", "saldo de abertura"], "related": ["ending_balance", "balance"] },
-    { "canonical": "benchmark", "synonyms": ["benchmark", "index", "reference rate", "benchmark", "indice de referencia", "taxa de referencia"], "related": ["rate_of_return", "interest_rate"] },
-    { "canonical": "billing_amount", "synonyms": ["billing amount", "billed amount", "invoice total", "valor faturado", "valor cobrado"], "related": ["invoice_amount", "payment_amount"] },
-    { "canonical": "book_value", "synonyms": ["book value", "carrying value", "net book value", "valor contabil", "valor liquido contabil"], "related": ["fair_value", "market_value"] },
-    { "canonical": "budget_amount", "synonyms": ["budget", "budget amount", "budgeted", "orcamento", "valor orcado", "orcado"], "related": ["actual_amount", "variance_amount"] },
-    { "canonical": "budget_category", "synonyms": ["budget category", "budget line", "budget item", "categoria orcamentaria", "linha orcamentaria"], "related": ["budget_amount", "expense_category"] },
-    { "canonical": "budget_variance", "synonyms": ["budget variance", "variance", "var", "variacao orcamentaria", "desvio orcamentario"], "related": ["budget_amount", "actual_amount"] },
-    { "canonical": "capital_gains", "synonyms": ["capital gains", "capital gain", "gain on sale", "ganho de capital", "lucro na venda"], "related": ["investment_amount", "roi"] },
-    { "canonical": "capex_amount", "synonyms": ["capex", "capital expenditure", "capital spending", "capex", "despesa de capital", "investimento"], "related": ["budget_amount", "asset_value"] },
-    { "canonical": "cash_balance", "synonyms": ["cash balance", "cash on hand", "cash position", "saldo de caixa", "disponibilidades"], "related": ["bank_account", "cash_equivalent"] },
-    { "canonical": "cash_equivalent", "synonyms": ["cash equivalent", "cash equivalents", "near cash", "equivalente de caixa", "aplicacoes de liquidez imediata"], "related": ["cash_balance", "investment_amount"] },
-    { "canonical": "closing_balance", "synonyms": ["closing balance", "period end balance", "month end balance", "saldo de fechamento", "saldo final do periodo"], "related": ["ending_balance", "beginning_balance"] },
-    { "canonical": "cogs", "synonyms": ["cogs", "cost of goods sold", "cost of sales", "cpv", "cmv", "custo dos produtos vendidos"], "related": ["gross_profit", "revenue_amount"] },
-    { "canonical": "commission_amount", "synonyms": ["commission", "commission amount", "sales commission", "comissao", "valor de comissao"], "related": ["sales_amount", "expense_amount"] },
-    { "canonical": "company_code", "synonyms": ["company code", "entity code", "co code", "codigo da empresa", "cod empresa"], "related": ["entity_name", "cost_center"] },
-    { "canonical": "consolidated_amount", "synonyms": ["consolidated", "consol", "consolidated amount", "consolidado", "valor consolidado"], "related": ["entity_name", "intercompany_amount"] },
-    { "canonical": "contribution_margin", "synonyms": ["contribution margin", "marginal contribution", "cm", "margem de contribuicao", "contribuicao marginal"], "related": ["gross_profit", "operating_income"] },
-    { "canonical": "conversion_rate", "synonyms": ["conversion rate", "exchange rate", "fx rate", "taxa de conversao", "taxa de cambio"], "related": ["exchange_rate", "currency"] },
-    { "canonical": "cost_center", "synonyms": ["cost center", "cc", "department code", "centro de custo", "cc"], "related": ["company_code", "expense_category"] },
-    { "canonical": "cost_of_revenue", "synonyms": ["cost of revenue", "cost of services", "service costs", "custo da receita", "custo dos servicos"], "related": ["cogs", "revenue_amount"] },
-    { "canonical": "credit_amount", "synonyms": ["credit", "credit amount", "cr", "credito", "valor a credito"], "related": ["debit_amount", "journal_entry"] },
-    { "canonical": "credit_rating", "synonyms": ["credit rating", "rating", "credit score", "classificacao de credito", "rating de credito"], "related": ["risk_rating", "debt_amount"] },
-    { "canonical": "currency", "synonyms": ["currency", "ccy", "curr", "moeda", "divisa"], "related": ["exchange_rate", "base_currency"] },
-    { "canonical": "current_assets", "synonyms": ["current assets", "short-term assets", "ativo circulante", "ativos de curto prazo"], "related": ["total_assets", "current_liabilities"] },
-    { "canonical": "current_liabilities", "synonyms": ["current liabilities", "short-term liabilities", "passivo circulante", "passivos de curto prazo"], "related": ["total_liabilities", "current_assets"] },
-    { "canonical": "current_ratio", "synonyms": ["current ratio", "liquidity ratio", "indice de liquidez corrente", "liquidez corrente"], "related": ["current_assets", "current_liabilities"] },
-    { "canonical": "days_outstanding", "synonyms": ["days outstanding", "dso", "days sales outstanding", "dias em aberto", "prazo medio de recebimento"], "related": ["aging_bucket", "receivable_amount"] },
-    { "canonical": "debit_amount", "synonyms": ["debit", "debit amount", "dr", "debito", "valor a debito"], "related": ["credit_amount", "journal_entry"] },
-    { "canonical": "debt_amount", "synonyms": ["debt", "debt amount", "borrowings", "divida", "valor da divida", "emprestimos"], "related": ["long_term_debt", "short_term_debt"] },
-    { "canonical": "deferred_revenue", "synonyms": ["deferred revenue", "unearned revenue", "prepaid revenue", "receita diferida", "receita antecipada"], "related": ["revenue_amount", "billing_amount"] },
-    { "canonical": "depreciation_amount", "synonyms": ["depreciation", "depr", "depreciation expense", "depreciacao", "despesa de depreciacao"], "related": ["accumulated_depreciation", "useful_life"] },
-    { "canonical": "depreciation_method", "synonyms": ["depreciation method", "depr method", "method", "metodo de depreciacao", "criterio de depreciacao"], "related": ["depreciation_amount", "useful_life"] },
-    { "canonical": "discount_rate", "synonyms": ["discount rate", "hurdle rate", "wacc", "taxa de desconto", "custo de capital"], "related": ["net_present_value", "interest_rate"] },
-    { "canonical": "dividend_amount", "synonyms": ["dividend", "dividend amount", "div", "dividendo", "valor do dividendo"], "related": ["dividend_yield", "retained_earnings"] },
-    { "canonical": "dividend_yield", "synonyms": ["dividend yield", "yield", "div yield", "dividend yield", "rendimento de dividendos"], "related": ["dividend_amount", "market_value"] },
-    { "canonical": "ebitda", "synonyms": ["ebitda", "adjusted ebitda", "lajida", "ebitda ajustado"], "related": ["operating_income", "depreciation_amount"] },
-    { "canonical": "effective_date", "synonyms": ["effective date", "eff date", "start date", "data de vigencia", "data efetiva", "data inicio"], "related": ["maturity_date", "period"] },
-    { "canonical": "ending_balance", "synonyms": ["ending balance", "closing balance", "end bal", "saldo final", "saldo de encerramento"], "related": ["beginning_balance", "balance"] },
-    { "canonical": "entity_name", "synonyms": ["entity", "entity name", "company", "entidade", "empresa", "razao social"], "related": ["company_code", "consolidated_amount"] },
-    { "canonical": "equity_amount", "synonyms": ["equity", "shareholders equity", "net equity", "patrimonio liquido", "capital proprio"], "related": ["total_equity", "retained_earnings"] },
-    { "canonical": "exchange_rate", "synonyms": ["exchange rate", "fx rate", "rate", "taxa de cambio", "cotacao", "taxa cambial"], "related": ["currency", "fx_gain_loss"] },
-    { "canonical": "expense_amount", "synonyms": ["expense", "expense amount", "expenditure", "despesa", "valor da despesa", "gasto"], "related": ["expense_category", "budget_amount"] },
-    { "canonical": "expense_category", "synonyms": ["expense category", "expense type", "cost category", "categoria de despesa", "tipo de despesa"], "related": ["expense_amount", "cost_center"] },
-    { "canonical": "expense_type", "synonyms": ["expense type", "type of expense", "nature", "tipo de despesa", "natureza da despesa"], "related": ["expense_category", "expense_amount"] },
-    { "canonical": "face_value", "synonyms": ["face value", "par value", "nominal value", "valor de face", "valor nominal"], "related": ["market_value", "book_value"] },
-    { "canonical": "fair_value", "synonyms": ["fair value", "fair market value", "fmv", "valor justo", "valor de mercado"], "related": ["book_value", "market_value"] },
-    { "canonical": "fee_amount", "synonyms": ["fee", "fee amount", "service fee", "taxa", "valor da taxa", "honorarios"], "related": ["expense_amount", "billing_amount"] },
-    { "canonical": "fiscal_period", "synonyms": ["fiscal period", "period", "accounting period", "periodo fiscal", "periodo contabil"], "related": ["fiscal_year", "period"] },
-    { "canonical": "fiscal_year", "synonyms": ["fiscal year", "fy", "financial year", "ano fiscal", "exercicio fiscal", "exercicio"], "related": ["fiscal_period", "period"] },
-    { "canonical": "fixed_assets", "synonyms": ["fixed assets", "property plant equipment", "ppe", "ativo imobilizado", "imobilizado"], "related": ["asset_value", "depreciation_amount"] },
-    { "canonical": "forecast_amount", "synonyms": ["forecast", "projected", "estimated", "previsao", "projetado", "estimado"], "related": ["budget_amount", "actual_amount"] },
-    { "canonical": "funding_source", "synonyms": ["funding source", "source of funds", "financing", "fonte de recurso", "origem dos recursos"], "related": ["loan_amount", "equity_amount"] },
-    { "canonical": "fx_gain_loss", "synonyms": ["fx gain loss", "foreign exchange gain", "currency gain loss", "variacao cambial", "ganho perda cambial"], "related": ["exchange_rate", "currency"] },
-    { "canonical": "gl_account", "synonyms": ["gl account", "general ledger account", "ledger account", "conta contabil", "conta do razao"], "related": ["account_code", "account_name"] },
-    { "canonical": "goodwill", "synonyms": ["goodwill", "intangible asset", "agio", "goodwill", "fundo de comercio"], "related": ["asset_value", "impairment_amount"] },
-    { "canonical": "gross_margin", "synonyms": ["gross margin", "gm", "gross profit margin", "margem bruta", "margem de lucro bruto"], "related": ["gross_profit", "revenue_amount"] },
-    { "canonical": "gross_profit", "synonyms": ["gross profit", "gross income", "lucro bruto", "resultado bruto"], "related": ["revenue_amount", "cogs"] },
-    { "canonical": "gross_revenue", "synonyms": ["gross revenue", "gross sales", "total revenue", "receita bruta", "vendas brutas"], "related": ["net_revenue", "revenue_amount"] },
-    { "canonical": "impairment_amount", "synonyms": ["impairment", "impairment loss", "write-down", "perda por impairment", "reducao ao valor recuperavel"], "related": ["asset_value", "goodwill"] },
-    { "canonical": "income_tax", "synonyms": ["income tax", "tax expense", "corporate tax", "imposto de renda", "irpj", "irpj/csll"], "related": ["tax_amount", "tax_rate"] },
-    { "canonical": "insurance_premium", "synonyms": ["insurance premium", "premium", "insurance cost", "premio de seguro", "custo do seguro"], "related": ["expense_amount", "fee_amount"] },
-    { "canonical": "intercompany_amount", "synonyms": ["intercompany", "interco", "ic amount", "intercompany", "valor intercompany", "eliminacao"], "related": ["entity_name", "consolidated_amount"] },
-    { "canonical": "interest_expense", "synonyms": ["interest expense", "finance cost", "borrowing cost", "despesa de juros", "custo financeiro"], "related": ["interest_rate", "debt_amount"] },
-    { "canonical": "interest_income", "synonyms": ["interest income", "finance income", "interest earned", "receita de juros", "rendimentos financeiros"], "related": ["interest_rate", "investment_amount"] },
-    { "canonical": "interest_rate", "synonyms": ["interest rate", "rate", "coupon rate", "taxa de juros", "taxa", "cupom"], "related": ["interest_expense", "interest_income"] },
-    { "canonical": "inventory_value", "synonyms": ["inventory", "inventory value", "stock value", "estoque", "valor do estoque"], "related": ["cogs", "current_assets"] },
-    { "canonical": "investment_amount", "synonyms": ["investment", "investment amount", "invested", "investimento", "valor investido"], "related": ["roi", "rate_of_return"] },
-    { "canonical": "invoice_amount", "synonyms": ["invoice amount", "invoice total", "inv amt", "valor da nota fiscal", "valor da fatura"], "related": ["invoice_number", "billing_amount"] },
-    { "canonical": "invoice_date", "synonyms": ["invoice date", "inv date", "billing date", "data da nota fiscal", "data da fatura"], "related": ["invoice_number", "payment_date"] },
-    { "canonical": "invoice_number", "synonyms": ["invoice number", "inv no", "invoice #", "numero da nota fiscal", "nf", "numero da fatura"], "related": ["invoice_amount", "invoice_date"] },
-    { "canonical": "journal_entry", "synonyms": ["journal entry", "je", "entry", "lancamento contabil", "lancamento", "partida"], "related": ["debit_amount", "credit_amount"] },
-    { "canonical": "liability_amount", "synonyms": ["liability", "obligation", "amount owed", "passivo", "obrigacao", "valor devido"], "related": ["total_liabilities", "current_liabilities"] },
-    { "canonical": "loan_amount", "synonyms": ["loan amount", "principal", "loan balance", "valor do emprestimo", "principal", "saldo do emprestimo"], "related": ["loan_balance", "interest_rate"] },
-    { "canonical": "loan_balance", "synonyms": ["loan balance", "outstanding loan", "remaining principal", "saldo do emprestimo", "saldo devedor"], "related": ["loan_amount", "payment_amount"] },
-    { "canonical": "long_term_debt", "synonyms": ["long-term debt", "lt debt", "non-current liabilities", "divida de longo prazo", "passivo nao circulante"], "related": ["short_term_debt", "debt_amount"] },
-    { "canonical": "market_value", "synonyms": ["market value", "market price", "mv", "valor de mercado", "preco de mercado"], "related": ["fair_value", "book_value"] },
-    { "canonical": "maturity_date", "synonyms": ["maturity date", "maturity", "due date", "data de vencimento", "vencimento"], "related": ["effective_date", "loan_amount"] },
-    { "canonical": "net_assets", "synonyms": ["net assets", "total net assets", "ativos liquidos", "patrimonio liquido"], "related": ["total_assets", "total_liabilities"] },
-    { "canonical": "net_income", "synonyms": ["net income", "net profit", "bottom line", "lucro liquido", "resultado liquido"], "related": ["gross_profit", "operating_income"] },
-    { "canonical": "net_present_value", "synonyms": ["net present value", "npv", "present value", "valor presente liquido", "vpl"], "related": ["discount_rate", "present_value"] },
-    { "canonical": "net_revenue", "synonyms": ["net revenue", "net sales", "receita liquida", "vendas liquidas"], "related": ["gross_revenue", "revenue_amount"] },
-    { "canonical": "opening_balance", "synonyms": ["opening balance", "initial balance", "start balance", "saldo de abertura", "saldo inicial"], "related": ["beginning_balance", "ending_balance"] },
-    { "canonical": "operating_expense", "synonyms": ["operating expense", "opex", "operating costs", "despesa operacional", "custo operacional"], "related": ["operating_income", "expense_amount"] },
-    { "canonical": "operating_income", "synonyms": ["operating income", "operating profit", "ebit", "lucro operacional", "resultado operacional"], "related": ["operating_expense", "ebitda"] },
-    { "canonical": "operating_margin", "synonyms": ["operating margin", "op margin", "ebit margin", "margem operacional", "margem ebit"], "related": ["operating_income", "revenue_amount"] },
-    { "canonical": "other_income", "synonyms": ["other income", "non-operating income", "miscellaneous income", "outras receitas", "receitas nao operacionais"], "related": ["revenue_amount", "interest_income"] },
-    { "canonical": "par_value", "synonyms": ["par value", "nominal value", "stated value", "valor nominal", "valor par"], "related": ["face_value", "equity_amount"] },
-    { "canonical": "payable_amount", "synonyms": ["payable", "amount payable", "trade payable", "contas a pagar", "valor a pagar"], "related": ["payment_amount", "accounts_payable"] },
-    { "canonical": "payment_amount", "synonyms": ["payment", "payment amount", "amt paid", "pagamento", "valor pago", "valor do pagamento"], "related": ["payment_date", "payment_method"] },
-    { "canonical": "payment_date", "synonyms": ["payment date", "pay date", "settlement date", "data de pagamento", "data do pagamento"], "related": ["payment_amount", "due_date"] },
-    { "canonical": "payment_method", "synonyms": ["payment method", "pay method", "form of payment", "forma de pagamento", "meio de pagamento"], "related": ["payment_amount", "payment_date"] },
-    { "canonical": "payment_status", "synonyms": ["payment status", "pay status", "status", "status do pagamento", "situacao do pagamento"], "related": ["payment_amount", "payment_date"] },
-    { "canonical": "payment_term", "synonyms": ["payment term", "terms", "net days", "prazo de pagamento", "condicao de pagamento"], "related": ["payment_date", "invoice_date"] },
-    { "canonical": "payroll_amount", "synonyms": ["payroll", "salary", "wages", "folha de pagamento", "salario", "remuneracao"], "related": ["expense_amount", "entity_name"] },
-    { "canonical": "period", "synonyms": ["period", "accounting period", "month", "periodo", "mes", "competencia"], "related": ["fiscal_period", "fiscal_year"] },
-    { "canonical": "premium_amount", "synonyms": ["premium", "premium amount", "premium paid", "premio", "valor do premio"], "related": ["insurance_premium", "fee_amount"] },
-    { "canonical": "present_value", "synonyms": ["present value", "pv", "discounted value", "valor presente", "valor descontado"], "related": ["net_present_value", "discount_rate"] },
-    { "canonical": "profit_margin", "synonyms": ["profit margin", "margin", "net margin", "margem de lucro", "margem liquida"], "related": ["net_income", "revenue_amount"] },
-    { "canonical": "provision_amount", "synonyms": ["provision", "reserve", "allowance", "provisao", "reserva"], "related": ["liability_amount", "expense_amount"] },
-    { "canonical": "purchase_price", "synonyms": ["purchase price", "acquisition cost", "cost price", "preco de compra", "custo de aquisicao"], "related": ["unit_cost", "selling_price"] },
-    { "canonical": "quarterly_amount", "synonyms": ["quarterly", "q1", "q2", "q3", "q4", "trimestral", "valor trimestral"], "related": ["period", "fiscal_year"] },
-    { "canonical": "rate_of_return", "synonyms": ["rate of return", "ror", "return", "taxa de retorno", "retorno"], "related": ["roi", "investment_amount"] },
-    { "canonical": "receivable_amount", "synonyms": ["receivable", "amount receivable", "trade receivable", "contas a receber", "valor a receber"], "related": ["days_outstanding", "aging_bucket"] },
-    { "canonical": "reconciliation_amount", "synonyms": ["reconciliation", "recon amount", "reconciled", "conciliacao", "valor conciliado"], "related": ["balance", "audit_adjustment"] },
-    { "canonical": "remaining_balance", "synonyms": ["remaining balance", "outstanding balance", "balance due", "saldo remanescente", "saldo em aberto"], "related": ["balance", "payment_amount"] },
-    { "canonical": "retained_earnings", "synonyms": ["retained earnings", "accumulated earnings", "retained profit", "lucros acumulados", "lucros retidos"], "related": ["net_income", "dividend_amount"] },
-    { "canonical": "return_on_assets", "synonyms": ["return on assets", "roa", "asset return", "retorno sobre ativos", "roa"], "related": ["net_income", "total_assets"] },
-    { "canonical": "return_on_equity", "synonyms": ["return on equity", "roe", "equity return", "retorno sobre patrimonio", "roe"], "related": ["net_income", "equity_amount"] },
-    { "canonical": "revenue_amount", "synonyms": ["revenue", "sales", "income", "receita", "vendas", "faturamento"], "related": ["net_revenue", "gross_revenue"] },
-    { "canonical": "risk_rating", "synonyms": ["risk rating", "risk score", "risk level", "classificacao de risco", "nivel de risco"], "related": ["credit_rating", "provision_amount"] },
-    { "canonical": "roi", "synonyms": ["roi", "return on investment", "retorno sobre investimento", "roi"], "related": ["rate_of_return", "investment_amount"] },
-    { "canonical": "running_total", "synonyms": ["running total", "cumulative total", "ytd total", "total acumulado", "acumulado"], "related": ["total_amount", "year_to_date"] },
-    { "canonical": "sales_amount", "synonyms": ["sales", "sales amount", "net sales", "vendas", "valor de vendas"], "related": ["revenue_amount", "commission_amount"] },
-    { "canonical": "selling_price", "synonyms": ["selling price", "sale price", "unit price", "preco de venda", "preco unitario de venda"], "related": ["unit_price", "purchase_price"] },
-    { "canonical": "settlement_amount", "synonyms": ["settlement amount", "settled", "net settlement", "valor de liquidacao", "valor liquidado"], "related": ["payment_amount", "invoice_amount"] },
-    { "canonical": "short_term_debt", "synonyms": ["short-term debt", "st debt", "current debt", "divida de curto prazo", "emprestimos de curto prazo"], "related": ["long_term_debt", "debt_amount"] },
-    { "canonical": "spread", "synonyms": ["spread", "margin", "markup", "spread", "margem", "markup"], "related": ["interest_rate", "basis_points"] },
-    { "canonical": "subtotal", "synonyms": ["subtotal", "sub-total", "partial total", "subtotal", "total parcial"], "related": ["total_amount", "running_total"] },
-    { "canonical": "tax_amount", "synonyms": ["tax", "tax amount", "tax expense", "imposto", "valor do imposto", "tributo"], "related": ["tax_rate", "income_tax"] },
-    { "canonical": "tax_rate", "synonyms": ["tax rate", "effective tax rate", "rate", "aliquota", "taxa de imposto", "aliquota efetiva"], "related": ["tax_amount", "income_tax"] },
-    { "canonical": "total_amount", "synonyms": ["total", "total amount", "grand total", "total", "valor total", "total geral"], "related": ["subtotal", "running_total"] },
-    { "canonical": "total_assets", "synonyms": ["total assets", "assets total", "total do ativo", "ativo total"], "related": ["current_assets", "fixed_assets"] },
-    { "canonical": "total_equity", "synonyms": ["total equity", "equity total", "net worth", "total do patrimonio liquido", "patrimonio total"], "related": ["equity_amount", "retained_earnings"] },
-    { "canonical": "total_liabilities", "synonyms": ["total liabilities", "liabilities total", "total do passivo", "passivo total"], "related": ["current_liabilities", "long_term_debt"] },
-    { "canonical": "total_revenue", "synonyms": ["total revenue", "revenue total", "total sales", "receita total", "total de vendas"], "related": ["revenue_amount", "net_revenue"] },
-    { "canonical": "transaction_amount", "synonyms": ["transaction amount", "txn amount", "amount", "valor da transacao", "valor da operacao"], "related": ["transaction_date", "transaction_type"] },
-    { "canonical": "transaction_date", "synonyms": ["transaction date", "txn date", "trade date", "data da transacao", "data da operacao"], "related": ["transaction_amount", "effective_date"] },
-    { "canonical": "transaction_type", "synonyms": ["transaction type", "txn type", "type", "tipo de transacao", "tipo de operacao"], "related": ["transaction_amount", "transaction_date"] },
-    { "canonical": "treasury_amount", "synonyms": ["treasury", "treasury position", "cash management", "tesouraria", "posicao de caixa"], "related": ["cash_balance", "investment_amount"] },
-    { "canonical": "turnover_ratio", "synonyms": ["turnover ratio", "turnover", "asset turnover", "giro", "giro do ativo", "indice de rotatividade"], "related": ["revenue_amount", "total_assets"] },
-    { "canonical": "unit_cost", "synonyms": ["unit cost", "cost per unit", "cpu", "custo unitario", "custo por unidade"], "related": ["unit_price", "cogs"] },
-    { "canonical": "unit_price", "synonyms": ["unit price", "price per unit", "ppu", "preco unitario", "preco por unidade"], "related": ["unit_cost", "selling_price"] },
-    { "canonical": "unrealized_gain", "synonyms": ["unrealized gain", "unrealized gain loss", "mark to market", "ganho nao realizado", "ajuste a valor de mercado"], "related": ["fair_value", "market_value"] },
-    { "canonical": "useful_life", "synonyms": ["useful life", "economic life", "asset life", "vida util", "vida economica"], "related": ["depreciation_amount", "depreciation_method"] },
-    { "canonical": "variance_amount", "synonyms": ["variance", "var", "difference", "variacao", "desvio", "diferenca"], "related": ["budget_amount", "actual_amount"] },
-    { "canonical": "volume", "synonyms": ["volume", "quantity", "units", "volume", "quantidade", "unidades"], "related": ["unit_price", "sales_amount"] },
-    { "canonical": "weighted_average", "synonyms": ["weighted average", "wavg", "weighted avg", "media ponderada", "custo medio ponderado"], "related": ["unit_cost", "average_balance"] },
-    { "canonical": "withholding_tax", "synonyms": ["withholding tax", "wht", "tax withheld", "imposto retido", "retencao na fonte", "irrf"], "related": ["tax_amount", "tax_rate"] },
-    { "canonical": "working_capital", "synonyms": ["working capital", "net working capital", "nwc", "capital de giro", "capital circulante liquido"], "related": ["current_assets", "current_liabilities"] },
-    { "canonical": "write_off_amount", "synonyms": ["write-off", "write off", "bad debt", "baixa", "perda", "provisao para devedores duvidosos"], "related": ["receivable_amount", "provision_amount"] },
-    { "canonical": "year_to_date", "synonyms": ["year to date", "ytd", "cumulative", "acumulado do ano", "ytd", "acumulado no exercicio"], "related": ["period", "running_total"] },
-    { "canonical": "yield", "synonyms": ["yield", "return", "annual yield", "rendimento", "rentabilidade", "yield anual"], "related": ["dividend_yield", "rate_of_return"] }
+    {
+      "canonical": "account_code",
+      "synonyms": [
+        "account code",
+        "acct code",
+        "gl code",
+        "codigo da conta",
+        "cod conta"
+      ],
+      "related": [
+        "account_name",
+        "gl_account"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_account_code",
+      "curationReason": "weighted:account_code:domain_general"
+    },
+    {
+      "canonical": "account_name",
+      "synonyms": [
+        "account name",
+        "account",
+        "account description",
+        "conta",
+        "descricao da conta",
+        "nome da conta"
+      ],
+      "related": [
+        "account_code",
+        "account_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_account_name",
+      "curationReason": "weighted:account_name:domain_general"
+    },
+    {
+      "canonical": "account_type",
+      "synonyms": [
+        "account type",
+        "acct type",
+        "type",
+        "tipo de conta",
+        "natureza da conta"
+      ],
+      "related": [
+        "account_code",
+        "account_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_account_type",
+      "curationReason": "weighted:account_type:domain_general"
+    },
+    {
+      "canonical": "accrued_expenses",
+      "synonyms": [
+        "accrued expenses",
+        "accruals",
+        "accrued liabilities",
+        "despesas acumuladas",
+        "provisoes"
+      ],
+      "related": [
+        "expense_amount",
+        "accrued_revenue"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_accrued_expenses",
+      "curationReason": "weighted:accrued_expenses:domain_general"
+    },
+    {
+      "canonical": "accrued_revenue",
+      "synonyms": [
+        "accrued revenue",
+        "accrued income",
+        "unbilled revenue",
+        "receita acumulada",
+        "receita nao faturada"
+      ],
+      "related": [
+        "revenue_amount",
+        "accrued_expenses"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_accrued_revenue",
+      "curationReason": "weighted:accrued_revenue:domain_general"
+    },
+    {
+      "canonical": "accumulated_depreciation",
+      "synonyms": [
+        "accumulated depreciation",
+        "accum depr",
+        "total depreciation",
+        "depreciacao acumulada",
+        "depr acumulada"
+      ],
+      "related": [
+        "depreciation_amount",
+        "asset_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_accumulated_depreciation",
+      "curationReason": "weighted:accumulated_depreciation:domain_general"
+    },
+    {
+      "canonical": "actual_amount",
+      "synonyms": [
+        "actual",
+        "actual amount",
+        "actuals",
+        "realizado",
+        "valor realizado",
+        "valor atual"
+      ],
+      "related": [
+        "budget_amount",
+        "variance_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_actual_amount",
+      "curationReason": "weighted:actual_amount:domain_general"
+    },
+    {
+      "canonical": "aging_bucket",
+      "synonyms": [
+        "aging bucket",
+        "aging period",
+        "days range",
+        "faixa de vencimento",
+        "faixa de aging"
+      ],
+      "related": [
+        "days_outstanding",
+        "receivable_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_aging_bucket",
+      "curationReason": "weighted:aging_bucket:domain_general"
+    },
+    {
+      "canonical": "amortization_amount",
+      "synonyms": [
+        "amortization",
+        "amort",
+        "intangible amortization",
+        "amortizacao",
+        "valor de amortizacao"
+      ],
+      "related": [
+        "depreciation_amount",
+        "useful_life"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_amortization_amount",
+      "curationReason": "weighted:amortization_amount:domain_general"
+    },
+    {
+      "canonical": "annual_budget",
+      "synonyms": [
+        "annual budget",
+        "yearly budget",
+        "full year budget",
+        "orcamento anual",
+        "budget anual"
+      ],
+      "related": [
+        "budget_amount",
+        "fiscal_year"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_annual_budget",
+      "curationReason": "weighted:annual_budget:domain_general"
+    },
+    {
+      "canonical": "asset_class",
+      "synonyms": [
+        "asset class",
+        "asset category",
+        "asset group",
+        "classe de ativo",
+        "categoria do ativo"
+      ],
+      "related": [
+        "asset_value",
+        "account_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_class",
+      "curationReason": "weighted:asset_class:domain_general"
+    },
+    {
+      "canonical": "asset_value",
+      "synonyms": [
+        "asset value",
+        "book value",
+        "carrying amount",
+        "valor do ativo",
+        "valor contabil"
+      ],
+      "related": [
+        "asset_class",
+        "accumulated_depreciation"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_value",
+      "curationReason": "weighted:asset_value:domain_general"
+    },
+    {
+      "canonical": "audit_adjustment",
+      "synonyms": [
+        "audit adjustment",
+        "audit entry",
+        "adjusting entry",
+        "ajuste de auditoria",
+        "lancamento de ajuste"
+      ],
+      "related": [
+        "journal_entry",
+        "balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_audit_adjustment",
+      "curationReason": "weighted:audit_adjustment:domain_general"
+    },
+    {
+      "canonical": "average_balance",
+      "synonyms": [
+        "average balance",
+        "avg balance",
+        "mean balance",
+        "saldo medio",
+        "media do saldo"
+      ],
+      "related": [
+        "beginning_balance",
+        "ending_balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_average_balance",
+      "curationReason": "weighted:average_balance:domain_general"
+    },
+    {
+      "canonical": "balance",
+      "synonyms": [
+        "balance",
+        "account balance",
+        "bal",
+        "saldo",
+        "saldo da conta"
+      ],
+      "related": [
+        "beginning_balance",
+        "ending_balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_balance",
+      "curationReason": "weighted:balance:domain_general"
+    },
+    {
+      "canonical": "bank_account",
+      "synonyms": [
+        "bank account",
+        "bank",
+        "bank name",
+        "conta bancaria",
+        "banco"
+      ],
+      "related": [
+        "cash_balance",
+        "balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_account",
+      "curationReason": "weighted:bank_account:domain_general"
+    },
+    {
+      "canonical": "base_currency",
+      "synonyms": [
+        "base currency",
+        "functional currency",
+        "reporting currency",
+        "moeda base",
+        "moeda funcional"
+      ],
+      "related": [
+        "currency",
+        "exchange_rate"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_base_currency",
+      "curationReason": "weighted:base_currency:domain_general"
+    },
+    {
+      "canonical": "basis_points",
+      "synonyms": [
+        "basis points",
+        "bps",
+        "bp",
+        "pontos base",
+        "pontos percentuais"
+      ],
+      "related": [
+        "interest_rate",
+        "spread"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_basis_points",
+      "curationReason": "weighted:basis_points:domain_general"
+    },
+    {
+      "canonical": "beginning_balance",
+      "synonyms": [
+        "beginning balance",
+        "opening balance",
+        "beg bal",
+        "saldo inicial",
+        "saldo de abertura"
+      ],
+      "related": [
+        "ending_balance",
+        "balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_beginning_balance",
+      "curationReason": "weighted:beginning_balance:domain_general"
+    },
+    {
+      "canonical": "benchmark",
+      "synonyms": [
+        "benchmark",
+        "index",
+        "reference rate",
+        "benchmark",
+        "indice de referencia",
+        "taxa de referencia"
+      ],
+      "related": [
+        "rate_of_return",
+        "interest_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_benchmark",
+      "curationReason": "weighted:benchmark:domain_general"
+    },
+    {
+      "canonical": "billing_amount",
+      "synonyms": [
+        "billing amount",
+        "billed amount",
+        "invoice total",
+        "valor faturado",
+        "valor cobrado"
+      ],
+      "related": [
+        "invoice_amount",
+        "payment_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_billing_amount",
+      "curationReason": "weighted:billing_amount:domain_general"
+    },
+    {
+      "canonical": "book_value",
+      "synonyms": [
+        "book value",
+        "carrying value",
+        "net book value",
+        "valor contabil",
+        "valor liquido contabil"
+      ],
+      "related": [
+        "fair_value",
+        "market_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_book_value",
+      "curationReason": "weighted:book_value:domain_general"
+    },
+    {
+      "canonical": "budget_amount",
+      "synonyms": [
+        "budget",
+        "budget amount",
+        "budgeted",
+        "orcamento",
+        "valor orcado",
+        "orcado"
+      ],
+      "related": [
+        "actual_amount",
+        "variance_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_budget_amount",
+      "curationReason": "weighted:budget_amount:domain_general"
+    },
+    {
+      "canonical": "budget_category",
+      "synonyms": [
+        "budget category",
+        "budget line",
+        "budget item",
+        "categoria orcamentaria",
+        "linha orcamentaria"
+      ],
+      "related": [
+        "budget_amount",
+        "expense_category"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_budget_category",
+      "curationReason": "weighted:budget_category:domain_general"
+    },
+    {
+      "canonical": "budget_variance",
+      "synonyms": [
+        "budget variance",
+        "variance",
+        "var",
+        "variacao orcamentaria",
+        "desvio orcamentario"
+      ],
+      "related": [
+        "budget_amount",
+        "actual_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_budget_variance",
+      "curationReason": "weighted:budget_variance:domain_general"
+    },
+    {
+      "canonical": "capital_gains",
+      "synonyms": [
+        "capital gains",
+        "capital gain",
+        "gain on sale",
+        "ganho de capital",
+        "lucro na venda"
+      ],
+      "related": [
+        "investment_amount",
+        "roi"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_capital_gains",
+      "curationReason": "weighted:capital_gains:domain_general"
+    },
+    {
+      "canonical": "capex_amount",
+      "synonyms": [
+        "capex",
+        "capital expenditure",
+        "capital spending",
+        "capex",
+        "despesa de capital",
+        "investimento"
+      ],
+      "related": [
+        "budget_amount",
+        "asset_value"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_capex_amount",
+      "curationReason": "weighted:capex_amount:domain_general"
+    },
+    {
+      "canonical": "cash_balance",
+      "synonyms": [
+        "cash balance",
+        "cash on hand",
+        "cash position",
+        "saldo de caixa",
+        "disponibilidades"
+      ],
+      "related": [
+        "bank_account",
+        "cash_equivalent"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_cash_balance",
+      "curationReason": "weighted:cash_balance:domain_general"
+    },
+    {
+      "canonical": "cash_equivalent",
+      "synonyms": [
+        "cash equivalent",
+        "cash equivalents",
+        "near cash",
+        "equivalente de caixa",
+        "aplicacoes de liquidez imediata"
+      ],
+      "related": [
+        "cash_balance",
+        "investment_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_cash_equivalent",
+      "curationReason": "weighted:cash_equivalent:domain_general"
+    },
+    {
+      "canonical": "closing_balance",
+      "synonyms": [
+        "closing balance",
+        "period end balance",
+        "month end balance",
+        "saldo de fechamento",
+        "saldo final do periodo"
+      ],
+      "related": [
+        "ending_balance",
+        "beginning_balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_closing_balance",
+      "curationReason": "weighted:closing_balance:domain_general"
+    },
+    {
+      "canonical": "cogs",
+      "synonyms": [
+        "cogs",
+        "cost of goods sold",
+        "cost of sales",
+        "cpv",
+        "cmv",
+        "custo dos produtos vendidos"
+      ],
+      "related": [
+        "gross_profit",
+        "revenue_amount"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_cogs",
+      "curationReason": "weighted:cogs:domain_general"
+    },
+    {
+      "canonical": "commission_amount",
+      "synonyms": [
+        "commission",
+        "commission amount",
+        "sales commission",
+        "comissao",
+        "valor de comissao"
+      ],
+      "related": [
+        "sales_amount",
+        "expense_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_commission_amount",
+      "curationReason": "weighted:commission_amount:domain_general"
+    },
+    {
+      "canonical": "company_code",
+      "synonyms": [
+        "company code",
+        "entity code",
+        "co code",
+        "codigo da empresa",
+        "cod empresa"
+      ],
+      "related": [
+        "entity_name",
+        "cost_center"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_company_code",
+      "curationReason": "weighted:company_code:domain_general"
+    },
+    {
+      "canonical": "consolidated_amount",
+      "synonyms": [
+        "consolidated",
+        "consol",
+        "consolidated amount",
+        "consolidado",
+        "valor consolidado"
+      ],
+      "related": [
+        "entity_name",
+        "intercompany_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_consolidated_amount",
+      "curationReason": "weighted:consolidated_amount:domain_general"
+    },
+    {
+      "canonical": "contribution_margin",
+      "synonyms": [
+        "contribution margin",
+        "marginal contribution",
+        "cm",
+        "margem de contribuicao",
+        "contribuicao marginal"
+      ],
+      "related": [
+        "gross_profit",
+        "operating_income"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_contribution_margin",
+      "curationReason": "weighted:contribution_margin:domain_general"
+    },
+    {
+      "canonical": "conversion_rate",
+      "synonyms": [
+        "conversion rate",
+        "exchange rate",
+        "fx rate",
+        "taxa de conversao",
+        "taxa de cambio"
+      ],
+      "related": [
+        "exchange_rate",
+        "currency"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_conversion_rate",
+      "curationReason": "weighted:conversion_rate:domain_general"
+    },
+    {
+      "canonical": "cost_center",
+      "synonyms": [
+        "cost center",
+        "cc",
+        "department code",
+        "centro de custo",
+        "cc"
+      ],
+      "related": [
+        "company_code",
+        "expense_category"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_center",
+      "curationReason": "weighted:cost_center:domain_general"
+    },
+    {
+      "canonical": "cost_of_revenue",
+      "synonyms": [
+        "cost of revenue",
+        "cost of services",
+        "service costs",
+        "custo da receita",
+        "custo dos servicos"
+      ],
+      "related": [
+        "cogs",
+        "revenue_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_of_revenue",
+      "curationReason": "weighted:cost_of_revenue:domain_general"
+    },
+    {
+      "canonical": "credit_amount",
+      "synonyms": [
+        "credit",
+        "credit amount",
+        "cr",
+        "credito",
+        "valor a credito"
+      ],
+      "related": [
+        "debit_amount",
+        "journal_entry"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_amount",
+      "curationReason": "weighted:credit_amount:domain_general"
+    },
+    {
+      "canonical": "credit_rating",
+      "synonyms": [
+        "credit rating",
+        "rating",
+        "credit score",
+        "classificacao de credito",
+        "rating de credito"
+      ],
+      "related": [
+        "risk_rating",
+        "debt_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_credit_rating",
+      "curationReason": "weighted:credit_rating:domain_general"
+    },
+    {
+      "canonical": "currency",
+      "synonyms": [
+        "currency",
+        "ccy",
+        "curr",
+        "moeda",
+        "divisa"
+      ],
+      "related": [
+        "exchange_rate",
+        "base_currency"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_currency",
+      "curationReason": "weighted:currency:domain_general"
+    },
+    {
+      "canonical": "current_assets",
+      "synonyms": [
+        "current assets",
+        "short-term assets",
+        "ativo circulante",
+        "ativos de curto prazo"
+      ],
+      "related": [
+        "total_assets",
+        "current_liabilities"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_current_assets",
+      "curationReason": "weighted:current_assets:domain_general"
+    },
+    {
+      "canonical": "current_liabilities",
+      "synonyms": [
+        "current liabilities",
+        "short-term liabilities",
+        "passivo circulante",
+        "passivos de curto prazo"
+      ],
+      "related": [
+        "total_liabilities",
+        "current_assets"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_current_liabilities",
+      "curationReason": "weighted:current_liabilities:domain_general"
+    },
+    {
+      "canonical": "current_ratio",
+      "synonyms": [
+        "current ratio",
+        "liquidity ratio",
+        "indice de liquidez corrente",
+        "liquidez corrente"
+      ],
+      "related": [
+        "current_assets",
+        "current_liabilities"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_current_ratio",
+      "curationReason": "weighted:current_ratio:domain_general"
+    },
+    {
+      "canonical": "days_outstanding",
+      "synonyms": [
+        "days outstanding",
+        "dso",
+        "days sales outstanding",
+        "dias em aberto",
+        "prazo medio de recebimento"
+      ],
+      "related": [
+        "aging_bucket",
+        "receivable_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_days_outstanding",
+      "curationReason": "weighted:days_outstanding:domain_general"
+    },
+    {
+      "canonical": "debit_amount",
+      "synonyms": [
+        "debit",
+        "debit amount",
+        "dr",
+        "debito",
+        "valor a debito"
+      ],
+      "related": [
+        "credit_amount",
+        "journal_entry"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_debit_amount",
+      "curationReason": "weighted:debit_amount:domain_general"
+    },
+    {
+      "canonical": "debt_amount",
+      "synonyms": [
+        "debt",
+        "debt amount",
+        "borrowings",
+        "divida",
+        "valor da divida",
+        "emprestimos"
+      ],
+      "related": [
+        "long_term_debt",
+        "short_term_debt"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_debt_amount",
+      "curationReason": "weighted:debt_amount:domain_general"
+    },
+    {
+      "canonical": "deferred_revenue",
+      "synonyms": [
+        "deferred revenue",
+        "unearned revenue",
+        "prepaid revenue",
+        "receita diferida",
+        "receita antecipada"
+      ],
+      "related": [
+        "revenue_amount",
+        "billing_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_deferred_revenue",
+      "curationReason": "weighted:deferred_revenue:domain_general"
+    },
+    {
+      "canonical": "depreciation_amount",
+      "synonyms": [
+        "depreciation",
+        "depr",
+        "depreciation expense",
+        "depreciacao",
+        "despesa de depreciacao"
+      ],
+      "related": [
+        "accumulated_depreciation",
+        "useful_life"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_depreciation_amount",
+      "curationReason": "weighted:depreciation_amount:domain_general"
+    },
+    {
+      "canonical": "depreciation_method",
+      "synonyms": [
+        "depreciation method",
+        "depr method",
+        "method",
+        "metodo de depreciacao",
+        "criterio de depreciacao"
+      ],
+      "related": [
+        "depreciation_amount",
+        "useful_life"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_depreciation_method",
+      "curationReason": "weighted:depreciation_method:domain_general"
+    },
+    {
+      "canonical": "discount_rate",
+      "synonyms": [
+        "discount rate",
+        "hurdle rate",
+        "wacc",
+        "taxa de desconto",
+        "custo de capital"
+      ],
+      "related": [
+        "net_present_value",
+        "interest_rate"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_discount_rate",
+      "curationReason": "weighted:discount_rate:domain_general"
+    },
+    {
+      "canonical": "dividend_amount",
+      "synonyms": [
+        "dividend",
+        "dividend amount",
+        "div",
+        "dividendo",
+        "valor do dividendo"
+      ],
+      "related": [
+        "dividend_yield",
+        "retained_earnings"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_dividend_amount",
+      "curationReason": "weighted:dividend_amount:domain_general"
+    },
+    {
+      "canonical": "dividend_yield",
+      "synonyms": [
+        "dividend yield",
+        "yield",
+        "div yield",
+        "dividend yield",
+        "rendimento de dividendos"
+      ],
+      "related": [
+        "dividend_amount",
+        "market_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_dividend_yield",
+      "curationReason": "weighted:dividend_yield:domain_general"
+    },
+    {
+      "canonical": "ebitda",
+      "synonyms": [
+        "ebitda",
+        "adjusted ebitda",
+        "lajida",
+        "ebitda ajustado"
+      ],
+      "related": [
+        "operating_income",
+        "depreciation_amount"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_ebitda",
+      "curationReason": "weighted:ebitda:domain_general"
+    },
+    {
+      "canonical": "effective_date",
+      "synonyms": [
+        "effective date",
+        "eff date",
+        "start date",
+        "data de vigencia",
+        "data efetiva",
+        "data inicio"
+      ],
+      "related": [
+        "maturity_date",
+        "period"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_effective_date",
+      "curationReason": "weighted:effective_date:domain_general"
+    },
+    {
+      "canonical": "ending_balance",
+      "synonyms": [
+        "ending balance",
+        "closing balance",
+        "end bal",
+        "saldo final",
+        "saldo de encerramento"
+      ],
+      "related": [
+        "beginning_balance",
+        "balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_ending_balance",
+      "curationReason": "weighted:ending_balance:domain_general"
+    },
+    {
+      "canonical": "entity_name",
+      "synonyms": [
+        "entity",
+        "entity name",
+        "company",
+        "entidade",
+        "empresa",
+        "razao social"
+      ],
+      "related": [
+        "company_code",
+        "consolidated_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_entity_name",
+      "curationReason": "weighted:entity_name:domain_general"
+    },
+    {
+      "canonical": "equity_amount",
+      "synonyms": [
+        "equity",
+        "shareholders equity",
+        "net equity",
+        "patrimonio liquido",
+        "capital proprio"
+      ],
+      "related": [
+        "total_equity",
+        "retained_earnings"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_equity_amount",
+      "curationReason": "weighted:equity_amount:domain_general"
+    },
+    {
+      "canonical": "exchange_rate",
+      "synonyms": [
+        "exchange rate",
+        "fx rate",
+        "rate",
+        "taxa de cambio",
+        "cotacao",
+        "taxa cambial"
+      ],
+      "related": [
+        "currency",
+        "fx_gain_loss"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_exchange_rate",
+      "curationReason": "weighted:exchange_rate:domain_general"
+    },
+    {
+      "canonical": "expense_amount",
+      "synonyms": [
+        "expense",
+        "expense amount",
+        "expenditure",
+        "despesa",
+        "valor da despesa",
+        "gasto"
+      ],
+      "related": [
+        "expense_category",
+        "budget_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_expense_amount",
+      "curationReason": "weighted:expense_amount:domain_general"
+    },
+    {
+      "canonical": "expense_category",
+      "synonyms": [
+        "expense category",
+        "expense type",
+        "cost category",
+        "categoria de despesa",
+        "tipo de despesa"
+      ],
+      "related": [
+        "expense_amount",
+        "cost_center"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_expense_category",
+      "curationReason": "weighted:expense_category:domain_general"
+    },
+    {
+      "canonical": "expense_type",
+      "synonyms": [
+        "expense type",
+        "type of expense",
+        "nature",
+        "tipo de despesa",
+        "natureza da despesa"
+      ],
+      "related": [
+        "expense_category",
+        "expense_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_expense_type",
+      "curationReason": "weighted:expense_type:domain_general"
+    },
+    {
+      "canonical": "face_value",
+      "synonyms": [
+        "face value",
+        "par value",
+        "nominal value",
+        "valor de face",
+        "valor nominal"
+      ],
+      "related": [
+        "market_value",
+        "book_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_face_value",
+      "curationReason": "weighted:face_value:domain_general"
+    },
+    {
+      "canonical": "fair_value",
+      "synonyms": [
+        "fair value",
+        "fair market value",
+        "fmv",
+        "valor justo",
+        "valor de mercado"
+      ],
+      "related": [
+        "book_value",
+        "market_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_fair_value",
+      "curationReason": "weighted:fair_value:domain_general"
+    },
+    {
+      "canonical": "fee_amount",
+      "synonyms": [
+        "fee",
+        "fee amount",
+        "service fee",
+        "taxa",
+        "valor da taxa",
+        "honorarios"
+      ],
+      "related": [
+        "expense_amount",
+        "billing_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_fee_amount",
+      "curationReason": "weighted:fee_amount:domain_general"
+    },
+    {
+      "canonical": "fiscal_period",
+      "synonyms": [
+        "fiscal period",
+        "period",
+        "accounting period",
+        "periodo fiscal",
+        "periodo contabil"
+      ],
+      "related": [
+        "fiscal_year",
+        "period"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_fiscal_period",
+      "curationReason": "weighted:fiscal_period:domain_general"
+    },
+    {
+      "canonical": "fiscal_year",
+      "synonyms": [
+        "fiscal year",
+        "fy",
+        "financial year",
+        "ano fiscal",
+        "exercicio fiscal",
+        "exercicio"
+      ],
+      "related": [
+        "fiscal_period",
+        "period"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_fiscal_year",
+      "curationReason": "weighted:fiscal_year:domain_general"
+    },
+    {
+      "canonical": "fixed_assets",
+      "synonyms": [
+        "fixed assets",
+        "property plant equipment",
+        "ppe",
+        "ativo imobilizado",
+        "imobilizado"
+      ],
+      "related": [
+        "asset_value",
+        "depreciation_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_fixed_assets",
+      "curationReason": "weighted:fixed_assets:domain_general"
+    },
+    {
+      "canonical": "forecast_amount",
+      "synonyms": [
+        "forecast",
+        "projected",
+        "estimated",
+        "previsao",
+        "projetado",
+        "estimado"
+      ],
+      "related": [
+        "budget_amount",
+        "actual_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_forecast_amount",
+      "curationReason": "weighted:forecast_amount:domain_general"
+    },
+    {
+      "canonical": "funding_source",
+      "synonyms": [
+        "funding source",
+        "source of funds",
+        "financing",
+        "fonte de recurso",
+        "origem dos recursos"
+      ],
+      "related": [
+        "loan_amount",
+        "equity_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_funding_source",
+      "curationReason": "weighted:funding_source:domain_general"
+    },
+    {
+      "canonical": "fx_gain_loss",
+      "synonyms": [
+        "fx gain loss",
+        "foreign exchange gain",
+        "currency gain loss",
+        "variacao cambial",
+        "ganho perda cambial"
+      ],
+      "related": [
+        "exchange_rate",
+        "currency"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_fx_gain_loss",
+      "curationReason": "weighted:fx_gain_loss:domain_general"
+    },
+    {
+      "canonical": "gl_account",
+      "synonyms": [
+        "gl account",
+        "general ledger account",
+        "ledger account",
+        "conta contabil",
+        "conta do razao"
+      ],
+      "related": [
+        "account_code",
+        "account_name"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_gl_account",
+      "curationReason": "weighted:gl_account:domain_general"
+    },
+    {
+      "canonical": "goodwill",
+      "synonyms": [
+        "goodwill",
+        "intangible asset",
+        "agio",
+        "goodwill",
+        "fundo de comercio"
+      ],
+      "related": [
+        "asset_value",
+        "impairment_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_goodwill",
+      "curationReason": "weighted:goodwill:domain_general"
+    },
+    {
+      "canonical": "gross_margin",
+      "synonyms": [
+        "gross margin",
+        "gm",
+        "gross profit margin",
+        "margem bruta",
+        "margem de lucro bruto"
+      ],
+      "related": [
+        "gross_profit",
+        "revenue_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_gross_margin",
+      "curationReason": "weighted:gross_margin:domain_general"
+    },
+    {
+      "canonical": "gross_profit",
+      "synonyms": [
+        "gross profit",
+        "gross income",
+        "lucro bruto",
+        "resultado bruto"
+      ],
+      "related": [
+        "revenue_amount",
+        "cogs"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_gross_profit",
+      "curationReason": "weighted:gross_profit:domain_general"
+    },
+    {
+      "canonical": "gross_revenue",
+      "synonyms": [
+        "gross revenue",
+        "gross sales",
+        "total revenue",
+        "receita bruta",
+        "vendas brutas"
+      ],
+      "related": [
+        "net_revenue",
+        "revenue_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_gross_revenue",
+      "curationReason": "weighted:gross_revenue:domain_general"
+    },
+    {
+      "canonical": "impairment_amount",
+      "synonyms": [
+        "impairment",
+        "impairment loss",
+        "write-down",
+        "perda por impairment",
+        "reducao ao valor recuperavel"
+      ],
+      "related": [
+        "asset_value",
+        "goodwill"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_impairment_amount",
+      "curationReason": "weighted:impairment_amount:domain_general"
+    },
+    {
+      "canonical": "income_tax",
+      "synonyms": [
+        "income tax",
+        "tax expense",
+        "corporate tax",
+        "imposto de renda",
+        "irpj",
+        "irpj/csll"
+      ],
+      "related": [
+        "tax_amount",
+        "tax_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_income_tax",
+      "curationReason": "weighted:income_tax:domain_general"
+    },
+    {
+      "canonical": "insurance_premium",
+      "synonyms": [
+        "insurance premium",
+        "premium",
+        "insurance cost",
+        "premio de seguro",
+        "custo do seguro"
+      ],
+      "related": [
+        "expense_amount",
+        "fee_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_insurance_premium",
+      "curationReason": "weighted:insurance_premium:domain_general"
+    },
+    {
+      "canonical": "intercompany_amount",
+      "synonyms": [
+        "intercompany",
+        "interco",
+        "ic amount",
+        "intercompany",
+        "valor intercompany",
+        "eliminacao"
+      ],
+      "related": [
+        "entity_name",
+        "consolidated_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_intercompany_amount",
+      "curationReason": "weighted:intercompany_amount:domain_general"
+    },
+    {
+      "canonical": "interest_expense",
+      "synonyms": [
+        "interest expense",
+        "finance cost",
+        "borrowing cost",
+        "despesa de juros",
+        "custo financeiro"
+      ],
+      "related": [
+        "interest_rate",
+        "debt_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_interest_expense",
+      "curationReason": "weighted:interest_expense:domain_general"
+    },
+    {
+      "canonical": "interest_income",
+      "synonyms": [
+        "interest income",
+        "finance income",
+        "interest earned",
+        "receita de juros",
+        "rendimentos financeiros"
+      ],
+      "related": [
+        "interest_rate",
+        "investment_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_interest_income",
+      "curationReason": "weighted:interest_income:domain_general"
+    },
+    {
+      "canonical": "interest_rate",
+      "synonyms": [
+        "interest rate",
+        "rate",
+        "coupon rate",
+        "taxa de juros",
+        "taxa",
+        "cupom"
+      ],
+      "related": [
+        "interest_expense",
+        "interest_income"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_interest_rate",
+      "curationReason": "weighted:interest_rate:domain_general"
+    },
+    {
+      "canonical": "inventory_value",
+      "synonyms": [
+        "inventory",
+        "inventory value",
+        "stock value",
+        "estoque",
+        "valor do estoque"
+      ],
+      "related": [
+        "cogs",
+        "current_assets"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_inventory_value",
+      "curationReason": "weighted:inventory_value:domain_general"
+    },
+    {
+      "canonical": "investment_amount",
+      "synonyms": [
+        "investment",
+        "investment amount",
+        "invested",
+        "investimento",
+        "valor investido"
+      ],
+      "related": [
+        "roi",
+        "rate_of_return"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_investment_amount",
+      "curationReason": "weighted:investment_amount:domain_general"
+    },
+    {
+      "canonical": "invoice_amount",
+      "synonyms": [
+        "invoice amount",
+        "invoice total",
+        "inv amt",
+        "valor da nota fiscal",
+        "valor da fatura"
+      ],
+      "related": [
+        "invoice_number",
+        "billing_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_invoice_amount",
+      "curationReason": "weighted:invoice_amount:domain_general"
+    },
+    {
+      "canonical": "invoice_date",
+      "synonyms": [
+        "invoice date",
+        "inv date",
+        "billing date",
+        "data da nota fiscal",
+        "data da fatura"
+      ],
+      "related": [
+        "invoice_number",
+        "payment_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_invoice_date",
+      "curationReason": "weighted:invoice_date:domain_general"
+    },
+    {
+      "canonical": "invoice_number",
+      "synonyms": [
+        "invoice number",
+        "inv no",
+        "invoice #",
+        "numero da nota fiscal",
+        "nf",
+        "numero da fatura"
+      ],
+      "related": [
+        "invoice_amount",
+        "invoice_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_invoice_number",
+      "curationReason": "weighted:invoice_number:domain_general"
+    },
+    {
+      "canonical": "journal_entry",
+      "synonyms": [
+        "journal entry",
+        "je",
+        "entry",
+        "lancamento contabil",
+        "lancamento",
+        "partida"
+      ],
+      "related": [
+        "debit_amount",
+        "credit_amount"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_journal_entry",
+      "curationReason": "weighted:journal_entry:domain_general"
+    },
+    {
+      "canonical": "liability_amount",
+      "synonyms": [
+        "liability",
+        "obligation",
+        "amount owed",
+        "passivo",
+        "obrigacao",
+        "valor devido"
+      ],
+      "related": [
+        "total_liabilities",
+        "current_liabilities"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_liability_amount",
+      "curationReason": "weighted:liability_amount:domain_general"
+    },
+    {
+      "canonical": "loan_amount",
+      "synonyms": [
+        "loan amount",
+        "principal",
+        "loan balance",
+        "valor do emprestimo",
+        "principal",
+        "saldo do emprestimo"
+      ],
+      "related": [
+        "loan_balance",
+        "interest_rate"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_loan_amount",
+      "curationReason": "weighted:loan_amount:domain_general"
+    },
+    {
+      "canonical": "loan_balance",
+      "synonyms": [
+        "loan balance",
+        "outstanding loan",
+        "remaining principal",
+        "saldo do emprestimo",
+        "saldo devedor"
+      ],
+      "related": [
+        "loan_amount",
+        "payment_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_loan_balance",
+      "curationReason": "weighted:loan_balance:domain_general"
+    },
+    {
+      "canonical": "long_term_debt",
+      "synonyms": [
+        "long-term debt",
+        "lt debt",
+        "non-current liabilities",
+        "divida de longo prazo",
+        "passivo nao circulante"
+      ],
+      "related": [
+        "short_term_debt",
+        "debt_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_long_term_debt",
+      "curationReason": "weighted:long_term_debt:domain_general"
+    },
+    {
+      "canonical": "market_value",
+      "synonyms": [
+        "market value",
+        "market price",
+        "mv",
+        "valor de mercado",
+        "preco de mercado"
+      ],
+      "related": [
+        "fair_value",
+        "book_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_market_value",
+      "curationReason": "weighted:market_value:domain_general"
+    },
+    {
+      "canonical": "maturity_date",
+      "synonyms": [
+        "maturity date",
+        "maturity",
+        "due date",
+        "data de vencimento",
+        "vencimento"
+      ],
+      "related": [
+        "effective_date",
+        "loan_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_maturity_date",
+      "curationReason": "weighted:maturity_date:domain_general"
+    },
+    {
+      "canonical": "net_assets",
+      "synonyms": [
+        "net assets",
+        "total net assets",
+        "ativos liquidos",
+        "patrimonio liquido"
+      ],
+      "related": [
+        "total_assets",
+        "total_liabilities"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_net_assets",
+      "curationReason": "weighted:net_assets:domain_general"
+    },
+    {
+      "canonical": "net_income",
+      "synonyms": [
+        "net income",
+        "net profit",
+        "bottom line",
+        "lucro liquido",
+        "resultado liquido"
+      ],
+      "related": [
+        "gross_profit",
+        "operating_income"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_net_income",
+      "curationReason": "weighted:net_income:domain_general"
+    },
+    {
+      "canonical": "net_present_value",
+      "synonyms": [
+        "net present value",
+        "npv",
+        "present value",
+        "valor presente liquido",
+        "vpl"
+      ],
+      "related": [
+        "discount_rate",
+        "present_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_net_present_value",
+      "curationReason": "weighted:net_present_value:domain_general"
+    },
+    {
+      "canonical": "net_revenue",
+      "synonyms": [
+        "net revenue",
+        "net sales",
+        "receita liquida",
+        "vendas liquidas"
+      ],
+      "related": [
+        "gross_revenue",
+        "revenue_amount"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_net_revenue",
+      "curationReason": "weighted:net_revenue:domain_general"
+    },
+    {
+      "canonical": "opening_balance",
+      "synonyms": [
+        "opening balance",
+        "initial balance",
+        "start balance",
+        "saldo de abertura",
+        "saldo inicial"
+      ],
+      "related": [
+        "beginning_balance",
+        "ending_balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_opening_balance",
+      "curationReason": "weighted:opening_balance:domain_general"
+    },
+    {
+      "canonical": "operating_expense",
+      "synonyms": [
+        "operating expense",
+        "opex",
+        "operating costs",
+        "despesa operacional",
+        "custo operacional"
+      ],
+      "related": [
+        "operating_income",
+        "expense_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_operating_expense",
+      "curationReason": "weighted:operating_expense:domain_general"
+    },
+    {
+      "canonical": "operating_income",
+      "synonyms": [
+        "operating income",
+        "operating profit",
+        "ebit",
+        "lucro operacional",
+        "resultado operacional"
+      ],
+      "related": [
+        "operating_expense",
+        "ebitda"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_operating_income",
+      "curationReason": "weighted:operating_income:domain_general"
+    },
+    {
+      "canonical": "operating_margin",
+      "synonyms": [
+        "operating margin",
+        "op margin",
+        "ebit margin",
+        "margem operacional",
+        "margem ebit"
+      ],
+      "related": [
+        "operating_income",
+        "revenue_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_operating_margin",
+      "curationReason": "weighted:operating_margin:domain_general"
+    },
+    {
+      "canonical": "other_income",
+      "synonyms": [
+        "other income",
+        "non-operating income",
+        "miscellaneous income",
+        "outras receitas",
+        "receitas nao operacionais"
+      ],
+      "related": [
+        "revenue_amount",
+        "interest_income"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_other_income",
+      "curationReason": "weighted:other_income:domain_general"
+    },
+    {
+      "canonical": "par_value",
+      "synonyms": [
+        "par value",
+        "nominal value",
+        "stated value",
+        "valor nominal",
+        "valor par"
+      ],
+      "related": [
+        "face_value",
+        "equity_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_par_value",
+      "curationReason": "weighted:par_value:domain_general"
+    },
+    {
+      "canonical": "payable_amount",
+      "synonyms": [
+        "payable",
+        "amount payable",
+        "trade payable",
+        "contas a pagar",
+        "valor a pagar"
+      ],
+      "related": [
+        "payment_amount",
+        "accounts_payable"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_payable_amount",
+      "curationReason": "weighted:payable_amount:domain_general"
+    },
+    {
+      "canonical": "payment_amount",
+      "synonyms": [
+        "payment",
+        "payment amount",
+        "amt paid",
+        "pagamento",
+        "valor pago",
+        "valor do pagamento"
+      ],
+      "related": [
+        "payment_date",
+        "payment_method"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_payment_amount",
+      "curationReason": "weighted:payment_amount:domain_general"
+    },
+    {
+      "canonical": "payment_date",
+      "synonyms": [
+        "payment date",
+        "pay date",
+        "settlement date",
+        "data de pagamento",
+        "data do pagamento"
+      ],
+      "related": [
+        "payment_amount",
+        "due_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_payment_date",
+      "curationReason": "weighted:payment_date:domain_general"
+    },
+    {
+      "canonical": "payment_method",
+      "synonyms": [
+        "payment method",
+        "pay method",
+        "form of payment",
+        "forma de pagamento",
+        "meio de pagamento"
+      ],
+      "related": [
+        "payment_amount",
+        "payment_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_payment_method",
+      "curationReason": "weighted:payment_method:domain_general"
+    },
+    {
+      "canonical": "payment_status",
+      "synonyms": [
+        "payment status",
+        "pay status",
+        "status",
+        "status do pagamento",
+        "situacao do pagamento"
+      ],
+      "related": [
+        "payment_amount",
+        "payment_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_payment_status",
+      "curationReason": "weighted:payment_status:domain_general"
+    },
+    {
+      "canonical": "payment_term",
+      "synonyms": [
+        "payment term",
+        "terms",
+        "net days",
+        "prazo de pagamento",
+        "condicao de pagamento"
+      ],
+      "related": [
+        "payment_date",
+        "invoice_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_payment_term",
+      "curationReason": "weighted:payment_term:domain_general"
+    },
+    {
+      "canonical": "payroll_amount",
+      "synonyms": [
+        "payroll",
+        "salary",
+        "wages",
+        "folha de pagamento",
+        "salario",
+        "remuneracao"
+      ],
+      "related": [
+        "expense_amount",
+        "entity_name"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_payroll_amount",
+      "curationReason": "weighted:payroll_amount:domain_general"
+    },
+    {
+      "canonical": "period",
+      "synonyms": [
+        "period",
+        "accounting period",
+        "month",
+        "periodo",
+        "mes",
+        "competencia"
+      ],
+      "related": [
+        "fiscal_period",
+        "fiscal_year"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_period",
+      "curationReason": "weighted:period:domain_general"
+    },
+    {
+      "canonical": "premium_amount",
+      "synonyms": [
+        "premium",
+        "premium amount",
+        "premium paid",
+        "premio",
+        "valor do premio"
+      ],
+      "related": [
+        "insurance_premium",
+        "fee_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_premium_amount",
+      "curationReason": "weighted:premium_amount:domain_general"
+    },
+    {
+      "canonical": "present_value",
+      "synonyms": [
+        "present value",
+        "pv",
+        "discounted value",
+        "valor presente",
+        "valor descontado"
+      ],
+      "related": [
+        "net_present_value",
+        "discount_rate"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_present_value",
+      "curationReason": "weighted:present_value:domain_general"
+    },
+    {
+      "canonical": "profit_margin",
+      "synonyms": [
+        "profit margin",
+        "margin",
+        "net margin",
+        "margem de lucro",
+        "margem liquida"
+      ],
+      "related": [
+        "net_income",
+        "revenue_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_profit_margin",
+      "curationReason": "weighted:profit_margin:domain_general"
+    },
+    {
+      "canonical": "provision_amount",
+      "synonyms": [
+        "provision",
+        "reserve",
+        "allowance",
+        "provisao",
+        "reserva"
+      ],
+      "related": [
+        "liability_amount",
+        "expense_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_provision_amount",
+      "curationReason": "weighted:provision_amount:domain_general"
+    },
+    {
+      "canonical": "purchase_price",
+      "synonyms": [
+        "purchase price",
+        "acquisition cost",
+        "cost price",
+        "preco de compra",
+        "custo de aquisicao"
+      ],
+      "related": [
+        "unit_cost",
+        "selling_price"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_purchase_price",
+      "curationReason": "weighted:purchase_price:domain_general"
+    },
+    {
+      "canonical": "quarterly_amount",
+      "synonyms": [
+        "quarterly",
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "trimestral",
+        "valor trimestral"
+      ],
+      "related": [
+        "period",
+        "fiscal_year"
+      ],
+      "priority": 732,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_quarterly_amount",
+      "curationReason": "weighted:quarterly_amount:domain_general"
+    },
+    {
+      "canonical": "rate_of_return",
+      "synonyms": [
+        "rate of return",
+        "ror",
+        "return",
+        "taxa de retorno",
+        "retorno"
+      ],
+      "related": [
+        "roi",
+        "investment_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_rate_of_return",
+      "curationReason": "weighted:rate_of_return:domain_general"
+    },
+    {
+      "canonical": "receivable_amount",
+      "synonyms": [
+        "receivable",
+        "amount receivable",
+        "trade receivable",
+        "contas a receber",
+        "valor a receber"
+      ],
+      "related": [
+        "days_outstanding",
+        "aging_bucket"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_receivable_amount",
+      "curationReason": "weighted:receivable_amount:domain_general"
+    },
+    {
+      "canonical": "reconciliation_amount",
+      "synonyms": [
+        "reconciliation",
+        "recon amount",
+        "reconciled",
+        "conciliacao",
+        "valor conciliado"
+      ],
+      "related": [
+        "balance",
+        "audit_adjustment"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_reconciliation_amount",
+      "curationReason": "weighted:reconciliation_amount:domain_general"
+    },
+    {
+      "canonical": "remaining_balance",
+      "synonyms": [
+        "remaining balance",
+        "outstanding balance",
+        "balance due",
+        "saldo remanescente",
+        "saldo em aberto"
+      ],
+      "related": [
+        "balance",
+        "payment_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_remaining_balance",
+      "curationReason": "weighted:remaining_balance:domain_general"
+    },
+    {
+      "canonical": "retained_earnings",
+      "synonyms": [
+        "retained earnings",
+        "accumulated earnings",
+        "retained profit",
+        "lucros acumulados",
+        "lucros retidos"
+      ],
+      "related": [
+        "net_income",
+        "dividend_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_retained_earnings",
+      "curationReason": "weighted:retained_earnings:domain_general"
+    },
+    {
+      "canonical": "return_on_assets",
+      "synonyms": [
+        "return on assets",
+        "roa",
+        "asset return",
+        "retorno sobre ativos",
+        "roa"
+      ],
+      "related": [
+        "net_income",
+        "total_assets"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_return_on_assets",
+      "curationReason": "weighted:return_on_assets:domain_general"
+    },
+    {
+      "canonical": "return_on_equity",
+      "synonyms": [
+        "return on equity",
+        "roe",
+        "equity return",
+        "retorno sobre patrimonio",
+        "roe"
+      ],
+      "related": [
+        "net_income",
+        "equity_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_return_on_equity",
+      "curationReason": "weighted:return_on_equity:domain_general"
+    },
+    {
+      "canonical": "revenue_amount",
+      "synonyms": [
+        "revenue",
+        "sales",
+        "income",
+        "receita",
+        "vendas",
+        "faturamento"
+      ],
+      "related": [
+        "net_revenue",
+        "gross_revenue"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_revenue_amount",
+      "curationReason": "weighted:revenue_amount:domain_general"
+    },
+    {
+      "canonical": "risk_rating",
+      "synonyms": [
+        "risk rating",
+        "risk score",
+        "risk level",
+        "classificacao de risco",
+        "nivel de risco"
+      ],
+      "related": [
+        "credit_rating",
+        "provision_amount"
+      ],
+      "priority": 820,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_risk_rating",
+      "curationReason": "weighted:risk_rating:domain_general"
+    },
+    {
+      "canonical": "roi",
+      "synonyms": [
+        "roi",
+        "return on investment",
+        "retorno sobre investimento",
+        "roi"
+      ],
+      "related": [
+        "rate_of_return",
+        "investment_amount"
+      ],
+      "priority": 534,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_roi",
+      "curationReason": "weighted:roi:domain_general"
+    },
+    {
+      "canonical": "running_total",
+      "synonyms": [
+        "running total",
+        "cumulative total",
+        "ytd total",
+        "total acumulado",
+        "acumulado"
+      ],
+      "related": [
+        "total_amount",
+        "year_to_date"
+      ],
+      "priority": 890,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_running_total",
+      "curationReason": "weighted:running_total:domain_general"
+    },
+    {
+      "canonical": "sales_amount",
+      "synonyms": [
+        "sales",
+        "sales amount",
+        "net sales",
+        "vendas",
+        "valor de vendas"
+      ],
+      "related": [
+        "revenue_amount",
+        "commission_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_sales_amount",
+      "curationReason": "weighted:sales_amount:domain_general"
+    },
+    {
+      "canonical": "selling_price",
+      "synonyms": [
+        "selling price",
+        "sale price",
+        "unit price",
+        "preco de venda",
+        "preco unitario de venda"
+      ],
+      "related": [
+        "unit_price",
+        "purchase_price"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_selling_price",
+      "curationReason": "weighted:selling_price:domain_general"
+    },
+    {
+      "canonical": "settlement_amount",
+      "synonyms": [
+        "settlement amount",
+        "settled",
+        "net settlement",
+        "valor de liquidacao",
+        "valor liquidado"
+      ],
+      "related": [
+        "payment_amount",
+        "invoice_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_settlement_amount",
+      "curationReason": "weighted:settlement_amount:domain_general"
+    },
+    {
+      "canonical": "short_term_debt",
+      "synonyms": [
+        "short-term debt",
+        "st debt",
+        "current debt",
+        "divida de curto prazo",
+        "emprestimos de curto prazo"
+      ],
+      "related": [
+        "long_term_debt",
+        "debt_amount"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_short_term_debt",
+      "curationReason": "weighted:short_term_debt:domain_general"
+    },
+    {
+      "canonical": "spread",
+      "synonyms": [
+        "spread",
+        "margin",
+        "markup",
+        "spread",
+        "margem",
+        "markup"
+      ],
+      "related": [
+        "interest_rate",
+        "basis_points"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_spread",
+      "curationReason": "weighted:spread:domain_general"
+    },
+    {
+      "canonical": "subtotal",
+      "synonyms": [
+        "subtotal",
+        "sub-total",
+        "partial total",
+        "subtotal",
+        "total parcial"
+      ],
+      "related": [
+        "total_amount",
+        "running_total"
+      ],
+      "priority": 890,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_subtotal",
+      "curationReason": "weighted:subtotal:domain_general"
+    },
+    {
+      "canonical": "tax_amount",
+      "synonyms": [
+        "tax",
+        "tax amount",
+        "tax expense",
+        "imposto",
+        "valor do imposto",
+        "tributo"
+      ],
+      "related": [
+        "tax_rate",
+        "income_tax"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_tax_amount",
+      "curationReason": "weighted:tax_amount:domain_general"
+    },
+    {
+      "canonical": "tax_rate",
+      "synonyms": [
+        "tax rate",
+        "effective tax rate",
+        "rate",
+        "aliquota",
+        "taxa de imposto",
+        "aliquota efetiva"
+      ],
+      "related": [
+        "tax_amount",
+        "income_tax"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_tax_rate",
+      "curationReason": "weighted:tax_rate:domain_general"
+    },
+    {
+      "canonical": "total_amount",
+      "synonyms": [
+        "total",
+        "total amount",
+        "grand total",
+        "total",
+        "valor total",
+        "total geral"
+      ],
+      "related": [
+        "subtotal",
+        "running_total"
+      ],
+      "priority": 1076,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_total_amount",
+      "curationReason": "weighted:total_amount:domain_general"
+    },
+    {
+      "canonical": "total_assets",
+      "synonyms": [
+        "total assets",
+        "assets total",
+        "total do ativo",
+        "ativo total"
+      ],
+      "related": [
+        "current_assets",
+        "fixed_assets"
+      ],
+      "priority": 884,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_total_assets",
+      "curationReason": "weighted:total_assets:domain_general"
+    },
+    {
+      "canonical": "total_equity",
+      "synonyms": [
+        "total equity",
+        "equity total",
+        "net worth",
+        "total do patrimonio liquido",
+        "patrimonio total"
+      ],
+      "related": [
+        "equity_amount",
+        "retained_earnings"
+      ],
+      "priority": 890,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_total_equity",
+      "curationReason": "weighted:total_equity:domain_general"
+    },
+    {
+      "canonical": "total_liabilities",
+      "synonyms": [
+        "total liabilities",
+        "liabilities total",
+        "total do passivo",
+        "passivo total"
+      ],
+      "related": [
+        "current_liabilities",
+        "long_term_debt"
+      ],
+      "priority": 884,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_total_liabilities",
+      "curationReason": "weighted:total_liabilities:domain_general"
+    },
+    {
+      "canonical": "total_revenue",
+      "synonyms": [
+        "total revenue",
+        "revenue total",
+        "total sales",
+        "receita total",
+        "total de vendas"
+      ],
+      "related": [
+        "revenue_amount",
+        "net_revenue"
+      ],
+      "priority": 890,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_total_revenue",
+      "curationReason": "weighted:total_revenue:domain_general"
+    },
+    {
+      "canonical": "transaction_amount",
+      "synonyms": [
+        "transaction amount",
+        "txn amount",
+        "amount",
+        "valor da transacao",
+        "valor da operacao"
+      ],
+      "related": [
+        "transaction_date",
+        "transaction_type"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_transaction_amount",
+      "curationReason": "weighted:transaction_amount:domain_general"
+    },
+    {
+      "canonical": "transaction_date",
+      "synonyms": [
+        "transaction date",
+        "txn date",
+        "trade date",
+        "data da transacao",
+        "data da operacao"
+      ],
+      "related": [
+        "transaction_amount",
+        "effective_date"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_transaction_date",
+      "curationReason": "weighted:transaction_date:domain_general"
+    },
+    {
+      "canonical": "transaction_type",
+      "synonyms": [
+        "transaction type",
+        "txn type",
+        "type",
+        "tipo de transacao",
+        "tipo de operacao"
+      ],
+      "related": [
+        "transaction_amount",
+        "transaction_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_transaction_type",
+      "curationReason": "weighted:transaction_type:domain_general"
+    },
+    {
+      "canonical": "treasury_amount",
+      "synonyms": [
+        "treasury",
+        "treasury position",
+        "cash management",
+        "tesouraria",
+        "posicao de caixa"
+      ],
+      "related": [
+        "cash_balance",
+        "investment_amount"
+      ],
+      "priority": 720,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_treasury_amount",
+      "curationReason": "weighted:treasury_amount:domain_general"
+    },
+    {
+      "canonical": "turnover_ratio",
+      "synonyms": [
+        "turnover ratio",
+        "turnover",
+        "asset turnover",
+        "giro",
+        "giro do ativo",
+        "indice de rotatividade"
+      ],
+      "related": [
+        "revenue_amount",
+        "total_assets"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_turnover_ratio",
+      "curationReason": "weighted:turnover_ratio:domain_general"
+    },
+    {
+      "canonical": "unit_cost",
+      "synonyms": [
+        "unit cost",
+        "cost per unit",
+        "cpu",
+        "custo unitario",
+        "custo por unidade"
+      ],
+      "related": [
+        "unit_price",
+        "cogs"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_unit_cost",
+      "curationReason": "weighted:unit_cost:domain_general"
+    },
+    {
+      "canonical": "unit_price",
+      "synonyms": [
+        "unit price",
+        "price per unit",
+        "ppu",
+        "preco unitario",
+        "preco por unidade"
+      ],
+      "related": [
+        "unit_cost",
+        "selling_price"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_unit_price",
+      "curationReason": "weighted:unit_price:domain_general"
+    },
+    {
+      "canonical": "unrealized_gain",
+      "synonyms": [
+        "unrealized gain",
+        "unrealized gain loss",
+        "mark to market",
+        "ganho nao realizado",
+        "ajuste a valor de mercado"
+      ],
+      "related": [
+        "fair_value",
+        "market_value"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_unrealized_gain",
+      "curationReason": "weighted:unrealized_gain:domain_general"
+    },
+    {
+      "canonical": "useful_life",
+      "synonyms": [
+        "useful life",
+        "economic life",
+        "asset life",
+        "vida util",
+        "vida economica"
+      ],
+      "related": [
+        "depreciation_amount",
+        "depreciation_method"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_useful_life",
+      "curationReason": "weighted:useful_life:domain_general"
+    },
+    {
+      "canonical": "variance_amount",
+      "synonyms": [
+        "variance",
+        "var",
+        "difference",
+        "variacao",
+        "desvio",
+        "diferenca"
+      ],
+      "related": [
+        "budget_amount",
+        "actual_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_variance_amount",
+      "curationReason": "weighted:variance_amount:domain_general"
+    },
+    {
+      "canonical": "volume",
+      "synonyms": [
+        "volume",
+        "quantity",
+        "units",
+        "volume",
+        "quantidade",
+        "unidades"
+      ],
+      "related": [
+        "unit_price",
+        "sales_amount"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_volume",
+      "curationReason": "weighted:volume:domain_general"
+    },
+    {
+      "canonical": "weighted_average",
+      "synonyms": [
+        "weighted average",
+        "wavg",
+        "weighted avg",
+        "media ponderada",
+        "custo medio ponderado"
+      ],
+      "related": [
+        "unit_cost",
+        "average_balance"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_weighted_average",
+      "curationReason": "weighted:weighted_average:domain_general"
+    },
+    {
+      "canonical": "withholding_tax",
+      "synonyms": [
+        "withholding tax",
+        "wht",
+        "tax withheld",
+        "imposto retido",
+        "retencao na fonte",
+        "irrf"
+      ],
+      "related": [
+        "tax_amount",
+        "tax_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_withholding_tax",
+      "curationReason": "weighted:withholding_tax:domain_general"
+    },
+    {
+      "canonical": "working_capital",
+      "synonyms": [
+        "working capital",
+        "net working capital",
+        "nwc",
+        "capital de giro",
+        "capital circulante liquido"
+      ],
+      "related": [
+        "current_assets",
+        "current_liabilities"
+      ],
+      "priority": 540,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_working_capital",
+      "curationReason": "weighted:working_capital:domain_general"
+    },
+    {
+      "canonical": "write_off_amount",
+      "synonyms": [
+        "write-off",
+        "write off",
+        "bad debt",
+        "baixa",
+        "perda",
+        "provisao para devedores duvidosos"
+      ],
+      "related": [
+        "receivable_amount",
+        "provision_amount"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_write_off_amount",
+      "curationReason": "weighted:write_off_amount:domain_general"
+    },
+    {
+      "canonical": "year_to_date",
+      "synonyms": [
+        "year to date",
+        "ytd",
+        "cumulative",
+        "acumulado do ano",
+        "ytd",
+        "acumulado no exercicio"
+      ],
+      "related": [
+        "period",
+        "running_total"
+      ],
+      "priority": 726,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_year_to_date",
+      "curationReason": "weighted:year_to_date:domain_general"
+    },
+    {
+      "canonical": "yield",
+      "synonyms": [
+        "yield",
+        "return",
+        "annual yield",
+        "rendimento",
+        "rentabilidade",
+        "yield anual"
+      ],
+      "related": [
+        "dividend_yield",
+        "rate_of_return"
+      ],
+      "priority": 546,
+      "scope": "table_header:finance",
+      "disambiguationRuleId": "headers_disambiguation_general_yield",
+      "curationReason": "weighted:yield:domain_general"
+    }
   ]
 }

@@ -1,0 +1,201 @@
+{
+  "_meta": {
+    "id": "di_ops_lexicon_en",
+    "version": "1.0.0",
+    "description": "EN lexicon for operations domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "language": "en"
+  },
+  "domain": "ops",
+  "terms": [
+    {
+      "id": "ops_lex_work_order",
+      "canonical": "work order",
+      "synonyms": [
+        "service order",
+        "maintenance request"
+      ],
+      "display": "Work Order"
+    },
+    {
+      "id": "ops_lex_incident",
+      "canonical": "incident",
+      "synonyms": [
+        "occurrence",
+        "failure event",
+        "breakdown"
+      ],
+      "display": "Incident"
+    },
+    {
+      "id": "ops_lex_preventive_maintenance",
+      "canonical": "preventive maintenance",
+      "synonyms": [
+        "scheduled maintenance",
+        "planned maintenance"
+      ],
+      "display": "Preventive Maintenance"
+    },
+    {
+      "id": "ops_lex_corrective_maintenance",
+      "canonical": "corrective maintenance",
+      "synonyms": [
+        "unplanned maintenance",
+        "repair"
+      ],
+      "display": "Corrective Maintenance"
+    },
+    {
+      "id": "ops_lex_shipping_manifest",
+      "canonical": "shipping manifest",
+      "synonyms": [
+        "bill of lading",
+        "freight manifest"
+      ],
+      "display": "Shipping Manifest"
+    },
+    {
+      "id": "ops_lex_packing_list",
+      "canonical": "packing list",
+      "synonyms": [
+        "packing slip",
+        "delivery note"
+      ],
+      "display": "Packing List"
+    },
+    {
+      "id": "ops_lex_quality_inspection",
+      "canonical": "quality inspection",
+      "synonyms": [
+        "QC check",
+        "quality audit"
+      ],
+      "display": "Quality Inspection"
+    },
+    {
+      "id": "ops_lex_non_conformance",
+      "canonical": "non-conformance",
+      "synonyms": [
+        "defect",
+        "deviation",
+        "NCR"
+      ],
+      "display": "Non-Conformance"
+    },
+    {
+      "id": "ops_lex_throughput",
+      "canonical": "throughput",
+      "synonyms": [
+        "output rate",
+        "production rate"
+      ],
+      "display": "Throughput"
+    },
+    {
+      "id": "ops_lex_cycle_time",
+      "canonical": "cycle time",
+      "synonyms": [
+        "takt time",
+        "processing time"
+      ],
+      "display": "Cycle Time"
+    },
+    {
+      "id": "ops_lex_downtime",
+      "canonical": "downtime",
+      "synonyms": [
+        "outage",
+        "stoppage"
+      ],
+      "display": "Downtime"
+    },
+    {
+      "id": "ops_lex_uptime",
+      "canonical": "uptime",
+      "synonyms": [
+        "availability",
+        "operational time"
+      ],
+      "display": "Uptime"
+    },
+    {
+      "id": "ops_lex_lead_time",
+      "canonical": "lead time",
+      "synonyms": [
+        "delivery lead time",
+        "procurement lead time"
+      ],
+      "display": "Lead Time"
+    },
+    {
+      "id": "ops_lex_safety_stock",
+      "canonical": "safety stock",
+      "synonyms": [
+        "buffer stock",
+        "reserve inventory"
+      ],
+      "display": "Safety Stock"
+    },
+    {
+      "id": "ops_lex_reorder_point",
+      "canonical": "reorder point",
+      "synonyms": [
+        "restock threshold",
+        "minimum stock level"
+      ],
+      "display": "Reorder Point"
+    },
+    {
+      "id": "ops_lex_purchase_order",
+      "canonical": "purchase order",
+      "synonyms": [
+        "PO",
+        "procurement order"
+      ],
+      "display": "Purchase Order"
+    },
+    {
+      "id": "ops_lex_bill_of_materials",
+      "canonical": "bill of materials",
+      "synonyms": [
+        "BOM",
+        "parts list"
+      ],
+      "display": "Bill of Materials"
+    },
+    {
+      "id": "ops_lex_sla",
+      "canonical": "service level agreement",
+      "synonyms": [
+        "SLA",
+        "service contract"
+      ],
+      "display": "Service Level Agreement"
+    },
+    {
+      "id": "ops_lex_oee",
+      "canonical": "overall equipment effectiveness",
+      "synonyms": [
+        "OEE",
+        "equipment efficiency"
+      ],
+      "display": "Overall Equipment Effectiveness"
+    },
+    {
+      "id": "ops_lex_root_cause",
+      "canonical": "root cause",
+      "synonyms": [
+        "root cause analysis",
+        "RCA"
+      ],
+      "display": "Root Cause"
+    }
+  ]
+}

@@ -598,6 +598,29 @@
         "pt": "Configurando eixos do gráfico..."
       }
     },
+    "XLSX_CHART_MOVE_RESIZE": {
+      "domain": "excel",
+      "runtimeOperator": "CREATE_CHART",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "implemented": true,
+      "requiredSlots": [],
+      "optionalSlots": [
+        "chartId",
+        "sheetName",
+        "targetSheetName",
+        "anchorCell",
+        "widthPx",
+        "heightPx"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Moving or resizing chart...",
+        "pt": "Movendo ou redimensionando gráfico..."
+      }
+    },
     "XLSX_CHART_DELETE": {
       "domain": "excel",
       "runtimeOperator": "CREATE_CHART",
@@ -1258,6 +1281,23 @@
       "uiStepTemplate": {
         "en": "Applying {{targetCase}} to text...",
         "pt": "Aplicando {{targetCase}} ao texto..."
+      }
+    },
+    "DOCX_UPDATE_TOC": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [],
+      "optionalSlots": [
+        "targets"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Updating table of contents...",
+        "pt": "Atualizando sumário..."
       }
     },
     "DOCX_CREATE_TABLE": {

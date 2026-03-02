@@ -1,0 +1,133 @@
+{
+  "_meta": {
+    "id": "di_ops_sections_ops_shipping_manifest",
+    "version": "1.0.0",
+    "description": "Section map for shipping manifest documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_shipping_manifest"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "shipping manifest",
+        "bill of lading",
+        "packing list",
+        "romaneio",
+        "conhecimento de transporte"
+      ]
+    },
+    {
+      "id": "shipper_consignee",
+      "name": {
+        "en": "Shipper and Consignee",
+        "pt": "Remetente e Destinatario"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "shipper",
+        "consignee",
+        "from",
+        "to",
+        "remetente",
+        "destinatario"
+      ]
+    },
+    {
+      "id": "routing",
+      "name": {
+        "en": "Routing",
+        "pt": "Roteamento"
+      },
+      "required": false,
+      "order": 3,
+      "headingAnchors": [
+        "carrier",
+        "route",
+        "vehicle",
+        "transport",
+        "transportadora"
+      ]
+    },
+    {
+      "id": "item_list",
+      "name": {
+        "en": "Item List",
+        "pt": "Lista de Itens"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "items",
+        "contents",
+        "goods",
+        "products",
+        "mercadorias",
+        "itens"
+      ]
+    },
+    {
+      "id": "totals",
+      "name": {
+        "en": "Totals",
+        "pt": "Totais"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "total",
+        "weight",
+        "volume",
+        "packages",
+        "peso",
+        "volumes"
+      ]
+    },
+    {
+      "id": "special_instructions",
+      "name": {
+        "en": "Special Instructions",
+        "pt": "Instrucoes Especiais"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "instructions",
+        "handling",
+        "hazardous",
+        "instrucoes",
+        "manuseio"
+      ]
+    },
+    {
+      "id": "footer_metadata",
+      "name": {
+        "en": "Footer Metadata",
+        "pt": "Rodape e Metadados"
+      },
+      "required": false,
+      "order": 7,
+      "headingAnchors": [
+        "signature",
+        "page",
+        "document id",
+        "stamp",
+        "assinatura"
+      ]
+    }
+  ]
+}
