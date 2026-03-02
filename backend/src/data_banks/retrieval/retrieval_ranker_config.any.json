@@ -55,12 +55,14 @@
       }
     },
     "weights": {
-      "semantic": 0.52,
-      "lexical": 0.22,
-      "structural": 0.14,
+      "semantic": 0.46,
+      "lexical": 0.20,
+      "structural": 0.12,
       "titleBoost": 0.06,
-      "typeBoost": 0.03,
-      "recencyBoost": 0.03
+      "documentIntelligenceBoost": 0.08,
+      "routingPriorityBoost": 0.04,
+      "typeBoost": 0.02,
+      "recencyBoost": 0.02
     },
     "normalization": {
       "semanticScore": {
@@ -207,7 +209,7 @@
       },
       "action": {
         "type": "score_and_rank",
-        "formula": "final = wS*semantic + wL*lexical + wH*structural + wT*titleBoost + wY*typeBoost + wR*recencyBoost - penalties",
+        "formula": "final = wS*semantic + wL*lexical + wH*structural + wT*titleBoost + wDI*documentIntelligenceBoost + wRP*routingPriorityBoost + wY*typeBoost + wR*recencyBoost - penalties",
         "applyCaps": {
           "minFinalScore": 0.28
         }
