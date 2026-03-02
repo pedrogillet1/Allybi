@@ -146,7 +146,7 @@
         "globalSearchMinQueryChars": 12,
         "maxEvidenceItemsForAnswer": 8,
         "preferActiveScopeWhenFollowup": true,
-        "staleScopePenalty": 0.22,
+        "staleScopePenalty": 0.12,
         "maxGlobalRetrievalsPerTurn": 1
       },
       "scopeRuntime": {
@@ -254,7 +254,7 @@
           },
           "hedgePrefixWeak": {
             "en": "Based on the limited information available, ",
-            "pt": "Com base nas informacoes limitadas disponiveis, ",
+            "pt": "Pelos trechos encontrados, ",
             "es": "Con base en la informacion limitada disponible, "
           },
           "hedgePrefixModerateNarrative": {

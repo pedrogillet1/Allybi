@@ -31,11 +31,11 @@
       "answerModeOverrides": {
         "_comment": "Some answer modes are not content-heavy; the UI does the work.",
         "nav_pills": {
-          "suppressBodyFormatting": true,
-          "maxBodySentences": 1,
+          "suppressBodyFormatting": false,
+          "maxBodySentences": 3,
           "requireIntro": true,
           "requireConclusion": false,
-          "allowBullets": false,
+          "allowBullets": true,
           "allowTables": false,
           "allowQuotes": false,
           "allowFollowup": false
@@ -98,13 +98,13 @@
       "tableRules": {
         "_comment": "Tables must be clean GFM and kept readable. Do NOT cram paragraphs inside cells.",
         "maxSentencesPerCell": 2,
-        "maxCharsPerCell": 80,
+        "maxCharsPerCell": 120,
         "preferKVPairsIfWide": true,
         "maxColumnsSoft": 6,
         "maxRowsSoft": 18,
         "neverBoldInsideTables": true,
-        "requireHeaderRow": true,
-        "requireSeparatorRow": true
+        "requireHeaderRow": false,
+        "requireSeparatorRow": false
       },
 
       "conclusionRules": {
@@ -194,12 +194,12 @@
     },
     "detailed": {
       "name": "Detailed",
-      "budget": { "maxChars": 6000, "maxParagraphs": 8, "maxBullets": 12, "maxTableRows": 28, "maxQuoteLines": 8, "maxQuestions": 1 },
+      "budget": { "maxChars": 6000, "maxParagraphs": 8, "maxBullets": 12, "maxTableRows": 25, "maxQuoteLines": 8, "maxQuestions": 1 },
       "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
     },
     "deep": {
       "name": "Deep",
-      "budget": { "maxChars": 8000, "maxParagraphs": 10, "maxBullets": 14, "maxTableRows": 36, "maxQuoteLines": 10, "maxQuestions": 1 },
+      "budget": { "maxChars": 8000, "maxParagraphs": 10, "maxBullets": 14, "maxTableRows": 25, "maxQuoteLines": 10, "maxQuestions": 1 },
       "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
     }
   },
@@ -224,10 +224,10 @@
     ],
     "rules": {
       "nav_or_open": {
-        "_comment": "Navigation answers: body is minimal; UI pills do the rest.",
+        "_comment": "Navigation answers: body is concise; UI pills complement the text.",
         "whenAny": ["answerModeIs:nav_pills", "operatorIs:open", "operatorIs:locate_file", "signals.navQuery"],
-        "choose": "micro",
-        "forceConstraints": { "maxSentences": 1, "maxChars": 120, "skipBullets": true }
+        "choose": "brief",
+        "forceConstraints": { "maxSentences": 3, "maxChars": 800, "skipBullets": false }
       },
       "user_requests_micro": {
         "whenAny": ["signals.justAnswer", "signals.tldr"],
@@ -396,10 +396,10 @@
     "table": {
       "strictGfm": true,
       "requireLeadIn": true,
-      "maxRowsByProfile": { "micro": 10, "brief": 14, "concise": 18, "standard": 22, "detailed": 28, "deep": 36 },
+      "maxRowsByProfile": { "micro": 10, "brief": 14, "concise": 18, "standard": 22, "detailed": 25, "deep": 25 },
       "cellRulesOverride": {
         "maxSentencesPerCell": 2,
-        "maxCharsPerCell": 80
+        "maxCharsPerCell": 200
       },
       "skipIf": ["modeIs:quote", "userAskedForBulletsOnly", "answerModeIs:nav_pills"]
     },
@@ -463,7 +463,7 @@
       {
         "id": "ASP6_1004_table_cell_caps",
         "input": { "block": "table" },
-        "expect": { "maxSentencesPerCell": 2, "maxCharsPerCell": 80 }
+        "expect": { "maxSentencesPerCell": 2, "maxCharsPerCell": 120 }
       },
       {
         "id": "ASP6_1005_json_request_maps_to_table_or_bullets",

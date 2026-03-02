@@ -185,7 +185,7 @@
       "preferActiveDocOnFollowup": true,
       "enforceAttachedScopeBeforeGlobal": true,
       "globalScopeRequiresUnlockSignal": true,
-      "staleContextPenalty": 0.18,
+      "staleContextPenalty": 0.12,
       "continuityBoost": 0.12
     }
   },
