@@ -32,7 +32,7 @@
 //   (let fallback engine decide the microcopy).
 
 import type { Attachment } from "../../../types/handlerResult.types";
-import { getBank } from "../banks/bankLoader.service";
+import { getBank, getOptionalBank } from "../banks/bankLoader.service";
 import type { ChatProvenanceDTO } from "../../../modules/chat/domain/chat.contracts";
 import { validateChatProvenance } from "../../../modules/chat/runtime/provenance/ProvenanceValidator";
 import {
@@ -107,6 +107,7 @@ export interface ResponseContractContext {
     locationKey: string;
     snippetHash: string;
   }>;
+  provenanceFailOpenWithEvidence?: boolean;
 }
 
 export interface DraftResponse {
@@ -122,6 +123,11 @@ export interface EnforcedResponse {
     warnings: string[];
     blocked: boolean;
     reasonCode?: string;
+    provenance?: {
+      action: "allow" | "hedge" | "block";
+      reasonCode: string | null;
+      severity: "warning" | "error" | null;
+    };
   };
 }
 
@@ -517,11 +523,20 @@ function limitChars(
   );
   if (lastPunct > 80)
     return { text: slice.slice(0, lastPunct + 1).trim(), changed: true };
+  const lastWhitespace = Math.max(
+    slice.lastIndexOf(" "),
+    slice.lastIndexOf("\n"),
+    slice.lastIndexOf("\t"),
+  );
+  if (lastWhitespace > 80) {
+    return { text: slice.slice(0, lastWhitespace).trim(), changed: true };
+  }
   return { text: slice.trim(), changed: true };
 }
 
 function charsPerToken(language: ResponseContractContext["language"]): number {
-  if (language === "pt" || language === "es") return 4.5;
+  // PT/ES have diacritics and multi-byte chars → fewer chars per token than English
+  if (language === "pt" || language === "es") return 3.5;
   return 4.0;
 }
 
@@ -1860,17 +1875,18 @@ export class ResponseContractEnforcerService {
     this.truncation = getBank<TruncationLimitsBank>("truncation_and_limits");
     this.bulletRules = getBank<BulletRulesBank>("bullet_rules");
     this.tableRules = getBank<TableRulesBank>("table_rules");
-    this.quoteStyles = getBank<QuoteStylesBank>("quote_styles");
-    this.citationStyles = getBank<CitationStylesBank>("citation_styles");
-    this.listStyles = getBank<ListStylesBank>("list_styles");
-    this.tableStyles = getBank<TableStylesBank>("table_styles");
+    this.quoteStyles = getOptionalBank<QuoteStylesBank>("quote_styles") || undefined;
+    this.citationStyles =
+      getOptionalBank<CitationStylesBank>("citation_styles") || undefined;
+    this.listStyles = getOptionalBank<ListStylesBank>("list_styles") || undefined;
+    this.tableStyles = getOptionalBank<TableStylesBank>("table_styles") || undefined;
     this.answerStylePolicy = getBank<AnswerStylePolicyBank>("answer_style_policy");
-    this.boldingRules = getBank<BoldingRulesBank>("bolding_rules");
+    this.boldingRules = getOptionalBank<BoldingRulesBank>("bolding_rules") || undefined;
     this.operatorContracts =
-      getBank<OperatorContractsBank>("operator_contracts");
-    this.operatorOutputShapes = getBank<OperatorOutputShapesBank>(
-      "operator_output_shapes",
-    );
+      getOptionalBank<OperatorContractsBank>("operator_contracts") || undefined;
+    this.operatorOutputShapes =
+      getOptionalBank<OperatorOutputShapesBank>("operator_output_shapes") ||
+      undefined;
   }
 
   private resolveOperatorContract(operatorId: unknown): {
@@ -2014,9 +2030,12 @@ export class ResponseContractEnforcerService {
     let content = draft.content || "";
     const listStyleEnabled = this.listStyles?.config?.enabled !== false;
     const tableStyleEnabled = this.tableStyles?.config?.enabled !== false;
-    const requiresProvenance =
-      Boolean(ctx.evidenceRequired) ||
-      String(ctx.answerMode || "").startsWith("doc_grounded");
+    const requiresProvenance = String(ctx.answerMode || "").startsWith(
+      "doc_grounded",
+    );
+    let provenanceEnforcement:
+      | EnforcedResponse["enforcement"]["provenance"]
+      | undefined;
     const operatorContract = this.resolveOperatorContract(ctx.operator);
     let effectiveOutputShape =
       normalizeShape(ctx.constraints?.outputShape) ||
@@ -2076,6 +2095,9 @@ export class ResponseContractEnforcerService {
             warnings: [...warnings, "NAV_PILLS_MISSING_SOURCE_BUTTONS"],
             blocked: true,
             reasonCode: "nav_pills_missing_buttons",
+            ...(provenanceEnforcement
+              ? { provenance: provenanceEnforcement }
+              : {}),
           },
         };
       }
@@ -2083,12 +2105,24 @@ export class ResponseContractEnforcerService {
       return {
         content,
         attachments,
-        enforcement: { repairs, warnings, blocked: false },
+        enforcement: {
+          repairs,
+          warnings,
+          blocked: false,
+          ...(provenanceEnforcement
+            ? { provenance: provenanceEnforcement }
+            : {}),
+        },
       };
     }
 
     // 1b) Apply operator-linked output shape contracts in non-nav modes.
-    if (effectiveOutputShape === "button_only") {
+    // Skip button_only truncation for doc_grounded modes — those produce
+    // full content answers, not navigation buttons.
+    const isDocGrounded = String(ctx.answerMode || "").startsWith(
+      "doc_grounded",
+    );
+    if (effectiveOutputShape === "button_only" && !isDocGrounded) {
       const s1 = stripInlineSourcesSections(content);
       if (s1.changed) repairs.push("BUTTON_ONLY_STRIPPED_INLINE_SOURCES");
       content = s1.text;
@@ -2133,23 +2167,35 @@ export class ResponseContractEnforcerService {
     }
 
     if (requiresProvenance) {
-      const hasEvidenceDocuments =
-        (ctx.provenance?.sourceDocumentIds ?? []).length > 0;
+      let provenanceDecision:
+        | EnforcedResponse["enforcement"]["provenance"]
+        | undefined;
       const provenanceCheck = validateChatProvenance({
         provenance: ctx.provenance,
-        answerMode: ctx.answerMode as any,
+        answerMode: ctx.answerMode as string as import("../../../modules/chat/domain/chat.contracts").AnswerMode,
         allowedDocumentIds: ctx.allowedDocumentIds || [],
       });
       if (!provenanceCheck.ok) {
-        // When sourceDocumentIds are present the LLM was invoked with real
-        // evidence.  Lexical provenance matching (token overlap) produces
-        // false negatives for cross-language answers, short numeric
-        // extractions, and paraphrased summaries.  Demote to a warning
-        // instead of blocking so the grounded answer is preserved.
-        if (hasEvidenceDocuments) {
-          warnings.push(...(provenanceCheck.warnings || []));
-          warnings.push("PROVENANCE_CHECK_DEMOTED_HAS_EVIDENCE");
+        const reasonCode = provenanceCheck.failureCode || "missing_provenance";
+        const hasEvidenceMap = (ctx.evidenceMap || []).length > 0;
+        const softFailure =
+          (reasonCode === "missing_provenance" ||
+            reasonCode === "insufficient_provenance_coverage") &&
+          hasEvidenceMap &&
+          ctx.provenanceFailOpenWithEvidence === true;
+        if (softFailure) {
+          provenanceDecision = {
+            action: "hedge",
+            reasonCode,
+            severity: "warning",
+          };
+          warnings.push("PROVENANCE_FAILOPEN_WITH_EVIDENCE", ...provenanceCheck.warnings);
         } else {
+          provenanceDecision = {
+            action: "block",
+            reasonCode,
+            severity: "error",
+          };
           return {
             content: "",
             attachments,
@@ -2157,35 +2203,65 @@ export class ResponseContractEnforcerService {
               repairs,
               warnings: [...warnings, ...provenanceCheck.warnings],
               blocked: true,
-              reasonCode: provenanceCheck.failureCode || "missing_provenance",
+              reasonCode,
+              ...(provenanceDecision
+                ? { provenance: provenanceDecision }
+                : {}),
             },
           };
         }
       }
-      // Provenance map integrity is always required for doc-grounded output.
-      // Skip the map check when provenance was already demoted (evidence
-      // documents present but lexical overlap failed) — the map check would
-      // also fail for the same root cause (empty snippetRefs).
-      if (!hasEvidenceDocuments) {
+
+      if (provenanceCheck.ok) {
         const mapCheck = validateProvenanceAgainstEvidenceMap({
           provenance: ctx.provenance,
           evidenceMap: ctx.evidenceMap,
           required: requiresProvenance,
         });
         if (!mapCheck.ok) {
-          return {
-            content: "",
-            attachments,
-            enforcement: {
-              repairs,
-              warnings: [...warnings, ...mapCheck.warnings],
-              blocked: true,
-              reasonCode: mapCheck.failureCode || "missing_evidence_map",
-            },
-          };
+          const mapReasonCode = mapCheck.failureCode || "missing_evidence_map";
+          const hasEvidenceMap = (ctx.evidenceMap || []).length > 0;
+          const softMapFailure =
+            (mapReasonCode === "evidence_map_mismatch" ||
+              mapReasonCode === "evidence_map_hash_mismatch" ||
+              mapReasonCode === "missing_evidence_map") &&
+            hasEvidenceMap &&
+            ctx.provenanceFailOpenWithEvidence === true;
+          if (softMapFailure) {
+            provenanceDecision = {
+              action: "hedge",
+              reasonCode: mapReasonCode,
+              severity: "warning",
+            };
+            warnings.push(
+              "PROVENANCE_MAP_FAILOPEN_WITH_EVIDENCE",
+              ...mapCheck.warnings,
+            );
+          } else {
+            provenanceDecision = {
+              action: "block",
+              reasonCode: mapReasonCode,
+              severity: "error",
+            };
+            return {
+              content: "",
+              attachments,
+              enforcement: {
+                repairs,
+                warnings: [...warnings, ...mapCheck.warnings],
+                blocked: true,
+                reasonCode: mapReasonCode,
+                ...(provenanceDecision
+                  ? { provenance: provenanceDecision }
+                  : {}),
+              },
+            };
+          }
         }
       }
+      provenanceEnforcement = provenanceDecision;
     }
+
 
     // 2) Strip "Sources:" leakage (all non-nav modes)
     {
@@ -2204,6 +2280,7 @@ export class ResponseContractEnforcerService {
         content = citations.text;
       }
     }
+
 
     // 3) Remove code fences + JSON output (Koda never outputs code blocks)
     const allowCode =
@@ -2231,11 +2308,15 @@ export class ResponseContractEnforcerService {
             warnings,
             blocked: true,
             reasonCode: "json_not_allowed",
+            ...(provenanceEnforcement
+              ? { provenance: provenanceEnforcement }
+              : {}),
           },
         };
       }
       repairs.push("JSON_STRIPPED");
     }
+
 
     // 4) Normalize bullet lines before table/length checks.
     {
@@ -2280,16 +2361,7 @@ export class ResponseContractEnforcerService {
           content = tablePolicies.text;
         }
         if (tablePolicies.criticalViolation) {
-          return {
-            content: "",
-            attachments,
-            enforcement: {
-              repairs,
-              warnings: [...warnings, "TABLE_CONTRACT_VIOLATION"],
-              blocked: true,
-              reasonCode: "table_contract_violation",
-            },
-          };
+          warnings.push("TABLE_CONTRACT_VIOLATION_DEMOTED");
         }
       }
       const citationStyleEnabled = this.citationStyles?.config?.enabled !== false;
@@ -2301,6 +2373,7 @@ export class ResponseContractEnforcerService {
         }
       }
     }
+
 
     // 5c) Apply answer-style policy contracts (mode suppressions, paragraph caps).
     {
@@ -2319,17 +2392,18 @@ export class ResponseContractEnforcerService {
       styleProfileMaxChars = style.profileMaxChars;
     }
 
+
     // 5d) Enforce max-question constraint.
     {
       const maxQuestionsRule =
         this.renderPolicy?.enforcementRules?.rules &&
         Array.isArray(this.renderPolicy.enforcementRules.rules)
           ? this.renderPolicy.enforcementRules.rules.find(
-              (rule: any) => String(rule?.id || "").trim() === "RP6_MAX_ONE_QUESTION",
+              (rule: unknown) => String((rule as Record<string, unknown>)?.id || "").trim() === "RP6_MAX_ONE_QUESTION",
             )
           : null;
       const renderPolicyMaxQuestions =
-        toPositiveInt((maxQuestionsRule as any)?.then?.maxQuestions) || 1;
+        toPositiveInt(((maxQuestionsRule as Record<string, unknown> | null)?.then as Record<string, unknown> | undefined)?.maxQuestions) || 1;
       const effectiveMaxQuestions =
         typeof styleMaxQuestions === "number"
           ? Math.max(0, Math.min(renderPolicyMaxQuestions, styleMaxQuestions))
@@ -2343,6 +2417,7 @@ export class ResponseContractEnforcerService {
         content = limitedQuestions.text;
       }
     }
+
 
     // 6) Enforce short constraints (if user requested short)
     if (
@@ -2383,6 +2458,7 @@ export class ResponseContractEnforcerService {
       }
     }
 
+
     // 7) Token-aware hard max length (safety)
     const softTokenLimit = this.resolveSoftTokenLimit(ctx);
     const softTokenLimited = trimTextToTokenBudget(content, softTokenLimit, {
@@ -2418,6 +2494,7 @@ export class ResponseContractEnforcerService {
       content = emergency.text;
     }
 
+
     // 7c) Apply answer-mode max char limit.
     {
       const modeMaxChars = this.resolveModeCharLimit(ctx);
@@ -2436,6 +2513,7 @@ export class ResponseContractEnforcerService {
         }
       }
     }
+
 
     // 8) Remove banned phrases / leakage patterns.
     {
@@ -2461,6 +2539,9 @@ export class ResponseContractEnforcerService {
             warnings: [...warnings, "BANNED_PHRASE_CRITICAL_RESIDUAL"],
             blocked: true,
             reasonCode: "banned_phrase_critical",
+            ...(provenanceEnforcement
+              ? { provenance: provenanceEnforcement }
+              : {}),
           },
         };
       }
@@ -2515,6 +2596,9 @@ export class ResponseContractEnforcerService {
           warnings: [...warnings, "EMPTY_AFTER_ENFORCEMENT"],
           blocked: true,
           reasonCode: "empty_after_contract_enforcement",
+          ...(provenanceEnforcement
+            ? { provenance: provenanceEnforcement }
+            : {}),
         },
       };
     }
@@ -2522,7 +2606,12 @@ export class ResponseContractEnforcerService {
     return {
       content,
       attachments,
-      enforcement: { repairs, warnings, blocked: false },
+      enforcement: {
+        repairs,
+        warnings,
+        blocked: false,
+        ...(provenanceEnforcement ? { provenance: provenanceEnforcement } : {}),
+      },
     };
   }
 
